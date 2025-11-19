@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class InfoRow extends StatelessWidget {
   const InfoRow({super.key});
@@ -21,15 +22,18 @@ class InfoRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 5),
-            const Text(
+            Text(
               "9:15",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: GoogleFonts.nunito(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
-        const Text(
+        Text(
           "Câu 3/20",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ],
     );

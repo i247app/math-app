@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomProgressBar extends StatelessWidget {
   const CustomProgressBar({super.key});
@@ -8,9 +9,9 @@ class CustomProgressBar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Câu hỏi 15/15",
-          style: TextStyle(
+          style: GoogleFonts.nunito(
             fontSize: 12,
             fontWeight: FontWeight.bold,
             color: Colors.black54,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
+import 'package:math_ai_app/ui/math%20test%20process/view/math_result_screen.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/custom_progress_bar.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/info_row.dart';
@@ -88,7 +89,11 @@ class MathQuizScreen extends StatelessWidget {
               child: CustomPrimaryButton(
                 text: 'Nộp',
                 width: 160,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ResultScreen()),
+                  );
+                },
               ),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AnswerButton extends StatelessWidget {
   final String label;
@@ -41,7 +42,7 @@ class AnswerButton extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 value,
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -74,7 +75,7 @@ class AnswerButton extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 label,
-                style: const TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,

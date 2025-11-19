@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class QuestionBoard extends StatelessWidget {
   const QuestionBoard({super.key});
@@ -19,9 +20,9 @@ class QuestionBoard extends StatelessWidget {
           color: const Color(0xFF1E7858),
           borderRadius: BorderRadius.circular(4),
         ),
-        child: const Text(
+        child: Text(
           "2 + 3 = ?",
-          style: TextStyle(
+          style: GoogleFonts.nunito(
             fontSize: 50,
             fontWeight: FontWeight.bold,
             color: Colors.white,
