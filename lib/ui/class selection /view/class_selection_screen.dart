@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:math_ai_app/ui/math%20test%20process/view/math_test_intro_screen.dart';
+import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
 
 import '../data/class_item_data.dart';
 import '../widget/class_card_widget.dart';
+
 class ClassSelectionScreen extends StatelessWidget {
   const ClassSelectionScreen({super.key});
 
@@ -50,68 +54,13 @@ class ClassSelectionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. HEADER SECTION
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Hello",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: [
-                          // Bee Icon Placeholder
-                          Image.asset(
-                            'assets/imgs/bee_icon.png', // Replace with your bee icon
-                            width: 40,
-                            errorBuilder: (c, o, s) => const Icon(Icons.bug_report, color: Colors.yellow, size: 30),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            "RonKLe",
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  // Profile Image
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.orange.shade100, width: 2),
-                    ),
-                    child: CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Colors.orange.shade100,
-                      backgroundImage: const AssetImage("assets/imgs/profile.png"), // Your profile image
-                      // Fallback if image missing:
-                      onBackgroundImageError: (_, _) {},
-                      child: const Icon(Icons.person),
-                    ),
-                  ),
-                ],
-              ),
-
+              HeaderSection(),
               const SizedBox(height: 40),
 
               // 2. TITLE SECTION
-              const Text(
+              Text(
                 "Chọn Lớp Học\ncủa bạn!",
-                style: TextStyle(
+                style: GoogleFonts.nunito(
                   fontSize: 40,
                   height: 1.2,
                   fontWeight: FontWeight.w800,
@@ -130,7 +79,8 @@ class ClassSelectionScreen extends StatelessWidget {
                     crossAxisCount: 3, // 3 items per row
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 20, // Space between rows
-                    childAspectRatio: 0.75, // Adjust height of cards relative to width
+                    childAspectRatio:
+                        0.75, // Adjust height of cards relative to width
                   ),
                   itemBuilder: (context, index) {
                     return ClassCard(data: classes[index]);
@@ -145,18 +95,24 @@ class ClassSelectionScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Handle Continue Action
-                    debugPrint("Tiếp Tục Clicked");
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const MathTestIntroScreen(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3E2723), // Dark Brown color
+                    backgroundColor: const Color(
+                      0xFF3E2723,
+                    ), // Dark Brown color
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 2,
                   ),
-                  child: const Text(
+                  child: Text(
                     "Tiếp Tục",
-                    style: TextStyle(
+                    style: GoogleFonts.nunito(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

@@ -22,12 +22,9 @@ class OnboardingScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(flex: 2),
-              Image.asset(
-                'assets/imgs/welcome.png',
-                height: 250,
-              ),
+              Image.asset('assets/imgs/welcome.png', height: 250),
               const SizedBox(height: 32),
-               Text(
+              Text(
                 'MATH PLUS',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.nunito(
@@ -38,7 +35,7 @@ class OnboardingScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-               Text(
+              Text(
                 'Learning AI',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.nunito(
@@ -51,7 +48,7 @@ class OnboardingScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // --- PHẦN MÔ TẢ ---
-               Text(
+              Text(
                 'Ứng dụng giúp bé từ mẫu giáo\nđến lớp 5 học Toán thông\nminh hơn với AI',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.nunito(
@@ -62,9 +59,14 @@ class OnboardingScreen extends StatelessWidget {
               ),
 
               const Spacer(flex: 3),
-              CustomPrimaryButton(text: 'Bắt Đầu', onPressed: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => SignupScreen()));
-              }),
+              CustomPrimaryButton(
+                text: 'Bắt Đầu',
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => SignupScreen()));
+                },
+              ),
               const Spacer(flex: 1),
             ],
           ),

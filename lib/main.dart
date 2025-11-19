@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:math_ai_app/ui/onboarding_screen.dart';
+import 'package:math_ai_app/ui/onboarding%20screen/view/onboarding_screen.dart';
 
 void main() {
   runApp(const MyApp());
