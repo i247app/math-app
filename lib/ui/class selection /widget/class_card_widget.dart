@@ -72,7 +72,6 @@ class _ClassCardState extends State<ClassCard>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // The Main Colored Card
                 Expanded(
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
@@ -102,7 +101,6 @@ class _ClassCardState extends State<ClassCard>
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Image
                             Expanded(
                               child: AnimatedOpacity(
                                 opacity: widget.isSelected ? 1.0 : 0.8,
@@ -120,7 +118,6 @@ class _ClassCardState extends State<ClassCard>
                               ),
                             ),
                             const SizedBox(height: 8),
-                            // Text
                             Text(
                               widget.data.title,
                               textAlign: TextAlign.center,
@@ -134,7 +131,6 @@ class _ClassCardState extends State<ClassCard>
                             ),
                           ],
                         ),
-                        // Selection checkmark
                         if (widget.isSelected)
                           Positioned(
                             top: 8,
@@ -157,7 +153,6 @@ class _ClassCardState extends State<ClassCard>
                               ),
                             ),
                           ),
-                        // Badge for special classes
                         if (widget.data.hasBadge)
                           Positioned(
                             top: 4,

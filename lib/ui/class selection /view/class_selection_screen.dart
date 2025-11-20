@@ -45,46 +45,42 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
     setState(() {
       selectedIndex = index;
     });
-    _animationController.forward().then((_) {
-      // Add haptic feedback
-      // HapticFeedback.selectionClick();
-    });
+    _animationController.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Define the data for the classes
     final List<ClassItemData> classes = [
       ClassItemData(
         title: "Mẫu giáo",
         imagePath: "assets/imgs/maugiao.jpg",
-        color: const Color(0xFF9FE6D8), // Teal/Green color
+        color: const Color(0xFF9FE6D8),
       ),
       ClassItemData(
         title: "Lớp 1",
         imagePath: "assets/imgs/lop1.jpg",
-        color: const Color(0xFFFFD561), // Yellow color
+        color: const Color(0xFFFFD561),
       ),
       ClassItemData(
         title: "Lớp 2",
-        imagePath: "assets/imgs/lop2.jpg", // Assuming you have this
-        color: const Color(0xFFFF8A65), // Orange color
+        imagePath: "assets/imgs/lop2.jpg",
+        color: const Color(0xFFFF8A65),
       ),
       ClassItemData(
         title: "Lớp 3",
-        imagePath: "assets/imgs/lop3.jpg", // Assuming you have this
-        color: const Color(0xFFAEDEF4), // Light Blue color
+        imagePath: "assets/imgs/lop3.jpg",
+        color: const Color(0xFFAEDEF4),
       ),
       ClassItemData(
         title: "Lớp 4",
-        imagePath: "assets/imgs/lop4.jpg", // Assuming you have this
-        color: const Color(0xFFC5E1A5), // Light Green color
+        imagePath: "assets/imgs/lop4.jpg",
+        color: const Color(0xFFC5E1A5),
       ),
       ClassItemData(
         title: "Lớp 5",
         imagePath: "assets/imgs/lop5.jpg",
-        color: const Color(0xFFF8BBD0), // Pink color
-        hasBadge: true, // Special flag for Class 5
+        color: const Color(0xFFF8BBD0),
+        hasBadge: true,
       ),
     ];
 
@@ -99,7 +95,6 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
               HeaderSection(),
               const SizedBox(height: 40),
 
-              // 2. TITLE SECTION
               Text(
                 "Chọn Lớp Học\ncủa bạn!",
                 style: GoogleFonts.nunito(
@@ -112,17 +107,15 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
 
               const SizedBox(height: 30),
 
-              // 3. GRID SECTION
               Expanded(
                 child: GridView.builder(
                   physics: const BouncingScrollPhysics(),
                   itemCount: classes.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, // 3 items per row
+                    crossAxisCount: 3,
                     crossAxisSpacing: 12,
-                    mainAxisSpacing: 20, // Space between rows
-                    childAspectRatio:
-                        0.75, // Adjust height of cards relative to width
+                    mainAxisSpacing: 20,
+                    childAspectRatio: 0.75,
                   ),
                   itemBuilder: (context, index) {
                     final isSelected = selectedIndex == index;
@@ -144,7 +137,6 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                 ),
               ),
 
-              // 4. BUTTON SECTION
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -153,7 +145,6 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                   child: ElevatedButton(
                     onPressed: selectedIndex != null
                         ? () {
-                            // Handle Continue Action with selected class
                             final selectedClass = classes[selectedIndex!];
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -168,7 +159,6 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                               ),
                             );
 
-                            // Navigate to next screen after a short delay
                             Future.delayed(
                               const Duration(milliseconds: 500),
                               () {
