@@ -1,119 +1,210 @@
-# Miscellaneous
-*.class
+######################################################################
+# 0. CORE UTILITIES & OS
+######################################################################
+
+# OS Generated Files (macOS)
+.DS_Store
+._*
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+**/.TemporaryItems
+.com.apple.timemachine.donotbackup
+.VolumeIcon.icns
+.Spotlight-V100
+.Trash/
+
+# OS Generated Files (Windows/Linux)
+ehthumbs.db
+Thumbs.db
+
+# Generic IDE and Log Files
+log_file
 *.lock
 *.log
 *.pyc
+session_data_store
+*~
+[._]*.s[a-w][a-z]
+*.swo
 *.swp
-.buildlog/
-.history
+.idea/
+.vscode/
+..air.toml
 
+# Maven
+/target/
 
+# Gradle
+/.gradle/
+/build/
 
-# Flutter repo-specific
-/bin/cache/
-/bin/internal/bootstrap.bat
-/bin/internal/bootstrap.sh
-/bin/mingit/
-/dev/benchmarks/mega_gallery/
-/dev/bots/.recipe_deps
-/dev/bots/android_tools/
-/dev/devicelab/ABresults*.json
-/dev/docs/doc/
-/dev/docs/flutter.docs.zip
-/dev/docs/lib/
-/dev/docs/pubspec.yaml
-/dev/integration_tests/**/xcuserdata
-/dev/integration_tests/**/Pods
-/packages/flutter/coverage/
-version
-analysis_benchmark.json
+# C/C++/Java/Go Build Artifacts and Libraries
+*.class
+*.jar
+*.war
+*.ear
+*.o
+*.a
+*.ilk
+*.pdb
+*.obj
+*.exe
+*.dll
+*.so
+*.out
+*.test
+*/bin/*
+*/out/*
+*/dist/*
+.mtj.tmp/
 
-# packages file containing multi-root paths
-.packages.generated
+# Java
+hs_err_pid*
+replay_pid*
 
-# Flutter/Dart/Pub related
-**/doc/api/
+# Go Build and Workspace Files
+.gocache/
+.godoc/
+go.work
+go.work.sum
+
+# Environment Variables
+.env
+.env.*
+.env*
+!.env.*example
+
+# AI/Tooling Cache & History
+.cursor/
+.claude/
+.crush/
+.specify/
+.opencode/
+.grok
+.aider*
+sgconfig.yml
+.astgrep/
+
+######################################################################
+# 1. FLUTTER CORE
+######################################################################
+
 .dart_tool/
+.packages
 .flutter-plugins
 .flutter-plugins-dependencies
-**/generated_plugin_registrant.dart
-.packages
-.pub-preload-cache/
-.pub/
-build/
-flutter_*.png
-linked_*.ds
-unlinked.ds
-unlinked_spec.ds
+.last_build_id
+flutter_export_environment.sh
 
-# Android related
-**/android/**/gradle-wrapper.jar
-.gradle/
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
+# Generated plugin registration files
 **/android/**/GeneratedPluginRegistrant.java
-**/android/key.properties
-*.jks
+**/ios/Runner/GeneratedPluginRegistrant.*
 
-# iOS/XCode related
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/profile
-**/ios/**/xcuserdata
-**/ios/.generated/
-**/ios/Flutter/.last_build_id
+# iOS Frameworks
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
-**/ios/Flutter/Flutter.podspec
 **/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/ephemeral
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/
-**/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
 
-# macOS
-**/Flutter/ephemeral/
-**/Pods/
-**/macos/Flutter/GeneratedPluginRegistrant.swift
-**/macos/Flutter/ephemeral
-**/xcuserdata/
+# Flutter-specific test exception
+!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
-# Windows
-**/windows/flutter/generated_plugin_registrant.cc
-**/windows/flutter/generated_plugin_registrant.h
-**/windows/flutter/generated_plugins.cmake
+######################################################################
+# 2. ANDROID NATIVE
+######################################################################
 
-# Linux
-**/linux/flutter/generated_plugin_registrant.cc
-**/linux/flutter/generated_plugin_registrant.h
-**/linux/flutter/generated_plugins.cmake
+# Gradle and Build Directories
+/android/.gradle
+/android/build
+/android/app/build
+/android/.cxx
+/android/captures/
 
-# Coverage
-coverage/
+# IDE and Local Configuration
+/android/.idea
+/android/local.properties
 
-# Symbols
-app.*.symbols
+# Gradle Wrappers
+**/android/**/gradle-wrapper.jar
+/android/gradlew
+/android/gradlew.bat
 
-# Exceptions to above rules.
+# Android Studio Build Artifacts
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+*.aab
+
+# Security/Signing Files
+/android/key.properties
+/android/keystore
+/android/app/google-services.json
+*.pepk
+
+######################################################################
+# 3. IOS / XCODE NATIVE
+######################################################################
+
+# Build Caches
+DerivedData/
+**/ios/**/DerivedData/
+
+# User-Specific Data and State
+xcuserdata/
+**/ios/**/xcuserdata
+*.xcuserstate
+*.moved-aside
+**/ios/**/*.moved-aside
+**/ios/**/*sync/
+
+# Xcode Project Files and State
+*.xcworkspace
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+**/ios/**/*.pbxuser
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.perspectivev3
+
+# Dependencies and Generated Files
+**/ios/**/Pods/
+**/ios/.generated/
+**/ios/**/.symlinks/
+**/ios/**/profile
+
+# Other Temporary Files
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/Icon?
+
+# Exceptions
+!**/ios/**/default.pbxuser
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
-!**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-!/dev/ci/**/Gemfile.lock
+
+######################################################################
+# 4. CUSTOM / PROJECT-SPECIFIC FILES
+######################################################################
+
+# Security/Signing Files
+secrets/
+keys/
+*.pem
+dist/
+
+# Documentation and Large Assets
+static/
+CONVENTIONS.md
+WARP.md
+CLAUDE.md
+GEMINI.md
+QWEN.md
+AGENTS.MD
