@@ -1,0 +1,1 @@
+enum WalletTab { activity, manage }

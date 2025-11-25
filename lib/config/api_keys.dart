@@ -1,0 +1,10 @@
+import 'dart:io';
+// TODO Load these from the server on startup
+
+const ANDROID_GOOGLE_MAP_API_KEY = 'AIzaSyCPBm-TQkogTMgUE57RLhvAs4wiAxXTsI8';
+const IOS_GOOGLE_MAP_API_KEY = 'AIzaSyCPBm-TQkogTMgUE57RLhvAs4wiAxXTsI8';
+
+const X_ANDROID_GOOGLE_MAP_API_KEY = 'AIzaSyCbYDPoFS0Zld3vCgqWxWXxiI6zNgoKhFY';
+const X_IOS_GOOGLE_MAP_API_KEY = 'AIzaSyCzD-tEl1FYMOBcTMVDR_0hCU357joYHM4';
+
+String get GOOGLE_MAP_API_KEY => Platform.isAndroid ? ANDROID_GOOGLE_MAP_API_KEY : IOS_GOOGLE_MAP_API_KEY;

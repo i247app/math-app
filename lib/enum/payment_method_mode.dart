@@ -1,0 +1,1 @@
+enum PaymentMethodMode { card, bank }
