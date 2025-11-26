@@ -1,88 +1,173 @@
-# Miscellaneous
+# Custom Start Here
+
+# AI files
+.cursor/
+AGENTS.md
+GEMINI.md
+CLAUDE.md
+QWEN.md
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
+.env*
+!.env.*example
+
+# Custom End Here
+
+# Standard gitignore Below
+
+# Miscellaneous (Applies at a higher level)
 *.class
 *.log
 *.pyc
 *.swp
+*.swo
+*.bak
+*.orig
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
 .swiftpm/
-migrate_working_dir/
+*.lock
+*.podspec
+*.un~
 
-# IntelliJ related
+# Security (Sensitive files - be cautious!)
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+/bin/
+/target/
+/out/
+.classpath
+.project
+.settings/
+nbproject/
+/dist/
+/build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 *.iml
-*.ipr
-*.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# Flutter - Primary Focus
+# General Flutter project files
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-.packages
+.metadata
+build/
+
+# Flutter/Dart/Pub related
+**/doc/api/
 .pub-cache/
 .pub/
-/build/
+*.g.dart
+*.freezed.dart
 
-# Symbolication related
-app.*.symbols
+# Android - Primary Target
+android/.gradle
+android/build
+android/app/build
+android/.idea
+android/.cxx
+android/local.properties
+**/android/**/gradle-wrapper.jar
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/**/GeneratedPluginRegistrant.java
+android/key.properties
+android/keystore
+android/app/google-services.json
 
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
+# Android Studio build artifacts
 /android/app/debug
 /android/app/profile
 /android/app/release
+*.pepk
+*.aab
 
-# iOS/XCode related
+# iOS/Xcode - Primary Target
+xcuserdata/
+*.xcworkspace
+DerivedData/
+*.moved-aside
+*.xcuserstate
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
 **/ios/**/*.moved-aside
 **/ios/**/*.pbxuser
 **/ios/**/*.perspectivev3
-**/ios/**/UserInterfaceState.xcuserstate
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
 **/ios/.generated/
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
-**/ios/Flutter/Flutter.podspec
 **/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/ephemeral/
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/
-**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/.last_build_id
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
-
-# macOS related
-**/macos/Flutter/GeneratedPluginRegistrant.swift
-**/macos/Flutter/ephemeral/
-
-# Coverage
-coverage/
-
-# Web related
-lib/generated_plugin_registrant.dart
-
-# Firebase
 **/ios/Runner/GoogleService-Info.plist
-**/android/app/google-services.json
-firebase_options.dart
+flutter_export_environment.sh # Flutter iOS build environment script
 
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# Exceptions to above rules.
+# Exceptions to iOS rules
+!**/ios/**/default.mode1v3
+!**/ios/**/default.mode2v3
+!**/ios/**/default.pbxuser
+!**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# VS Code (common development environment)
+.vscode/
+
+# IntelliJ related (common with Android development)
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Symbolication and Obfuscation
+app.*.symbols
+app.*.map.json
+
+.env
+*.env
+
+# AI files
+.cursor/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+QWEN.md
+ios/Runner/Base.lproj/Main.storyboard
