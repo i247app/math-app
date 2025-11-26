@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:math_ai_app/data/providers/user_provider.dart';
 
 class HeaderSection extends StatelessWidget {
   const HeaderSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,7 +35,7 @@ class HeaderSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "RonKLe",
+                  userProvider.userName,
                   style: GoogleFonts.nunito(
                     fontSize: 30,
                     fontWeight: FontWeight.w900,

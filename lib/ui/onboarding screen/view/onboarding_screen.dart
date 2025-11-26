@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
-import 'package:math_ai_app/ui/auth/view/signup_screen.dart';
+import 'package:math_ai_app/ui/auth/view/login_screen.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -64,7 +64,7 @@ class OnboardingScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(
                     context,
-                  ).push(MaterialPageRoute(builder: (_) => SignupScreen()));
+                  ).push(MaterialPageRoute(builder: (_) => LoginScreen()));
                 },
               ),
               const Spacer(flex: 1),

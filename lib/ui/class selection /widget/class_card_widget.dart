@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../data/class_item_data.dart';
+import '../../../data/models/grades/grade_model.dart';
 
 class ClassCard extends StatefulWidget {
-  final ClassItemData data;
+  final GradeModel data;
   final bool isSelected;
   final VoidCallback? onTap;
   final double selectionAnimation;
@@ -59,6 +59,19 @@ class _ClassCardState extends State<ClassCard>
 
   @override
   Widget build(BuildContext context) {
+    // Generate color based on display order
+    final colors = [
+      const Color(0xFF9FE6D8), // Light green
+      const Color(0xFFFFD561), // Yellow
+      const Color(0xFFFF8A65), // Orange
+      const Color(0xFFAEDEF4), // Light blue
+      const Color(0xFFC5E1A5), // Light green
+      const Color(0xFFF8BBD0), // Pink
+    ];
+    final color = colors[(widget.data.displayOrder - 1) % colors.length];
+
+    // Show badge for the last grade or if it's the newest
+    final hasBadge = widget.data.displayOrder == 3;
     return AnimatedBuilder(
       animation: _tapController,
       builder: (context, child) {
@@ -78,7 +91,7 @@ class _ClassCardState extends State<ClassCard>
                     width: double.infinity,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: widget.data.color,
+                      color: color,
                       borderRadius: BorderRadius.circular(12),
                       border: widget.isSelected
                           ? Border.all(color: const Color(0xFF3E2723), width: 3)
@@ -105,8 +118,8 @@ class _ClassCardState extends State<ClassCard>
                               child: AnimatedOpacity(
                                 opacity: widget.isSelected ? 1.0 : 0.8,
                                 duration: const Duration(milliseconds: 200),
-                                child: Image.asset(
-                                  widget.data.imagePath,
+                                child: Image.network(
+                                  widget.data.iconUrl,
                                   fit: BoxFit.contain,
                                   errorBuilder: (context, error, stackTrace) {
                                     return const Icon(
@@ -119,7 +132,7 @@ class _ClassCardState extends State<ClassCard>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              widget.data.title,
+                              widget.data.label,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.nunito(
                                 fontSize: 14,
@@ -153,7 +166,7 @@ class _ClassCardState extends State<ClassCard>
                               ),
                             ),
                           ),
-                        if (widget.data.hasBadge)
+                        if (hasBadge)
                           Positioned(
                             top: 4,
                             left: 4,

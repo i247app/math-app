@@ -1,5 +1,6 @@
 import 'package:math_ai_app/data/models/user/user_model.dart';
 import 'package:math_ai_app/data/responses/sign_up/sign_up_response.dart';
+import 'package:math_ai_app/data/responses/login/login_response.dart';
 
 // Import network functions
 import '../network/network.dart' as network;
@@ -25,6 +26,19 @@ class AuthRepository {
     return response;
   }
 
+  Future<LoginResponse> login({
+    required String loginName,
+    required String password,
+  }) async {
+    // Call API
+    final response = await network.login(
+      loginName: loginName,
+      password: password,
+    );
+
+    return response;
+  }
+
   // Validation methods
   String? validateName(String? name) {
     if (name == null || name.trim().isEmpty) {
@@ -44,6 +58,28 @@ class AuthRepository {
       return 'Họ tên chỉ được chứa chữ cái và khoảng trắng';
     }
     return null;
+  }
+
+  String? validateLoginName(String? loginName) {
+    if (loginName == null || loginName.trim().isEmpty) {
+      return 'Vui lòng nhập email hoặc số điện thoại';
+    }
+
+    // Check if it's an email
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (emailRegex.hasMatch(loginName.trim())) {
+      return null; // Valid email
+    }
+
+    // Check if it's a phone number
+    final cleanPhone = loginName.replaceAll(RegExp(r'[^\d]'), '');
+    if (cleanPhone.length >= 10 &&
+        cleanPhone.length <= 11 &&
+        cleanPhone.startsWith('0')) {
+      return null; // Valid phone
+    }
+
+    return 'Vui lòng nhập email hợp lệ hoặc số điện thoại';
   }
 
   String? validateEmail(String? email) {

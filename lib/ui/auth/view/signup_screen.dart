@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
+import 'package:math_ai_app/data/providers/user_provider.dart';
 import 'package:math_ai_app/data/repositories/auth_repository.dart';
 import 'package:math_ai_app/ui/class%20selection%20/view/class_selection_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/shared/widget/custom_text_field.dart';
 
@@ -105,15 +107,22 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
+      FocusScope.of(context).unfocus();
       final response = await _authRepository.signup(
         name: _nameController.text.trim(),
-        email: _emailController.text.trim(),  
+        email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
         password: _passwordController.text,
       );
 
       if (response.isSuccess && response.result != null) {
         if (mounted) {
+          // Set user in provider
+          Provider.of<UserProvider>(
+            context,
+            listen: false,
+          ).setUser(response.result!);
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -122,7 +131,6 @@ class _SignupScreenState extends State<SignupScreen> {
               backgroundColor: Colors.green,
             ),
           );
-
           // Navigate to next screen after success
           await Future.delayed(const Duration(seconds: 1));
           if (mounted) {
@@ -165,126 +173,132 @@ class _SignupScreenState extends State<SignupScreen> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 16.0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 16),
-                Text(
-                  'Tạo Hồ Sơ',
-                  style: GoogleFonts.nunito(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black,
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 16),
+                  Text(
+                    'Tạo Hồ Sơ',
+                    style: GoogleFonts.nunito(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.orange.shade100, width: 4),
-                  ),
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.orange.shade50,
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/imgs/woman.png',
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Colors.orange,
-                            ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.orange.shade100,
+                        width: 4,
+                      ),
+                    ),
+                    child: CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.orange.shade50,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/imgs/woman.png',
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(
+                                Icons.person,
+                                size: 60,
+                                color: Colors.orange,
+                              ),
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                buildCustomTextField(
-                  label: 'Họ tên:',
-                  hintText: 'Tên của bạn',
-                  icon: Icons.person_outline,
-                  controller: _nameController,
-                  errorText: _nameError,
-                  onChanged: (_) => _validateName(),
-                ),
+                  buildCustomTextField(
+                    label: 'Họ tên:',
+                    hintText: 'Tên của bạn',
+                    icon: Icons.person_outline,
+                    controller: _nameController,
+                    errorText: _nameError,
+                    onChanged: (_) => _validateName(),
+                  ),
 
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                buildCustomTextField(
-                  label: 'Email:',
-                  hintText: 'Email của bạn',
-                  icon: Icons.email_outlined,
-                  controller: _emailController,
-                  errorText: _emailError,
-                  inputType: TextInputType.emailAddress,
-                  onChanged: (_) => _validateEmail(),
-                ),
+                  buildCustomTextField(
+                    label: 'Email:',
+                    hintText: 'Email của bạn',
+                    icon: Icons.email_outlined,
+                    controller: _emailController,
+                    errorText: _emailError,
+                    inputType: TextInputType.emailAddress,
+                    onChanged: (_) => _validateEmail(),
+                  ),
 
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                buildCustomTextField(
-                  label: 'Tuổi:',
-                  hintText: 'Chọn tuổi',
-                  icon: Icons.calendar_today_outlined,
-                  controller: _ageController,
-                  errorText: _ageError,
-                  isReadOnly: true,
-                  onTap: () async {
-                    final selectedAge = await showDialog<int>(
-                      context: context,
-                      builder: (context) => AgePickerDialog(),
-                    );
-                    if (selectedAge != null) {
-                      _ageController.text = selectedAge.toString();
-                      _validateAge();
-                    }
-                  },
-                ),
+                  buildCustomTextField(
+                    label: 'Tuổi:',
+                    hintText: 'Chọn tuổi',
+                    icon: Icons.calendar_today_outlined,
+                    controller: _ageController,
+                    errorText: _ageError,
+                    isReadOnly: true,
+                    onTap: () async {
+                      final selectedAge = await showDialog<int>(
+                        context: context,
+                        builder: (context) => AgePickerDialog(),
+                      );
+                      if (selectedAge != null) {
+                        _ageController.text = selectedAge.toString();
+                        _validateAge();
+                      }
+                    },
+                  ),
 
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                buildCustomTextField(
-                  label: 'Số điện thoại:',
-                  hintText: 'Số điện thoại của bạn',
-                  icon: Icons.phone_outlined,
-                  controller: _phoneController,
-                  errorText: _phoneError,
-                  inputType: TextInputType.phone,
-                  onChanged: (_) => _validatePhone(),
-                ),
+                  buildCustomTextField(
+                    label: 'Số điện thoại:',
+                    hintText: 'Số điện thoại của bạn',
+                    icon: Icons.phone_outlined,
+                    controller: _phoneController,
+                    errorText: _phoneError,
+                    inputType: TextInputType.phone,
+                    onChanged: (_) => _validatePhone(),
+                  ),
 
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                buildCustomTextField(
-                  label: 'Mật khẩu:',
-                  hintText: 'Nhập mật khẩu',
-                  icon: Icons.lock_outline,
-                  controller: _passwordController,
-                  errorText: _passwordError,
-                  isPassword: true,
-                  onChanged: (_) => _validatePassword(),
-                ),
+                  buildCustomTextField(
+                    label: 'Mật khẩu:',
+                    hintText: 'Nhập mật khẩu',
+                    icon: Icons.lock_outline,
+                    controller: _passwordController,
+                    errorText: _passwordError,
+                    isPassword: true,
+                    onChanged: (_) => _validatePassword(),
+                  ),
 
-                const SizedBox(height: 40),
-                CustomPrimaryButton(
-                  text: _isLoading ? 'Đang xử lý...' : 'Tiếp Tục',
-                  onPressed: _isLoading ? null : _handleSignup,
-                ),
+                  const SizedBox(height: 40),
+                  CustomPrimaryButton(
+                    text: _isLoading ? 'Đang xử lý...' : 'Tiếp Tục',
+                    onPressed: _isLoading ? null : _handleSignup,
+                  ),
 
-                const SizedBox(height: 20),
-              ],
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),

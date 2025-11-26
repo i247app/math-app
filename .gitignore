@@ -171,3 +171,6 @@ CLAUDE.md
 GEMINI.md
 QWEN.md
 ios/Runner/Base.lproj/Main.storyboard
+macos/Runner/Configs/AppInfo.xcconfig
+macos/Runner/Configs/Debug.xcconfig
+

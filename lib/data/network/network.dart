@@ -7,6 +7,8 @@ import 'package:math_ai_app/data/models/user/user_model.dart';
 
 import '../responses/base/base_response.dart';
 import '../responses/sign_up/sign_up_response.dart';
+import '../responses/login/login_response.dart';
+import '../responses/grades/grades_list_response.dart';
 import '/config/config.dart';
 
 import 'auth_interceptor.dart';
@@ -51,6 +53,19 @@ Future<http.Response> _post(
 //   );
 // }
 
+// GET helper function
+Future<http.Response> _get(Uri uri, {Map<String, String>? headers}) async {
+  final xReqId = _reqCounter++;
+  return client.get(
+    uri,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Request-ID': xReqId.toString(),
+      ...(headers ?? {}),
+    },
+  );
+}
+
 T _parseResponse<T extends BaseResponse>(
   http.Response response,
   T Function(Map<String, dynamic> json) fromJson,
@@ -80,4 +95,22 @@ Future<SignUpResponse> signup({required User user}) async {
   });
 
   return _parseResponse(response, SignUpResponse.fromJson);
+}
+
+Future<LoginResponse> login({
+  required String loginName,
+  required String password,
+}) async {
+  final response = await _post(Uri.parse('$API_ROOT/login'), {
+    "login_name": loginName,
+    "password": password,
+  });
+
+  return _parseResponse(response, LoginResponse.fromJson);
+}
+
+Future<GradesListResponse> getGradesList() async {
+  final response = await _get(Uri.parse('$API_ROOT/grades/list'));
+
+  return _parseResponse(response, GradesListResponse.fromJson);
 }
