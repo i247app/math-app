@@ -9,6 +9,7 @@ import '../responses/base/base_response.dart';
 import '../responses/sign_up/sign_up_response.dart';
 import '../responses/login/login_response.dart';
 import '../responses/grades/grades_list_response.dart';
+import '../responses/levels/levels_list_response.dart';
 import '/config/config.dart';
 
 import 'auth_interceptor.dart';
@@ -113,4 +114,13 @@ Future<GradesListResponse> getGradesList() async {
   final response = await _get(Uri.parse('$API_ROOT/grades/list'));
 
   return _parseResponse(response, GradesListResponse.fromJson);
+}
+
+Future<LevelsListResponse> getLevelsList() async {
+  final response = await _get(Uri.parse('$API_ROOT/levels/list'));
+
+  return _parseResponse<LevelsListResponse>(
+    response,
+    LevelsListResponse.fromJson,
+  );
 }

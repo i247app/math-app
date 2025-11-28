@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:math_ai_app/data/providers/grades_provider.dart';
+import 'package:math_ai_app/data/providers/levels_provider.dart';
 import 'package:math_ai_app/data/providers/user_provider.dart';
-import 'package:math_ai_app/ui/level%20selection/view/level_selection_screen.dart';
+import 'package:math_ai_app/ui/math%20test%20process/view/math_test_intro_screen.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
 import 'package:provider/provider.dart';
 
-import '../widget/class_card_widget.dart';
+import '../widget/level_card_widget.dart';
 
-class ClassSelectionScreen extends StatefulWidget {
-  const ClassSelectionScreen({super.key});
+class LevelSelectionScreen extends StatefulWidget {
+  const LevelSelectionScreen({super.key});
 
   @override
-  State<ClassSelectionScreen> createState() => _ClassSelectionScreenState();
+  State<LevelSelectionScreen> createState() => _LevelSelectionScreenState();
 }
 
-class _ClassSelectionScreenState extends State<ClassSelectionScreen>
+class _LevelSelectionScreenState extends State<LevelSelectionScreen>
     with TickerProviderStateMixin {
   int? selectedIndex;
   late AnimationController _animationController;
@@ -36,9 +36,9 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    // Load grades data
+    // Load levels data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<GradesProvider>().loadGrades();
+      context.read<LevelsProvider>().loadLevels();
     });
   }
 
@@ -48,7 +48,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
     super.dispose();
   }
 
-  void _selectClass(int index) {
+  void _selectLevel(int index) {
     setState(() {
       selectedIndex = index;
     });
@@ -57,16 +57,16 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GradesProvider>(
-      builder: (context, gradesProvider, child) {
-        if (gradesProvider.isLoading) {
+    return Consumer<LevelsProvider>(
+      builder: (context, levelsProvider, child) {
+        if (levelsProvider.isLoading) {
           return const Scaffold(
             backgroundColor: Colors.white,
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        if (gradesProvider.error != null) {
+        if (levelsProvider.error != null) {
           return Scaffold(
             backgroundColor: Colors.white,
             body: Center(
@@ -74,13 +74,13 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Lỗi tải dữ liệu: ${gradesProvider.error}',
+                    'Lỗi tải dữ liệu: ${levelsProvider.error}',
                     style: GoogleFonts.nunito(fontSize: 16, color: Colors.red),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => gradesProvider.loadGrades(),
+                    onPressed: () => levelsProvider.loadLevels(),
                     child: const Text('Thử lại'),
                   ),
                 ],
@@ -89,8 +89,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
           );
         }
 
-        final grades = gradesProvider.grades ?? [];
-        // No need to convert - ClassCard now accepts GradeModel directly
+        final levels = levelsProvider.levels ?? [];
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -107,7 +106,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                   const SizedBox(height: 40),
 
                   Text(
-                    "Chọn Lớp Học\ncủa bạn!",
+                    "Chọn Mức Độ\ncủa bạn!",
                     style: GoogleFonts.nunito(
                       fontSize: 40,
                       height: 1.2,
@@ -125,13 +124,13 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                           flex: 3,
                           child: GridView.builder(
                             physics: const BouncingScrollPhysics(),
-                            itemCount: grades.length,
+                            itemCount: levels.length,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
+                                  crossAxisCount: 2,
                                   crossAxisSpacing: 12,
                                   mainAxisSpacing: 20,
-                                  childAspectRatio: 0.75,
+                                  childAspectRatio: 0.8,
                                 ),
                             itemBuilder: (context, index) {
                               final isSelected = selectedIndex == index;
@@ -142,10 +141,10 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                     scale: isSelected
                                         ? _scaleAnimation.value
                                         : 1.0,
-                                    child: ClassCard(
-                                      data: grades[index],
+                                    child: LevelCard(
+                                      data: levels[index],
                                       isSelected: isSelected,
-                                      onTap: () => _selectClass(index),
+                                      onTap: () => _selectLevel(index),
                                       selectionAnimation: _fadeAnimation.value,
                                     ),
                                   );
@@ -165,12 +164,12 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                             child: ElevatedButton(
                               onPressed: selectedIndex != null
                                   ? () {
-                                      final selectedGrade =
-                                          grades[selectedIndex!];
+                                      final selectedLevel =
+                                          levels[selectedIndex!];
 
-                                      // Save selected grade to user provider
+                                      // Save selected level to user provider
                                       context.read<UserProvider>().setUserClass(
-                                        selectedGrade.label,
+                                        '${context.read<UserProvider>().userClass} - ${selectedLevel.label}',
                                       );
 
                                       ScaffoldMessenger.of(
@@ -178,7 +177,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                       ).showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            'Đã chọn ${selectedGrade.label}',
+                                            'Đã chọn ${selectedLevel.label}',
                                             style: GoogleFonts.nunito(
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -197,7 +196,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
                                                 builder: (_) =>
-                                                    const LevelSelectionScreen(),
+                                                    const MathTestIntroScreen(),
                                               ),
                                             );
                                           }
@@ -217,7 +216,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                               child: Text(
                                 selectedIndex != null
                                     ? "Tiếp Tục"
-                                    : "Chọn lớp học",
+                                    : "Chọn mức độ",
                                 style: GoogleFonts.nunito(
                                   fontSize: 18,
                                   color: selectedIndex != null

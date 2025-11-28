@@ -4,6 +4,7 @@ import 'package:math_ai_app/data/providers/user_provider.dart';
 import 'package:math_ai_app/data/providers/auth_provider.dart';
 import 'package:math_ai_app/data/providers/setting_provider.dart';
 import 'package:math_ai_app/data/providers/grades_provider.dart';
+import 'package:math_ai_app/data/providers/levels_provider.dart';
 import 'package:math_ai_app/ui/onboarding%20screen/view/onboarding_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => DeviceInfoProvider()),
         ChangeNotifierProvider(create: (context) => SettingProvider()),
         ChangeNotifierProvider(create: (context) => GradesProvider()),
+        ChangeNotifierProvider(create: (context) => LevelsProvider()),
       ],
       child: const AppRoot(),
     );
