@@ -115,18 +115,18 @@ class _SignupScreenState extends State<SignupScreen> {
         password: _passwordController.text,
       );
 
-      if (response.isSuccess && response.result != null) {
+      if (response.isSuccess && response.user != null) {
         if (mounted) {
           // Set user in provider
           Provider.of<UserProvider>(
             context,
             listen: false,
-          ).setUser(response.result!);
+          ).setUser(response.user!);
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Đăng ký thành công! Chào mừng ${response.result!.name}',
+                'Đăng ký thành công! Chào mừng ${response.user!.name}',
               ),
               backgroundColor: Colors.green,
             ),

@@ -8,17 +8,34 @@ part 'levels_list_response.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class LevelsListResponse extends BaseResponse {
-  @JsonKey(name: 'metadata')
-  final MetadataModel? metadata;
-
   @JsonKey(name: 'result')
-  final List<LevelModel>? result;
+  final LevelsResult? result;
 
-  LevelsListResponse({String? blockUtilDt, this.metadata, this.result});
+  LevelsListResponse({String? blockUtilDt, this.result});
 
   factory LevelsListResponse.fromJson(Map<String, dynamic> json) =>
       _$LevelsListResponseFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$LevelsListResponseToJson(this);
+
+  // Helper getters for easier access
+  List<LevelModel>? get levels => result?.items;
+  MetadataModel? get metadata => result?.metadata;
+}
+
+@JsonSerializable(explicitToJson: true)
+class LevelsResult {
+  @JsonKey(name: 'items')
+  final List<LevelModel>? items;
+
+  @JsonKey(name: 'metadata')
+  final MetadataModel? metadata;
+
+  LevelsResult({this.items, this.metadata});
+
+  factory LevelsResult.fromJson(Map<String, dynamic> json) =>
+      _$LevelsResultFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LevelsResultToJson(this);
 }

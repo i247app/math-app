@@ -8,7 +8,7 @@ part 'sign_up_response.g.dart';
 @JsonSerializable(explicitToJson: true)
 class SignUpResponse extends BaseResponse {
   @JsonKey(name: 'result')
-  User? result;
+  SignUpResult? result;
 
   SignUpResponse({
     super.status,
@@ -29,4 +29,20 @@ class SignUpResponse extends BaseResponse {
 
   @override
   Map<String, dynamic> toJson() => _$SignUpResponseToJson(this);
+
+  // Helper getter for easier access
+  User? get user => result?.user;
+}
+
+@JsonSerializable(explicitToJson: true)
+class SignUpResult {
+  @JsonKey(name: 'user')
+  User? user;
+
+  SignUpResult({this.user});
+
+  factory SignUpResult.fromJson(Map<String, dynamic> json) =>
+      _$SignUpResultFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SignUpResultToJson(this);
 }

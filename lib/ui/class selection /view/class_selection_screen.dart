@@ -169,6 +169,9 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                           grades[selectedIndex!];
 
                                       // Save selected grade to user provider
+                                      context
+                                          .read<UserProvider>()
+                                          .setSelectedGrade(selectedGrade);
                                       context.read<UserProvider>().setUserClass(
                                         selectedGrade.label,
                                       );
@@ -193,7 +196,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                       Future.delayed(
                                         const Duration(milliseconds: 500),
                                         () {
-                                          if (mounted) {
+                                          if (context.mounted) {
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
                                                 builder: (_) =>

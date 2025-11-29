@@ -3,11 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
 import 'package:math_ai_app/data/repositories/auth_repository.dart';
 import 'package:math_ai_app/ui/auth/view/signup_screen.dart';
-import 'package:math_ai_app/ui/class%20selection%20/view/class_selection_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/shared/widget/custom_text_field.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../bottom_navigation_bar/view/bottom_navigation_bar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await Future.delayed(const Duration(seconds: 1));
           if (mounted) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const ClassSelectionScreen()),
+              MaterialPageRoute(builder: (_) => BottomNavigationBarScreen()),
             );
           }
         }

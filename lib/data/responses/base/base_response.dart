@@ -27,12 +27,7 @@ class BaseResponse {
   @JsonKey(includeFromJson: false, includeToJson: false)
   Map<String, String> httpHeaders = {};
 
-  BaseResponse({
-    this.status,
-    this.error,
-    this.message,
-    this.blockUtilDt,
-  });
+  BaseResponse({this.status, this.error, this.message, this.blockUtilDt});
 
   factory BaseResponse.fromJson(Map<String, dynamic> json) =>
       _$BaseResponseFromJson(json);

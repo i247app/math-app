@@ -10,6 +10,8 @@ import '../responses/sign_up/sign_up_response.dart';
 import '../responses/login/login_response.dart';
 import '../responses/grades/grades_list_response.dart';
 import '../responses/levels/levels_list_response.dart';
+import '../responses/profile/profile_create_response.dart';
+import '../responses/profile/profile_fetch_response.dart';
 import '/config/config.dart';
 
 import 'auth_interceptor.dart';
@@ -123,4 +125,25 @@ Future<LevelsListResponse> getLevelsList() async {
     response,
     LevelsListResponse.fromJson,
   );
+}
+
+Future<ProfileCreateResponse> createProfile({
+  required String uid,
+  required String grade,
+  required String level,
+}) async {
+  final response = await _post(Uri.parse('$API_ROOT/profiles/create'), {
+    "uid": uid,
+    "grade": grade,
+    "level": level,
+  });
+
+  return _parseResponse(response, ProfileCreateResponse.fromJson);
+}
+
+Future<ProfileFetchResponse> fetchProfile(String uid) async {
+  final response = await _post(Uri.parse('$API_ROOT/profiles/fetch'), {
+    "uid": uid,
+  });
+  return _parseResponse(response, ProfileFetchResponse.fromJson);
 }

@@ -14,7 +14,7 @@ SignUpResponse _$SignUpResponseFromJson(Map<String, dynamic> json) =>
       blockUtilDt: json['block_until_dt'] as String?,
       result: json['result'] == null
           ? null
-          : User.fromJson(json['result'] as Map<String, dynamic>),
+          : SignUpResult.fromJson(json['result'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$SignUpResponseToJson(SignUpResponse instance) =>
@@ -25,3 +25,12 @@ Map<String, dynamic> _$SignUpResponseToJson(SignUpResponse instance) =>
       'message': instance.message,
       'result': instance.result?.toJson(),
     };
+
+SignUpResult _$SignUpResultFromJson(Map<String, dynamic> json) => SignUpResult(
+  user: json['user'] == null
+      ? null
+      : User.fromJson(json['user'] as Map<String, dynamic>),
+);
+
+Map<String, dynamic> _$SignUpResultToJson(SignUpResult instance) =>
+    <String, dynamic>{'user': instance.user?.toJson()};

@@ -21,8 +21,8 @@ class GradesProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
     try {
       final response = await _gradesRepository.getGradesList();
-      if (response.isSuccess && response.result != null) {
-        _grades = response.result!;
+      if (response.isSuccess && response.grades != null) {
+        _grades = response.grades!;
       } else {
         _error = response.message ?? 'Failed to load grades';
       }

@@ -21,8 +21,8 @@ class LevelsProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
     try {
       final response = await _levelsRepository.getLevelsList();
-      if (response.isSuccess && response.result != null) {
-        _levels = response.result!;
+      if (response.isSuccess && response.levels != null) {
+        _levels = response.levels!;
       } else {
         _error = response.message ?? 'Failed to load levels';
       }

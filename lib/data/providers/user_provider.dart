@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:math_ai_app/data/models/user/user_model.dart';
+import 'package:math_ai_app/data/models/grades/grade_model.dart';
 
 class UserProvider with ChangeNotifier {
   User? _user;
+  GradeModel? _selectedGrade;
 
   User? get user => _user;
+  GradeModel? get selectedGrade => _selectedGrade;
 
   bool get isLoggedIn => _user != null;
 
@@ -19,6 +22,11 @@ class UserProvider with ChangeNotifier {
 
   void setUser(User user) {
     _user = user;
+    notifyListeners();
+  }
+
+  void setSelectedGrade(GradeModel grade) {
+    _selectedGrade = grade;
     notifyListeners();
   }
 

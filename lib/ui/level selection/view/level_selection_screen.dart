@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/data/providers/levels_provider.dart';
 import 'package:math_ai_app/data/providers/user_provider.dart';
-import 'package:math_ai_app/ui/math%20test%20process/view/math_test_intro_screen.dart';
+import 'package:math_ai_app/data/providers/profile_provider.dart';
+import 'package:math_ai_app/ui/bottom_navigation_bar/view/bottom_navigation_bar.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
 import 'package:provider/provider.dart';
 
@@ -191,14 +192,84 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
 
                                       Future.delayed(
                                         const Duration(milliseconds: 500),
-                                        () {
-                                          if (mounted) {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (_) =>
-                                                    const MathTestIntroScreen(),
-                                              ),
-                                            );
+                                        () async {
+                                          if (context.mounted) {
+                                            // Get selected grade from UserProvider
+                                            final userProvider = context
+                                                .read<UserProvider>();
+                                            final selectedGrade =
+                                                userProvider.selectedGrade;
+
+                                            // Get selected level
+                                            final selectedLevel =
+                                                levels[selectedIndex!];
+
+                                            if (selectedGrade != null) {
+                                              // Get user ID - try user.id first, fallback to email if id is null/empty
+                                              final userId =
+                                                  userProvider
+                                                          .user
+                                                          ?.id
+                                                          ?.isNotEmpty ==
+                                                      true
+                                                  ? userProvider.user!.id!
+                                                  : userProvider.user?.email ??
+                                                        '';
+
+                                              if (userId.isEmpty) {
+                                                if (!context.mounted) return;
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.',
+                                                    ),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                                return;
+                                              }
+
+                                              // Create profile
+                                              if (!context.mounted) return;
+                                              final profileProvider = context
+                                                  .read<ProfileProvider>();
+                                              final success =
+                                                  await profileProvider
+                                                      .createProfile(
+                                                        uid: userId,
+                                                        grade:
+                                                            selectedGrade.label,
+                                                        level:
+                                                            selectedLevel.label,
+                                                      );
+
+                                              if (success && context.mounted) {
+                                                Navigator.of(
+                                                  context,
+                                                ).pushReplacement(
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        const BottomNavigationBarScreen(),
+                                                  ),
+                                                );
+                                              } else {
+                                                // Show error
+                                                if (!context.mounted) return;
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      profileProvider.error ??
+                                                          'Tạo profile thất bại',
+                                                    ),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                              }
+                                            }
                                           }
                                         },
                                       );
