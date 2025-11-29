@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 final Color _borderColor = const Color(0xFFFFC107);
@@ -14,6 +15,7 @@ Widget buildCustomTextField({
   VoidCallback? onTap,
   String? errorText,
   Function(String)? onChanged,
+  List<TextInputFormatter>? inputFormatters,
 }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,6 +49,7 @@ Widget buildCustomTextField({
           readOnly: isReadOnly,
           onTap: onTap,
           onChanged: onChanged,
+          inputFormatters: inputFormatters,
           style: GoogleFonts.nunito(fontSize: 16, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.grey[500]),

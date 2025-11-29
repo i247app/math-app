@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:math_ai_app/ui/bottom_navigation_bar/view/bottom_navigation_bar.dart';
 
 class SuggestionAndButtons extends StatelessWidget {
   const SuggestionAndButtons({super.key});
@@ -35,7 +36,13 @@ class SuggestionAndButtons extends StatelessWidget {
                     child: SizedBox(
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const BottomNavigationBarScreen(),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF3E2723),
                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -59,7 +66,15 @@ class SuggestionAndButtons extends StatelessWidget {
                     child: SizedBox(
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const BottomNavigationBarScreen(
+                                initialIndex: 1,
+                              ),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF3E2723),
                           padding: const EdgeInsets.symmetric(vertical: 12),

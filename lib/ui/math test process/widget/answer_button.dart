@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class AnswerButton extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
   final Color labelColor;
+  final bool isSelected;
+  final VoidCallback? onTap;
 
   const AnswerButton({
     super.key,
@@ -13,77 +16,96 @@ class AnswerButton extends StatelessWidget {
     required this.value,
     required this.color,
     required this.labelColor,
+    this.isSelected = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 70,
-      child: Stack(
-        children: [
-          Positioned(
-            left: 25,
-            right: 0,
-            top: 5,
-            bottom: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black12, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha((255 * 0.1).toInt()),
-                    blurRadius: 2,
-                    offset: const Offset(0, 2),
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        height: 70,
+        child: Stack(
+          children: [
+            Positioned(
+              left: 25,
+              right: 0,
+              top: 5,
+              bottom: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isSelected ? color.withOpacity(0.7) : color,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected ? Colors.blue : Colors.black12,
+                    width: isSelected ? 3 : 1,
                   ),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                value,
-                style: GoogleFonts.nunito(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                      offset: const Offset(-1, -1),
-                      color: Colors.black.withAlpha((255 * 0.3).toInt()),
-                    ),
-                    Shadow(
-                      offset: const Offset(1, 1),
-                      color: Colors.black.withAlpha((255 * 0.3).toInt()),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha((255 * 0.1).toInt()),
+                      blurRadius: 2,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: labelColor,
-                border: Border.all(color: Colors.white, width: 3),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                label,
-                style: GoogleFonts.nunito(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 4.0),
+                  child: AutoSizeText(
+                    value,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    minFontSize: 10,
+                    maxFontSize: 25,
+                    style: GoogleFonts.nunito(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          offset: const Offset(-1, -1),
+                          color: Colors.black.withAlpha((255 * 0.3).toInt()),
+                        ),
+                        Shadow(
+                          offset: const Offset(1, 1),
+                          color: Colors.black.withAlpha((255 * 0.3).toInt()),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSelected ? Colors.blue : labelColor,
+                  border: Border.all(color: Colors.white, width: 3),
+                ),
+                alignment: Alignment.center,
+                child: AutoSizeText(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  minFontSize: 8,
+                  maxFontSize: 20,
+                  style: GoogleFonts.nunito(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

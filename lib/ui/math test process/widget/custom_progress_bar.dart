@@ -2,7 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomProgressBar extends StatelessWidget {
-  const CustomProgressBar({super.key});
+  final int currentQuestion;
+  final int totalQuestions;
+  final int currentQuiz;
+  final int totalQuizzes;
+
+  const CustomProgressBar({
+    super.key,
+    required this.currentQuestion,
+    required this.totalQuestions,
+    required this.currentQuiz,
+    required this.totalQuizzes,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +21,7 @@ class CustomProgressBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Câu hỏi 15/15",
+          "Bài $currentQuiz/$totalQuizzes - Câu $currentQuestion/$totalQuestions",
           style: GoogleFonts.nunito(
             fontSize: 12,
             fontWeight: FontWeight.bold,
@@ -38,12 +49,14 @@ class CustomProgressBar extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(
-                      10,
+                      totalQuestions > 10 ? 10 : totalQuestions,
                       (index) => Container(
                         width: 8,
                         height: 8,
-                        decoration: const BoxDecoration(
-                          color: Colors.black87,
+                        decoration: BoxDecoration(
+                          color: index < currentQuestion
+                              ? Colors.black87
+                              : Colors.white,
                           shape: BoxShape.circle,
                         ),
                       ),

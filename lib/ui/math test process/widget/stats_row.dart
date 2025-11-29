@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StatsRow extends StatelessWidget {
-  const StatsRow({super.key});
+  final int correctAnswers;
+  final int totalQuestions;
+  final int percentage;
+
+  const StatsRow({
+    super.key,
+    required this.correctAnswers,
+    required this.totalQuestions,
+    required this.percentage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +21,7 @@ class StatsRow extends StatelessWidget {
         _buildStatCard(
           icon: Icons.check,
           iconColor: Colors.green,
-          value: "12",
+          value: "$correctAnswers",
           label: "Đúng",
           bgColor: const Color(0xFFE8F5E9),
           borderColor: Colors.green,
@@ -20,18 +29,18 @@ class StatsRow extends StatelessWidget {
         _buildStatCard(
           icon: Icons.close,
           iconColor: Colors.red,
-          value: "3",
+          value: "${totalQuestions - correctAnswers}",
           label: "Sai",
           bgColor: const Color(0xFFFFEBEE),
           borderColor: Colors.red,
         ),
         _buildStatCard(
-          icon: Icons.access_time,
-          iconColor: Colors.orange,
-          value: "5:13",
-          label: "Thời gian",
-          bgColor: const Color(0xFFFFFDE7),
-          borderColor: Colors.orange,
+          icon: Icons.percent,
+          iconColor: Colors.blue,
+          value: "$percentage%",
+          label: "Điểm",
+          bgColor: const Color(0xFFE3F2FD),
+          borderColor: Colors.blue,
         ),
       ],
     );

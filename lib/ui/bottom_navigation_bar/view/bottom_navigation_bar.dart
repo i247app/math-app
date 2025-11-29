@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:math_ai_app/ui/math%20test%20process/view/math_quizz_screen.dart';
+import 'package:math_ai_app/ui/math%20test%20process/view/math_test_intro_screen.dart';
 import '../sub_view/profile_screen.dart';
 import 'placeholder_screen.dart';
 
 class BottomNavigationBarScreen extends StatefulWidget {
-  const BottomNavigationBarScreen({super.key});
+  final int initialIndex;
+  const BottomNavigationBarScreen({super.key, this.initialIndex = 3});
 
   @override
   State<BottomNavigationBarScreen> createState() =>
@@ -12,11 +15,18 @@ class BottomNavigationBarScreen extends StatefulWidget {
 }
 
 class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
-  int _currentIndex = 3; // Mặc định mở tab Profile (index 3)
+  late int _currentIndex; // Mặc định mở tab Profile (index 3)
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
 
   final List<Widget> _screens = [
     const PlaceholderScreen(title: "Trang Chủ", color: Colors.blueAccent),
-    const PlaceholderScreen(title: "Bài Kiểm Tra", color: Colors.purpleAccent),
+    // const PlaceholderScreen(title: "Bài Kiểm Tra", color: Colors.purpleAccent),
+    const MathTestIntroScreen(),
     const PlaceholderScreen(title: "Tiến Độ", color: Colors.greenAccent),
     const ProfileScreen(),
   ];

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LevelChartSection extends StatelessWidget {
-  const LevelChartSection({super.key});
+  final String aiReview;
+
+  const LevelChartSection({super.key, required this.aiReview});
 
   @override
   Widget build(BuildContext context) {
@@ -40,19 +42,23 @@ class LevelChartSection extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text(
-          "Bạn đang ở",
+          "AI Review",
           style: GoogleFonts.nunito(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: const Color(0xFF0D47A1),
           ),
         ),
-        Text(
-          "Level 2 - Trung Bình",
-          style: GoogleFonts.nunito(
-            fontSize: 20,
-            fontWeight: FontWeight.w900,
-            color: const Color(0xFF0D47A1),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            aiReview,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nunito(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF0D47A1),
+            ),
           ),
         ),
       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
 import 'package:math_ai_app/data/providers/user_provider.dart';
@@ -275,6 +276,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     controller: _phoneController,
                     errorText: _phoneError,
                     inputType: TextInputType.phone,
+                    inputFormatters: [LengthLimitingTextInputFormatter(10)],
                     onChanged: (_) => _validatePhone(),
                   ),
 

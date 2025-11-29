@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class InfoRow extends StatelessWidget {
-  const InfoRow({super.key});
+  final int remainingTime;
+  final int currentQuestion;
+  final int totalQuestions;
+
+  const InfoRow({
+    super.key,
+    required this.remainingTime,
+    required this.currentQuestion,
+    required this.totalQuestions,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +32,7 @@ class InfoRow extends StatelessWidget {
             ),
             const SizedBox(width: 5),
             Text(
-              "9:15",
+              "${(remainingTime ~/ 60).toString().padLeft(2, '0')}:${(remainingTime % 60).toString().padLeft(2, '0')}",
               style: GoogleFonts.nunito(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -32,7 +41,7 @@ class InfoRow extends StatelessWidget {
           ],
         ),
         Text(
-          "Câu 3/20",
+          "Câu $currentQuestion/$totalQuestions",
           style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ],
