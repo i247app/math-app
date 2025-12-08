@@ -57,37 +57,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _navigateToClassSelection() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const ClassSelectionScreen(),
-      ),
-    ).then((_) {
-      // Refresh profile after returning from class selection
-      if (mounted) {
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        final uid = userProvider.user?.id;
-        if (uid != null && uid.isNotEmpty) {
-          context.read<ProfileProvider>().fetchProfile(uid);
-        }
-      }
-    });
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const ClassSelectionScreen()))
+        .then((_) {
+          // Refresh profile after returning from class selection
+          if (mounted) {
+            final userProvider = Provider.of<UserProvider>(
+              context,
+              listen: false,
+            );
+            final uid = userProvider.user?.id;
+            if (uid != null && uid.isNotEmpty) {
+              context.read<ProfileProvider>().fetchProfile(uid);
+            }
+          }
+        });
   }
 
   void _navigateToLevelSelection() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const LevelSelectionScreen(),
-      ),
-    ).then((_) {
-      // Refresh profile after returning from level selection
-      if (mounted) {
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        final uid = userProvider.user?.id;
-        if (uid != null && uid.isNotEmpty) {
-          context.read<ProfileProvider>().fetchProfile(uid);
-        }
-      }
-    });
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const LevelSelectionScreen()))
+        .then((_) {
+          // Refresh profile after returning from level selection
+          if (mounted) {
+            final userProvider = Provider.of<UserProvider>(
+              context,
+              listen: false,
+            );
+            final uid = userProvider.user?.id;
+            if (uid != null && uid.isNotEmpty) {
+              context.read<ProfileProvider>().fetchProfile(uid);
+            }
+          }
+        });
   }
 
   @override
