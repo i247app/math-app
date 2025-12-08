@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../data/providers/profile_provider.dart';
 import '../../../data/providers/user_provider.dart';
-import 'package:math_ai_app/ui/class selection /view/class_selection_screen.dart';
-import 'package:math_ai_app/ui/level selection/view/level_selection_screen.dart';
+import '../../auth/view/login_screen.dart';
 import '../widget/curved_header_background.dart';
 import '../widget/info_card.dart';
 import '../widget/menu_row_item.dart';
@@ -27,69 +26,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _updateProfile(String grade, String level) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final uid = userProvider.user?.id;
-    if (uid != null && uid.isNotEmpty) {
-      final success = await context.read<ProfileProvider>().updateProfile(
-        uid: uid,
-        grade: grade,
-        level: level,
-      );
-      if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cập nhật hồ sơ thành công')),
-        );
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: ${context.read<ProfileProvider>().error}'),
-          ),
-        );
-      }
-    }
-  }
-
   void _navigateToEditProfile() {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (_) => const EditProfileScreen()));
   }
 
-  void _navigateToClassSelection() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const ClassSelectionScreen()))
-        .then((_) {
-          // Refresh profile after returning from class selection
-          if (mounted) {
-            final userProvider = Provider.of<UserProvider>(
-              context,
-              listen: false,
-            );
-            final uid = userProvider.user?.id;
-            if (uid != null && uid.isNotEmpty) {
-              context.read<ProfileProvider>().fetchProfile(uid);
-            }
-          }
-        });
-  }
+  void _logout() {
+    // Clear user data
+    context.read<UserProvider>().clearUser();
+    context.read<ProfileProvider>().clearProfile();
 
-  void _navigateToLevelSelection() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const LevelSelectionScreen()))
-        .then((_) {
-          // Refresh profile after returning from level selection
-          if (mounted) {
-            final userProvider = Provider.of<UserProvider>(
-              context,
-              listen: false,
-            );
-            final uid = userProvider.user?.id;
-            if (uid != null && uid.isNotEmpty) {
-              context.read<ProfileProvider>().fetchProfile(uid);
-            }
-          }
-        });
+    // Navigate to login screen and remove all previous routes
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
   }
 
   @override
@@ -112,6 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final profile = profileProvider.profile;
 
         return Scaffold(
+          backgroundColor: Colors.blue.shade50,
           body: Stack(
             children: [
               const CurvedHeaderBackground(),
@@ -140,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               icon: Icons.table_chart_outlined,
                               title:
                                   "Lớp hiện tại: ${profile?.grade ?? 'Chưa có'}",
-                              onTap: _navigateToClassSelection,
+                              onTap: _navigateToEditProfile,
                             ),
                             MenuRowItem(
                               icon: Icons.notifications_none_rounded,
@@ -150,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               icon: Icons.translate,
                               title:
                                   "Hiện tại level: ${profile?.level ?? 'Chưa có'}",
-                              onTap: _navigateToLevelSelection,
+                              onTap: _navigateToEditProfile,
                               isLast: true,
                             ),
                           ],
@@ -158,7 +111,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         const SizedBox(height: 15),
 
-                        // Khối 2: Cài đặt
                         const InfoCard(
                           children: [
                             MenuRowItem(
@@ -175,21 +127,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         const SizedBox(height: 15),
-
-                        // Khối 3: Hỗ trợ
-                        const InfoCard(
+                        InfoCard(
                           children: [
                             MenuRowItem(
-                              icon: Icons.person_search_outlined,
-                              title: "Help & Support",
-                            ),
-                            MenuRowItem(
-                              icon: Icons.chat_bubble_outline,
-                              title: "Contact us",
-                            ),
-                            MenuRowItem(
-                              icon: Icons.lock_outline,
-                              title: "Privacy policy",
+                              icon: Icons.logout,
+                              title: "Đăng xuất",
+                              onTap: _logout,
                               isLast: true,
                             ),
                           ],

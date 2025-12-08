@@ -106,7 +106,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     if (selectedGradeIndex == null || selectedLevelIndex == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Vui lòng chọn cả lớp và mức độ'),
+          content: Text('Vui lòng chọn cả lớp và kì học'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -125,8 +125,8 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     if (uid != null && uid.isNotEmpty) {
       final success = await profileProvider.updateProfile(
         uid: uid,
-        grade: selectedGrade.label,
-        level: selectedLevel.label,
+        gradeId: selectedGrade.id,
+        semesterId: selectedLevel.id,
       );
 
       if (success && mounted) {
@@ -249,9 +249,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
               const SizedBox(height: 30),
 
-              // Level Selection Section
+              // Semester Selection Section
               Text(
-                "Chọn Mức Độ",
+                "Chọn Kì Học",
                 style: GoogleFonts.nunito(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -271,7 +271,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       child: Column(
                         children: [
                           Text(
-                            'Lỗi tải mức độ: ${levelsProvider.error}',
+                            'Lỗi tải kì học: ${levelsProvider.error}',
                             style: const TextStyle(color: Colors.red),
                           ),
                           ElevatedButton(

@@ -24,7 +24,7 @@ class GenerateQuizResponse extends BaseResponse {
 @JsonSerializable()
 class GenerateQuizResult {
   @JsonKey(name: 'user_latest_quiz_id')
-  final String userLatestQuizId;
+  final String? userLatestQuizId;
   final String response;
   final List<QuizQuestion> data;
   final String role;
@@ -32,7 +32,7 @@ class GenerateQuizResult {
   final String timestamp;
 
   GenerateQuizResult({
-    required this.userLatestQuizId,
+    this.userLatestQuizId,
     required this.response,
     required this.data,
     required this.role,

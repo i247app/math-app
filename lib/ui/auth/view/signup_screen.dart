@@ -18,8 +18,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _birthDateController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -27,18 +26,17 @@ class _SignupScreenState extends State<SignupScreen> {
 
   // Validation errors
   String? _nameError;
-  String? _emailError;
-  String? _ageError;
+  String? _birthDateError;
   String? _phoneError;
   String? _passwordError;
 
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
-    _ageController.dispose();
+    _birthDateController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -50,15 +48,11 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  void _validateEmail() {
+  void _validateBirthDate() {
     setState(() {
-      _emailError = _authRepository.validateEmail(_emailController.text);
-    });
-  }
-
-  void _validateAge() {
-    setState(() {
-      _ageError = _authRepository.validateAge(_ageController.text);
+      _birthDateError = _authRepository.validateBirthDate(
+        _birthDateController.text,
+      );
     });
   }
 
@@ -78,8 +72,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _validateAll() {
     _validateName();
-    _validateEmail();
-    _validateAge();
+    _validateBirthDate();
     _validatePhone();
     _validatePassword();
   }
@@ -91,10 +84,9 @@ class _SignupScreenState extends State<SignupScreen> {
     // Check if all validations pass
     if (!_authRepository.isValidAll(
       name: _nameController.text,
-      email: _emailController.text,
       phone: _phoneController.text,
       password: _passwordController.text,
-      age: _ageController.text,
+      birthDate: _birthDateController.text,
     )) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -111,9 +103,9 @@ class _SignupScreenState extends State<SignupScreen> {
       FocusScope.of(context).unfocus();
       final response = await _authRepository.signup(
         name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
         password: _passwordController.text,
+        birthDate: _birthDateController.text.trim(),
       );
 
       if (response.isSuccess && response.user != null) {
@@ -173,7 +165,7 @@ class _SignupScreenState extends State<SignupScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blue.shade50,
         body: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: SafeArea(
@@ -237,32 +229,36 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 12),
 
                   buildCustomTextField(
-                    label: 'Email:',
-                    hintText: 'Email của bạn',
-                    icon: Icons.email_outlined,
-                    controller: _emailController,
-                    errorText: _emailError,
-                    inputType: TextInputType.emailAddress,
-                    onChanged: (_) => _validateEmail(),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  buildCustomTextField(
-                    label: 'Tuổi:',
-                    hintText: 'Chọn tuổi',
+                    label: 'Ngày sinh:',
+                    hintText: 'Chọn ngày sinh',
                     icon: Icons.calendar_today_outlined,
-                    controller: _ageController,
-                    errorText: _ageError,
+                    controller: _birthDateController,
+                    errorText: _birthDateError,
                     isReadOnly: true,
                     onTap: () async {
-                      final selectedAge = await showDialog<int>(
+                      final DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        builder: (context) => AgePickerDialog(),
+                        initialDate: DateTime(2003),
+                        firstDate: DateTime(1950),
+                        lastDate: DateTime.now(),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: const ColorScheme.light(
+                                primary: Color(0xFF3E2723),
+                                onPrimary: Colors.white,
+                                onSurface: Colors.black,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
                       );
-                      if (selectedAge != null) {
-                        _ageController.text = selectedAge.toString();
-                        _validateAge();
+                      if (pickedDate != null) {
+                        final formattedDate =
+                            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                        _birthDateController.text = formattedDate;
+                        _validateBirthDate();
                       }
                     },
                   ),
@@ -282,14 +278,98 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 12),
 
-                  buildCustomTextField(
-                    label: 'Mật khẩu:',
-                    hintText: 'Nhập mật khẩu',
-                    icon: Icons.lock_outline,
-                    controller: _passwordController,
-                    errorText: _passwordError,
-                    isPassword: true,
-                    onChanged: (_) => _validatePassword(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+                        child: Text(
+                          'Mật khẩu:',
+                          style: GoogleFonts.nunito(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withAlpha((255 * 0.1).round()),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: _passwordController,
+                          obscureText: !_isPasswordVisible,
+                          decoration: InputDecoration(
+                            hintText: 'Nhập mật khẩu',
+                            hintStyle: GoogleFonts.nunito(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.lock_outline,
+                              color: Color(0xFFFFC107),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFFFC107),
+                                width: 2,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 1,
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 2,
+                              ),
+                            ),
+                            errorText: _passwordError,
+                            errorStyle: GoogleFonts.nunito(
+                              color: Colors.red,
+                              fontSize: 12,
+                            ),
+                          ),
+                          onChanged: (_) => _validatePassword(),
+                        ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 40),
@@ -305,75 +385,6 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class AgePickerDialog extends StatefulWidget {
-  const AgePickerDialog({super.key});
-
-  @override
-  State<AgePickerDialog> createState() => _AgePickerDialogState();
-}
-
-class _AgePickerDialogState extends State<AgePickerDialog> {
-  int _selectedAge = 6;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(
-        'Chọn tuổi',
-        style: GoogleFonts.nunito(fontWeight: FontWeight.bold),
-      ),
-      content: SizedBox(
-        height: 200,
-        width: 300,
-        child: ListWheelScrollView(
-          itemExtent: 50,
-          diameterRatio: 1.5,
-          physics: const FixedExtentScrollPhysics(),
-          onSelectedItemChanged: (index) {
-            setState(() {
-              _selectedAge = index + 3; // Ages from 3 to 18
-            });
-          },
-          children: List.generate(
-            16, // 3 to 18 inclusive
-            (index) {
-              final age = index + 3;
-              final isSelected = age == _selectedAge;
-              return Center(
-                child: Text(
-                  '$age tuổi',
-                  style: GoogleFonts.nunito(
-                    fontSize: isSelected ? 24 : 18,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: isSelected
-                        ? Theme.of(context).primaryColor
-                        : Colors.black54,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text('Hủy', style: GoogleFonts.nunito(color: Colors.grey)),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(_selectedAge),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF3E2723),
-          ),
-          child: Text('Chọn', style: GoogleFonts.nunito(color: Colors.white)),
-        ),
-      ],
     );
   }
 }

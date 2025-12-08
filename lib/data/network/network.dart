@@ -123,7 +123,7 @@ Future<GradesListResponse> getGradesList() async {
 }
 
 Future<LevelsListResponse> getLevelsList() async {
-  final response = await _get(Uri.parse('$API_ROOT/levels/list'));
+  final response = await _get(Uri.parse('$API_ROOT/semesters/list'));
 
   return _parseResponse<LevelsListResponse>(
     response,
@@ -133,13 +133,13 @@ Future<LevelsListResponse> getLevelsList() async {
 
 Future<ProfileCreateResponse> createProfile({
   required String uid,
-  required String grade,
-  required String level,
+  required String gradeId,
+  required String semesterId,
 }) async {
   final response = await _post(Uri.parse('$API_ROOT/profiles/create'), {
     "uid": uid,
-    "grade": grade,
-    "level": level,
+    "grade_id": gradeId,
+    "semester_id": semesterId,
   });
 
   return _parseResponse(response, ProfileCreateResponse.fromJson);

@@ -35,10 +35,8 @@ class AnswerSection extends StatelessWidget {
           children: [
             Expanded(
               child: AnswerButton(
-                label: answers[0].label,
                 value: answers[0].content,
                 color: Colors.lightBlue.shade400,
-                labelColor: Colors.red,
                 isSelected: selectedAnswer == answers[0].label,
                 onTap: () => onAnswerSelected(answers[0].label),
               ),
@@ -46,10 +44,8 @@ class AnswerSection extends StatelessWidget {
             const SizedBox(width: 15),
             Expanded(
               child: AnswerButton(
-                label: answers[1].label,
                 value: answers[1].content,
                 color: Colors.pinkAccent.shade100,
-                labelColor: Colors.red,
                 isSelected: selectedAnswer == answers[1].label,
                 onTap: () => onAnswerSelected(answers[1].label),
               ),
@@ -61,10 +57,8 @@ class AnswerSection extends StatelessWidget {
           children: [
             Expanded(
               child: AnswerButton(
-                label: answers[2].label,
                 value: answers[2].content,
                 color: Colors.amber,
-                labelColor: Colors.red,
                 isSelected: selectedAnswer == answers[2].label,
                 onTap: () => onAnswerSelected(answers[2].label),
               ),
@@ -72,10 +66,8 @@ class AnswerSection extends StatelessWidget {
             const SizedBox(width: 7),
             Expanded(
               child: AnswerButton(
-                label: answers[3].label,
                 value: answers[3].content,
                 color: Colors.lightGreen,
-                labelColor: Colors.red,
                 isSelected: selectedAnswer == answers[3].label,
                 onTap: () => onAnswerSelected(answers[3].label),
               ),

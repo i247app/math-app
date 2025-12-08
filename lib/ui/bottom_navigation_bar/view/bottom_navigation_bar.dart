@@ -24,7 +24,6 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
 
   final List<Widget> _screens = [
     const PlaceholderScreen(title: "Trang Chủ", color: Colors.blueAccent),
-    // const PlaceholderScreen(title: "Bài Kiểm Tra", color: Colors.purpleAccent),
     const MathTestIntroScreen(),
     const PlaceholderScreen(title: "Tiến Độ", color: Colors.greenAccent),
     const ProfileScreen(),
@@ -33,6 +32,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue.shade50,
       // IndexedStack giúp giữ trạng thái màn hình, không bị load lại khi chuyển tab
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(

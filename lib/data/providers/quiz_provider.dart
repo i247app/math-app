@@ -43,26 +43,19 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
     notifyListeners();
 
     try {
-      final response = await _quizRepository
-          .generateQuiz(uid)
-          .timeout(const Duration(seconds: 10));
+      final response = await _quizRepository.generateQuiz(uid);
 
       if (response.isSuccess && response.result.data.isNotEmpty) {
-        // Add new quiz to the list
         _allQuizzes.add(response.result.data);
-        // Move to the new quiz
         _currentQuizIndex = _allQuizzes.length - 1;
         _currentQuestionIndex = 0;
-        _remainingTime = 300; // Reset timer for new quiz
+        _remainingTime = 300; 
 
         return true;
       } else {
         _error = response.message ?? 'Failed to generate quiz';
         return false;
       }
-    } on TimeoutException {
-      _error = 'Request timeout. Please check your internet connection.';
-      return false;
     } catch (e) {
       _error = 'Network error: ${e.toString()}';
       return false;
@@ -120,9 +113,7 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
       // Collect all answers from all quizzes
       final allAnswers = getAllAnswers();
 
-      final response = await _quizRepository
-          .submitQuiz(uid, allAnswers)
-          .timeout(const Duration(seconds: 10));
+      final response = await _quizRepository.submitQuiz(uid, allAnswers);
 
       if (response.isSuccess) {
         _result = response.result.data;
@@ -131,9 +122,6 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
         _error = response.message ?? 'Failed to submit quiz';
         return false;
       }
-    } on TimeoutException {
-      _error = 'Request timeout. Please check your internet connection.';
-      return false;
     } catch (e) {
       _error = 'Network error: ${e.toString()}';
       return false;

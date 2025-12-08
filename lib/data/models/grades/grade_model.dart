@@ -13,7 +13,7 @@ class GradeModel {
   @JsonKey(name: 'description')
   final String description;
 
-  @JsonKey(name: 'icon_url')
+  @JsonKey(name: 'image_url')
   final String iconUrl;
 
   @JsonKey(name: 'display_order')

@@ -7,13 +7,13 @@ import '../models/profile/update_profile_request.dart';
 class ProfileRepository {
   Future<ProfileCreateResponse> createProfile({
     required String uid,
-    required String grade,
-    required String level,
+    required String gradeId,
+    required String semesterId,
   }) async {
     final response = await network.createProfile(
       uid: uid,
-      grade: grade,
-      level: level,
+      gradeId: gradeId,
+      semesterId: semesterId,
     );
     return response;
   }

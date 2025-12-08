@@ -24,7 +24,7 @@ class SubmitQuizResponse extends BaseResponse {
 @JsonSerializable()
 class SubmitQuizResult {
   @JsonKey(name: 'user_latest_quiz_id')
-  final String userLatestQuizId;
+  final String? userLatestQuizId;
   final String response;
   final QuizResultData data;
   final String role;
@@ -32,7 +32,7 @@ class SubmitQuizResult {
   final String timestamp;
 
   SubmitQuizResult({
-    required this.userLatestQuizId,
+    this.userLatestQuizId,
     required this.response,
     required this.data,
     required this.role,

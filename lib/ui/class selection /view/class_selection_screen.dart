@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 import '../widget/class_card_widget.dart';
 
 class ClassSelectionScreen extends StatefulWidget {
-  const ClassSelectionScreen({super.key});
+  final bool isForUpdate;
+
+  const ClassSelectionScreen({super.key, this.isForUpdate = false});
 
   @override
   State<ClassSelectionScreen> createState() => _ClassSelectionScreenState();

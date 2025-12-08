@@ -25,24 +25,31 @@ class HeaderSection extends StatelessWidget {
                 color: Colors.black87,
               ),
             ),
-            Row(
-              children: [
-                Image.asset(
-                  'assets/imgs/bee.jpg',
-                  width: 35,
-                  errorBuilder: (c, o, s) =>
-                      const Icon(Icons.bug_report, color: Colors.yellow),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  userProvider.userName,
-                  style: GoogleFonts.nunito(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/imgs/bee.jpg',
+                    width: 35,
+                    errorBuilder: (c, o, s) =>
+                        const Icon(Icons.bug_report, color: Colors.yellow),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    userProvider.userName,
+                    style: GoogleFonts.nunito(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

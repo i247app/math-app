@@ -107,7 +107,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                   const SizedBox(height: 40),
 
                   Text(
-                    "Chọn Mức Độ\ncủa bạn!",
+                    "Chọn Kì Học\ncủa bạn!",
                     style: GoogleFonts.nunito(
                       fontSize: 40,
                       height: 1.2,
@@ -239,10 +239,10 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                                   await profileProvider
                                                       .createProfile(
                                                         uid: userId,
-                                                        grade:
-                                                            selectedGrade.label,
-                                                        level:
-                                                            selectedLevel.label,
+                                                        gradeId:
+                                                            selectedGrade.id,
+                                                        semesterId:
+                                                            selectedLevel.id,
                                                       );
 
                                               if (success && context.mounted) {
@@ -287,7 +287,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                               child: Text(
                                 selectedIndex != null
                                     ? "Tiếp Tục"
-                                    : "Chọn mức độ",
+                                    : "Chọn kì học",
                                 style: GoogleFonts.nunito(
                                   fontSize: 18,
                                   color: selectedIndex != null

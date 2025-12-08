@@ -7,16 +7,16 @@ class UpdateProfileRequest {
   @JsonKey(name: 'uid')
   final String uid;
 
-  @JsonKey(name: 'grade')
-  final String grade;
+  @JsonKey(name: 'grade_id')
+  final String gradeId;
 
-  @JsonKey(name: 'level')
-  final String level;
+  @JsonKey(name: 'semester_id')
+  final String semesterId;
 
   UpdateProfileRequest({
     required this.uid,
-    required this.grade,
-    required this.level,
+    required this.gradeId,
+    required this.semesterId,
   });
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>

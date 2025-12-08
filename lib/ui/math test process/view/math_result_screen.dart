@@ -29,26 +29,10 @@ class ResultScreen extends StatelessWidget {
             : "CẦN CỐ GẮNG!";
         final completedText =
             "Đã hoàn thành ${result.correctNumber}/${result.totalQuestions} câu!";
-
         return Scaffold(
+          backgroundColor: Colors.blue.shade50,
           body: Stack(
             children: [
-              Positioned(
-                top: 80,
-                left: 0,
-                right: 0,
-                child: Image.asset(
-                  'assets/imgs/cloud.png',
-                  fit: BoxFit.cover,
-                  height: 500,
-                  width: double.infinity,
-                  errorBuilder: (c, e, s) => Container(
-                    height: 500,
-                    color: Colors.white.withAlpha((255 * 0.5).toInt()),
-                  ),
-                ),
-              ),
-
               Positioned(
                 top: 180,
                 left: 0,
@@ -71,22 +55,13 @@ class ResultScreen extends StatelessWidget {
                         color: const Color(0xFF0277BD),
                       ),
                     ),
-                    const SizedBox(height: 20),
+
                     SizedBox(
                       height: 220,
                       width: 220,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          Image.asset(
-                            'assets/imgs/bee13.png',
-                            fit: BoxFit.contain,
-                            errorBuilder: (c, e, s) => Container(
-                              color: Colors.amber,
-                              width: 100,
-                              height: 100,
-                            ),
-                          ),
                           Positioned(
                             top: 30,
                             left: 120,
@@ -108,20 +83,6 @@ class ResultScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Image.asset(
-                  'assets/imgs/grass_background.png',
-                  fit: BoxFit.cover,
-                  height: 150,
-                  errorBuilder: (c, e, s) =>
-                      Container(height: 150, color: Colors.green),
-                ),
-              ),
-
               SafeArea(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
@@ -133,8 +94,17 @@ class ResultScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         HeaderSection(),
-                        const SizedBox(height: 10),
-                        const SizedBox(height: 250),
+                        const SizedBox(height: 120),
+                        SizedBox(
+                          height: 120,
+                          child: Image(
+                            image: const AssetImage(
+                              'assets/imgs/appriciation.png',
+                            ),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                         StatsRow(
                           correctAnswers: result.correctNumber,
                           totalQuestions: result.totalQuestions,
@@ -146,17 +116,6 @@ class ResultScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-              ),
-
-              Positioned(
-                bottom: 20,
-                left: -10,
-                child: Image.asset(
-                  'assets/imgs/bee15.png',
-                  height: 180,
-                  errorBuilder: (c, e, s) =>
-                      const Icon(Icons.bug_report, size: 100),
                 ),
               ),
             ],

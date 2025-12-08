@@ -17,8 +17,8 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<bool> createProfile({
     required String uid,
-    required String grade,
-    required String level,
+    required String gradeId,
+    required String semesterId,
   }) async {
     _isLoading = true;
     _error = null;
@@ -27,8 +27,8 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
     try {
       final response = await _profileRepository.createProfile(
         uid: uid,
-        grade: grade,
-        level: level,
+        gradeId: gradeId,
+        semesterId: semesterId,
       );
 
       if (response.isSuccess && response.profile != null) {
@@ -73,8 +73,8 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<bool> updateProfile({
     required String uid,
-    required String grade,
-    required String level,
+    required String gradeId,
+    required String semesterId,
   }) async {
     _isLoading = true;
     _error = null;
@@ -83,12 +83,12 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
     try {
       final request = UpdateProfileRequest(
         uid: uid,
-        grade: grade,
-        level: level,
+        gradeId: gradeId,
+        semesterId: semesterId,
       );
       final response = await _profileRepository.updateProfile(request);
 
-      if (response.isSuccess && response.result.profile != null) {
+      if (response.isSuccess) {
         _profile = response.result.profile;
         return true;
       } else {

@@ -8,16 +8,16 @@ import '../network/network.dart' as network;
 class AuthRepository {
   Future<SignUpResponse> signup({
     required String name,
-    required String email,
     required String phone,
     required String password,
+    required String birthDate,
   }) async {
     // Create user object
     final user = User(
       name: name,
-      email: email,
       phone: phone,
       password: password,
+      dob: birthDate,
     );
 
     // Call API
@@ -138,16 +138,31 @@ class AuthRepository {
     return null;
   }
 
-  String? validateAge(String? age) {
-    if (age == null || age.trim().isEmpty) {
-      return 'Vui lòng chọn tuổi';
+  String? validateBirthDate(String? birthDate) {
+    if (birthDate == null || birthDate.trim().isEmpty) {
+      return 'Vui lòng chọn ngày sinh';
     }
-    final ageNum = int.tryParse(age.trim());
-    if (ageNum == null) {
-      return 'Tuổi phải là số';
+    // Check format YYYY-MM-DD
+    final dateRegex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+    if (!dateRegex.hasMatch(birthDate.trim())) {
+      return 'Ngày sinh không hợp lệ';
     }
-    if (ageNum < 3 || ageNum > 18) {
-      return 'Tuổi phải từ 3 đến 18';
+    // Parse date to check validity
+    try {
+      final date = DateTime.parse(birthDate.trim());
+      final now = DateTime.now();
+      final age =
+          now.year -
+          date.year -
+          (now.month < date.month ||
+                  (now.month == date.month && now.day < date.day)
+              ? 1
+              : 0);
+      if (age < 3 || age > 18) {
+        return 'Tuổi phải từ 3 đến 18';
+      }
+    } catch (e) {
+      return 'Ngày sinh không hợp lệ';
     }
     return null;
   }
@@ -155,34 +170,30 @@ class AuthRepository {
   // Validate all fields at once
   Map<String, String?> validateAll({
     required String name,
-    required String email,
     required String phone,
     required String password,
-    required String age,
+    required String birthDate,
   }) {
     return {
       'name': validateName(name),
-      'email': validateEmail(email),
       'phone': validatePhone(phone),
       'password': validatePassword(password),
-      'age': validateAge(age),
+      'birthDate': validateBirthDate(birthDate),
     };
   }
 
   // Check if all validations pass
   bool isValidAll({
     required String name,
-    required String email,
     required String phone,
     required String password,
-    required String age,
+    required String birthDate,
   }) {
     final validations = validateAll(
       name: name,
-      email: email,
       phone: phone,
       password: password,
-      age: age,
+      birthDate: birthDate,
     );
     return validations.values.every((error) => error == null);
   }
