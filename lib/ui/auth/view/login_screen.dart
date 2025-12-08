@@ -240,8 +240,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       children: [
                         buildCustomTextField(
-                          label: 'Email hoặc tên đăng nhập:',
-                          hintText: 'Email hoặc tên đăng nhập',
+                          label: 'SĐT hoặc tên đăng nhập:',
+                          hintText: 'SĐT hoặc tên đăng nhập',
                           icon: Icons.email_outlined,
                           controller: _loginNameController,
                           errorText: _loginNameError,

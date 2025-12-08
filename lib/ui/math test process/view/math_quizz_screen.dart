@@ -8,6 +8,7 @@ import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart'
 import 'package:math_ai_app/ui/math%20test%20process/widget/info_row.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/question_board.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/answer_section.dart';
+import 'package:math_ai_app/ui/math%20test%20process/widget/error_screen.dart';
 import 'package:math_ai_app/data/providers/quiz_provider.dart';
 import 'package:math_ai_app/data/providers/user_provider.dart';
 
@@ -21,6 +22,7 @@ class MathQuizScreen extends StatefulWidget {
 class _MathQuizScreenState extends State<MathQuizScreen> {
   Timer? _timer;
   bool isSubmitting = false;
+  bool _showLoading = true;
 
   @override
   void initState() {
@@ -44,7 +46,26 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       await quizProvider.generateQuiz(uid);
       if (quizProvider.questions != null &&
           quizProvider.questions!.isNotEmpty) {
-        _startTimer();
+        // Allow loading animation to complete before showing quiz
+        await Future.delayed(const Duration(seconds: 2));
+        if (mounted) {
+          setState(() {
+            _showLoading = false;
+          });
+          _startTimer();
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _showLoading = false;
+          });
+        }
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _showLoading = false;
+        });
       }
     }
   }
@@ -65,6 +86,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
   Future<void> _autoSubmit() async {
     setState(() {
       isSubmitting = true;
+      _showLoading = true;
     });
     final userProvider = context.read<UserProvider>();
     final uid = userProvider.user?.id;
@@ -72,22 +94,33 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       final quizProvider = context.read<QuizProvider>();
       final success = await quizProvider.submitQuiz(uid);
       if (success && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ResultScreen()),
-        );
+        // Allow loading animation to complete before navigating
+        await Future.delayed(const Duration(seconds: 2));
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const ResultScreen()),
+          );
+        }
       } else if (mounted) {
         // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(quizProvider.error ?? 'Failed to submit quiz'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        await Future.delayed(const Duration(seconds: 2));
+        if (mounted) {
+          setState(() {
+            _showLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(quizProvider.error ?? 'Failed to submit quiz'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
     if (mounted) {
       setState(() {
         isSubmitting = false;
+        _showLoading = false;
       });
     }
   }
@@ -110,6 +143,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           await _autoSubmit();
         } else {
           // Load next quiz
+          if (!mounted) return;
           final userProvider = context.read<UserProvider>();
           final uid = userProvider.user?.id;
           if (uid != null && uid.isNotEmpty) {
@@ -127,7 +161,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
   Widget build(BuildContext context) {
     return Consumer<QuizProvider>(
       builder: (context, quizProvider, child) {
-        if (quizProvider.isLoading || isSubmitting) {
+        if (_showLoading || quizProvider.isLoading || isSubmitting) {
           return Scaffold(
             backgroundColor: Colors.blue.shade50,
             body: Container(
@@ -439,20 +473,9 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
         }
 
         if (quizProvider.error != null) {
-          return Scaffold(
-            backgroundColor: Colors.blue.shade50,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Error: ${quizProvider.error}'),
-                  ElevatedButton(
-                    onPressed: _initializeQuiz,
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            ),
+          return ErrorScreen(
+            errorMessage: quizProvider.error!,
+            onRetry: _initializeQuiz,
           );
         }
 

@@ -149,18 +149,18 @@ class AuthRepository {
     }
     // Parse date to check validity
     try {
-      final date = DateTime.parse(birthDate.trim());
-      final now = DateTime.now();
-      final age =
-          now.year -
-          date.year -
-          (now.month < date.month ||
-                  (now.month == date.month && now.day < date.day)
-              ? 1
-              : 0);
-      if (age < 3 || age > 18) {
-        return 'Tuổi phải từ 3 đến 18';
-      }
+      // final date = DateTime.parse(birthDate.trim());
+      // final now = DateTime.now();
+      // final age =
+      //     now.year -
+      //     date.year -
+      //     (now.month < date.month ||
+      //             (now.month == date.month && now.day < date.day)
+      //         ? 1
+      //         : 0);
+      // if (age < 3 || age > 18) {
+      //   return 'Tuổi phải từ 3 đến 18';
+      // }
     } catch (e) {
       return 'Ngày sinh không hợp lệ';
     }

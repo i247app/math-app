@@ -6,6 +6,7 @@ import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart'
 import 'package:math_ai_app/ui/math%20test%20process/widget/stats_row.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/level_chart_section.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/suggestion_and_buttons.dart';
+import 'package:math_ai_app/ui/math%20test%20process/widget/error_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
@@ -14,6 +15,17 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<QuizProvider>(
       builder: (context, quizProvider, child) {
+        // Check for error first
+        if (quizProvider.error != null) {
+          return ErrorScreen(
+            errorMessage: quizProvider.error!,
+            onRetry: () {
+              // Navigate back to quiz screen to retry
+              Navigator.of(context).pop();
+            },
+          );
+        }
+
         final result = quizProvider.result;
         if (result == null) {
           return const Scaffold(
