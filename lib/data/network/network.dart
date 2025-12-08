@@ -12,6 +12,8 @@ import '../responses/grades/grades_list_response.dart';
 import '../responses/levels/levels_list_response.dart';
 import '../responses/profile/profile_create_response.dart';
 import '../responses/profile/profile_fetch_response.dart';
+import '../models/profile/update_profile_request.dart';
+import '../models/profile/update_profile_response.dart';
 import '../responses/quiz/generate_quiz_response.dart';
 import '../responses/quiz/submit_quiz_response.dart';
 import '/config/config.dart';
@@ -150,6 +152,16 @@ Future<ProfileFetchResponse> fetchProfile(String uid) async {
   return _parseResponse(response, ProfileFetchResponse.fromJson);
 }
 
+Future<UpdateProfileResponse> updateProfile(
+  UpdateProfileRequest request,
+) async {
+  final response = await _post(
+    Uri.parse('$API_ROOT/profiles/update'),
+    request.toJson(),
+  );
+  return _parseResponse(response, UpdateProfileResponse.fromJson);
+}
+
 Future<GenerateQuizResponse> generateQuiz(String uid) async {
   final response = await _post(Uri.parse('$API_ROOT/generate-quiz'), {
     "uid": uid,
@@ -167,3 +179,6 @@ Future<SubmitQuizResponse> submitQuiz(
   });
   return _parseResponse(response, SubmitQuizResponse.fromJson);
 }
+
+
+// {{url}}/generate-quiz-practice

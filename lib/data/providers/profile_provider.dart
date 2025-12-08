@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/profile/profile_model.dart';
+import '../models/profile/update_profile_request.dart';
 import '../repositories/profile_repository.dart';
 
 class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
@@ -59,6 +60,39 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
         return true;
       } else {
         _error = response.message ?? 'Failed to fetch profile';
+        return false;
+      }
+    } catch (e) {
+      _error = 'Network error: ${e.toString()}';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updateProfile({
+    required String uid,
+    required String grade,
+    required String level,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final request = UpdateProfileRequest(
+        uid: uid,
+        grade: grade,
+        level: level,
+      );
+      final response = await _profileRepository.updateProfile(request);
+
+      if (response.isSuccess && response.result.profile != null) {
+        _profile = response.result.profile;
+        return true;
+      } else {
+        _error = response.message ?? 'Failed to update profile';
         return false;
       }
     } catch (e) {

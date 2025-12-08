@@ -49,7 +49,7 @@ class AnswerButton extends StatelessWidget {
                     ),
                   ],
                 ),
-                alignment: Alignment.centerRight,
+                alignment: Alignment.center,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 4.0),
                   child: AutoSizeText(

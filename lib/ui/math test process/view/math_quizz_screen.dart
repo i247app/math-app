@@ -91,10 +91,10 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
     }
   }
 
-  void _handlePreviousPress() async {
-    final quizProvider = context.read<QuizProvider>();
-    quizProvider.loadPreviousQuiz();
-  }
+  // void _handlePreviousPress() async {
+  //   final quizProvider = context.read<QuizProvider>();
+  //   quizProvider.loadPreviousQuiz();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +233,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
               ),
 
               Positioned(
-                bottom: 80,
+                bottom: 100,
                 left: 0,
                 right: 0,
                 child: Center(
@@ -283,7 +283,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                       //     ),
                       //   ),
                       // ),
-                      const SizedBox(width: 20),
+                      // const SizedBox(width: 20),
                       SizedBox(
                         width: 120,
                         height: 56,

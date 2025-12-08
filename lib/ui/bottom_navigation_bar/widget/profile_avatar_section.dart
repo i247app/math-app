@@ -4,11 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 class ProfileAvatarSection extends StatelessWidget {
   final String name;
   final String email;
+  final VoidCallback? onEditTap;
 
   const ProfileAvatarSection({
     super.key,
     required this.name,
     required this.email,
+    this.onEditTap,
   });
 
   @override
@@ -36,20 +38,27 @@ class ProfileAvatarSection extends StatelessWidget {
             Positioned(
               bottom: 0,
               right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha((255 * 0.1).toInt()),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+              child: GestureDetector(
+                onTap: onEditTap,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha((255 * 0.1).toInt()),
+                        blurRadius: 5,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.edit,
+                    size: 20,
+                    color: Colors.black87,
+                  ),
                 ),
-                child: const Icon(Icons.edit, size: 20, color: Colors.black87),
               ),
             ),
           ],

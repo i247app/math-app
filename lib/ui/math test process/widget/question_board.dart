@@ -17,21 +17,21 @@ class QuestionBoard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withAlpha((255 * 0.2).toInt()),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Container(
-        height: 140,
+        height: 200,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: const Color(0xFF1E7858),
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withAlpha((255 * 0.1).toInt()),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

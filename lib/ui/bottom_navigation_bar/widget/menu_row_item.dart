@@ -6,6 +6,7 @@ class MenuRowItem extends StatelessWidget {
   final String title;
   final String? trailingText;
   final bool isLast;
+  final VoidCallback? onTap;
 
   const MenuRowItem({
     super.key,
@@ -13,38 +14,42 @@ class MenuRowItem extends StatelessWidget {
     required this.title,
     this.trailingText,
     this.isLast = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Row(
-            children: [
-              Icon(icon, size: 26, color: Colors.black87),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.nunito(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+        InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Row(
+              children: [
+                Icon(icon, size: 26, color: Colors.black87),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: GoogleFonts.nunito(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
-              ),
-              if (trailingText != null)
-                Text(
-                  trailingText!,
-                  style: GoogleFonts.nunito(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.orange,
+                if (trailingText != null)
+                  Text(
+                    trailingText!,
+                    style: GoogleFonts.nunito(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.orange,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
         if (!isLast)

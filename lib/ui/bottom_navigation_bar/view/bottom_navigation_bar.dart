@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:math_ai_app/ui/math%20test%20process/view/math_quizz_screen.dart';
 import 'package:math_ai_app/ui/math%20test%20process/view/math_test_intro_screen.dart';
 import '../sub_view/profile_screen.dart';
 import 'placeholder_screen.dart';
