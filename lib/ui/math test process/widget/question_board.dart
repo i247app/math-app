@@ -11,7 +11,7 @@ class QuestionBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 199,
+      height: 250,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: const Color(0xFF48C8B5),
@@ -33,9 +33,9 @@ class QuestionBoard extends StatelessWidget {
           maxLines: 5,
           overflow: TextOverflow.visible,
           minFontSize: 20,
-          maxFontSize: 35,
+          maxFontSize: 30,
           style: GoogleFonts.nunito(
-            fontSize: 35,
+            fontSize: 30,
             fontWeight: FontWeight.bold,
             color: Colors.white,
             letterSpacing: 2,
