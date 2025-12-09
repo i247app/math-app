@@ -21,7 +21,7 @@ class AnswerButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        height: 90,
+        height: 111,
         child: Stack(
           children: [
             Positioned(
@@ -34,7 +34,7 @@ class AnswerButton extends StatelessWidget {
                   color: isSelected
                       ? color.withAlpha((255 * 0.7).toInt())
                       : color,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(5),
                   border: Border.all(
                     color: isSelected ? Colors.blue : Colors.black12,
                     width: isSelected ? 3 : 1,
@@ -55,21 +55,21 @@ class AnswerButton extends StatelessWidget {
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
                     minFontSize: 10,
-                    maxFontSize: 25,
+                    maxFontSize: 30,
                     style: GoogleFonts.nunito(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          offset: const Offset(-1, -1),
-                          color: Colors.black.withAlpha((255 * 0.3).toInt()),
-                        ),
-                        Shadow(
-                          offset: const Offset(1, 1),
-                          color: Colors.black.withAlpha((255 * 0.3).toInt()),
-                        ),
-                      ],
+                      color: const Color(0xFFF5F5F5),
+                      // shadows: [
+                      //   Shadow(
+                      //     offset: const Offset(-1, -1),
+                      //     color: Colors.black.withAlpha((255 * 0.3).toInt()),
+                      //   ),
+                      //   Shadow(
+                      //     offset: const Offset(1, 1),
+                      //     color: Colors.black.withAlpha((255 * 0.3).toInt()),
+                      //   ),
+                      // ],
                     ),
                   ),
                 ),

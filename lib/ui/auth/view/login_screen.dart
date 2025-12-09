@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
@@ -202,21 +203,31 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.blue.shade50,
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/imgs/woman.png',
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(
-                                Icons.person,
-                                size: 60,
-                                color: Colors.blue,
-                              ),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (kDebugMode) {
+                          setState(() {
+                            _loginNameController.text = '0816904167';
+                            _passwordController.text = 'Anhhlv@230500';
+                          });
+                        }
+                      },
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.blue.shade50,
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/imgs/woman.png',
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.person,
+                                  size: 60,
+                                  color: Colors.blue,
+                                ),
+                          ),
                         ),
                       ),
                     ),

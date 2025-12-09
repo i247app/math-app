@@ -8,7 +8,6 @@ import '../widget/curved_header_background.dart';
 import '../widget/info_card.dart';
 import '../widget/menu_row_item.dart';
 import '../widget/profile_avatar_section.dart';
-import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

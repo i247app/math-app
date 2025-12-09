@@ -11,6 +11,7 @@ class AuthRepository {
     required String phone,
     required String password,
     required String birthDate,
+    required String grade,
   }) async {
     // Create user object
     final user = User(
@@ -18,6 +19,7 @@ class AuthRepository {
       phone: phone,
       password: password,
       dob: birthDate,
+      grade: grade,
     );
 
     // Call API

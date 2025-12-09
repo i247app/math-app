@@ -21,8 +21,10 @@ class MathQuizScreen extends StatefulWidget {
 
 class _MathQuizScreenState extends State<MathQuizScreen> {
   Timer? _timer;
+  Timer? _animationTimer;
   bool isSubmitting = false;
   bool _showLoading = true;
+  int _animationKey = 0; // Key to restart animations
 
   @override
   void initState() {
@@ -35,10 +37,14 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _animationTimer?.cancel();
     super.dispose();
   }
 
   Future<void> _initializeQuiz() async {
+    // Start animation timer for continuous symbol animations
+    _startAnimationTimer();
+
     final userProvider = context.read<UserProvider>();
     final uid = userProvider.user?.id;
     if (uid != null && uid.isNotEmpty) {
@@ -52,6 +58,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           setState(() {
             _showLoading = false;
           });
+          _animationTimer?.cancel();
           _startTimer();
         }
       } else {
@@ -59,6 +66,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           setState(() {
             _showLoading = false;
           });
+          _animationTimer?.cancel();
         }
       }
     } else {
@@ -66,6 +74,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
         setState(() {
           _showLoading = false;
         });
+        _animationTimer?.cancel();
       }
     }
   }
@@ -83,11 +92,25 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
     });
   }
 
+  void _startAnimationTimer() {
+    _animationTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (mounted && _showLoading) {
+        setState(() {
+          _animationKey++;
+        });
+      } else {
+        _animationTimer?.cancel();
+      }
+    });
+  }
+
   Future<void> _autoSubmit() async {
     setState(() {
       isSubmitting = true;
       _showLoading = true;
     });
+    _animationTimer?.cancel();
+    _startAnimationTimer();
     final userProvider = context.read<UserProvider>();
     final uid = userProvider.user?.id;
     if (uid != null && uid.isNotEmpty) {
@@ -191,8 +214,13 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                           return Transform.scale(
                             scale: scale,
                             child: TweenAnimationBuilder<double>(
-                              tween: Tween<double>(begin: 0, end: 360),
-                              duration: const Duration(seconds: 4),
+                              tween: Tween<double>(
+                                begin: 0,
+                                end: 360 * 100,
+                              ), // Rotate 100 full circles
+                              duration: const Duration(
+                                seconds: 120,
+                              ), // Slower continuous rotation
                               curve: Curves.linear,
                               builder: (context, rotation, child) {
                                 return Transform.rotate(
@@ -328,7 +356,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                       // Circular progress indicator with animation
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
-                        duration: const Duration(seconds: 6),
+                        duration: const Duration(seconds: 13),
                         curve: Curves.easeInOut,
                         builder: (context, value, child) {
                           return SizedBox(
@@ -352,37 +380,38 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 30),
 
                       // Math symbols floating animation
                       SizedBox(
-                        height: 60,
+                        key: ValueKey(_animationKey),
+                        height: 100,
                         child: Stack(
                           children: [
                             TweenAnimationBuilder<Offset>(
                               tween: Tween<Offset>(
-                                begin: const Offset(-50, 0),
-                                end: const Offset(50, -20),
+                                begin: const Offset(-100, 10),
+                                end: const Offset(450, -30),
                               ),
-                              duration: const Duration(seconds: 2),
+                              duration: const Duration(seconds: 4),
                               curve: Curves.easeInOut,
                               builder: (context, offset, child) {
                                 return Positioned(
-                                  left: 50 + offset.dx,
-                                  top: 20 + offset.dy,
+                                  left: offset.dx,
+                                  top: offset.dy,
                                   child: TweenAnimationBuilder<double>(
                                     tween: Tween<double>(begin: 0.8, end: 1.2),
-                                    duration: const Duration(milliseconds: 500),
+                                    duration: const Duration(milliseconds: 800),
                                     curve: Curves.easeInOut,
                                     builder: (context, scale, child) {
                                       return Transform.scale(
                                         scale: scale,
                                         child: Opacity(
-                                          opacity: 0.6,
+                                          opacity: 0.7,
                                           child: Text(
                                             '➕',
                                             style: TextStyle(
-                                              fontSize: 24,
+                                              fontSize: 28,
                                               color: Colors.orange.shade700,
                                             ),
                                           ),
@@ -395,28 +424,28 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                             ),
                             TweenAnimationBuilder<Offset>(
                               tween: Tween<Offset>(
-                                begin: const Offset(100, 20),
-                                end: const Offset(-30, -10),
+                                begin: const Offset(500, 5),
+                                end: const Offset(-80, -25),
                               ),
-                              duration: const Duration(seconds: 2),
+                              duration: const Duration(seconds: 4),
                               curve: Curves.easeInOut,
                               builder: (context, offset, child) {
                                 return Positioned(
-                                  right: 50 + offset.dx,
-                                  top: 10 + offset.dy,
+                                  left: offset.dx,
+                                  top: offset.dy,
                                   child: TweenAnimationBuilder<double>(
                                     tween: Tween<double>(begin: 0.8, end: 1.2),
-                                    duration: const Duration(milliseconds: 500),
+                                    duration: const Duration(milliseconds: 800),
                                     curve: Curves.easeInOut,
                                     builder: (context, scale, child) {
                                       return Transform.scale(
                                         scale: scale,
                                         child: Opacity(
-                                          opacity: 0.6,
+                                          opacity: 0.7,
                                           child: Text(
                                             '➗',
                                             style: TextStyle(
-                                              fontSize: 24,
+                                              fontSize: 28,
                                               color: Colors.blue.shade700,
                                             ),
                                           ),
@@ -429,28 +458,28 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                             ),
                             TweenAnimationBuilder<Offset>(
                               tween: Tween<Offset>(
-                                begin: const Offset(0, 40),
-                                end: const Offset(80, -30),
+                                begin: const Offset(-80, 35),
+                                end: const Offset(480, -15),
                               ),
-                              duration: const Duration(seconds: 2),
+                              duration: const Duration(seconds: 4),
                               curve: Curves.easeInOut,
                               builder: (context, offset, child) {
                                 return Positioned(
-                                  left: 100 + offset.dx,
-                                  bottom: 10 + offset.dy,
+                                  left: offset.dx,
+                                  top: offset.dy,
                                   child: TweenAnimationBuilder<double>(
                                     tween: Tween<double>(begin: 0.8, end: 1.2),
-                                    duration: const Duration(milliseconds: 500),
+                                    duration: const Duration(milliseconds: 800),
                                     curve: Curves.easeInOut,
                                     builder: (context, scale, child) {
                                       return Transform.scale(
                                         scale: scale,
                                         child: Opacity(
-                                          opacity: 0.6,
+                                          opacity: 0.7,
                                           child: Text(
                                             '✖️',
                                             style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 26,
                                               color: Colors.red.shade700,
                                             ),
                                           ),
@@ -498,20 +527,17 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                   ),
                   child: Column(
                     children: [
-                      HeaderSection(),
-                      const SizedBox(height: 10),
+                      // HeaderSection(),
+                      const SizedBox(height: 30),
                       Text(
                         "KIỂM TRA",
                         style: GoogleFonts.nunito(
-                          fontSize: 24,
+                          fontSize: 32,
                           fontWeight: FontWeight.w800,
                           color: const Color(0xFF3E2723),
                         ),
                       ),
-
-                      const SizedBox(height: 10),
-                      const SizedBox(height: 20),
-
+                      const SizedBox(height: 50),
                       InfoRow(
                         remainingTime: quizProvider.remainingTime,
                         currentQuestion: quizProvider.currentQuestionIndex + 1,
@@ -525,7 +551,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                             quizProvider.currentQuestion?.questionName ?? '',
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
 
                       Expanded(
                         child: AnswerSection(

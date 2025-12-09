@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/ui/math%20test%20process/view/math_test_intro_screen.dart';
 import '../sub_view/profile_screen.dart';
+import 'assessment_screen.dart';
 import 'placeholder_screen.dart';
 
 class BottomNavigationBarScreen extends StatefulWidget {
@@ -24,8 +25,9 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
 
   final List<Widget> _screens = [
     const PlaceholderScreen(title: "Trang Chủ", color: Colors.blueAccent),
-    const MathTestIntroScreen(),
-    const PlaceholderScreen(title: "Tiến Độ", color: Colors.greenAccent),
+    //const MathTestIntroScreen(),
+    const AssessmentScreen(),
+    const AssessmentScreen(),
     const ProfileScreen(),
   ];
 

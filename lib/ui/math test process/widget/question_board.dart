@@ -11,10 +11,12 @@ class QuestionBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(8),
+      height: 199,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: const Color(0xFFE67E22),
-        borderRadius: BorderRadius.circular(8),
+        color: const Color(0xFF48C8B5),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF9E498), width: 10),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha((255 * 0.2).toInt()),
@@ -23,35 +25,20 @@ class QuestionBoard extends StatelessWidget {
           ),
         ],
       ),
-      child: Container(
-        height: 250,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E7858),
-          borderRadius: BorderRadius.circular(4),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha((255 * 0.1).toInt()),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: AutoSizeText(
-            question,
-            textAlign: TextAlign.center,
-            maxLines: 5,
-            overflow: TextOverflow.visible,
-            minFontSize: 20,
-            maxFontSize: 35,
-            style: GoogleFonts.nunito(
-              fontSize: 35,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 2,
-            ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: AutoSizeText(
+          question,
+          textAlign: TextAlign.center,
+          maxLines: 5,
+          overflow: TextOverflow.visible,
+          minFontSize: 20,
+          maxFontSize: 35,
+          style: GoogleFonts.nunito(
+            fontSize: 35,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 2,
           ),
         ),
       ),

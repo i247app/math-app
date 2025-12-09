@@ -169,6 +169,14 @@ Future<GenerateQuizResponse> generateQuiz(String uid) async {
   return _parseResponse(response, GenerateQuizResponse.fromJson);
 }
 
+Future<GenerateQuizResponse> generatePractice(String uid) async {
+  final response = await _post(
+    Uri.parse('$API_ROOT/quiz-practices/reinforce'),
+    {"uid": uid},
+  );
+  return _parseResponse(response, GenerateQuizResponse.fromJson);
+}
+
 Future<SubmitQuizResponse> submitQuiz(
   String uid,
   List<Map<String, dynamic>> answers,

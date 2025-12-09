@@ -18,6 +18,9 @@ class User {
   @JsonKey(name: 'dob')
   String? dob;
 
+  @JsonKey(name: 'grade')
+  String? grade;
+
   @JsonKey(name: 'password')
   String? password;
 
@@ -39,6 +42,7 @@ class User {
     this.email,
     this.phone,
     this.dob,
+    this.grade,
     this.password,
     this.avatarUrl,
     this.role,
@@ -52,6 +56,7 @@ class User {
     String? email,
     String? phone,
     String? dob,
+    String? grade,
     String? password,
     String? avatarUrl,
     String? role,
@@ -64,6 +69,7 @@ class User {
       email: email ?? this.email,
       phone: phone ?? this.phone,
       dob: dob ?? this.dob,
+      grade: grade ?? this.grade,
       password: password ?? this.password,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       role: role ?? this.role,

@@ -32,6 +32,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
+  final TextEditingController _gradeController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -40,6 +41,7 @@ class _SignupScreenState extends State<SignupScreen> {
   // Validation errors
   String? _nameError;
   String? _birthDateError;
+  String? _gradeError;
   String? _phoneError;
   String? _passwordError;
 
@@ -50,6 +52,7 @@ class _SignupScreenState extends State<SignupScreen> {
   void dispose() {
     _nameController.dispose();
     _birthDateController.dispose();
+    _gradeController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -66,6 +69,16 @@ class _SignupScreenState extends State<SignupScreen> {
       _birthDateError = _authRepository.validateBirthDate(
         _birthDateController.text,
       );
+    });
+  }
+
+  void _validateGrade() {
+    setState(() {
+      if (_gradeController.text.isEmpty) {
+        _gradeError = 'Vui lòng chọn lớp học';
+      } else {
+        _gradeError = null;
+      }
     });
   }
 
@@ -86,6 +99,7 @@ class _SignupScreenState extends State<SignupScreen> {
   void _validateAll() {
     _validateName();
     _validateBirthDate();
+    _validateGrade();
     _validatePhone();
     _validatePassword();
   }
@@ -96,11 +110,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
     // Check if all validations pass
     if (!_authRepository.isValidAll(
-      name: _nameController.text,
-      phone: _phoneController.text,
-      password: _passwordController.text,
-      birthDate: _birthDateController.text,
-    )) {
+          name: _nameController.text,
+          phone: _phoneController.text,
+          password: _passwordController.text,
+          birthDate: _birthDateController.text,
+        ) ||
+        _gradeError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vui lòng kiểm tra lại thông tin'),
@@ -119,6 +134,7 @@ class _SignupScreenState extends State<SignupScreen> {
         phone: _phoneController.text.trim(),
         password: _passwordController.text,
         birthDate: _birthDateController.text.trim(),
+        grade: _gradeController.text.trim(),
       );
 
       if (response.isSuccess && response.user != null) {
@@ -243,39 +259,163 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 12),
 
-                  buildCustomTextField(
-                    label: 'Ngày sinh:',
-                    hintText: 'Chọn ngày sinh',
-                    icon: Icons.calendar_today_outlined,
-                    controller: _birthDateController,
-                    errorText: _birthDateError,
-                    isReadOnly: true,
-                    onTap: () async {
-                      final DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime(2003),
-                        firstDate: DateTime(1950),
-                        lastDate: DateTime.now(),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: const ColorScheme.light(
-                                primary: Color(0xFF3E2723),
-                                onPrimary: Colors.white,
-                                onSurface: Colors.black,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: buildCustomTextField(
+                          label: 'Ngày sinh:',
+                          hintText: 'Chọn ngày sinh',
+                          icon: Icons.calendar_today_outlined,
+                          controller: _birthDateController,
+                          errorText: _birthDateError,
+                          isReadOnly: true,
+                          onTap: () async {
+                            final DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime(2003),
+                              firstDate: DateTime(1950),
+                              lastDate: DateTime.now(),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: const ColorScheme.light(
+                                      primary: Color(0xFF3E2723),
+                                      onPrimary: Colors.white,
+                                      onSurface: Colors.black,
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (pickedDate != null) {
+                              final formattedDate =
+                                  "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                              _birthDateController.text = formattedDate;
+                              _validateBirthDate();
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 4.0,
+                                bottom: 8.0,
+                              ),
+                              child: Text(
+                                'Lớp học:',
+                                style: GoogleFonts.nunito(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
                               ),
                             ),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (pickedDate != null) {
-                        final formattedDate =
-                            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                        _birthDateController.text = formattedDate;
-                        _validateBirthDate();
-                      }
-                    },
+                            Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withAlpha(
+                                      (255 * 0.1).round(),
+                                    ),
+                                    spreadRadius: 1,
+                                    blurRadius: 3,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _gradeController.text.isEmpty
+                                    ? null
+                                    : _gradeController.text,
+                                hint: Text(
+                                  'Chọn lớp',
+                                  style: GoogleFonts.nunito(
+                                    color: Colors.grey[400],
+                                  ),
+                                ),
+                                items: List.generate(5, (index) {
+                                  final grade = 'Grade ${index + 1}';
+                                  return DropdownMenuItem<String>(
+                                    value: grade,
+                                    child: Text(
+                                      grade,
+                                      style: GoogleFonts.nunito(
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    _gradeController.text = value;
+                                    _validateGrade();
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.school_outlined,
+                                    color: Colors.grey[500],
+                                  ),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16.0,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFFFC107),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFFFC107),
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: Colors.red,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: Colors.red,
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (_gradeError != null)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 4.0,
+                                  top: 4.0,
+                                ),
+                                child: Text(
+                                  _gradeError!,
+                                  style: GoogleFonts.nunito(
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 12),
