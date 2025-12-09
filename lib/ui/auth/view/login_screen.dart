@@ -253,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         buildCustomTextField(
                           label: 'SĐT hoặc tên đăng nhập:',
                           hintText: 'SĐT hoặc tên đăng nhập',
-                          icon: Icons.email_outlined,
+                          icon: Icons.phone,
                           controller: _loginNameController,
                           errorText: _loginNameError,
                           inputType: TextInputType.emailAddress,
