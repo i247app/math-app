@@ -21,7 +21,7 @@ class AnswerButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        height: 70,
+        height: 90,
         child: Stack(
           children: [
             Positioned(

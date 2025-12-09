@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 
 const LOCALHOST_ANDROID_ROOT = 'http://10.0.2.2:8000';
 const LOCALHOST_IOS_ROOT = 'http://0.0.0.0:8000';
-const T1_ROOT = 'https://elaborative-nonimbricate-johnna.ngrok-free.dev';
-const T2_ROOT = 'https://elaborative-nonimbricate-johnna.ngrok-free.dev';
+const T1_ROOT = 'https://m1.i247.com/go';
+const T2_ROOT = 'https://m1.i247.com/go';
 
 String DEV_API_ROOT = T1_ROOT;
 

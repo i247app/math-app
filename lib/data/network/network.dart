@@ -163,7 +163,7 @@ Future<UpdateProfileResponse> updateProfile(
 }
 
 Future<GenerateQuizResponse> generateQuiz(String uid) async {
-  final response = await _post(Uri.parse('$API_ROOT/generate-quiz'), {
+  final response = await _post(Uri.parse('$API_ROOT/quiz-practices/generate'), {
     "uid": uid,
   });
   return _parseResponse(response, GenerateQuizResponse.fromJson);
@@ -173,7 +173,7 @@ Future<SubmitQuizResponse> submitQuiz(
   String uid,
   List<Map<String, dynamic>> answers,
 ) async {
-  final response = await _post(Uri.parse('$API_ROOT/submit-quiz'), {
+  final response = await _post(Uri.parse('$API_ROOT/quiz-practices/submit'), {
     "uid": uid,
     "answers": answers,
   });
@@ -181,4 +181,4 @@ Future<SubmitQuizResponse> submitQuiz(
 }
 
 
-// {{url}}/generate-quiz-practice
+// {{url}}/quiz-practices/reinforce

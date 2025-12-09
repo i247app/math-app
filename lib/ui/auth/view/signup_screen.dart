@@ -9,6 +9,19 @@ import 'package:provider/provider.dart';
 
 import '../../../core/shared/widget/custom_text_field.dart';
 
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
+
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -214,9 +227,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   buildCustomTextField(
                     label: 'Họ tên:',
                     hintText: 'Tên của bạn',
@@ -224,6 +235,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     controller: _nameController,
                     errorText: _nameError,
                     onChanged: (_) => _validateName(),
+                    inputFormatters: [
+                      UpperCaseTextFormatter(),
+                      LengthLimitingTextInputFormatter(30),
+                    ],
                   ),
 
                   const SizedBox(height: 12),

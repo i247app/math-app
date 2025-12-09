@@ -24,7 +24,7 @@ class QuestionBoard extends StatelessWidget {
         ],
       ),
       child: Container(
-        height: 200,
+        height: 250,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: const Color(0xFF1E7858),

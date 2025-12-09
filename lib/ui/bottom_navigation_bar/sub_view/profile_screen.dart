@@ -27,9 +27,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _navigateToEditProfile() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const EditProfileScreen()));
+    // Navigator.of(
+    //   context,
+    // ).push(MaterialPageRoute(builder: (_) => const EditProfileScreen()));
   }
 
   void _logout() {

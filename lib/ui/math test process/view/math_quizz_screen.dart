@@ -47,7 +47,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       if (quizProvider.questions != null &&
           quizProvider.questions!.isNotEmpty) {
         // Allow loading animation to complete before showing quiz
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 5));
         if (mounted) {
           setState(() {
             _showLoading = false;
@@ -95,7 +95,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       final success = await quizProvider.submitQuiz(uid);
       if (success && mounted) {
         // Allow loading animation to complete before navigating
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 5));
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const ResultScreen()),
@@ -103,7 +103,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
         }
       } else if (mounted) {
         // Show error message
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 5));
         if (mounted) {
           setState(() {
             _showLoading = false;
@@ -270,7 +270,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                       // Animated loading text
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
-                        duration: const Duration(milliseconds: 500),
+                        duration: const Duration(milliseconds: 1500),
                         builder: (context, opacity, child) {
                           return Opacity(
                             opacity: opacity,
@@ -328,7 +328,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                       // Circular progress indicator with animation
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
-                        duration: const Duration(seconds: 2),
+                        duration: const Duration(seconds: 6),
                         curve: Curves.easeInOut,
                         builder: (context, value, child) {
                           return SizedBox(
