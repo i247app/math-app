@@ -49,11 +49,39 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
         _allQuizzes.add(response.result.data);
         _currentQuizIndex = _allQuizzes.length - 1;
         _currentQuestionIndex = 0;
-        _remainingTime = 300; 
+        _remainingTime = 300;
 
         return true;
       } else {
         _error = response.message ?? 'Failed to generate quiz';
+        return false;
+      }
+    } catch (e) {
+      _error = 'Network error: ${e.toString()}';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> generatePractice(String uid) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await _quizRepository.generatePractice(uid);
+
+      if (response.isSuccess && response.result.data.isNotEmpty) {
+        _allQuizzes.add(response.result.data);
+        _currentQuizIndex = _allQuizzes.length - 1;
+        _currentQuestionIndex = 0;
+        _remainingTime = 300;
+
+        return true;
+      } else {
+        _error = response.message ?? 'Failed to generate practice quiz';
         return false;
       }
     } catch (e) {

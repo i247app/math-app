@@ -8,6 +8,11 @@ class QuizRepository {
     return response;
   }
 
+  Future<GenerateQuizResponse> generatePractice(String uid) async {
+    final response = await network.generatePractice(uid);
+    return response;
+  }
+
   Future<SubmitQuizResponse> submitQuiz(
     String uid,
     List<Map<String, dynamic>> answers,

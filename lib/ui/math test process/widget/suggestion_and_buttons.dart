@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
-import 'package:math_ai_app/ui/bottom_navigation_bar/view/bottom_navigation_bar.dart';
+import 'package:provider/provider.dart';
+import 'package:math_ai_app/data/providers/quiz_provider.dart';
+import 'package:math_ai_app/data/providers/user_provider.dart';
 
 import '../view/math_quizz_screen.dart';
 
@@ -57,13 +58,33 @@ class SuggestionAndButtons extends StatelessWidget {
             text: 'Practice',
             circularNumber: 28,
             height: 56,
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) =>
-                      const BottomNavigationBarScreen(initialIndex: 1),
-                ),
-              );
+            onPressed: () async {
+              // Call generatePractice API first
+              final userProvider = context.read<UserProvider>();
+              final quizProvider = context.read<QuizProvider>();
+              final uid = userProvider.user?.id;
+
+              if (uid != null && uid.isNotEmpty) {
+                try {
+                  await quizProvider.generatePractice(uid);
+                  // Navigate to MathQuizScreen after API call
+                  if (context.mounted) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const MathQuizScreen()),
+                    );
+                  }
+                } catch (e) {
+                  // Handle error if needed
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to generate practice quiz: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              }
             },
           ),
           // child: SizedBox(

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:math_ai_app/ui/math%20test%20process/view/math_result_screen.dart';
-import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/info_row.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/question_board.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/answer_section.dart';
@@ -117,7 +116,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       final quizProvider = context.read<QuizProvider>();
       final success = await quizProvider.submitQuiz(uid);
       if (success && mounted) {
-        // Allow loading animation to complete before navigating
         await Future.delayed(const Duration(seconds: 5));
         if (mounted) {
           Navigator.of(context).pushReplacement(
@@ -156,7 +154,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
     );
 
     // Auto proceed after selection
-    Future.delayed(const Duration(milliseconds: 800), () async {
+    Future.delayed(const Duration(milliseconds: 200), () async {
       if (quizProvider.currentQuestionIndex >=
           quizProvider.totalQuestions - 1) {
         // Last question in current quiz
