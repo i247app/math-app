@@ -24,7 +24,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   }
 
   final List<Widget> _screens = [
-    const PlaceholderScreen(title: "Trang Chủ", color: Colors.blueAccent),
+    const PlaceholderScreen(title: "Home", color: Colors.blueAccent),
     //const MathTestIntroScreen(),
     const AssessmentScreen(),
     const AssessmentScreen(),
@@ -66,19 +66,19 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_rounded),
-              label: "Trang Chủ",
+              label: "Home",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.assignment_outlined),
-              label: "Bài Kiểm Tra",
+              label: "Test",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.history_edu),
-              label: "Tiến Độ",
+              label: "Progress",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),
-              label: "Hồ Sơ",
+              label: "Profile",
             ),
           ],
         ),

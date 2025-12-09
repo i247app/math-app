@@ -50,49 +50,7 @@ class ResultScreen extends StatelessWidget {
                 top: 180,
                 left: 0,
                 right: 0,
-                child: Column(
-                  children: [
-                    // Text(
-                    //   message,
-                    //   style: GoogleFonts.nunito(
-                    //     fontSize: 28,
-                    //     fontWeight: FontWeight.w900,
-                    //     color: const Color(0xFF01579B),
-                    //   ),
-                    // ),
-                    // Text(
-                    //   completedText,
-                    //   style: GoogleFonts.nunito(
-                    //     fontSize: 18,
-                    //     fontWeight: FontWeight.w900,
-                    //     color: const Color(0xFF0277BD),
-                    //   ),
-                    // ),
-
-                    // SizedBox(
-                    //   height: 220,
-                    //   width: 220,
-                    //   child: Stack(
-                    //     alignment: Alignment.center,
-                    //     children: [
-                    //       Positioned(
-                    //         top: 30,
-                    //         left: 120,
-                    //         child: Transform.rotate(
-                    //           angle: -0.2,
-                    //           child: Text(
-                    //             "$percentage%",
-                    //             style: GoogleFonts.nunito(
-                    //               fontSize: 28,
-                    //               fontWeight: FontWeight.bold,
-                    //               color: Colors.white,
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
+                child: Column(children: [
                   ],
                 ),
               ),
