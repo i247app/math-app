@@ -37,7 +37,7 @@ class AssessmentScreen extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    'Assessment Table',
+                    '',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
