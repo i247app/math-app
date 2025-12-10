@@ -17,12 +17,12 @@ class MathSelectionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Header Section (Giả lập phần đã có sẵn của bạn)
+              
               HeaderSection(),
 
               const SizedBox(height: 20),
 
-              // 2. Main Title
+              
               Text(
                 "Chọn dạng Toán\nđã học!",
                 style: GoogleFonts.nunito(
@@ -35,9 +35,9 @@ class MathSelectionScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // 3. Card 1: Ôn tập và bổ sung (Màu xanh ngọc)
+              
               const TopicCard(
-                color: Color(0xFF98D8D0), // Màu xanh ngọc
+                color: Color(0xFF98D8D0), 
                 title: "ÔN TẬP VÀ BỔ SUNG",
                 items: [
                   "Ôn tập số đến 100",
@@ -50,9 +50,9 @@ class MathSelectionScreen extends StatelessWidget {
 
               const SizedBox(height: 15),
 
-              // 4. Card 2: Phép cộng trừ (Màu xanh dương nhạt)
+              
               const TopicCard(
-                color: Color(0xFF9AE1FC), // Màu xanh dương
+                color: Color(0xFF9AE1FC), 
                 title: "PHÉP CỘNG, PHÉP TRỪ QUA 10 TRONG PHẠM VI 20",
                 items: [
                   "Ôn tập số đến 100",
@@ -63,9 +63,9 @@ class MathSelectionScreen extends StatelessWidget {
 
               const SizedBox(height: 15),
 
-              // 5. Card 3: Các số đến 1000 (Màu vàng)
+              
               const TopicCard(
-                color: Color(0xFFFCE196), // Màu vàng
+                color: Color(0xFFFCE196), 
                 title: "CÁC SỐ ĐẾN 1000",
                 items: [
                   "Ôn tập số đến 100",
@@ -76,7 +76,7 @@ class MathSelectionScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // 6. Button Tiếp Tục
+              
               Center(
                 child: SizedBox(
                   width: 200,
@@ -84,7 +84,7 @@ class MathSelectionScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3E2714), // Màu nâu đậm
+                      backgroundColor: const Color(0xFF3E2714), 
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// ignore: constant_identifier_names
+
 enum CardNetwork { Visa, Mastercard, AmericanExpress, Discover, Unknown, Invalid }
 
 abstract class CardUtils {

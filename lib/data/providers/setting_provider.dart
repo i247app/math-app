@@ -6,7 +6,7 @@ class SettingProvider with ChangeNotifier {
   static const String _notificationsKey = 'notifications_enabled';
   static const String _soundKey = 'sound_enabled';
 
-  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.light;
   bool _notificationsEnabled = true;
   bool _soundEnabled = true;
 
@@ -16,7 +16,7 @@ class SettingProvider with ChangeNotifier {
 
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final themeIndex = prefs.getInt(_themeKey) ?? 0;
+    final themeIndex = prefs.getInt(_themeKey) ?? 1;
     _themeMode = ThemeMode.values[themeIndex];
     _notificationsEnabled = prefs.getBool(_notificationsKey) ?? true;
     _soundEnabled = prefs.getBool(_soundKey) ?? true;

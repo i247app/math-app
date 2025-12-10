@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_assessment_text.dart';
 import 'package:provider/provider.dart';
 import 'package:math_ai_app/data/providers/quiz_provider.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
-import 'package:math_ai_app/ui/math%20test%20process/widget/stats_row.dart';
-import 'package:math_ai_app/ui/math%20test%20process/widget/level_chart_section.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/suggestion_and_buttons.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/error_screen.dart';
 
@@ -16,12 +13,12 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<QuizProvider>(
       builder: (context, quizProvider, child) {
-        // Check for error first
+        
         if (quizProvider.error != null) {
           return ErrorScreen(
             errorMessage: quizProvider.error!,
             onRetry: () {
-              // Navigate back to quiz screen to retry
+              
               Navigator.of(context).pop();
             },
           );
@@ -34,14 +31,14 @@ class ResultScreen extends StatelessWidget {
           );
         }
 
-        final percentage = result.scorePercentage;
-        // final message = percentage >= 80
-        //     ? "TỐT LẮM!"
-        //     : percentage >= 60
-        //     ? "KHÁ TỐT!"
-        //     : "CẦN CỐ GẮNG!";
-        // final completedText =
-        //     "Đã hoàn thành ${result.correctNumber}/${result.totalQuestions} câu!";
+        
+        
+        
+        
+        
+        
+        
+        
         return Scaffold(
           backgroundColor: Colors.blue.shade50,
           body: Stack(
@@ -66,15 +63,15 @@ class ResultScreen extends StatelessWidget {
                       children: [
                         HeaderSection(),
                         const SizedBox(height: 120),
-                        // SizedBox(
-                        //   height: 120,
-                        //   child: Image(
-                        //     image: const AssetImage(
-                        //       'assets/imgs/appriciation.png',
-                        //     ),
-                        //     fit: BoxFit.contain,
-                        //   ),
-                        // ),
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
                         Container(
                           width: double.infinity,
                           height: 203,
@@ -104,13 +101,13 @@ class ResultScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        // StatsRow(
-                        //   correctAnswers: result.correctNumber,
-                        //   totalQuestions: result.totalQuestions,
-                        //   percentage: percentage,
-                        // ),
-                        // const SizedBox(height: 15),
-                        // LevelChartSection(aiReview: result.aiReview),
+                        
+                        
+                        
+                        
+                        
+                        
+                        
                         CustomAssessmentText(text: result.aiReview),
                         SizedBox(height: 30),
                         const SuggestionAndButtons(),

@@ -49,22 +49,29 @@ class _AppRootState extends State<AppRoot> {
     _initializeProviders();
   }
 
-  Future<void> _initializeProviders() async {}
+  Future<void> _initializeProviders() async {
+    await context.read<SettingProvider>().loadSettings();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Math Plus',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.dark,
-      ),
-      home: const OnboardingScreen(),
-      debugShowCheckedModeBanner: false,
+    return Consumer<SettingProvider>(
+      builder: (context, settingProvider, child) {
+        return MaterialApp(
+          title: 'Math Plus',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            brightness: Brightness.light,
+          ),
+          darkTheme: ThemeData(
+            primarySwatch: Colors.blue,
+            brightness: Brightness.dark,
+          ),
+          themeMode: settingProvider.themeMode,
+          home: const OnboardingScreen(),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }

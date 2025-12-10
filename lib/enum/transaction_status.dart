@@ -66,7 +66,7 @@ extension TransactionStatusUpdatable on TransactionStatus {
   bool get isUpdatable {
     switch (this) {
       case TransactionStatus.newEntry:
-      // case TransactionStatus.holdBySender:
+      
       case TransactionStatus.unknown:
       case TransactionStatus.kycNotValid:
         return true;

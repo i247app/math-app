@@ -29,7 +29,7 @@ class PlaceholderScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.construction, size: 80, color: color.withOpacity(0.5)),
+            Icon(Icons.construction, size: 80, color: color.withAlpha(128)),
             const SizedBox(height: 20),
             Text(
               "Màn hình $title",

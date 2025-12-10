@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
 import 'package:math_ai_app/data/providers/user_provider.dart';
+import 'package:math_ai_app/data/providers/grades_provider.dart';
+import 'package:math_ai_app/data/providers/levels_provider.dart';
 import 'package:math_ai_app/data/repositories/auth_repository.dart';
-import 'package:math_ai_app/ui/class%20selection%20/view/class_selection_screen.dart';
+import 'package:math_ai_app/ui/auth/widget/avatar_picker_widget.dart';
+import 'package:math_ai_app/ui/auth/widget/birthdate_field_widget.dart';
+import 'package:math_ai_app/ui/auth/widget/password_field_widget.dart';
 import 'package:provider/provider.dart';
 
+import '../widget/custom_grade_semester_selection.dart';
 import '../../../core/shared/widget/custom_text_field.dart';
+import '../../bottom_navigation_bar/view/bottom_navigation_bar.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -32,16 +39,20 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
-  final TextEditingController _gradeController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   final AuthRepository _authRepository = AuthRepository();
+  final ImagePicker _imagePicker = ImagePicker();
 
-  // Validation errors
+  String? _selectedGradeId;
+  String? _selectedSemesterId;
+  XFile? _selectedImage;
+
   String? _nameError;
   String? _birthDateError;
   String? _gradeError;
+  String? _semesterError;
   String? _phoneError;
   String? _passwordError;
 
@@ -49,10 +60,19 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isPasswordVisible = false;
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<GradesProvider>().loadGrades();
+      context.read<LevelsProvider>().loadLevels();
+    });
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _birthDateController.dispose();
-    _gradeController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -74,10 +94,20 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _validateGrade() {
     setState(() {
-      if (_gradeController.text.isEmpty) {
+      if (_selectedGradeId == null || _selectedGradeId!.isEmpty) {
         _gradeError = 'Vui lòng chọn lớp học';
       } else {
         _gradeError = null;
+      }
+    });
+  }
+
+  void _validateSemester() {
+    setState(() {
+      if (_selectedSemesterId == null || _selectedSemesterId!.isEmpty) {
+        _semesterError = 'Vui lòng chọn kỳ học';
+      } else {
+        _semesterError = null;
       }
     });
   }
@@ -100,22 +130,47 @@ class _SignupScreenState extends State<SignupScreen> {
     _validateName();
     _validateBirthDate();
     _validateGrade();
+    _validateSemester();
     _validatePhone();
     _validatePassword();
   }
 
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        setState(() {
+          _selectedImage = image;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi chọn ảnh: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _handleSignup() async {
-    // Validate all fields
     _validateAll();
 
-    // Check if all validations pass
     if (!_authRepository.isValidAll(
           name: _nameController.text,
           phone: _phoneController.text,
           password: _passwordController.text,
           birthDate: _birthDateController.text,
         ) ||
-        _gradeError != null) {
+        _gradeError != null ||
+        _semesterError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vui lòng kiểm tra lại thông tin'),
@@ -134,12 +189,13 @@ class _SignupScreenState extends State<SignupScreen> {
         phone: _phoneController.text.trim(),
         password: _passwordController.text,
         birthDate: _birthDateController.text.trim(),
-        grade: _gradeController.text.trim(),
+        gradeId: _selectedGradeId!,
+        semesterId: _selectedSemesterId!,
+        avatarPath: _selectedImage?.path,
       );
 
       if (response.isSuccess && response.user != null) {
         if (mounted) {
-          // Set user in provider
           Provider.of<UserProvider>(
             context,
             listen: false,
@@ -148,16 +204,18 @@ class _SignupScreenState extends State<SignupScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Đăng ký thành công! Chào mừng ${response.user!.name}',
+                'Registration successful! Welcome ${response.user!.name}',
               ),
               backgroundColor: Colors.green,
             ),
           );
-          // Navigate to next screen after success
-          await Future.delayed(const Duration(seconds: 1));
+
+          await Future.delayed(const Duration(milliseconds: 300));
           if (mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const ClassSelectionScreen()),
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => BottomNavigationBarScreen(initialIndex: 3),
+              ),
             );
           }
         }
@@ -166,7 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                response.message ?? 'Đăng ký thất bại. Vui lòng thử lại.',
+                response.message ?? 'Registration failed. Please try again.',
               ),
               backgroundColor: Colors.red,
             ),
@@ -216,32 +274,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.orange.shade100,
-                        width: 4,
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.orange.shade50,
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/imgs/woman.png',
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(
-                                Icons.person,
-                                size: 60,
-                                color: Colors.orange,
-                              ),
-                        ),
-                      ),
-                    ),
+
+                  AvatarPickerWidget(
+                    selectedImage: _selectedImage,
+                    onTap: _pickImage,
                   ),
                   const SizedBox(height: 16),
                   buildCustomTextField(
@@ -258,164 +294,59 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
 
                   const SizedBox(height: 12),
+                  GradeSemesterSelectionWidget(
+                    selectedGradeId: _selectedGradeId,
+                    selectedSemesterId: _selectedSemesterId,
+                    gradeError: _gradeError,
+                    semesterError: _semesterError,
+                    onGradeChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedGradeId = value;
+                        });
+                        _validateGrade();
+                      }
+                    },
+                    onSemesterChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedSemesterId = value;
+                        });
+                        _validateSemester();
+                      }
+                    },
+                  ),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: buildCustomTextField(
-                          label: 'Ngày sinh:',
-                          hintText: 'Chọn ngày sinh',
-                          icon: Icons.calendar_today_outlined,
-                          controller: _birthDateController,
-                          errorText: _birthDateError,
-                          isReadOnly: true,
-                          onTap: () async {
-                            final DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime(2003),
-                              firstDate: DateTime(1950),
-                              lastDate: DateTime.now(),
-                              builder: (context, child) {
-                                return Theme(
-                                  data: Theme.of(context).copyWith(
-                                    colorScheme: const ColorScheme.light(
-                                      primary: Color(0xFF3E2723),
-                                      onPrimary: Colors.white,
-                                      onSurface: Colors.black,
-                                    ),
-                                  ),
-                                  child: child!,
-                                );
-                              },
-                            );
-                            if (pickedDate != null) {
-                              final formattedDate =
-                                  "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                              _birthDateController.text = formattedDate;
-                              _validateBirthDate();
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: 4.0,
-                                bottom: 8.0,
-                              ),
-                              child: Text(
-                                'Lớp học:',
-                                style: GoogleFonts.nunito(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
+                  const SizedBox(height: 12),
+                  BirthDateFieldWidget(
+                    controller: _birthDateController,
+                    errorText: _birthDateError,
+                    onTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime(2003),
+                        firstDate: DateTime(1950),
+                        lastDate: DateTime.now(),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: const ColorScheme.light(
+                                primary: Color(0xFF3E2723),
+                                onPrimary: Colors.white,
+                                onSurface: Colors.black,
                               ),
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withAlpha(
-                                      (255 * 0.1).round(),
-                                    ),
-                                    spreadRadius: 1,
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: DropdownButtonFormField<String>(
-                                initialValue: _gradeController.text.isEmpty
-                                    ? null
-                                    : _gradeController.text,
-                                hint: Text(
-                                  'Chọn lớp',
-                                  style: GoogleFonts.nunito(
-                                    color: Colors.grey[400],
-                                  ),
-                                ),
-                                items: List.generate(5, (index) {
-                                  final grade = 'Grade ${index + 1}';
-                                  return DropdownMenuItem<String>(
-                                    value: grade,
-                                    child: Text(
-                                      grade,
-                                      style: GoogleFonts.nunito(
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  );
-                                }),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    _gradeController.text = value;
-                                    _validateGrade();
-                                  }
-                                },
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.school_outlined,
-                                    color: Colors.grey[500],
-                                  ),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16.0,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: const BorderSide(
-                                      color: Color(0xFFFFC107),
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: const BorderSide(
-                                      color: Color(0xFFFFC107),
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: const BorderSide(
-                                      color: Colors.red,
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: const BorderSide(
-                                      color: Colors.red,
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            if (_gradeError != null)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 4.0,
-                                  top: 4.0,
-                                ),
-                                child: Text(
-                                  _gradeError!,
-                                  style: GoogleFonts.nunito(
-                                    color: Colors.red,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (pickedDate != null) {
+                        final formattedDate =
+                            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                        _birthDateController.text = formattedDate;
+                        _validateBirthDate();
+                      }
+                    },
                   ),
 
                   const SizedBox(height: 12),
@@ -433,98 +364,16 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 12),
 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
-                        child: Text(
-                          'Mật khẩu:',
-                          style: GoogleFonts.nunito(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withAlpha((255 * 0.1).round()),
-                              spreadRadius: 1,
-                              blurRadius: 3,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _passwordController,
-                          obscureText: !_isPasswordVisible,
-                          decoration: InputDecoration(
-                            hintText: 'Nhập mật khẩu',
-                            hintStyle: GoogleFonts.nunito(
-                              color: Colors.grey,
-                              fontSize: 16,
-                            ),
-                            prefixIcon: const Icon(
-                              Icons.lock_outline,
-                              color: Color(0xFFFFC107),
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isPasswordVisible
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.grey,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _isPasswordVisible = !_isPasswordVisible;
-                                });
-                              },
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFFFC107),
-                                width: 2,
-                              ),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 1,
-                              ),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 2,
-                              ),
-                            ),
-                            errorText: _passwordError,
-                            errorStyle: GoogleFonts.nunito(
-                              color: Colors.red,
-                              fontSize: 12,
-                            ),
-                          ),
-                          onChanged: (_) => _validatePassword(),
-                        ),
-                      ),
-                    ],
+                  PasswordFieldWidget(
+                    controller: _passwordController,
+                    errorText: _passwordError,
+                    isPasswordVisible: _isPasswordVisible,
+                    onVisibilityToggle: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                    onChanged: (_) => _validatePassword(),
                   ),
 
                   const SizedBox(height: 40),

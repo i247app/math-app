@@ -18,7 +18,7 @@ class ProfileCreateResponse extends BaseResponse {
   @override
   Map<String, dynamic> toJson() => _$ProfileCreateResponseToJson(this);
 
-  // Helper getter for easier access
+  
   ProfileModel? get profile => result?.profile;
 }
 

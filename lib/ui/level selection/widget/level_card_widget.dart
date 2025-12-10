@@ -59,16 +59,16 @@ class _LevelCardState extends State<LevelCard>
 
   @override
   Widget build(BuildContext context) {
-    // Generate color based on display order
+    
     final colors = [
-      const Color(0xFFE8F5E8), // Light green - Basic
-      const Color(0xFFFFF3E0), // Light orange - Intermediate
-      const Color(0xFFFFEBEE), // Light red - Advanced
-      const Color(0xFFF3E5F5), // Light purple - Expert
+      const Color(0xFFE8F5E8), 
+      const Color(0xFFFFF3E0), 
+      const Color(0xFFFFEBEE), 
+      const Color(0xFFF3E5F5), 
     ];
     final color = colors[(widget.data.displayOrder - 1) % colors.length];
 
-    // Show badge for the expert level
+    
     final hasBadge = widget.data.displayOrder == 4;
 
     return AnimatedBuilder(

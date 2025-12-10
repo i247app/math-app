@@ -9,8 +9,7 @@ class UpdateProfileResponse extends BaseResponse {
   @JsonKey(name: 'result')
   final UpdateProfileResult result;
 
-  UpdateProfileResponse({required this.result, String? message, int? status})
-    : super(message: message, status: status);
+  UpdateProfileResponse({required this.result});
 
   factory UpdateProfileResponse.fromJson(Map<String, dynamic> json) =>
       _$UpdateProfileResponseFromJson(json);

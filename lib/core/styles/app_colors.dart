@@ -8,11 +8,11 @@ class AppColors {
   static const tertiary = Color(0xFFFF8D6C);
   static const outline = Colors.grey;
 
-  //
+  
   static const backgroundLight = Color(0xFFF5F5F5);
   static const onBackgroundLight = Color(0xFF000000);
 
-  //
+  
   static const backgroundDark = Color(0xFF212121);
   static const onBackgroundDark = Color(0xFFFFFFFF);
 

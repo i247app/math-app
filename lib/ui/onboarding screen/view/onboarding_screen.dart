@@ -47,7 +47,7 @@ class OnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // --- PHẦN MÔ TẢ ---
+              
               Text(
                 'Ứng dụng giúp bé từ mẫu giáo\nđến lớp 5 học Toán thông\nminh hơn với AI',
                 textAlign: TextAlign.center,

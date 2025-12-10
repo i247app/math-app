@@ -38,7 +38,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    // Load grades data
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<GradesProvider>().loadGrades();
     });
@@ -92,7 +92,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
         }
 
         final grades = gradesProvider.grades ?? [];
-        // No need to convert - ClassCard now accepts GradeModel directly
+        
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -170,7 +170,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                       final selectedGrade =
                                           grades[selectedIndex!];
 
-                                      // Save selected grade to user provider
+                                      
                                       context
                                           .read<UserProvider>()
                                           .setSelectedGrade(selectedGrade);

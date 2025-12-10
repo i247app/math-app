@@ -18,7 +18,7 @@ class LoginResponse extends BaseResponse {
   @override
   Map<String, dynamic> toJson() => _$LoginResponseToJson(this);
 
-  // Helper getters for easier access
+  
   bool? get isSecure => result?.isSecure;
   String? get loginStatus => result?.loginStatus;
   bool? get needs2fa => result?.needs2fa;

@@ -33,7 +33,7 @@ final client = http_interceptor.InterceptedHttp.build(
   ],
 );
 
-// POST helper function
+
 Future<http.Response> _post(
   Uri uri,
   Object? body, {
@@ -51,16 +51,16 @@ Future<http.Response> _post(
   );
 }
 
-// PUT helper function
-// Future<http.Response> _put(Uri uri, Object? body) async {
-//   return client.put(
-//     uri,
-//     body: json.encode(body),
-//     headers: {'Content-Type': 'application/json'},
-//   );
-// }
 
-// GET helper function
+
+
+
+
+
+
+
+
+
 Future<http.Response> _get(Uri uri, {Map<String, String>? headers}) async {
   final xReqId = _reqCounter++;
   return client.get(
@@ -90,9 +90,9 @@ T _parseResponse<T extends BaseResponse>(
   return bo;
 }
 
-//
-// API STARTS HERE
-//
+
+
+
 Future<SignUpResponse> signup({required User user}) async {
   final response = await _post(Uri.parse('$API_ROOT/users/create'), {
     "name": user.name,
@@ -100,6 +100,46 @@ Future<SignUpResponse> signup({required User user}) async {
     "phone": user.phone,
     "password": user.password,
   });
+
+  return _parseResponse(response, SignUpResponse.fromJson);
+}
+
+Future<SignUpResponse> signupWithFormData({
+  required String name,
+  required String phone,
+  required String password,
+  required String birthDate,
+  required String gradeId,
+  required String semesterId,
+  required String? avatarPath,
+}) async {
+  final xReqId = _reqCounter++;
+
+  var request = http.MultipartRequest(
+    'POST',
+    Uri.parse('$API_ROOT/users/create'),
+  );
+
+  request.headers.addAll({
+    'Content-Type': 'multipart/form-data',
+    'X-Request-ID': xReqId.toString(),
+  });
+
+  
+  request.fields['name'] = name;
+  request.fields['phone'] = phone;
+  request.fields['password'] = password;
+  request.fields['dob'] = birthDate;
+  request.fields['grade_id'] = gradeId;
+  request.fields['semester_id'] = semesterId;
+
+  
+  if (avatarPath != null && avatarPath.isNotEmpty) {
+    request.files.add(await http.MultipartFile.fromPath('avatar', avatarPath));
+  }
+
+  final streamedResponse = await request.send();
+  final response = await http.Response.fromStream(streamedResponse);
 
   return _parseResponse(response, SignUpResponse.fromJson);
 }
@@ -189,4 +229,3 @@ Future<SubmitQuizResponse> submitQuiz(
 }
 
 
-// {{url}}/quiz-practices/reinforce

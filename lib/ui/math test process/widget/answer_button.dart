@@ -60,16 +60,16 @@ class AnswerButton extends StatelessWidget {
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFFF5F5F5),
-                      // shadows: [
-                      //   Shadow(
-                      //     offset: const Offset(-1, -1),
-                      //     color: Colors.black.withAlpha((255 * 0.3).toInt()),
-                      //   ),
-                      //   Shadow(
-                      //     offset: const Offset(1, 1),
-                      //     color: Colors.black.withAlpha((255 * 0.3).toInt()),
-                      //   ),
-                      // ],
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
                     ),
                   ),
                 ),

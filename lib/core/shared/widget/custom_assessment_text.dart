@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Custom text widget matching the CSS properties:
-/// - font-family: Nunito
-/// - font-weight: 800
-/// - font-size: 25px
-/// - line-height: 130%
-/// - letter-spacing: 0%
-/// - text-align: center
+
+
+
+
+
+
+
 class CustomAssessmentText extends StatelessWidget {
   final String text;
   final Color? color;
@@ -42,7 +42,7 @@ class CustomAssessmentText extends StatelessWidget {
   }
 }
 
-/// Alternative: Extension method for TextStyle
+
 extension AssessmentTextStyle on TextStyle {
   static TextStyle custom({
     Color color = Colors.white,

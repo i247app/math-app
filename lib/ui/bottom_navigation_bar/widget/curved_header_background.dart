@@ -9,7 +9,7 @@ class CurvedHeaderBackground extends StatelessWidget {
       clipper: _HeaderClipper(),
       child: Container(
         height: 300,
-        color: const Color(0xFFFAFAC8), // Màu vàng nhạt
+        color: const Color(0xFFFAFAC8), 
       ),
     );
   }

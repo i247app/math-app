@@ -1,16 +1,16 @@
 import 'package:intl/intl.dart';
 
-/// DateHelper contains helper methods to convert between DateTime and String
+
 abstract class DateHelper {
   static const String prettyDateFormat = 'dd-MMM-yyyy';
   static const String prettyTimestampFormat = 'MMM d, yyyy \'at\' h:mm a';
   static const String prettyTimeFormat = 'h:mm a';
 
-  // expecting a utc DateTime String from server
+  
   static DateTime? from20FSP(String z) {
-    // const isUTC = true;
+    
     try {
-      // yyyyMMddHHmmss.SSSSSS
+      
       String year = z.substring(0, 4);
       String month = z.substring(4, 6);
       String date = z.substring(6, 8);
@@ -18,12 +18,12 @@ abstract class DateHelper {
       String min = z.substring(10, 12);
       String sec = z.substring(12, 14);
       return DateTime.utc(
-        int.parse(year), // YEAR
-        int.parse(month), // MONTH
-        int.parse(date), // DATE
-        int.parse(hour), // HOUR
-        int.parse(min), // MINUTE
-        int.parse(sec), // SECOND
+        int.parse(year), 
+        int.parse(month), 
+        int.parse(date), 
+        int.parse(hour), 
+        int.parse(min), 
+        int.parse(sec), 
       );
     } catch (e) {
       return null;
@@ -32,9 +32,9 @@ abstract class DateHelper {
 
   static String? to20FSP(DateTime date) {
     try {
-      // if (toUTC) {
-      //   date = date.toUtc();
-      // }
+      
+      
+      
       final convertD = date.toString();
       final year = convertD.substring(0, 4);
       final month = convertD.substring(5, 7);
@@ -43,14 +43,14 @@ abstract class DateHelper {
       final min = convertD.substring(14, 16);
       final sec = convertD.substring(17, 19);
       final meSec = convertD.substring(20);
-      // String vToString =
-      //     year + month + monthDate + hour + min + sec + "." + meSec;
+      
+      
       String vToString = "$year$month$monthDate$hour$min$sec.$meSec";
       vToString = vToString.replaceAll(RegExp(r"[a-zA-Z]"), "");
-      // print("vToString : $vToString");
+      
       return vToString;
     } catch (e) {
-      // print(e.toString());
+      
       return null;
     }
   }

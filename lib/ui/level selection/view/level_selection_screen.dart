@@ -37,7 +37,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    // Load levels data
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LevelsProvider>().loadLevels();
     });
@@ -168,7 +168,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                       final selectedLevel =
                                           levels[selectedIndex!];
 
-                                      // Save selected level to user provider
+                                      
                                       context.read<UserProvider>().setUserClass(
                                         '${context.read<UserProvider>().userClass} - ${selectedLevel.label}',
                                       );
@@ -194,18 +194,18 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                         const Duration(milliseconds: 500),
                                         () async {
                                           if (context.mounted) {
-                                            // Get selected grade from UserProvider
+                                            
                                             final userProvider = context
                                                 .read<UserProvider>();
                                             final selectedGrade =
                                                 userProvider.selectedGrade;
 
-                                            // Get selected level
+                                            
                                             final selectedLevel =
                                                 levels[selectedIndex!];
 
                                             if (selectedGrade != null) {
-                                              // Get user ID - try user.id first, fallback to email if id is null/empty
+                                              
                                               final userId =
                                                   userProvider
                                                           .user
@@ -231,7 +231,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                                 return;
                                               }
 
-                                              // Create profile
+                                              
                                               if (!context.mounted) return;
                                               final profileProvider = context
                                                   .read<ProfileProvider>();
@@ -255,7 +255,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                                   ),
                                                 );
                                               } else {
-                                                // Show error
+                                                
                                                 if (!context.mounted) return;
                                                 ScaffoldMessenger.of(
                                                   context,

@@ -19,7 +19,7 @@ class BaseResponse {
   @JsonKey(name: 'message')
   String? message;
 
-  /// HTTP request data
+  
   @JsonKey(includeFromJson: false, includeToJson: false)
   int httpStatusCode = 0;
   @JsonKey(includeFromJson: false, includeToJson: false)

@@ -1,8 +1,8 @@
 class AppKeys {
-  // App
+  
   static const String appName = 'app_name';
 
-  // Navigation
+  
   static const String navHome = 'nav_home';
   static const String navSettings = 'nav_settings';
   static const String navProfile = 'nav_profile';
@@ -11,7 +11,7 @@ class AppKeys {
   static const String navSendMoney = 'nav_send_money';
   static const String navReceiveMoney = 'nav_receive_money';
 
-  // Account KYC Screen
+  
   static const String kycVerification = 'kyc_verification';
   static const String kycNoData = 'kyc_no_data';
   static const String kycResidentialAddress = 'kyc_residential_address';
@@ -24,7 +24,7 @@ class AppKeys {
   static const String kycStatusIncomplete = 'kyc_status_incomplete';
   static const String back = 'back';
 
-  // Account Screen
+  
   static const String myAccount = 'my_account';
   static const String userNotFound = 'user_not_found';
   static const String chooseAvatar = 'choose_avatar';
@@ -36,14 +36,14 @@ class AppKeys {
   static const String changePassword = 'change_password';
   static const String deleteAccount = 'delete_account';
 
-  // Address Search Screen
+  
   static const String addressSearch = 'address_search';
   static const String addressLabel = 'address_label';
   static const String addressHint = 'address_hint';
   static const String addressNotFound = 'address_not_found';
   static const String save = 'save';
 
-  // Delete Confirmation Screen
+  
   static const String deleteAccountTitle = 'delete_account_title';
   static const String areYouSure = 'are_you_sure';
   static const String deleteWarning = 'delete_warning';
@@ -52,7 +52,7 @@ class AppKeys {
   static const String cancelTitle = 'cancel';
   static const String failedToDeleteAccount = 'failed_to_delete_account';
 
-  // Edit Address Screen
+  
   static const String changeAddress = 'change_address';
   static const String addressInfo = 'address_info';
   static const String streetAddress = 'street_address';
@@ -64,7 +64,7 @@ class AppKeys {
   static const String zipCodeLabel = 'zip_code_label';
   static const String zipCodeHint = 'zip_code_hint';
 
-  // Edit Email Screen
+  
   static const String changeEmail = 'change_email';
   static const String emailInfo = 'email_info';
   static const String newEmailLabel = 'new_email_label';
@@ -72,7 +72,7 @@ class AppKeys {
   static const String emailEmptyError = 'email_empty_error';
   static const String emailInvalidError = 'email_invalid_error';
 
-  // Edit Name Screen
+  
   static const String changeName = 'change_name';
   static const String personalInformation = 'personal_information';
   static const String personalInfoSubtitle = 'personal_info_subtitle';
@@ -85,11 +85,11 @@ class AppKeys {
   static const String lastNameHint = 'last_name_hint';
   static const String nameMatchId = 'name_match_id';
 
-  // Edit Phone Screen
+  
   static const String changePhoneNumber = 'change_phone_number';
   static const String phoneInfo = 'phone_info';
 
-  // Common Messages
+  
   static const String error = 'error';
   static const String successUpdated = 'success_updated';
   static const String initializing = 'initializing';
@@ -98,16 +98,16 @@ class AppKeys {
   static const String processing = 'processing';
   static const String incomplete = 'incomplete';
 
-  // Additional missing keys
+  
   static const String errorLoadingUserColon = 'error_loading_user_colon';
 
-  // Language setting screen
+  
   static const String languageTitle = 'language_title';
   static const String languageEnglish = 'language_english';
   static const String languageVietnamese = 'language_vietnamese';
   static const String currentLanguage = 'current_language';
 
-  // Profile Screen
+  
   static const String accountAndSecurity = 'account_and_security';
   static const String receiver = 'receiver';
   static const String payment = 'payment';
@@ -119,12 +119,12 @@ class AppKeys {
   static const String areYouSureLogout = 'are_you_sure_logout';
   static const String yesLogout = 'yes_logout';
 
-  // Address Search Screen - additional keys
+  
   static const String somethingWentWrong = 'something_went_wrong';
   static const String pleaseRetryLater = 'please_retry_later';
   static const String couldNotFindMatches = 'could_not_find_matches';
 
-  // Edit Password Screen
+  
   static const String passwordSecurityInfo = 'password_security_info';
   static const String currentPassword = 'current_password';
   static const String currentPasswordHint = 'current_password_hint';
@@ -145,7 +145,7 @@ class AppKeys {
   static const String passwordCriteria4 = 'password_criteria_4';
   static const String passwordCriteria5 = 'password_criteria_5';
 
-  // Manage Receiver Screen
+  
   static const String manageReceivers = 'manage_receivers';
   static const String search = 'search';
   static const String noResultsFor = 'no_results_for';
@@ -154,7 +154,7 @@ class AppKeys {
   static const String addNewRecipientToStart = 'add_new_recipient_to_start';
   static const String addNewRecipient = 'add_new_recipient';
 
-  // Manage Payment Screen
+  
   static const String managePaymentMethodLabel = 'manage_payment_methods';
   static const String noPaymentMethods = 'no_payment_methods';
   static const String addPaymentMethodToStart = 'add_payment_method_to_start';
@@ -173,7 +173,7 @@ class AppKeys {
   static const String activatePayment = 'activate_payment';
   static const String completeVerification = 'complete_verification';
 
-  // Onboarding screen
+  
   static const String login = 'login';
   static const String signUp = 'sign_up';
   static const String contactUs = 'contact_us';
@@ -181,7 +181,7 @@ class AppKeys {
   static const String checkAvailability = 'check_availability';
   static const String transactionFee = 'transaction_fee';
 
-  // Login screen
+  
   static const String hiThere = 'hi_there';
   static const String welcomeBack = 'welcome_back';
   static const String username = 'username';
@@ -205,7 +205,7 @@ class AppKeys {
   static const String noThanks = 'no_thanks';
   static const String ok = 'ok';
 
-  // Main Home Screen
+  
   static const String exchangeRate = 'exchange_rate';
   static const String swapCurrencies = 'swap_currencies';
   static const String sendMoneyDescription = 'send_money_description';
@@ -214,7 +214,7 @@ class AppKeys {
   static const String earn = 'earn';
   static const String forEachFriendRefer = 'for_each_friend_refer';
 
-  // Security Verification Screen
+  
   static const String securityVerification = 'security_verification';
   static const String additionalSecurityRequired = 'additional_security_required';
   static const String receiveOtpOptions = 'receive_otp_options';
@@ -222,7 +222,7 @@ class AppKeys {
   static const String next = 'next';
   static const String failedToVerify = 'failed_to_verify';
 
-  // Activity Screen
+  
   static const String activityTitle = 'activity_title';
   static const String searchTransactions = 'search_transactions';
   static const String sortByAmount = 'sort_by_amount';
@@ -238,7 +238,7 @@ class AppKeys {
   static const String unknownRecipient = 'unknown_recipient';
   static const String clear = 'clear';
 
-  // Status translations
+  
   static const String statusInit = 'status_init';
   static const String statusPendingKyc = 'status_pending_kyc';
   static const String statusPendingCancel = 'status_pending_cancel';
@@ -265,7 +265,7 @@ class AppKeys {
   static const String statusHoldBySender = 'status_hold_by_sender';
   static const String statusGDue = 'status_g_due';
 
-  // Transfer Summary Screen
+  
   static const String transferSummary = 'transfer_summary';
   static const String financialDetails = 'financial_details';
   static const String recipientDetails = 'recipient_details';
@@ -299,7 +299,7 @@ class AppKeys {
   static const String adminActions = 'admin_actions';
   static const String transferSummaryDiscount = 'transfer_summary_discount';
 
-  // Add these keys to your AppKeys class
+  
   static const String updateSendAmount = 'update_send_amount';
   static const String currentAmount = 'current_amount';
   static const String newAmount = 'new_amount';
@@ -313,7 +313,7 @@ class AppKeys {
   static const String amountTooLow = 'amount_too_low';
   static const String amountTooHigh = 'amount_too_high';
 
-  // Add these keys to your existing AppKeys class
+  
   static const String changeSendAmount = 'change_send_amount';
   static const String amount = 'amount';
   static const String send = 'send';
@@ -323,7 +323,7 @@ class AppKeys {
   static const String noChangesDetectedMessage = 'no_changes_detected_message';
   static const String invalidAmountError = 'invalid_amount_error';
 
-  // Add these keys to your AppKeys class
+  
   static const String updateTransactionConfirm = 'update_transaction_confirm';
   static const String confirmUpdate = 'confirm_update';
   static const String slideToConfirm = 'slide_to_confirm';
@@ -337,7 +337,7 @@ class AppKeys {
   static const String noDueAmount = 'no_due_amount';
   static const String refundAmount = 'refund_amount';
 
-  // Send Money Screen
+  
   static const String sendMoneyTo = 'send_money_to';
   static const String sendMoneyAmount = 'send_money_amount';
   static const String deliveryOptions = 'delivery_options';
@@ -366,7 +366,7 @@ class AppKeys {
   static const String transactionFeeLabel = 'transaction_fee_label';
   static const String discountApplied = 'discount_applied';
 
-  // Sender Profile Screen
+  
   static const String senderProfile = 'sender_profile';
   static const String verifyProfileInformation = 'verify_profile_information';
   static const String senderInformation = 'sender_information';
@@ -378,7 +378,7 @@ class AppKeys {
   static const String modify = 'modify';
   static const String notProvided = 'not_provided';
 
-  // Receiver Profile Screen
+  
   static const String recipientProfile = 'recipient_profile';
   static const String chooseRecipient = 'choose_recipient';
   static const String noRecipientSelected = 'no_recipient_selected';
@@ -394,7 +394,7 @@ class AppKeys {
   static const String noRecipientsFound = 'no_recipients_found';
   static const String noSavedRecipientsMessage = 'no_saved_recipients_message';
 
-  // Add or Update Recipient Screen
+  
   static const String addRecipient = 'add_recipient';
   static const String updateRecipient = 'update_recipient';
   static const String changeRecipient = 'change_recipient';
@@ -428,17 +428,17 @@ class AppKeys {
   static const String searchRecipient = 'search_recipient';
   static const String recipient = 'recipient';
 
-  // Phone number input
+  
   static const String phoneCannotEmpty = 'phone_cannot_empty';
   static const String phoneEnter10Digits = 'phone_enter_10_digits';
   static const String phoneInvalidNumber = 'phone_invalid_number';
 
-  // Add or Update Payment Method Screen
+  
   static const String addPaymentMethodTitle = 'add_payment_method_title';
   static const String updatePaymentMethodTitle = 'update_payment_method_title';
   static const String paymentMethodInformation = 'payment_method_information';
 
-  // Card Detail
+  
   static const String cardDetail = 'card_detail';
   static const String cardNumber = 'card_number';
   static const String nameOnCard = 'name_on_card';
@@ -449,13 +449,13 @@ class AppKeys {
   static const String add = 'add';
   static const String update = 'update';
 
-  // Sign Up Screen
+  
   static const String messageAndDataRatesMayApply = 'message_and_data_rates_may_apply';
   static const String consentToReceiveSms = 'consent_to_receive_sms';
   static const String alreadyHaveAccount = 'already_have_account';
   static const String phoneVerification = 'phone_verification';
 
-  // Summary Screen
+  
   static const String receiveAmount = 'receive_amount';
   static const String fee = 'fee';
   static const String total = 'total';
@@ -474,14 +474,14 @@ class AppKeys {
   static const String pay = 'pay';
   static const String chooseBankPickup = 'choose_bank_pickup';
 
-  // Footer Notice Widget
+  
   static const String footerCfpbLine1 = 'footer_cfpb_line_1';
   static const String footerCfpbLine2 = 'footer_cfpb_line_2';
   static const String footerFxGainNotice = 'footer_fx_gain_notice';
   static const String footerDragToSendAgree = 'footer_drag_to_send_agree';
   static const String footerEzmonexAgreementPolicy = 'footer_ezmonex_agreement_policy';
 
-  // Add these to your existing AppKeys class
+  
   static const String addBankAccountTitle = 'add_bank_account_title';
   static const String updateBankAccountTitle = 'update_bank_account_title';
   static const String bankAccountDetails = 'bank_account_details';
@@ -507,7 +507,7 @@ class AppKeys {
   static const String addBank = 'add_bank';
   static const String limit = 'limit';
 
-  // Dialog Helper
+  
   static const String confirmTitle = 'confirm_title';
   static const String areYouSureYouWantTo = 'are_you_sure_you_want_to';
   static const String thisActionCannotBeUndone = 'this_action_cannot_be_undone';

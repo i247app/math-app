@@ -19,7 +19,7 @@ class LevelsListResponse extends BaseResponse {
   @override
   Map<String, dynamic> toJson() => _$LevelsListResponseToJson(this);
 
-  // Helper getters for easier access
+  
   List<LevelModel>? get levels => result?.items;
   MetadataModel? get metadata => result?.metadata;
 }

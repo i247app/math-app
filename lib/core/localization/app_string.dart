@@ -3,10 +3,10 @@ import 'app_keys.dart';
 class AppStrings {
   static const Map<String, Map<String, String>> _localizedValues = {
     'en': {
-      // App
+      
       AppKeys.appName: 'EzMonex',
 
-      // Navigation
+      
       AppKeys.navHome: 'Home',
       AppKeys.navSettings: 'Settings',
       AppKeys.navProfile: 'Profile',
@@ -15,7 +15,7 @@ class AppStrings {
       AppKeys.navSendMoney: 'Send',
       AppKeys.navReceiveMoney: 'Receive Money',
 
-      // Account KYC Screen
+      
       AppKeys.kycVerification: 'KYC Verification',
       AppKeys.kycNoData: "You haven't submitted any KYC data yet.",
       AppKeys.kycResidentialAddress: 'Residential Address Verification',
@@ -28,7 +28,7 @@ class AppStrings {
       AppKeys.kycStatusIncomplete: 'Incomplete',
       AppKeys.back: 'Back',
 
-      // Account Screen
+      
       AppKeys.myAccount: 'My Account',
       AppKeys.userNotFound: 'User not found',
       AppKeys.chooseAvatar: 'Choose Avatar',
@@ -40,7 +40,7 @@ class AppStrings {
       AppKeys.changePassword: 'Change Password',
       AppKeys.deleteAccount: 'Delete Account',
 
-      // Address Search Screen
+      
       AppKeys.addressSearch: 'Address Search',
       AppKeys.addressLabel: 'Address',
       AppKeys.addressHint: 'e.g., 20 Cooper Square',
@@ -48,7 +48,7 @@ class AppStrings {
       AppKeys.save: 'Save',
       AppKeys.add: 'Add',
       AppKeys.update: 'Update',
-      // Delete Confirmation Screen
+      
       AppKeys.deleteAccountTitle: 'Delete Account',
       AppKeys.areYouSure: 'Are you absolutely sure?',
       AppKeys.deleteWarning:
@@ -57,7 +57,7 @@ class AppStrings {
       AppKeys.yesDeleteAccount: 'Yes, Delete My Account',
       AppKeys.cancelTitle: 'Cancel',
       AppKeys.failedToDeleteAccount: 'Failed to delete account',
-      // Edit Address Screen
+      
       AppKeys.changeAddress: 'Change Address',
       AppKeys.addressInfo:
           'Tap on any field to search for and select your new address. The fields will be filled in automatically.',
@@ -70,7 +70,7 @@ class AppStrings {
       AppKeys.zipCodeLabel: 'ZIP Code',
       AppKeys.zipCodeHint: 'e.g., 90210',
 
-      // Edit Email Screen
+      
       AppKeys.changeEmail: 'Change Email',
       AppKeys.emailInfo:
           "Enter your new email address. We'll send a verification code to complete the change.",
@@ -79,7 +79,7 @@ class AppStrings {
       AppKeys.emailEmptyError: 'Email cannot be empty.',
       AppKeys.emailInvalidError: 'Please enter a valid email address.',
 
-      // Edit Name Screen
+      
       AppKeys.changeName: 'Change Name',
       AppKeys.personalInformation: 'Personal Information',
       AppKeys.personalInfoSubtitle: 'Update your legal name as it appears on your ID',
@@ -93,12 +93,12 @@ class AppStrings {
       AppKeys.nameMatchId:
           'Make sure your name matches exactly as it appears on your government-issued ID.',
 
-      // Edit Phone Screen
+      
       AppKeys.changePhoneNumber: 'Change Phone Number',
       AppKeys.phoneInfo:
           "Enter your new phone number. We'll send a verification code to complete the change.",
 
-      // Common Messages
+      
       AppKeys.error: 'ERROR',
       AppKeys.successUpdated: 'updated successfully',
       AppKeys.initializing: 'Initializing...',
@@ -108,13 +108,13 @@ class AppStrings {
       AppKeys.incomplete: 'Incomplete',
       AppKeys.errorLoadingUserColon: 'Error loading user:',
 
-      // Language setting screen
+      
       AppKeys.languageTitle: 'Change Language',
       AppKeys.languageEnglish: 'English',
       AppKeys.languageVietnamese: 'Vietnamese',
       AppKeys.currentLanguage: 'Current Language',
 
-      // Profile Screen
+      
       AppKeys.accountAndSecurity: 'Account & Security',
       AppKeys.receiver: 'Receiver',
       AppKeys.payment: 'Payment',
@@ -126,12 +126,12 @@ class AppStrings {
       AppKeys.areYouSureLogout: 'Are you sure you want to logout?',
       AppKeys.yesLogout: 'Yes, Logout',
 
-      // Address Search Screen - additional
+      
       AppKeys.somethingWentWrong: 'Something went wrong. Please try again later',
       AppKeys.pleaseRetryLater: 'Please try again later',
       AppKeys.couldNotFindMatches: "We couldn't find any matches.",
 
-      // Edit Password Screen
+      
       AppKeys.passwordSecurityInfo: 'For your security, please use a strong password.',
       AppKeys.currentPasswordRequired: 'Current password is required!',
       AppKeys.currentPasswordHint: 'Current password',
@@ -152,7 +152,7 @@ class AppStrings {
       AppKeys.passwordCriteria4: 'At least one number',
       AppKeys.passwordCriteria5: 'At least one special character: !@#\$%&*.-_',
 
-      // Manage Receiver Screen
+      
       AppKeys.manageReceivers: 'Manage Receivers',
       AppKeys.search: 'Search',
       AppKeys.noResultsFor: 'No results for',
@@ -161,7 +161,7 @@ class AppStrings {
       AppKeys.addNewRecipientToStart: 'Add a new recipient to get started.',
       AppKeys.addNewRecipient: 'Add New Recipient',
 
-      // Manage Payment Screen
+      
       AppKeys.managePaymentMethodLabel: 'Manage Payments',
       AppKeys.noPaymentMethods: 'No Payment Methods',
       AppKeys.addPaymentMethodToStart: 'Add a payment method to get started.',
@@ -180,7 +180,7 @@ class AppStrings {
       AppKeys.activatePayment: 'Activate payment',
       AppKeys.completeVerification: 'Complete verification',
 
-      // Onboarding screen
+      
       AppKeys.login: 'Log In',
       AppKeys.signUp: 'Sign Up',
       AppKeys.contactUs: 'Contact Us',
@@ -188,7 +188,7 @@ class AppStrings {
       AppKeys.checkAvailability: 'Check Availability',
       AppKeys.transactionFee: 'Fee Estimator',
 
-      // Login screen
+      
       AppKeys.hiThere: 'Hi there! 👋',
       AppKeys.welcomeBack: 'Welcome back, Sign in to your account',
       AppKeys.username: 'Username',
@@ -213,7 +213,7 @@ class AppStrings {
       AppKeys.noThanks: 'No, Thanks',
       AppKeys.ok: 'OK',
 
-      // Main Home Screen
+      
       AppKeys.exchangeRate: 'Exchange Rate',
       AppKeys.swapCurrencies: 'Swap Currencies',
       AppKeys.sendMoneyDescription: 'Send money in USD and receive in USD or local currency',
@@ -223,7 +223,7 @@ class AppStrings {
       AppKeys.earn: 'Earn',
       AppKeys.forEachFriendRefer: 'for each friend you refer!',
 
-      // Security Verification Screen
+      
       AppKeys.securityVerification: 'Security Verification',
       AppKeys.additionalSecurityRequired:
           'Additional security verification is required. Complete the process by entering the One-Time-Password (OTP) verification code.',
@@ -232,7 +232,7 @@ class AppStrings {
       AppKeys.next: 'Next',
       AppKeys.failedToVerify: 'Failed to verify!',
 
-      // Activity Screen
+      
       AppKeys.activityTitle: 'Activity',
       AppKeys.searchTransactions: 'Search transactions',
       AppKeys.sortByAmount: 'Sort by amount',
@@ -248,7 +248,7 @@ class AppStrings {
       AppKeys.unknownRecipient: 'Unknown Recipient',
       AppKeys.clear: 'Clear',
 
-      // Status translations
+      
       AppKeys.statusInit: 'Initialized',
       AppKeys.statusPendingKyc: 'Pending KYC',
       AppKeys.statusPendingCancel: 'Pending Cancel',
@@ -275,7 +275,7 @@ class AppStrings {
       AppKeys.statusHoldBySender: 'Hold by Sender',
       AppKeys.statusGDue: 'GDue',
 
-      // Transfer Summary Screen
+      
       AppKeys.transferSummary: 'Transfer Summary',
       AppKeys.financialDetails: 'Financial Details',
       AppKeys.recipientDetails: 'Recipient Details',
@@ -346,7 +346,7 @@ class AppStrings {
       AppKeys.noDueAmount: 'No amount due',
       AppKeys.refundAmount: 'Refund Amount',
 
-      // Send Money Screen
+      
       AppKeys.sendMoneyTo: 'Send Money To',
       AppKeys.sendMoneyAmount: 'Amount',
       AppKeys.deliveryOptions: 'Delivery Options',
@@ -386,7 +386,7 @@ class AppStrings {
       AppKeys.modify: 'Modify',
       AppKeys.notProvided: 'Not provided',
 
-      // Receiver Profile Screen
+      
       AppKeys.recipientProfile: 'Recipient Profile',
       AppKeys.chooseRecipient: 'Choose Recipient',
       AppKeys.noRecipientSelected: 'No recipient selected',
@@ -402,7 +402,7 @@ class AppStrings {
       AppKeys.noRecipientsFound: "No Recipients Found",
       AppKeys.noSavedRecipientsMessage: "You have no saved recipients yet. Please add one.",
 
-      // Add or Update Recipient Screen
+      
       AppKeys.addRecipient: 'Add Recipient',
       AppKeys.updateRecipient: 'Update Recipient',
       AppKeys.recipientInformation: 'Recipient Information',
@@ -434,7 +434,7 @@ class AppStrings {
       AppKeys.contact: 'Contact',
       AppKeys.searchRecipient: 'Search Recipient',
       AppKeys.recipient: 'Recipient',
-      // Phone number input
+      
       AppKeys.phoneCannotEmpty: 'Phone can not empty.',
       AppKeys.phoneEnter10Digits: 'Please enter enough 10 digits.',
       AppKeys.phoneInvalidNumber:
@@ -450,7 +450,7 @@ class AppStrings {
       AppKeys.billingAddress: 'Billing Address',
       AppKeys.setAsDefaultPayment: 'Set as default payment method',
 
-      // Sign Up Screen
+      
       AppKeys.messageAndDataRatesMayApply:
           'I consent to receive SMS alerts from EZMonex for phone verification purposes.',
       AppKeys.consentToReceiveSms:
@@ -458,7 +458,7 @@ class AppStrings {
       AppKeys.alreadyHaveAccount: 'Already have an account?',
       AppKeys.phoneVerification: 'Phone Verification',
 
-      // Summary screen
+      
       AppKeys.receiveAmount: 'Receive Amount',
       AppKeys.fee: 'Fee',
       AppKeys.total: 'Total',
@@ -508,7 +508,7 @@ class AppStrings {
       AppKeys.addBank: 'Add Bank',
       AppKeys.limit: 'Limit',
 
-      // Dialog Helper
+      
       AppKeys.confirmTitle: 'Confirm',
       AppKeys.areYouSureYouWantTo: 'Are you sure you want to',
       AppKeys.thisActionCannotBeUndone: 'This action cannot be undone.',
@@ -546,10 +546,10 @@ class AppStrings {
       AppKeys.requestCancelTransaction: 'Request Cancel Transaction',
     },
     'vi': {
-      // App
+      
       AppKeys.appName: 'EzMonex',
 
-      // Navigation
+      
       AppKeys.navHome: 'Trang chủ',
       AppKeys.navSettings: 'Cài đặt',
       AppKeys.navProfile: 'Hồ sơ',
@@ -558,7 +558,7 @@ class AppStrings {
       AppKeys.navSendMoney: 'Gửi tiền',
       AppKeys.navReceiveMoney: 'Nhận tiền',
 
-      // Account KYC Screen
+      
       AppKeys.kycVerification: 'Xác minh KYC',
       AppKeys.kycNoData: 'Bạn chưa gửi bất kỳ dữ liệu KYC nào.',
       AppKeys.kycResidentialAddress: 'Xác minh địa chỉ cư trú',
@@ -571,7 +571,7 @@ class AppStrings {
       AppKeys.kycStatusIncomplete: 'Chưa hoàn thành',
       AppKeys.back: 'Quay lại',
 
-      // Account Screen
+      
       AppKeys.myAccount: 'Tài khoản của tôi',
       AppKeys.userNotFound: 'Không tìm thấy người dùng',
       AppKeys.chooseAvatar: 'Chọn ảnh đại diện',
@@ -583,14 +583,14 @@ class AppStrings {
       AppKeys.changePassword: 'Đổi mật khẩu',
       AppKeys.deleteAccount: 'Xóa tài khoản',
 
-      // Address Search Screen
+      
       AppKeys.addressSearch: 'Tìm kiếm địa chỉ',
       AppKeys.addressLabel: 'Địa chỉ',
       AppKeys.addressHint: 'VD: 20 Cooper Square',
       AppKeys.addressNotFound: '⚠️ Không thể tìm thấy địa chỉ.',
       AppKeys.save: 'Lưu',
 
-      // Delete Confirmation Screen
+      
       AppKeys.deleteAccountTitle: 'Xóa tài khoản',
       AppKeys.areYouSure: 'Bạn có chắc chắn không?',
       AppKeys.deleteWarning:
@@ -600,7 +600,7 @@ class AppStrings {
       AppKeys.cancelTitle: 'Hủy',
       AppKeys.failedToDeleteAccount: 'Không thể xóa tài khoản',
 
-      // Edit Address Screen
+      
       AppKeys.changeAddress: 'Thay đổi địa chỉ',
       AppKeys.addressInfo:
           'Nhấn vào bất kỳ trường nào để tìm kiếm và chọn địa chỉ mới. Các trường sẽ được điền tự động.',
@@ -613,7 +613,7 @@ class AppStrings {
       AppKeys.zipCodeLabel: 'Mã bưu điện',
       AppKeys.zipCodeHint: 'VD: 70000',
 
-      // Edit Email Screen
+      
       AppKeys.changeEmail: 'Thay đổi email',
       AppKeys.emailInfo:
           'Nhập địa chỉ email mới. Chúng tôi sẽ gửi mã xác minh để hoàn tất thay đổi.',
@@ -622,7 +622,7 @@ class AppStrings {
       AppKeys.emailEmptyError: 'Email không được để trống.',
       AppKeys.emailInvalidError: 'Vui lòng nhập địa chỉ email hợp lệ.',
 
-      // Edit Name Screen
+      
       AppKeys.changeName: 'Thay đổi tên',
       AppKeys.personalInformation: 'Thông tin cá nhân',
       AppKeys.personalInfoSubtitle: 'Cập nhật tên pháp lý như trên giấy tờ tùy thân',
@@ -636,12 +636,12 @@ class AppStrings {
       AppKeys.nameMatchId:
           'Đảm bảo tên của bạn khớp chính xác như trên giấy tờ tùy thân do chính phủ cấp.',
 
-      // Edit Phone Screen
+      
       AppKeys.changePhoneNumber: 'Thay đổi số điện thoại',
       AppKeys.phoneInfo:
           'Nhập số điện thoại mới. Chúng tôi sẽ gửi mã xác minh để hoàn tất thay đổi.',
 
-      // Common Messages
+      
       AppKeys.error: 'LỖI',
       AppKeys.successUpdated: 'đã cập nhật thành công',
       AppKeys.initializing: 'Đang khởi tạo...',
@@ -651,13 +651,13 @@ class AppStrings {
       AppKeys.incomplete: 'Chưa hoàn thành',
       AppKeys.errorLoadingUserColon: 'Lỗi tải người dùng:',
 
-      // Language setting screen
+      
       AppKeys.languageTitle: 'Thay đổi ngôn ngữ',
       AppKeys.languageEnglish: 'Tiếng Anh',
       AppKeys.languageVietnamese: 'Tiếng Việt',
       AppKeys.currentLanguage: 'Ngôn ngữ hiện tại',
 
-      // Profile Screen
+      
       AppKeys.accountAndSecurity: 'Tài khoản & Bảo mật',
       AppKeys.receiver: 'Người nhận',
       AppKeys.payment: 'Thanh toán',
@@ -669,12 +669,12 @@ class AppStrings {
       AppKeys.areYouSureLogout: 'Bạn có chắc chắn muốn đăng xuất không?',
       AppKeys.yesLogout: 'Có, đăng xuất',
 
-      // Address Search Screen - additional
+      
       AppKeys.somethingWentWrong: 'Đã xảy ra lỗi. Vui lòng thử lại sau',
       AppKeys.pleaseRetryLater: 'Vui lòng thử lại sau',
       AppKeys.couldNotFindMatches: 'Chúng tôi không tìm thấy kết quả phù hợp.',
 
-      // Edit Password Screen
+      
       AppKeys.passwordSecurityInfo: 'Để bảo mật, vui lòng sử dụng mật khẩu mạnh.',
       AppKeys.currentPasswordRequired: 'Mật khẩu hiện tại là bắt buộc!',
       AppKeys.currentPassword: 'Mật khẩu hiện tại',
@@ -695,7 +695,7 @@ class AppStrings {
       AppKeys.passwordCriteria4: 'Ít nhất một số',
       AppKeys.passwordCriteria5: 'Ít nhất một ký tự đặc biệt: !@#\$%&*.-_',
 
-      // Manage Receiver Screen
+      
       AppKeys.manageReceivers: 'Quản lý người nhận',
       AppKeys.search: 'Tìm kiếm',
       AppKeys.noResultsFor: 'Không có kết quả cho',
@@ -704,7 +704,7 @@ class AppStrings {
       AppKeys.addNewRecipientToStart: 'Thêm người nhận mới để bắt đầu.',
       AppKeys.addNewRecipient: 'Thêm người nhận mới',
 
-      // Manage Payment Screen
+      
       AppKeys.managePaymentMethodLabel: 'Quản lý thanh toán',
       AppKeys.noPaymentMethods: 'Không có phương thức thanh toán',
       AppKeys.addPaymentMethodToStart: 'Thêm phương thức thanh toán để bắt đầu.',
@@ -723,7 +723,7 @@ class AppStrings {
       AppKeys.activatePayment: 'Bật thanh toán',
       AppKeys.completeVerification: 'Hoàn tất xác minh',
 
-      // Onboarding screen
+      
       AppKeys.login: 'Đăng nhập',
       AppKeys.signUp: 'Đăng ký',
       AppKeys.contactUs: 'Liên hệ',
@@ -731,7 +731,7 @@ class AppStrings {
       AppKeys.checkAvailability: 'Kiểm tra khả dụng',
       AppKeys.transactionFee: 'Phí giao dịch',
 
-      // Login screen
+      
       AppKeys.hiThere: 'Xin chào! 👋',
       AppKeys.welcomeBack: 'Chào mừng trở lại, đăng nhập vào tài khoản của bạn',
       AppKeys.username: 'Tên đăng nhập',
@@ -756,7 +756,7 @@ class AppStrings {
       AppKeys.noThanks: 'Không, cảm ơn',
       AppKeys.ok: 'OK',
 
-      // Main Home Screen
+      
       AppKeys.exchangeRate: 'Tỷ giá',
       AppKeys.swapCurrencies: 'Hoán đổi tiền tệ',
       AppKeys.sendMoneyDescription: 'Gửi tiền bằng USD và nhận bằng USD hoặc tiền tệ địa phương',
@@ -766,7 +766,7 @@ class AppStrings {
       AppKeys.earn: 'Kiếm',
       AppKeys.forEachFriendRefer: 'cho mỗi bạn bè bạn giới thiệu!',
 
-      // Security Verification Screen
+      
       AppKeys.securityVerification: 'Xác minh bảo mật',
       AppKeys.additionalSecurityRequired:
           'Yêu cầu xác minh bảo mật bổ sung. Hoàn tất quy trình bằng cách nhập mã xác minh One-Time-Password (OTP).',
@@ -775,7 +775,7 @@ class AppStrings {
       AppKeys.next: 'Tiếp theo',
       AppKeys.failedToVerify: 'Xác minh thất bại!',
 
-      // Activity Screen
+      
       AppKeys.activityTitle: 'Hoạt động',
       AppKeys.searchTransactions: 'Tìm kiếm giao dịch',
       AppKeys.sortByAmount: 'Sắp xếp theo số tiền',
@@ -791,7 +791,7 @@ class AppStrings {
       AppKeys.unknownRecipient: 'Người nhận không xác định',
       AppKeys.clear: 'Xóa',
 
-      // Status translations
+      
       AppKeys.statusInit: 'Khởi tạo',
       AppKeys.statusPendingKyc: 'Chờ KYC',
       AppKeys.statusPendingCancel: 'Chờ hủy',
@@ -818,7 +818,7 @@ class AppStrings {
       AppKeys.statusHoldBySender: 'Tạm giữ bởi người gửi',
       AppKeys.statusGDue: 'GDue',
 
-      // Transfer Summary Screen
+      
       AppKeys.transferSummary: 'Tóm tắt giao dịch',
       AppKeys.financialDetails: 'Chi tiết tài chính',
       AppKeys.recipientDetails: 'Thông tin người nhận',
@@ -887,7 +887,7 @@ class AppStrings {
       AppKeys.noDueAmount: 'Không có số tiền cần thanh toán',
       AppKeys.refundAmount: 'Số tiền hoàn lại',
 
-      // Send Money Screen
+      
       AppKeys.sendMoneyTo: 'Gửi tiền đến',
       AppKeys.sendMoneyAmount: 'Số tiền',
       AppKeys.deliveryOptions: 'Tùy chọn giao hàng',
@@ -916,7 +916,7 @@ class AppStrings {
       AppKeys.transactionFeeLabel: 'Phí giao dịch',
       AppKeys.discountApplied: 'Đã áp dụng giảm giá',
 
-      // Sender Profile Screen
+      
       AppKeys.senderProfile: 'Hồ sơ người gửi',
       AppKeys.verifyProfileInformation: 'Xác minh thông tin hồ sơ của bạn',
       AppKeys.senderInformation: 'Thông tin người gửi',
@@ -928,7 +928,7 @@ class AppStrings {
       AppKeys.modify: 'Chỉnh sửa',
       AppKeys.notProvided: 'Chưa cung cấp',
 
-      // Receiver Profile Screen
+      
       AppKeys.recipientProfile: 'Hồ Sơ Người Nhận',
       AppKeys.chooseRecipient: 'Chọn Người Nhận',
       AppKeys.noRecipientSelected: 'Chưa chọn người nhận',
@@ -944,7 +944,7 @@ class AppStrings {
       AppKeys.noSavedRecipientsMessage:
           "Bạn chưa có người nhận nào được lưu. Vui lòng thêm một người.",
 
-      // Add or Update Recipient Screen
+      
       AppKeys.addRecipient: 'Thêm Người Nhận',
       AppKeys.updateRecipient: 'Cập Nhật Người Nhận',
       AppKeys.recipientInformation: 'Thông Tin Người Nhận',
@@ -977,14 +977,14 @@ class AppStrings {
       AppKeys.contact: 'Liên hệ',
       AppKeys.searchRecipient: 'Tìm kiếm người nhận',
       AppKeys.recipient: 'Người nhận',
-      // Phone number input
+      
       AppKeys.phoneCannotEmpty: 'Số điện thoại không được để trống',
       AppKeys.phoneEnter10Digits: 'Vui lòng nhập số điện thoại gồm 10 chữ số',
       AppKeys.phoneInvalidNumber:
           'Số điện thoại bạn cung cấp có vẻ không hợp lệ. Vui lòng kiểm tra lại số và thử lại.',
       AppKeys.emailOptional: 'Email (Tùy chọn)',
 
-      // Add or Update Payment Method Screen
+      
       AppKeys.addPaymentMethodTitle: 'Thêm Phương Thức Thanh Toán',
       AppKeys.updatePaymentMethodTitle: 'Cập Nhật Phương Thức Thanh Toán',
       AppKeys.cardDetail: 'Chi Tiết',
@@ -997,7 +997,7 @@ class AppStrings {
       AppKeys.add: 'Thêm',
       AppKeys.update: 'Cập Nhật',
 
-      // Sign Up Screen
+      
       AppKeys.messageAndDataRatesMayApply:
           'Tôi đồng ý nhận cảnh báo SMS từ EZMonex cho mục đích xác minh điện thoại.',
       AppKeys.consentToReceiveSms:
@@ -1005,7 +1005,7 @@ class AppStrings {
       AppKeys.alreadyHaveAccount: 'Đã có tài khoản?',
       AppKeys.phoneVerification: 'Xác minh điện thoại',
 
-      // Summary Screen
+      
       AppKeys.receiveAmount: 'Số tiền nhận',
       AppKeys.fee: 'Phí',
       AppKeys.total: 'Tổng',

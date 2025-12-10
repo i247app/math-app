@@ -8,14 +8,14 @@ import '../responses/quiz/submit_quiz_response.dart';
 class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
   final QuizRepository _quizRepository = QuizRepository();
 
-  List<List<QuizQuestion>> _allQuizzes = []; // All quizzes
-  int _currentQuizIndex = 0; // Current quiz index
+  final List<List<QuizQuestion>> _allQuizzes = [];
+  int _currentQuizIndex = 0;
   QuizResultData? _result;
   bool _isLoading = false;
   String? _error;
   int _currentQuestionIndex = 0;
-  Map<String, String> _allSelectedAnswers = {}; // quiz_id -> answers JSON
-  int _remainingTime = 300; // 5 minutes in seconds
+  final Map<String, String> _allSelectedAnswers = {};
+  int _remainingTime = 300;
 
   List<QuizQuestion>? get questions =>
       _allQuizzes.isNotEmpty && _currentQuizIndex < _allQuizzes.length
@@ -94,17 +94,15 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
   }
 
   Future<bool> loadNextQuiz(String uid) async {
-    // Save current quiz answers
     _saveCurrentQuizAnswers();
 
-    // Always generate a new quiz
     return await generateQuiz(uid);
   }
 
   void loadPreviousQuiz() {
     if (_currentQuizIndex > 0) {
       _currentQuizIndex--;
-      _currentQuestionIndex = 0; // Reset to first question
+      _currentQuestionIndex = 0;
       notifyListeners();
     }
   }
@@ -115,7 +113,6 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
     final currentQuiz = _allQuizzes[_currentQuizIndex];
     final quizId = 'quiz_$_currentQuizIndex';
 
-    // Create answers map for current quiz
     final answersMap = <int, String>{};
     for (final question in currentQuiz) {
       final answer =
@@ -125,7 +122,6 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
       }
     }
 
-    // Store as JSON string
     _allSelectedAnswers[quizId] = answersMap.toString();
   }
 
@@ -135,10 +131,8 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
     notifyListeners();
 
     try {
-      // Save current quiz answers first
       _saveCurrentQuizAnswers();
 
-      // Collect all answers from all quizzes
       final allAnswers = getAllAnswers();
 
       final response = await _quizRepository.submitQuiz(uid, allAnswers);
@@ -205,10 +199,7 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   void updateTimer(int remainingTime) {
     _remainingTime = remainingTime;
-    if (_remainingTime <= 0) {
-      // Auto-submit when time is up
-      // Note: This will be called from the UI, so we don't call submit here
-    }
+    if (_remainingTime <= 0) {}
     notifyListeners();
   }
 
@@ -224,8 +215,9 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
   }
 
   bool get isAllQuestionsAnsweredInCurrentQuiz {
-    if (_allQuizzes.isEmpty || _currentQuizIndex >= _allQuizzes.length)
+    if (_allQuizzes.isEmpty || _currentQuizIndex >= _allQuizzes.length) {
       return false;
+    }
     final quizId = 'quiz_$_currentQuizIndex';
     final currentQuiz = _allQuizzes[_currentQuizIndex];
     for (final question in currentQuiz) {

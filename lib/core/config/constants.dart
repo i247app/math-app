@@ -32,7 +32,7 @@ class Constants {
 
   static String getCurrentDayFormatted() => formatDate(DateTime.now());
 
-  // Làm tròn Double đến 3 chữ số sau dấu .
+  
   static double? parseAndRound(String input) {
     try {
       input = input.replaceAll(',', '.');
@@ -74,10 +74,10 @@ class Constants {
   }
 
   static Map<String, String> convertStringToDateAndTime(String input) {
-    // Use the format that matches the trimmed string: "yyyy-MM-dd HH:mm"
+    
     DateFormat inputFormat = DateFormat("yyyy-MM-dd HH:mm");
     DateTime dateTime = inputFormat.parse(input);
-    // Format date to "dd/MM/yyyy" if needed
+    
     String date = DateFormat("dd/MM/yyyy").format(dateTime);
     String time = DateFormat("HH:mm").format(dateTime);
     return {"date": date, "time": time};

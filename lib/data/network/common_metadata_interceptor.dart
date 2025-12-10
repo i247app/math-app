@@ -10,7 +10,7 @@ import '../../config/constant.dart';
 import '/data/providers/device_info_provider.dart';
 
 class CommonMetadataInterceptor extends InterceptorContract {
-  // Define the common metadata to include in all requests
+  
   Future<Map<String, dynamic>> _getMetadata(BuildContext context) async {
     final deviceInfoState = context.read<DeviceInfoProvider>();
     final info = await PackageInfo.fromPlatform();
@@ -42,12 +42,12 @@ class CommonMetadataInterceptor extends InterceptorContract {
       request.headers["Accept-Encoding"] = "gzip";
     }
 
-    // Only modify requests with a JSON body (skip GET and non-JSON requests)
+    
     try {
       if (request is Request && request.method != 'GET') {
         final contentType = request.headers['Content-Type']?.toLowerCase();
         if (contentType?.contains('application/json') ?? false) {
-          // Decode existing body (if any)
+          
           Map<String, dynamic> bodyJson = {};
           if (request.body.isNotEmpty) {
             try {
@@ -56,14 +56,14 @@ class CommonMetadataInterceptor extends InterceptorContract {
               if (kDebugMode) {
                 debugPrint('CommonMetadataInterceptor: Failed to decode body: $e');
               }
-              return request; // Skip if body is not valid JSON
+              return request; 
             }
           }
-          // Merge metadata
+          
           final metadata = await _getMetadata(context);
           bodyJson.addAll(metadata);
 
-          // Encode and update body
+          
           request.body = jsonEncode(bodyJson);
           request.headers['Content-Type'] = 'application/json; charset=utf-8';
           if (kDebugMode) {
@@ -90,7 +90,7 @@ class CommonMetadataInterceptor extends InterceptorContract {
 
   @override
   Future<BaseResponse> interceptResponse({required BaseResponse response}) async {
-    // No response modifications needed
+    
     return response;
   }
 }

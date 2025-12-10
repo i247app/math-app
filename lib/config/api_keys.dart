@@ -1,5 +1,5 @@
 import 'dart:io';
-// TODO Load these from the server on startup
+
 
 const ANDROID_GOOGLE_MAP_API_KEY = 'AIzaSyCPBm-TQkogTMgUE57RLhvAs4wiAxXTsI8';
 const IOS_GOOGLE_MAP_API_KEY = 'AIzaSyCPBm-TQkogTMgUE57RLhvAs4wiAxXTsI8';

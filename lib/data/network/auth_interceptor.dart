@@ -29,8 +29,8 @@ class AuthInterceptor extends InterceptorContract {
     debugPrint('📍 Headers: ${request.headers}');
     final authState = navigatorKey.currentContext!.read<AuthProvider>();
     final myAuthToken = authState.authToken;
-    // final userProvider = navigatorKey.currentContext!.read<UserProvider>();
-    // final language = userProvider.settingModel?.language ?? 'en';
+    
+    
     if ((myAuthToken ?? '').isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $myAuthToken';
     }
@@ -47,7 +47,7 @@ class AuthInterceptor extends InterceptorContract {
     if (deviceInfoState.devicePushToken?.isNotEmpty ?? false) {
       request.headers['X-Device-Push-Token'] = deviceInfoState.devicePushToken!;
     }
-    //request.headers['Accept-Language'] = language;
+    
     return request;
   }
 
@@ -68,65 +68,65 @@ class AuthInterceptor extends InterceptorContract {
       );
     }
 
-    // final shouldBounceOutLegacy = detectLegacyBounceOut(response);
-    // final shouldBounceOutNew = detectNewBounceOut(response);
-    // final isBlocked = detectBlocked(response);
-    // final isReadOnly = detectReadOnly(response);
+    
+    
+    
+    
 
-    // if (shouldBounceOutLegacy || shouldBounceOutNew || isBlocked) {
-    //   if (navigatorKey.currentContext != null) {
-    //     DialogHelper.dismissAllDialogs(navigatorKey.currentContext!);
-    //   }
-    //   await (AuthService.clearData(navigatorKey.currentContext!, isNotReturnOnBoarding: true));
-    //   Future.microtask(() {
-    //     DialogHelper.errorDialog(
-    //       title: isBlocked ? 'You\'ve been blocked' : 'Invalid Session',
-    //       subtitle:
-    //           isBlocked || shouldBounceOutNew
-    //               ? 'For security reasons, you\'ve been blocked. Please contact support for additional info.'
-    //               : 'For security reasons, you have been logged out. Please log in again.',
-    //       actionLabel: 'OK',
-    //       fct: () async {
-    //         Navigator.of(
-    //           navigatorKey.currentContext!,
-    //         ).pushNamedAndRemoveUntil(RoutesName.onBoarding, (route) => false);
-    //       },
-    //       context: navigatorKey.currentContext!,
-    //     );
-    //   });
-    // }
-    // if (navigatorKey.currentContext != null) {
-    //   if (isReadOnly) {
-    //     if (navigatorKey.currentContext != null) {
-    //       DialogHelper.dismissAllDialogs(navigatorKey.currentContext!);
-    //     }
-    //     Future.microtask(() {
-    //       navigatorKey.currentContext!.read<AuthProvider>().isReadOnly = true;
-    //       final userProvider = navigatorKey.currentContext!.read<UserProvider>();
-    //       userProvider.user?.userStatus = 'READ_ONLY';
-    //       if (!GlobalVariable.isShowDialog) {
-    //         DialogHelper.errorDialog(
-    //           title: 'Account Issue',
-    //           subtitle: 'Your account has been restricted. Please contact support for assistance.',
-    //           actionLabel: 'OK',
-    //           fct: () {
-    //             GlobalVariable.isShowDialog = true;
-    //             Navigator.of(
-    //               navigatorKey.currentContext!,
-    //             ).push(MaterialPageRoute(builder: (_) => BottomNavigation(currentIndex: 0)));
-    //           },
-    //           context: navigatorKey.currentContext!,
-    //         );
-    //       }
-    //     });
-    //   }
-    // }
-    // if (!shouldBounceOutLegacy &&
-    //     !shouldBounceOutNew &&
-    //     !isBlocked &&
-    //     navigatorKey.currentContext != null) {
-    //   GlobalVariable.isShowDialog = false;
-    // }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     return response;
   }
 }

@@ -12,7 +12,9 @@ import 'package:math_ai_app/data/providers/quiz_provider.dart';
 import 'package:math_ai_app/data/providers/user_provider.dart';
 
 class MathQuizScreen extends StatefulWidget {
-  const MathQuizScreen({super.key});
+  final bool isPractice;
+
+  const MathQuizScreen({super.key, this.isPractice = false});
 
   @override
   State<MathQuizScreen> createState() => _MathQuizScreenState();
@@ -23,7 +25,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
   Timer? _animationTimer;
   bool isSubmitting = false;
   bool _showLoading = true;
-  int _animationKey = 0; // Key to restart animations
+  int _animationKey = 0; 
 
   @override
   void initState() {
@@ -41,17 +43,22 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
   }
 
   Future<void> _initializeQuiz() async {
-    // Start animation timer for continuous symbol animations
+    
     _startAnimationTimer();
 
     final userProvider = context.read<UserProvider>();
     final uid = userProvider.user?.id;
     if (uid != null && uid.isNotEmpty) {
       final quizProvider = context.read<QuizProvider>();
-      await quizProvider.generateQuiz(uid);
+      
+      if (widget.isPractice) {
+        await quizProvider.generatePractice(uid);
+      } else {
+        await quizProvider.generateQuiz(uid);
+      }
       if (quizProvider.questions != null &&
           quizProvider.questions!.isNotEmpty) {
-        // Allow loading animation to complete before showing quiz
+        
         await Future.delayed(const Duration(seconds: 5));
         if (mounted) {
           setState(() {
@@ -123,7 +130,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           );
         }
       } else if (mounted) {
-        // Show error message
+        
         await Future.delayed(const Duration(seconds: 5));
         if (mounted) {
           setState(() {
@@ -153,17 +160,17 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       answerLabel,
     );
 
-    // Auto proceed after selection
+    
     Future.delayed(const Duration(milliseconds: 200), () async {
       if (quizProvider.currentQuestionIndex >=
           quizProvider.totalQuestions - 1) {
-        // Last question in current quiz
+        
         if (quizProvider.isLastQuiz) {
-          // Last quiz, auto submit
+          
           _timer?.cancel();
           await _autoSubmit();
         } else {
-          // Load next quiz
+          
           if (!mounted) return;
           final userProvider = context.read<UserProvider>();
           final uid = userProvider.user?.id;
@@ -172,7 +179,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           }
         }
       } else {
-        // Next question in current quiz
+        
         quizProvider.nextQuestion();
       }
     });
@@ -191,9 +198,9 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFFFF8E1), // Light yellow
-                    Color(0xFFFFE082), // Yellow
-                    Color(0xFFFFD54F), // Darker yellow
+                    Color(0xFFFFF8E1), 
+                    Color(0xFFFFE082), 
+                    Color(0xFFFFD54F), 
                   ],
                 ),
               ),
@@ -203,7 +210,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Animated bee
+                      
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0.8, end: 1.2),
                         duration: const Duration(seconds: 1),
@@ -215,17 +222,17 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                               tween: Tween<double>(
                                 begin: 0,
                                 end: 360 * 100,
-                              ), // Rotate 100 full circles
+                              ), 
                               duration: const Duration(
                                 seconds: 120,
-                              ), // Slower continuous rotation
+                              ), 
                               curve: Curves.linear,
                               builder: (context, rotation, child) {
                                 return Transform.rotate(
                                   angle:
                                       rotation *
                                       3.14159 /
-                                      180, // Convert to radians
+                                      180, 
                                   child: Container(
                                     width: 120,
                                     height: 120,
@@ -293,7 +300,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
 
                       const SizedBox(height: 40),
 
-                      // Animated loading text
+                      
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
                         duration: const Duration(milliseconds: 1500),
@@ -317,7 +324,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
 
                       const SizedBox(height: 20),
 
-                      // Animated dots
+                      
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(3, (index) {
@@ -351,10 +358,10 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
 
                       const SizedBox(height: 40),
 
-                      // Circular progress indicator with animation
+                      
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
-                        duration: const Duration(seconds: 13),
+                        duration: const Duration(seconds: 11),
                         curve: Curves.easeInOut,
                         builder: (context, value, child) {
                           return SizedBox(
@@ -380,7 +387,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
 
                       const SizedBox(height: 30),
 
-                      // Math symbols floating animation
+                      
                       SizedBox(
                         key: ValueKey(_animationKey),
                         height: 100,
@@ -525,7 +532,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                   ),
                   child: Column(
                     children: [
-                      // HeaderSection(),
+                      
                       const SizedBox(height: 30),
                       Text(
                         "KIỂM TRA",
@@ -557,8 +564,8 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                           selectedAnswer: quizProvider
                               .getSelectedAnswerForCurrentQuestion(),
                           onAnswerSelected: _onAnswerSelected,
-                          onNext: null, // Not used anymore
-                          onPrevious: null, // Not used anymore
+                          onNext: null, 
+                          onPrevious: null, 
                         ),
                       ),
                     ],

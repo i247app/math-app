@@ -30,7 +30,7 @@ class SignUpResponse extends BaseResponse {
   @override
   Map<String, dynamic> toJson() => _$SignUpResponseToJson(this);
 
-  // Helper getter for easier access
+  
   User? get user => result?.user;
 }
 

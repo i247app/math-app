@@ -18,7 +18,7 @@ class ErrorScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Error icon with animation
+              
               TweenAnimationBuilder<double>(
                 tween: Tween<double>(begin: 0.8, end: 1.0),
                 duration: const Duration(milliseconds: 600),
@@ -52,7 +52,7 @@ class ErrorScreen extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              // Error title
+              
               Text(
                 'Có lỗi xảy ra!',
                 style: GoogleFonts.nunito(
@@ -65,7 +65,7 @@ class ErrorScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // Error message
+              
               Text(
                 errorMessage,
                 style: GoogleFonts.nunito(
@@ -79,7 +79,7 @@ class ErrorScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // Retry button
+              
               if (onRetry != null)
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0, end: 1),
@@ -117,7 +117,7 @@ class ErrorScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Back button
+              
               TextButton.icon(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(Icons.arrow_back),

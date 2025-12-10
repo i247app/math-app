@@ -23,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final AuthRepository _authRepository = AuthRepository();
 
-  // Validation errors
   String? _loginNameError;
   String? _passwordError;
 
@@ -61,7 +60,6 @@ class _LoginScreenState extends State<LoginScreen> {
     FocusScope.of(context).unfocus();
     _validateAll();
 
-    // Check if all validations pass
     if (_loginNameError != null ||
         _passwordError != null ||
         _loginNameController.text.isEmpty ||
@@ -85,7 +83,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.isSuccess && response.user != null) {
         if (mounted) {
-          // Set user in provider
           Provider.of<UserProvider>(
             context,
             listen: false,
@@ -100,7 +97,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
 
-          // Navigate to next screen after success
           await Future.delayed(const Duration(seconds: 1));
           if (mounted) {
             Navigator.of(context).pushReplacement(
@@ -148,15 +144,11 @@ class _LoginScreenState extends State<LoginScreen> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFFE3F2FD), // Light blue
-                Color(0xFFBBDEFB), // Slightly darker blue
-                Colors.white,
-              ],
+              colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB), Colors.white],
             ),
           ),
           child: SafeArea(
-            bottom: false, // Allow content to extend to bottom
+            bottom: false,
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
@@ -166,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 16),
-                  // Welcome back text
+
                   Text(
                     'Chào Mừng Trở Lại!',
                     style: GoogleFonts.nunito(
@@ -187,7 +179,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Avatar with better styling
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -233,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  // Login form with card background
+
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -283,7 +274,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Signup link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -304,7 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         child: Text(
-                          'Đăng ký ngay',
+                          'Sign up now',
                           style: GoogleFonts.nunito(
                             fontSize: 16,
                             color: Colors.blue.shade700,

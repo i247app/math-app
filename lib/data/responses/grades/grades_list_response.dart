@@ -19,7 +19,7 @@ class GradesListResponse extends BaseResponse {
   @override
   Map<String, dynamic> toJson() => _$GradesListResponseToJson(this);
 
-  // Helper getters for easier access
+  
   List<GradeModel>? get grades => result?.items;
   MetadataModel? get metadata => result?.metadata;
 }

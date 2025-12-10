@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:math_ai_app/ui/math%20test%20process/view/math_test_intro_screen.dart';
 import '../sub_view/profile_screen.dart';
 import 'assessment_screen.dart';
 import 'placeholder_screen.dart';
@@ -15,7 +14,7 @@ class BottomNavigationBarScreen extends StatefulWidget {
 }
 
 class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
-  late int _currentIndex; // Mặc định mở tab Profile (index 3)
+  late int _currentIndex; 
 
   @override
   void initState() {
@@ -25,7 +24,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
 
   final List<Widget> _screens = [
     const PlaceholderScreen(title: "Home", color: Colors.blueAccent),
-    //const MathTestIntroScreen(),
+    
     const AssessmentScreen(),
     const AssessmentScreen(),
     const ProfileScreen(),
@@ -35,7 +34,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
-      // IndexedStack giúp giữ trạng thái màn hình, không bị load lại khi chuyển tab
+      
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

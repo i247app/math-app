@@ -21,6 +21,12 @@ class User {
   @JsonKey(name: 'grade')
   String? grade;
 
+  @JsonKey(name: 'grade_id')
+  String? gradeId;
+
+  @JsonKey(name: 'semester_id')
+  String? semesterId;
+
   @JsonKey(name: 'password')
   String? password;
 
@@ -43,6 +49,8 @@ class User {
     this.phone,
     this.dob,
     this.grade,
+    this.gradeId,
+    this.semesterId,
     this.password,
     this.avatarUrl,
     this.role,
@@ -57,6 +65,8 @@ class User {
     String? phone,
     String? dob,
     String? grade,
+    String? gradeId,
+    String? semesterId,
     String? password,
     String? avatarUrl,
     String? role,
@@ -70,6 +80,8 @@ class User {
       phone: phone ?? this.phone,
       dob: dob ?? this.dob,
       grade: grade ?? this.grade,
+      gradeId: gradeId ?? this.gradeId,
+      semesterId: semesterId ?? this.semesterId,
       password: password ?? this.password,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       role: role ?? this.role,

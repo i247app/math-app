@@ -29,7 +29,7 @@ class TopicCard extends StatelessWidget {
             title,
             style: GoogleFonts.nunito(
               fontSize: 18,
-              fontWeight: FontWeight.w800, // ExtraBold
+              fontWeight: FontWeight.w800, 
               color: Colors.black87,
             ),
           ),
@@ -52,7 +52,7 @@ class TopicCard extends StatelessWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: const Color(0xFF1A1A1A),
-                        height: 1.3, // Khoảng cách dòng dễ đọc
+                        height: 1.3, 
                       ),
                     ),
                   ),

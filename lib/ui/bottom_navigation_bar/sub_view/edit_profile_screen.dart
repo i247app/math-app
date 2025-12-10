@@ -38,7 +38,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    // Load data and set current selections
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadDataAndSetCurrentSelections();
     });
@@ -49,15 +49,15 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     final levelsProvider = context.read<LevelsProvider>();
     final profileProvider = context.read<ProfileProvider>();
 
-    // Load grades and levels
+    
     gradesProvider.loadGrades();
     levelsProvider.loadLevels();
 
-    // Set current selections based on profile
+    
     final currentGrade = profileProvider.profile?.grade;
     final currentLevel = profileProvider.profile?.level;
 
-    // Find current grade index
+    
     if (currentGrade != null && gradesProvider.grades != null) {
       for (int i = 0; i < gradesProvider.grades!.length; i++) {
         if (gradesProvider.grades![i].label == currentGrade) {
@@ -69,7 +69,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       }
     }
 
-    // Find current level index
+    
     if (currentLevel != null && levelsProvider.levels != null) {
       for (int i = 0; i < levelsProvider.levels!.length; i++) {
         if (levelsProvider.levels![i].label == currentLevel) {
@@ -136,7 +136,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.of(context).pop(); // Go back to profile screen
+        Navigator.of(context).pop(); 
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -158,7 +158,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with back button
+              
               Row(
                 children: [
                   IconButton(
@@ -178,7 +178,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
               ),
               const SizedBox(height: 20),
 
-              // Grade Selection Section
+              
               Text(
                 "Chọn Lớp Học",
                 style: GoogleFonts.nunito(
@@ -249,7 +249,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
               const SizedBox(height: 30),
 
-              // Semester Selection Section
+              
               Text(
                 "Chọn Kì Học",
                 style: GoogleFonts.nunito(
@@ -320,7 +320,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
               const Spacer(),
 
-              // Update Button
+              
               SizedBox(
                 width: double.infinity,
                 height: 55,

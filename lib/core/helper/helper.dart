@@ -38,26 +38,26 @@ class Helper {
     return format.format(amount);
   }
 
-  // static int? getCountryIdByName(String? countryName, List<Country> countries) {
-  //   if (countryName == null) return null;
-  //   final country = countries.firstWhere(
-  //     (c) => c.name == countryName,
-  //     orElse: () => Country(id: -1, name: countryName),
-  //   );
-  //   return country.id;
-  // }
+  
+  
+  
+  
+  
+  
+  
+  
 
-  // static int? getBankIdByName(
-  //   String? bankName,
-  //   List<BankAccountByCountry> banks,
-  // ) {
-  //   if (bankName == null) return null;
-  //   final bank = banks.firstWhere(
-  //     (b) => b.name == bankName,
-  //     orElse: () => BankAccountByCountry(bankId: -1, name: bankName),
-  //   );
-  //   return bank.bankId;
-  // }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   static String removeVietnameseDiacritics(String str) {
     str = str.replaceAll(RegExp(r'[àáạảãâầấậẩẫăằắặẳẵ]'), 'a');
@@ -78,33 +78,33 @@ class Helper {
     return str;
   }
 
-  // static String getCodeByCurrencyCoreId(int? id) {
-  //   if (id == Currency.vnd.coreId) {
-  //     return Currency.vnd.code;
-  //   }
-  //   return Currency.usd.code;
-  // }
+  
+  
+  
+  
+  
+  
 
-  // static int getCoreIdByCurrencyCode(String? code) {
-  //   if (code == Currency.vnd.code) {
-  //     return Currency.vnd.coreId;
-  //   }
-  //   return Currency.usd.coreId;
-  // }
+  
+  
+  
+  
+  
+  
 
-  // static String getReceiveCurrencyCode(String? code) {
-  //   if (code == Currency.vnd.code) {
-  //     return Currency.vnd.code;
-  //   }
-  //   return Currency.usd.code;
-  // }
+  
+  
+  
+  
+  
+  
 
-  // static String getCountryCodeByCurrencyCode(String? code) {
-  //   if (code == Currency.vnd.code) {
-  //     return Currency.vnd.countryCode;
-  //   }
-  //   return Currency.usd.countryCode;
-  // }
+  
+  
+  
+  
+  
+  
 
   static bool? jsonIntToBool(int? value) {
     if (value != null) {

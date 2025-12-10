@@ -59,18 +59,18 @@ class _ClassCardState extends State<ClassCard>
 
   @override
   Widget build(BuildContext context) {
-    // Generate color based on display order
+    
     final colors = [
-      const Color(0xFF9FE6D8), // Light green
-      const Color(0xFFFFD561), // Yellow
-      const Color(0xFFFF8A65), // Orange
-      const Color(0xFFAEDEF4), // Light blue
-      const Color(0xFFC5E1A5), // Light green
-      const Color(0xFFF8BBD0), // Pink
+      const Color(0xFF9FE6D8), 
+      const Color(0xFFFFD561), 
+      const Color(0xFFFF8A65), 
+      const Color(0xFFAEDEF4), 
+      const Color(0xFFC5E1A5), 
+      const Color(0xFFF8BBD0), 
     ];
     final color = colors[(widget.data.displayOrder - 1) % colors.length];
 
-    // Show badge for the last grade or if it's the newest
+    
     final hasBadge = widget.data.displayOrder == 3;
     return AnimatedBuilder(
       animation: _tapController,

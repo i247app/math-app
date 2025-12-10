@@ -18,7 +18,7 @@ class ProfileFetchResponse extends BaseResponse {
   @override
   Map<String, dynamic> toJson() => _$ProfileFetchResponseToJson(this);
 
-  // Helper getter for easier access
+  
   ProfileModel? get profile => result?.profile;
 }
 

@@ -9,7 +9,7 @@ class TimeUtils {
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(utcDateTime);
   }
 
-  /// Parses a custom UTC timestamp string "yyyyMMddHHmmss.SSSSSS" into a UTC DateTime object.
+  
   static DateTime? parseCustomTimestamp(String timestamp) {
     if (timestamp.length != 21) {
       debugPrint(
@@ -33,13 +33,13 @@ class TimeUtils {
     }
   }
 
-  /// Parses the server's UTC timestamp string and converts it to a local DateTime object.
+  
   static DateTime? parseServerUtcToLocal(String timestamp) {
     final utcTime = parseCustomTimestamp(timestamp);
     return utcTime?.toLocal();
   }
 
-  /// Converts a local DateTime object to a UTC timestamp string in "yyyyMMddHHmmss.SSSSSS" format.
+  
   static String formatLocalTimeToServerUtcString(DateTime localTime) {
     final utcTime = localTime.toUtc();
     final year = utcTime.year.toString().padLeft(4, '0');

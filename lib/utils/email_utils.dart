@@ -78,13 +78,13 @@ class EmailInputController extends TextEditingController {
   }
 
   void onEmailChanged() {
-    // Auto-validate on every change but with the following rules:
-    // 1. Immediately cancel any existing timers, clear the email error
-    // 2. Run full validation after a 500ms delay timer
+    
+    
+    
     validationDelayTimer?.cancel();
     _emailError = isRequired ? '' : null;
     _displayErrorText = EmailUtils.validateEmail(text);
-    // debugPrint("CLEARING EMAIL ERROR");
+    
     notifyListeners();
 
     validationDelayTimer = Timer(validationDelay, () {
@@ -97,8 +97,8 @@ class EmailInputController extends TextEditingController {
 
     final emailBeingChecked = text;
 
-    // If email is empty AND isRequired == false,
-    // no need to run validation as an empty email is acceptable
+    
+    
     if (text.isEmpty && !isRequired) {
       debugPrint("Email is empty and not required, so skipping validation...");
       _emailError = null;
@@ -106,7 +106,7 @@ class EmailInputController extends TextEditingController {
       return;
     }
 
-    // Validate email
+    
     final validationError = EmailUtils.validateEmail(text);
     _isEmailValid = validationError == null;
     _emailError = validationError;
@@ -115,7 +115,7 @@ class EmailInputController extends TextEditingController {
       return;
     }
 
-    // Validation is successful
+    
     _validatedAndAvailableEmail = emailBeingChecked;
     _isEmailValid = true;
 
