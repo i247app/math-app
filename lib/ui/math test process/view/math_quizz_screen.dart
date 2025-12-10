@@ -25,7 +25,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
   Timer? _animationTimer;
   bool isSubmitting = false;
   bool _showLoading = true;
-  int _animationKey = 0; 
+  int _animationKey = 0;
 
   @override
   void initState() {
@@ -43,14 +43,13 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
   }
 
   Future<void> _initializeQuiz() async {
-    
     _startAnimationTimer();
 
     final userProvider = context.read<UserProvider>();
     final uid = userProvider.user?.id;
     if (uid != null && uid.isNotEmpty) {
       final quizProvider = context.read<QuizProvider>();
-      
+
       if (widget.isPractice) {
         await quizProvider.generatePractice(uid);
       } else {
@@ -58,7 +57,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       }
       if (quizProvider.questions != null &&
           quizProvider.questions!.isNotEmpty) {
-        
         await Future.delayed(const Duration(seconds: 5));
         if (mounted) {
           setState(() {
@@ -130,7 +128,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           );
         }
       } else if (mounted) {
-        
         await Future.delayed(const Duration(seconds: 5));
         if (mounted) {
           setState(() {
@@ -160,17 +157,13 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       answerLabel,
     );
 
-    
     Future.delayed(const Duration(milliseconds: 200), () async {
       if (quizProvider.currentQuestionIndex >=
           quizProvider.totalQuestions - 1) {
-        
         if (quizProvider.isLastQuiz) {
-          
           _timer?.cancel();
           await _autoSubmit();
         } else {
-          
           if (!mounted) return;
           final userProvider = context.read<UserProvider>();
           final uid = userProvider.user?.id;
@@ -179,7 +172,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           }
         }
       } else {
-        
         quizProvider.nextQuestion();
       }
     });
@@ -198,9 +190,9 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFFFF8E1), 
-                    Color(0xFFFFE082), 
-                    Color(0xFFFFD54F), 
+                    Color(0xFFFFF8E1),
+                    Color(0xFFFFE082),
+                    Color(0xFFFFD54F),
                   ],
                 ),
               ),
@@ -210,7 +202,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0.8, end: 1.2),
                         duration: const Duration(seconds: 1),
@@ -219,20 +210,12 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
                           return Transform.scale(
                             scale: scale,
                             child: TweenAnimationBuilder<double>(
-                              tween: Tween<double>(
-                                begin: 0,
-                                end: 360 * 100,
-                              ), 
-                              duration: const Duration(
-                                seconds: 120,
-                              ), 
+                              tween: Tween<double>(begin: 0, end: 360 * 100),
+                              duration: const Duration(seconds: 120),
                               curve: Curves.linear,
                               builder: (context, rotation, child) {
                                 return Transform.rotate(
-                                  angle:
-                                      rotation *
-                                      3.14159 /
-                                      180, 
+                                  angle: rotation * 3.14159 / 180,
                                   child: Container(
                                     width: 120,
                                     height: 120,
@@ -300,7 +283,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
 
                       const SizedBox(height: 40),
 
-                      
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
                         duration: const Duration(milliseconds: 1500),
@@ -324,7 +306,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
 
                       const SizedBox(height: 20),
 
-                      
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(3, (index) {
@@ -358,7 +339,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
 
                       const SizedBox(height: 40),
 
-                      
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
                         duration: const Duration(seconds: 11),
@@ -387,7 +367,6 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
 
                       const SizedBox(height: 30),
 
-                      
                       SizedBox(
                         key: ValueKey(_animationKey),
                         height: 100,
@@ -514,65 +493,93 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
         }
 
         if (quizProvider.questions == null || quizProvider.questions!.isEmpty) {
-          return const Scaffold(
-            backgroundColor: Color(0xFFE3F2FD),
-            body: Center(child: Text('No questions available')),
+          return PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (didPop, result) {
+              if (!didPop) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Không thể quay lại trong khi đang làm bài kiểm tra',
+                    ),
+                  ),
+                );
+              }
+            },
+            child: const Scaffold(
+              backgroundColor: Color(0xFFE3F2FD),
+              body: Center(child: Text('No questions available')),
+            ),
           );
         }
 
-        return Scaffold(
-          backgroundColor: Colors.blue.shade50,
-          body: Stack(
-            children: [
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    children: [
-                      
-                      const SizedBox(height: 30),
-                      Text(
-                        "KIỂM TRA",
-                        style: GoogleFonts.nunito(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFF3E2723),
-                        ),
-                      ),
-                      const SizedBox(height: 50),
-                      InfoRow(
-                        remainingTime: quizProvider.remainingTime,
-                        currentQuestion: quizProvider.currentQuestionIndex + 1,
-                        totalQuestions: quizProvider.totalQuestions,
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      QuestionBoard(
-                        question:
-                            quizProvider.currentQuestion?.questionName ?? '',
-                      ),
-
-                      const SizedBox(height: 30),
-
-                      Expanded(
-                        child: AnswerSection(
-                          question: quizProvider.currentQuestion,
-                          selectedAnswer: quizProvider
-                              .getSelectedAnswerForCurrentQuestion(),
-                          onAnswerSelected: _onAnswerSelected,
-                          onNext: null, 
-                          onPrevious: null, 
-                        ),
-                      ),
-                    ],
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Không thể quay lại trong khi đang làm bài kiểm tra',
                   ),
                 ),
-              ),
-            ],
+              );
+            }
+          },
+          child: Scaffold(
+            backgroundColor: Colors.blue.shade50,
+            body: Stack(
+              children: [
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 10,
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 30),
+                        Text(
+                          "KIỂM TRA",
+                          style: GoogleFonts.nunito(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF3E2723),
+                          ),
+                        ),
+                        const SizedBox(height: 50),
+                        InfoRow(
+                          remainingTime: quizProvider.remainingTime,
+                          currentQuestion:
+                              quizProvider.currentQuestionIndex + 1,
+                          totalQuestions: quizProvider.totalQuestions,
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        QuestionBoard(
+                          question:
+                              quizProvider.currentQuestion?.questionName ?? '',
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        Expanded(
+                          child: AnswerSection(
+                            question: quizProvider.currentQuestion,
+                            selectedAnswer: quizProvider
+                                .getSelectedAnswerForCurrentQuestion(),
+                            onAnswerSelected: _onAnswerSelected,
+                            onNext: null,
+                            onPrevious: null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

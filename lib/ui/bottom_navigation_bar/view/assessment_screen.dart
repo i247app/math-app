@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
+import 'package:math_ai_app/ui/bottom_navigation_bar/widget/bar_chart_widget.dart';
 
 import '../../math test process/view/math_quizz_screen.dart';
 
@@ -20,14 +21,14 @@ class AssessmentScreen extends StatelessWidget {
               SizedBox(height: 120),
               Container(
                 width: double.infinity,
-                height: 203,
+                height: 250,
                 decoration: BoxDecoration(
-                  color: Color(0xFFF4714F),
+                  color: const Color(0xFFD9F6F4),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
                       color: const Color(
-                        0xFFF4714F,
+                        0xFFD9F6F4,
                       ).withAlpha((255 * 0.3).toInt()),
                       spreadRadius: 2,
                       blurRadius: 8,
@@ -35,18 +36,9 @@ class AssessmentScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Center(
-                  child: Text(
-                    '',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                child: const BarChartWidget(),
               ),
-              
+
               Spacer(),
               CustomPrimaryButton(
                 text: 'Test',

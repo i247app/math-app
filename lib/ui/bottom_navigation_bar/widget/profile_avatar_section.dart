@@ -4,12 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 class ProfileAvatarSection extends StatelessWidget {
   final String name;
   final String email;
+  final String? avatarUrl;
   final VoidCallback? onEditTap;
 
   const ProfileAvatarSection({
     super.key,
     required this.name,
     required this.email,
+    this.avatarUrl,
     this.onEditTap,
   });
 
@@ -25,14 +27,19 @@ class ProfileAvatarSection extends StatelessWidget {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 60,
                 backgroundColor: Color(0xFFFFCC80),
-                child: Icon(
-                  Icons.person_4_rounded,
-                  size: 80,
-                  color: Colors.brown,
-                ),
+                backgroundImage: avatarUrl != null
+                    ? NetworkImage(avatarUrl!)
+                    : null,
+                child: avatarUrl == null
+                    ? const Icon(
+                        Icons.person_4_rounded,
+                        size: 80,
+                        color: Colors.brown,
+                      )
+                    : null,
               ),
             ),
             Positioned(

@@ -1,7 +1,7 @@
 import '../network/network.dart' as network;
 import '../responses/profile/profile_create_response.dart';
 import '../responses/profile/profile_fetch_response.dart';
-import '../models/profile/update_profile_response.dart';
+import '../responses/update_profile/update_profile_response.dart';
 import '../models/profile/update_profile_request.dart';
 
 class ProfileRepository {
@@ -27,6 +27,21 @@ class ProfileRepository {
     UpdateProfileRequest request,
   ) async {
     final response = await network.updateProfile(request);
+    return response;
+  }
+
+  Future<UpdateProfileResponse> updateProfileWithFormData({
+    required String uid,
+    String? gradeId,
+    String? semesterId,
+    String? avatarPath,
+  }) async {
+    final response = await network.updateProfileWithFormData(
+      uid: uid,
+      gradeId: gradeId,
+      semesterId: semesterId,
+      avatarPath: avatarPath,
+    );
     return response;
   }
 }

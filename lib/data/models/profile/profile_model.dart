@@ -22,8 +22,11 @@ class ProfileModel {
   @JsonKey(name: 'grade')
   final String? grade;
 
-  @JsonKey(name: 'level')
-  final String? level;
+  @JsonKey(name: 'semester')
+  final String? semester;
+
+  @JsonKey(name: 'avatar_url')
+  final String? avatarUrl;
 
   @JsonKey(name: 'status')
   final String? status;
@@ -41,7 +44,8 @@ class ProfileModel {
     this.email,
     this.phone,
     this.grade,
-    this.level,
+    this.semester,
+    this.avatarUrl,
     this.status,
     this.createdAt,
     this.modifiedAt,

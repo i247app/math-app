@@ -89,7 +89,8 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
       final response = await _profileRepository.updateProfile(request);
 
       if (response.isSuccess) {
-        _profile = response.result.profile;
+        // Refresh profile after successful update
+        await fetchProfile(uid);
         return true;
       } else {
         _error = response.message ?? 'Failed to update profile';

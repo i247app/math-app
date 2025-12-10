@@ -13,7 +13,7 @@ import '../responses/levels/levels_list_response.dart';
 import '../responses/profile/profile_create_response.dart';
 import '../responses/profile/profile_fetch_response.dart';
 import '../models/profile/update_profile_request.dart';
-import '../models/profile/update_profile_response.dart';
+import '../responses/update_profile/update_profile_response.dart';
 import '../responses/quiz/generate_quiz_response.dart';
 import '../responses/quiz/submit_quiz_response.dart';
 import '/config/config.dart';
@@ -240,4 +240,66 @@ Future<SubmitQuizResponse> submitQuiz(
     "answers": answers,
   });
   return _parseResponse(response, SubmitQuizResponse.fromJson);
+}
+
+Future<UpdateProfileResponse> updateProfileWithFormData({
+  required String uid,
+  String? gradeId,
+  String? semesterId,
+  String? avatarPath,
+}) async {
+  final xReqId = _reqCounter++;
+
+  debugPrint('>> OUT [$xReqId]: POST $API_ROOT/users/update');
+  debugPrint('>> Fields: uid=$uid, grade_id=$gradeId, avatarPath=$avatarPath');
+
+  var request = http.MultipartRequest(
+    'POST',
+    Uri.parse('$API_ROOT/users/update'),
+  );
+
+  request.headers.addAll({
+    'Content-Type': 'multipart/form-data',
+    'X-Request-ID': xReqId.toString(),
+  });
+
+  request.fields['uid'] = uid;
+  if (gradeId != null) {
+    request.fields['grade_id'] = gradeId;
+  }
+  if (semesterId != null) {
+    request.fields['semester_id'] = semesterId;
+  }
+
+  debugPrint('>> Request fields: ${request.fields}');
+
+  if (avatarPath != null && avatarPath.isNotEmpty) {
+    debugPrint('>> Adding avatar file: $avatarPath');
+    try {
+      final file = await http.MultipartFile.fromPath('avatar', avatarPath);
+      request.files.add(file);
+      debugPrint('>> Request files count: ${request.files.length}');
+      debugPrint(
+        '>> Avatar file added: ${file.filename}, size: ${file.length}',
+      );
+    } catch (e) {
+      debugPrint('>> Error adding avatar file: $e');
+      rethrow;
+    }
+  }
+
+  debugPrint(
+    '>> Final request files: ${request.files.map((f) => '${f.field}: ${f.filename}').toList()}',
+  );
+
+  debugPrint('>> Sending multipart/form-data request...');
+  debugPrint('>> Content-Type header: ${request.headers['Content-Type']}');
+
+  final streamedResponse = await request.send();
+  final response = await http.Response.fromStream(streamedResponse);
+
+  debugPrint('>> IN [$xReqId]: ${response.statusCode}');
+  debugPrint('>> Response body: ${response.body}');
+
+  return _parseResponse(response, UpdateProfileResponse.fromJson);
 }

@@ -61,7 +61,9 @@ class HeaderSection extends StatelessWidget {
           child: CircleAvatar(
             radius: 26,
             backgroundColor: Colors.orange.shade100,
-            backgroundImage: const AssetImage("assets/imgs/woman.png"),
+            backgroundImage: userProvider.user?.avatarUrl != null
+                ? NetworkImage(userProvider.user!.avatarUrl!)
+                : const AssetImage("assets/imgs/woman.png"),
             onBackgroundImageError: (_, _) {},
           ),
         ),

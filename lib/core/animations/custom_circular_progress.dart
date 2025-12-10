@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
@@ -42,7 +41,7 @@ class CustomCircularProgressIndicator extends StatelessWidget {
                     pathBackgroundColor: Colors.black45,
                   ),
                 ),
-                Image.asset('assets/imgs/logo.png', height: 40, width: 40),
+                Image.asset('assets/logos/logo.png', height: 40, width: 40),
               ],
             ),
           ),

@@ -73,18 +73,19 @@ class GradeSemesterSelectionWidget extends StatelessWidget {
 
                     return DropdownButtonFormField<String>(
                       initialValue: selectedGradeId,
+                      isDense: true,
                       decoration: InputDecoration(
                         hintText: 'Chọn lớp',
                         hintStyle: GoogleFonts.nunito(
                           color: Colors.grey,
                           fontSize: 16,
                         ),
-                        prefixIcon: const Icon(
-                          Icons.school_outlined,
-                          color: Color(0xFFFFC107),
-                        ),
                         filled: true,
                         fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -202,18 +203,19 @@ class GradeSemesterSelectionWidget extends StatelessWidget {
 
                     return DropdownButtonFormField<String>(
                       initialValue: selectedSemesterId,
+                      isDense: true,
                       decoration: InputDecoration(
-                        hintText: 'Chọn học kỳ',
+                        hintText: 'Học kỳ',
                         hintStyle: GoogleFonts.nunito(
                           color: Colors.grey,
                           fontSize: 16,
                         ),
-                        prefixIcon: const Icon(
-                          Icons.calendar_view_month_outlined,
-                          color: Color(0xFFFFC107),
-                        ),
                         filled: true,
                         fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,

@@ -8,6 +8,7 @@ import '../widget/curved_header_background.dart';
 import '../widget/info_card.dart';
 import '../widget/menu_row_item.dart';
 import '../widget/profile_avatar_section.dart';
+import '../widget/update_profile_dialog.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -25,7 +26,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  void _navigateToEditProfile() {}
+  void _navigateToEditProfile() {
+    showDialog(
+      context: context,
+      builder: (context) => const UpdateProfileDialog(),
+    );
+  }
 
   void _logout() {
     context.read<UserProvider>().clearUser();
@@ -76,6 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ProfileAvatarSection(
                           name: profile?.name ?? 'User',
                           email: profile?.email ?? '',
+                          avatarUrl: profile?.avatarUrl,
                           onEditTap: _navigateToEditProfile,
                         ),
 
@@ -95,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             MenuRowItem(
                               icon: Icons.translate,
                               title:
-                                  "Hiện tại level: ${profile?.level ?? 'Chưa có'}",
+                                  "Hiện tại semester: ${profile?.semester ?? 'Chưa có'}",
                               onTap: _navigateToEditProfile,
                               isLast: true,
                             ),

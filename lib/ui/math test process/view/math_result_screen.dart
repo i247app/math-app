@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:math_ai_app/core/shared/widget/custom_assessment_text.dart';
+import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
+import 'package:math_ai_app/ui/bottom_navigation_bar/view/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:math_ai_app/data/providers/quiz_provider.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
@@ -13,12 +15,10 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<QuizProvider>(
       builder: (context, quizProvider, child) {
-        
         if (quizProvider.error != null) {
           return ErrorScreen(
             errorMessage: quizProvider.error!,
             onRetry: () {
-              
               Navigator.of(context).pop();
             },
           );
@@ -31,14 +31,6 @@ class ResultScreen extends StatelessWidget {
           );
         }
 
-        
-        
-        
-        
-        
-        
-        
-        
         return Scaffold(
           backgroundColor: Colors.blue.shade50,
           body: Stack(
@@ -63,15 +55,7 @@ class ResultScreen extends StatelessWidget {
                       children: [
                         HeaderSection(),
                         const SizedBox(height: 120),
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
+
                         Container(
                           width: double.infinity,
                           height: 203,
@@ -101,16 +85,23 @@ class ResultScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        
-                        
-                        
-                        
-                        
-                        
-                        
+
                         CustomAssessmentText(text: result.aiReview),
                         SizedBox(height: 30),
                         const SuggestionAndButtons(),
+                        SizedBox(height: 30),
+                        CustomPrimaryButton(
+                          circularNumber: 28,
+                          text: 'Home Page',
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    BottomNavigationBarScreen(initialIndex: 3),
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),

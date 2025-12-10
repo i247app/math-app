@@ -35,7 +35,12 @@ class CustomScreenLoader extends StatelessWidget {
               Platform.isIOS
                   ? const CupertinoActivityIndicator(radius: 35)
                   : const CircularProgressIndicator(strokeWidth: 2),
-              Image.asset('assets/imgs/logo.png', height: 30, width: 30, fit: BoxFit.cover,),
+              Image.asset(
+                'assets/logos/logo.png',
+                height: 30,
+                width: 30,
+                fit: BoxFit.cover,
+              ),
             ],
           ),
         ),

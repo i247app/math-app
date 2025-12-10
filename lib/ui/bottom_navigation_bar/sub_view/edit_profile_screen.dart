@@ -19,7 +19,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen>
     with TickerProviderStateMixin {
   int? selectedGradeIndex;
-  int? selectedLevelIndex;
+  int? selectedSemesterIndex;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -38,7 +38,6 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadDataAndSetCurrentSelections();
     });
@@ -49,15 +48,12 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     final levelsProvider = context.read<LevelsProvider>();
     final profileProvider = context.read<ProfileProvider>();
 
-    
     gradesProvider.loadGrades();
     levelsProvider.loadLevels();
 
-    
     final currentGrade = profileProvider.profile?.grade;
-    final currentLevel = profileProvider.profile?.level;
+    final currentSemester = profileProvider.profile?.semester;
 
-    
     if (currentGrade != null && gradesProvider.grades != null) {
       for (int i = 0; i < gradesProvider.grades!.length; i++) {
         if (gradesProvider.grades![i].label == currentGrade) {
@@ -69,12 +65,11 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       }
     }
 
-    
-    if (currentLevel != null && levelsProvider.levels != null) {
+    if (currentSemester != null && levelsProvider.levels != null) {
       for (int i = 0; i < levelsProvider.levels!.length; i++) {
-        if (levelsProvider.levels![i].label == currentLevel) {
+        if (levelsProvider.levels![i].label == currentSemester) {
           setState(() {
-            selectedLevelIndex = i;
+            selectedSemesterIndex = i;
           });
           break;
         }
@@ -95,15 +90,15 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     _animationController.forward();
   }
 
-  void _selectLevel(int index) {
+  void _selectSemester(int index) {
     setState(() {
-      selectedLevelIndex = index;
+      selectedSemesterIndex = index;
     });
     _animationController.forward();
   }
 
   Future<void> _updateProfile() async {
-    if (selectedGradeIndex == null || selectedLevelIndex == null) {
+    if (selectedGradeIndex == null || selectedSemesterIndex == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vui lòng chọn cả lớp và kì học'),
@@ -119,14 +114,14 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     final userProvider = context.read<UserProvider>();
 
     final selectedGrade = gradesProvider.grades![selectedGradeIndex!];
-    final selectedLevel = levelsProvider.levels![selectedLevelIndex!];
+    final selectedSemester = levelsProvider.levels![selectedSemesterIndex!];
 
     final uid = userProvider.user?.id;
     if (uid != null && uid.isNotEmpty) {
       final success = await profileProvider.updateProfile(
         uid: uid,
         gradeId: selectedGrade.id,
-        semesterId: selectedLevel.id,
+        semesterId: selectedSemester.id,
       );
 
       if (success && mounted) {
@@ -136,7 +131,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.of(context).pop(); 
+        Navigator.of(context).pop();
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -158,7 +153,6 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               Row(
                 children: [
                   IconButton(
@@ -178,7 +172,6 @@ class _EditProfileScreenState extends State<EditProfileScreen>
               ),
               const SizedBox(height: 20),
 
-              
               Text(
                 "Chọn Lớp Học",
                 style: GoogleFonts.nunito(
@@ -249,7 +242,6 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
               const SizedBox(height: 30),
 
-              
               Text(
                 "Chọn Kì Học",
                 style: GoogleFonts.nunito(
@@ -297,7 +289,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                             childAspectRatio: 0.8,
                           ),
                       itemBuilder: (context, index) {
-                        final isSelected = selectedLevelIndex == index;
+                        final isSelected = selectedSemesterIndex == index;
                         return AnimatedBuilder(
                           animation: _animationController,
                           builder: (context, child) {
@@ -306,7 +298,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                               child: LevelCard(
                                 data: levels[index],
                                 isSelected: isSelected,
-                                onTap: () => _selectLevel(index),
+                                onTap: () => _selectSemester(index),
                                 selectionAnimation: _fadeAnimation.value,
                               ),
                             );
@@ -320,19 +312,19 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
               const Spacer(),
 
-              
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
                   onPressed:
-                      (selectedGradeIndex != null && selectedLevelIndex != null)
+                      (selectedGradeIndex != null &&
+                          selectedSemesterIndex != null)
                       ? _updateProfile
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         (selectedGradeIndex != null &&
-                            selectedLevelIndex != null)
+                            selectedSemesterIndex != null)
                         ? const Color(0xFF3E2723)
                         : Colors.grey[400],
                     shape: RoundedRectangleBorder(
@@ -340,7 +332,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                     ),
                     elevation:
                         (selectedGradeIndex != null &&
-                            selectedLevelIndex != null)
+                            selectedSemesterIndex != null)
                         ? 2
                         : 0,
                   ),
@@ -357,7 +349,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                           fontSize: 18,
                           color:
                               (selectedGradeIndex != null &&
-                                  selectedLevelIndex != null)
+                                  selectedSemesterIndex != null)
                               ? Colors.white
                               : Colors.grey[600],
                           fontWeight: FontWeight.bold,

@@ -29,7 +29,6 @@ class SuggestionAndButtons extends StatelessWidget {
             circularNumber: 28,
             height: 56,
             onPressed: () {
-              
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => const MathQuizScreen(isPractice: true),

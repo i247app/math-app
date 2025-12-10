@@ -1,5 +1,6 @@
 import 'package:math_ai_app/data/responses/sign_up/sign_up_response.dart';
 import 'package:math_ai_app/data/responses/login/login_response.dart';
+import 'package:math_ai_app/data/responses/update_profile/update_profile_response.dart';
 
 import '../network/network.dart' as network;
 
@@ -33,6 +34,20 @@ class AuthRepository {
     final response = await network.login(
       loginName: loginName,
       password: password,
+    );
+
+    return response;
+  }
+
+  Future<UpdateProfileResponse> updateProfile({
+    required String uid,
+    required String gradeId,
+    required String? avatarPath,
+  }) async {
+    final response = await network.updateProfileWithFormData(
+      uid: uid,
+      gradeId: gradeId,
+      avatarPath: avatarPath,
     );
 
     return response;
