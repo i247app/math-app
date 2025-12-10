@@ -7,11 +7,13 @@ import 'package:image_picker/image_picker.dart';
 class AvatarPickerWidget extends StatelessWidget {
   final XFile? selectedImage;
   final VoidCallback onTap;
+  final VoidCallback? onRemove;
 
   const AvatarPickerWidget({
     super.key,
     required this.selectedImage,
     required this.onTap,
+    this.onRemove,
   });
 
   @override
@@ -20,34 +22,57 @@ class AvatarPickerWidget extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.orange.shade100, width: 4),
-            ),
-            child: CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.orange.shade50,
-              backgroundImage: selectedImage != null
-                  ? FileImage(File(selectedImage!.path))
-                  : null,
-              child: selectedImage == null
-                  ? ClipOval(
-                      child: Image.asset(
-                        'assets/imgs/woman.png',
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Colors.orange,
-                            ),
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.orange.shade100, width: 4),
+                ),
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.orange.shade50,
+                  backgroundImage: selectedImage != null
+                      ? FileImage(File(selectedImage!.path))
+                      : null,
+                  child: selectedImage == null
+                      ? ClipOval(
+                          child: Image.asset(
+                            'assets/imgs/woman.png',
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.person,
+                                  size: 60,
+                                  color: Colors.orange,
+                                ),
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+              if (selectedImage != null && onRemove != null)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: onRemove,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
                       ),
-                    )
-                  : null,
-            ),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: 8),

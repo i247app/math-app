@@ -25,18 +25,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  void _navigateToEditProfile() {
-    
-    
-    
-  }
+  void _navigateToEditProfile() {}
 
   void _logout() {
-    
     context.read<UserProvider>().clearUser();
     context.read<ProfileProvider>().clearProfile();
 
-    
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
@@ -46,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userProvider = context.read<UserProvider>();
       final uid = userProvider.user?.id;

@@ -1,7 +1,6 @@
 import 'package:math_ai_app/data/responses/sign_up/sign_up_response.dart';
 import 'package:math_ai_app/data/responses/login/login_response.dart';
 
-
 import '../network/network.dart' as network;
 
 class AuthRepository {
@@ -14,7 +13,6 @@ class AuthRepository {
     required String semesterId,
     required String? avatarPath,
   }) async {
-    
     final response = await network.signupWithFormData(
       name: name,
       phone: phone,
@@ -32,7 +30,6 @@ class AuthRepository {
     required String loginName,
     required String password,
   }) async {
-    
     final response = await network.login(
       loginName: loginName,
       password: password,
@@ -41,7 +38,6 @@ class AuthRepository {
     return response;
   }
 
-  
   String? validateName(String? name) {
     if (name == null || name.trim().isEmpty) {
       return 'Vui lòng nhập họ tên';
@@ -52,7 +48,7 @@ class AuthRepository {
     if (name.trim().length > 50) {
       return 'Họ tên không được vượt quá 50 ký tự';
     }
-    
+
     final nameRegex = RegExp(
       r'^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$',
     );
@@ -67,18 +63,16 @@ class AuthRepository {
       return 'Vui lòng nhập email hoặc số điện thoại';
     }
 
-    
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (emailRegex.hasMatch(loginName.trim())) {
-      return null; 
+      return null;
     }
 
-    
     final cleanPhone = loginName.replaceAll(RegExp(r'[^\d]'), '');
     if (cleanPhone.length >= 10 &&
         cleanPhone.length <= 11 &&
         cleanPhone.startsWith('0')) {
-      return null; 
+      return null;
     }
 
     return 'Vui lòng nhập email hợp lệ hoặc số điện thoại';
@@ -99,12 +93,12 @@ class AuthRepository {
     if (phone == null || phone.trim().isEmpty) {
       return 'Vui lòng nhập số điện thoại';
     }
-    
+
     final cleanPhone = phone.replaceAll(RegExp(r'[^\d]'), '');
     if (cleanPhone.length < 10 || cleanPhone.length > 11) {
       return 'Số điện thoại phải có 10-11 chữ số';
     }
-    
+
     if (!cleanPhone.startsWith('0')) {
       return 'Số điện thoại phải bắt đầu bằng 0';
     }
@@ -121,19 +115,19 @@ class AuthRepository {
     if (password.length > 50) {
       return 'Mật khẩu không được vượt quá 50 ký tự';
     }
-    
+
     if (!RegExp(r'[A-Z]').hasMatch(password)) {
       return 'Mật khẩu phải chứa ít nhất 1 chữ hoa';
     }
-    
+
     if (!RegExp(r'[a-z]').hasMatch(password)) {
       return 'Mật khẩu phải chứa ít nhất 1 chữ thường';
     }
-    
+
     if (!RegExp(r'[0-9]').hasMatch(password)) {
       return 'Mật khẩu phải chứa ít nhất 1 chữ số';
     }
-    
+
     if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
       return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt';
     }
@@ -144,32 +138,18 @@ class AuthRepository {
     if (birthDate == null || birthDate.trim().isEmpty) {
       return 'Vui lòng chọn ngày sinh';
     }
-    
+
     final dateRegex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!dateRegex.hasMatch(birthDate.trim())) {
       return 'Ngày sinh không hợp lệ';
     }
-    
-    try {
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-    } catch (e) {
+
+    try {} catch (e) {
       return 'Ngày sinh không hợp lệ';
     }
     return null;
   }
 
-  
   Map<String, String?> validateAll({
     required String name,
     required String phone,
@@ -184,7 +164,6 @@ class AuthRepository {
     };
   }
 
-  
   bool isValidAll({
     required String name,
     required String phone,

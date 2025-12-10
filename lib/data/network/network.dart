@@ -33,7 +33,6 @@ final client = http_interceptor.InterceptedHttp.build(
   ],
 );
 
-
 Future<http.Response> _post(
   Uri uri,
   Object? body, {
@@ -50,16 +49,6 @@ Future<http.Response> _post(
     },
   );
 }
-
-
-
-
-
-
-
-
-
-
 
 Future<http.Response> _get(Uri uri, {Map<String, String>? headers}) async {
   final xReqId = _reqCounter++;
@@ -90,9 +79,6 @@ T _parseResponse<T extends BaseResponse>(
   return bo;
 }
 
-
-
-
 Future<SignUpResponse> signup({required User user}) async {
   final response = await _post(Uri.parse('$API_ROOT/users/create'), {
     "name": user.name,
@@ -115,6 +101,11 @@ Future<SignUpResponse> signupWithFormData({
 }) async {
   final xReqId = _reqCounter++;
 
+  debugPrint('>> OUT [$xReqId]: POST $API_ROOT/users/create');
+  debugPrint(
+    '>> Fields: name=$name, phone=$phone, password=***, dob=$birthDate, grade_id=$gradeId, semester_id=$semesterId, avatarPath=$avatarPath',
+  );
+
   var request = http.MultipartRequest(
     'POST',
     Uri.parse('$API_ROOT/users/create'),
@@ -125,7 +116,6 @@ Future<SignUpResponse> signupWithFormData({
     'X-Request-ID': xReqId.toString(),
   });
 
-  
   request.fields['name'] = name;
   request.fields['phone'] = phone;
   request.fields['password'] = password;
@@ -133,13 +123,37 @@ Future<SignUpResponse> signupWithFormData({
   request.fields['grade_id'] = gradeId;
   request.fields['semester_id'] = semesterId;
 
-  
+  debugPrint('>> Request fields: ${request.fields}');
+
   if (avatarPath != null && avatarPath.isNotEmpty) {
-    request.files.add(await http.MultipartFile.fromPath('avatar', avatarPath));
+    debugPrint('>> Adding avatar file: $avatarPath');
+    try {
+      final file = await http.MultipartFile.fromPath('avatar', avatarPath);
+      request.files.add(file);
+      debugPrint('>> Request files count: ${request.files.length}');
+      debugPrint(
+        '>> Avatar file added: ${file.filename}, size: ${file.length}',
+      );
+    } catch (e) {
+      debugPrint('>> Error adding avatar file: $e');
+      rethrow;
+    }
   }
+
+  debugPrint(
+    '>> Final request files: ${request.files.map((f) => '${f.field}: ${f.filename}').toList()}',
+  );
+
+  debugPrint('>> Sending multipart/form-data request...');
+  debugPrint('>> Content-Type header: ${request.headers['Content-Type']}');
 
   final streamedResponse = await request.send();
   final response = await http.Response.fromStream(streamedResponse);
+
+  debugPrint(
+    '<< IN [$xReqId]: ${response.statusCode} ${response.reasonPhrase}',
+  );
+  debugPrint('<< Body: ${response.body}');
 
   return _parseResponse(response, SignUpResponse.fromJson);
 }
@@ -227,5 +241,3 @@ Future<SubmitQuizResponse> submitQuiz(
   });
   return _parseResponse(response, SubmitQuizResponse.fromJson);
 }
-
-

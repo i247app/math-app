@@ -160,6 +160,12 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  void _removeImage() {
+    setState(() {
+      _selectedImage = null;
+    });
+  }
+
   Future<void> _handleSignup() async {
     _validateAll();
 
@@ -278,6 +284,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   AvatarPickerWidget(
                     selectedImage: _selectedImage,
                     onTap: _pickImage,
+                    onRemove: _removeImage,
                   ),
                   const SizedBox(height: 16),
                   buildCustomTextField(
