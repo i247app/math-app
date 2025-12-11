@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:math_ai_app/ui/bottom_navigation_bar/view/bottom_navigation_bar.dart';
 
 class ErrorScreen extends StatelessWidget {
   final String errorMessage;
@@ -18,7 +19,6 @@ class ErrorScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              
               TweenAnimationBuilder<double>(
                 tween: Tween<double>(begin: 0.8, end: 1.0),
                 duration: const Duration(milliseconds: 600),
@@ -52,7 +52,6 @@ class ErrorScreen extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              
               Text(
                 'Có lỗi xảy ra!',
                 style: GoogleFonts.nunito(
@@ -65,7 +64,6 @@ class ErrorScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              
               Text(
                 errorMessage,
                 style: GoogleFonts.nunito(
@@ -79,7 +77,6 @@ class ErrorScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              
               if (onRetry != null)
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0, end: 1),
@@ -117,9 +114,15 @@ class ErrorScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              
               TextButton.icon(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          BottomNavigationBarScreen(initialIndex: 1),
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.arrow_back),
                 label: Text(
                   'Quay lại',

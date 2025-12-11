@@ -149,14 +149,7 @@ class _SignupScreenState extends State<SignupScreen> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi chọn ảnh: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Image selection error occurred but no snackbar shown
     }
   }
 
@@ -177,12 +170,6 @@ class _SignupScreenState extends State<SignupScreen> {
         ) ||
         _gradeError != null ||
         _semesterError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng kiểm tra lại thông tin'),
-          backgroundColor: Colors.red,
-        ),
-      );
       return;
     }
 
@@ -200,21 +187,16 @@ class _SignupScreenState extends State<SignupScreen> {
         avatarPath: _selectedImage?.path,
       );
 
-      if (response.isSuccess && response.user != null) {
+      if (!response.isSuccess) {
+        return;
+      }
+
+      if (response.user != null) {
         if (mounted) {
           Provider.of<UserProvider>(
             context,
             listen: false,
           ).setUser(response.user!);
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Registration successful! Welcome ${response.user!.name}',
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
 
           await Future.delayed(const Duration(milliseconds: 300));
           if (mounted) {
@@ -226,26 +208,10 @@ class _SignupScreenState extends State<SignupScreen> {
           }
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                response.message ?? 'Registration failed. Please try again.',
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        // Registration failed but no snackbar shown
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi kết nối: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Network error occurred but no snackbar shown
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

@@ -99,12 +99,6 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
   Future<void> _updateProfile() async {
     if (selectedGradeIndex == null || selectedSemesterIndex == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn cả lớp và kì học'),
-          backgroundColor: Colors.orange,
-        ),
-      );
       return;
     }
 
@@ -125,20 +119,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       );
 
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cập nhật hồ sơ thành công'),
-            backgroundColor: Colors.green,
-          ),
-        );
         Navigator.of(context).pop();
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: ${profileProvider.error}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // Profile update failed but no snackbar shown
       }
     }
   }

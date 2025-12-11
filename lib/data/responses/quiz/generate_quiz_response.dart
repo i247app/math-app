@@ -6,7 +6,7 @@ part 'generate_quiz_response.g.dart';
 
 @JsonSerializable()
 class GenerateQuizResponse extends BaseResponse {
-  final GenerateQuizResult result;
+  final GenerateQuizResult? result;
 
   GenerateQuizResponse({
     required super.message,
@@ -49,18 +49,18 @@ class GenerateQuizResult {
 @JsonSerializable()
 class QuizQuestion {
   @JsonKey(name: 'question_number')
-  final int questionNumber;
+  int? questionNumber;
   @JsonKey(name: 'question_name')
-  final String questionName;
-  final List<QuizAnswer> answers;
+  String? questionName;
+  List<QuizAnswer>? answers;
   @JsonKey(name: 'right_answer')
-  final String rightAnswer;
+  String? rightAnswer;
 
   QuizQuestion({
-    required this.questionNumber,
-    required this.questionName,
-    required this.answers,
-    required this.rightAnswer,
+    this.questionNumber,
+    this.questionName,
+    this.answers,
+    this.rightAnswer,
   });
 
   factory QuizQuestion.fromJson(Map<String, dynamic> json) =>

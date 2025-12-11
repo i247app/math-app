@@ -24,7 +24,7 @@ class GradesProvider with ChangeNotifier, DiagnosticableTreeMixin {
       if (response.isSuccess && response.grades != null) {
         _grades = response.grades!;
       } else {
-        _error = response.message ?? 'Failed to load grades';
+        _error = response.error ?? response.message ?? 'Failed to load grades';
       }
     } catch (e) {
       _error = 'Network error: ${e.toString()}';

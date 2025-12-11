@@ -25,7 +25,7 @@ class AnswerSection extends StatelessWidget {
     }
 
     final answers = question!.answers;
-    if (answers.isEmpty) {
+    if (answers!.isEmpty) {
       return const Center(child: Text('No answers available'));
     }
 

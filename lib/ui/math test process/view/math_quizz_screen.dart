@@ -153,7 +153,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
   void _onAnswerSelected(String answerLabel) {
     final quizProvider = context.read<QuizProvider>();
     quizProvider.selectAnswer(
-      quizProvider.currentQuestion!.questionNumber,
+      quizProvider.currentQuestion!.questionNumber!,
       answerLabel,
     );
 

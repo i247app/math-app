@@ -29,9 +29,9 @@ class CommonMetadataInterceptor extends InterceptorContract {
   @override
   Future<BaseRequest> interceptRequest({required BaseRequest request}) async {
     if (navigatorKey.currentContext == null) {
-      if (kDebugMode) {
-        debugPrint('CommonMetadataInterceptor: Navigator context is null');
-      }
+      // if (kDebugMode) {
+      //   debugPrint('CommonMetadataInterceptor: Navigator context is null');
+      // }
       return request;
     }
 

@@ -35,7 +35,8 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
         _profile = response.profile!;
         return true;
       } else {
-        _error = response.message ?? 'Failed to create profile';
+        _error =
+            response.error ?? response.message ?? 'Failed to create profile';
         return false;
       }
     } catch (e) {
@@ -59,7 +60,8 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
         _profile = response.profile!;
         return true;
       } else {
-        _error = response.message ?? 'Failed to fetch profile';
+        _error =
+            response.error ?? response.message ?? 'Failed to fetch profile';
         return false;
       }
     } catch (e) {
@@ -93,7 +95,8 @@ class ProfileProvider with ChangeNotifier, DiagnosticableTreeMixin {
         await fetchProfile(uid);
         return true;
       } else {
-        _error = response.message ?? 'Failed to update profile';
+        _error =
+            response.error ?? response.message ?? 'Failed to update profile';
         return false;
       }
     } catch (e) {

@@ -129,14 +129,7 @@ class _UpdateProfileDialogState extends State<UpdateProfileDialog> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi chọn ảnh: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Image selection error occurred but no snackbar shown
     }
   }
 
@@ -146,12 +139,6 @@ class _UpdateProfileDialogState extends State<UpdateProfileDialog> {
 
     final uid = userProvider.user?.id;
     if (uid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Không tìm thấy thông tin người dùng'),
-          backgroundColor: Colors.red,
-        ),
-      );
       return;
     }
 
@@ -178,14 +165,6 @@ class _UpdateProfileDialogState extends State<UpdateProfileDialog> {
       if (gradeIdToUpdate == null &&
           semesterIdToUpdate == null &&
           avatarPathToUpdate == null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Không có thay đổi nào để cập nhật'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
         setState(() {
           _isLoading = false;
         });
@@ -199,30 +178,21 @@ class _UpdateProfileDialogState extends State<UpdateProfileDialog> {
         avatarPath: avatarPathToUpdate,
       );
 
-      if (response.isSuccess && context.mounted) {
+      if (!response.isSuccess) {
+        return;
+      }
+
+      if (context.mounted) {
         // Refresh profile
         await profileProvider.fetchProfile(uid);
 
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Cập nhật profile thành công'),
-              backgroundColor: Colors.green,
-            ),
-          );
           if (mounted) {
             Navigator.of(context).pop();
           }
         }
       } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response.message ?? 'Cập nhật thất bại'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        // Profile update failed but no snackbar shown
       }
     } catch (e) {
       if (context.mounted) {

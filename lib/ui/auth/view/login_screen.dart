@@ -64,12 +64,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordError != null ||
         _loginNameController.text.isEmpty ||
         _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng kiểm tra lại thông tin'),
-          backgroundColor: Colors.red,
-        ),
-      );
       return;
     }
 
@@ -81,21 +75,16 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
 
-      if (response.isSuccess && response.user != null) {
+      if (!response.isSuccess) {
+        return;
+      }
+
+      if (response.user != null) {
         if (mounted) {
           Provider.of<UserProvider>(
             context,
             listen: false,
           ).setUser(response.user!);
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Đăng nhập thành công! Chào mừng ${response.user!.name}',
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
 
           await Future.delayed(const Duration(seconds: 1));
           if (mounted) {
@@ -105,26 +94,10 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                response.message ?? 'Đăng nhập thất bại. Vui lòng thử lại.',
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        // Login failed but no snackbar shown
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi kết nối: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Network error occurred but no snackbar shown
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

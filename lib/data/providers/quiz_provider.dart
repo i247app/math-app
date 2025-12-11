@@ -45,15 +45,18 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
     try {
       final response = await _quizRepository.generateQuiz(uid);
 
-      if (response.isSuccess && response.result.data.isNotEmpty) {
-        _allQuizzes.add(response.result.data);
+      if (response.isSuccess &&
+          response.result != null &&
+          response.result!.data.isNotEmpty) {
+        _allQuizzes.add(response.result!.data);
         _currentQuizIndex = _allQuizzes.length - 1;
         _currentQuestionIndex = 0;
         _remainingTime = 300;
 
         return true;
       } else {
-        _error = response.message ?? 'Failed to generate quiz';
+        _error =
+            response.error ?? response.message ?? 'Failed to generate quiz';
         return false;
       }
     } catch (e) {
@@ -73,15 +76,20 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
     try {
       final response = await _quizRepository.generatePractice(uid);
 
-      if (response.isSuccess && response.result.data.isNotEmpty) {
-        _allQuizzes.add(response.result.data);
+      if (response.isSuccess &&
+          response.result != null &&
+          response.result!.data.isNotEmpty) {
+        _allQuizzes.add(response.result!.data);
         _currentQuizIndex = _allQuizzes.length - 1;
         _currentQuestionIndex = 0;
         _remainingTime = 300;
 
         return true;
       } else {
-        _error = response.message ?? 'Failed to generate practice quiz';
+        _error =
+            response.error ??
+            response.message ??
+            'Failed to generate practice quiz';
         return false;
       }
     } catch (e) {
@@ -118,7 +126,7 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
       final answer =
           _allSelectedAnswers['${quizId}_${question.questionNumber}'];
       if (answer != null) {
-        answersMap[question.questionNumber] = answer;
+        answersMap[question.questionNumber!] = answer;
       }
     }
 
@@ -138,10 +146,10 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
       final response = await _quizRepository.submitQuiz(uid, allAnswers);
 
       if (response.isSuccess) {
-        _result = response.result.data;
+        _result = response.result!.data;
         return true;
       } else {
-        _error = response.message ?? 'Failed to submit quiz';
+        _error = response.error ?? response.message ?? 'Failed to submit quiz';
         return false;
       }
     } catch (e) {

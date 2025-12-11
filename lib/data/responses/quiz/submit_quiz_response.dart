@@ -6,7 +6,7 @@ part 'submit_quiz_response.g.dart';
 
 @JsonSerializable()
 class SubmitQuizResponse extends BaseResponse {
-  final SubmitQuizResult result;
+  final SubmitQuizResult? result;
 
   SubmitQuizResponse({
     required super.message,
@@ -25,19 +25,19 @@ class SubmitQuizResponse extends BaseResponse {
 class SubmitQuizResult {
   @JsonKey(name: 'user_latest_quiz_id')
   final String? userLatestQuizId;
-  final String response;
-  final QuizResultData data;
-  final String role;
-  final String model;
-  final String timestamp;
+  final String? response;
+  final QuizResultData? data;
+  final String? role;
+  final String? model;
+  final String? timestamp;
 
   SubmitQuizResult({
     this.userLatestQuizId,
-    required this.response,
-    required this.data,
-    required this.role,
-    required this.model,
-    required this.timestamp,
+    this.response,
+    this.data,
+    this.role,
+    this.model,
+    this.timestamp,
   });
 
   factory SubmitQuizResult.fromJson(Map<String, dynamic> json) =>

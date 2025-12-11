@@ -24,7 +24,7 @@ class LevelsProvider with ChangeNotifier, DiagnosticableTreeMixin {
       if (response.isSuccess && response.levels != null) {
         _levels = response.levels!;
       } else {
-        _error = response.message ?? 'Failed to load levels';
+        _error = response.error ?? response.message ?? 'Failed to load levels';
       }
     } catch (e) {
       _error = 'Network error: ${e.toString()}';
