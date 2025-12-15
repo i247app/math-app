@@ -37,7 +37,6 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LevelsProvider>().loadLevels();
     });
@@ -168,44 +167,23 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                       final selectedLevel =
                                           levels[selectedIndex!];
 
-                                      
                                       context.read<UserProvider>().setUserClass(
                                         '${context.read<UserProvider>().userClass} - ${selectedLevel.label}',
-                                      );
-
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Đã chọn ${selectedLevel.label}',
-                                            style: GoogleFonts.nunito(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          backgroundColor: const Color(
-                                            0xFF4CAF50,
-                                          ),
-                                          duration: const Duration(seconds: 1),
-                                        ),
                                       );
 
                                       Future.delayed(
                                         const Duration(milliseconds: 500),
                                         () async {
                                           if (context.mounted) {
-                                            
                                             final userProvider = context
                                                 .read<UserProvider>();
                                             final selectedGrade =
                                                 userProvider.selectedGrade;
 
-                                            
                                             final selectedLevel =
                                                 levels[selectedIndex!];
 
                                             if (selectedGrade != null) {
-                                              
                                               final userId =
                                                   userProvider
                                                           .user
@@ -217,21 +195,9 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                                         '';
 
                                               if (userId.isEmpty) {
-                                                if (!context.mounted) return;
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                      'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.',
-                                                    ),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
                                                 return;
                                               }
 
-                                              
                                               if (!context.mounted) return;
                                               final profileProvider = context
                                                   .read<ProfileProvider>();
@@ -255,19 +221,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                                   ),
                                                 );
                                               } else {
-                                                
-                                                if (!context.mounted) return;
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      profileProvider.error ??
-                                                          'Tạo profile thất bại',
-                                                    ),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
+                                                // Profile creation failed but no snackbar shown
                                               }
                                             }
                                           }

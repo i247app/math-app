@@ -133,12 +133,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           setState(() {
             _showLoading = false;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(quizProvider.error ?? 'Failed to submit quiz'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          // Quiz submission failed but no snackbar shown
         }
       }
     }
@@ -496,15 +491,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           return PopScope(
             canPop: false,
             onPopInvokedWithResult: (didPop, result) {
-              if (!didPop) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Không thể quay lại trong khi đang làm bài kiểm tra',
-                    ),
-                  ),
-                );
-              }
+              // Cannot go back during quiz but no snackbar shown
             },
             child: const Scaffold(
               backgroundColor: Color(0xFFE3F2FD),
@@ -516,15 +503,7 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
         return PopScope(
           canPop: false,
           onPopInvokedWithResult: (didPop, result) {
-            if (!didPop) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Không thể quay lại trong khi đang làm bài kiểm tra',
-                  ),
-                ),
-              );
-            }
+            // Cannot go back during quiz but no snackbar shown
           },
           child: Scaffold(
             backgroundColor: Colors.blue.shade50,

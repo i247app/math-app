@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_interceptor/http_interceptor.dart' as http_interceptor;
 import 'package:math_ai_app/data/models/user/user_model.dart';
@@ -71,7 +70,6 @@ T _parseResponse<T extends BaseResponse>(
     bo = fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   } catch (e) {
     bo = fromJson(jsonDecode('{}') as Map<String, dynamic>);
-    debugPrint("Error parsing response json: $e");
   }
   bo.httpStatusCode = response.statusCode;
   bo.httpReasonPhrase = response.reasonPhrase ?? '';
@@ -101,11 +99,6 @@ Future<SignUpResponse> signupWithFormData({
 }) async {
   final xReqId = _reqCounter++;
 
-  debugPrint('>> OUT [$xReqId]: POST $API_ROOT/users/create');
-  debugPrint(
-    '>> Fields: name=$name, phone=$phone, password=***, dob=$birthDate, grade_id=$gradeId, semester_id=$semesterId, avatarPath=$avatarPath',
-  );
-
   var request = http.MultipartRequest(
     'POST',
     Uri.parse('$API_ROOT/users/create'),
@@ -123,37 +116,17 @@ Future<SignUpResponse> signupWithFormData({
   request.fields['grade_id'] = gradeId;
   request.fields['semester_id'] = semesterId;
 
-  debugPrint('>> Request fields: ${request.fields}');
-
   if (avatarPath != null && avatarPath.isNotEmpty) {
-    debugPrint('>> Adding avatar file: $avatarPath');
     try {
       final file = await http.MultipartFile.fromPath('avatar', avatarPath);
       request.files.add(file);
-      debugPrint('>> Request files count: ${request.files.length}');
-      debugPrint(
-        '>> Avatar file added: ${file.filename}, size: ${file.length}',
-      );
     } catch (e) {
-      debugPrint('>> Error adding avatar file: $e');
       rethrow;
     }
   }
 
-  debugPrint(
-    '>> Final request files: ${request.files.map((f) => '${f.field}: ${f.filename}').toList()}',
-  );
-
-  debugPrint('>> Sending multipart/form-data request...');
-  debugPrint('>> Content-Type header: ${request.headers['Content-Type']}');
-
   final streamedResponse = await request.send();
   final response = await http.Response.fromStream(streamedResponse);
-
-  debugPrint(
-    '<< IN [$xReqId]: ${response.statusCode} ${response.reasonPhrase}',
-  );
-  debugPrint('<< Body: ${response.body}');
 
   return _parseResponse(response, SignUpResponse.fromJson);
 }
@@ -250,9 +223,6 @@ Future<UpdateProfileResponse> updateProfileWithFormData({
 }) async {
   final xReqId = _reqCounter++;
 
-  debugPrint('>> OUT [$xReqId]: POST $API_ROOT/users/update');
-  debugPrint('>> Fields: uid=$uid, grade_id=$gradeId, avatarPath=$avatarPath');
-
   var request = http.MultipartRequest(
     'POST',
     Uri.parse('$API_ROOT/users/update'),
@@ -271,35 +241,17 @@ Future<UpdateProfileResponse> updateProfileWithFormData({
     request.fields['semester_id'] = semesterId;
   }
 
-  debugPrint('>> Request fields: ${request.fields}');
-
   if (avatarPath != null && avatarPath.isNotEmpty) {
-    debugPrint('>> Adding avatar file: $avatarPath');
     try {
       final file = await http.MultipartFile.fromPath('avatar', avatarPath);
       request.files.add(file);
-      debugPrint('>> Request files count: ${request.files.length}');
-      debugPrint(
-        '>> Avatar file added: ${file.filename}, size: ${file.length}',
-      );
     } catch (e) {
-      debugPrint('>> Error adding avatar file: $e');
       rethrow;
     }
   }
 
-  debugPrint(
-    '>> Final request files: ${request.files.map((f) => '${f.field}: ${f.filename}').toList()}',
-  );
-
-  debugPrint('>> Sending multipart/form-data request...');
-  debugPrint('>> Content-Type header: ${request.headers['Content-Type']}');
-
   final streamedResponse = await request.send();
   final response = await http.Response.fromStream(streamedResponse);
-
-  debugPrint('>> IN [$xReqId]: ${response.statusCode}');
-  debugPrint('>> Response body: ${response.body}');
 
   return _parseResponse(response, UpdateProfileResponse.fromJson);
 }

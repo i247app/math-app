@@ -38,7 +38,6 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<GradesProvider>().loadGrades();
     });
@@ -92,7 +91,6 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
         }
 
         final grades = gradesProvider.grades ?? [];
-        
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -170,29 +168,11 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                       final selectedGrade =
                                           grades[selectedIndex!];
 
-                                      
                                       context
                                           .read<UserProvider>()
                                           .setSelectedGrade(selectedGrade);
                                       context.read<UserProvider>().setUserClass(
                                         selectedGrade.label,
-                                      );
-
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Đã chọn ${selectedGrade.label}',
-                                            style: GoogleFonts.nunito(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          backgroundColor: const Color(
-                                            0xFF4CAF50,
-                                          ),
-                                          duration: const Duration(seconds: 1),
-                                        ),
                                       );
 
                                       Future.delayed(

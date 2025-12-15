@@ -195,11 +195,7 @@ class _UpdateProfileDialogState extends State<UpdateProfileDialog> {
         // Profile update failed but no snackbar shown
       }
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
-        );
-      }
+      // Network error occurred but no snackbar shown
     } finally {
       if (context.mounted) {
         setState(() {
