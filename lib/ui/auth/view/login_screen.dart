@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
 import 'package:math_ai_app/data/repositories/auth_repository.dart';
 import 'package:math_ai_app/ui/auth/view/signup_screen.dart';
+import 'package:math_ai_app/ui/contact us /contact_us_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/shared/widget/custom_text_field.dart';
@@ -246,6 +247,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   const SizedBox(height: 24),
+
+                  Center(
+                    child: IconButton(
+                      tooltip: 'Contact support',
+                      icon: Icon(
+                        Icons.support_agent_rounded,
+                        color: Colors.blue.shade700,
+                        size: 28,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ContactUsPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

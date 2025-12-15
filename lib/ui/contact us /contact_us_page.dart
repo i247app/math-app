@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:math_ai_app/core/shared/widget/custom_app_bar.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
 
 import '../../../core/shared/widget/custom_text_field.dart';
@@ -100,8 +101,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement contact us API call
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+      await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
         // Handle success
@@ -121,22 +121,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black87),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(
-            'Contact Us',
-            style: GoogleFonts.nunito(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
-            ),
-          ),
-        ),
+        appBar: CustomAppBar(title: 'Contact Us', isNeedIcon: false),
         body: Container(
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
