@@ -6,9 +6,12 @@ import 'package:math_ai_app/data/providers/setting_provider.dart';
 import 'package:math_ai_app/data/providers/grades_provider.dart';
 import 'package:math_ai_app/data/providers/levels_provider.dart';
 import 'package:math_ai_app/data/providers/profile_provider.dart';
+import 'package:math_ai_app/data/providers/contact_provider.dart';
 import 'package:math_ai_app/data/providers/quiz_provider.dart';
 import 'package:math_ai_app/ui/onboarding%20screen/view/onboarding_screen.dart';
 import 'package:provider/provider.dart';
+
+import 'package:math_ai_app/config/constant.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,6 +31,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => GradesProvider()),
         ChangeNotifierProvider(create: (context) => LevelsProvider()),
         ChangeNotifierProvider(create: (context) => ProfileProvider()),
+        ChangeNotifierProvider(create: (context) => ContactProvider()),
         ChangeNotifierProvider(create: (context) => QuizProvider()),
       ],
       child: const AppRoot(),
@@ -58,6 +62,7 @@ class _AppRootState extends State<AppRoot> {
     return Consumer<SettingProvider>(
       builder: (context, settingProvider, child) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           title: 'Math Plus',
           theme: ThemeData(
             primarySwatch: Colors.blue,

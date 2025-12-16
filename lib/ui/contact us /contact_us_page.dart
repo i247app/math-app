@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:math_ai_app/core/shared/widget/custom_app_bar.dart';
 import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
+import 'package:math_ai_app/data/network/network.dart';
 
 import '../../../core/shared/widget/custom_text_field.dart';
 
@@ -13,17 +14,15 @@ class ContactUsPage extends StatefulWidget {
 }
 
 class _ContactUsPageState extends State<ContactUsPage> {
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _messageController = TextEditingController();
-
-  String? _nameError;
   String? _emailError;
-  String? _phoneError;
-  String? _messageError;
-
   bool _isLoading = false;
+  final TextEditingController _messageController = TextEditingController();
+  String? _messageError;
+  final TextEditingController _nameController = TextEditingController();
+  String? _nameError;
+  final TextEditingController _phoneController = TextEditingController();
+  String? _phoneError;
 
   @override
   void dispose() {
@@ -101,10 +100,44 @@ class _ContactUsPageState extends State<ContactUsPage> {
     setState(() => _isLoading = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        // Handle success
+      final email = _emailController.text.trim();
+      final name = _nameController.text.trim();
+      final phone = _phoneController.text.trim();
+      final message = _messageController.text.trim();
+      final response = await submitContactForm(
+        contactEmail: email,
+        contactName: name,
+        contactPhone: phone,
+        contactMessage: message,
+      );
+      if (response.isHttpSuccess && response.isSuccess) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Your message has been sent successfully!',
+                style: GoogleFonts.nunito(color: Colors.white, fontSize: 16),
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _nameController.clear();
+          _emailController.clear();
+          _phoneController.clear();
+          _messageController.clear();
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to send message. Please try again later.',
+                style: GoogleFonts.nunito(color: Colors.white, fontSize: 16),
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
       // Handle error

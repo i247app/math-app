@@ -9,6 +9,7 @@ import '../widget/info_card.dart';
 import '../widget/menu_row_item.dart';
 import '../widget/profile_avatar_section.dart';
 import '../widget/update_profile_dialog.dart';
+import 'contact_list_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -129,6 +130,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 15),
                         InfoCard(
                           children: [
+                            MenuRowItem(
+                              icon: Icons.contact_mail,
+                              title: 'Liên hệ (Contacts)',
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const ContactListScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 8),
                             MenuRowItem(
                               icon: Icons.logout,
                               title: "Đăng xuất",

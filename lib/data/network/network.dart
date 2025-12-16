@@ -5,6 +5,7 @@ import 'package:http_interceptor/http_interceptor.dart' as http_interceptor;
 import 'package:math_ai_app/data/models/user/user_model.dart';
 
 import '../responses/base/base_response.dart';
+import '../responses/contact/list_contact_response.dart';
 import '../responses/sign_up/sign_up_response.dart';
 import '../responses/login/login_response.dart';
 import '../responses/grades/grades_list_response.dart';
@@ -254,4 +255,31 @@ Future<UpdateProfileResponse> updateProfileWithFormData({
   final response = await http.Response.fromStream(streamedResponse);
 
   return _parseResponse(response, UpdateProfileResponse.fromJson);
+}
+
+Future<BaseResponse> submitContactForm({
+  required String contactEmail,
+  required String contactName,
+  required String contactPhone,
+  required String contactMessage,
+}) async {
+  final response = await _post(Uri.parse('$API_ROOT/contact/submit'), {
+    "contact_email": contactEmail,
+    "contact_name": contactName,
+    "contact_phone": contactPhone,
+    "contact_message": contactMessage,
+  });
+
+  return _parseResponse(response, BaseResponse.fromJson);
+}
+
+Future<ListContactResponse> getContactsList({
+  int page = 1,
+  int size = 10,
+}) async {
+  final response = await _get(
+    Uri.parse('$API_ROOT/contact?page=$page&size=$size'),
+  );
+
+  return _parseResponse(response, ListContactResponse.fromJson);
 }

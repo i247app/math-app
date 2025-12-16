@@ -29,8 +29,7 @@ class AuthInterceptor extends InterceptorContract {
     debugPrint('📍 Headers: ${request.headers}');
     final authState = navigatorKey.currentContext!.read<AuthProvider>();
     final myAuthToken = authState.authToken;
-    
-    
+
     if ((myAuthToken ?? '').isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $myAuthToken';
     }
@@ -47,7 +46,7 @@ class AuthInterceptor extends InterceptorContract {
     if (deviceInfoState.devicePushToken?.isNotEmpty ?? false) {
       request.headers['X-Device-Push-Token'] = deviceInfoState.devicePushToken!;
     }
-    
+
     return request;
   }
 
@@ -68,65 +67,6 @@ class AuthInterceptor extends InterceptorContract {
       );
     }
 
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     return response;
   }
 }
