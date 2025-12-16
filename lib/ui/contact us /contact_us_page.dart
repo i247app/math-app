@@ -245,6 +245,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                           errorText: _phoneError,
                           inputType: TextInputType.phone,
                           onChanged: (_) => _validatePhone(),
+                          maxLength: 10,
                         ),
 
                         const SizedBox(height: 16),
@@ -284,6 +285,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                                 maxLines: 6,
                                 keyboardType: TextInputType.multiline,
                                 textInputAction: TextInputAction.newline,
+                                maxLength: 200,
                                 decoration: InputDecoration(
                                   hintText: 'Enter your message...',
                                   hintStyle: GoogleFonts.nunito(

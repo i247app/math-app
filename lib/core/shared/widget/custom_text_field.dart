@@ -9,6 +9,7 @@ Widget buildCustomTextField({
   required String hintText,
   required IconData icon,
   required TextEditingController controller,
+  int? maxLength,
   bool isPassword = false,
   TextInputType inputType = TextInputType.text,
   bool isReadOnly = false,
@@ -50,6 +51,7 @@ Widget buildCustomTextField({
           onTap: onTap,
           onChanged: onChanged,
           inputFormatters: inputFormatters,
+          maxLength: maxLength,
           style: GoogleFonts.nunito(fontSize: 16, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.grey[500]),
