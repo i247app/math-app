@@ -37,13 +37,21 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
       ? questions![_currentQuestionIndex]
       : null;
 
-  Future<bool> generateQuiz(String uid) async {
+  Future<bool> generateQuiz(
+    String uid, {
+    String? gradeId,
+    String? semesterId,
+  }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final response = await _quizRepository.generateQuiz(uid);
+      final response = await _quizRepository.generateQuiz(
+        uid,
+        gradeId: gradeId,
+        semesterId: semesterId,
+      );
 
       if (response.isSuccess &&
           response.result != null &&
@@ -101,10 +109,14 @@ class QuizProvider with ChangeNotifier, DiagnosticableTreeMixin {
     }
   }
 
-  Future<bool> loadNextQuiz(String uid) async {
+  Future<bool> loadNextQuiz(
+    String uid, {
+    String? gradeId,
+    String? semesterId,
+  }) async {
     _saveCurrentQuizAnswers();
 
-    return await generateQuiz(uid);
+    return await generateQuiz(uid, gradeId: gradeId, semesterId: semesterId);
   }
 
   void loadPreviousQuiz() {

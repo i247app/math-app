@@ -13,8 +13,15 @@ import 'package:math_ai_app/data/providers/user_provider.dart';
 
 class MathQuizScreen extends StatefulWidget {
   final bool isPractice;
+  final String? gradeId;
+  final String? semesterId;
 
-  const MathQuizScreen({super.key, this.isPractice = false});
+  const MathQuizScreen({
+    super.key,
+    this.isPractice = false,
+    this.gradeId,
+    this.semesterId,
+  });
 
   @override
   State<MathQuizScreen> createState() => _MathQuizScreenState();
@@ -53,7 +60,11 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
       if (widget.isPractice) {
         await quizProvider.generatePractice(uid);
       } else {
-        await quizProvider.generateQuiz(uid);
+        await quizProvider.generateQuiz(
+          uid,
+          gradeId: widget.gradeId,
+          semesterId: widget.semesterId,
+        );
       }
       if (quizProvider.questions != null &&
           quizProvider.questions!.isNotEmpty) {
@@ -163,7 +174,11 @@ class _MathQuizScreenState extends State<MathQuizScreen> {
           final userProvider = context.read<UserProvider>();
           final uid = userProvider.user?.id;
           if (uid != null && uid.isNotEmpty) {
-            await quizProvider.loadNextQuiz(uid);
+            await quizProvider.loadNextQuiz(
+              uid,
+              gradeId: widget.gradeId,
+              semesterId: widget.semesterId,
+            );
           }
         }
       } else {

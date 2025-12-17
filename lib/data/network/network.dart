@@ -190,10 +190,23 @@ Future<UpdateProfileResponse> updateProfile(
   return _parseResponse(response, UpdateProfileResponse.fromJson);
 }
 
-Future<GenerateQuizResponse> generateQuiz(String uid) async {
-  final response = await _post(Uri.parse('$API_ROOT/quiz-practices/generate'), {
-    "uid": uid,
-  });
+Future<GenerateQuizResponse> generateQuiz(
+  String uid, {
+  String? gradeId,
+  String? semesterId,
+}) async {
+  final body = <String, dynamic>{"uid": uid};
+  if (gradeId != null && gradeId.isNotEmpty) {
+    body["grade_id"] = gradeId;
+  }
+  if (semesterId != null && semesterId.isNotEmpty) {
+    body["semester_id"] = semesterId;
+  }
+
+  final response = await _post(
+    Uri.parse('$API_ROOT/quiz-practices/generate'),
+    body,
+  );
   return _parseResponse(response, GenerateQuizResponse.fromJson);
 }
 
@@ -282,4 +295,18 @@ Future<ListContactResponse> getContactsList({
   );
 
   return _parseResponse(response, ListContactResponse.fromJson);
+}
+
+/*
+[POST] {{url}}/contact/check_read
+{
+    "contact_id": "8f242087-3287-4c8a-a65e-a48b09734aa7"
+}
+*/
+Future<BaseResponse> markContactAsRead({required String contactId}) async {
+  final response = await _post(Uri.parse('$API_ROOT/contact/mark-read'), {
+    "contact_id": contactId,
+  });
+
+  return _parseResponse(response, BaseResponse.fromJson);
 }

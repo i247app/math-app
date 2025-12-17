@@ -3,8 +3,16 @@ import '../responses/quiz/generate_quiz_response.dart';
 import '../responses/quiz/submit_quiz_response.dart';
 
 class QuizRepository {
-  Future<GenerateQuizResponse> generateQuiz(String uid) async {
-    final response = await network.generateQuiz(uid);
+  Future<GenerateQuizResponse> generateQuiz(
+    String uid, {
+    String? gradeId,
+    String? semesterId,
+  }) async {
+    final response = await network.generateQuiz(
+      uid,
+      gradeId: gradeId,
+      semesterId: semesterId,
+    );
     return response;
   }
 

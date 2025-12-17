@@ -3,7 +3,7 @@ import 'package:math_ai_app/core/shared/widget/custom_primary_button.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
 import 'package:math_ai_app/ui/bottom_navigation_bar/widget/bar_chart_widget.dart';
 
-import '../../math test process/view/math_quizz_screen.dart';
+import '../../class selection /view/class_selection_screen.dart';
 
 class AssessmentScreen extends StatelessWidget {
   const AssessmentScreen({super.key});
@@ -47,7 +47,10 @@ class AssessmentScreen extends StatelessWidget {
                 circularNumber: 28,
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const MathQuizScreen()),
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          const ClassSelectionScreen(isAssessmentFlow: true),
+                    ),
                   );
                 },
               ),

@@ -5,12 +5,23 @@ import 'package:math_ai_app/data/providers/user_provider.dart';
 import 'package:math_ai_app/data/providers/profile_provider.dart';
 import 'package:math_ai_app/ui/bottom_navigation_bar/view/bottom_navigation_bar.dart';
 import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart';
+import 'package:math_ai_app/ui/math%20test%20process/view/math_quizz_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../widget/level_card_widget.dart';
+import '../../../data/models/levels/level_model.dart';
 
 class LevelSelectionScreen extends StatefulWidget {
-  const LevelSelectionScreen({super.key});
+  final bool isAssessmentFlow;
+  final String? gradeId;
+  final String? gradeLabel;
+
+  const LevelSelectionScreen({
+    super.key,
+    this.isAssessmentFlow = false,
+    this.gradeId,
+    this.gradeLabel,
+  });
 
   @override
   State<LevelSelectionScreen> createState() => _LevelSelectionScreenState();
@@ -19,6 +30,7 @@ class LevelSelectionScreen extends StatefulWidget {
 class _LevelSelectionScreenState extends State<LevelSelectionScreen>
     with TickerProviderStateMixin {
   int? selectedIndex;
+  bool _navigating = false;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -53,6 +65,73 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
       selectedIndex = index;
     });
     _animationController.forward();
+
+    final selectedLevel = (context.read<LevelsProvider>().levels ?? [])[index];
+    _handleLevelSelection(selectedLevel);
+  }
+
+  void _handleLevelSelection(LevelModel selectedLevel) {
+    if (_navigating) return;
+    _navigating = true;
+
+    if (widget.isAssessmentFlow) {
+      final gradeId =
+          widget.gradeId ?? context.read<UserProvider>().selectedGrade?.id;
+
+      if (gradeId == null || gradeId.isEmpty) {
+        return;
+      }
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) =>
+              MathQuizScreen(gradeId: gradeId, semesterId: selectedLevel.id),
+        ),
+      );
+    } else {
+      context.read<UserProvider>().setUserClass(
+        '${context.read<UserProvider>().userClass} - ${selectedLevel.label}',
+      );
+
+      Future.delayed(const Duration(milliseconds: 200), () async {
+        if (context.mounted) {
+          final userProvider = context.read<UserProvider>();
+          final selectedGrade = userProvider.selectedGrade;
+
+          if (selectedGrade != null) {
+            final userId = userProvider.user?.id?.isNotEmpty == true
+                ? userProvider.user!.id!
+                : userProvider.user?.email ?? '';
+
+            if (userId.isEmpty) {
+              return;
+            }
+
+            if (!context.mounted) return;
+            final profileProvider = context.read<ProfileProvider>();
+            final success = await profileProvider.createProfile(
+              uid: userId,
+              gradeId: selectedGrade.id,
+              semesterId: selectedLevel.id,
+            );
+
+            if (success && context.mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => const BottomNavigationBarScreen(),
+                ),
+              );
+            } else {
+              // Profile creation failed but no snackbar shown
+            }
+          }
+        }
+      });
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigating = false;
+    });
   }
 
   @override
@@ -106,7 +185,9 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                   const SizedBox(height: 40),
 
                   Text(
-                    "Chọn Kì Học\ncủa bạn!",
+                    widget.gradeLabel != null
+                        ? "Chọn Kì Học\ncho ${widget.gradeLabel}!"
+                        : "Chọn Kì Học\ncủa bạn!",
                     style: GoogleFonts.nunito(
                       fontSize: 40,
                       height: 1.2,
@@ -134,6 +215,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                 ),
                             itemBuilder: (context, index) {
                               final isSelected = selectedIndex == index;
+                              final level = levels[index];
                               return AnimatedBuilder(
                                 animation: _animationController,
                                 builder: (context, child) {
@@ -142,7 +224,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                                         ? _scaleAnimation.value
                                         : 1.0,
                                     child: LevelCard(
-                                      data: levels[index],
+                                      data: level,
                                       isSelected: isSelected,
                                       onTap: () => _selectLevel(index),
                                       selectionAnimation: _fadeAnimation.value,
@@ -154,105 +236,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen>
                           ),
                         ),
 
-                        const SizedBox(height: 20),
-
-                        SizedBox(
-                          width: double.infinity,
-                          height: 55,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            child: ElevatedButton(
-                              onPressed: selectedIndex != null
-                                  ? () {
-                                      final selectedLevel =
-                                          levels[selectedIndex!];
-
-                                      context.read<UserProvider>().setUserClass(
-                                        '${context.read<UserProvider>().userClass} - ${selectedLevel.label}',
-                                      );
-
-                                      Future.delayed(
-                                        const Duration(milliseconds: 500),
-                                        () async {
-                                          if (context.mounted) {
-                                            final userProvider = context
-                                                .read<UserProvider>();
-                                            final selectedGrade =
-                                                userProvider.selectedGrade;
-
-                                            final selectedLevel =
-                                                levels[selectedIndex!];
-
-                                            if (selectedGrade != null) {
-                                              final userId =
-                                                  userProvider
-                                                          .user
-                                                          ?.id
-                                                          ?.isNotEmpty ==
-                                                      true
-                                                  ? userProvider.user!.id!
-                                                  : userProvider.user?.email ??
-                                                        '';
-
-                                              if (userId.isEmpty) {
-                                                return;
-                                              }
-
-                                              if (!context.mounted) return;
-                                              final profileProvider = context
-                                                  .read<ProfileProvider>();
-                                              final success =
-                                                  await profileProvider
-                                                      .createProfile(
-                                                        uid: userId,
-                                                        gradeId:
-                                                            selectedGrade.id,
-                                                        semesterId:
-                                                            selectedLevel.id,
-                                                      );
-
-                                              if (success && context.mounted) {
-                                                Navigator.of(
-                                                  context,
-                                                ).pushReplacement(
-                                                  MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        const BottomNavigationBarScreen(),
-                                                  ),
-                                                );
-                                              } else {
-                                                // Profile creation failed but no snackbar shown
-                                              }
-                                            }
-                                          }
-                                        },
-                                      );
-                                    }
-                                  : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedIndex != null
-                                    ? const Color(0xFF3E2723)
-                                    : Colors.grey[400],
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: selectedIndex != null ? 2 : 0,
-                              ),
-                              child: Text(
-                                selectedIndex != null
-                                    ? "Tiếp Tục"
-                                    : "Chọn kì học",
-                                style: GoogleFonts.nunito(
-                                  fontSize: 18,
-                                  color: selectedIndex != null
-                                      ? Colors.white
-                                      : Colors.grey[600],
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        const SizedBox(height: 12),
                       ],
                     ),
                   ),

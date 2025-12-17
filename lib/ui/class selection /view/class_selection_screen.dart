@@ -7,11 +7,18 @@ import 'package:math_ai_app/ui/math%20test%20process/widget/header_section.dart'
 import 'package:provider/provider.dart';
 
 import '../widget/class_card_widget.dart';
+import '../../math test process/view/math_quizz_screen.dart';
+import '../../../data/models/grades/grade_model.dart';
 
 class ClassSelectionScreen extends StatefulWidget {
   final bool isForUpdate;
+  final bool isAssessmentFlow;
 
-  const ClassSelectionScreen({super.key, this.isForUpdate = false});
+  const ClassSelectionScreen({
+    super.key,
+    this.isForUpdate = false,
+    this.isAssessmentFlow = false,
+  });
 
   @override
   State<ClassSelectionScreen> createState() => _ClassSelectionScreenState();
@@ -20,6 +27,7 @@ class ClassSelectionScreen extends StatefulWidget {
 class _ClassSelectionScreenState extends State<ClassSelectionScreen>
     with TickerProviderStateMixin {
   int? selectedIndex;
+  bool _navigating = false;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -49,11 +57,49 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
     super.dispose();
   }
 
-  void _selectClass(int index) {
+  void _selectClass(int index, GradeModel grade) {
     setState(() {
       selectedIndex = index;
     });
     _animationController.forward();
+
+    // Auto-advance after selection
+    _goNext(grade);
+  }
+
+  void _goNext(GradeModel grade) {
+    if (_navigating) return;
+    _navigating = true;
+
+    context.read<UserProvider>().setSelectedGrade(grade);
+    context.read<UserProvider>().setUserClass(grade.label);
+
+    if (widget.isAssessmentFlow) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => LevelSelectionScreen(
+            isAssessmentFlow: true,
+            gradeId: grade.id,
+            gradeLabel: grade.label,
+          ),
+        ),
+      );
+    } else {
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const LevelSelectionScreen()));
+    }
+
+    // allow subsequent navigation after this frame to avoid rapid double taps
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigating = false;
+    });
+  }
+
+  void _skipToQuiz() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const MathQuizScreen()),
+    );
   }
 
   @override
@@ -135,6 +181,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                 ),
                             itemBuilder: (context, index) {
                               final isSelected = selectedIndex == index;
+                              final grade = grades[index];
                               return AnimatedBuilder(
                                 animation: _animationController,
                                 builder: (context, child) {
@@ -143,9 +190,9 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                                         ? _scaleAnimation.value
                                         : 1.0,
                                     child: ClassCard(
-                                      data: grades[index],
+                                      data: grade,
                                       isSelected: isSelected,
-                                      onTap: () => _selectClass(index),
+                                      onTap: () => _selectClass(index, grade),
                                       selectionAnimation: _fadeAnimation.value,
                                     ),
                                   );
@@ -155,65 +202,19 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen>
                           ),
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 8),
 
-                        SizedBox(
-                          width: double.infinity,
-                          height: 55,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            child: ElevatedButton(
-                              onPressed: selectedIndex != null
-                                  ? () {
-                                      final selectedGrade =
-                                          grades[selectedIndex!];
-
-                                      context
-                                          .read<UserProvider>()
-                                          .setSelectedGrade(selectedGrade);
-                                      context.read<UserProvider>().setUserClass(
-                                        selectedGrade.label,
-                                      );
-
-                                      Future.delayed(
-                                        const Duration(milliseconds: 500),
-                                        () {
-                                          if (context.mounted) {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (_) =>
-                                                    const LevelSelectionScreen(),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      );
-                                    }
-                                  : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedIndex != null
-                                    ? const Color(0xFF3E2723)
-                                    : Colors.grey[400],
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: selectedIndex != null ? 2 : 0,
-                              ),
-                              child: Text(
-                                selectedIndex != null
-                                    ? "Tiếp Tục"
-                                    : "Chọn lớp học",
-                                style: GoogleFonts.nunito(
-                                  fontSize: 18,
-                                  color: selectedIndex != null
-                                      ? Colors.white
-                                      : Colors.grey[600],
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                        if (widget.isAssessmentFlow) ...[
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: OutlinedButton(
+                              onPressed: _skipToQuiz,
+                              child: const Text('Skip'),
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
