@@ -6,4 +6,9 @@ class ContactRepository {
     final response = await network.getContactsList(page: page, size: size);
     return response;
   }
+
+  Future<bool> markAsRead(String contactId) async {
+    final response = await network.markContactAsRead(contactId: contactId);
+    return response.isSuccess;
+  }
 }

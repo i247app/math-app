@@ -11,6 +11,7 @@ class ContactProvider with ChangeNotifier, DiagnosticableTreeMixin {
   MetadataModel? _metadata;
   bool _isLoading = false;
   String? _error;
+  final Set<String> _readIds = {};
 
   List<ContactModel>? get items => _items;
   MetadataModel? get metadata => _metadata;
@@ -29,6 +30,11 @@ class ContactProvider with ChangeNotifier, DiagnosticableTreeMixin {
       );
       if (response.isSuccess && response.items != null) {
         _items = response.items;
+        // populate read ids from response if provided
+        _readIds.clear();
+        for (final it in _items!) {
+          if (it.isRead == true) _readIds.add(it.id);
+        }
         _metadata = response.metadata;
       } else {
         _error =
@@ -39,6 +45,38 @@ class ContactProvider with ChangeNotifier, DiagnosticableTreeMixin {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<bool> markAsRead(String contactId) async {
+    try {
+      final success = await _contactRepository.markAsRead(contactId);
+      if (success) {
+        _readIds.add(contactId);
+        // also update local model if present
+        if (_items != null) {
+          for (var i = 0; i < _items!.length; i++) {
+            if (_items![i].id == contactId) {
+              _items![i] = ContactModel(
+                id: _items![i].id,
+                uid: _items![i].uid,
+                contactName: _items![i].contactName,
+                contactEmail: _items![i].contactEmail,
+                contactPhone: _items![i].contactPhone,
+                contactMessage: _items![i].contactMessage,
+                isRead: true,
+              );
+              break;
+            }
+          }
+        }
+        notifyListeners();
+      }
+      return success;
+    } catch (e) {
+      _error = 'Network error: ${e.toString()}';
+      notifyListeners();
+      return false;
     }
   }
 

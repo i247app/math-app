@@ -18,6 +18,8 @@ class ContactModel {
 
   @JsonKey(name: 'contact_message')
   final String contactMessage;
+  @JsonKey(name: 'is_read')
+  final bool? isRead;
 
   ContactModel({
     required this.id,
@@ -26,6 +28,7 @@ class ContactModel {
     required this.contactEmail,
     required this.contactPhone,
     required this.contactMessage,
+    this.isRead,
   });
 
   factory ContactModel.fromJson(Map<String, dynamic> json) =>
