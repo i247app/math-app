@@ -13,12 +13,6 @@ flutter pub get
 flutter run
 ```
 
-Set the backend host in `.env`:
-
-```dotenv
-API_BASE_URL=http://10.0.2.2:8000
-```
-
 For Xcode:
 
 ```bash

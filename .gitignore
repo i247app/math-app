@@ -1,45 +1,210 @@
-# Miscellaneous
-*.class
+######################################################################
+# 0. CORE UTILITIES & OS
+######################################################################
+
+# OS Generated Files (macOS)
+.DS_Store
+._*
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+**/.TemporaryItems
+.com.apple.timemachine.donotbackup
+.VolumeIcon.icns
+.Spotlight-V100
+.Trash/
+
+# OS Generated Files (Windows/Linux)
+ehthumbs.db
+Thumbs.db
+
+# Generic IDE and Log Files
+log_file
+*.lock
 *.log
 *.pyc
+session_data_store
+*~
+[._]*.s[a-w][a-z]
+*.swo
 *.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
 .idea/
+.vscode/
+..air.toml
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# Maven
+/target/
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
+# Gradle
+/.gradle/
 /build/
-/coverage/
 
-# Symbolication related
-app.*.symbols
+# C/C++/Java/Go Build Artifacts and Libraries
+*.class
+*.jar
+*.war
+*.ear
+*.o
+*.a
+*.ilk
+*.pdb
+*.obj
+*.exe
+*.dll
+*.so
+*.out
+*.test
+*/bin/*
+*/out/*
+*/dist/*
+.mtj.tmp/
 
-# Obfuscation related
-app.*.map.json
+# Java
+hs_err_pid*
+replay_pid*
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# Go Build and Workspace Files
+.gocache/
+.godoc/
+go.work
+go.work.sum
+
+# Environment Variables
+.env
+.env.*
+.env*
+!.env.*example
+
+# AI/Tooling Cache & History
+.cursor/
+.claude/
+.crush/
+.specify/
+.opencode/
+.grok
+.aider*
+sgconfig.yml
+.astgrep/
+
+######################################################################
+# 1. FLUTTER CORE
+######################################################################
+
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.last_build_id
+flutter_export_environment.sh
+
+# Generated plugin registration files
+**/android/**/GeneratedPluginRegistrant.java
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# iOS Frameworks
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/ServiceDefinitions.json
+
+# Flutter-specific test exception
+!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+######################################################################
+# 2. ANDROID NATIVE
+######################################################################
+
+# Gradle and Build Directories
+/android/.gradle
+/android/build
+/android/app/build
+/android/.cxx
+/android/captures/
+
+# IDE and Local Configuration
+/android/.idea
+/android/local.properties
+
+# Gradle Wrappers
+**/android/**/gradle-wrapper.jar
+/android/gradlew
+/android/gradlew.bat
+
+# Android Studio Build Artifacts
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+*.aab
+
+# Security/Signing Files
+/android/key.properties
+/android/keystore
+/android/app/google-services.json
+*.pepk
+
+######################################################################
+# 3. IOS / XCODE NATIVE
+######################################################################
+
+# Build Caches
+DerivedData/
+**/ios/**/DerivedData/
+
+# User-Specific Data and State
+xcuserdata/
+**/ios/**/xcuserdata
+*.xcuserstate
+*.moved-aside
+**/ios/**/*.moved-aside
+**/ios/**/*sync/
+
+# Xcode Project Files and State
+*.xcworkspace
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+**/ios/**/*.pbxuser
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.perspectivev3
+
+# Dependencies and Generated Files
+**/ios/**/Pods/
+**/ios/.generated/
+**/ios/**/.symlinks/
+**/ios/**/profile
+
+# Other Temporary Files
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/Icon?
+
+# Exceptions
+!**/ios/**/default.pbxuser
+!**/ios/**/default.mode1v3
+!**/ios/**/default.mode2v3
+!**/ios/**/default.perspectivev3
+
+######################################################################
+# 4. CUSTOM / PROJECT-SPECIFIC FILES
+######################################################################
+
+# Security/Signing Files
+secrets/
+keys/
+*.pem
+dist/
+
+# Documentation and Large Assets
+static/
+CONVENTIONS.md
+WARP.md
+CLAUDE.md
+GEMINI.md
+QWEN.md
+AGENTS.MD
