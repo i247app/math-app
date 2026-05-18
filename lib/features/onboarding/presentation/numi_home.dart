@@ -55,6 +55,15 @@ class _NumiHomeState extends State<NumiHome> {
                     duration: const Duration(milliseconds: 340),
                     switchInCurve: Curves.easeOutCubic,
                     switchOutCurve: Curves.easeInCubic,
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          ...previousChildren,
+                          if (currentChild != null) currentChild,
+                        ],
+                      );
+                    },
                     transitionBuilder: (child, animation) {
                       final slide = Tween<Offset>(
                         begin: const Offset(0.045, 0),

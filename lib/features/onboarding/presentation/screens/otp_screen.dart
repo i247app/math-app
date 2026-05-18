@@ -78,7 +78,7 @@ class _OtpScreenState extends State<OtpScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: compact ? 16 : 24),
+          const SizedBox(height: 12),
           Row(
             children: [
               CircleIconButton(

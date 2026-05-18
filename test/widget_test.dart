@@ -68,7 +68,7 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(-900, 0));
     await tester.pumpAndSettle();
     expect(find.text('Lớp 5'), findsOneWidget);
-    expect(find.text('Kết nối tri thức với cuộc sống'), findsOneWidget);
+    expect(find.text('Kết nối tri thức'), findsOneWidget);
     expect(find.text('Chân trời sáng tạo'), findsOneWidget);
     expect(find.text('Cánh Diều'), findsOneWidget);
   });

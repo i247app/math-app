@@ -15,7 +15,7 @@ class OnboardingState {
     this.screen = AppScreen.welcome,
     this.phoneRegion = PhoneRegion.vn,
     this.selectedGrade = 'Lớp 1',
-    this.selectedCurriculum = 'Kết nối tri thức với cuộc sống',
+    this.selectedCurriculum = 'Kết nối tri thức',
     this.avatarPath,
     this.isPickingAvatar = false,
     this.avatarError,

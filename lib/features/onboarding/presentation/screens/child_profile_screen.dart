@@ -32,7 +32,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
   ];
 
   static const curriculums = [
-    'Kết nối tri thức với cuộc sống',
+    'Kết nối tri thức',
     'Chân trời sáng tạo',
     'Cánh Diều',
   ];
@@ -70,7 +70,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: compact ? 14 : 24),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   CircleIconButton(

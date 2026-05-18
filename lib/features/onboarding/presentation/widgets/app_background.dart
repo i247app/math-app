@@ -11,29 +11,26 @@ class AppBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.skyMint,
-                Color(0xFFF2FFF2),
-                AppColors.mintMist,
-              ],
+        const Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.aquaMist, AppColors.mintMist],
+              ),
             ),
           ),
-          child: SizedBox.expand(),
         ),
         const Positioned(
-          left: -76,
-          bottom: -96,
-          child: _BackgroundRing(size: 190),
+          left: -150,
+          bottom: -54,
+          child: _BackgroundRing(size: 220),
         ),
         const Positioned(
-          right: -54,
-          bottom: -44,
-          child: _BackgroundCircle(size: 142),
+          right: -48,
+          bottom: -28,
+          child: _BackgroundCircle(size: 155),
         ),
         Positioned.fill(child: child),
       ],
@@ -54,8 +51,8 @@ class _BackgroundRing extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: const Color(0xFFD8DAC6).withValues(alpha: 0.62),
-          width: 20,
+          color: AppColors.sandRing,
+          width: 38,
         ),
       ),
     );
@@ -74,7 +71,7 @@ class _BackgroundCircle extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.skyMint.withValues(alpha: 0.78),
+        color: AppColors.aquaSoft.withValues(alpha: 0.36),
       ),
     );
   }
