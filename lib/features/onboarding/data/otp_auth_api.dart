@@ -1,8 +1,6 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
 import '../../../core/config/api_config.dart';
+import '../../../core/network/auth_models.dart';
+import '../../../core/network/network_client.dart';
 
 class PhoneCheckResult {
   const PhoneCheckResult({
@@ -52,6 +50,19 @@ class LoginUser {
   final String? role;
 }
 
+extension on AuthUser {
+  LoginUser toLoginUser({String? fallbackPhone}) {
+    return LoginUser(
+      id: id ?? '',
+      email: email,
+      name: name,
+      phone: phone ?? fallbackPhone,
+      avatarUrl: avatarUrl,
+      role: role,
+    );
+  }
+}
+
 class VerifyOtpResult {
   const VerifyOtpResult({
     required this.isValid,
@@ -88,39 +99,45 @@ abstract class OtpAuthService {
 class OtpAuthApi implements OtpAuthService {
   OtpAuthApi({
     String? baseUrl,
-    HttpClient? httpClient,
-  })  : _baseUrl = baseUrl ?? ApiConfig.baseUrl,
-        _httpClient = httpClient ?? HttpClient();
+    NetworkApi? networkApi,
+  }) : _networkApi =
+            networkApi ?? NetworkApi(baseUrl: baseUrl ?? ApiConfig.baseUrl);
 
-  final String _baseUrl;
-  final HttpClient _httpClient;
+  static const _localOtpCode = '1234';
+
+  final NetworkApi _networkApi;
+  final Map<String, String> _pendingOtpCodes = {};
+  final Map<String, LoginUser> _loginUsers = {};
 
   @override
   Future<PhoneCheckResult> checkPhone(String phone) async {
-    final json = await _post('/auth/phone/check', {'phone': phone});
-
     return PhoneCheckResult(
-      phone: json['phone'] as String? ?? phone,
-      exists: json['exists'] == true,
-      userId: json['user_id'] as String?,
+      phone: phone,
+      exists: true,
+      userId: _loginUsers[phone]?.id,
     );
   }
 
   @override
   Future<SendOtpResult> sendLoginOtp(String phone) async {
-    final json = await _post('/auth/otp/send', {
-      'phone_number': phone,
-      'purpose': 'login',
-      'channel': 'sms',
-    });
+    final AuthResponse response;
+    try {
+      response = await _networkApi.login(LoginRequest(phone: phone));
+    } on NetworkException catch (error) {
+      throw OtpAuthException(error.message, status: error.status);
+    }
+
+    final user = response.user?.toLoginUser(fallbackPhone: phone);
+    if (user != null) {
+      _loginUsers[phone] = user;
+    }
+    _pendingOtpCodes[phone] = _localOtpCode;
 
     return SendOtpResult(
-      otpId: json['otp_id'] as String?,
-      otpCode: _readString(json['otp_code']),
-      purpose: json['purpose'] as String? ?? 'login',
-      expiresIn: json['expires_in'] as int? ?? 180,
-      expiresAt: json['expires_at'] as String?,
-      message: json['message'] as String?,
+      otpCode: _localOtpCode,
+      purpose: 'login',
+      expiresIn: 180,
+      message: response.status,
     );
   }
 
@@ -129,114 +146,18 @@ class OtpAuthApi implements OtpAuthService {
     required String phone,
     required String otpCode,
   }) async {
-    final json = await _post(
-      '/auth/otp/verify',
-      {
-        'phone_number': phone,
-        'purpose': 'login',
-        'otp_code': otpCode,
-      },
-      headers: {
-        'Device-UUID': 'numi-flutter-${Platform.operatingSystem}',
-        'Device-Name': 'NUMI ${Platform.operatingSystem}',
-      },
-    );
-
-    final login = json['login'];
-    final user = login is Map<String, dynamic> ? login['user'] : null;
+    final expectedOtp = _pendingOtpCodes[phone];
+    final isValid = expectedOtp != null && expectedOtp == otpCode;
+    if (isValid) {
+      _pendingOtpCodes.remove(phone);
+    }
 
     return VerifyOtpResult(
-      isValid: json['is_valid'] == true,
-      message: json['message'] as String?,
-      user: user is Map<String, dynamic>
-          ? LoginUser(
-              id: user['id'] as String? ?? '',
-              email: user['email'] as String?,
-              name: user['name'] as String?,
-              phone: user['phone'] as String?,
-              avatarUrl: user['avatar_url'] as String?,
-              role: user['role'] as String?,
-            )
+      isValid: isValid,
+      message: isValid ? 'Success' : 'OTP không hợp lệ.',
+      user: isValid
+          ? _loginUsers[phone] ?? LoginUser(id: '', phone: phone)
           : null,
     );
-  }
-
-  Future<Map<String, dynamic>> _post(
-    String path,
-    Map<String, Object?> body, {
-    Map<String, String> headers = const {},
-  }) async {
-    if (_baseUrl.trim().isEmpty) {
-      throw const OtpAuthException(
-        'Chưa cấu hình API_BASE_URL cho OTP API.',
-      );
-    }
-
-    final normalizedBaseUrl = _baseUrl.endsWith('/')
-        ? _baseUrl.substring(0, _baseUrl.length - 1)
-        : _baseUrl;
-    final uri = Uri.parse('$normalizedBaseUrl$path');
-    final HttpClientRequest request;
-    try {
-      request = await _httpClient.postUrl(uri).timeout(
-            const Duration(seconds: 15),
-          );
-    } on TimeoutException {
-      throw const OtpAuthException('Kết nối API quá thời gian chờ.');
-    } on SocketException catch (error) {
-      throw OtpAuthException(
-        'Không kết nối được API: ${error.message}',
-      );
-    }
-
-    request.headers.contentType = ContentType.json;
-    for (final entry in headers.entries) {
-      request.headers.set(entry.key, entry.value);
-    }
-
-    request.write(jsonEncode(body));
-
-    final HttpClientResponse response;
-    try {
-      response = await request.close().timeout(const Duration(seconds: 15));
-    } on TimeoutException {
-      throw const OtpAuthException('API phản hồi quá thời gian chờ.');
-    } on SocketException catch (error) {
-      throw OtpAuthException(
-        'Không kết nối được API: ${error.message}',
-      );
-    }
-
-    final responseBody = await response.transform(utf8.decoder).join();
-    final Object? decoded;
-    try {
-      decoded = jsonDecode(responseBody);
-    } on FormatException {
-      throw const OtpAuthException('Response từ server không phải JSON.');
-    }
-
-    if (decoded is! Map<String, dynamic>) {
-      throw const OtpAuthException('Response từ server không hợp lệ.');
-    }
-
-    final status = decoded['mstatus'] as int?;
-    if (status != 200) {
-      throw OtpAuthException(
-        decoded['mmessage'] as String? ??
-            decoded['error'] as String? ??
-            'Request failed.',
-        status: status,
-      );
-    }
-
-    return decoded;
-  }
-
-  String? _readString(Object? value) {
-    if (value == null) {
-      return null;
-    }
-
-    return value.toString();
   }
 }

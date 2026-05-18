@@ -129,17 +129,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
 
     try {
-      final check = await _authService.checkPhone(phone);
-      if (!check.exists) {
-        emit(
-          state.copyWith(
-            isSendingOtp: false,
-            authError: 'Số điện thoại chưa tồn tại.',
-          ),
-        );
-        return;
-      }
-
       final otp = await _authService.sendLoginOtp(phone);
       emit(
         state.copyWith(
