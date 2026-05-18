@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:numi_flutter/features/onboarding/data/avatar_picker.dart';
+import 'package:numi_flutter/features/onboarding/data/otp_auth_api.dart';
 import 'package:numi_flutter/features/onboarding/presentation/bloc/onboarding_cubit.dart';
 import 'package:numi_flutter/main.dart';
 
 void main() {
+  final authService = _FakeOtpAuthService();
+
   testWidgets('shows NUMI welcome screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const NumiApp());
+    await tester.pumpWidget(NumiApp(authService: authService));
 
     expect(find.text('NUMI'), findsOneWidget);
     expect(find.text('BẮT ĐẦU'), findsOneWidget);
@@ -15,7 +18,7 @@ void main() {
 
   testWidgets('opens OTP screen after phone verification',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const NumiApp());
+    await tester.pumpWidget(NumiApp(authService: authService));
 
     await tester.tap(find.text('BẮT ĐẦU'));
     await tester.pumpAndSettle();
@@ -24,13 +27,17 @@ void main() {
     await tester.tap(find.text('Gửi mã OTP  →'));
     await tester.pumpAndSettle();
 
+    expect(find.textContaining('Mã OTP vừa gửi: 1234'), findsOneWidget);
+    await tester.tap(find.text('Đóng'));
+    await tester.pumpAndSettle();
+
     expect(find.text('MÃ XÁC NHẬN'), findsOneWidget);
     expect(find.text('Xác nhận  →'), findsOneWidget);
   });
 
   testWidgets('supports US region and numeric-only phone entry',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const NumiApp());
+    await tester.pumpWidget(NumiApp(authService: authService));
 
     await tester.tap(find.text('BẮT ĐẦU'));
     await tester.pumpAndSettle();
@@ -49,9 +56,9 @@ void main() {
     expect(find.text('+1'), findsOneWidget);
   });
 
-  testWidgets('opens child profile setup without OTP verification',
+  testWidgets('opens child profile setup after OTP verification',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const NumiApp());
+    await tester.pumpWidget(NumiApp(authService: authService));
 
     await tester.tap(find.text('BẮT ĐẦU'));
     await tester.pumpAndSettle();
@@ -59,7 +66,15 @@ void main() {
     await tester.enterText(find.byType(EditableText), '0901234567');
     await tester.tap(find.text('Gửi mã OTP  →'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Đóng'));
+    await tester.pumpAndSettle();
 
+    for (var index = 0; index < 4; index++) {
+      await tester.enterText(
+        find.byType(EditableText).at(index),
+        '${index + 1}',
+      );
+    }
     await tester.tap(find.text('Xác nhận  →'));
     await tester.pumpAndSettle();
 
@@ -93,4 +108,34 @@ class _FakeAvatarPickerService extends AvatarPickerService {
 
   @override
   Future<String?> pickAvatarPath() async => path;
+}
+
+class _FakeOtpAuthService implements OtpAuthService {
+  @override
+  Future<PhoneCheckResult> checkPhone(String phone) async {
+    return PhoneCheckResult(phone: phone, exists: true, userId: 'user-1');
+  }
+
+  @override
+  Future<SendOtpResult> sendLoginOtp(String phone) async {
+    return const SendOtpResult(
+      expiresIn: 180,
+      otpId: 'otp-1',
+      otpCode: '1234',
+      purpose: 'login',
+    );
+  }
+
+  @override
+  Future<VerifyOtpResult> verifyLoginOtp({
+    required String phone,
+    required String otpCode,
+  }) async {
+    return VerifyOtpResult(
+      isValid: otpCode == '1234',
+      user: otpCode == '1234'
+          ? const LoginUser(id: 'user-1', phone: '0901234567')
+          : null,
+    );
+  }
 }

@@ -14,6 +14,7 @@ class LoginScreen extends StatelessWidget {
     required this.onRegionChanged,
     required this.onBack,
     required this.onSendOtp,
+    required this.isSendingOtp,
   });
 
   final TextEditingController controller;
@@ -21,6 +22,7 @@ class LoginScreen extends StatelessWidget {
   final ValueChanged<PhoneRegion> onRegionChanged;
   final VoidCallback onBack;
   final VoidCallback onSendOtp;
+  final bool isSendingOtp;
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +83,7 @@ class LoginScreen extends StatelessWidget {
             region: region,
             onRegionChanged: onRegionChanged,
             onSendOtp: onSendOtp,
+            isSendingOtp: isSendingOtp,
           ),
           const SizedBox(height: 28),
         ],
@@ -96,12 +99,14 @@ class LoginCard extends StatelessWidget {
     required this.region,
     required this.onRegionChanged,
     required this.onSendOtp,
+    required this.isSendingOtp,
   });
 
   final TextEditingController controller;
   final PhoneRegion region;
   final ValueChanged<PhoneRegion> onRegionChanged;
   final VoidCallback onSendOtp;
+  final bool isSendingOtp;
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +197,8 @@ class LoginCard extends StatelessWidget {
           ),
           const SizedBox(height: 28),
           PrimaryButton(
-            label: 'Gửi mã OTP  →',
-            onPressed: onSendOtp,
+            label: isSendingOtp ? 'Đang gửi...' : 'Gửi mã OTP  →',
+            onPressed: isSendingOtp ? null : onSendOtp,
           ),
           const SizedBox(height: 16),
           const Center(

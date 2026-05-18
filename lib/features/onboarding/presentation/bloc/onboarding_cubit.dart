@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/avatar_picker.dart';
+import '../../data/otp_auth_api.dart';
 import '../../domain/phone_region.dart';
 
 enum AppScreen {
@@ -19,6 +20,15 @@ class OnboardingState {
     this.avatarPath,
     this.isPickingAvatar = false,
     this.avatarError,
+    this.phoneNumber,
+    this.isSendingOtp = false,
+    this.isVerifyingOtp = false,
+    this.otpExpiresIn,
+    this.devOtpCode,
+    this.devOtpPurpose,
+    this.otpPreviewId = 0,
+    this.authError,
+    this.loginUser,
   });
 
   final AppScreen screen;
@@ -28,6 +38,15 @@ class OnboardingState {
   final String? avatarPath;
   final bool isPickingAvatar;
   final String? avatarError;
+  final String? phoneNumber;
+  final bool isSendingOtp;
+  final bool isVerifyingOtp;
+  final int? otpExpiresIn;
+  final String? devOtpCode;
+  final String? devOtpPurpose;
+  final int otpPreviewId;
+  final String? authError;
+  final LoginUser? loginUser;
 
   OnboardingState copyWith({
     AppScreen? screen,
@@ -37,7 +56,18 @@ class OnboardingState {
     String? avatarPath,
     bool? isPickingAvatar,
     String? avatarError,
+    String? phoneNumber,
+    bool? isSendingOtp,
+    bool? isVerifyingOtp,
+    int? otpExpiresIn,
+    String? devOtpCode,
+    String? devOtpPurpose,
+    int? otpPreviewId,
+    String? authError,
+    LoginUser? loginUser,
     bool clearAvatarError = false,
+    bool clearAuthError = false,
+    bool clearDevOtp = false,
   }) {
     return OnboardingState(
       screen: screen ?? this.screen,
@@ -47,6 +77,15 @@ class OnboardingState {
       avatarPath: avatarPath ?? this.avatarPath,
       isPickingAvatar: isPickingAvatar ?? this.isPickingAvatar,
       avatarError: clearAvatarError ? null : avatarError ?? this.avatarError,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      isSendingOtp: isSendingOtp ?? this.isSendingOtp,
+      isVerifyingOtp: isVerifyingOtp ?? this.isVerifyingOtp,
+      otpExpiresIn: otpExpiresIn ?? this.otpExpiresIn,
+      devOtpCode: clearDevOtp ? null : devOtpCode ?? this.devOtpCode,
+      devOtpPurpose: clearDevOtp ? null : devOtpPurpose ?? this.devOtpPurpose,
+      otpPreviewId: otpPreviewId ?? this.otpPreviewId,
+      authError: clearAuthError ? null : authError ?? this.authError,
+      loginUser: loginUser ?? this.loginUser,
     );
   }
 }
@@ -54,10 +93,13 @@ class OnboardingState {
 class OnboardingCubit extends Cubit<OnboardingState> {
   OnboardingCubit({
     AvatarPickerService avatarPicker = const AvatarPickerService(),
+    OtpAuthService? authService,
   })  : _avatarPicker = avatarPicker,
+        _authService = authService ?? OtpAuthApi(),
         super(const OnboardingState());
 
   final AvatarPickerService _avatarPicker;
+  final OtpAuthService _authService;
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
@@ -77,6 +119,105 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void selectCurriculum(String curriculum) {
     emit(state.copyWith(selectedCurriculum: curriculum));
+  }
+
+  Future<void> requestLoginOtp(String phone) async {
+    if (state.isSendingOtp) {
+      return;
+    }
+
+    emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
+
+    try {
+      final check = await _authService.checkPhone(phone);
+      if (!check.exists) {
+        emit(
+          state.copyWith(
+            isSendingOtp: false,
+            authError: 'Số điện thoại chưa tồn tại.',
+          ),
+        );
+        return;
+      }
+
+      final otp = await _authService.sendLoginOtp(phone);
+      emit(
+        state.copyWith(
+          screen: AppScreen.otp,
+          phoneNumber: phone,
+          otpExpiresIn: otp.expiresIn,
+          devOtpCode: otp.otpCode,
+          devOtpPurpose: otp.purpose,
+          otpPreviewId: state.otpPreviewId + 1,
+          isSendingOtp: false,
+          clearAuthError: true,
+          clearDevOtp: otp.otpCode == null,
+        ),
+      );
+    } on OtpAuthException catch (error) {
+      emit(
+        state.copyWith(
+          isSendingOtp: false,
+          authError: error.message,
+        ),
+      );
+    } catch (_) {
+      emit(
+        state.copyWith(
+          isSendingOtp: false,
+          authError: 'Không thể gửi OTP. Vui lòng thử lại.',
+        ),
+      );
+    }
+  }
+
+  Future<void> verifyLoginOtp(String otpCode) async {
+    final phone = state.phoneNumber;
+    if (state.isVerifyingOtp || phone == null) {
+      return;
+    }
+
+    emit(state.copyWith(isVerifyingOtp: true, clearAuthError: true));
+
+    try {
+      final result = await _authService.verifyLoginOtp(
+        phone: phone,
+        otpCode: otpCode,
+      );
+
+      if (!result.isValid || result.user == null) {
+        emit(
+          state.copyWith(
+            isVerifyingOtp: false,
+            authError: result.message ?? 'OTP không hợp lệ.',
+          ),
+        );
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          screen: AppScreen.profile,
+          isVerifyingOtp: false,
+          loginUser: result.user,
+          clearAuthError: true,
+        ),
+      );
+    } on OtpAuthException catch (error) {
+      emit(
+        state.copyWith(
+          isVerifyingOtp: false,
+          authError: error.message,
+        ),
+      );
+    } catch (_) {
+      emit(
+        state.copyWith(
+          isVerifyingOtp: false,
+          authError: 'Không thể xác thực OTP. Vui lòng thử lại.',
+        ),
+      );
+    }
   }
 
   Future<void> pickAvatar() async {

@@ -10,11 +10,13 @@ class OtpScreen extends StatefulWidget {
     required this.onBack,
     required this.onConfirm,
     required this.onResend,
+    required this.isVerifyingOtp,
   });
 
   final VoidCallback onBack;
-  final VoidCallback onConfirm;
+  final ValueChanged<String> onConfirm;
   final VoidCallback onResend;
+  final bool isVerifyingOtp;
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -63,7 +65,14 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void handleConfirm() {
-    widget.onConfirm();
+    final otpCode = controllers.map((controller) => controller.text).join();
+    if (otpCode.length < controllers.length) {
+      HapticFeedback.selectionClick();
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+    widget.onConfirm(otpCode);
   }
 
   @override
@@ -126,6 +135,7 @@ class _OtpScreenState extends State<OtpScreen> {
             onChanged: updateDigit,
             onConfirm: handleConfirm,
             onResend: widget.onResend,
+            isVerifyingOtp: widget.isVerifyingOtp,
           ),
           const SizedBox(height: 32),
         ],
@@ -142,6 +152,7 @@ class OtpCard extends StatelessWidget {
     required this.onChanged,
     required this.onConfirm,
     required this.onResend,
+    required this.isVerifyingOtp,
   });
 
   final List<TextEditingController> controllers;
@@ -149,6 +160,7 @@ class OtpCard extends StatelessWidget {
   final void Function(int index, String value) onChanged;
   final VoidCallback onConfirm;
   final VoidCallback onResend;
+  final bool isVerifyingOtp;
 
   @override
   Widget build(BuildContext context) {
@@ -212,8 +224,8 @@ class OtpCard extends StatelessWidget {
           ),
           const SizedBox(height: 26),
           PrimaryButton(
-            label: 'Xác nhận  →',
-            onPressed: onConfirm,
+            label: isVerifyingOtp ? 'Đang xác thực...' : 'Xác nhận  →',
+            onPressed: isVerifyingOtp ? null : onConfirm,
           ),
           const SizedBox(height: 20),
           Center(
