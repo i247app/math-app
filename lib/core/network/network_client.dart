@@ -105,10 +105,6 @@ class NetworkApi {
     return _post('/users/create', request.toJson());
   }
 
-  Future<AuthResponse> login(LoginRequest request) {
-    return _post('/auth', request.toJson());
-  }
-
   Future<AuthResponse> authOtp(LoginRequest request) {
     return _post('/auth/otp', request.toJson());
   }

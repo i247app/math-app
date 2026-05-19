@@ -138,9 +138,11 @@ class OtpAuthApi implements OtpAuthService {
   Future<AuthPhoneLookupResult> checkAuthPhone(String phone) async {
     final AuthResponse response;
     try {
-      response = await _networkApi.login(LoginRequest(phone: phone));
+      response = await _networkApi.authOtp(LoginRequest(phone: phone));
     } on NetworkException catch (error) {
       if (error.status == 202 || error.status == 4006) {
+        _pendingOtpCodes.remove(phone);
+        _loginUsers.remove(phone);
         return AuthPhoneLookupResult(phone: phone, exists: false);
       }
 
@@ -149,7 +151,7 @@ class OtpAuthApi implements OtpAuthService {
 
     final user = response.user?.toLoginUser(fallbackPhone: phone);
     if (user == null) {
-      throw const OtpAuthException('Response login thiếu thông tin user.');
+      throw const OtpAuthException('Response OTP thiếu thông tin user.');
     }
 
     _loginUsers[phone] = user;
