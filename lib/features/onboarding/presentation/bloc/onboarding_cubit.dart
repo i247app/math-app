@@ -7,8 +7,15 @@ import '../../domain/phone_region.dart';
 enum AppScreen {
   welcome,
   login,
+  signupPrompt,
   otp,
   profile,
+  home,
+}
+
+enum OtpFlow {
+  login,
+  signup,
 }
 
 class OnboardingState {
@@ -21,12 +28,17 @@ class OnboardingState {
     this.isPickingAvatar = false,
     this.avatarError,
     this.phoneNumber,
+    this.checkedPhone,
+    this.isCheckingAuthPhone = false,
+    this.phoneExists,
+    this.phoneLookupUser,
     this.isSendingOtp = false,
     this.isVerifyingOtp = false,
     this.otpExpiresIn,
     this.devOtpCode,
     this.devOtpPurpose,
     this.otpPreviewId = 0,
+    this.otpFlow = OtpFlow.login,
     this.authError,
     this.loginUser,
   });
@@ -39,12 +51,17 @@ class OnboardingState {
   final bool isPickingAvatar;
   final String? avatarError;
   final String? phoneNumber;
+  final String? checkedPhone;
+  final bool isCheckingAuthPhone;
+  final bool? phoneExists;
+  final LoginUser? phoneLookupUser;
   final bool isSendingOtp;
   final bool isVerifyingOtp;
   final int? otpExpiresIn;
   final String? devOtpCode;
   final String? devOtpPurpose;
   final int otpPreviewId;
+  final OtpFlow otpFlow;
   final String? authError;
   final LoginUser? loginUser;
 
@@ -57,17 +74,23 @@ class OnboardingState {
     bool? isPickingAvatar,
     String? avatarError,
     String? phoneNumber,
+    String? checkedPhone,
+    bool? isCheckingAuthPhone,
+    bool? phoneExists,
+    LoginUser? phoneLookupUser,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     int? otpExpiresIn,
     String? devOtpCode,
     String? devOtpPurpose,
     int? otpPreviewId,
+    OtpFlow? otpFlow,
     String? authError,
     LoginUser? loginUser,
     bool clearAvatarError = false,
     bool clearAuthError = false,
     bool clearDevOtp = false,
+    bool clearPhoneLookup = false,
   }) {
     return OnboardingState(
       screen: screen ?? this.screen,
@@ -78,12 +101,18 @@ class OnboardingState {
       isPickingAvatar: isPickingAvatar ?? this.isPickingAvatar,
       avatarError: clearAvatarError ? null : avatarError ?? this.avatarError,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      checkedPhone: clearPhoneLookup ? null : checkedPhone ?? this.checkedPhone,
+      isCheckingAuthPhone: isCheckingAuthPhone ?? this.isCheckingAuthPhone,
+      phoneExists: clearPhoneLookup ? null : phoneExists ?? this.phoneExists,
+      phoneLookupUser:
+          clearPhoneLookup ? null : phoneLookupUser ?? this.phoneLookupUser,
       isSendingOtp: isSendingOtp ?? this.isSendingOtp,
       isVerifyingOtp: isVerifyingOtp ?? this.isVerifyingOtp,
       otpExpiresIn: otpExpiresIn ?? this.otpExpiresIn,
       devOtpCode: clearDevOtp ? null : devOtpCode ?? this.devOtpCode,
       devOtpPurpose: clearDevOtp ? null : devOtpPurpose ?? this.devOtpPurpose,
       otpPreviewId: otpPreviewId ?? this.otpPreviewId,
+      otpFlow: otpFlow ?? this.otpFlow,
       authError: clearAuthError ? null : authError ?? this.authError,
       loginUser: loginUser ?? this.loginUser,
     );
@@ -105,9 +134,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void openLogin() => emit(state.copyWith(screen: AppScreen.login));
 
+  void openSignupPrompt() =>
+      emit(state.copyWith(screen: AppScreen.signupPrompt));
+
   void openOtp() => emit(state.copyWith(screen: AppScreen.otp));
 
   void openProfile() => emit(state.copyWith(screen: AppScreen.profile));
+
+  void openHome() => emit(state.copyWith(screen: AppScreen.home));
 
   void selectPhoneRegion(PhoneRegion region) {
     emit(state.copyWith(phoneRegion: region));
@@ -121,8 +155,88 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     emit(state.copyWith(selectedCurriculum: curriculum));
   }
 
-  Future<void> requestLoginOtp(String phone) async {
+  void clearPhoneLookup() {
+    emit(
+      state.copyWith(
+        isCheckingAuthPhone: false,
+        clearAuthError: true,
+        clearPhoneLookup: true,
+      ),
+    );
+  }
+
+  Future<void> checkAuthPhone(String phone) async {
+    if (state.isCheckingAuthPhone && state.checkedPhone == phone) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        phoneNumber: phone,
+        checkedPhone: phone,
+        isCheckingAuthPhone: true,
+        phoneExists: null,
+        phoneLookupUser: null,
+        clearAuthError: true,
+      ),
+    );
+
+    try {
+      final result = await _authService.checkAuthPhone(phone);
+      if (state.checkedPhone != phone) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          phoneNumber: phone,
+          checkedPhone: phone,
+          isCheckingAuthPhone: false,
+          phoneExists: result.exists,
+          phoneLookupUser: result.user,
+          clearAuthError: true,
+        ),
+      );
+    } on OtpAuthException catch (error) {
+      if (state.checkedPhone != phone) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          isCheckingAuthPhone: false,
+          authError: error.message,
+          clearPhoneLookup: true,
+        ),
+      );
+    } catch (_) {
+      if (state.checkedPhone != phone) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          isCheckingAuthPhone: false,
+          authError: 'Không thể kiểm tra số điện thoại.',
+          clearPhoneLookup: true,
+        ),
+      );
+    }
+  }
+
+  Future<void> submitLoginPhone(String phone) async {
     if (state.isSendingOtp) {
+      return;
+    }
+
+    if (state.phoneExists == false && state.checkedPhone == phone) {
+      emit(
+        state.copyWith(
+          screen: AppScreen.signupPrompt,
+          phoneNumber: phone,
+          clearAuthError: true,
+        ),
+      );
       return;
     }
 
@@ -138,12 +252,25 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           devOtpCode: otp.otpCode,
           devOtpPurpose: otp.purpose,
           otpPreviewId: state.otpPreviewId + 1,
+          otpFlow: OtpFlow.login,
           isSendingOtp: false,
           clearAuthError: true,
           clearDevOtp: otp.otpCode == null,
         ),
       );
     } on OtpAuthException catch (error) {
+      if (error.status == 202 || error.status == 4006) {
+        emit(
+          state.copyWith(
+            screen: AppScreen.signupPrompt,
+            phoneNumber: phone,
+            isSendingOtp: false,
+            clearAuthError: true,
+          ),
+        );
+        return;
+      }
+
       emit(
         state.copyWith(
           isSendingOtp: false,
@@ -160,6 +287,22 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
   }
 
+  void startSignupVerification() {
+    final phone = state.phoneNumber;
+    if (phone == null) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        screen: AppScreen.otp,
+        otpFlow: OtpFlow.signup,
+        clearAuthError: true,
+        clearDevOtp: true,
+      ),
+    );
+  }
+
   Future<void> verifyLoginOtp(String otpCode) async {
     final phone = state.phoneNumber;
     if (state.isVerifyingOtp || phone == null) {
@@ -169,6 +312,17 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     emit(state.copyWith(isVerifyingOtp: true, clearAuthError: true));
 
     try {
+      if (state.otpFlow == OtpFlow.signup) {
+        emit(
+          state.copyWith(
+            screen: AppScreen.profile,
+            isVerifyingOtp: false,
+            clearAuthError: true,
+          ),
+        );
+        return;
+      }
+
       final result = await _authService.verifyLoginOtp(
         phone: phone,
         otpCode: otpCode,
@@ -186,7 +340,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
       emit(
         state.copyWith(
-          screen: AppScreen.profile,
+          screen: AppScreen.home,
           isVerifyingOtp: false,
           loginUser: result.user,
           clearAuthError: true,

@@ -37,6 +37,7 @@ class AuthResponse {
     this.status,
     this.mmessage,
     this.debug,
+    this.otpCode,
     this.user,
   });
 
@@ -44,6 +45,7 @@ class AuthResponse {
   final String? status;
   final String? mmessage;
   final String? debug;
+  final String? otpCode;
   final AuthUser? user;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) =>
@@ -56,6 +58,7 @@ class AuthResponse {
 class AuthUser {
   const AuthUser({
     this.id,
+    this.userId,
     this.email,
     this.name,
     this.phone,
@@ -63,7 +66,9 @@ class AuthUser {
     this.role,
   });
 
+  @JsonKey(fromJson: _stringFromJson)
   final String? id;
+  final String? userId;
   final String? email;
   final String? name;
   final String? phone;
@@ -74,4 +79,6 @@ class AuthUser {
       _$AuthUserFromJson(json);
 
   Map<String, dynamic> toJson() => _$AuthUserToJson(this);
+
+  static String? _stringFromJson(Object? value) => value?.toString();
 }

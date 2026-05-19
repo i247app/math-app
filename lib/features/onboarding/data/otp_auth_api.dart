@@ -50,10 +50,22 @@ class LoginUser {
   final String? role;
 }
 
+class AuthPhoneLookupResult {
+  const AuthPhoneLookupResult({
+    required this.phone,
+    required this.exists,
+    this.user,
+  });
+
+  final String phone;
+  final bool exists;
+  final LoginUser? user;
+}
+
 extension on AuthUser {
   LoginUser toLoginUser({String? fallbackPhone}) {
     return LoginUser(
-      id: id ?? '',
+      id: userId ?? id ?? '',
       email: email,
       name: name,
       phone: phone ?? fallbackPhone,
@@ -88,6 +100,10 @@ class OtpAuthException implements Exception {
 abstract class OtpAuthService {
   Future<PhoneCheckResult> checkPhone(String phone);
 
+  Future<AuthPhoneLookupResult> checkAuthPhone(String phone);
+
+  Future<LoginUser> loginWithPhone(String phone);
+
   Future<SendOtpResult> sendLoginOtp(String phone);
 
   Future<VerifyOtpResult> verifyLoginOtp({
@@ -119,26 +135,67 @@ class OtpAuthApi implements OtpAuthService {
   }
 
   @override
-  Future<SendOtpResult> sendLoginOtp(String phone) async {
+  Future<AuthPhoneLookupResult> checkAuthPhone(String phone) async {
     final AuthResponse response;
     try {
       response = await _networkApi.login(LoginRequest(phone: phone));
+    } on NetworkException catch (error) {
+      if (error.status == 202 || error.status == 4006) {
+        return AuthPhoneLookupResult(phone: phone, exists: false);
+      }
+
+      throw OtpAuthException(error.message, status: error.status);
+    }
+
+    final user = response.user?.toLoginUser(fallbackPhone: phone);
+    if (user == null) {
+      throw const OtpAuthException('Response login thiếu thông tin user.');
+    }
+
+    _loginUsers[phone] = user;
+    return AuthPhoneLookupResult(phone: phone, exists: true, user: user);
+  }
+
+  @override
+  Future<SendOtpResult> sendLoginOtp(String phone) async {
+    final AuthResponse response;
+    try {
+      response = await _networkApi.authOtp(LoginRequest(phone: phone));
     } on NetworkException catch (error) {
       throw OtpAuthException(error.message, status: error.status);
     }
 
     final user = response.user?.toLoginUser(fallbackPhone: phone);
-    if (user != null) {
-      _loginUsers[phone] = user;
+    if (user == null) {
+      throw const OtpAuthException('Response OTP thiếu thông tin user.');
     }
-    _pendingOtpCodes[phone] = _localOtpCode;
+
+    final otpCode = response.otpCode ?? _localOtpCode;
+    _loginUsers[phone] = user;
+    _pendingOtpCodes[phone] = otpCode;
 
     return SendOtpResult(
-      otpCode: _localOtpCode,
+      otpCode: otpCode,
       purpose: 'login',
       expiresIn: 180,
       message: response.status,
     );
+  }
+
+  @override
+  Future<LoginUser> loginWithPhone(String phone) async {
+    final cachedUser = _loginUsers[phone];
+    if (cachedUser != null) {
+      return cachedUser;
+    }
+
+    final result = await checkAuthPhone(phone);
+    final user = result.user;
+    if (!result.exists || user == null) {
+      throw const OtpAuthException('User not found', status: 202);
+    }
+
+    return user;
   }
 
   @override

@@ -106,7 +106,11 @@ class NetworkApi {
   }
 
   Future<AuthResponse> login(LoginRequest request) {
-    return _post('/auth/login', request.toJson());
+    return _post('/auth', request.toJson());
+  }
+
+  Future<AuthResponse> authOtp(LoginRequest request) {
+    return _post('/auth/otp', request.toJson());
   }
 
   Future<AuthResponse> _post(String path, Map<String, dynamic> body) async {

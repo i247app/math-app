@@ -41,6 +41,7 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) => AuthResponse(
       status: json['status'] as String?,
       mmessage: json['mmessage'] as String?,
       debug: json['debug'] as String?,
+      otpCode: json['otp_code'] as String?,
       user: json['user'] == null
           ? null
           : AuthUser.fromJson(json['user'] as Map<String, dynamic>),
@@ -52,11 +53,13 @@ Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
       'status': instance.status,
       'mmessage': instance.mmessage,
       'debug': instance.debug,
+      'otp_code': instance.otpCode,
       'user': instance.user?.toJson(),
     };
 
 AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => AuthUser(
-      id: json['id'] as String?,
+      id: AuthUser._stringFromJson(json['id']),
+      userId: json['user_id'] as String?,
       email: json['email'] as String?,
       name: json['name'] as String?,
       phone: json['phone'] as String?,
@@ -66,6 +69,7 @@ AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => AuthUser(
 
 Map<String, dynamic> _$AuthUserToJson(AuthUser instance) => <String, dynamic>{
       'id': instance.id,
+      'user_id': instance.userId,
       'email': instance.email,
       'name': instance.name,
       'phone': instance.phone,

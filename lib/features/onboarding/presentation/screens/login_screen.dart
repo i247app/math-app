@@ -15,6 +15,11 @@ class LoginScreen extends StatelessWidget {
     required this.onBack,
     required this.onSendOtp,
     required this.isSendingOtp,
+    required this.isCheckingAuthPhone,
+    required this.canSendOtp,
+    required this.onPhoneChanged,
+    this.phoneExists,
+    this.phoneErrorText,
   });
 
   final TextEditingController controller;
@@ -23,6 +28,11 @@ class LoginScreen extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onSendOtp;
   final bool isSendingOtp;
+  final bool isCheckingAuthPhone;
+  final bool canSendOtp;
+  final ValueChanged<String> onPhoneChanged;
+  final bool? phoneExists;
+  final String? phoneErrorText;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +94,11 @@ class LoginScreen extends StatelessWidget {
             onRegionChanged: onRegionChanged,
             onSendOtp: onSendOtp,
             isSendingOtp: isSendingOtp,
+            isCheckingAuthPhone: isCheckingAuthPhone,
+            canSendOtp: canSendOtp,
+            onPhoneChanged: onPhoneChanged,
+            phoneExists: phoneExists,
+            phoneErrorText: phoneErrorText,
           ),
           const SizedBox(height: 28),
         ],
@@ -100,6 +115,11 @@ class LoginCard extends StatelessWidget {
     required this.onRegionChanged,
     required this.onSendOtp,
     required this.isSendingOtp,
+    required this.isCheckingAuthPhone,
+    required this.canSendOtp,
+    required this.onPhoneChanged,
+    this.phoneExists,
+    this.phoneErrorText,
   });
 
   final TextEditingController controller;
@@ -107,6 +127,23 @@ class LoginCard extends StatelessWidget {
   final ValueChanged<PhoneRegion> onRegionChanged;
   final VoidCallback onSendOtp;
   final bool isSendingOtp;
+  final bool isCheckingAuthPhone;
+  final bool canSendOtp;
+  final ValueChanged<String> onPhoneChanged;
+  final bool? phoneExists;
+  final String? phoneErrorText;
+
+  String get _buttonLabel {
+    if (isSendingOtp) {
+      return 'Đang xử lý...';
+    }
+
+    if (isCheckingAuthPhone) {
+      return 'Đang kiểm tra...';
+    }
+
+    return phoneExists == false ? 'Đăng ký' : 'Đăng nhập';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +215,7 @@ class LoginCard extends StatelessWidget {
                       FilteringTextInputFormatter.digitsOnly,
                       PhoneInputFormatter(region),
                     ],
+                    onChanged: onPhoneChanged,
                     decoration: InputDecoration(
                       hintText: region.hint,
                       hintStyle: const TextStyle(color: Color(0xFFC8CFCB)),
@@ -195,38 +233,70 @@ class LoginCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 28),
-          PrimaryButton(
-            label: isSendingOtp ? 'Đang gửi...' : 'Gửi mã OTP  →',
-            onPressed: isSendingOtp ? null : onSendOtp,
-          ),
-          const SizedBox(height: 16),
-          const Center(
-            child: SizedBox(
-              width: 255,
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.timer_outlined,
-                    size: 20,
-                    color: AppColors.orangeAccent,
-                  ),
-                  SizedBox(width: 10),
-                  Flexible(
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: phoneErrorText == null
+                ? const SizedBox(height: 18)
+                : Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 6),
                     child: Text(
-                      'Bạn sẽ nhận được mã trong vòng 30 giây',
-                      style: TextStyle(
-                        color: AppColors.muted,
+                      phoneErrorText!,
+                      style: const TextStyle(
+                        color: Color(0xFFD9534F),
                         fontSize: 13,
-                        height: 1.28,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0,
+                        height: 1.25,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
+          ),
+          const SizedBox(height: 24),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            child: canSendOtp || isSendingOtp || isCheckingAuthPhone
+                ? Column(
+                    key: const ValueKey('send-otp-actions'),
+                    children: [
+                      PrimaryButton(
+                        label: _buttonLabel,
+                        onPressed: isSendingOtp || isCheckingAuthPhone
+                            ? null
+                            : onSendOtp,
+                      ),
+                      const SizedBox(height: 16),
+                      const Center(
+                        child: SizedBox(
+                          width: 255,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.timer_outlined,
+                                size: 20,
+                                color: AppColors.orangeAccent,
+                              ),
+                              SizedBox(width: 10),
+                              Flexible(
+                                child: Text(
+                                  'Bạn sẽ nhận được mã trong vòng 30 giây',
+                                  style: TextStyle(
+                                    color: AppColors.muted,
+                                    fontSize: 13,
+                                    height: 1.28,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox(
+                    key: ValueKey('send-otp-placeholder'),
+                    height: 0,
+                  ),
           ),
         ],
       ),

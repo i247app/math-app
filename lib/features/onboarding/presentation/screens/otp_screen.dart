@@ -23,14 +23,16 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+  static const otpLength = 4;
+
   late final List<TextEditingController> controllers;
   late final List<FocusNode> focusNodes;
 
   @override
   void initState() {
     super.initState();
-    controllers = List.generate(4, (_) => TextEditingController());
-    focusNodes = List.generate(4, (_) => FocusNode());
+    controllers = List.generate(otpLength, (_) => TextEditingController());
+    focusNodes = List.generate(otpLength, (_) => FocusNode());
   }
 
   @override
