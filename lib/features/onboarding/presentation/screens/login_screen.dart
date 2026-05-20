@@ -146,7 +146,7 @@ class LoginCard extends StatelessWidget {
       return 'Đang kiểm tra...';
     }
 
-    return phoneExists == false ? 'Đăng ký' : 'Đăng nhập';
+    return 'Đăng ký';
   }
 
   @override
@@ -257,7 +257,10 @@ class LoginCard extends StatelessWidget {
           const SizedBox(height: 24),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 220),
-            child: canSendOtp || isSendingOtp || isCheckingAuthPhone
+            child: canSendOtp &&
+                    (phoneExists == false ||
+                        isSendingOtp ||
+                        isCheckingAuthPhone)
                 ? Column(
                     key: const ValueKey('send-otp-actions'),
                     children: [

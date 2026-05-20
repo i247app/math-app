@@ -40,14 +40,6 @@ void main() {
     await tester.enterText(find.byType(EditableText), '0901234567');
     await tester.pumpAndSettle();
 
-    expect(find.text('Đăng nhập'), findsOneWidget);
-    await tester.tap(find.text('Đăng nhập'));
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('Mã OTP vừa gửi: 7152'), findsOneWidget);
-    await tester.tap(find.text('Đóng'));
-    await tester.pumpAndSettle();
-
     expect(find.text('MÃ XÁC NHẬN'), findsOneWidget);
     final otpDigits = '7152'.split('');
     for (var index = 0; index < otpDigits.length; index++) {
@@ -82,7 +74,7 @@ void main() {
     expect(find.text('+1'), findsOneWidget);
   });
 
-  testWidgets('opens child profile setup after OTP verification',
+  testWidgets('opens signup screen after OTP verification',
       (WidgetTester tester) async {
     await tester.pumpWidget(NumiApp(authService: _FakeOtpAuthService()));
 
@@ -96,13 +88,7 @@ void main() {
     await tester.tap(find.text('Đăng ký'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Số điện thoại này chưa tồn tại trong hệ thống NUMI.'),
-      findsOneWidget,
-    );
-    expect(find.text('0999999999'), findsOneWidget);
-    await tester.tap(find.text('Tiếp tục'));
-    await tester.pumpAndSettle();
+    expect(find.text('MÃ XÁC NHẬN'), findsOneWidget);
 
     final otpDigits = '7152'.split('');
     for (var index = 0; index < otpDigits.length; index++) {
@@ -115,13 +101,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('ẢNH ĐẠI DIỆN'), findsOneWidget);
-    expect(find.text('Mẫu giáo'), findsOneWidget);
-    await tester.drag(find.byType(ListView), const Offset(-900, 0));
-    await tester.pumpAndSettle();
-    expect(find.text('Lớp 5'), findsOneWidget);
-    expect(find.text('Kết nối tri thức'), findsOneWidget);
-    expect(find.text('Chân trời sáng tạo'), findsOneWidget);
-    expect(find.text('Cánh Diều'), findsOneWidget);
+    expect(find.textContaining('Username'), findsOneWidget);
+    expect(find.textContaining('Email'), findsOneWidget);
+    expect(find.text('Nhập tên của bé'), findsOneWidget);
+    expect(find.text('Nhập email'), findsOneWidget);
   });
 
   test('updates avatar path after picking an image', () async {
@@ -185,13 +168,24 @@ class _FakeOtpAuthService implements OtpAuthService {
   }
 
   @override
+  Future<SendOtpResult> sendRegisterOtp(String phone) async {
+    return const SendOtpResult(
+      expiresIn: 180,
+      otpId: 'otp-register-1',
+      otpCode: '7152',
+      purpose: 'register',
+    );
+  }
+
+  @override
   Future<VerifyOtpResult> verifyLoginOtp({
     required String phone,
     required String otpCode,
+    String otpType = loginOtpType,
   }) async {
     return VerifyOtpResult(
       isValid: otpCode == '7152',
-      user: otpCode == '7152'
+      user: otpCode == '7152' && otpType == loginOtpType
           ? const LoginUser(id: 'user-1', phone: '0901234567')
           : null,
     );

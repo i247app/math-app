@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/otp_auth_api.dart';
 import '../domain/phone_region.dart';
 import 'bloc/onboarding_cubit.dart';
-import 'screens/child_profile_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/otp_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/signup_prompt_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'widgets/app_background.dart';
@@ -229,8 +229,8 @@ class _NumiHomeState extends State<NumiHome> {
                           },
                           isVerifyingOtp: state.isVerifyingOtp,
                         ),
-                      AppScreen.profile => ChildProfileScreen(
-                          key: const ValueKey('profile'),
+                      AppScreen.signup => SignupScreen(
+                          key: const ValueKey('signup'),
                           onBack: cubit.openOtp,
                           onContinue: () => HapticFeedback.mediumImpact(),
                         ),

@@ -2,6 +2,9 @@ import '../../../core/config/api_config.dart';
 import '../../../core/network/auth_models.dart';
 import '../../../core/network/network_client.dart';
 
+const loginOtpType = 'LOGIN_2FA';
+const registerOtpType = 'REGISTER';
+
 class PhoneCheckResult {
   const PhoneCheckResult({
     required this.phone,
@@ -40,6 +43,8 @@ class LoginUser {
     this.phone,
     this.avatarUrl,
     this.role,
+    this.createDt,
+    this.modifyDt,
   });
 
   final String id;
@@ -48,6 +53,8 @@ class LoginUser {
   final String? phone;
   final String? avatarUrl;
   final String? role;
+  final String? createDt;
+  final String? modifyDt;
 }
 
 class AuthPhoneLookupResult {
@@ -79,6 +86,8 @@ extension on AuthUser {
       phone: phone ?? fallbackPhone,
       avatarUrl: avatarUrl,
       role: role,
+      createDt: createDt,
+      modifyDt: modifyDt,
     );
   }
 }
@@ -114,9 +123,12 @@ abstract class OtpAuthService {
 
   Future<SendOtpResult> sendLoginOtp(String phone);
 
+  Future<SendOtpResult> sendRegisterOtp(String phone);
+
   Future<VerifyOtpResult> verifyLoginOtp({
     required String phone,
     required String otpCode,
+    String otpType = loginOtpType,
   });
 }
 
@@ -126,8 +138,6 @@ class OtpAuthApi implements OtpAuthService {
     NetworkApi? networkApi,
   }) : _networkApi =
             networkApi ?? NetworkApi(baseUrl: baseUrl ?? ApiConfig.baseUrl);
-
-  static const _loginOtpType = 'LOGIN_2FA';
 
   final NetworkApi _networkApi;
   final Map<String, LoginUser> _loginUsers = {};
@@ -197,6 +207,29 @@ class OtpAuthApi implements OtpAuthService {
   }
 
   @override
+  Future<SendOtpResult> sendRegisterOtp(String phone) async {
+    final SendOtpResponse response;
+    try {
+      response = await _networkApi.sendOtp(
+        SendOtpRequest(
+          otpType: registerOtpType,
+          identifier: phone,
+        ),
+      );
+    } on NetworkException catch (error) {
+      throw OtpAuthException(error.message, status: error.status);
+    }
+
+    return SendOtpResult(
+      otpCode: response.otpCode,
+      purpose: 'register',
+      expiresAt: response.expiresAt,
+      expiresIn: _expiresInFrom(response.expiresAt) ?? 180,
+      message: response.status,
+    );
+  }
+
+  @override
   Future<LoginUser> loginWithPhone(String phone) async {
     final cachedUser = _loginUsers[phone];
     if (cachedUser != null) {
@@ -216,12 +249,13 @@ class OtpAuthApi implements OtpAuthService {
   Future<VerifyOtpResult> verifyLoginOtp({
     required String phone,
     required String otpCode,
+    String otpType = loginOtpType,
   }) async {
     final VerifyOtpResponse response;
     try {
       response = await _networkApi.verifyOtp(
         VerifyOtpRequest(
-          otpType: _loginOtpType,
+          otpType: otpType,
           identifier: phone,
           otpCode: otpCode,
         ),
@@ -241,5 +275,19 @@ class OtpAuthApi implements OtpAuthService {
       message: response.status,
       user: response.verified ? user : null,
     );
+  }
+
+  static int? _expiresInFrom(String? expiresAt) {
+    if (expiresAt == null) {
+      return null;
+    }
+
+    final parsed = DateTime.tryParse(expiresAt);
+    if (parsed == null) {
+      return null;
+    }
+
+    final seconds = parsed.toUtc().difference(DateTime.now().toUtc()).inSeconds;
+    return seconds < 0 ? 0 : seconds;
   }
 }

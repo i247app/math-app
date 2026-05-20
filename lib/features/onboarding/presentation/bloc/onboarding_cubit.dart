@@ -9,7 +9,7 @@ enum AppScreen {
   login,
   signupPrompt,
   otp,
-  profile,
+  signup,
   home,
 }
 
@@ -139,7 +139,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void openOtp() => emit(state.copyWith(screen: AppScreen.otp));
 
-  void openProfile() => emit(state.copyWith(screen: AppScreen.profile));
+  void openSignup() => emit(state.copyWith(screen: AppScreen.signup));
 
   void openHome() => emit(state.copyWith(screen: AppScreen.home));
 
@@ -239,13 +239,39 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
 
     if (state.phoneExists == false && state.checkedPhone == phone) {
-      emit(
-        state.copyWith(
-          screen: AppScreen.signupPrompt,
-          phoneNumber: phone,
-          clearAuthError: true,
-        ),
-      );
+      emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
+
+      try {
+        final otp = await _authService.sendRegisterOtp(phone);
+        emit(
+          state.copyWith(
+            screen: AppScreen.otp,
+            phoneNumber: phone,
+            otpExpiresIn: otp.expiresIn,
+            devOtpCode: otp.otpCode,
+            devOtpPurpose: otp.purpose,
+            otpPreviewId: state.otpPreviewId + 1,
+            otpFlow: OtpFlow.signup,
+            isSendingOtp: false,
+            clearAuthError: true,
+            clearDevOtp: otp.otpCode == null,
+          ),
+        );
+      } on OtpAuthException catch (error) {
+        emit(
+          state.copyWith(
+            isSendingOtp: false,
+            authError: error.message,
+          ),
+        );
+      } catch (_) {
+        emit(
+          state.copyWith(
+            isSendingOtp: false,
+            authError: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
+          ),
+        );
+      }
       return;
     }
 
@@ -296,20 +322,44 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
   }
 
-  void startSignupVerification() {
+  Future<void> startSignupVerification() async {
     final phone = state.phoneNumber;
-    if (phone == null) {
+    if (phone == null || state.isSendingOtp) {
       return;
     }
 
-    emit(
-      state.copyWith(
-        screen: AppScreen.otp,
-        otpFlow: OtpFlow.signup,
-        clearAuthError: true,
-        clearDevOtp: true,
-      ),
-    );
+    emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
+
+    try {
+      final otp = await _authService.sendRegisterOtp(phone);
+      emit(
+        state.copyWith(
+          screen: AppScreen.otp,
+          otpExpiresIn: otp.expiresIn,
+          devOtpCode: otp.otpCode,
+          devOtpPurpose: otp.purpose,
+          otpPreviewId: state.otpPreviewId + 1,
+          otpFlow: OtpFlow.signup,
+          isSendingOtp: false,
+          clearAuthError: true,
+          clearDevOtp: otp.otpCode == null,
+        ),
+      );
+    } on OtpAuthException catch (error) {
+      emit(
+        state.copyWith(
+          isSendingOtp: false,
+          authError: error.message,
+        ),
+      );
+    } catch (_) {
+      emit(
+        state.copyWith(
+          isSendingOtp: false,
+          authError: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
+        ),
+      );
+    }
   }
 
   Future<void> verifyLoginOtp(String otpCode) async {
@@ -325,6 +375,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       final result = await _authService.verifyLoginOtp(
         phone: phone,
         otpCode: otpCode,
+        otpType: otpFlow == OtpFlow.signup ? registerOtpType : loginOtpType,
       );
 
       if (!result.isValid) {
@@ -340,7 +391,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       if (otpFlow == OtpFlow.signup) {
         emit(
           state.copyWith(
-            screen: AppScreen.profile,
+            screen: AppScreen.signup,
             isVerifyingOtp: false,
             loginUser: result.user,
             clearAuthError: true,

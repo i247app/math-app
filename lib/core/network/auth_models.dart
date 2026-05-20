@@ -31,6 +31,22 @@ class LoginRequest {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
+class SendOtpRequest {
+  const SendOtpRequest({
+    required this.otpType,
+    required this.identifier,
+  });
+
+  final String otpType;
+  final String identifier;
+
+  factory SendOtpRequest.fromJson(Map<String, dynamic> json) =>
+      _$SendOtpRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SendOtpRequestToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class VerifyOtpRequest {
   const VerifyOtpRequest({
     required this.otpType,
@@ -63,6 +79,7 @@ class AuthResponse {
   final String? status;
   final String? mmessage;
   final String? debug;
+  @JsonKey(name: 'otp_code')
   final String? otpCode;
   final AuthUser? user;
 
@@ -70,6 +87,32 @@ class AuthResponse {
       _$AuthResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$AuthResponseToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class SendOtpResponse {
+  const SendOtpResponse({
+    required this.mstatus,
+    this.expiresAt,
+    this.otpCode,
+    this.otpType,
+    this.status,
+    this.mmessage,
+    this.debug,
+  });
+
+  final int mstatus;
+  final String? expiresAt;
+  final String? otpCode;
+  final String? otpType;
+  final String? status;
+  final String? mmessage;
+  final String? debug;
+
+  factory SendOtpResponse.fromJson(Map<String, dynamic> json) =>
+      _$SendOtpResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SendOtpResponseToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
@@ -109,6 +152,8 @@ class AuthUser {
     this.phone,
     this.avatarUrl,
     this.role,
+    this.createDt,
+    this.modifyDt,
   });
 
   @JsonKey(fromJson: _stringFromJson)
@@ -119,6 +164,8 @@ class AuthUser {
   final String? phone;
   final String? avatarUrl;
   final String? role;
+  final String? createDt;
+  final String? modifyDt;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) =>
       _$AuthUserFromJson(json);
