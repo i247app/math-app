@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 
@@ -21,10 +22,28 @@ class AiAssessmentScreen extends StatefulWidget {
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   int selectedAnswer = 22;
+  bool isGeneratingQuestion = true;
+  Timer? generationTimer;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
   static const _answers = [20, 22, 25, 18];
+
+  @override
+  void initState() {
+    super.initState();
+    generationTimer = Timer(const Duration(milliseconds: 1400), () {
+      if (mounted) {
+        setState(() => isGeneratingQuestion = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    generationTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,33 +74,47 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                       ),
                       Positioned.fill(
                         top: s(80),
-                        bottom: s(97),
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          padding: EdgeInsets.fromLTRB(
-                            s(24),
-                            0,
-                            s(24),
-                            s(24),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _ProgressSection(scale: scale),
-                              SizedBox(height: s(32)),
-                              _QuestionCard(scale: scale),
-                              SizedBox(height: s(32)),
-                              _AnswerGrid(
-                                scale: scale,
-                                answers: _answers,
-                                selectedAnswer: selectedAnswer,
-                                onSelected: (answer) {
-                                  HapticFeedback.selectionClick();
-                                  setState(() => selectedAnswer = answer);
-                                },
-                              ),
-                            ],
-                          ),
+                        bottom: isGeneratingQuestion ? 0 : s(97),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 320),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          child: isGeneratingQuestion
+                              ? _GeneratingQuestionLoader(
+                                  key: const ValueKey('question-loader'),
+                                  scale: scale,
+                                )
+                              : SingleChildScrollView(
+                                  key: const ValueKey('question-content'),
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: EdgeInsets.fromLTRB(
+                                    s(24),
+                                    0,
+                                    s(24),
+                                    s(24),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      _ProgressSection(scale: scale),
+                                      SizedBox(height: s(32)),
+                                      _QuestionCard(scale: scale),
+                                      SizedBox(height: s(32)),
+                                      _AnswerGrid(
+                                        scale: scale,
+                                        answers: _answers,
+                                        selectedAnswer: selectedAnswer,
+                                        onSelected: (answer) {
+                                          HapticFeedback.selectionClick();
+                                          setState(
+                                            () => selectedAnswer = answer,
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
                         ),
                       ),
                       Positioned(
@@ -90,12 +123,13 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                         top: 0,
                         child: _AssessmentHeader(scale: scale),
                       ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: _AssessmentBottomBar(scale: scale),
-                      ),
+                      if (!isGeneratingQuestion)
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: _AssessmentBottomBar(scale: scale),
+                        ),
                     ],
                   ),
                 ),
@@ -259,6 +293,76 @@ class _ProgressSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _GeneratingQuestionLoader extends StatefulWidget {
+  const _GeneratingQuestionLoader({super.key, required this.scale});
+
+  final double scale;
+
+  @override
+  State<_GeneratingQuestionLoader> createState() =>
+      _GeneratingQuestionLoaderState();
+}
+
+class _GeneratingQuestionLoaderState extends State<_GeneratingQuestionLoader>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const letters = ['n', 'u', 'm', 'i', 'n', 'u', 'm', 'i'];
+
+    return Center(
+      child: AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(letters.length, (index) {
+              final delayedProgress =
+                  (controller.value - (index * 0.075)) % 1.0;
+              final lift = delayedProgress <= 0.20
+                  ? -34 *
+                      widget.scale *
+                      math.sin(delayedProgress / 0.20 * math.pi)
+                  : 0.0;
+
+              return Transform.translate(
+                offset: Offset(0, lift),
+                child: Text(
+                  letters[index],
+                  style: TextStyle(
+                    color: _assessmentTeal,
+                    fontFamily: 'Nunito',
+                    fontSize: 40 * widget.scale,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 3 * widget.scale,
+                  ),
+                ),
+              );
+            }),
+          );
+        },
+      ),
     );
   }
 }
