@@ -14,10 +14,12 @@ class HomeScreen extends StatefulWidget {
     super.key,
     required this.user,
     required this.onBack,
+    required this.onLogout,
   });
 
   final LoginUser? user;
   final VoidCallback onBack;
+  final VoidCallback onLogout;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -65,6 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     bodySize: s(11),
                     buttonHeight: s(35),
                   ),
+                  user: widget.user,
+                  onLogout: widget.onLogout,
+                  contentHeight: y(365),
+                  fontSize: s(14),
                 ),
               ),
               if (_activeTab == 0) ...[
@@ -122,15 +128,32 @@ class _TabContent extends StatelessWidget {
   const _TabContent({
     required this.activeTab,
     required this.heroCard,
+    required this.user,
+    required this.onLogout,
+    required this.contentHeight,
+    required this.fontSize,
   });
 
   final int activeTab;
   final Widget heroCard;
+  final LoginUser? user;
+  final VoidCallback onLogout;
+  final double contentHeight;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
     if (activeTab == 0) {
       return heroCard;
+    }
+
+    if (activeTab == 3) {
+      return _AccountTab(
+        user: user,
+        onLogout: onLogout,
+        height: contentHeight,
+        fontSize: fontSize,
+      );
     }
 
     return const SizedBox.shrink();
@@ -423,7 +446,8 @@ class _HeroButton extends StatelessWidget {
             ),
           ),
           SizedBox(width: height * 0.22),
-          Icon(Icons.rocket_launch_outlined, color: Colors.white, size: height * 0.52),
+          Icon(Icons.rocket_launch_outlined,
+              color: Colors.white, size: height * 0.52),
         ],
       ),
     );
@@ -718,6 +742,105 @@ class _NavItem extends StatelessWidget {
                     height: 1,
                     letterSpacing: 0,
                   ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AccountTab extends StatelessWidget {
+  const _AccountTab({
+    required this.user,
+    required this.onLogout,
+    required this.height,
+    required this.fontSize,
+  });
+
+  final LoginUser? user;
+  final VoidCallback onLogout;
+  final double height;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final userName = user?.name?.trim() ?? 'Minh Quân';
+    final userEmail = user?.email?.trim() ?? '';
+    final userPhone = user?.phone?.trim() ?? '';
+
+    return SingleChildScrollView(
+      child: SizedBox(
+        height: height,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFD6C1),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
+              ),
+              child: Icon(
+                Icons.person_rounded,
+                color: const Color(0xFF2A7D75),
+                size: 48,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              userName,
+              style: TextStyle(
+                color: _teal,
+                fontFamily: 'Nunito',
+                fontSize: fontSize + 2,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            if (userPhone.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                userPhone,
+                style: TextStyle(
+                  color: const Color(0xFF8B9995),
+                  fontFamily: 'Nunito',
+                  fontSize: fontSize,
+                ),
+              ),
+            ],
+            if (userEmail.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                userEmail,
+                style: TextStyle(
+                  color: const Color(0xFF8B9995),
+                  fontFamily: 'Nunito',
+                  fontSize: fontSize,
+                ),
+              ),
+            ],
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: onLogout,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _orange,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'ĐĂNG XUẤT',
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
                 ),
               ),
             ),

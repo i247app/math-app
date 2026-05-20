@@ -149,6 +149,9 @@ class _FakeOtpAuthService implements OtpAuthService {
   }
 
   @override
+  Future<LoginUser?> restoreSession() async => null;
+
+  @override
   Future<LoginUser> loginWithPhone(String phone) async {
     if (phone == '0999999999') {
       throw const OtpAuthException('User not found', status: 202);
@@ -204,5 +207,10 @@ class _FakeOtpAuthService implements OtpAuthService {
           ? const LoginUser(id: 'user-1', phone: '0901234567')
           : null,
     );
+  }
+
+  @override
+  Future<void> logout() async {
+    // Fake logout - no-op
   }
 }

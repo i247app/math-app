@@ -12,6 +12,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   cupertino_icons: ^1.0.8
   dio: ^5.9.2
+  flutter_secure_storage: ^9.2.4
   json_annotation: 4.9.0
 
 dev_dependencies:
@@ -30,4 +31,3 @@ flutter:
     - family: Nunito
       fonts:
         - asset: assets/fonts/Nunito-wght.ttf
-

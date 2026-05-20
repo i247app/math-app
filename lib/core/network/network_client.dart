@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/api_config.dart';
 import 'auth_models.dart';
@@ -14,12 +15,43 @@ class NetworkException implements Exception {
   String toString() => message;
 }
 
+abstract class AuthTokenStore {
+  Future<String?> readToken();
+
+  Future<void> writeToken(String token);
+
+  Future<void> clearToken();
+}
+
+class SecureAuthTokenStore implements AuthTokenStore {
+  const SecureAuthTokenStore({
+    FlutterSecureStorage storage = const FlutterSecureStorage(),
+  }) : _storage = storage;
+
+  static const _tokenKey = 'auth_token';
+
+  final FlutterSecureStorage _storage;
+
+  @override
+  Future<String?> readToken() => _storage.read(key: _tokenKey);
+
+  @override
+  Future<void> writeToken(String token) {
+    return _storage.write(key: _tokenKey, value: token);
+  }
+
+  @override
+  Future<void> clearToken() => _storage.delete(key: _tokenKey);
+}
+
 class NetworkClient {
   NetworkClient({
     String? baseUrl,
     Dio? dio,
+    AuthTokenStore? authTokenStore,
   })  : _baseUrl = _normalizeBaseUrl(baseUrl ?? ApiConfig.baseUrl),
-        _dio = dio ?? Dio() {
+        _dio = dio ?? Dio(),
+        _authTokenStore = authTokenStore ?? const SecureAuthTokenStore() {
     _dio.options
       ..baseUrl = _baseUrl
       ..connectTimeout = const Duration(seconds: 15)
@@ -28,6 +60,9 @@ class NetworkClient {
       ..contentType = Headers.jsonContentType
       ..responseType = ResponseType.json
       ..validateStatus = (_) => true;
+    _dio.interceptors.add(
+      _AuthTokenInterceptor(authTokenStore: _authTokenStore),
+    );
     _dio.interceptors.add(
       LogInterceptor(
         requestHeader: true,
@@ -42,6 +77,7 @@ class NetworkClient {
 
   final String _baseUrl;
   final Dio _dio;
+  final AuthTokenStore _authTokenStore;
 
   Future<Map<String, dynamic>> postJson(
     String path,
@@ -55,10 +91,33 @@ class NetworkClient {
     try {
       response = await _dio.post<Object?>(path, data: body);
     } on DioException catch (error) {
-      throw NetworkException(_dioErrorMessage(error));
+      throw NetworkException(
+        _dioErrorMessage(error),
+        status: error.response?.statusCode,
+      );
     }
 
-    return _jsonFromResponse(response);
+    _throwForHttpStatus(response);
+    return _jsonObjectFromResponse(response);
+  }
+
+  Future<Map<String, dynamic>> getJson(String path) async {
+    if (_baseUrl.trim().isEmpty) {
+      throw const NetworkException('Chưa cấu hình API_BASE_URL.');
+    }
+
+    final Response<Object?> response;
+    try {
+      response = await _dio.get<Object?>(path);
+    } on DioException catch (error) {
+      throw NetworkException(
+        _dioErrorMessage(error),
+        status: error.response?.statusCode,
+      );
+    }
+
+    _throwForHttpStatus(response);
+    return _jsonObjectFromResponse(response);
   }
 
   Future<Map<String, dynamic>> postMultipart(
@@ -77,10 +136,44 @@ class NetworkClient {
         options: Options(contentType: Headers.multipartFormDataContentType),
       );
     } on DioException catch (error) {
-      throw NetworkException(_dioErrorMessage(error));
+      throw NetworkException(
+        _dioErrorMessage(error),
+        status: error.response?.statusCode,
+      );
     }
 
-    return _jsonFromResponse(response);
+    _throwForHttpStatus(response);
+    return _jsonObjectFromResponse(response);
+  }
+
+  Future<void> clearAuthToken() => _authTokenStore.clearToken();
+
+  Future<bool> hasAuthToken() async {
+    final token = (await _authTokenStore.readToken())?.trim();
+    return token != null && token.isNotEmpty;
+  }
+
+  static Map<String, dynamic> _jsonObjectFromResponse(
+    Response<Object?> response,
+  ) {
+    final data = response.data;
+    return switch (data) {
+      final Map<String, dynamic> json => json,
+      final Map<Object?, Object?> json => Map<String, dynamic>.from(json),
+      _ => throw const NetworkException('Response từ server không hợp lệ.'),
+    };
+  }
+
+  static void _throwForHttpStatus(Response<Object?> response) {
+    final statusCode = response.statusCode;
+    if (statusCode == null || statusCode < 400) {
+      return;
+    }
+
+    throw NetworkException(
+      _responseErrorMessage(response.data),
+      status: statusCode,
+    );
   }
 
   static String _normalizeBaseUrl(String baseUrl) {
@@ -89,13 +182,22 @@ class NetworkClient {
         : baseUrl;
   }
 
-  static Map<String, dynamic> _jsonFromResponse(Response<Object?> response) {
-    final data = response.data;
-    return switch (data) {
-      final Map<String, dynamic> json => json,
-      final Map<Object?, Object?> json => Map<String, dynamic>.from(json),
-      _ => throw const NetworkException('Response từ server không hợp lệ.'),
-    };
+  static String _responseErrorMessage(Object? data) {
+    if (data case final Map<String, dynamic> json) {
+      final message = json['mmessage'] ?? json['debug'] ?? json['status'];
+      if (message is String && message.trim().isNotEmpty) {
+        return message;
+      }
+    }
+
+    if (data case final Map<Object?, Object?> json) {
+      final message = json['mmessage'] ?? json['debug'] ?? json['status'];
+      if (message is String && message.trim().isNotEmpty) {
+        return message;
+      }
+    }
+
+    return 'Request failed.';
   }
 
   static String _dioErrorMessage(DioException error) {
@@ -115,6 +217,72 @@ class NetworkClient {
       case DioExceptionType.unknown:
         return error.message ?? 'Không kết nối được API.';
     }
+  }
+}
+
+class _AuthTokenInterceptor extends QueuedInterceptor {
+  _AuthTokenInterceptor({required AuthTokenStore authTokenStore})
+      : _authTokenStore = authTokenStore;
+
+  static const _authTokenHeader = 'X-Auth-Token';
+  static const _authorizationHeader = 'Authorization';
+
+  final AuthTokenStore _authTokenStore;
+
+  @override
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    if (!_hasHeader(options.headers, _authorizationHeader)) {
+      final token = (await _authTokenStore.readToken())?.trim();
+      if (token != null && token.isNotEmpty) {
+        options.headers[_authorizationHeader] = 'Bearer $token';
+      }
+    }
+
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) async {
+    await _storeTokenFromHeaders(response.headers);
+    handler.next(response);
+  }
+
+  @override
+  void onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final response = err.response;
+    if (response != null) {
+      await _storeTokenFromHeaders(response.headers);
+    }
+
+    handler.next(err);
+  }
+
+  Future<void> _storeTokenFromHeaders(Headers headers) async {
+    for (final entry in headers.map.entries) {
+      if (entry.key.toLowerCase() != _authTokenHeader.toLowerCase()) {
+        continue;
+      }
+
+      final firstValue = entry.value.isEmpty ? null : entry.value.first;
+      final token = firstValue?.trim();
+      if (token != null && token.isNotEmpty) {
+        await _authTokenStore.writeToken(token);
+      }
+      return;
+    }
+  }
+
+  static bool _hasHeader(Map<String, dynamic> headers, String name) {
+    return headers.keys.any((key) => key.toLowerCase() == name.toLowerCase());
   }
 }
 
@@ -199,6 +367,16 @@ class NetworkApi {
     return verifyResponse;
   }
 
+  Future<AuthUser> getCurrentUser() async {
+    final responseJson = await _networkClient.postJson('/users/me', {});
+    final userJson = _currentUserJson(responseJson);
+    return AuthUser.fromJson(userJson);
+  }
+
+  Future<void> clearAuthToken() => _networkClient.clearAuthToken();
+
+  Future<bool> hasAuthToken() => _networkClient.hasAuthToken();
+
   Future<AuthResponse> _post(String path, Map<String, dynamic> body) async {
     final responseJson = await _networkClient.postJson(path, body);
     final authResponse = AuthResponse.fromJson(responseJson);
@@ -213,5 +391,46 @@ class NetworkApi {
     }
 
     return authResponse;
+  }
+
+  static Map<String, dynamic> _currentUserJson(Map<String, dynamic> json) {
+    final mstatus = json['mstatus'];
+    if (mstatus is int && mstatus != 200) {
+      throw NetworkException(
+        _apiErrorMessage(json),
+        status: mstatus,
+      );
+    }
+
+    final data = json['data'];
+    final user = json['user'] ?? _nestedUser(data) ?? data;
+    if (user case final Map<String, dynamic> userJson) {
+      return userJson;
+    }
+    if (user case final Map<Object?, Object?> userJson) {
+      return Map<String, dynamic>.from(userJson);
+    }
+
+    return json;
+  }
+
+  static Object? _nestedUser(Object? data) {
+    if (data case final Map<String, dynamic> dataJson) {
+      return dataJson['user'];
+    }
+    if (data case final Map<Object?, Object?> dataJson) {
+      return dataJson['user'];
+    }
+
+    return null;
+  }
+
+  static String _apiErrorMessage(Map<String, dynamic> json) {
+    final message = json['mmessage'] ?? json['debug'] ?? json['status'];
+    if (message is String && message.trim().isNotEmpty) {
+      return message;
+    }
+
+    return 'Request failed.';
   }
 }

@@ -174,6 +174,50 @@ class ProgressDots extends StatelessWidget {
   }
 }
 
+class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({
+    super.key,
+    this.message = 'Đang tải...',
+  });
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenFrame(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const BrandMark(compact: true),
+            const SizedBox(height: 28),
+            const SizedBox(
+              width: 38,
+              height: 38,
+              child: CircularProgressIndicator(
+                strokeWidth: 4,
+                color: AppColors.teal,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.muted,
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class BrandMark extends StatelessWidget {
   const BrandMark({super.key, this.compact = false});
 
