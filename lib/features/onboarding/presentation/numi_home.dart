@@ -232,7 +232,11 @@ class _NumiHomeState extends State<NumiHome> {
                       AppScreen.signup => SignupScreen(
                           key: const ValueKey('signup'),
                           onBack: cubit.openOtp,
-                          onContinue: () => HapticFeedback.mediumImpact(),
+                          isSigningUp: state.isSigningUp,
+                          onContinue: (name, email) {
+                            HapticFeedback.mediumImpact();
+                            cubit.submitSignup(name: name, email: email);
+                          },
                         ),
                       AppScreen.home => HomeScreen(
                           key: const ValueKey('home'),

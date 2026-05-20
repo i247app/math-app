@@ -121,6 +121,13 @@ abstract class OtpAuthService {
 
   Future<LoginUser> loginWithPhone(String phone);
 
+  Future<LoginUser> signupWithPhone({
+    required String phone,
+    required String name,
+    String? email,
+    String? avatarPath,
+  });
+
   Future<SendOtpResult> sendLoginOtp(String phone);
 
   Future<SendOtpResult> sendRegisterOtp(String phone);
@@ -246,6 +253,37 @@ class OtpAuthApi implements OtpAuthService {
   }
 
   @override
+  Future<LoginUser> signupWithPhone({
+    required String phone,
+    required String name,
+    String? email,
+    String? avatarPath,
+  }) async {
+    final AuthResponse response;
+    try {
+      response = await _networkApi.signup(
+        SignupRequest(
+          phone: phone,
+          name: name,
+          email: email,
+        ),
+        avatarPath: avatarPath,
+      );
+    } on NetworkException catch (error) {
+      throw OtpAuthException(error.message, status: error.status);
+    }
+
+    final user = _signupUserFromResponse(
+      response,
+      fallbackPhone: phone,
+      fallbackName: name,
+      fallbackEmail: email,
+    );
+    _loginUsers[phone] = user;
+    return user;
+  }
+
+  @override
   Future<VerifyOtpResult> verifyLoginOtp({
     required String phone,
     required String otpCode,
@@ -289,5 +327,26 @@ class OtpAuthApi implements OtpAuthService {
 
     final seconds = parsed.toUtc().difference(DateTime.now().toUtc()).inSeconds;
     return seconds < 0 ? 0 : seconds;
+  }
+
+  static LoginUser _signupUserFromResponse(
+    AuthResponse response, {
+    required String fallbackPhone,
+    required String fallbackName,
+    String? fallbackEmail,
+  }) {
+    final user = response.user;
+    final profile = response.profile;
+
+    return LoginUser(
+      id: user?.userId ?? user?.id ?? profile?.userId ?? fallbackPhone,
+      email: user?.email ?? fallbackEmail,
+      name: profile?.name ?? user?.name ?? fallbackName,
+      phone: user?.phone ?? fallbackPhone,
+      avatarUrl: profile?.avatarUrl ?? user?.avatarUrl,
+      role: user?.role,
+      createDt: user?.createDt ?? profile?.createDt,
+      modifyDt: user?.modifyDt ?? profile?.modifyDt,
+    );
   }
 }

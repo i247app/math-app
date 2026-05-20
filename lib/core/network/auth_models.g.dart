@@ -10,6 +10,7 @@ SignupRequest _$SignupRequestFromJson(Map<String, dynamic> json) =>
     SignupRequest(
       phone: json['phone'] as String,
       email: json['email'] as String?,
+      name: json['name'] as String?,
     );
 
 Map<String, dynamic> _$SignupRequestToJson(SignupRequest instance) {
@@ -24,6 +25,7 @@ Map<String, dynamic> _$SignupRequestToJson(SignupRequest instance) {
   }
 
   writeNotNull('email', instance.email);
+  writeNotNull('name', instance.name);
   return val;
 }
 
@@ -71,6 +73,9 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) => AuthResponse(
       user: json['user'] == null
           ? null
           : AuthUser.fromJson(json['user'] as Map<String, dynamic>),
+      profile: json['profile'] == null
+          ? null
+          : AuthProfile.fromJson(json['profile'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
@@ -81,6 +86,7 @@ Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
       'debug': instance.debug,
       'otp_code': instance.otpCode,
       'user': instance.user?.toJson(),
+      'profile': instance.profile?.toJson(),
     };
 
 SendOtpResponse _$SendOtpResponseFromJson(Map<String, dynamic> json) =>
@@ -127,6 +133,27 @@ Map<String, dynamic> _$VerifyOtpResponseToJson(VerifyOtpResponse instance) =>
       'debug': instance.debug,
       'user': instance.user?.toJson(),
       'verified': instance.verified,
+    };
+
+AuthProfile _$AuthProfileFromJson(Map<String, dynamic> json) => AuthProfile(
+      id: AuthUser._stringFromJson(json['id']),
+      profileId: json['profile_id'] as String?,
+      userId: json['user_id'] as String?,
+      name: json['name'] as String?,
+      avatarUrl: json['avatar_url'] as String?,
+      createDt: json['create_dt'] as String?,
+      modifyDt: json['modify_dt'] as String?,
+    );
+
+Map<String, dynamic> _$AuthProfileToJson(AuthProfile instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'profile_id': instance.profileId,
+      'user_id': instance.userId,
+      'name': instance.name,
+      'avatar_url': instance.avatarUrl,
+      'create_dt': instance.createDt,
+      'modify_dt': instance.modifyDt,
     };
 
 AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => AuthUser(

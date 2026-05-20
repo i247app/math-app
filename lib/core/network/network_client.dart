@@ -58,18 +58,44 @@ class NetworkClient {
       throw NetworkException(_dioErrorMessage(error));
     }
 
-    final data = response.data;
-    return switch (data) {
-      final Map<String, dynamic> json => json,
-      final Map<Object?, Object?> json => Map<String, dynamic>.from(json),
-      _ => throw const NetworkException('Response từ server không hợp lệ.'),
-    };
+    return _jsonFromResponse(response);
+  }
+
+  Future<Map<String, dynamic>> postMultipart(
+    String path,
+    FormData formData,
+  ) async {
+    if (_baseUrl.trim().isEmpty) {
+      throw const NetworkException('Chưa cấu hình API_BASE_URL.');
+    }
+
+    final Response<Object?> response;
+    try {
+      response = await _dio.post<Object?>(
+        path,
+        data: formData,
+        options: Options(contentType: Headers.multipartFormDataContentType),
+      );
+    } on DioException catch (error) {
+      throw NetworkException(_dioErrorMessage(error));
+    }
+
+    return _jsonFromResponse(response);
   }
 
   static String _normalizeBaseUrl(String baseUrl) {
     return baseUrl.endsWith('/')
         ? baseUrl.substring(0, baseUrl.length - 1)
         : baseUrl;
+  }
+
+  static Map<String, dynamic> _jsonFromResponse(Response<Object?> response) {
+    final data = response.data;
+    return switch (data) {
+      final Map<String, dynamic> json => json,
+      final Map<Object?, Object?> json => Map<String, dynamic>.from(json),
+      _ => throw const NetworkException('Response từ server không hợp lệ.'),
+    };
   }
 
   static String _dioErrorMessage(DioException error) {
@@ -101,8 +127,34 @@ class NetworkApi {
 
   final NetworkClient _networkClient;
 
-  Future<AuthResponse> signup(SignupRequest request) {
-    return _post('/users/create', request.toJson());
+  Future<AuthResponse> signup(
+    SignupRequest request, {
+    String? avatarPath,
+  }) async {
+    final formData = FormData.fromMap({
+      'metadata': '{}',
+      'phone': request.phone,
+      if (request.email?.isNotEmpty == true) 'email': request.email,
+      if (request.name?.isNotEmpty == true) 'name': request.name,
+      if (avatarPath?.isNotEmpty == true)
+        'avatar': await MultipartFile.fromFile(avatarPath!),
+    });
+    final responseJson = await _networkClient.postMultipart(
+      '/users/create',
+      formData,
+    );
+    final authResponse = AuthResponse.fromJson(responseJson);
+    if (authResponse.mstatus != 200) {
+      throw NetworkException(
+        authResponse.mmessage ??
+            authResponse.debug ??
+            authResponse.status ??
+            'Request failed.',
+        status: authResponse.mstatus,
+      );
+    }
+
+    return authResponse;
   }
 
   Future<AuthResponse> authOtp(LoginRequest request) {

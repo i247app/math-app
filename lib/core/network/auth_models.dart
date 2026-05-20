@@ -7,10 +7,12 @@ class SignupRequest {
   const SignupRequest({
     required this.phone,
     this.email,
+    this.name,
   });
 
   final String phone;
   final String? email;
+  final String? name;
 
   factory SignupRequest.fromJson(Map<String, dynamic> json) =>
       _$SignupRequestFromJson(json);
@@ -73,6 +75,7 @@ class AuthResponse {
     this.debug,
     this.otpCode,
     this.user,
+    this.profile,
   });
 
   final int mstatus;
@@ -82,6 +85,7 @@ class AuthResponse {
   @JsonKey(name: 'otp_code')
   final String? otpCode;
   final AuthUser? user;
+  final AuthProfile? profile;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) =>
       _$AuthResponseFromJson(json);
@@ -140,6 +144,33 @@ class VerifyOtpResponse {
       _$VerifyOtpResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$VerifyOtpResponseToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class AuthProfile {
+  const AuthProfile({
+    this.id,
+    this.profileId,
+    this.userId,
+    this.name,
+    this.avatarUrl,
+    this.createDt,
+    this.modifyDt,
+  });
+
+  @JsonKey(fromJson: AuthUser._stringFromJson)
+  final String? id;
+  final String? profileId;
+  final String? userId;
+  final String? name;
+  final String? avatarUrl;
+  final String? createDt;
+  final String? modifyDt;
+
+  factory AuthProfile.fromJson(Map<String, dynamic> json) =>
+      _$AuthProfileFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AuthProfileToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)

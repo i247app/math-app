@@ -12,10 +12,12 @@ class SignupScreen extends StatefulWidget {
     super.key,
     required this.onBack,
     required this.onContinue,
+    required this.isSigningUp,
   });
 
   final VoidCallback onBack;
-  final VoidCallback onContinue;
+  final void Function(String name, String? email) onContinue;
+  final bool isSigningUp;
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -143,16 +145,27 @@ class _SignupScreenState extends State<SignupScreen> {
                           ],
                         ),
                         child: TextButton(
-                          onPressed: widget.onContinue,
+                          onPressed: widget.isSigningUp
+                              ? null
+                              : () {
+                                  FocusManager.instance.primaryFocus
+                                      ?.unfocus();
+                                  widget.onContinue(
+                                    usernameController.text,
+                                    emailController.text,
+                                  );
+                                },
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             ),
                           ),
-                          child: const Text(
-                            'Tiếp Tục  →',
-                            style: TextStyle(
+                          child: Text(
+                            widget.isSigningUp
+                                ? 'Đang đăng ký...'
+                                : 'Tiếp Tục  →',
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 0,

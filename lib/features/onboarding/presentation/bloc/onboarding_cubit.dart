@@ -34,6 +34,7 @@ class OnboardingState {
     this.phoneLookupUser,
     this.isSendingOtp = false,
     this.isVerifyingOtp = false,
+    this.isSigningUp = false,
     this.otpExpiresIn,
     this.devOtpCode,
     this.devOtpPurpose,
@@ -57,6 +58,7 @@ class OnboardingState {
   final LoginUser? phoneLookupUser;
   final bool isSendingOtp;
   final bool isVerifyingOtp;
+  final bool isSigningUp;
   final int? otpExpiresIn;
   final String? devOtpCode;
   final String? devOtpPurpose;
@@ -80,6 +82,7 @@ class OnboardingState {
     LoginUser? phoneLookupUser,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
+    bool? isSigningUp,
     int? otpExpiresIn,
     String? devOtpCode,
     String? devOtpPurpose,
@@ -108,6 +111,7 @@ class OnboardingState {
           clearPhoneLookup ? null : phoneLookupUser ?? this.phoneLookupUser,
       isSendingOtp: isSendingOtp ?? this.isSendingOtp,
       isVerifyingOtp: isVerifyingOtp ?? this.isVerifyingOtp,
+      isSigningUp: isSigningUp ?? this.isSigningUp,
       otpExpiresIn: otpExpiresIn ?? this.otpExpiresIn,
       devOtpCode: clearDevOtp ? null : devOtpCode ?? this.devOtpCode,
       devOtpPurpose: clearDevOtp ? null : devOtpPurpose ?? this.devOtpPurpose,
@@ -430,6 +434,56 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         state.copyWith(
           isVerifyingOtp: false,
           authError: 'Không thể xác thực OTP. Vui lòng thử lại.',
+        ),
+      );
+    }
+  }
+
+  Future<void> submitSignup({
+    required String name,
+    String? email,
+  }) async {
+    final phone = state.phoneNumber;
+    final trimmedName = name.trim();
+    final trimmedEmail = email?.trim();
+    if (state.isSigningUp || phone == null) {
+      return;
+    }
+
+    if (trimmedName.isEmpty) {
+      emit(state.copyWith(authError: 'Vui lòng nhập tên của bé.'));
+      return;
+    }
+
+    emit(state.copyWith(isSigningUp: true, clearAuthError: true));
+
+    try {
+      final user = await _authService.signupWithPhone(
+        phone: phone,
+        name: trimmedName,
+        email: trimmedEmail?.isEmpty == true ? null : trimmedEmail,
+        avatarPath: state.avatarPath,
+      );
+      emit(
+        state.copyWith(
+          screen: AppScreen.home,
+          isSigningUp: false,
+          loginUser: user,
+          clearAuthError: true,
+        ),
+      );
+    } on OtpAuthException catch (error) {
+      emit(
+        state.copyWith(
+          isSigningUp: false,
+          authError: error.message,
+        ),
+      );
+    } catch (_) {
+      emit(
+        state.copyWith(
+          isSigningUp: false,
+          authError: 'Không thể đăng ký. Vui lòng thử lại.',
         ),
       );
     }

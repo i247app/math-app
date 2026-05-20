@@ -158,6 +158,21 @@ class _FakeOtpAuthService implements OtpAuthService {
   }
 
   @override
+  Future<LoginUser> signupWithPhone({
+    required String phone,
+    required String name,
+    String? email,
+    String? avatarPath,
+  }) async {
+    return LoginUser(
+      id: 'user-register-1',
+      name: name,
+      phone: phone,
+      email: email,
+    );
+  }
+
+  @override
   Future<SendOtpResult> sendLoginOtp(String phone) async {
     return const SendOtpResult(
       expiresIn: 180,
