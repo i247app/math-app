@@ -321,27 +321,39 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     emit(state.copyWith(isVerifyingOtp: true, clearAuthError: true));
 
     try {
-      if (state.otpFlow == OtpFlow.signup) {
+      final otpFlow = state.otpFlow;
+      final result = await _authService.verifyLoginOtp(
+        phone: phone,
+        otpCode: otpCode,
+      );
+
+      if (!result.isValid) {
+        emit(
+          state.copyWith(
+            isVerifyingOtp: false,
+            authError: result.message ?? 'OTP không hợp lệ.',
+          ),
+        );
+        return;
+      }
+
+      if (otpFlow == OtpFlow.signup) {
         emit(
           state.copyWith(
             screen: AppScreen.profile,
             isVerifyingOtp: false,
+            loginUser: result.user,
             clearAuthError: true,
           ),
         );
         return;
       }
 
-      final result = await _authService.verifyLoginOtp(
-        phone: phone,
-        otpCode: otpCode,
-      );
-
-      if (!result.isValid || result.user == null) {
+      if (result.user == null) {
         emit(
           state.copyWith(
             isVerifyingOtp: false,
-            authError: result.message ?? 'OTP không hợp lệ.',
+            authError: 'Response OTP thiếu thông tin user.',
           ),
         );
         return;

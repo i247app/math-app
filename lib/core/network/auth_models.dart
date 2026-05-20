@@ -30,6 +30,24 @@ class LoginRequest {
   Map<String, dynamic> toJson() => _$LoginRequestToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
+class VerifyOtpRequest {
+  const VerifyOtpRequest({
+    required this.otpType,
+    required this.identifier,
+    required this.otpCode,
+  });
+
+  final String otpType;
+  final String identifier;
+  final String otpCode;
+
+  factory VerifyOtpRequest.fromJson(Map<String, dynamic> json) =>
+      _$VerifyOtpRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$VerifyOtpRequestToJson(this);
+}
+
 @JsonSerializable(explicitToJson: true)
 class AuthResponse {
   const AuthResponse({
@@ -52,6 +70,33 @@ class AuthResponse {
       _$AuthResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$AuthResponseToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class VerifyOtpResponse {
+  const VerifyOtpResponse({
+    required this.mstatus,
+    this.otpType,
+    this.status,
+    this.mmessage,
+    this.debug,
+    this.user,
+    this.verified = false,
+  });
+
+  final int mstatus;
+  final String? otpType;
+  final String? status;
+  final String? mmessage;
+  final String? debug;
+  final AuthUser? user;
+  @JsonKey(defaultValue: false)
+  final bool verified;
+
+  factory VerifyOtpResponse.fromJson(Map<String, dynamic> json) =>
+      _$VerifyOtpResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$VerifyOtpResponseToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)

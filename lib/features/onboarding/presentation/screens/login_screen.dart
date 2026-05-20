@@ -41,67 +41,71 @@ class LoginScreen extends StatelessWidget {
     final compact = height < 760;
     final tight = width < 370;
 
-    return ScreenFrame(
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              CircleIconButton(
-                icon: Icons.arrow_back_rounded,
-                onPressed: onBack,
-              ),
-              const Spacer(),
-              const ProgressDots(activeIndex: 1),
-            ],
-          ),
-          SizedBox(height: compact ? 64 : 98),
-          RichText(
-            text: TextSpan(
-              style: TextStyle(
-                color: AppColors.ink,
-                fontSize: tight ? 30 : 34,
-                height: 1.04,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0,
-              ),
-              children: const [
-                TextSpan(text: 'Xác minh '),
-                TextSpan(
-                  text: 'tài khoản',
-                  style: TextStyle(color: AppColors.teal),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: ScreenFrame(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                CircleIconButton(
+                  icon: Icons.arrow_back_rounded,
+                  onPressed: onBack,
                 ),
+                const Spacer(),
+                const ProgressDots(activeIndex: 1),
               ],
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Vui lòng nhập số điện thoại để tiếp tục hành trình học tập cùng Numi.',
-            style: TextStyle(
-              color: AppColors.muted,
-              fontSize: tight ? 15 : 16,
-              height: 1.42,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0,
+            SizedBox(height: compact ? 64 : 98),
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: AppColors.ink,
+                  fontSize: tight ? 30 : 34,
+                  height: 1.04,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+                children: const [
+                  TextSpan(text: 'Xác minh '),
+                  TextSpan(
+                    text: 'tài khoản',
+                    style: TextStyle(color: AppColors.teal),
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: compact ? 26 : 30),
-          LoginCard(
-            controller: controller,
-            region: region,
-            onRegionChanged: onRegionChanged,
-            onSendOtp: onSendOtp,
-            isSendingOtp: isSendingOtp,
-            isCheckingAuthPhone: isCheckingAuthPhone,
-            canSendOtp: canSendOtp,
-            onPhoneChanged: onPhoneChanged,
-            phoneExists: phoneExists,
-            phoneErrorText: phoneErrorText,
-          ),
-          const SizedBox(height: 28),
-        ],
+            const SizedBox(height: 12),
+            Text(
+              'Vui lòng nhập số điện thoại để tiếp tục hành trình học tập cùng Numi.',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontSize: tight ? 15 : 16,
+                height: 1.42,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0,
+              ),
+            ),
+            SizedBox(height: compact ? 26 : 30),
+            LoginCard(
+              controller: controller,
+              region: region,
+              onRegionChanged: onRegionChanged,
+              onSendOtp: onSendOtp,
+              isSendingOtp: isSendingOtp,
+              isCheckingAuthPhone: isCheckingAuthPhone,
+              canSendOtp: canSendOtp,
+              onPhoneChanged: onPhoneChanged,
+              phoneExists: phoneExists,
+              phoneErrorText: phoneErrorText,
+            ),
+            const SizedBox(height: 28),
+          ],
+        ),
       ),
     );
   }

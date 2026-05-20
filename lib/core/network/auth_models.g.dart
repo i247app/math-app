@@ -36,6 +36,20 @@ Map<String, dynamic> _$LoginRequestToJson(LoginRequest instance) =>
       'phone': instance.phone,
     };
 
+VerifyOtpRequest _$VerifyOtpRequestFromJson(Map<String, dynamic> json) =>
+    VerifyOtpRequest(
+      otpType: json['otp_type'] as String,
+      identifier: json['identifier'] as String,
+      otpCode: json['otp_code'] as String,
+    );
+
+Map<String, dynamic> _$VerifyOtpRequestToJson(VerifyOtpRequest instance) =>
+    <String, dynamic>{
+      'otp_type': instance.otpType,
+      'identifier': instance.identifier,
+      'otp_code': instance.otpCode,
+    };
+
 AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) => AuthResponse(
       mstatus: (json['mstatus'] as num).toInt(),
       status: json['status'] as String?,
@@ -55,6 +69,30 @@ Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
       'debug': instance.debug,
       'otpCode': instance.otpCode,
       'user': instance.user?.toJson(),
+    };
+
+VerifyOtpResponse _$VerifyOtpResponseFromJson(Map<String, dynamic> json) =>
+    VerifyOtpResponse(
+      mstatus: (json['mstatus'] as num).toInt(),
+      otpType: json['otp_type'] as String?,
+      status: json['status'] as String?,
+      mmessage: json['mmessage'] as String?,
+      debug: json['debug'] as String?,
+      user: json['user'] == null
+          ? null
+          : AuthUser.fromJson(json['user'] as Map<String, dynamic>),
+      verified: json['verified'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$VerifyOtpResponseToJson(VerifyOtpResponse instance) =>
+    <String, dynamic>{
+      'mstatus': instance.mstatus,
+      'otp_type': instance.otpType,
+      'status': instance.status,
+      'mmessage': instance.mmessage,
+      'debug': instance.debug,
+      'user': instance.user?.toJson(),
+      'verified': instance.verified,
     };
 
 AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => AuthUser(
