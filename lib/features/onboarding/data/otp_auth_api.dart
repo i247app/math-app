@@ -55,11 +55,19 @@ class AuthPhoneLookupResult {
     required this.phone,
     required this.exists,
     this.user,
+    this.otpCode,
+    this.purpose,
+    this.expiresIn,
+    this.message,
   });
 
   final String phone;
   final bool exists;
   final LoginUser? user;
+  final String? otpCode;
+  final String? purpose;
+  final int? expiresIn;
+  final String? message;
 }
 
 extension on AuthUser {
@@ -140,7 +148,7 @@ class OtpAuthApi implements OtpAuthService {
     try {
       response = await _networkApi.authOtp(LoginRequest(phone: phone));
     } on NetworkException catch (error) {
-      if (error.status == 202 || error.status == 4006) {
+      if (error.status == 202) {
         _pendingOtpCodes.remove(phone);
         _loginUsers.remove(phone);
         return AuthPhoneLookupResult(phone: phone, exists: false);
@@ -154,8 +162,18 @@ class OtpAuthApi implements OtpAuthService {
       throw const OtpAuthException('Response OTP thiếu thông tin user.');
     }
 
+    final otpCode = response.otpCode ?? _localOtpCode;
     _loginUsers[phone] = user;
-    return AuthPhoneLookupResult(phone: phone, exists: true, user: user);
+    _pendingOtpCodes[phone] = otpCode;
+    return AuthPhoneLookupResult(
+      phone: phone,
+      exists: true,
+      user: user,
+      otpCode: otpCode,
+      purpose: 'login',
+      expiresIn: 180,
+      message: response.status,
+    );
   }
 
   @override

@@ -189,12 +189,21 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
       emit(
         state.copyWith(
+          screen: result.exists ? AppScreen.otp : state.screen,
           phoneNumber: phone,
           checkedPhone: phone,
           isCheckingAuthPhone: false,
           phoneExists: result.exists,
           phoneLookupUser: result.user,
+          otpExpiresIn: result.expiresIn,
+          devOtpCode: result.otpCode,
+          devOtpPurpose: result.purpose,
+          otpPreviewId: result.otpCode == null
+              ? state.otpPreviewId
+              : state.otpPreviewId + 1,
+          otpFlow: OtpFlow.login,
           clearAuthError: true,
+          clearDevOtp: result.otpCode == null,
         ),
       );
     } on OtpAuthException catch (error) {
@@ -259,7 +268,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         ),
       );
     } on OtpAuthException catch (error) {
-      if (error.status == 202 || error.status == 4006) {
+      if (error.status == 202) {
         emit(
           state.copyWith(
             screen: AppScreen.signupPrompt,

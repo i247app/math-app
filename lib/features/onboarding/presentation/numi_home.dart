@@ -122,36 +122,41 @@ class _NumiHomeState extends State<NumiHome> {
         child: Scaffold(
           resizeToAvoidBottomInset: true,
           body: AppBackground(
-            child: SafeArea(
-              child: BlocConsumer<OnboardingCubit, OnboardingState>(
-                listenWhen: (previous, current) {
-                  final hasNewError = previous.authError != current.authError &&
-                      current.authError != null;
-                  final hasNewDevOtp =
-                      previous.otpPreviewId != current.otpPreviewId &&
-                          current.devOtpCode != null;
+            child: BlocConsumer<OnboardingCubit, OnboardingState>(
+              listenWhen: (previous, current) {
+                final hasNewError = previous.authError != current.authError &&
+                    current.authError != null;
+                final hasNewDevOtp =
+                    previous.otpPreviewId != current.otpPreviewId &&
+                        current.devOtpCode != null;
 
-                  return hasNewError || hasNewDevOtp;
-                },
-                listener: (context, state) {
-                  final authError = state.authError;
-                  if (authError != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(authError)),
-                    );
-                  }
+                return hasNewError || hasNewDevOtp;
+              },
+              listener: (context, state) {
+                final authError = state.authError;
+                if (authError != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(authError)),
+                  );
+                }
 
-                  showDevOtpDialog(state);
-                },
-                builder: (context, state) {
-                  final cubit = context.read<OnboardingCubit>();
-                  final phoneComplete =
-                      _phoneDigits.length >= state.phoneRegion.maxDigits;
-                  final phoneErrorText = _phoneHasInput && !phoneComplete
-                      ? 'Số điện thoại chưa đủ ký tự.'
-                      : null;
+                showDevOtpDialog(state);
+              },
+              builder: (context, state) {
+                final cubit = context.read<OnboardingCubit>();
+                final phoneComplete =
+                    _phoneDigits.length >= state.phoneRegion.maxDigits;
+                final phoneErrorText = _phoneHasInput && !phoneComplete
+                    ? 'Số điện thoại chưa đủ ký tự.'
+                    : null;
+                final useSafeArea = state.screen != AppScreen.welcome;
 
-                  return AnimatedSwitcher(
+                return SafeArea(
+                  top: useSafeArea,
+                  bottom: useSafeArea,
+                  left: useSafeArea,
+                  right: useSafeArea,
+                  child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 340),
                     switchInCurve: Curves.easeOutCubic,
                     switchOutCurve: Curves.easeInCubic,
@@ -233,9 +238,9 @@ class _NumiHomeState extends State<NumiHome> {
                           onBack: cubit.openLogin,
                         ),
                     },
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ),

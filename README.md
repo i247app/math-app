@@ -7,10 +7,23 @@ Flutter source for the NUMI onboarding and phone verification flow.
 Install Flutter first, then run:
 
 ```bash
-cd numi_flutter
-flutter create --platforms=ios,android .
+make setup
+make run
+```
+
+Without `make`, run the equivalent commands from the repository root:
+
+```bash
+cp env.example .env
 flutter pub get
+dart run build_runner build --delete-conflicting-outputs
 flutter run
+```
+
+If platform folders need to be regenerated:
+
+```bash
+make create-platforms
 ```
 
 For Xcode:
