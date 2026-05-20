@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
+import 'assessment_screen.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
@@ -489,7 +490,16 @@ class _TestHeroCard extends StatelessWidget {
           ),
           Positioned(
             bottom: 28 * scale,
-            child: _HeroButton(scale: scale),
+            child: _HeroButton(
+              scale: scale,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const AiAssessmentScreen(),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -616,41 +626,67 @@ class _EquationChip extends StatelessWidget {
   }
 }
 
-class _HeroButton extends StatelessWidget {
-  const _HeroButton({required this.scale});
+class _HeroButton extends StatefulWidget {
+  const _HeroButton({required this.scale, required this.onTap});
 
   final double scale;
+  final VoidCallback onTap;
+
+  @override
+  State<_HeroButton> createState() => _HeroButtonState();
+}
+
+class _HeroButtonState extends State<_HeroButton> {
+  bool pressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final height = 42 * scale;
+    final height = 42 * widget.scale;
+    final depth = 6 * widget.scale;
+    final pressOffset = pressed ? depth : 0.0;
 
     return GestureDetector(
-      onTap: HapticFeedback.mediumImpact,
+      onTapDown: (_) => setState(() => pressed = true),
+      onTapCancel: () => setState(() => pressed = false),
+      onTapUp: (_) => setState(() => pressed = false),
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        widget.onTap();
+      },
       child: SizedBox(
-        height: height + 8 * scale,
+        height: height + 8 * widget.scale,
         child: Stack(
           clipBehavior: Clip.none,
           children: [
             Positioned.fill(
-              top: 6 * scale,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF621C00),
-                  borderRadius: BorderRadius.circular(999),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFA03A0F).withValues(alpha: 0.34),
-                      blurRadius: 18 * scale,
-                      offset: Offset(0, 12 * scale),
-                    ),
-                  ],
+              top: depth,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 90),
+                opacity: pressed ? 0.25 : 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF621C00),
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFA03A0F).withValues(alpha: 0.34),
+                        blurRadius: 18 * widget.scale,
+                        offset: Offset(0, 12 * widget.scale),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            Container(
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 90),
+              curve: Curves.easeOutCubic,
+              transform: Matrix4.translationValues(0, pressOffset, 0),
               height: height,
-              padding: EdgeInsets.only(left: 18 * scale, right: 14 * scale),
+              padding: EdgeInsets.only(
+                left: 18 * widget.scale,
+                right: 14 * widget.scale,
+              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(999),
                 gradient: const LinearGradient(
@@ -660,9 +696,10 @@ class _HeroButton extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.45),
+                    color:
+                        Colors.white.withValues(alpha: pressed ? 0.22 : 0.45),
                     blurRadius: 1,
-                    offset: Offset(0, 1 * scale),
+                    offset: Offset(0, 1 * widget.scale),
                   ),
                 ],
               ),
@@ -674,19 +711,34 @@ class _HeroButton extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'Nunito',
-                      fontSize: 17 * scale,
+                      fontSize: 17 * widget.scale,
                       fontWeight: FontWeight.w900,
                       height: 1,
                       letterSpacing: 0,
                     ),
                   ),
-                  SizedBox(width: 10 * scale),
+                  SizedBox(width: 10 * widget.scale),
                   Icon(
                     Icons.rocket_launch_outlined,
                     color: Colors.white,
-                    size: 21 * scale,
+                    size: 21 * widget.scale,
                   ),
                 ],
+              ),
+            ),
+            Positioned.fill(
+              top: depth,
+              child: IgnorePointer(
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 90),
+                  opacity: pressed ? 0.16 : 0,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
