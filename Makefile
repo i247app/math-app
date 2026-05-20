@@ -1,53 +1,53 @@
-.PHONY: help setup env pub-get run analyze format generate models create-model test clean doctor create-platforms
+.PHONY: build project pods pub clean
 
-help:
-	@echo "NUMI Flutter app commands"
-	@echo ""
-	@echo "Setup:"
-	@echo "  make setup             Create .env, install packages, generate models"
-	@echo "  make env               Copy env.example to .env if .env is missing"
-	@echo "  make pub-get           Run flutter pub get"
-	@echo "  make generate          Run build_runner for generated Dart models"
-	@echo "  make models            Alias for make generate"
-	@echo "  make create-model      Alias for make generate"
-	@echo ""
-	@echo "Development:"
-	@echo "  make run               Run the app"
-	@echo "  make analyze           Run flutter analyze"
-	@echo "  make format            Format lib and test"
-	@echo "  make test              Run flutter test"
-	@echo "  make clean             Run flutter clean"
-	@echo "  make doctor            Run flutter doctor"
-	@echo "  make create-platforms  Regenerate iOS/Android platform folders"
+# linux and macos based Makefile
 
-setup: env pub-get generate
+apk-debug: project
+	flutter build apk --debug
 
-env:
-	@if [ ! -f .env ]; then cp env.example .env && echo "Created .env from env.example"; else echo ".env already exists"; fi
+apk-release: project
+	flutter build apk --release
 
-pub-get:
-	flutter pub get
+release-android: project
+	flutter build appbundle --release
 
-run:
-	flutter run
+release-ios:    project
+	flutter build ios --release 
 
-analyze:
-	flutter analyze
+build: project
+#	@echo "prep release quickfix..."
+#	flutter build ios --config-only --release
+#	@echo "prep release quickfix done"
 
-format:
-	dart format lib test
+project: clean pub models pods
 
-generate:
+pods:
+	cd ios && pod install
+
+models:
 	dart run build_runner build --delete-conflicting-outputs
 
-test:
-	flutter test
+pub:
+	flutter pub upgrade
+	flutter pub get
 
 clean:
 	flutter clean
+	@echo "cleaning g.dart files..."
+	find . -name "*.g.dart" -type f -print0 | xargs -0 rm -fv
+	@echo "cleaning dart_tool files..."
+	rm -rf .dart_tool/
+	@echo "cleaning lock files..."
+	rm -fv pubspec.lock
+	rm -rf ios/Podfile.lock
+	rm -rf macos/Podfile.lock
+	@echo "cleaning ios files..."
+	rm -rf ios/Podfile.lock ios/Pods ios/.symlinks ios/Flutter/Flutter.framework
+	@echo "cleaning ios done"
 
-doctor:
-	flutter doctor
+build-release-android:
+	flutter build appbundle --release
+	open build/app/outputs/bundle/release/
 
-create-platforms:
-	flutter create --platforms=ios,android .
+# generate-upload-keystore:
+#	keytool -genkey -v -keystore /tmp/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
