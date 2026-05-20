@@ -50,6 +50,18 @@ class _NumiHomeState extends State<NumiHome> {
     });
   }
 
+  void clearLoginPhoneInput() {
+    _lastLookupPhone = null;
+    if (phoneController.text.isEmpty && !_phoneHasInput) {
+      return;
+    }
+
+    phoneController.clear();
+    setState(() {
+      _phoneHasInput = false;
+    });
+  }
+
   void handlePhoneInputChanged(
     OnboardingCubit cubit,
     PhoneRegion region,
@@ -100,11 +112,8 @@ class _NumiHomeState extends State<NumiHome> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('OTP test'),
-          content: Text(
-            'Mã OTP vừa gửi: $otpCode\n'
-            'Purpose: ${state.devOtpPurpose ?? 'login'}',
-          ),
+          title: const Text('OTP'),
+          content: Text('Mã OTP vừa gửi: $otpCode'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
@@ -133,10 +142,16 @@ class _NumiHomeState extends State<NumiHome> {
                 final hasNewDevOtp =
                     previous.otpPreviewId != current.otpPreviewId &&
                         current.devOtpCode != null;
+                final leftLoginScreen = previous.screen == AppScreen.login &&
+                    current.screen != AppScreen.login;
 
-                return hasNewError || hasNewDevOtp;
+                return hasNewError || hasNewDevOtp || leftLoginScreen;
               },
               listener: (context, state) {
+                if (state.screen != AppScreen.login) {
+                  clearLoginPhoneInput();
+                }
+
                 final authError = state.authError;
                 if (authError != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -238,6 +253,8 @@ class _NumiHomeState extends State<NumiHome> {
                                   }
                                 },
                                 isVerifyingOtp: state.isVerifyingOtp,
+                                otpError: state.otpError,
+                                otpErrorId: state.otpErrorId,
                               ),
                             AppScreen.signup => SignupScreen(
                                 key: const ValueKey('signup'),

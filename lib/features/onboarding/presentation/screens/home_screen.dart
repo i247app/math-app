@@ -1,13 +1,17 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
 
-const _teal = Color(0xFF008778);
-const _deepInk = Color(0xFF213F37);
-const _orange = Color(0xFFE36D3F);
+const _teal = Color(0xFF006762);
+const _muted = Color(0xFF515F54);
+const _deepInk = Color(0xFF253228);
+const _orange = Color(0xFFDE5E31);
+const _mintBackground = Color(0xFFEBFAEC);
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -28,87 +32,90 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _activeTab = 0;
 
-  static const _designWidth = 273.0;
-  static const _designHeight = 613.0;
+  static const _designWidth = 390.0;
+  static const _designHeight = 844.0;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final widthScale = constraints.maxWidth / _designWidth;
-        final heightScale = constraints.maxHeight / _designHeight;
-        final scale = math.min(widthScale, heightScale);
+        final width = math.min(constraints.maxWidth, 430.0);
+        final height = constraints.maxHeight;
+        final scale = math.min(width / _designWidth, height / _designHeight);
         final studentName = _displayName(widget.user);
 
-        double x(double value) => value * widthScale;
-        double y(double value) => value * heightScale;
         double s(double value) => value * scale;
+        final navHeight = s(88);
+        final showHeader = _activeTab == 0;
 
-        return SizedBox.expand(
-          child: Stack(
-            children: [
-              const Positioned.fill(child: _HomeBackground()),
-              Positioned(
-                left: x(22),
-                right: x(22),
-                top: y(14),
-                child: _Header(name: studentName, size: s(38)),
-              ),
-              Positioned(
-                left: x(22),
-                right: x(22),
-                top: y(66),
-                child: _TabContent(
-                  activeTab: _activeTab,
-                  heroCard: _TestHeroCard(
-                    height: y(365),
-                    mascotSize: s(172),
-                    titleSize: s(24),
-                    bodySize: s(11),
-                    buttonHeight: s(35),
+        return Center(
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Positioned.fill(child: _HomeBackground()),
+                Positioned.fill(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 280),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      final offset = Tween<Offset>(
+                        begin: const Offset(0.035, 0),
+                        end: Offset.zero,
+                      ).animate(animation);
+
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(position: offset, child: child),
+                      );
+                    },
+                    child: _TabContent(
+                      key: ValueKey(_activeTab),
+                      activeTab: _activeTab,
+                      user: widget.user,
+                      onLogout: widget.onLogout,
+                      bottomPadding: navHeight + s(24),
+                      headerHeight: showHeader ? s(98) : 0,
+                      scale: scale,
+                    ),
                   ),
-                  user: widget.user,
-                  onLogout: widget.onLogout,
-                  contentHeight: y(365),
-                  fontSize: s(14),
                 ),
-              ),
-              if (_activeTab == 0) ...[
+                if (showHeader)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    child: _HeaderBar(
+                      height: s(98),
+                      horizontalPadding: s(24),
+                      name: studentName,
+                      user: widget.user,
+                    ),
+                  ),
                 Positioned(
-                  left: x(22),
-                  right: x(22),
-                  top: y(450),
-                  child: _AchievementsHeader(fontSize: s(14)),
-                ),
-                Positioned(
-                  left: x(20),
-                  right: x(20),
-                  top: y(490),
-                  child: _AchievementCard(
-                    height: s(78),
-                    iconSize: s(48),
-                    titleSize: s(13),
-                    bodySize: s(10),
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: _BottomNavigation(
+                    height: navHeight,
+                    scale: scale,
+                    activeIndex: _activeTab,
+                    onTabSelected: (index) {
+                      if (index == _activeTab) {
+                        HapticFeedback.selectionClick();
+                        return;
+                      }
+
+                      HapticFeedback.lightImpact();
+                      setState(() => _activeTab = index);
+                    },
                   ),
                 ),
               ],
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: _BottomNavigation(
-                  height: s(70),
-                  iconSize: s(19),
-                  labelSize: s(8),
-                  activeIndex: _activeTab,
-                  onTabSelected: (index) {
-                    setState(() {
-                      _activeTab = index;
-                    });
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -126,37 +133,75 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _TabContent extends StatelessWidget {
   const _TabContent({
+    super.key,
     required this.activeTab,
-    required this.heroCard,
     required this.user,
     required this.onLogout,
-    required this.contentHeight,
-    required this.fontSize,
+    required this.bottomPadding,
+    required this.headerHeight,
+    required this.scale,
   });
 
   final int activeTab;
-  final Widget heroCard;
   final LoginUser? user;
   final VoidCallback onLogout;
-  final double contentHeight;
-  final double fontSize;
+  final double bottomPadding;
+  final double headerHeight;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
-    if (activeTab == 0) {
-      return heroCard;
-    }
+    final horizontalPadding = EdgeInsets.only(
+      left: 24 * scale,
+      right: 24 * scale,
+      top: headerHeight + (activeTab == 0 ? 0 : 24 * scale),
+      bottom: bottomPadding,
+    );
 
-    if (activeTab == 3) {
-      return _AccountTab(
-        user: user,
-        onLogout: onLogout,
-        height: contentHeight,
-        fontSize: fontSize,
+    if (activeTab == 0) {
+      return SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: horizontalPadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _TestHeroCard(height: 430 * scale, scale: scale),
+            SizedBox(height: 28 * scale),
+            _AchievementsHeader(scale: scale),
+            SizedBox(height: 20 * scale),
+            _AchievementCard(scale: scale),
+          ],
+        ),
       );
     }
 
-    return const SizedBox.shrink();
+    if (activeTab == 3) {
+      return SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: horizontalPadding,
+        child: _AccountTab(
+          user: user,
+          onLogout: onLogout,
+          minHeight: 487 * scale,
+          scale: scale,
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: horizontalPadding,
+      child: _SoonTab(
+        icon:
+            activeTab == 1 ? Icons.auto_stories_rounded : Icons.history_rounded,
+        title: activeTab == 1 ? 'Ôn tập' : 'Lịch sử',
+        subtitle: activeTab == 1
+            ? 'Các bài luyện tập sẽ xuất hiện tại đây.'
+            : 'Lịch sử học tập sẽ được cập nhật sau mỗi buổi học.',
+        minHeight: 487 * scale,
+        scale: scale,
+      ),
+    );
   }
 }
 
@@ -167,191 +212,247 @@ class _HomeBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return const DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE9F9ED),
-            Color(0xFFEFFFF0),
-            Color(0xFFE6FAF0),
-          ],
+        color: _mintBackground,
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x3300504B),
+            blurRadius: 44,
+            offset: Offset(0, 28),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderBar extends StatelessWidget {
+  const _HeaderBar({
+    required this.height,
+    required this.horizontalPadding,
+    required this.name,
+    required this.user,
+  });
+
+  final double height;
+  final double horizontalPadding;
+  final String name;
+  final LoginUser? user;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          height: height,
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            height * 0.20,
+            horizontalPadding,
+            height * 0.21,
+          ),
+          decoration: BoxDecoration(
+            color: _mintBackground.withValues(alpha: 0.92),
+          ),
+          child: Row(
+            children: [
+              _StudentAvatar(
+                size: height * 0.45,
+                avatarUrl: user?.avatarUrl,
+              ),
+              SizedBox(width: height * 0.14),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'HỌC SINH',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: _muted.withValues(alpha: 0.6),
+                        fontFamily: 'Nunito',
+                        fontSize: height * 0.10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.8,
+                        height: 1,
+                      ),
+                    ),
+                    SizedBox(height: height * 0.06),
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: _teal,
+                        fontFamily: 'Nunito',
+                        fontSize: height * 0.18,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _NotificationButton(size: height * 0.45),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.name, required this.size});
+class _StudentAvatar extends StatelessWidget {
+  const _StudentAvatar({required this.size, this.avatarUrl});
 
-  final String name;
+  final double size;
+  final String? avatarUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = avatarUrl?.trim();
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.peach,
+            boxShadow: [
+              BoxShadow(
+                color: _teal.withValues(alpha: 0.05),
+                spreadRadius: size * 0.08,
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.11),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: url == null || url.isEmpty
+              ? Icon(
+                  Icons.person_rounded,
+                  color: const Color(0xFF2A7D75),
+                  size: size * 0.66,
+                )
+              : Image.network(
+                  url,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) {
+                    return Icon(
+                      Icons.person_rounded,
+                      color: const Color(0xFF2A7D75),
+                      size: size * 0.66,
+                    );
+                  },
+                ),
+        ),
+        Positioned(
+          right: -size * 0.05,
+          bottom: -size * 0.05,
+          child: Container(
+            width: size * 0.32,
+            height: size * 0.32,
+            decoration: BoxDecoration(
+              color: const Color(0xFF22C55E),
+              shape: BoxShape.circle,
+              border: Border.all(color: _mintBackground, width: size * 0.05),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _NotificationButton extends StatelessWidget {
+  const _NotificationButton({required this.size});
+
   final double size;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: size + 2,
-      child: Row(
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFD6C1),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.person_rounded,
-                  color: const Color(0xFF2A7D75),
-                  size: size * 0.64,
-                ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 1,
-                child: Container(
-                  width: size * 0.22,
-                  height: size * 0.22,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF16B881),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                ),
-              ),
-            ],
+    return Material(
+      color: Colors.white,
+      shadowColor: Colors.black.withValues(alpha: 0.08),
+      elevation: 2,
+      borderRadius: BorderRadius.circular(size * 0.36),
+      child: InkWell(
+        onTap: HapticFeedback.selectionClick,
+        borderRadius: BorderRadius.circular(size * 0.36),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Icon(
+            Icons.notifications_none_rounded,
+            color: _teal,
+            size: size * 0.50,
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'HỌC SINH',
-                  style: TextStyle(
-                    color: Color(0xFF9BAAA4),
-                    fontFamily: 'Nunito',
-                    fontSize: 7,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 2,
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: _teal,
-                    fontFamily: 'Nunito',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 12,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.notifications_none_rounded,
-              color: _teal,
-              size: 21,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _TestHeroCard extends StatelessWidget {
-  const _TestHeroCard({
-    required this.height,
-    required this.mascotSize,
-    required this.titleSize,
-    required this.bodySize,
-    required this.buttonHeight,
-  });
+  const _TestHeroCard({required this.height, required this.scale});
 
   final double height;
-  final double mascotSize;
-  final double titleSize;
-  final double bodySize;
-  final double buttonHeight;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(48 * scale),
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF2DC8BE),
-            Color(0xFFB2D1B7),
-            Color(0xFFECE4CB),
+            Color(0xFF29CDC3),
+            Color(0xFF9AC8B6),
+            Color(0xFFF2E6C8),
           ],
           stops: [0, 0.55, 1],
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3AB8A7).withValues(alpha: 0.16),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
+            color: const Color(0xFF00504B).withValues(alpha: 0.25),
+            blurRadius: 30 * scale,
+            offset: Offset(0, 18 * scale),
           ),
         ],
       ),
+      clipBehavior: Clip.antiAlias,
       child: Stack(
-        clipBehavior: Clip.none,
         alignment: Alignment.topCenter,
         children: [
-          const Positioned(
-            right: 34,
-            top: 30,
-            child: _HeroMathGlyph(),
+          Positioned(
+            right: 40 * scale,
+            top: 40 * scale,
+            child: _HeroMathGlyph(scale: scale),
           ),
           Positioned(
-            left: 18,
-            bottom: 28,
+            left: 24 * scale,
+            bottom: 58 * scale,
             child: Transform.rotate(
-              angle: 0.18,
-              child: const _HeroTriangleGhost(),
+              angle: -0.16,
+              child: _HeroTriangleGhost(scale: scale),
             ),
           ),
           Positioned(
-            top: 44,
-            left: 20,
-            right: 20,
+            top: 58 * scale,
+            left: 24 * scale,
+            right: 24 * scale,
             child: Column(
               children: [
                 Text(
@@ -360,22 +461,22 @@ class _TestHeroCard extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'Nunito',
-                    fontSize: titleSize,
+                    fontSize: 34 * scale,
                     fontWeight: FontWeight.w900,
-                    height: 1,
+                    height: 1.05,
                     letterSpacing: 0,
                   ),
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 15 * scale),
                 Text(
                   'Cùng AI kiểm tra khả năng toán học\nvượt trội riêng bạn.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.88),
+                    color: Colors.white.withValues(alpha: 0.86),
                     fontFamily: 'Nunito',
-                    fontSize: bodySize,
+                    fontSize: 14 * scale,
                     fontWeight: FontWeight.w700,
-                    height: 1.45,
+                    height: 1.62,
                     letterSpacing: 0,
                   ),
                 ),
@@ -383,121 +484,268 @@ class _TestHeroCard extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: height * 0.40,
-            child: Image.asset(
-              'assets/images/home_test_mascot.png',
-              width: mascotSize,
-              height: mascotSize,
-              fit: BoxFit.contain,
+            top: 176 * scale,
+            child: _MascotStage(scale: scale),
+          ),
+          Positioned(
+            bottom: 28 * scale,
+            child: _HeroButton(scale: scale),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MascotStage extends StatelessWidget {
+  const _MascotStage({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 216 * scale,
+      height: 202 * scale,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            bottom: 12 * scale,
+            child: Container(
+              width: 176 * scale,
+              height: 29 * scale,
+              decoration: BoxDecoration(
+                color: const Color(0xFF253228).withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF253228).withValues(alpha: 0.12),
+                    blurRadius: 18 * scale,
+                    spreadRadius: 2 * scale,
+                  ),
+                ],
+              ),
             ),
           ),
           Positioned(
-            bottom: 22,
-            child: _HeroButton(height: buttonHeight),
+            right: -18 * scale,
+            top: 18 * scale,
+            child: Transform.rotate(
+              angle: 0.11,
+              child: _EquationChip(
+                text: '5 + 3 = 8',
+                foreground: _teal,
+                background: Colors.white,
+                scale: scale,
+              ),
+            ),
+          ),
+          Positioned(
+            left: -18 * scale,
+            bottom: 50 * scale,
+            child: Transform.rotate(
+              angle: -0.18,
+              child: _EquationChip(
+                text: '2 × 2 = 4',
+                foreground: const Color(0xFF832800),
+                background: const Color(0xFFFFC4B1),
+                scale: scale,
+              ),
+            ),
+          ),
+          Image.asset(
+            'assets/images/home_test_mascot.png',
+            width: 176 * scale,
+            height: 176 * scale,
+            fit: BoxFit.contain,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EquationChip extends StatelessWidget {
+  const _EquationChip({
+    required this.text,
+    required this.foreground,
+    required this.background,
+    required this.scale,
+  });
+
+  final String text;
+  final Color foreground;
+  final Color background;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(24 * scale),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 8 * scale,
+            offset: Offset(0, 3 * scale),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 14 * scale,
+          vertical: 10 * scale,
+        ),
+        child: Text(
+          text,
+          maxLines: 1,
+          style: TextStyle(
+            color: foreground,
+            fontFamily: 'Nunito',
+            fontSize: 19 * scale,
+            fontWeight: FontWeight.w900,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
       ),
     );
   }
 }
 
 class _HeroButton extends StatelessWidget {
-  const _HeroButton({required this.height});
+  const _HeroButton({required this.scale});
 
-  final double height;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      padding: EdgeInsets.only(left: height * 0.44, right: height * 0.34),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(height),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFF8B64), _orange],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: _orange.withValues(alpha: 0.45),
-            blurRadius: 12,
-            offset: const Offset(0, 7),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Bắt đầu ngay',
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Nunito',
-              fontSize: height * 0.38,
-              fontWeight: FontWeight.w900,
-              height: 1,
-              letterSpacing: 0,
+    final height = 42 * scale;
+
+    return GestureDetector(
+      onTap: HapticFeedback.mediumImpact,
+      child: SizedBox(
+        height: height + 8 * scale,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              top: 6 * scale,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF621C00),
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFA03A0F).withValues(alpha: 0.34),
+                      blurRadius: 18 * scale,
+                      offset: Offset(0, 12 * scale),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          SizedBox(width: height * 0.22),
-          Icon(Icons.rocket_launch_outlined,
-              color: Colors.white, size: height * 0.52),
-        ],
+            Container(
+              height: height,
+              padding: EdgeInsets.only(left: 18 * scale, right: 14 * scale),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFFFF9F7D), Color(0xFFA03A0F)],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.45),
+                    blurRadius: 1,
+                    offset: Offset(0, 1 * scale),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Bắt đầu ngay',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Nunito',
+                      fontSize: 17 * scale,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  SizedBox(width: 10 * scale),
+                  Icon(
+                    Icons.rocket_launch_outlined,
+                    color: Colors.white,
+                    size: 21 * scale,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _AchievementsHeader extends StatelessWidget {
-  const _AchievementsHeader({required this.fontSize});
+  const _AchievementsHeader({required this.scale});
 
-  final double fontSize;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Thành tích của bạn',
-              style: TextStyle(
-                color: _deepInk,
-                fontFamily: 'Nunito',
-                fontSize: fontSize,
-                fontWeight: FontWeight.w900,
-                height: 1,
-                letterSpacing: 0,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Thành tích của bạn',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: _deepInk,
+                  fontFamily: 'Nunito',
+                  fontSize: 20 * scale,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  letterSpacing: 0,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              width: 34,
-              height: 2,
-              color: const Color(0xFFE9B68B),
-            ),
-          ],
+              SizedBox(height: 10 * scale),
+              Container(
+                width: 48 * scale,
+                height: 4 * scale,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFA03A0F).withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ],
+          ),
         ),
-        const Spacer(),
         Padding(
-          padding: const EdgeInsets.only(bottom: 2),
+          padding: EdgeInsets.only(bottom: 3 * scale),
           child: Text(
             'XEM TẤT CẢ',
             style: TextStyle(
               color: _teal,
               fontFamily: 'Nunito',
-              fontSize: fontSize * 0.56,
+              fontSize: 11 * scale,
               fontWeight: FontWeight.w900,
               height: 1,
-              letterSpacing: 0.2,
+              letterSpacing: 0,
             ),
           ),
         ),
@@ -507,50 +755,44 @@ class _AchievementsHeader extends StatelessWidget {
 }
 
 class _AchievementCard extends StatelessWidget {
-  const _AchievementCard({
-    required this.height,
-    required this.iconSize,
-    required this.titleSize,
-    required this.bodySize,
-  });
+  const _AchievementCard({required this.scale});
 
-  final double height;
-  final double iconSize;
-  final double titleSize;
-  final double bodySize;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
+      height: 104 * scale,
+      padding: EdgeInsets.all(21 * scale),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: Colors.white.withValues(alpha: 0.86),
+        borderRadius: BorderRadius.circular(32 * scale),
+        border:
+            Border.all(color: const Color(0xFFA2B1A3).withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 2 * scale,
+            offset: Offset(0, 1 * scale),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            width: iconSize,
-            height: iconSize,
-            decoration: const BoxDecoration(
-              color: Color(0xFFE9F5F2),
-              shape: BoxShape.circle,
+            width: 64 * scale,
+            height: 64 * scale,
+            decoration: BoxDecoration(
+              color: _teal.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(28 * scale),
             ),
             child: Icon(
               Icons.auto_awesome_rounded,
               color: _teal,
-              size: iconSize * 0.48,
+              size: 28 * scale,
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 20 * scale),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -563,21 +805,21 @@ class _AchievementCard extends StatelessWidget {
                   style: TextStyle(
                     color: _deepInk,
                     fontFamily: 'Nunito',
-                    fontSize: titleSize,
+                    fontSize: 16 * scale,
                     fontWeight: FontWeight.w900,
-                    height: 1,
+                    height: 1.12,
                     letterSpacing: 0,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6 * scale),
                 Text(
-                  'Đã hoàn thành 12 bài tập hè',
+                  'Đã hoàn thành 12 bài tập hôm nay',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.grayText,
                     fontFamily: 'Nunito',
-                    fontSize: bodySize,
+                    fontSize: 13 * scale,
                     fontWeight: FontWeight.w700,
                     height: 1,
                     letterSpacing: 0,
@@ -586,14 +828,19 @@ class _AchievementCard extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(width: 10 * scale),
           Container(
-            width: 28,
-            height: 28,
+            width: 36 * scale,
+            height: 36 * scale,
             decoration: const BoxDecoration(
-              color: Color(0xFFDFF5E9),
+              color: Color(0xFFDBEDDC),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.chevron_right_rounded, color: _teal),
+            child: Icon(
+              Icons.chevron_right_rounded,
+              color: _teal,
+              size: 24 * scale,
+            ),
           ),
         ],
       ),
@@ -604,74 +851,273 @@ class _AchievementCard extends StatelessWidget {
 class _BottomNavigation extends StatelessWidget {
   const _BottomNavigation({
     required this.height,
-    required this.iconSize,
-    required this.labelSize,
+    required this.scale,
     required this.activeIndex,
     required this.onTabSelected,
   });
 
   final double height;
-  final double iconSize;
-  final double labelSize;
+  final double scale;
   final int activeIndex;
   final ValueChanged<int> onTabSelected;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Positioned.fill(
-            top: 10,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+    const items = [
+      _NavItemData(Icons.home_filled, 'HOME'),
+      _NavItemData(Icons.explore_outlined, 'ÔN TẬP'),
+      _NavItemData(Icons.map_outlined, 'LỊCH SỬ'),
+      _NavItemData(Icons.person_outline_rounded, 'TÀI KHOẢN'),
+    ];
+
+    return ClipRRect(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(48 * scale)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          height: height,
+          padding: EdgeInsets.fromLTRB(
+            20 * scale,
+            12 * scale,
+            20 * scale,
+            16 * scale,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.92),
+            borderRadius:
+                BorderRadius.vertical(top: Radius.circular(48 * scale)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 32 * scale,
+                offset: Offset(0, -8 * scale),
+              ),
+            ],
+          ),
+          child: Row(
+            children: List.generate(items.length, (index) {
+              return Expanded(
+                child: _AnimatedNavItem(
+                  data: items[index],
+                  active: activeIndex == index,
+                  scale: scale,
+                  onTap: () => onTabSelected(index),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedNavItem extends StatelessWidget {
+  const _AnimatedNavItem({
+    required this.data,
+    required this.active,
+    required this.scale,
+    required this.onTap,
+  });
+
+  final _NavItemData data;
+  final bool active;
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final inactiveColor = const Color(0xFF515F54).withValues(alpha: 0.68);
+
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 360),
+      curve: Curves.easeOutBack,
+      tween: Tween<double>(end: active ? 1 : 0),
+      builder: (context, value, child) {
+        final color = Color.lerp(inactiveColor, Colors.white, value)!;
+        final lift = -5 * scale * value;
+
+        return Semantics(
+          selected: active,
+          button: true,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(48 * scale),
+              child: Transform.translate(
+                offset: Offset(0, lift),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                  height: 60 * scale,
+                  margin: EdgeInsets.symmetric(horizontal: 2 * scale),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: active ? 14 * scale : 8 * scale,
+                    vertical: active ? 8 * scale : 7 * scale,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Color.lerp(Colors.transparent, _teal, value),
+                    borderRadius: BorderRadius.circular(48 * scale),
+                    boxShadow: active
+                        ? [
+                            BoxShadow(
+                              color: _teal.withValues(alpha: 0.26),
+                              blurRadius: 14 * scale,
+                              offset: Offset(0, 10 * scale),
+                            ),
+                            BoxShadow(
+                              color: _teal.withValues(alpha: 0.18),
+                              blurRadius: 6 * scale,
+                              offset: Offset(0, 3 * scale),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Transform.scale(
+                        scale: 1 + (0.12 * value),
+                        child: Icon(
+                          data.icon,
+                          color: color,
+                          size: (active ? 20 : 19) * scale,
+                        ),
+                      ),
+                      SizedBox(height: 5 * scale),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          data.label,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: color,
+                            fontFamily: 'Nunito',
+                            fontSize: 10 * scale,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                            letterSpacing: active ? 0.2 : 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-          Positioned(
-            left: 18,
-            right: 18,
-            bottom: 14,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _NavItem(
-                  icon: Icons.home_filled,
-                  label: 'HOME',
-                  iconSize: iconSize,
-                  labelSize: labelSize,
-                  active: activeIndex == 0,
-                  onTap: () => onTabSelected(0),
+        );
+      },
+    );
+  }
+}
+
+class _NavItemData {
+  const _NavItemData(this.icon, this.label);
+
+  final IconData icon;
+  final String label;
+}
+
+class _AccountTab extends StatelessWidget {
+  const _AccountTab({
+    required this.user,
+    required this.onLogout,
+    required this.minHeight,
+    required this.scale,
+  });
+
+  final LoginUser? user;
+  final VoidCallback onLogout;
+  final double minHeight;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final userName = user?.name?.trim() ?? 'Minh Quân';
+    final userEmail = user?.email?.trim() ?? '';
+    final userPhone = user?.phone?.trim() ?? '';
+
+    return Container(
+      constraints: BoxConstraints(minHeight: minHeight),
+      padding: EdgeInsets.all(28 * scale),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.86),
+        borderRadius: BorderRadius.circular(40 * scale),
+        border:
+            Border.all(color: const Color(0xFFA2B1A3).withValues(alpha: 0.14)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _StudentAvatar(size: 84 * scale, avatarUrl: user?.avatarUrl),
+          SizedBox(height: 20 * scale),
+          Text(
+            userName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: _teal,
+              fontFamily: 'Nunito',
+              fontSize: 22 * scale,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
+            ),
+          ),
+          if (userPhone.isNotEmpty) ...[
+            SizedBox(height: 8 * scale),
+            Text(
+              userPhone,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: _muted,
+                fontFamily: 'Nunito',
+                fontSize: 14 * scale,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+          if (userEmail.isNotEmpty) ...[
+            SizedBox(height: 4 * scale),
+            Text(
+              userEmail,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: _muted,
+                fontFamily: 'Nunito',
+                fontSize: 14 * scale,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+          SizedBox(height: 30 * scale),
+          SizedBox(
+            height: 46 * scale,
+            child: ElevatedButton(
+              onPressed: onLogout,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _orange,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: EdgeInsets.symmetric(horizontal: 30 * scale),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18 * scale),
                 ),
-                _NavItem(
-                  icon: Icons.explore_outlined,
-                  label: 'ÔN TẬP',
-                  iconSize: iconSize,
-                  labelSize: labelSize,
-                  active: activeIndex == 1,
-                  onTap: () => onTabSelected(1),
+              ),
+              child: Text(
+                'ĐĂNG XUẤT',
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 14 * scale,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
                 ),
-                _NavItem(
-                  icon: Icons.map_outlined,
-                  label: 'LỊCH SỬ',
-                  iconSize: iconSize,
-                  labelSize: labelSize,
-                  active: activeIndex == 2,
-                  onTap: () => onTabSelected(2),
-                ),
-                _NavItem(
-                  icon: Icons.person_outline_rounded,
-                  label: 'TÀI KHOẢN',
-                  iconSize: iconSize,
-                  labelSize: labelSize,
-                  active: activeIndex == 3,
-                  onTap: () => onTabSelected(3),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -680,179 +1126,79 @@ class _BottomNavigation extends StatelessWidget {
   }
 }
 
-class _NavItem extends StatelessWidget {
-  const _NavItem({
+class _SoonTab extends StatelessWidget {
+  const _SoonTab({
     required this.icon,
-    required this.label,
-    required this.iconSize,
-    required this.labelSize,
-    required this.active,
-    required this.onTap,
+    required this.title,
+    required this.subtitle,
+    required this.minHeight,
+    required this.scale,
   });
 
   final IconData icon;
-  final String label;
-  final double iconSize;
-  final double labelSize;
-  final bool active;
-  final VoidCallback onTap;
+  final String title;
+  final String subtitle;
+  final double minHeight;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? Colors.white : const Color(0xFF8B9995);
-    final itemHeight = math.max(44.0, iconSize + labelSize + 12);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        width: active ? 54 : 48,
-        height: itemHeight,
-        decoration: BoxDecoration(
-          color: active ? _teal : Colors.transparent,
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: active
-              ? [
-                  BoxShadow(
-                    color: _teal.withValues(alpha: 0.25),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: iconSize),
-            const SizedBox(height: 2),
-            SizedBox(
-              width: double.infinity,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: color,
-                    fontFamily: 'Nunito',
-                    fontSize: labelSize,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+    return Container(
+      constraints: BoxConstraints(minHeight: minHeight),
+      padding: EdgeInsets.all(28 * scale),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(40 * scale),
+        border:
+            Border.all(color: const Color(0xFFA2B1A3).withValues(alpha: 0.12)),
       ),
-    );
-  }
-}
-
-class _AccountTab extends StatelessWidget {
-  const _AccountTab({
-    required this.user,
-    required this.onLogout,
-    required this.height,
-    required this.fontSize,
-  });
-
-  final LoginUser? user;
-  final VoidCallback onLogout;
-  final double height;
-  final double fontSize;
-
-  @override
-  Widget build(BuildContext context) {
-    final userName = user?.name?.trim() ?? 'Minh Quân';
-    final userEmail = user?.email?.trim() ?? '';
-    final userPhone = user?.phone?.trim() ?? '';
-
-    return SingleChildScrollView(
-      child: SizedBox(
-        height: height,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD6C1),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 3),
-              ),
-              child: Icon(
-                Icons.person_rounded,
-                color: const Color(0xFF2A7D75),
-                size: 48,
-              ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 76 * scale,
+            height: 76 * scale,
+            decoration: BoxDecoration(
+              color: _teal.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(28 * scale),
             ),
-            const SizedBox(height: 20),
-            Text(
-              userName,
-              style: TextStyle(
-                color: _teal,
-                fontFamily: 'Nunito',
-                fontSize: fontSize + 2,
-                fontWeight: FontWeight.w900,
-              ),
+            child: Icon(icon, color: _teal, size: 36 * scale),
+          ),
+          SizedBox(height: 20 * scale),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: _deepInk,
+              fontFamily: 'Nunito',
+              fontSize: 22 * scale,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
             ),
-            if (userPhone.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                userPhone,
-                style: TextStyle(
-                  color: const Color(0xFF8B9995),
-                  fontFamily: 'Nunito',
-                  fontSize: fontSize,
-                ),
-              ),
-            ],
-            if (userEmail.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                userEmail,
-                style: TextStyle(
-                  color: const Color(0xFF8B9995),
-                  fontFamily: 'Nunito',
-                  fontSize: fontSize,
-                ),
-              ),
-            ],
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: onLogout,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _orange,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text(
-                'ĐĂNG XUẤT',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1,
-                ),
-              ),
+          ),
+          SizedBox(height: 8 * scale),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: _muted,
+              fontFamily: 'Nunito',
+              fontSize: 14 * scale,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
+              letterSpacing: 0,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class _HeroMathGlyph extends StatelessWidget {
-  const _HeroMathGlyph();
+  const _HeroMathGlyph({required this.scale});
+
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -861,25 +1207,29 @@ class _HeroMathGlyph extends StatelessWidget {
       style: TextStyle(
         color: Colors.white.withValues(alpha: 0.10),
         fontFamily: 'Nunito',
-        fontSize: 46,
+        fontSize: 64 * scale,
         fontWeight: FontWeight.w900,
         height: 1,
+        letterSpacing: 0,
       ),
     );
   }
 }
 
 class _HeroTriangleGhost extends StatelessWidget {
-  const _HeroTriangleGhost();
+  const _HeroTriangleGhost({required this.scale});
+
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 48,
-      height: 48,
+      width: 58 * scale,
+      height: 58 * scale,
       child: CustomPaint(
         painter: _TriangleOutlinePainter(
-          color: Colors.white.withValues(alpha: 0.13),
+          color: Colors.white.withValues(alpha: 0.12),
+          strokeWidth: 6 * scale,
         ),
       ),
     );
@@ -887,16 +1237,20 @@ class _HeroTriangleGhost extends StatelessWidget {
 }
 
 class _TriangleOutlinePainter extends CustomPainter {
-  const _TriangleOutlinePainter({required this.color});
+  const _TriangleOutlinePainter({
+    required this.color,
+    required this.strokeWidth,
+  });
 
   final Color color;
+  final double strokeWidth;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5
+      ..strokeWidth = strokeWidth
       ..strokeJoin = StrokeJoin.round;
     final path = Path()
       ..moveTo(size.width / 2, size.height * 0.14)
@@ -909,6 +1263,6 @@ class _TriangleOutlinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _TriangleOutlinePainter oldDelegate) {
-    return oldDelegate.color != color;
+    return oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth;
   }
 }
