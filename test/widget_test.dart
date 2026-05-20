@@ -104,10 +104,11 @@ void main() {
     await tester.tap(find.text('Tiếp tục'));
     await tester.pumpAndSettle();
 
-    for (var index = 0; index < 4; index++) {
+    final otpDigits = '7152'.split('');
+    for (var index = 0; index < otpDigits.length; index++) {
       await tester.enterText(
         find.byType(EditableText).at(index),
-        '9',
+        otpDigits[index],
       );
     }
     await tester.tap(find.text('Xác nhận  →'));

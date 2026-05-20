@@ -127,10 +127,9 @@ class OtpAuthApi implements OtpAuthService {
   }) : _networkApi =
             networkApi ?? NetworkApi(baseUrl: baseUrl ?? ApiConfig.baseUrl);
 
-  static const _localOtpCode = '1234';
+  static const _loginOtpType = 'LOGIN_2FA';
 
   final NetworkApi _networkApi;
-  final Map<String, String> _pendingOtpCodes = {};
   final Map<String, LoginUser> _loginUsers = {};
 
   @override
@@ -149,7 +148,6 @@ class OtpAuthApi implements OtpAuthService {
       response = await _networkApi.authOtp(LoginRequest(phone: phone));
     } on NetworkException catch (error) {
       if (error.status == 202) {
-        _pendingOtpCodes.remove(phone);
         _loginUsers.remove(phone);
         return AuthPhoneLookupResult(phone: phone, exists: false);
       }
@@ -162,14 +160,12 @@ class OtpAuthApi implements OtpAuthService {
       throw const OtpAuthException('Response OTP thiếu thông tin user.');
     }
 
-    final otpCode = response.otpCode ?? _localOtpCode;
     _loginUsers[phone] = user;
-    _pendingOtpCodes[phone] = otpCode;
     return AuthPhoneLookupResult(
       phone: phone,
       exists: true,
       user: user,
-      otpCode: otpCode,
+      otpCode: response.otpCode,
       purpose: 'login',
       expiresIn: 180,
       message: response.status,
@@ -190,12 +186,10 @@ class OtpAuthApi implements OtpAuthService {
       throw const OtpAuthException('Response OTP thiếu thông tin user.');
     }
 
-    final otpCode = response.otpCode ?? _localOtpCode;
     _loginUsers[phone] = user;
-    _pendingOtpCodes[phone] = otpCode;
 
     return SendOtpResult(
-      otpCode: otpCode,
+      otpCode: response.otpCode,
       purpose: 'login',
       expiresIn: 180,
       message: response.status,
@@ -223,18 +217,29 @@ class OtpAuthApi implements OtpAuthService {
     required String phone,
     required String otpCode,
   }) async {
-    final expectedOtp = _pendingOtpCodes[phone];
-    final isValid = expectedOtp != null && expectedOtp == otpCode;
-    if (isValid) {
-      _pendingOtpCodes.remove(phone);
+    final VerifyOtpResponse response;
+    try {
+      response = await _networkApi.verifyOtp(
+        VerifyOtpRequest(
+          otpType: _loginOtpType,
+          identifier: phone,
+          otpCode: otpCode,
+        ),
+      );
+    } on NetworkException catch (error) {
+      throw OtpAuthException(error.message, status: error.status);
+    }
+
+    final user = response.user?.toLoginUser(fallbackPhone: phone) ??
+        _loginUsers[phone];
+    if (response.verified && user != null) {
+      _loginUsers[phone] = user;
     }
 
     return VerifyOtpResult(
-      isValid: isValid,
-      message: isValid ? 'Success' : 'OTP không hợp lệ.',
-      user: isValid
-          ? _loginUsers[phone] ?? LoginUser(id: '', phone: phone)
-          : null,
+      isValid: response.verified,
+      message: response.status,
+      user: response.verified ? user : null,
     );
   }
 }

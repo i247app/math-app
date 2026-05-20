@@ -65,6 +65,8 @@ class _NumiHomeState extends State<NumiHome> {
       return;
     }
 
+    FocusScope.of(context).unfocus();
+
     if (_lastLookupPhone == digits) {
       return;
     }

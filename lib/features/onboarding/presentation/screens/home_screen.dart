@@ -676,6 +676,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = active ? Colors.white : const Color(0xFF8B9995);
+    final itemHeight = math.max(44.0, iconSize + labelSize + 12);
 
     return InkWell(
       onTap: onTap,
@@ -683,7 +684,7 @@ class _NavItem extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         width: active ? 54 : 48,
-        height: 44,
+        height: itemHeight,
         decoration: BoxDecoration(
           color: active ? _teal : Colors.transparent,
           borderRadius: BorderRadius.circular(22),
@@ -701,16 +702,23 @@ class _NavItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: color, size: iconSize),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontFamily: 'Nunito',
-                fontSize: labelSize,
-                fontWeight: FontWeight.w900,
-                height: 1,
-                letterSpacing: 0,
+            const SizedBox(height: 2),
+            SizedBox(
+              width: double.infinity,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: color,
+                    fontFamily: 'Nunito',
+                    fontSize: labelSize,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
               ),
             ),
           ],

@@ -109,6 +109,25 @@ class NetworkApi {
     return _post('/auth/otp', request.toJson());
   }
 
+  Future<VerifyOtpResponse> verifyOtp(VerifyOtpRequest request) async {
+    final responseJson = await _networkClient.postJson(
+      '/otps/verify',
+      request.toJson(),
+    );
+    final verifyResponse = VerifyOtpResponse.fromJson(responseJson);
+    if (verifyResponse.mstatus != 200) {
+      throw NetworkException(
+        verifyResponse.mmessage ??
+            verifyResponse.debug ??
+            verifyResponse.status ??
+            'Request failed.',
+        status: verifyResponse.mstatus,
+      );
+    }
+
+    return verifyResponse;
+  }
+
   Future<AuthResponse> _post(String path, Map<String, dynamic> body) async {
     final responseJson = await _networkClient.postJson(path, body);
     final authResponse = AuthResponse.fromJson(responseJson);
