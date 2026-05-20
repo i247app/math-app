@@ -12,6 +12,7 @@ import 'screens/otp_screen.dart';
 import 'screens/signup_prompt_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'widgets/app_background.dart';
+import 'widgets/common_widgets.dart';
 
 class NumiHome extends StatefulWidget {
   const NumiHome({super.key, this.authService});
@@ -118,7 +119,8 @@ class _NumiHomeState extends State<NumiHome> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => OnboardingCubit(authService: widget.authService),
+      create: (_) =>
+          OnboardingCubit(authService: widget.authService)..restoreSession(),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark,
         child: Scaffold(
@@ -151,7 +153,8 @@ class _NumiHomeState extends State<NumiHome> {
                 final phoneErrorText = _phoneHasInput && !phoneComplete
                     ? 'Số điện thoại chưa đủ ký tự.'
                     : null;
-                final useSafeArea = state.screen != AppScreen.welcome;
+                final useSafeArea = !state.isRestoringSession &&
+                    state.screen != AppScreen.welcome;
 
                 return SafeArea(
                   top: useSafeArea,
@@ -182,64 +185,71 @@ class _NumiHomeState extends State<NumiHome> {
                         child: SlideTransition(position: slide, child: child),
                       );
                     },
-                    child: switch (state.screen) {
-                      AppScreen.welcome => WelcomeScreen(
-                          key: const ValueKey('welcome'),
-                          onStart: cubit.openLogin,
-                        ),
-                      AppScreen.login => LoginScreen(
-                          key: const ValueKey('login'),
-                          controller: phoneController,
-                          region: state.phoneRegion,
-                          onRegionChanged: (region) {
-                            phoneController.clear();
-                            _phoneHasInput = false;
-                            _lastLookupPhone = null;
-                            cubit.clearPhoneLookup();
-                            cubit.selectPhoneRegion(region);
+                    child: state.isRestoringSession
+                        ? const LoadingScreen(
+                            key: ValueKey('session-loading'),
+                            message: 'Đang kiểm tra phiên đăng nhập...',
+                          )
+                        : switch (state.screen) {
+                            AppScreen.welcome => WelcomeScreen(
+                                key: const ValueKey('welcome'),
+                                onStart: cubit.openLogin,
+                              ),
+                            AppScreen.login => LoginScreen(
+                                key: const ValueKey('login'),
+                                controller: phoneController,
+                                region: state.phoneRegion,
+                                onRegionChanged: (region) {
+                                  phoneController.clear();
+                                  _phoneHasInput = false;
+                                  _lastLookupPhone = null;
+                                  cubit.clearPhoneLookup();
+                                  cubit.selectPhoneRegion(region);
+                                },
+                                onBack: cubit.openWelcome,
+                                onSendOtp: () =>
+                                    sendOtp(cubit, state.phoneRegion),
+                                isSendingOtp: state.isSendingOtp,
+                                isCheckingAuthPhone: state.isCheckingAuthPhone,
+                                canSendOtp: phoneComplete,
+                                phoneExists: state.phoneExists,
+                                onPhoneChanged: (value) =>
+                                    handlePhoneInputChanged(
+                                  cubit,
+                                  state.phoneRegion,
+                                  value,
+                                ),
+                                phoneErrorText: phoneErrorText,
+                              ),
+                            AppScreen.signupPrompt => SignupPromptScreen(
+                                key: const ValueKey('signup-prompt'),
+                                phoneNumber: state.phoneNumber,
+                                onBack: cubit.openLogin,
+                                onContinue: cubit.startSignupVerification,
+                              ),
+                            AppScreen.otp => OtpScreen(
+                                key: const ValueKey('otp'),
+                                onBack: cubit.openLogin,
+                                onConfirm: cubit.verifyLoginOtp,
+                                onResend: () {
+                                  final phone = state.phoneNumber;
+                                  if (phone != null) {
+                                    cubit.submitLoginPhone(phone);
+                                  }
+                                },
+                                isVerifyingOtp: state.isVerifyingOtp,
+                              ),
+                            AppScreen.profile => ChildProfileScreen(
+                                key: const ValueKey('profile'),
+                                onBack: cubit.openOtp,
+                                onContinue: () => HapticFeedback.mediumImpact(),
+                              ),
+                            AppScreen.home => HomeScreen(
+                                key: const ValueKey('home'),
+                                user: state.loginUser,
+                                onBack: cubit.openLogin,
+                              ),
                           },
-                          onBack: cubit.openWelcome,
-                          onSendOtp: () => sendOtp(cubit, state.phoneRegion),
-                          isSendingOtp: state.isSendingOtp,
-                          isCheckingAuthPhone: state.isCheckingAuthPhone,
-                          canSendOtp: phoneComplete,
-                          phoneExists: state.phoneExists,
-                          onPhoneChanged: (value) => handlePhoneInputChanged(
-                            cubit,
-                            state.phoneRegion,
-                            value,
-                          ),
-                          phoneErrorText: phoneErrorText,
-                        ),
-                      AppScreen.signupPrompt => SignupPromptScreen(
-                          key: const ValueKey('signup-prompt'),
-                          phoneNumber: state.phoneNumber,
-                          onBack: cubit.openLogin,
-                          onContinue: cubit.startSignupVerification,
-                        ),
-                      AppScreen.otp => OtpScreen(
-                          key: const ValueKey('otp'),
-                          onBack: cubit.openLogin,
-                          onConfirm: cubit.verifyLoginOtp,
-                          onResend: () {
-                            final phone = state.phoneNumber;
-                            if (phone != null) {
-                              cubit.submitLoginPhone(phone);
-                            }
-                          },
-                          isVerifyingOtp: state.isVerifyingOtp,
-                        ),
-                      AppScreen.profile => ChildProfileScreen(
-                          key: const ValueKey('profile'),
-                          onBack: cubit.openOtp,
-                          onContinue: () => HapticFeedback.mediumImpact(),
-                        ),
-                      AppScreen.home => HomeScreen(
-                          key: const ValueKey('home'),
-                          user: state.loginUser,
-                          onBack: cubit.openLogin,
-                        ),
-                    },
                   ),
                 );
               },

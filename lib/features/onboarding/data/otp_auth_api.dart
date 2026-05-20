@@ -110,6 +110,8 @@ abstract class OtpAuthService {
 
   Future<AuthPhoneLookupResult> checkAuthPhone(String phone);
 
+  Future<LoginUser?> restoreSession();
+
   Future<LoginUser> loginWithPhone(String phone);
 
   Future<SendOtpResult> sendLoginOtp(String phone);
@@ -131,6 +133,23 @@ class OtpAuthApi implements OtpAuthService {
 
   final NetworkApi _networkApi;
   final Map<String, LoginUser> _loginUsers = {};
+
+  @override
+  Future<LoginUser?> restoreSession() async {
+    if (!await _networkApi.hasAuthToken()) {
+      return null;
+    }
+
+    try {
+      return (await _networkApi.getCurrentUser()).toLoginUser();
+    } on NetworkException catch (error) {
+      if (_isUnauthorized(error.status)) {
+        await _networkApi.clearAuthToken();
+      }
+
+      return null;
+    }
+  }
 
   @override
   Future<PhoneCheckResult> checkPhone(String phone) async {
@@ -230,16 +249,32 @@ class OtpAuthApi implements OtpAuthService {
       throw OtpAuthException(error.message, status: error.status);
     }
 
-    final user = response.user?.toLoginUser(fallbackPhone: phone) ??
-        _loginUsers[phone];
+    final user =
+        response.user?.toLoginUser(fallbackPhone: phone) ?? _loginUsers[phone];
     if (response.verified && user != null) {
       _loginUsers[phone] = user;
     }
 
+    final currentUser = response.verified ? await _currentUserOrNull() : null;
+
     return VerifyOtpResult(
       isValid: response.verified,
       message: response.status,
-      user: response.verified ? user : null,
+      user: response.verified ? currentUser ?? user : null,
     );
   }
+
+  Future<LoginUser?> _currentUserOrNull() async {
+    try {
+      return (await _networkApi.getCurrentUser()).toLoginUser();
+    } on NetworkException catch (error) {
+      if (_isUnauthorized(error.status)) {
+        await _networkApi.clearAuthToken();
+      }
+
+      return null;
+    }
+  }
+
+  static bool _isUnauthorized(int? status) => status == 401 || status == 403;
 }

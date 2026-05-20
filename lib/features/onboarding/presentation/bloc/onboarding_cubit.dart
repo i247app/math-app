@@ -27,6 +27,7 @@ class OnboardingState {
     this.avatarPath,
     this.isPickingAvatar = false,
     this.avatarError,
+    this.isRestoringSession = false,
     this.phoneNumber,
     this.checkedPhone,
     this.isCheckingAuthPhone = false,
@@ -50,6 +51,7 @@ class OnboardingState {
   final String? avatarPath;
   final bool isPickingAvatar;
   final String? avatarError;
+  final bool isRestoringSession;
   final String? phoneNumber;
   final String? checkedPhone;
   final bool isCheckingAuthPhone;
@@ -73,6 +75,7 @@ class OnboardingState {
     String? avatarPath,
     bool? isPickingAvatar,
     String? avatarError,
+    bool? isRestoringSession,
     String? phoneNumber,
     String? checkedPhone,
     bool? isCheckingAuthPhone,
@@ -100,6 +103,7 @@ class OnboardingState {
       avatarPath: avatarPath ?? this.avatarPath,
       isPickingAvatar: isPickingAvatar ?? this.isPickingAvatar,
       avatarError: clearAvatarError ? null : avatarError ?? this.avatarError,
+      isRestoringSession: isRestoringSession ?? this.isRestoringSession,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       checkedPhone: clearPhoneLookup ? null : checkedPhone ?? this.checkedPhone,
       isCheckingAuthPhone: isCheckingAuthPhone ?? this.isCheckingAuthPhone,
@@ -142,6 +146,34 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   void openProfile() => emit(state.copyWith(screen: AppScreen.profile));
 
   void openHome() => emit(state.copyWith(screen: AppScreen.home));
+
+  Future<void> restoreSession() async {
+    if (state.isRestoringSession || state.loginUser != null) {
+      return;
+    }
+
+    emit(state.copyWith(isRestoringSession: true, clearAuthError: true));
+
+    try {
+      final user = await _authService.restoreSession();
+      if (isClosed) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          screen: user == null ? state.screen : AppScreen.home,
+          isRestoringSession: false,
+          loginUser: user,
+          clearAuthError: true,
+        ),
+      );
+    } catch (_) {
+      if (!isClosed) {
+        emit(state.copyWith(isRestoringSession: false));
+      }
+    }
+  }
 
   void selectPhoneRegion(PhoneRegion region) {
     emit(state.copyWith(phoneRegion: region));
