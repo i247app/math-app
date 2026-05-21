@@ -158,7 +158,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                         ),
                       ),
                       Positioned.fill(
-                        top: s(80),
+                        top: isGeneratingQuestion ? 0 : s(80),
                         bottom: isGeneratingQuestion || errorMessage != null
                             ? 0
                             : s(97),
@@ -215,12 +215,13 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                     ),
                         ),
                       ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        child: _AssessmentHeader(scale: scale),
-                      ),
+                      if (!isGeneratingQuestion)
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          top: 0,
+                          child: _AssessmentHeader(scale: scale),
+                        ),
                       if (!isGeneratingQuestion && errorMessage == null)
                         Positioned(
                           left: 0,

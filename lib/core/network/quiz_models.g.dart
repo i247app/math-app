@@ -9,12 +9,14 @@ part of 'quiz_models.dart';
 GenerateQuizRequest _$GenerateQuizRequestFromJson(Map<String, dynamic> json) =>
     GenerateQuizRequest(
       type: json['type'] as String,
+      gradeLabel: json['grade_label'] as String,
     );
 
 Map<String, dynamic> _$GenerateQuizRequestToJson(
         GenerateQuizRequest instance) =>
     <String, dynamic>{
       'type': instance.type,
+      'grade_label': instance.gradeLabel,
     };
 
 GenerateQuizResponse _$GenerateQuizResponseFromJson(

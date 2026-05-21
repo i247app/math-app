@@ -4,9 +4,14 @@ part 'quiz_models.g.dart';
 
 @JsonSerializable()
 class GenerateQuizRequest {
-  const GenerateQuizRequest({required this.type});
+  const GenerateQuizRequest({
+    required this.type,
+    required this.gradeLabel,
+  });
 
   final String type;
+  @JsonKey(name: 'grade_label')
+  final String gradeLabel;
 
   factory GenerateQuizRequest.fromJson(Map<String, dynamic> json) =>
       _$GenerateQuizRequestFromJson(json);

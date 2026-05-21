@@ -3,6 +3,7 @@ import '../../../core/network/network_client.dart';
 import '../../../core/network/quiz_models.dart';
 
 const practiceQuizType = 'PRACTICE';
+const practiceQuizGradeLabel = 'Grade 1';
 
 class QuizException implements Exception {
   const QuizException(this.message, {this.status});
@@ -51,7 +52,10 @@ class QuizApi implements QuizService {
     final GenerateQuizResponse response;
     try {
       response = await _networkApi.generateQuiz(
-        const GenerateQuizRequest(type: practiceQuizType),
+        const GenerateQuizRequest(
+          type: practiceQuizType,
+          gradeLabel: practiceQuizGradeLabel,
+        ),
       );
     } on NetworkException catch (error) {
       throw QuizException(error.message, status: error.status);
