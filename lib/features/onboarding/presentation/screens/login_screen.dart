@@ -259,6 +259,18 @@ class LoginCard extends StatelessWidget {
                     ? Column(
                         key: const ValueKey('send-otp-actions'),
                         children: [
+                          const Text(
+                            'Đây là tài khoản MỚI. Tiếp tục đăng ký?',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.muted,
+                              fontSize: 13,
+                              height: 1.25,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           PrimaryButton(
                             label: 'Đăng ký',
                             onPressed: onSendOtp,

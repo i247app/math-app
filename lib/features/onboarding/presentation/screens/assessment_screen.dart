@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/network/quiz_models.dart';
 import '../../data/quiz_api.dart';
+import 'assessment_result_screen.dart';
 
 const _assessmentMint = Color(0xFFEBFAEC);
 const _assessmentTeal = Color(0xFF006762);
@@ -108,6 +109,11 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     final questions = quiz?.questions ?? const <QuizQuestion>[];
     if (questionIndex >= questions.length - 1) {
       HapticFeedback.mediumImpact();
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const AssessmentResultScreen(),
+        ),
+      );
       return;
     }
 
