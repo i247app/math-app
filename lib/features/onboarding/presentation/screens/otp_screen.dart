@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,32 +14,70 @@ class OtpScreen extends StatefulWidget {
     required this.onConfirm,
     required this.onResend,
     required this.isVerifyingOtp,
+    required this.resendSeconds,
+    required this.resendResetId,
+    this.otpError,
+    this.otpErrorId = 0,
   });
 
   final VoidCallback onBack;
   final ValueChanged<String> onConfirm;
   final VoidCallback onResend;
   final bool isVerifyingOtp;
+  final int resendSeconds;
+  final int resendResetId;
+  final String? otpError;
+  final int otpErrorId;
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenState extends State<OtpScreen>
+    with SingleTickerProviderStateMixin {
   static const otpLength = 4;
 
   late final List<TextEditingController> controllers;
   late final List<FocusNode> focusNodes;
+  late final AnimationController errorShakeController;
+  Timer? resendTimer;
+  int resendCountdown = 0;
+  bool hideOtpError = false;
 
   @override
   void initState() {
     super.initState();
     controllers = List.generate(otpLength, (_) => TextEditingController());
     focusNodes = List.generate(otpLength, (_) => FocusNode());
+    errorShakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 380),
+    );
+    startResendCountdown(widget.resendSeconds, notify: false);
+  }
+
+  @override
+  void didUpdateWidget(covariant OtpScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.resendResetId != oldWidget.resendResetId ||
+        widget.resendSeconds != oldWidget.resendSeconds) {
+      startResendCountdown(widget.resendSeconds);
+    }
+
+    if (widget.otpErrorId != oldWidget.otpErrorId && widget.otpError != null) {
+      showOtpError();
+      return;
+    }
+
+    if (widget.otpError == null && oldWidget.otpError != null) {
+      hideOtpError = false;
+    }
   }
 
   @override
   void dispose() {
+    resendTimer?.cancel();
+    errorShakeController.dispose();
     for (final controller in controllers) {
       controller.dispose();
     }
@@ -46,23 +87,100 @@ class _OtpScreenState extends State<OtpScreen> {
     super.dispose();
   }
 
+  void startResendCountdown(int seconds, {bool notify = true}) {
+    resendTimer?.cancel();
+    final initialSeconds = seconds < 0 ? 0 : seconds;
+    if (notify) {
+      setState(() {
+        resendCountdown = initialSeconds;
+      });
+    } else {
+      resendCountdown = initialSeconds;
+    }
+
+    if (initialSeconds == 0) {
+      return;
+    }
+
+    resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      if (resendCountdown <= 1) {
+        timer.cancel();
+        setState(() {
+          resendCountdown = 0;
+        });
+        return;
+      }
+
+      setState(() {
+        resendCountdown--;
+      });
+    });
+  }
+
+  void showOtpError() {
+    HapticFeedback.mediumImpact();
+    for (final controller in controllers) {
+      controller.clear();
+    }
+    setState(() {
+      hideOtpError = false;
+    });
+    errorShakeController.forward(from: 0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        focusNodes.first.requestFocus();
+      }
+    });
+  }
+
   void updateDigit(int index, String value) {
-    final digit = value.replaceAll(RegExp(r'\D'), '');
-    if (digit.isEmpty) {
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+    if (digits.isEmpty) {
       controllers[index].clear();
+      if (index > 0) {
+        focusNodes[index - 1].requestFocus();
+      }
       setState(() {});
       return;
     }
 
-    controllers[index].text = digit.substring(digit.length - 1);
-    controllers[index].selection = const TextSelection.collapsed(offset: 1);
-
-    if (index < focusNodes.length - 1) {
-      focusNodes[index + 1].requestFocus();
-    } else {
-      focusNodes[index].unfocus();
+    if (widget.otpError != null && !hideOtpError) {
+      hideOtpError = true;
     }
 
+    var nextIndex = index;
+    for (final digit in digits.split('')) {
+      if (nextIndex >= controllers.length) {
+        break;
+      }
+
+      controllers[nextIndex].text = digit;
+      controllers[nextIndex].selection =
+          const TextSelection.collapsed(offset: 1);
+      nextIndex++;
+    }
+
+    if (nextIndex < focusNodes.length) {
+      focusNodes[nextIndex].requestFocus();
+    } else {
+      focusNodes.last.unfocus();
+    }
+
+    setState(() {});
+  }
+
+  void handleEmptyBackspace(int index) {
+    if (index == 0) {
+      return;
+    }
+
+    controllers[index - 1].clear();
+    focusNodes[index - 1].requestFocus();
     setState(() {});
   }
 
@@ -77,12 +195,22 @@ class _OtpScreenState extends State<OtpScreen> {
     widget.onConfirm(otpCode);
   }
 
+  void handleResend() {
+    if (resendCountdown > 0) {
+      HapticFeedback.selectionClick();
+      return;
+    }
+
+    widget.onResend();
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
-    final tight = width < 370;
+    final mascotSize = width < 370 ? 170.0 : 188.0;
+    final otpError = hideOtpError ? null : widget.otpError;
 
     return ScreenFrame(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -100,44 +228,34 @@ class _OtpScreenState extends State<OtpScreen> {
               const ProgressDots(activeIndex: 2),
             ],
           ),
-          SizedBox(height: compact ? 58 : 80),
-          RichText(
-            text: TextSpan(
-              style: TextStyle(
-                color: AppColors.ink,
-                fontSize: tight ? 30 : 34,
-                height: 1.04,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0,
-              ),
-              children: const [
-                TextSpan(text: 'Xác thực '),
-                TextSpan(
-                  text: 'OTP',
-                  style: TextStyle(color: AppColors.teal),
-                ),
-              ],
-            ),
+          SizedBox(height: compact ? 34 : 54),
+          Center(
+            child: _OtpBrandMascot(size: mascotSize),
           ),
-          const SizedBox(height: 14),
-          Text(
-            'Vui lòng nhập mã 4 số đã được gửi đến số điện thoại của bạn.',
-            style: TextStyle(
-              color: AppColors.muted,
-              fontSize: tight ? 15 : 16,
-              height: 1.42,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0,
+          SizedBox(height: compact ? 28 : 50),
+          AnimatedBuilder(
+            animation: errorShakeController,
+            builder: (context, child) {
+              final offset =
+                  math.sin(errorShakeController.value * math.pi * 6) *
+                      9 *
+                      (1 - errorShakeController.value);
+              return Transform.translate(
+                offset: Offset(offset, 0),
+                child: child,
+              );
+            },
+            child: OtpCard(
+              controllers: controllers,
+              focusNodes: focusNodes,
+              onChanged: updateDigit,
+              onEmptyBackspace: handleEmptyBackspace,
+              onConfirm: handleConfirm,
+              onResend: handleResend,
+              isVerifyingOtp: widget.isVerifyingOtp,
+              resendCountdown: resendCountdown,
+              errorText: otpError,
             ),
-          ),
-          SizedBox(height: compact ? 28 : 38),
-          OtpCard(
-            controllers: controllers,
-            focusNodes: focusNodes,
-            onChanged: updateDigit,
-            onConfirm: handleConfirm,
-            onResend: widget.onResend,
-            isVerifyingOtp: widget.isVerifyingOtp,
           ),
           const SizedBox(height: 32),
         ],
@@ -152,22 +270,29 @@ class OtpCard extends StatelessWidget {
     required this.controllers,
     required this.focusNodes,
     required this.onChanged,
+    required this.onEmptyBackspace,
     required this.onConfirm,
     required this.onResend,
     required this.isVerifyingOtp,
+    required this.resendCountdown,
+    this.errorText,
   });
 
   final List<TextEditingController> controllers;
   final List<FocusNode> focusNodes;
   final void Function(int index, String value) onChanged;
+  final ValueChanged<int> onEmptyBackspace;
   final VoidCallback onConfirm;
   final VoidCallback onResend;
   final bool isVerifyingOtp;
+  final int resendCountdown;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final horizontalPadding = width < 380 ? 20.0 : 30.0;
+    final hasError = errorText != null;
 
     return Container(
       width: double.infinity,
@@ -216,7 +341,13 @@ class OtpCard extends StatelessWidget {
                       child: OtpDigitBox(
                         controller: controllers[index],
                         focusNode: focusNodes[index],
+                        autofocus: index == 0,
+                        textInputAction: index == 3
+                            ? TextInputAction.done
+                            : TextInputAction.next,
                         onChanged: (value) => onChanged(index, value),
+                        onEmptyBackspace: () => onEmptyBackspace(index),
+                        hasError: hasError,
                       ),
                     ),
                   );
@@ -224,7 +355,38 @@ class OtpCard extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 26),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: errorText == null
+                ? const SizedBox(height: 26)
+                : Padding(
+                    padding:
+                        const EdgeInsets.only(top: 12, bottom: 14, left: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: Color(0xFFD9534F),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            errorText!,
+                            style: const TextStyle(
+                              color: Color(0xFFD9534F),
+                              fontSize: 13,
+                              height: 1.25,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
           PrimaryButton(
             label: isVerifyingOtp ? 'Đang xác thực...' : 'Xác nhận  →',
             onPressed: isVerifyingOtp ? null : onConfirm,
@@ -232,9 +394,13 @@ class OtpCard extends StatelessWidget {
           const SizedBox(height: 20),
           Center(
             child: TextButton.icon(
-              onPressed: onResend,
+              onPressed: resendCountdown == 0 ? onResend : null,
               icon: const Icon(Icons.refresh_rounded, size: 20),
-              label: const Text('Gửi lại mã sau 30 giây'),
+              label: Text(
+                resendCountdown == 0
+                    ? 'Gửi lại mã'
+                    : 'Gửi lại mã sau $resendCountdown giây',
+              ),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.muted,
                 textStyle: const TextStyle(
@@ -250,50 +416,118 @@ class OtpCard extends StatelessWidget {
   }
 }
 
+class _OtpBrandMascot extends StatelessWidget {
+  const _OtpBrandMascot({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          'assets/images/welcome_numi_character.png',
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+        ),
+        Text(
+          'numinumi',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: const Color(0xFF24594E),
+            fontFamily: 'Nunito',
+            fontSize: size * 0.24,
+            fontWeight: FontWeight.w900,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class OtpDigitBox extends StatelessWidget {
   const OtpDigitBox({
     super.key,
     required this.controller,
     required this.focusNode,
+    required this.autofocus,
+    required this.textInputAction,
     required this.onChanged,
+    required this.onEmptyBackspace,
+    required this.hasError,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
+  final bool autofocus;
+  final TextInputAction textInputAction;
   final ValueChanged<String> onChanged;
+  final VoidCallback onEmptyBackspace;
+  final bool hasError;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      focusNode: focusNode,
-      textAlign: TextAlign.center,
-      keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      maxLength: 1,
-      onChanged: onChanged,
-      style: const TextStyle(
-        color: AppColors.ink,
-        fontSize: 24,
-        fontWeight: FontWeight.w900,
-        letterSpacing: 0,
-      ),
-      decoration: InputDecoration(
-        counterText: '',
-        filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.82),
-        contentPadding: const EdgeInsets.symmetric(vertical: 15),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.inputLine),
+    return Focus(
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.backspace &&
+            controller.text.isEmpty) {
+          onEmptyBackspace();
+          return KeyEventResult.handled;
+        }
+
+        return KeyEventResult.ignored;
+      },
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        autofocus: autofocus,
+        textAlign: TextAlign.center,
+        keyboardType: TextInputType.number,
+        textInputAction: textInputAction,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        onChanged: onChanged,
+        onTap: () {
+          controller.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: controller.text.length,
+          );
+        },
+        style: const TextStyle(
+          color: AppColors.ink,
+          fontSize: 24,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.inputLine),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.teal, width: 2),
+        decoration: InputDecoration(
+          counterText: '',
+          filled: true,
+          fillColor: Colors.white.withValues(alpha: 0.82),
+          contentPadding: const EdgeInsets.symmetric(vertical: 15),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(18),
+            borderSide: BorderSide(
+              color: hasError ? const Color(0xFFD9534F) : AppColors.inputLine,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(18),
+            borderSide: BorderSide(
+              color: hasError ? const Color(0xFFD9534F) : AppColors.inputLine,
+              width: hasError ? 1.6 : 1,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(18),
+            borderSide: BorderSide(
+              color: hasError ? const Color(0xFFD9534F) : AppColors.teal,
+              width: 2,
+            ),
+          ),
         ),
       ),
     );

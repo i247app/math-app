@@ -39,7 +39,7 @@ class LoginScreen extends StatelessWidget {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
-    final tight = width < 370;
+    final mascotSize = width < 370 ? 170.0 : 188.0;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -60,37 +60,11 @@ class LoginScreen extends StatelessWidget {
                 const ProgressDots(activeIndex: 1),
               ],
             ),
-            SizedBox(height: compact ? 64 : 98),
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  color: AppColors.ink,
-                  fontSize: tight ? 30 : 34,
-                  height: 1.04,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                ),
-                children: const [
-                  TextSpan(text: 'Xác minh '),
-                  TextSpan(
-                    text: 'tài khoản',
-                    style: TextStyle(color: AppColors.teal),
-                  ),
-                ],
-              ),
+            SizedBox(height: compact ? 34 : 54),
+            Center(
+              child: _LoginBrandMascot(size: mascotSize),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Vui lòng nhập số điện thoại để tiếp tục hành trình học tập cùng Numi.',
-              style: TextStyle(
-                color: AppColors.muted,
-                fontSize: tight ? 15 : 16,
-                height: 1.42,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0,
-              ),
-            ),
-            SizedBox(height: compact ? 26 : 30),
+            SizedBox(height: compact ? 28 : 50),
             LoginCard(
               controller: controller,
               region: region,
@@ -107,6 +81,40 @@ class LoginScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _LoginBrandMascot extends StatelessWidget {
+  const _LoginBrandMascot({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          'assets/images/welcome_numi_character.png',
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+        ),
+        const SizedBox(height: 0),
+        Text(
+          'numinumi',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: const Color(0xFF24594E),
+            fontFamily: 'Nunito',
+            fontSize: size * 0.24,
+            fontWeight: FontWeight.w900,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -136,18 +144,6 @@ class LoginCard extends StatelessWidget {
   final ValueChanged<String> onPhoneChanged;
   final bool? phoneExists;
   final String? phoneErrorText;
-
-  String get _buttonLabel {
-    if (isSendingOtp) {
-      return 'Đang xử lý...';
-    }
-
-    if (isCheckingAuthPhone) {
-      return 'Đang kiểm tra...';
-    }
-
-    return 'Đăng ký';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -257,55 +253,115 @@ class LoginCard extends StatelessWidget {
           const SizedBox(height: 24),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 220),
-            child: canSendOtp &&
-                    (phoneExists == false ||
-                        isSendingOtp ||
-                        isCheckingAuthPhone)
-                ? Column(
-                    key: const ValueKey('send-otp-actions'),
-                    children: [
-                      PrimaryButton(
-                        label: _buttonLabel,
-                        onPressed: isSendingOtp || isCheckingAuthPhone
-                            ? null
-                            : onSendOtp,
-                      ),
-                      const SizedBox(height: 16),
-                      const Center(
-                        child: SizedBox(
-                          width: 255,
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.timer_outlined,
-                                size: 20,
-                                color: AppColors.orangeAccent,
-                              ),
-                              SizedBox(width: 10),
-                              Flexible(
-                                child: Text(
-                                  'Bạn sẽ nhận được mã trong vòng 30 giây',
-                                  style: TextStyle(
-                                    color: AppColors.muted,
-                                    fontSize: 13,
-                                    height: 1.28,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0,
-                                  ),
-                                ),
-                              ),
-                            ],
+            child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
+                ? const _CheckingDots(key: ValueKey('checking-phone'))
+                : canSendOtp && phoneExists == false
+                    ? Column(
+                        key: const ValueKey('send-otp-actions'),
+                        children: [
+                          PrimaryButton(
+                            label: 'Đăng ký',
+                            onPressed: onSendOtp,
                           ),
-                        ),
+                          const SizedBox(height: 16),
+                          const Center(
+                            child: SizedBox(
+                              width: 255,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.timer_outlined,
+                                    size: 20,
+                                    color: AppColors.orangeAccent,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      'Bạn sẽ nhận được mã trong vòng 30 giây',
+                                      style: TextStyle(
+                                        color: AppColors.muted,
+                                        fontSize: 13,
+                                        height: 1.28,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox(
+                        key: ValueKey('send-otp-placeholder'),
+                        height: 0,
                       ),
-                    ],
-                  )
-                : const SizedBox(
-                    key: ValueKey('send-otp-placeholder'),
-                    height: 0,
-                  ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CheckingDots extends StatefulWidget {
+  const _CheckingDots({super.key});
+
+  @override
+  State<_CheckingDots> createState() => _CheckingDotsState();
+}
+
+class _CheckingDotsState extends State<_CheckingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      key: const ValueKey('checking-phone-dots'),
+      height: 58,
+      child: Center(
+        child: AnimatedBuilder(
+          animation: controller,
+          builder: (context, child) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(3, (index) {
+                final progress = (controller.value + index * 0.22) % 1;
+                final opacity = 0.35 + 0.65 * (1 - (progress - 0.5).abs() * 2);
+                final lift = -7 * (1 - (progress - 0.5).abs() * 2);
+
+                return Transform.translate(
+                  offset: Offset(0, lift),
+                  child: Container(
+                    width: 9,
+                    height: 9,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.teal.withValues(alpha: opacity),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                );
+              }),
+            );
+          },
+        ),
       ),
     );
   }

@@ -36,10 +36,13 @@ class OnboardingState {
     this.isSendingOtp = false,
     this.isVerifyingOtp = false,
     this.isSigningUp = false,
+    this.otpExpiresAt,
     this.otpExpiresIn,
     this.devOtpCode,
     this.devOtpPurpose,
     this.otpPreviewId = 0,
+    this.otpError,
+    this.otpErrorId = 0,
     this.otpFlow = OtpFlow.login,
     this.authError,
     this.loginUser,
@@ -61,10 +64,13 @@ class OnboardingState {
   final bool isSendingOtp;
   final bool isVerifyingOtp;
   final bool isSigningUp;
+  final String? otpExpiresAt;
   final int? otpExpiresIn;
   final String? devOtpCode;
   final String? devOtpPurpose;
   final int otpPreviewId;
+  final String? otpError;
+  final int otpErrorId;
   final OtpFlow otpFlow;
   final String? authError;
   final LoginUser? loginUser;
@@ -86,16 +92,21 @@ class OnboardingState {
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
+    String? otpExpiresAt,
     int? otpExpiresIn,
     String? devOtpCode,
     String? devOtpPurpose,
     int? otpPreviewId,
+    String? otpError,
+    int? otpErrorId,
     OtpFlow? otpFlow,
     String? authError,
     LoginUser? loginUser,
     bool clearAvatarError = false,
     bool clearAuthError = false,
     bool clearDevOtp = false,
+    bool clearOtpError = false,
+    bool clearOtpExpiry = false,
     bool clearPhoneLookup = false,
   }) {
     return OnboardingState(
@@ -116,10 +127,13 @@ class OnboardingState {
       isSendingOtp: isSendingOtp ?? this.isSendingOtp,
       isVerifyingOtp: isVerifyingOtp ?? this.isVerifyingOtp,
       isSigningUp: isSigningUp ?? this.isSigningUp,
-      otpExpiresIn: otpExpiresIn ?? this.otpExpiresIn,
+      otpExpiresAt: clearOtpExpiry ? null : otpExpiresAt ?? this.otpExpiresAt,
+      otpExpiresIn: clearOtpExpiry ? null : otpExpiresIn ?? this.otpExpiresIn,
       devOtpCode: clearDevOtp ? null : devOtpCode ?? this.devOtpCode,
       devOtpPurpose: clearDevOtp ? null : devOtpPurpose ?? this.devOtpPurpose,
       otpPreviewId: otpPreviewId ?? this.otpPreviewId,
+      otpError: clearOtpError ? null : otpError ?? this.otpError,
+      otpErrorId: otpErrorId ?? this.otpErrorId,
       otpFlow: otpFlow ?? this.otpFlow,
       authError: clearAuthError ? null : authError ?? this.authError,
       loginUser: loginUser ?? this.loginUser,
@@ -140,12 +154,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
-  void openLogin() => emit(state.copyWith(screen: AppScreen.login));
+  void openLogin() =>
+      emit(state.copyWith(screen: AppScreen.login, clearOtpError: true));
 
   void openSignupPrompt() =>
       emit(state.copyWith(screen: AppScreen.signupPrompt));
 
-  void openOtp() => emit(state.copyWith(screen: AppScreen.otp));
+  void openOtp() =>
+      emit(state.copyWith(screen: AppScreen.otp, clearOtpError: true));
 
   void openSignup() => emit(state.copyWith(screen: AppScreen.signup));
 
@@ -246,15 +262,16 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isCheckingAuthPhone: false,
           phoneExists: result.exists,
           phoneLookupUser: result.user,
+          otpExpiresAt: result.expiresAt,
           otpExpiresIn: result.expiresIn,
           devOtpCode: result.otpCode,
           devOtpPurpose: result.purpose,
-          otpPreviewId: result.otpCode == null
-              ? state.otpPreviewId
-              : state.otpPreviewId + 1,
+          otpPreviewId: state.otpPreviewId + 1,
           otpFlow: OtpFlow.login,
           clearAuthError: true,
           clearDevOtp: result.otpCode == null,
+          clearOtpExpiry: result.expiresAt == null && result.expiresIn == null,
+          clearOtpError: true,
         ),
       );
     } on OtpAuthException catch (error) {
@@ -298,6 +315,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           state.copyWith(
             screen: AppScreen.otp,
             phoneNumber: phone,
+            otpExpiresAt: otp.expiresAt,
             otpExpiresIn: otp.expiresIn,
             devOtpCode: otp.otpCode,
             devOtpPurpose: otp.purpose,
@@ -306,6 +324,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
             isSendingOtp: false,
             clearAuthError: true,
             clearDevOtp: otp.otpCode == null,
+            clearOtpExpiry: otp.expiresAt == null,
+            clearOtpError: true,
           ),
         );
       } on OtpAuthException catch (error) {
@@ -334,6 +354,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         state.copyWith(
           screen: AppScreen.otp,
           phoneNumber: phone,
+          otpExpiresAt: otp.expiresAt,
           otpExpiresIn: otp.expiresIn,
           devOtpCode: otp.otpCode,
           devOtpPurpose: otp.purpose,
@@ -342,6 +363,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isSendingOtp: false,
           clearAuthError: true,
           clearDevOtp: otp.otpCode == null,
+          clearOtpExpiry: otp.expiresAt == null,
+          clearOtpError: true,
         ),
       );
     } on OtpAuthException catch (error) {
@@ -386,6 +409,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       emit(
         state.copyWith(
           screen: AppScreen.otp,
+          otpExpiresAt: otp.expiresAt,
           otpExpiresIn: otp.expiresIn,
           devOtpCode: otp.otpCode,
           devOtpPurpose: otp.purpose,
@@ -394,6 +418,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isSendingOtp: false,
           clearAuthError: true,
           clearDevOtp: otp.otpCode == null,
+          clearOtpExpiry: otp.expiresAt == null,
+          clearOtpError: true,
         ),
       );
     } on OtpAuthException catch (error) {
@@ -419,7 +445,13 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       return;
     }
 
-    emit(state.copyWith(isVerifyingOtp: true, clearAuthError: true));
+    emit(
+      state.copyWith(
+        isVerifyingOtp: true,
+        clearAuthError: true,
+        clearOtpError: true,
+      ),
+    );
 
     try {
       final otpFlow = state.otpFlow;
@@ -433,7 +465,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         emit(
           state.copyWith(
             isVerifyingOtp: false,
-            authError: result.message ?? 'OTP không hợp lệ.',
+            otpError: result.message ?? 'Mã OTP không đúng. Vui lòng thử lại.',
+            otpErrorId: state.otpErrorId + 1,
+            clearAuthError: true,
           ),
         );
         return;
@@ -446,6 +480,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
             isVerifyingOtp: false,
             loginUser: result.user,
             clearAuthError: true,
+            clearOtpError: true,
           ),
         );
         return;
@@ -467,9 +502,22 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isVerifyingOtp: false,
           loginUser: result.user,
           clearAuthError: true,
+          clearOtpError: true,
         ),
       );
     } on OtpAuthException catch (error) {
+      if (_isOtpValidationError(error.status)) {
+        emit(
+          state.copyWith(
+            isVerifyingOtp: false,
+            otpError: error.message,
+            otpErrorId: state.otpErrorId + 1,
+            clearAuthError: true,
+          ),
+        );
+        return;
+      }
+
       emit(
         state.copyWith(
           isVerifyingOtp: false,
@@ -484,6 +532,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         ),
       );
     }
+  }
+
+  static bool _isOtpValidationError(int? status) {
+    return status == 400 || status == 422 || status == 4706;
   }
 
   Future<void> submitSignup({

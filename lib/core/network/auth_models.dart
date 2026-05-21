@@ -73,6 +73,7 @@ class AuthResponse {
     this.status,
     this.mmessage,
     this.debug,
+    this.expiresAt,
     this.otpCode,
     this.user,
     this.profile,
@@ -82,6 +83,8 @@ class AuthResponse {
   final String? status;
   final String? mmessage;
   final String? debug;
+  @JsonKey(name: 'expires_at')
+  final String? expiresAt;
   @JsonKey(name: 'otp_code')
   final String? otpCode;
   final AuthUser? user;
