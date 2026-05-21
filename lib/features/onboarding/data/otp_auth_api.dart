@@ -64,6 +64,7 @@ class AuthPhoneLookupResult {
     this.user,
     this.otpCode,
     this.purpose,
+    this.expiresAt,
     this.expiresIn,
     this.message,
   });
@@ -73,6 +74,7 @@ class AuthPhoneLookupResult {
   final LoginUser? user;
   final String? otpCode;
   final String? purpose;
+  final String? expiresAt;
   final int? expiresIn;
   final String? message;
 }
@@ -205,7 +207,8 @@ class OtpAuthApi implements OtpAuthService {
       user: user,
       otpCode: response.otpCode,
       purpose: 'login',
-      expiresIn: 180,
+      expiresAt: response.expiresAt,
+      expiresIn: _expiresInFrom(response.expiresAt),
       message: response.status,
     );
   }
@@ -229,7 +232,8 @@ class OtpAuthApi implements OtpAuthService {
     return SendOtpResult(
       otpCode: response.otpCode,
       purpose: 'login',
-      expiresIn: 180,
+      expiresAt: response.expiresAt,
+      expiresIn: _expiresInFrom(response.expiresAt) ?? 0,
       message: response.status,
     );
   }
@@ -252,7 +256,7 @@ class OtpAuthApi implements OtpAuthService {
       otpCode: response.otpCode,
       purpose: 'register',
       expiresAt: response.expiresAt,
-      expiresIn: _expiresInFrom(response.expiresAt) ?? 180,
+      expiresIn: _expiresInFrom(response.expiresAt) ?? 0,
       message: response.status,
     );
   }

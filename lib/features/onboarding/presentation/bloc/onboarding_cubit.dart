@@ -36,6 +36,7 @@ class OnboardingState {
     this.isSendingOtp = false,
     this.isVerifyingOtp = false,
     this.isSigningUp = false,
+    this.otpExpiresAt,
     this.otpExpiresIn,
     this.devOtpCode,
     this.devOtpPurpose,
@@ -63,6 +64,7 @@ class OnboardingState {
   final bool isSendingOtp;
   final bool isVerifyingOtp;
   final bool isSigningUp;
+  final String? otpExpiresAt;
   final int? otpExpiresIn;
   final String? devOtpCode;
   final String? devOtpPurpose;
@@ -90,6 +92,7 @@ class OnboardingState {
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
+    String? otpExpiresAt,
     int? otpExpiresIn,
     String? devOtpCode,
     String? devOtpPurpose,
@@ -103,6 +106,7 @@ class OnboardingState {
     bool clearAuthError = false,
     bool clearDevOtp = false,
     bool clearOtpError = false,
+    bool clearOtpExpiry = false,
     bool clearPhoneLookup = false,
   }) {
     return OnboardingState(
@@ -123,7 +127,8 @@ class OnboardingState {
       isSendingOtp: isSendingOtp ?? this.isSendingOtp,
       isVerifyingOtp: isVerifyingOtp ?? this.isVerifyingOtp,
       isSigningUp: isSigningUp ?? this.isSigningUp,
-      otpExpiresIn: otpExpiresIn ?? this.otpExpiresIn,
+      otpExpiresAt: clearOtpExpiry ? null : otpExpiresAt ?? this.otpExpiresAt,
+      otpExpiresIn: clearOtpExpiry ? null : otpExpiresIn ?? this.otpExpiresIn,
       devOtpCode: clearDevOtp ? null : devOtpCode ?? this.devOtpCode,
       devOtpPurpose: clearDevOtp ? null : devOtpPurpose ?? this.devOtpPurpose,
       otpPreviewId: otpPreviewId ?? this.otpPreviewId,
@@ -257,15 +262,15 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isCheckingAuthPhone: false,
           phoneExists: result.exists,
           phoneLookupUser: result.user,
+          otpExpiresAt: result.expiresAt,
           otpExpiresIn: result.expiresIn,
           devOtpCode: result.otpCode,
           devOtpPurpose: result.purpose,
-          otpPreviewId: result.otpCode == null
-              ? state.otpPreviewId
-              : state.otpPreviewId + 1,
+          otpPreviewId: state.otpPreviewId + 1,
           otpFlow: OtpFlow.login,
           clearAuthError: true,
           clearDevOtp: result.otpCode == null,
+          clearOtpExpiry: result.expiresAt == null && result.expiresIn == null,
           clearOtpError: true,
         ),
       );
@@ -310,6 +315,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           state.copyWith(
             screen: AppScreen.otp,
             phoneNumber: phone,
+            otpExpiresAt: otp.expiresAt,
             otpExpiresIn: otp.expiresIn,
             devOtpCode: otp.otpCode,
             devOtpPurpose: otp.purpose,
@@ -318,6 +324,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
             isSendingOtp: false,
             clearAuthError: true,
             clearDevOtp: otp.otpCode == null,
+            clearOtpExpiry: otp.expiresAt == null,
             clearOtpError: true,
           ),
         );
@@ -347,6 +354,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         state.copyWith(
           screen: AppScreen.otp,
           phoneNumber: phone,
+          otpExpiresAt: otp.expiresAt,
           otpExpiresIn: otp.expiresIn,
           devOtpCode: otp.otpCode,
           devOtpPurpose: otp.purpose,
@@ -355,6 +363,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isSendingOtp: false,
           clearAuthError: true,
           clearDevOtp: otp.otpCode == null,
+          clearOtpExpiry: otp.expiresAt == null,
           clearOtpError: true,
         ),
       );
@@ -400,6 +409,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       emit(
         state.copyWith(
           screen: AppScreen.otp,
+          otpExpiresAt: otp.expiresAt,
           otpExpiresIn: otp.expiresIn,
           devOtpCode: otp.otpCode,
           devOtpPurpose: otp.purpose,
@@ -408,6 +418,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isSendingOtp: false,
           clearAuthError: true,
           clearDevOtp: otp.otpCode == null,
+          clearOtpExpiry: otp.expiresAt == null,
           clearOtpError: true,
         ),
       );

@@ -14,6 +14,8 @@ class OtpScreen extends StatefulWidget {
     required this.onConfirm,
     required this.onResend,
     required this.isVerifyingOtp,
+    required this.resendSeconds,
+    required this.resendResetId,
     this.otpError,
     this.otpErrorId = 0,
   });
@@ -22,6 +24,8 @@ class OtpScreen extends StatefulWidget {
   final ValueChanged<String> onConfirm;
   final VoidCallback onResend;
   final bool isVerifyingOtp;
+  final int resendSeconds;
+  final int resendResetId;
   final String? otpError;
   final int otpErrorId;
 
@@ -32,13 +36,12 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen>
     with SingleTickerProviderStateMixin {
   static const otpLength = 4;
-  static const resendSeconds = 30;
 
   late final List<TextEditingController> controllers;
   late final List<FocusNode> focusNodes;
   late final AnimationController errorShakeController;
   Timer? resendTimer;
-  int resendCountdown = resendSeconds;
+  int resendCountdown = 0;
   bool hideOtpError = false;
 
   @override
@@ -50,12 +53,17 @@ class _OtpScreenState extends State<OtpScreen>
       vsync: this,
       duration: const Duration(milliseconds: 380),
     );
-    startResendCountdown();
+    startResendCountdown(widget.resendSeconds, notify: false);
   }
 
   @override
   void didUpdateWidget(covariant OtpScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.resendResetId != oldWidget.resendResetId ||
+        widget.resendSeconds != oldWidget.resendSeconds) {
+      startResendCountdown(widget.resendSeconds);
+    }
+
     if (widget.otpErrorId != oldWidget.otpErrorId && widget.otpError != null) {
       showOtpError();
       return;
@@ -79,11 +87,20 @@ class _OtpScreenState extends State<OtpScreen>
     super.dispose();
   }
 
-  void startResendCountdown() {
+  void startResendCountdown(int seconds, {bool notify = true}) {
     resendTimer?.cancel();
-    setState(() {
-      resendCountdown = resendSeconds;
-    });
+    final initialSeconds = seconds < 0 ? 0 : seconds;
+    if (notify) {
+      setState(() {
+        resendCountdown = initialSeconds;
+      });
+    } else {
+      resendCountdown = initialSeconds;
+    }
+
+    if (initialSeconds == 0) {
+      return;
+    }
 
     resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
@@ -185,7 +202,6 @@ class _OtpScreenState extends State<OtpScreen>
     }
 
     widget.onResend();
-    startResendCountdown();
   }
 
   @override

@@ -253,6 +253,8 @@ class _NumiHomeState extends State<NumiHome> {
                                   }
                                 },
                                 isVerifyingOtp: state.isVerifyingOtp,
+                                resendSeconds: state.otpExpiresIn ?? 0,
+                                resendResetId: state.otpPreviewId,
                                 otpError: state.otpError,
                                 otpErrorId: state.otpErrorId,
                               ),
