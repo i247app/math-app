@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
-import 'assessment_screen.dart';
+import 'grade_selection_screen.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
@@ -495,7 +495,7 @@ class _TestHeroCard extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => const AiAssessmentScreen(),
+                    builder: (_) => const GradeSelectionScreen(),
                   ),
                 );
               },
