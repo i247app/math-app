@@ -1,9 +1,11 @@
-import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../../../../core/network/quiz_models.dart';
+import '../../data/quiz_api.dart';
 
 const _assessmentMint = Color(0xFFEBFAEC);
 const _assessmentTeal = Color(0xFF006762);
@@ -12,41 +14,118 @@ const _assessmentMuted = Color(0xFF515F54);
 const _assessmentPeach = Color(0xFFFFC4B1);
 const _assessmentRust = Color(0xFFA03A0F);
 const _assessmentProgress = Color(0xFF00618D);
+const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
+
+enum AiAssessmentResult {
+  generationFailed,
+}
 
 class AiAssessmentScreen extends StatefulWidget {
-  const AiAssessmentScreen({super.key});
+  const AiAssessmentScreen({super.key, this.quizService});
+
+  final QuizService? quizService;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
 }
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
-  int selectedAnswer = 22;
-  bool isGeneratingQuestion = true;
-  Timer? generationTimer;
+  late final QuizService _quizService;
+  GeneratedQuiz? quiz;
+  int questionIndex = 0;
+  final Map<int, String> selectedAnswerLabels = {};
+  String? errorMessage;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
-  static const _answers = [20, 22, 25, 18];
 
   @override
   void initState() {
     super.initState();
-    generationTimer = Timer(const Duration(milliseconds: 1400), () {
-      if (mounted) {
-        setState(() => isGeneratingQuestion = false);
+    _quizService = widget.quizService ??
+        (_useFakeQuizApi ? const FakeQuizApi() : QuizApi());
+    generateQuiz();
+  }
+
+  Future<void> generateQuiz() async {
+    setState(() {
+      quiz = null;
+      questionIndex = 0;
+      selectedAnswerLabels.clear();
+      errorMessage = null;
+    });
+
+    try {
+      final generatedQuiz = await _quizService.generatePracticeQuiz();
+      if (!mounted) {
+        return;
       }
+
+      setState(() {
+        quiz = generatedQuiz;
+      });
+    } on QuizException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      handleGenerationFailure(error.message);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      handleGenerationFailure('Không thể tạo câu hỏi. Vui lòng thử lại.');
+    }
+  }
+
+  void handleGenerationFailure(String message) {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop(AiAssessmentResult.generationFailed);
+      return;
+    }
+
+    setState(() => errorMessage = message);
+  }
+
+  void selectAnswer(QuizAnswer answer) {
+    HapticFeedback.selectionClick();
+    setState(() => selectedAnswerLabels[questionIndex] = answer.label);
+  }
+
+  void goToPreviousQuestion() {
+    if (questionIndex == 0) {
+      HapticFeedback.selectionClick();
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    setState(() => questionIndex--);
+  }
+
+  void goToNextQuestion() {
+    final questions = quiz?.questions ?? const <QuizQuestion>[];
+    if (questionIndex >= questions.length - 1) {
+      HapticFeedback.mediumImpact();
+      return;
+    }
+
+    HapticFeedback.mediumImpact();
+    setState(() {
+      questionIndex++;
     });
   }
 
   @override
-  void dispose() {
-    generationTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final currentQuiz = quiz;
+    final questions = currentQuiz?.questions ?? const <QuizQuestion>[];
+    final currentQuestion = questions.isEmpty ? null : questions[questionIndex];
+    final selectedAnswerLabel = selectedAnswerLabels[questionIndex];
+    final isGeneratingQuestion =
+        currentQuestion == null && errorMessage == null;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
@@ -74,47 +153,60 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                       ),
                       Positioned.fill(
                         top: s(80),
-                        bottom: isGeneratingQuestion ? 0 : s(97),
+                        bottom: isGeneratingQuestion || errorMessage != null
+                            ? 0
+                            : s(97),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 320),
                           switchInCurve: Curves.easeOutCubic,
                           switchOutCurve: Curves.easeInCubic,
-                          child: isGeneratingQuestion
-                              ? _GeneratingQuestionLoader(
-                                  key: const ValueKey('question-loader'),
+                          child: errorMessage != null
+                              ? _AssessmentErrorState(
+                                  key: const ValueKey('question-error'),
                                   scale: scale,
+                                  message: errorMessage!,
+                                  onRetry: generateQuiz,
                                 )
-                              : SingleChildScrollView(
-                                  key: const ValueKey('question-content'),
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: EdgeInsets.fromLTRB(
-                                    s(24),
-                                    0,
-                                    s(24),
-                                    s(24),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      _ProgressSection(scale: scale),
-                                      SizedBox(height: s(32)),
-                                      _QuestionCard(scale: scale),
-                                      SizedBox(height: s(32)),
-                                      _AnswerGrid(
-                                        scale: scale,
-                                        answers: _answers,
-                                        selectedAnswer: selectedAnswer,
-                                        onSelected: (answer) {
-                                          HapticFeedback.selectionClick();
-                                          setState(
-                                            () => selectedAnswer = answer,
-                                          );
-                                        },
+                              : isGeneratingQuestion
+                                  ? _GeneratingQuestionLoader(
+                                      key: const ValueKey('question-loader'),
+                                      scale: scale,
+                                    )
+                                  : SingleChildScrollView(
+                                      key: const ValueKey('question-content'),
+                                      physics: const BouncingScrollPhysics(),
+                                      padding: EdgeInsets.fromLTRB(
+                                        s(24),
+                                        0,
+                                        s(24),
+                                        s(24),
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          _ProgressSection(
+                                            scale: scale,
+                                            currentQuestion: questionIndex + 1,
+                                            totalQuestions: questions.length,
+                                          ),
+                                          SizedBox(height: s(32)),
+                                          _QuestionCard(
+                                            scale: scale,
+                                            question:
+                                                currentQuestion!.questionName,
+                                          ),
+                                          SizedBox(height: s(32)),
+                                          _AnswerGrid(
+                                            scale: scale,
+                                            answers: currentQuestion.answers,
+                                            selectedAnswerLabel:
+                                                selectedAnswerLabel,
+                                            onSelected: selectAnswer,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                         ),
                       ),
                       Positioned(
@@ -123,12 +215,17 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                         top: 0,
                         child: _AssessmentHeader(scale: scale),
                       ),
-                      if (!isGeneratingQuestion)
+                      if (!isGeneratingQuestion && errorMessage == null)
                         Positioned(
                           left: 0,
                           right: 0,
                           bottom: 0,
-                          child: _AssessmentBottomBar(scale: scale),
+                          child: _AssessmentBottomBar(
+                            scale: scale,
+                            canGoBack: questionIndex > 0,
+                            onBack: goToPreviousQuestion,
+                            onContinue: goToNextQuestion,
+                          ),
                         ),
                     ],
                   ),
@@ -239,17 +336,27 @@ class _HeaderIconButton extends StatelessWidget {
 }
 
 class _ProgressSection extends StatelessWidget {
-  const _ProgressSection({required this.scale});
+  const _ProgressSection({
+    required this.scale,
+    required this.currentQuestion,
+    required this.totalQuestions,
+  });
 
   final double scale;
+  final int currentQuestion;
+  final int totalQuestions;
 
   @override
   Widget build(BuildContext context) {
+    final progress =
+        totalQuestions == 0 ? 0.0 : currentQuestion / totalQuestions;
+    final progressValue = progress.clamp(0.0, 1.0);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'CÂU 1/10',
+          'CÂU $currentQuestion/$totalQuestions',
           style: TextStyle(
             color: _assessmentMuted,
             fontFamily: 'Nunito',
@@ -260,39 +367,120 @@ class _ProgressSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12 * scale),
-        Container(
+        SizedBox(
           height: 16 * scale,
-          padding: EdgeInsets.all(4 * scale),
-          decoration: BoxDecoration(
-            color: _assessmentPeach,
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4 * scale,
-                offset: Offset(0, 2 * scale),
-                blurStyle: BlurStyle.inner,
-              ),
-            ],
-          ),
-          alignment: Alignment.centerLeft,
-          child: FractionallySizedBox(
-            widthFactor: 0.10,
-            child: Container(
-              decoration: BoxDecoration(
-                color: _assessmentProgress,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: DecoratedBox(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final inset = 4 * scale;
+              final trackWidth = constraints.maxWidth;
+              final fillWidth =
+                  math.max(0.0, (trackWidth - inset * 2) * progressValue);
+
+              return Container(
+                padding: EdgeInsets.all(inset),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.20),
+                  color: _assessmentPeach,
                   borderRadius: BorderRadius.circular(999),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 4 * scale,
+                      offset: Offset(0, 2 * scale),
+                      blurStyle: BlurStyle.inner,
+                    ),
+                  ],
                 ),
-              ),
-            ),
+                alignment: Alignment.centerLeft,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutCubic,
+                  width: fillWidth,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: _assessmentProgress,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.20),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AssessmentErrorState extends StatelessWidget {
+  const _AssessmentErrorState({
+    super.key,
+    required this.scale,
+    required this.message,
+    required this.onRetry,
+  });
+
+  final double scale;
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 32 * scale),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 72 * scale,
+              height: 72 * scale,
+              decoration: BoxDecoration(
+                color: _assessmentPeach.withValues(alpha: 0.58),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.refresh_rounded,
+                color: _assessmentRust,
+                size: 34 * scale,
+              ),
+            ),
+            SizedBox(height: 20 * scale),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: _assessmentMuted,
+                fontFamily: 'Nunito',
+                fontSize: 15 * scale,
+                fontWeight: FontWeight.w800,
+                height: 1.35,
+                letterSpacing: 0,
+              ),
+            ),
+            SizedBox(height: 24 * scale),
+            SizedBox(
+              width: 168 * scale,
+              child: _BottomActionButton(
+                label: 'THỬ LẠI',
+                icon: Icons.refresh_rounded,
+                foreground: const Color(0xFFBEFFF9),
+                scale: scale,
+                onTap: onRetry,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [_assessmentTeal, Color(0xFF73F1E7)],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -368,9 +556,13 @@ class _GeneratingQuestionLoaderState extends State<_GeneratingQuestionLoader>
 }
 
 class _QuestionCard extends StatelessWidget {
-  const _QuestionCard({required this.scale});
+  const _QuestionCard({
+    required this.scale,
+    required this.question,
+  });
 
   final double scale;
+  final String question;
 
   @override
   Widget build(BuildContext context) {
@@ -386,7 +578,7 @@ class _QuestionCard extends StatelessWidget {
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Text(
-          '15 + 7 = ?',
+          question,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: _assessmentInk,
@@ -406,14 +598,14 @@ class _AnswerGrid extends StatelessWidget {
   const _AnswerGrid({
     required this.scale,
     required this.answers,
-    required this.selectedAnswer,
+    required this.selectedAnswerLabel,
     required this.onSelected,
   });
 
   final double scale;
-  final List<int> answers;
-  final int selectedAnswer;
-  final ValueChanged<int> onSelected;
+  final List<QuizAnswer> answers;
+  final String? selectedAnswerLabel;
+  final ValueChanged<QuizAnswer> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -431,7 +623,7 @@ class _AnswerGrid extends StatelessWidget {
         final answer = answers[index];
         return _AnswerButton(
           answer: answer,
-          selected: answer == selectedAnswer,
+          selected: answer.label == selectedAnswerLabel,
           scale: scale,
           onTap: () => onSelected(answer),
         );
@@ -448,7 +640,7 @@ class _AnswerButton extends StatelessWidget {
     required this.onTap,
   });
 
-  final int answer;
+  final QuizAnswer answer;
   final bool selected;
   final double scale;
   final VoidCallback onTap;
@@ -496,7 +688,7 @@ class _AnswerButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '$answer',
+                answer.content,
                 style: TextStyle(
                   color: textColor,
                   fontFamily: 'Nunito',
@@ -527,9 +719,17 @@ class _AnswerButton extends StatelessWidget {
 }
 
 class _AssessmentBottomBar extends StatelessWidget {
-  const _AssessmentBottomBar({required this.scale});
+  const _AssessmentBottomBar({
+    required this.scale,
+    required this.canGoBack,
+    required this.onBack,
+    required this.onContinue,
+  });
 
   final double scale;
+  final bool canGoBack;
+  final VoidCallback onBack;
+  final VoidCallback onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -556,12 +756,12 @@ class _AssessmentBottomBar extends StatelessWidget {
             children: [
               Expanded(
                 child: _BottomActionButton(
-                  label: 'THOÁT',
-                  icon: Icons.logout_rounded,
+                  label: 'CÂU TRƯỚC',
+                  icon: Icons.arrow_back_rounded,
                   background: _assessmentPeach.withValues(alpha: 0.50),
                   foreground: _assessmentRust,
                   scale: scale,
-                  onTap: () => Navigator.of(context).maybePop(),
+                  onTap: canGoBack ? onBack : null,
                 ),
               ),
               SizedBox(width: 48 * scale),
@@ -571,7 +771,7 @@ class _AssessmentBottomBar extends StatelessWidget {
                   icon: Icons.arrow_forward_rounded,
                   foreground: const Color(0xFFBEFFF9),
                   scale: scale,
-                  onTap: HapticFeedback.mediumImpact,
+                  onTap: onContinue,
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -602,12 +802,16 @@ class _BottomActionButton extends StatelessWidget {
   final IconData icon;
   final Color foreground;
   final double scale;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color? background;
   final Gradient? gradient;
 
   @override
   Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    final effectiveForeground =
+        enabled ? foreground : foreground.withValues(alpha: 0.38);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(999),
@@ -617,7 +821,7 @@ class _BottomActionButton extends StatelessWidget {
         child: Ink(
           height: 48 * scale,
           decoration: BoxDecoration(
-            color: background,
+            color: background?.withValues(alpha: enabled ? 1 : 0.42),
             gradient: gradient,
             borderRadius: BorderRadius.circular(999),
             boxShadow: gradient == null
@@ -633,13 +837,13 @@ class _BottomActionButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: foreground, size: 16 * scale),
+              Icon(icon, color: effectiveForeground, size: 16 * scale),
               SizedBox(width: 8 * scale),
               Text(
                 label,
                 maxLines: 1,
                 style: TextStyle(
-                  color: foreground,
+                  color: effectiveForeground,
                   fontFamily: 'Nunito',
                   fontSize: 12 * scale,
                   fontWeight: FontWeight.w900,

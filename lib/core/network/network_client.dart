@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/api_config.dart';
 import 'auth_models.dart';
+import 'quiz_models.dart';
 
 class NetworkException implements Exception {
   const NetworkException(this.message, {this.status});
@@ -81,15 +82,22 @@ class NetworkClient {
 
   Future<Map<String, dynamic>> postJson(
     String path,
-    Map<String, dynamic> body,
-  ) async {
+    Map<String, dynamic> body, {
+    Duration? receiveTimeout,
+  }) async {
     if (_baseUrl.trim().isEmpty) {
       throw const NetworkException('Chưa cấu hình API_BASE_URL.');
     }
 
     final Response<Object?> response;
     try {
-      response = await _dio.post<Object?>(path, data: body);
+      response = await _dio.post<Object?>(
+        path,
+        data: body,
+        options: receiveTimeout == null
+            ? null
+            : Options(receiveTimeout: receiveTimeout),
+      );
     } on DioException catch (error) {
       throw NetworkException(
         _dioErrorMessage(error),
@@ -365,6 +373,28 @@ class NetworkApi {
     }
 
     return verifyResponse;
+  }
+
+  Future<GenerateQuizResponse> generateQuiz(
+    GenerateQuizRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/quizzes/generate',
+      request.toJson(),
+      receiveTimeout: const Duration(seconds: 90),
+    );
+    final quizResponse = GenerateQuizResponse.fromJson(responseJson);
+    if (quizResponse.mstatus != 200) {
+      throw NetworkException(
+        quizResponse.mmessage ??
+            quizResponse.debug ??
+            quizResponse.status ??
+            'Request failed.',
+        status: quizResponse.mstatus,
+      );
+    }
+
+    return quizResponse;
   }
 
   Future<AuthUser> getCurrentUser() async {

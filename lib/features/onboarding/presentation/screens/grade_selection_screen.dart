@@ -13,11 +13,37 @@ const _gradeInk = Color(0xFF253228);
 const _gradePeach = Color(0xFFFFDCCA);
 const _gradeRust = Color(0xFFA03A0F);
 
-class GradeSelectionScreen extends StatelessWidget {
+class GradeSelectionScreen extends StatefulWidget {
   const GradeSelectionScreen({super.key});
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
+
+  @override
+  State<GradeSelectionScreen> createState() => _GradeSelectionScreenState();
+}
+
+class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
+  bool showGenerationFailed = false;
+
+  Future<void> openAssessment() async {
+    HapticFeedback.mediumImpact();
+    if (showGenerationFailed) {
+      setState(() => showGenerationFailed = false);
+    }
+
+    final result = await Navigator.of(context).push<AiAssessmentResult>(
+      MaterialPageRoute<AiAssessmentResult>(
+        builder: (_) => const AiAssessmentScreen(),
+      ),
+    );
+
+    if (!mounted || result != AiAssessmentResult.generationFailed) {
+      return;
+    }
+
+    setState(() => showGenerationFailed = true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +56,10 @@ class GradeSelectionScreen extends StatelessWidget {
             builder: (context, constraints) {
               final width = math.min(constraints.maxWidth, 430.0);
               final height = constraints.maxHeight;
-              final scale =
-                  math.min(width / _designWidth, height / _designHeight);
+              final scale = math.min(
+                width / GradeSelectionScreen._designWidth,
+                height / GradeSelectionScreen._designHeight,
+              );
 
               double s(double value) => value * scale;
 
@@ -66,6 +94,20 @@ class GradeSelectionScreen extends StatelessWidget {
                                   letterSpacing: 0,
                                 ),
                               ),
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 220),
+                                child: showGenerationFailed
+                                    ? Padding(
+                                        key: const ValueKey(
+                                          'generate-failed-notice',
+                                        ),
+                                        padding: EdgeInsets.only(top: s(18)),
+                                        child: _GradeFailureNotice(
+                                          scale: scale,
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
                               SizedBox(height: s(26)),
                               _GradeGrid(scale: scale),
                             ],
@@ -84,14 +126,7 @@ class GradeSelectionScreen extends StatelessWidget {
                         bottom: 0,
                         child: _GradeBottomBar(
                           scale: scale,
-                          onSkip: () {
-                            HapticFeedback.mediumImpact();
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute<void>(
-                                builder: (_) => const AiAssessmentScreen(),
-                              ),
-                            );
-                          },
+                          onSkip: openAssessment,
                           onContinue: () {
                             HapticFeedback.selectionClick();
                           },
@@ -104,6 +139,54 @@ class GradeSelectionScreen extends StatelessWidget {
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _GradeFailureNotice extends StatelessWidget {
+  const _GradeFailureNotice({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 15 * scale,
+        vertical: 12 * scale,
+      ),
+      decoration: BoxDecoration(
+        color: _gradePeach.withValues(alpha: 0.84),
+        borderRadius: BorderRadius.circular(20 * scale),
+        border: Border.all(
+          color: _gradeRust.withValues(alpha: 0.10),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            color: _gradeRust,
+            size: 20 * scale,
+          ),
+          SizedBox(width: 10 * scale),
+          Expanded(
+            child: Text(
+              'Tạo test thất bại. Vui lòng thử lại sau.',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: _gradeRust,
+                fontFamily: 'Nunito',
+                fontSize: 13 * scale,
+                fontWeight: FontWeight.w900,
+                height: 1.25,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
