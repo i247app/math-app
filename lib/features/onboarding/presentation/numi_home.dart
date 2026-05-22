@@ -235,12 +235,6 @@ class _NumiHomeState extends State<NumiHome> {
                                 ),
                                 phoneErrorText: phoneErrorText,
                               ),
-                            AppScreen.signupPrompt => SignupPromptScreen(
-                                key: const ValueKey('signup-prompt'),
-                                phoneNumber: state.phoneNumber,
-                                onBack: cubit.openLogin,
-                                onContinue: cubit.startSignupVerification,
-                              ),
                             AppScreen.otp => OtpScreen(
                                 key: const ValueKey('otp'),
                                 onBack: cubit.openLogin,

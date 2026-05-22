@@ -7,7 +7,6 @@ import '../../domain/phone_region.dart';
 enum AppScreen {
   welcome,
   login,
-  signupPrompt,
   otp,
   signup,
   home,
@@ -156,9 +155,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void openLogin() =>
       emit(state.copyWith(screen: AppScreen.login, clearOtpError: true));
-
-  void openSignupPrompt() =>
-      emit(state.copyWith(screen: AppScreen.signupPrompt));
 
   void openOtp() =>
       emit(state.copyWith(screen: AppScreen.otp, clearOtpError: true));
@@ -371,8 +367,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       if (error.status == 202) {
         emit(
           state.copyWith(
-            screen: AppScreen.signupPrompt,
+            screen: AppScreen.login,
             phoneNumber: phone,
+            checkedPhone: phone,
+            phoneExists: false,
             isSendingOtp: false,
             clearAuthError: true,
           ),
@@ -391,49 +389,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         state.copyWith(
           isSendingOtp: false,
           authError: 'Không thể gửi OTP. Vui lòng thử lại.',
-        ),
-      );
-    }
-  }
-
-  Future<void> startSignupVerification() async {
-    final phone = state.phoneNumber;
-    if (phone == null || state.isSendingOtp) {
-      return;
-    }
-
-    emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
-
-    try {
-      final otp = await _authService.sendRegisterOtp(phone);
-      emit(
-        state.copyWith(
-          screen: AppScreen.otp,
-          otpExpiresAt: otp.expiresAt,
-          otpExpiresIn: otp.expiresIn,
-          devOtpCode: otp.otpCode,
-          devOtpPurpose: otp.purpose,
-          otpPreviewId: state.otpPreviewId + 1,
-          otpFlow: OtpFlow.signup,
-          isSendingOtp: false,
-          clearAuthError: true,
-          clearDevOtp: otp.otpCode == null,
-          clearOtpExpiry: otp.expiresAt == null,
-          clearOtpError: true,
-        ),
-      );
-    } on OtpAuthException catch (error) {
-      emit(
-        state.copyWith(
-          isSendingOtp: false,
-          authError: error.message,
-        ),
-      );
-    } catch (_) {
-      emit(
-        state.copyWith(
-          isSendingOtp: false,
-          authError: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
         ),
       );
     }
