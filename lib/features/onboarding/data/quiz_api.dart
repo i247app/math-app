@@ -17,6 +17,11 @@ class QuizException implements Exception {
 
 abstract class QuizService {
   Future<GeneratedQuiz> generatePracticeQuiz();
+
+  Future<GeneratedQuiz> submitQuiz({
+    required String quizId,
+    required List<SubmitQuizAnswer> answers,
+  });
 }
 
 class FakeQuizApi implements QuizService {
@@ -30,6 +35,26 @@ class FakeQuizApi implements QuizService {
     if (response.mstatus != 200 || quiz == null || quiz.questions.isEmpty) {
       throw QuizException(
         response.mmessage ?? response.debug ?? 'Quiz không có câu hỏi.',
+        status: response.mstatus,
+      );
+    }
+
+    return quiz;
+  }
+
+  @override
+  Future<GeneratedQuiz> submitQuiz({
+    required String quizId,
+    required List<SubmitQuizAnswer> answers,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 700));
+    final response = SubmitQuizResponse.fromJson(
+      _fakeSubmitQuizResponse(quizId, answers),
+    );
+    final quiz = response.quiz;
+    if (response.mstatus != 200 || quiz == null) {
+      throw QuizException(
+        response.mmessage ?? response.debug ?? 'Nộp bài thất bại.',
         status: response.mstatus,
       );
     }
@@ -64,6 +89,31 @@ class QuizApi implements QuizService {
     final quiz = response.quiz;
     if (quiz == null || quiz.questions.isEmpty) {
       throw const QuizException('Quiz không có câu hỏi.');
+    }
+
+    return quiz;
+  }
+
+  @override
+  Future<GeneratedQuiz> submitQuiz({
+    required String quizId,
+    required List<SubmitQuizAnswer> answers,
+  }) async {
+    final SubmitQuizResponse response;
+    try {
+      response = await _networkApi.submitQuiz(
+        SubmitQuizRequest(
+          quizId: quizId,
+          answers: answers,
+        ),
+      );
+    } on NetworkException catch (error) {
+      throw QuizException(error.message, status: error.status);
+    }
+
+    final quiz = response.quiz;
+    if (quiz == null) {
+      throw const QuizException('Nộp bài thất bại.');
     }
 
     return quiz;
@@ -134,3 +184,31 @@ const _fakeGenerateQuizResponse = <String, Object?>{
   },
   'status': 'Success',
 };
+
+Map<String, Object?> _fakeSubmitQuizResponse(
+  String quizId,
+  List<SubmitQuizAnswer> answers,
+) {
+  final quiz = Map<String, Object?>.from(
+    _fakeGenerateQuizResponse['quiz']! as Map<String, Object?>,
+  );
+  quiz
+    ..['answers'] = answers.map((answer) => answer.toJson()).toList()
+    ..['modify_dt'] = '2026-05-22T05:02:31Z'
+    ..['quiz_id'] = quizId
+    ..['quiz_status'] = 'SUBMITTED'
+    ..['user_id'] = 'fake-user'
+    ..['grading'] = <String, Object?>{
+      'ai_review':
+          'Bé làm rất tốt phần phép cộng, hãy tiếp tục phát huy nhé! Chúng ta chỉ cần luyện tập thêm một chút ở các phép trừ có nhớ thôi.',
+      'correct_number': 4,
+      'score_percentage': 80,
+      'total_questions': 5,
+    };
+
+  return <String, Object?>{
+    'mstatus': 200,
+    'quiz': quiz,
+    'status': 'Success',
+  };
+}

@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/network/quiz_models.dart';
+
 const _resultMint = Color(0xFFEBFAEC);
 const _resultTeal = Color(0xFF006762);
 const _resultInk = Color(0xFF253228);
@@ -12,7 +14,9 @@ const _resultPeach = Color(0xFFFFDCCA);
 const _resultRust = Color(0xFFA03A0F);
 
 class AssessmentResultScreen extends StatelessWidget {
-  const AssessmentResultScreen({super.key});
+  const AssessmentResultScreen({super.key, this.quiz});
+
+  final GeneratedQuiz? quiz;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
@@ -32,6 +36,9 @@ class AssessmentResultScreen extends StatelessWidget {
                   math.min(width / _designWidth, height / _designHeight);
 
               double s(double value) => value * scale;
+              final grading = quiz?.grading;
+              final scoreText = _scoreText(grading);
+              final reviewText = _reviewText(grading);
 
               return Center(
                 child: SizedBox(
@@ -57,7 +64,10 @@ class AssessmentResultScreen extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              _ScoreRing(scale: scale),
+                              _ScoreRing(
+                                scale: scale,
+                                scoreText: scoreText,
+                              ),
                               SizedBox(height: s(28)),
                               Text(
                                 'Tuyệt vời!',
@@ -85,7 +95,10 @@ class AssessmentResultScreen extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: s(19)),
-                              _AiReviewCard(scale: scale),
+                              _AiReviewCard(
+                                scale: scale,
+                                reviewText: reviewText,
+                              ),
                             ],
                           ),
                         ),
@@ -204,9 +217,13 @@ class _HeaderIconButton extends StatelessWidget {
 }
 
 class _ScoreRing extends StatelessWidget {
-  const _ScoreRing({required this.scale});
+  const _ScoreRing({
+    required this.scale,
+    required this.scoreText,
+  });
 
   final double scale;
+  final String scoreText;
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +239,7 @@ class _ScoreRing extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            '9/10',
+            scoreText,
             style: TextStyle(
               color: _resultTeal,
               fontFamily: 'Nunito',
@@ -251,9 +268,13 @@ class _ScoreRing extends StatelessWidget {
 }
 
 class _AiReviewCard extends StatelessWidget {
-  const _AiReviewCard({required this.scale});
+  const _AiReviewCard({
+    required this.scale,
+    required this.reviewText,
+  });
 
   final double scale;
+  final String reviewText;
 
   @override
   Widget build(BuildContext context) {
@@ -322,7 +343,7 @@ class _AiReviewCard extends StatelessWidget {
                 ),
                 SizedBox(height: 9 * scale),
                 Text(
-                  '"Bé làm rất tốt phần phép cộng, hãy tiếp tục phát huy nhé! Chúng ta chỉ cần luyện tập thêm một chút ở các phép trừ có nhớ thôi."',
+                  '"$reviewText"',
                   style: TextStyle(
                     color: _resultMuted,
                     fontFamily: 'Nunito',
@@ -476,4 +497,28 @@ class _ResultActionButton extends StatelessWidget {
 void _exitToHome(BuildContext context) {
   HapticFeedback.mediumImpact();
   Navigator.of(context).popUntil((route) => route.isFirst);
+}
+
+String _scoreText(QuizGrading? grading) {
+  final correctNumber = grading?.correctNumber;
+  final totalQuestions = grading?.totalQuestions;
+  if (correctNumber != null && totalQuestions != null && totalQuestions > 0) {
+    return '$correctNumber/$totalQuestions';
+  }
+
+  final scorePercentage = grading?.scorePercentage;
+  if (scorePercentage != null) {
+    return '$scorePercentage/100';
+  }
+
+  return '9/10';
+}
+
+String _reviewText(QuizGrading? grading) {
+  final review = grading?.aiReview?.trim();
+  if (review != null && review.isNotEmpty) {
+    return review;
+  }
+
+  return 'Bé làm rất tốt phần phép cộng, hãy tiếp tục phát huy nhé! Chúng ta chỉ cần luyện tập thêm một chút ở các phép trừ có nhớ thôi.';
 }

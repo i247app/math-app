@@ -36,6 +36,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   int questionIndex = 0;
   final Map<int, String> selectedAnswerLabels = {};
   String? errorMessage;
+  VoidCallback? errorRetryAction;
+  bool isSubmittingQuiz = false;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
@@ -54,6 +56,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       questionIndex = 0;
       selectedAnswerLabels.clear();
       errorMessage = null;
+      errorRetryAction = null;
+      isSubmittingQuiz = false;
     });
 
     try {
@@ -108,12 +112,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   void goToNextQuestion() {
     final questions = quiz?.questions ?? const <QuizQuestion>[];
     if (questionIndex >= questions.length - 1) {
-      HapticFeedback.mediumImpact();
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => const AssessmentResultScreen(),
-        ),
-      );
+      submitCurrentQuiz();
       return;
     }
 
@@ -121,6 +120,163 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     setState(() {
       questionIndex++;
     });
+  }
+
+  Future<void> submitCurrentQuiz() async {
+    if (isSubmittingQuiz) {
+      return;
+    }
+
+    final currentQuiz = quiz;
+    final questions = currentQuiz?.questions ?? const <QuizQuestion>[];
+    final quizId = currentQuiz?.quizId;
+    if (currentQuiz == null || questions.isEmpty || quizId == null) {
+      setState(() {
+        errorMessage = 'Không tìm thấy bài test để nộp.';
+        errorRetryAction = null;
+      });
+      return;
+    }
+
+    var hasUnansweredQuestion = false;
+    for (var index = 0; index < questions.length; index++) {
+      if (selectedAnswerLabels[index] == null) {
+        hasUnansweredQuestion = true;
+        break;
+      }
+    }
+    if (hasUnansweredQuestion) {
+      HapticFeedback.selectionClick();
+      for (var index = 0; index < questions.length; index++) {
+        if (selectedAnswerLabels[index] == null) {
+          setState(() => questionIndex = index);
+          break;
+        }
+      }
+      return;
+    }
+
+    final answers = <SubmitQuizAnswer>[
+      for (var index = 0; index < questions.length; index++)
+        SubmitQuizAnswer(
+          questionNumber: questions[index].questionNumber,
+          label: selectedAnswerLabels[index]!,
+        ),
+    ];
+
+    HapticFeedback.mediumImpact();
+    setState(() {
+      errorMessage = null;
+      errorRetryAction = null;
+      isSubmittingQuiz = true;
+    });
+
+    try {
+      final submittedQuiz = await _quizService.submitQuiz(
+        quizId: quizId,
+        answers: answers,
+      );
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => AssessmentResultScreen(quiz: submittedQuiz),
+        ),
+      );
+    } on QuizException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        errorMessage = error.message;
+        errorRetryAction = () {
+          submitCurrentQuiz();
+        };
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        errorMessage = 'Nộp bài thất bại. Vui lòng thử lại.';
+        errorRetryAction = () {
+          submitCurrentQuiz();
+        };
+      });
+    } finally {
+      if (mounted) {
+        setState(() => isSubmittingQuiz = false);
+      }
+    }
+  }
+
+  Future<bool> showUnansweredSubmitDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          title: const Text(
+            'Bạn có câu hỏi chưa trả lời',
+            style: TextStyle(
+              color: _assessmentInk,
+              fontFamily: 'Nunito',
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
+            ),
+          ),
+          content: const Text(
+            'Bạn có chắc muốn nộp bài không?',
+            style: TextStyle(
+              color: _assessmentMuted,
+              fontFamily: 'Nunito',
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0,
+            ),
+          ),
+          actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'Ở LẠI',
+                style: TextStyle(
+                  color: _assessmentRust,
+                  fontFamily: 'Nunito',
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: _assessmentTeal,
+                foregroundColor: const Color(0xFFBEFFF9),
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text(
+                'NỘP BÀI',
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
   }
 
   @override
@@ -158,8 +314,12 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                         ),
                       ),
                       Positioned.fill(
-                        top: isGeneratingQuestion ? 0 : s(80),
-                        bottom: isGeneratingQuestion || errorMessage != null
+                        top: isGeneratingQuestion || isSubmittingQuiz
+                            ? 0
+                            : s(80),
+                        bottom: isGeneratingQuestion ||
+                                isSubmittingQuiz ||
+                                errorMessage != null
                             ? 0
                             : s(97),
                         child: AnimatedSwitcher(
@@ -171,9 +331,19 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                   key: const ValueKey('question-error'),
                                   scale: scale,
                                   message: errorMessage!,
-                                  onRetry: generateQuiz,
+                                  onRetry: errorRetryAction ??
+                                      () {
+                                        generateQuiz();
+                                      },
                                 )
-                              : isGeneratingQuestion
+                              : isSubmittingQuiz
+                                  ? _GeneratingQuestionLoader(
+                                      key: const ValueKey('submit-loader'),
+                                      scale: scale,
+                                      message:
+                                          'đợi Numi nộp bài cho bạn nhé!',
+                                    )
+                                  : isGeneratingQuestion
                                   ? _GeneratingQuestionLoader(
                                       key: const ValueKey('question-loader'),
                                       scale: scale,
@@ -215,14 +385,16 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                     ),
                         ),
                       ),
-                      if (!isGeneratingQuestion)
+                      if (!isGeneratingQuestion && !isSubmittingQuiz)
                         Positioned(
                           left: 0,
                           right: 0,
                           top: 0,
                           child: _AssessmentHeader(scale: scale),
                         ),
-                      if (!isGeneratingQuestion && errorMessage == null)
+                      if (!isGeneratingQuestion &&
+                          !isSubmittingQuiz &&
+                          errorMessage == null)
                         Positioned(
                           left: 0,
                           right: 0,
@@ -230,6 +402,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                           child: _AssessmentBottomBar(
                             scale: scale,
                             canGoBack: questionIndex > 0,
+                            isLastQuestion:
+                                questionIndex >= questions.length - 1,
+                            isSubmitting: isSubmittingQuiz,
                             onBack: goToPreviousQuestion,
                             onContinue: goToNextQuestion,
                           ),
@@ -493,9 +668,14 @@ class _AssessmentErrorState extends StatelessWidget {
 }
 
 class _GeneratingQuestionLoader extends StatefulWidget {
-  const _GeneratingQuestionLoader({super.key, required this.scale});
+  const _GeneratingQuestionLoader({
+    super.key,
+    required this.scale,
+    this.message,
+  });
 
   final double scale;
+  final String? message;
 
   @override
   State<_GeneratingQuestionLoader> createState() =>
@@ -529,32 +709,55 @@ class _GeneratingQuestionLoaderState extends State<_GeneratingQuestionLoader>
       child: AnimatedBuilder(
         animation: controller,
         builder: (context, child) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(letters.length, (index) {
-              final delayedProgress =
-                  (controller.value - (index * 0.075)) % 1.0;
-              final lift = delayedProgress <= 0.20
-                  ? -34 *
-                      widget.scale *
-                      math.sin(delayedProgress / 0.20 * math.pi)
-                  : 0.0;
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(letters.length, (index) {
+                  final delayedProgress =
+                      (controller.value - (index * 0.075)) % 1.0;
+                  final lift = delayedProgress <= 0.20
+                      ? -34 *
+                          widget.scale *
+                          math.sin(delayedProgress / 0.20 * math.pi)
+                      : 0.0;
 
-              return Transform.translate(
-                offset: Offset(0, lift),
-                child: Text(
-                  letters[index],
-                  style: TextStyle(
-                    color: _assessmentTeal,
-                    fontFamily: 'Nunito',
-                    fontSize: 40 * widget.scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 3 * widget.scale,
+                  return Transform.translate(
+                    offset: Offset(0, lift),
+                    child: Text(
+                      letters[index],
+                      style: TextStyle(
+                        color: _assessmentTeal,
+                        fontFamily: 'Nunito',
+                        fontSize: 40 * widget.scale,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 3 * widget.scale,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              if (widget.message != null) ...[
+                SizedBox(height: 18 * widget.scale),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 32 * widget.scale),
+                  child: Text(
+                    widget.message!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: _assessmentMuted,
+                      fontFamily: 'Nunito',
+                      fontSize: 16 * widget.scale,
+                      fontWeight: FontWeight.w800,
+                      height: 1.35,
+                      letterSpacing: 0,
+                    ),
                   ),
                 ),
-              );
-            }),
+              ],
+            ],
           );
         },
       ),
@@ -729,12 +932,16 @@ class _AssessmentBottomBar extends StatelessWidget {
   const _AssessmentBottomBar({
     required this.scale,
     required this.canGoBack,
+    required this.isLastQuestion,
+    required this.isSubmitting,
     required this.onBack,
     required this.onContinue,
   });
 
   final double scale;
   final bool canGoBack;
+  final bool isLastQuestion;
+  final bool isSubmitting;
   final VoidCallback onBack;
   final VoidCallback onContinue;
 
@@ -768,17 +975,23 @@ class _AssessmentBottomBar extends StatelessWidget {
                   background: _assessmentPeach.withValues(alpha: 0.50),
                   foreground: _assessmentRust,
                   scale: scale,
-                  onTap: canGoBack ? onBack : null,
+                  onTap: canGoBack && !isSubmitting ? onBack : null,
                 ),
               ),
               SizedBox(width: 48 * scale),
               Expanded(
                 child: _BottomActionButton(
-                  label: 'TIẾP TỤC',
-                  icon: Icons.arrow_forward_rounded,
+                  label: isSubmitting
+                      ? 'ĐANG NỘP'
+                      : isLastQuestion
+                          ? 'NỘP BÀI'
+                          : 'TIẾP TỤC',
+                  icon: isLastQuestion
+                      ? Icons.check_rounded
+                      : Icons.arrow_forward_rounded,
                   foreground: const Color(0xFFBEFFF9),
                   scale: scale,
-                  onTap: onContinue,
+                  onTap: isSubmitting ? null : onContinue,
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
