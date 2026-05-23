@@ -1,210 +1,174 @@
-######################################################################
-# 0. CORE UTILITIES & OS
-######################################################################
+# Custom Start Here
 
-# OS Generated Files (macOS)
-.DS_Store
-._*
-.fseventsd
-.DocumentRevisions-V100
-.TemporaryItems
-**/.TemporaryItems
-.com.apple.timemachine.donotbackup
-.VolumeIcon.icns
-.Spotlight-V100
-.Trash/
+# AI files
+.cursor/
+GEMINI.md
+CLAUDE.md
+QWEN.md
 
-# OS Generated Files (Windows/Linux)
-ehthumbs.db
-Thumbs.db
+# Go workspace file
+go.work
+go.work.sum
 
-# Generic IDE and Log Files
-log_file
-*.lock
+# env file
+.env*
+!.env.*example
+
+# Custom End Here
+
+# Standard gitignore Below
+
+# Miscellaneous (Applies at a higher level)
+*.class
 *.log
 *.pyc
-session_data_store
-*~
-[._]*.s[a-w][a-z]
-*.swo
 *.swp
-.idea/
-.vscode/
-..air.toml
+*.swo
+*.bak
+*.orig
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+*.lock
+*.podspec
+*.un~
 
-# Maven
-/target/
+# Security (Sensitive files - be cautious!)
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
 
-# Gradle
-/.gradle/
-/build/
-
-# C/C++/Java/Go Build Artifacts and Libraries
+# Java
 *.class
 *.jar
 *.war
 *.ear
-*.o
-*.a
-*.ilk
-*.pdb
-*.obj
-*.exe
-*.dll
-*.so
-*.out
-*.test
-*/bin/*
-*/out/*
-*/dist/*
-.mtj.tmp/
+/bin/
+/target/
+/out/
+.classpath
+.project
+.settings/
+nbproject/
+/dist/
+/build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+*.iml
+.idea/
 
-# Java
-hs_err_pid*
-replay_pid*
-
-# Go Build and Workspace Files
-.gocache/
-.godoc/
-go.work
-go.work.sum
-
-# Environment Variables
-.env
-.env.*
-.env*
-!.env.*example
-
-# AI/Tooling Cache & History
-.cursor/
-.claude/
-.crush/
-.specify/
-.opencode/
-.grok
-.aider*
-sgconfig.yml
-.astgrep/
-
-######################################################################
-# 1. FLUTTER CORE
-######################################################################
-
+# Flutter - Primary Focus
+# General Flutter project files
 .dart_tool/
-.packages
 .flutter-plugins
 .flutter-plugins-dependencies
-.last_build_id
-flutter_export_environment.sh
+.metadata
+build/
 
-# Generated plugin registration files
+# Flutter/Dart/Pub related
+**/doc/api/
+.pub-cache/
+.pub/
+*.g.dart
+*.freezed.dart
+
+# Android - Primary Target
+android/.gradle
+android/build
+android/app/build
+android/.idea
+android/.cxx
+android/local.properties
+**/android/**/gradle-wrapper.jar
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
 **/android/**/GeneratedPluginRegistrant.java
-**/ios/Runner/GeneratedPluginRegistrant.*
+android/key.properties
+android/keystore
+android/app/google-services.json
 
-# iOS Frameworks
+# Android Studio build artifacts
+/android/app/debug
+/android/app/profile
+/android/app/release
+*.pepk
+*.aab
+
+# iOS/Xcode - Primary Target
+xcuserdata/
+*.xcworkspace
+DerivedData/
+*.moved-aside
+*.xcuserstate
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
 **/ios/Flutter/App.framework
 **/ios/Flutter/Flutter.framework
 **/ios/Flutter/Generated.xcconfig
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
 **/ios/Flutter/flutter_assets/
+**/ios/Flutter/.last_build_id
 **/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/Runner/GoogleService-Info.plist
+flutter_export_environment.sh # Flutter iOS build environment script
 
-# Flutter-specific test exception
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-
-######################################################################
-# 2. ANDROID NATIVE
-######################################################################
-
-# Gradle and Build Directories
-/android/.gradle
-/android/build
-/android/app/build
-/android/.cxx
-/android/captures/
-
-# IDE and Local Configuration
-/android/.idea
-/android/local.properties
-
-# Gradle Wrappers
-**/android/**/gradle-wrapper.jar
-/android/gradlew
-/android/gradlew.bat
-
-# Android Studio Build Artifacts
-/android/app/debug/
-/android/app/profile/
-/android/app/release/
-*.aab
-
-# Security/Signing Files
-/android/key.properties
-/android/keystore
-/android/app/google-services.json
-*.pepk
-
-######################################################################
-# 3. IOS / XCODE NATIVE
-######################################################################
-
-# Build Caches
-DerivedData/
-**/ios/**/DerivedData/
-
-# User-Specific Data and State
-xcuserdata/
-**/ios/**/xcuserdata
-*.xcuserstate
-*.moved-aside
-**/ios/**/*.moved-aside
-**/ios/**/*sync/
-
-# Xcode Project Files and State
-*.xcworkspace
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-**/ios/**/*.pbxuser
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.perspectivev3
-
-# Dependencies and Generated Files
-**/ios/**/Pods/
-**/ios/.generated/
-**/ios/**/.symlinks/
-**/ios/**/profile
-
-# Other Temporary Files
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/Icon?
-
-# Exceptions
-!**/ios/**/default.pbxuser
+# Exceptions to iOS rules
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
+!**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
+!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
-######################################################################
-# 4. CUSTOM / PROJECT-SPECIFIC FILES
-######################################################################
+# VS Code (common development environment)
+.vscode/
 
-# Security/Signing Files
-secrets/
-keys/
-*.pem
-dist/
+# IntelliJ related (common with Android development)
+*.iml
+*.ipr
+*.iws
+.idea/
 
-# Documentation and Large Assets
-static/
-CONVENTIONS.md
-WARP.md
+# Symbolication and Obfuscation
+app.*.symbols
+app.*.map.json
+
+.env
+*.env
+
+# AI files
+.cursor/
+#AGENTS.md
 CLAUDE.md
 GEMINI.md
 QWEN.md
-#AGENTS.MD
+ios/Runner/Base.lproj/Main.storyboard
+macos/Runner/Configs/AppInfo.xcconfig
+macos/Runner/Configs/Debug.xcconfig
