@@ -321,11 +321,13 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     final selectedAnswerLabel = selectedAnswerLabels[questionIndex];
     final isGeneratingQuestion =
         currentQuestion == null && errorMessage == null;
+    final backgroundColor =
+        isGeneratingQuestion ? Colors.white : _assessmentMint;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: _assessmentMint,
+        backgroundColor: backgroundColor,
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -342,10 +344,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                   height: height,
                   child: Stack(
                     children: [
-                      const Positioned.fill(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(color: _assessmentMint),
-                        ),
+                      Positioned.fill(
+                        child: ColoredBox(color: backgroundColor),
                       ),
                       Positioned.fill(
                         top: isGeneratingQuestion || isSubmittingQuiz
@@ -381,6 +381,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                   ? _GeneratingQuestionLoader(
                                       key: const ValueKey('question-loader'),
                                       scale: scale,
+                                      message:
+                                          'Để Numi tạo bài kiểm tra cho bạn nhé',
                                     )
                                   : SingleChildScrollView(
                                       key: const ValueKey('question-content'),

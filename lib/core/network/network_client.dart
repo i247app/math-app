@@ -419,6 +419,27 @@ class NetworkApi {
     return quizResponse;
   }
 
+  Future<QuizListResponse> listQuizzes(
+    QuizListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/quizzes/list',
+      request.toJson(),
+    );
+    final quizResponse = QuizListResponse.fromJson(responseJson);
+    if (quizResponse.mstatus != 200) {
+      throw NetworkException(
+        quizResponse.mmessage ??
+            quizResponse.debug ??
+            quizResponse.status ??
+            'Request failed.',
+        status: quizResponse.mstatus,
+      );
+    }
+
+    return quizResponse;
+  }
+
   Future<AuthUser> getCurrentUser() async {
     final responseJson = await _networkClient.postJson('/users/me', {});
     final userJson = _currentUserJson(responseJson);

@@ -18,6 +18,11 @@ class QuizException implements Exception {
 abstract class QuizService {
   Future<GeneratedQuiz> generateAssessmentQuiz({String? previousQuizId});
 
+  Future<List<GeneratedQuiz>> listQuizzes({
+    String? userId,
+    String? profileId,
+  });
+
   Future<GeneratedQuiz> submitQuiz({
     required String quizId,
     required List<SubmitQuizAnswer> answers,
@@ -62,6 +67,23 @@ class FakeQuizApi implements QuizService {
     }
 
     return quiz;
+  }
+
+  @override
+  Future<List<GeneratedQuiz>> listQuizzes({
+    String? userId,
+    String? profileId,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    final response = QuizListResponse.fromJson(_fakeQuizListResponse());
+    if (response.mstatus != 200) {
+      throw QuizException(
+        response.mmessage ?? response.debug ?? 'Tải lịch sử thất bại.',
+        status: response.mstatus,
+      );
+    }
+
+    return response.quizzes;
   }
 }
 
@@ -120,6 +142,33 @@ class QuizApi implements QuizService {
     }
 
     return quiz;
+  }
+
+  @override
+  Future<List<GeneratedQuiz>> listQuizzes({
+    String? userId,
+    String? profileId,
+  }) async {
+    final cleanUserId = userId?.trim();
+    final cleanProfileId = profileId?.trim();
+    if ((cleanUserId == null || cleanUserId.isEmpty) &&
+        (cleanProfileId == null || cleanProfileId.isEmpty)) {
+      throw const QuizException('Thiếu user hoặc profile để tải lịch sử.');
+    }
+
+    final QuizListResponse response;
+    try {
+      response = await _networkApi.listQuizzes(
+        QuizListRequest(
+          userId: cleanUserId?.isEmpty == true ? null : cleanUserId,
+          profileId: cleanProfileId?.isEmpty == true ? null : cleanProfileId,
+        ),
+      );
+    } on NetworkException catch (error) {
+      throw QuizException(error.message, status: error.status);
+    }
+
+    return response.quizzes;
   }
 }
 
@@ -218,6 +267,75 @@ Map<String, Object?> _fakeSubmitQuizResponse(
   return <String, Object?>{
     'mstatus': 200,
     'quiz': quiz,
+    'status': 'Success',
+  };
+}
+
+Map<String, Object?> _fakeQuizListResponse() {
+  final submittedAssessment = _fakeGeneratedQuiz()
+    ..['answers'] = <Object?>[
+      <String, Object?>{'question_number': 1, 'label': 'A'},
+      <String, Object?>{'question_number': 2, 'label': 'B'},
+      <String, Object?>{'question_number': 3, 'label': 'C'},
+      <String, Object?>{'question_number': 4, 'label': 'A'},
+      <String, Object?>{'question_number': 5, 'label': 'B'},
+    ]
+    ..['create_dt'] = '2026-05-23T11:28:10Z'
+    ..['modify_dt'] = '2026-05-23T11:28:32Z'
+    ..['quiz_id'] = 'c02fe348-0540-498c-aaba-e3f9b06484f5'
+    ..['quiz_status'] = 'SUBMITTED'
+    ..['type'] = assessmentQuizType
+    ..['user_id'] = 'fake-user'
+    ..['grading'] = <String, Object?>{
+      'ai_detect_grade': assessmentQuizGradeLabel,
+      'ai_review':
+          'Good addition and subtraction skills; improve accuracy on addition problems.',
+      'correct_number': 4,
+      'score_percentage': 80,
+      'total_questions': 5,
+    };
+
+  final generatedAssessment = _fakeGeneratedQuiz()
+    ..['create_dt'] = '2026-05-23T11:28:43Z'
+    ..['modify_dt'] = '2026-05-23T11:28:43Z'
+    ..['previous_quiz_id'] = 'c02fe348-0540-498c-aaba-e3f9b06484f5'
+    ..['quiz_id'] = '30ae9c4f-254e-44d1-9ed2-28dfe826f5ee'
+    ..['quiz_status'] = 'GENERATED'
+    ..['type'] = assessmentQuizType
+    ..['user_id'] = 'fake-user';
+
+  final practiceQuiz = _fakeGeneratedQuiz()
+    ..['create_dt'] = '2026-05-23T05:46:05Z'
+    ..['modify_dt'] = '2026-05-23T05:46:32Z'
+    ..['quiz_id'] = '5450848b-fcd2-493d-9e55-ad7180538e2c'
+    ..['quiz_status'] = 'SUBMITTED'
+    ..['type'] = 'PRACTICE'
+    ..['user_id'] = 'fake-user'
+    ..['grading'] = <String, Object?>{
+      'ai_review':
+          'Strong understanding of addition and subtraction; practice more on addition with larger numbers.',
+      'correct_number': 5,
+      'score_percentage': 100,
+      'total_questions': 5,
+    };
+
+  return <String, Object?>{
+    'mstatus': 200,
+    'pagination': <String, Object?>{
+      'has_next': false,
+      'has_previous': false,
+      'page': 1,
+      'size': 20,
+      'skip': 0,
+      'take_all': false,
+      'total_count': 3,
+      'total_pages': 1,
+    },
+    'quizzes': <Object?>[
+      generatedAssessment,
+      submittedAssessment,
+      practiceQuiz,
+    ],
     'status': 'Success',
   };
 }
