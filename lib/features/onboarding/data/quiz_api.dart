@@ -2,8 +2,8 @@ import '../../../core/config/api_config.dart';
 import '../../../core/network/network_client.dart';
 import '../../../core/network/quiz_models.dart';
 
-const practiceQuizType = 'PRACTICE';
-const practiceQuizGradeLabel = 'Grade 1';
+const assessmentQuizType = 'ASSESSMENT';
+const assessmentQuizGradeLabel = 'Grade 1';
 
 class QuizException implements Exception {
   const QuizException(this.message, {this.status});
@@ -16,7 +16,7 @@ class QuizException implements Exception {
 }
 
 abstract class QuizService {
-  Future<GeneratedQuiz> generatePracticeQuiz();
+  Future<GeneratedQuiz> generateAssessmentQuiz({String? previousQuizId});
 
   Future<GeneratedQuiz> submitQuiz({
     required String quizId,
@@ -28,9 +28,11 @@ class FakeQuizApi implements QuizService {
   const FakeQuizApi();
 
   @override
-  Future<GeneratedQuiz> generatePracticeQuiz() async {
+  Future<GeneratedQuiz> generateAssessmentQuiz({String? previousQuizId}) async {
     await Future<void>.delayed(const Duration(milliseconds: 900));
-    final response = GenerateQuizResponse.fromJson(_fakeGenerateQuizResponse);
+    final response = GenerateQuizResponse.fromJson(
+      _fakeGenerateQuizResponse(previousQuizId: previousQuizId),
+    );
     final quiz = response.quiz;
     if (response.mstatus != 200 || quiz == null || quiz.questions.isEmpty) {
       throw QuizException(
@@ -73,13 +75,14 @@ class QuizApi implements QuizService {
   final NetworkApi _networkApi;
 
   @override
-  Future<GeneratedQuiz> generatePracticeQuiz() async {
+  Future<GeneratedQuiz> generateAssessmentQuiz({String? previousQuizId}) async {
     final GenerateQuizResponse response;
     try {
       response = await _networkApi.generateQuiz(
-        const GenerateQuizRequest(
-          type: practiceQuizType,
-          gradeLabel: practiceQuizGradeLabel,
+        GenerateQuizRequest(
+          type: assessmentQuizType,
+          gradeLabel: previousQuizId == null ? assessmentQuizGradeLabel : null,
+          previousQuizId: previousQuizId,
         ),
       );
     } on NetworkException catch (error) {
@@ -120,9 +123,16 @@ class QuizApi implements QuizService {
   }
 }
 
-const _fakeGenerateQuizResponse = <String, Object?>{
-  'mstatus': 200,
-  'quiz': <String, Object?>{
+Map<String, Object?> _fakeGenerateQuizResponse({String? previousQuizId}) {
+  return <String, Object?>{
+    'mstatus': 200,
+    'quiz': _fakeGeneratedQuiz(previousQuizId: previousQuizId),
+    'status': 'Success',
+  };
+}
+
+Map<String, Object?> _fakeGeneratedQuiz({String? previousQuizId}) {
+  return <String, Object?>{
     'create_dt': '2026-05-21T09:24:04Z',
     'id': 2,
     'modify_dt': '2026-05-21T09:24:04Z',
@@ -178,20 +188,19 @@ const _fakeGenerateQuizResponse = <String, Object?>{
         'question_number': 5,
       },
     ],
-    'quiz_id': '310f18bc-5933-4517-848f-fe4c096d6492',
+    'quiz_id': previousQuizId == null
+        ? '310f18bc-5933-4517-848f-fe4c096d6492'
+        : 'fake-assessment-retake-1',
     'quiz_status': 'GENERATED',
-    'type': practiceQuizType,
-  },
-  'status': 'Success',
-};
+    'type': assessmentQuizType,
+  };
+}
 
 Map<String, Object?> _fakeSubmitQuizResponse(
   String quizId,
   List<SubmitQuizAnswer> answers,
 ) {
-  final quiz = Map<String, Object?>.from(
-    _fakeGenerateQuizResponse['quiz']! as Map<String, Object?>,
-  );
+  final quiz = _fakeGeneratedQuiz();
   quiz
     ..['answers'] = answers.map((answer) => answer.toJson()).toList()
     ..['modify_dt'] = '2026-05-22T05:02:31Z'

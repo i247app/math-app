@@ -2,16 +2,19 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'quiz_models.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class GenerateQuizRequest {
   const GenerateQuizRequest({
     required this.type,
-    required this.gradeLabel,
+    this.gradeLabel,
+    this.previousQuizId,
   });
 
   final String type;
   @JsonKey(name: 'grade_label')
-  final String gradeLabel;
+  final String? gradeLabel;
+  @JsonKey(name: 'previous_quiz_id')
+  final String? previousQuizId;
 
   factory GenerateQuizRequest.fromJson(Map<String, dynamic> json) =>
       _$GenerateQuizRequestFromJson(json);

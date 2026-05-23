@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/network/quiz_models.dart';
+import '../../data/quiz_api.dart';
 
 const _resultMint = Color(0xFFEBFAEC);
 const _resultTeal = Color(0xFF006762);
@@ -12,14 +13,97 @@ const _resultInk = Color(0xFF253228);
 const _resultMuted = Color(0xFF515F54);
 const _resultPeach = Color(0xFFFFDCCA);
 const _resultRust = Color(0xFFA03A0F);
+const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
-class AssessmentResultScreen extends StatelessWidget {
-  const AssessmentResultScreen({super.key, this.quiz});
+class AssessmentResultScreen extends StatefulWidget {
+  const AssessmentResultScreen({
+    super.key,
+    this.quiz,
+    this.quizService,
+    this.onTestAgainGenerated,
+  });
 
   final GeneratedQuiz? quiz;
+  final QuizService? quizService;
+  final ValueChanged<GeneratedQuiz>? onTestAgainGenerated;
+
+  @override
+  State<AssessmentResultScreen> createState() => _AssessmentResultScreenState();
+}
+
+class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
+  late final QuizService _quizService;
+  bool isGeneratingAgain = false;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _quizService = widget.quizService ??
+        (_useFakeQuizApi ? const FakeQuizApi() : QuizApi());
+  }
+
+  Future<void> generateTestAgain() async {
+    final previousQuizId = widget.quiz?.quizId;
+    if (previousQuizId == null || previousQuizId.isEmpty) {
+      HapticFeedback.selectionClick();
+      showTestAgainError('Không tìm thấy bài test trước đó.');
+      return;
+    }
+
+    HapticFeedback.mediumImpact();
+    setState(() => isGeneratingAgain = true);
+
+    try {
+      final generatedQuiz = await _quizService.generateAssessmentQuiz(
+        previousQuizId: previousQuizId,
+      );
+      if (!mounted) {
+        return;
+      }
+
+      final onGenerated = widget.onTestAgainGenerated;
+      if (onGenerated != null) {
+        onGenerated(generatedQuiz);
+      } else {
+        Navigator.of(context).pop(generatedQuiz);
+      }
+    } on QuizException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => isGeneratingAgain = false);
+      showTestAgainError(error.message);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => isGeneratingAgain = false);
+      showTestAgainError('Không thể tạo bài mới. Vui lòng thử lại.');
+    }
+  }
+
+  void showTestAgainError(String message) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Tạo bài mới thất bại'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Đóng'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +120,7 @@ class AssessmentResultScreen extends StatelessWidget {
                   math.min(width / _designWidth, height / _designHeight);
 
               double s(double value) => value * scale;
-              final grading = quiz?.grading;
+              final grading = widget.quiz?.grading;
               final scoreText = _scoreText(grading);
               final reviewText = _reviewText(grading);
 
@@ -44,84 +128,176 @@ class AssessmentResultScreen extends StatelessWidget {
                 child: SizedBox(
                   width: width,
                   height: height,
-                  child: Stack(
-                    children: [
-                      const Positioned.fill(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(color: _resultMint),
-                        ),
-                      ),
-                      Positioned.fill(
-                        top: s(72),
-                        bottom: s(330),
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          padding: EdgeInsets.fromLTRB(
-                            s(23),
-                            s(14),
-                            s(23),
-                            s(28),
-                          ),
-                          child: Column(
-                            children: [
-                              _ScoreRing(
-                                scale: scale,
-                                scoreText: scoreText,
+                  child: isGeneratingAgain
+                      ? _TestAgainLoader(scale: scale)
+                      : Stack(
+                          children: [
+                            const Positioned.fill(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(color: _resultMint),
                               ),
-                              SizedBox(height: s(28)),
-                              Text(
-                                'Tuyệt vời!',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: _resultInk,
-                                  fontFamily: 'Nunito',
-                                  fontSize: 23 * scale,
-                                  fontWeight: FontWeight.w900,
-                                  height: 1,
-                                  letterSpacing: 0,
+                            ),
+                            Positioned.fill(
+                              top: s(72),
+                              bottom: s(330),
+                              child: SingleChildScrollView(
+                                physics: const BouncingScrollPhysics(),
+                                padding: EdgeInsets.fromLTRB(
+                                  s(23),
+                                  s(14),
+                                  s(23),
+                                  s(28),
+                                ),
+                                child: Column(
+                                  children: [
+                                    _ScoreRing(
+                                      scale: scale,
+                                      scoreText: scoreText,
+                                    ),
+                                    SizedBox(height: s(28)),
+                                    Text(
+                                      'Tuyệt vời!',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: _resultInk,
+                                        fontFamily: 'Nunito',
+                                        fontSize: 23 * scale,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                    SizedBox(height: s(12)),
+                                    Text(
+                                      'Bé đã hoàn thành xuất sắc thử thách này.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: _resultMuted,
+                                        fontFamily: 'Nunito',
+                                        fontSize: 14 * scale,
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.35,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                    SizedBox(height: s(19)),
+                                    _AiReviewCard(
+                                      scale: scale,
+                                      reviewText: reviewText,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              SizedBox(height: s(12)),
-                              Text(
-                                'Bé đã hoàn thành xuất sắc thử thách này.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: _resultMuted,
-                                  fontFamily: 'Nunito',
-                                  fontSize: 14 * scale,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.35,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                              SizedBox(height: s(19)),
-                              _AiReviewCard(
+                            ),
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              top: 0,
+                              child: _ResultHeader(scale: scale),
+                            ),
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: s(288),
+                              child: _ResultBottomBar(
                                 scale: scale,
-                                reviewText: reviewText,
+                                onTestAgain: generateTestAgain,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        child: _ResultHeader(scale: scale),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: s(288),
-                        child: _ResultBottomBar(scale: scale),
-                      ),
-                    ],
-                  ),
                 ),
               );
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TestAgainLoader extends StatefulWidget {
+  const _TestAgainLoader({required this.scale});
+
+  final double scale;
+
+  @override
+  State<_TestAgainLoader> createState() => _TestAgainLoaderState();
+}
+
+class _TestAgainLoaderState extends State<_TestAgainLoader>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const letters = ['n', 'u', 'm', 'i', 'n', 'u', 'm', 'i'];
+
+    return Center(
+      child: AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(letters.length, (index) {
+                  final delayedProgress =
+                      (controller.value - (index * 0.075)) % 1.0;
+                  final lift = delayedProgress <= 0.20
+                      ? -34 *
+                          widget.scale *
+                          math.sin(delayedProgress / 0.20 * math.pi)
+                      : 0.0;
+
+                  return Transform.translate(
+                    offset: Offset(0, lift),
+                    child: Text(
+                      letters[index],
+                      style: TextStyle(
+                        color: _resultTeal,
+                        fontFamily: 'Nunito',
+                        fontSize: 40 * widget.scale,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 3 * widget.scale,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              SizedBox(height: 18 * widget.scale),
+              Text(
+                'đợi Numi tạo bài mới cho bạn nhé!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: _resultMuted,
+                  fontFamily: 'Nunito',
+                  fontSize: 16 * widget.scale,
+                  fontWeight: FontWeight.w800,
+                  height: 1.35,
+                  letterSpacing: 0,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -152,7 +328,7 @@ class _ResultHeader extends StatelessWidget {
               _HeaderIconButton(
                 icon: Icons.close_rounded,
                 scale: scale,
-                onTap: () => _exitToHome(context),
+                onTap: () => _exitToGradeSelection(context),
               ),
               Expanded(
                 child: Text(
@@ -363,9 +539,13 @@ class _AiReviewCard extends StatelessWidget {
 }
 
 class _ResultBottomBar extends StatelessWidget {
-  const _ResultBottomBar({required this.scale});
+  const _ResultBottomBar({
+    required this.scale,
+    required this.onTestAgain,
+  });
 
   final double scale;
+  final VoidCallback onTestAgain;
 
   @override
   Widget build(BuildContext context) {
@@ -397,7 +577,7 @@ class _ResultBottomBar extends StatelessWidget {
                   background: _resultPeach,
                   foreground: _resultRust,
                   scale: scale,
-                  onTap: () => _exitToHome(context),
+                  onTap: () => _exitToGradeSelection(context),
                 ),
               ),
               SizedBox(width: 20 * scale),
@@ -407,7 +587,7 @@ class _ResultBottomBar extends StatelessWidget {
                   icon: Icons.arrow_forward_rounded,
                   foreground: const Color(0xFFBEFFF9),
                   scale: scale,
-                  onTap: HapticFeedback.selectionClick,
+                  onTap: onTestAgain,
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -494,9 +674,15 @@ class _ResultActionButton extends StatelessWidget {
   }
 }
 
-void _exitToHome(BuildContext context) {
+void _exitToGradeSelection(BuildContext context) {
   HapticFeedback.mediumImpact();
-  Navigator.of(context).popUntil((route) => route.isFirst);
+  final navigator = Navigator.of(context);
+  if (navigator.canPop()) {
+    navigator.pop();
+  }
+  if (navigator.canPop()) {
+    navigator.pop();
+  }
 }
 
 String _scoreText(QuizGrading? grading) {

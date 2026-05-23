@@ -22,9 +22,14 @@ enum AiAssessmentResult {
 }
 
 class AiAssessmentScreen extends StatefulWidget {
-  const AiAssessmentScreen({super.key, this.quizService});
+  const AiAssessmentScreen({
+    super.key,
+    this.quizService,
+    this.initialQuiz,
+  });
 
   final QuizService? quizService;
+  final GeneratedQuiz? initialQuiz;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -47,7 +52,12 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     super.initState();
     _quizService = widget.quizService ??
         (_useFakeQuizApi ? const FakeQuizApi() : QuizApi());
-    generateQuiz();
+    final initialQuiz = widget.initialQuiz;
+    if (initialQuiz == null) {
+      generateQuiz();
+    } else {
+      quiz = initialQuiz;
+    }
   }
 
   Future<void> generateQuiz() async {
@@ -61,7 +71,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     });
 
     try {
-      final generatedQuiz = await _quizService.generatePracticeQuiz();
+      final generatedQuiz = await _quizService.generateAssessmentQuiz();
       if (!mounted) {
         return;
       }
@@ -182,7 +192,11 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
       Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => AssessmentResultScreen(quiz: submittedQuiz),
+          builder: (_) => AssessmentResultScreen(
+            quiz: submittedQuiz,
+            quizService: _quizService,
+            onTestAgainGenerated: openGeneratedQuiz,
+          ),
         ),
       );
     } on QuizException catch (error) {
@@ -212,6 +226,26 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         setState(() => isSubmittingQuiz = false);
       }
     }
+  }
+
+  void openGeneratedQuiz(GeneratedQuiz generatedQuiz) {
+    if (!mounted) {
+      return;
+    }
+
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
+
+    navigator.pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => AiAssessmentScreen(
+          quizService: _quizService,
+          initialQuiz: generatedQuiz,
+        ),
+      ),
+    );
   }
 
   Future<bool> showUnansweredSubmitDialog() async {
