@@ -21,10 +21,12 @@ class GradeSelectionScreen extends StatefulWidget {
   const GradeSelectionScreen({
     super.key,
     this.user,
+    this.initialGrades = const <ProgramGrade>[],
     this.programService,
   });
 
   final LoginUser? user;
+  final List<ProgramGrade> initialGrades;
   final ProgramService? programService;
 
   static const _designWidth = 390.0;
@@ -37,7 +39,7 @@ class GradeSelectionScreen extends StatefulWidget {
 class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   late final ProgramService _programService;
   bool showGenerationFailed = false;
-  bool isLoadingGrades = true;
+  bool isLoadingGrades = false;
   String? gradeLoadError;
   List<ProgramGrade> grades = const <ProgramGrade>[];
   String? selectedGradeLabel;
@@ -47,7 +49,11 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     super.initState();
     _programService = widget.programService ??
         (_useFakeProgramApi ? const FakeProgramApi() : ProgramApi());
-    loadGrades();
+    grades = widget.initialGrades;
+    selectedGradeLabel = _defaultGradeLabel(grades);
+    if (grades.isEmpty) {
+      loadGrades();
+    }
   }
 
   Future<void> loadGrades() async {
@@ -430,21 +436,62 @@ class _GradeLoadState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 4,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12 * scale,
+        crossAxisSpacing: 12 * scale,
+        childAspectRatio: 1.12,
+      ),
+      itemBuilder: (context, index) {
+        return _GradeSkeletonCard(scale: scale);
+      },
+    );
+  }
+}
+
+class _GradeSkeletonCard extends StatelessWidget {
+  const _GradeSkeletonCard({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: 176 * scale,
+      padding: EdgeInsets.fromLTRB(
+        20 * scale,
+        20 * scale,
+        20 * scale,
+        17 * scale,
+      ),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.72),
+        color: Colors.white.withValues(alpha: 0.68),
         borderRadius: BorderRadius.circular(28 * scale),
       ),
-      child: Center(
-        child: SizedBox(
-          width: 30 * scale,
-          height: 30 * scale,
-          child: const CircularProgressIndicator(
-            color: _gradeTeal,
-            strokeWidth: 3,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 35 * scale,
+            height: 35 * scale,
+            decoration: BoxDecoration(
+              color: _gradeTeal.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
+          const Spacer(),
+          Container(
+            width: 72 * scale,
+            height: 15 * scale,
+            decoration: BoxDecoration(
+              color: _gradeInk.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+        ],
       ),
     );
   }

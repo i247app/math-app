@@ -4,8 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/network/program_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
+import '../../data/program_api.dart';
 import '../tabs/history_tab.dart';
 import 'grade_selection_screen.dart';
 
@@ -14,6 +16,7 @@ const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
 const _mintBackground = Color(0xFFEBFAEC);
+const _useFakeProgramApi = bool.fromEnvironment('USE_FAKE_PROGRAM_API');
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -32,10 +35,61 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final ProgramService _programService =
+      _useFakeProgramApi ? const FakeProgramApi() : ProgramApi();
   int _activeTab = 0;
+  String? _prefetchedGradeUserId;
+  bool _isPrefetchingGrades = false;
+  List<ProgramGrade> _prefetchedGrades = const <ProgramGrade>[];
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _prefetchGrades();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.user?.id != widget.user?.id) {
+      _prefetchedGrades = const <ProgramGrade>[];
+      _prefetchedGradeUserId = null;
+      _prefetchGrades();
+    }
+  }
+
+  Future<void> _prefetchGrades() async {
+    final userId = widget.user?.id.trim();
+    if (userId == null ||
+        userId.isEmpty ||
+        _isPrefetchingGrades ||
+        (_prefetchedGradeUserId == userId && _prefetchedGrades.isNotEmpty)) {
+      return;
+    }
+
+    _isPrefetchingGrades = true;
+    _prefetchedGradeUserId = userId;
+
+    try {
+      final grades = await _programService.listGrades(userId: userId);
+      if (!mounted || widget.user?.id.trim() != userId) {
+        return;
+      }
+
+      setState(() => _prefetchedGrades = grades);
+    } catch (_) {
+      if (!mounted || widget.user?.id.trim() != userId) {
+        return;
+      }
+
+      setState(() => _prefetchedGrades = const <ProgramGrade>[]);
+    } finally {
+      _isPrefetchingGrades = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       key: ValueKey(_activeTab),
                       activeTab: _activeTab,
                       user: widget.user,
+                      initialGrades: _prefetchedGrades,
+                      programService: _programService,
                       onLogout: widget.onLogout,
                       bottomPadding: navHeight + s(24),
                       headerHeight: showHeader ? s(98) : 0,
@@ -151,6 +207,8 @@ class _TabContent extends StatelessWidget {
     super.key,
     required this.activeTab,
     required this.user,
+    required this.initialGrades,
+    required this.programService,
     required this.onLogout,
     required this.bottomPadding,
     required this.headerHeight,
@@ -159,6 +217,8 @@ class _TabContent extends StatelessWidget {
 
   final int activeTab;
   final LoginUser? user;
+  final List<ProgramGrade> initialGrades;
+  final ProgramService programService;
   final VoidCallback onLogout;
   final double bottomPadding;
   final double headerHeight;
@@ -184,6 +244,8 @@ class _TabContent extends StatelessWidget {
               height: 430 * scale,
               scale: scale,
               user: user,
+              initialGrades: initialGrades,
+              programService: programService,
             ),
             SizedBox(height: 28 * scale),
             _AchievementsHeader(scale: scale),
@@ -434,11 +496,15 @@ class _TestHeroCard extends StatelessWidget {
     required this.height,
     required this.scale,
     required this.user,
+    required this.initialGrades,
+    required this.programService,
   });
 
   final double height;
   final double scale;
   final LoginUser? user;
+  final List<ProgramGrade> initialGrades;
+  final ProgramService programService;
 
   @override
   Widget build(BuildContext context) {
@@ -526,7 +592,11 @@ class _TestHeroCard extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => GradeSelectionScreen(user: user),
+                    builder: (_) => GradeSelectionScreen(
+                      user: user,
+                      initialGrades: initialGrades,
+                      programService: programService,
+                    ),
                   ),
                 );
               },
@@ -553,18 +623,18 @@ class _MascotStage extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Positioned(
-            bottom: 12 * scale,
+            bottom: 2 * scale,
             child: Container(
-              width: 176 * scale,
-              height: 29 * scale,
+              width: 142 * scale,
+              height: 18 * scale,
               decoration: BoxDecoration(
-                color: const Color(0xFF253228).withValues(alpha: 0.08),
+                color: const Color(0xFF253228).withValues(alpha: 0.045),
                 borderRadius: BorderRadius.circular(999),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF253228).withValues(alpha: 0.12),
-                    blurRadius: 18 * scale,
-                    spreadRadius: 2 * scale,
+                    color: const Color(0xFF253228).withValues(alpha: 0.06),
+                    blurRadius: 14 * scale,
+                    spreadRadius: 1 * scale,
                   ),
                 ],
               ),
@@ -700,9 +770,9 @@ class _HeroButtonState extends State<_HeroButton> {
                     borderRadius: BorderRadius.circular(999),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFA03A0F).withValues(alpha: 0.34),
-                        blurRadius: 18 * widget.scale,
-                        offset: Offset(0, 12 * widget.scale),
+                        color: const Color(0xFFA03A0F).withValues(alpha: 0.24),
+                        blurRadius: 12 * widget.scale,
+                        offset: Offset(0, 8 * widget.scale),
                       ),
                     ],
                   ),
