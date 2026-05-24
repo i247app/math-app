@@ -1,12 +1,12 @@
-class ProgramListRequest {
-  const ProgramListRequest({
+class GradeListRequest {
+  const GradeListRequest({
     required this.userId,
   });
 
   final String userId;
 
-  factory ProgramListRequest.fromJson(Map<String, dynamic> json) {
-    return ProgramListRequest(userId: json['user_id'] as String);
+  factory GradeListRequest.fromJson(Map<String, dynamic> json) {
+    return GradeListRequest(userId: json['user_id'] as String);
   }
 
   Map<String, dynamic> toJson() {
@@ -14,10 +14,10 @@ class ProgramListRequest {
   }
 }
 
-class ProgramListResponse {
-  const ProgramListResponse({
+class GradeListResponse {
+  const GradeListResponse({
     required this.mstatus,
-    this.grades = const <ProgramGrade>[],
+    this.grades = const <GradeModel>[],
     this.pagination,
     this.status,
     this.mmessage,
@@ -25,19 +25,19 @@ class ProgramListResponse {
   });
 
   final int mstatus;
-  final List<ProgramGrade> grades;
-  final ProgramPagination? pagination;
+  final List<GradeModel> grades;
+  final GradePagination? pagination;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory ProgramListResponse.fromJson(Map<String, dynamic> json) {
-    return ProgramListResponse(
+  factory GradeListResponse.fromJson(Map<String, dynamic> json) {
+    return GradeListResponse(
       mstatus: _intFromJson(json['mstatus']) ?? 0,
-      grades: _listFromJson(json['grades'], ProgramGrade.fromJson),
+      grades: _listFromJson(json['grades'], GradeModel.fromJson),
       pagination: _objectFromJson(
         json['pagination'],
-        ProgramPagination.fromJson,
+        GradePagination.fromJson,
       ),
       status: json['status'] as String?,
       mmessage: json['mmessage'] as String?,
@@ -57,8 +57,8 @@ class ProgramListResponse {
   }
 }
 
-class ProgramPagination {
-  const ProgramPagination({
+class GradePagination {
+  const GradePagination({
     this.hasNext,
     this.hasPrevious,
     this.page,
@@ -78,8 +78,8 @@ class ProgramPagination {
   final int? totalCount;
   final int? totalPages;
 
-  factory ProgramPagination.fromJson(Map<String, dynamic> json) {
-    return ProgramPagination(
+  factory GradePagination.fromJson(Map<String, dynamic> json) {
+    return GradePagination(
       hasNext: json['has_next'] as bool?,
       hasPrevious: json['has_previous'] as bool?,
       page: _intFromJson(json['page']),
@@ -105,8 +105,8 @@ class ProgramPagination {
   }
 }
 
-class ProgramGrade {
-  const ProgramGrade({
+class GradeModel {
+  const GradeModel({
     this.id,
     this.gradeId,
     this.label,
@@ -126,8 +126,8 @@ class ProgramGrade {
   final String? createDt;
   final String? modifyDt;
 
-  factory ProgramGrade.fromJson(Map<String, dynamic> json) {
-    return ProgramGrade(
+  factory GradeModel.fromJson(Map<String, dynamic> json) {
+    return GradeModel(
       id: json['id']?.toString(),
       gradeId: json['grade_id'] as String?,
       label: json['label'] as String?,

@@ -1,9 +1,9 @@
 import '../../../core/config/api_config.dart';
 import '../../../core/network/network_client.dart';
-import '../../../core/network/program_models.dart';
+import '../../../core/network/grade_models.dart';
 
-class ProgramException implements Exception {
-  const ProgramException(this.message, {this.status});
+class GradeException implements Exception {
+  const GradeException(this.message, {this.status});
 
   final String message;
   final int? status;
@@ -12,19 +12,19 @@ class ProgramException implements Exception {
   String toString() => message;
 }
 
-abstract class ProgramService {
-  Future<List<ProgramGrade>> listGrades({required String userId});
+abstract class GradeService {
+  Future<List<GradeModel>> listGrades({required String userId});
 }
 
-class FakeProgramApi implements ProgramService {
-  const FakeProgramApi();
+class FakeGradeApi implements GradeService {
+  const FakeGradeApi();
 
   @override
-  Future<List<ProgramGrade>> listGrades({required String userId}) async {
+  Future<List<GradeModel>> listGrades({required String userId}) async {
     await Future<void>.delayed(const Duration(milliseconds: 450));
-    final response = ProgramListResponse.fromJson(_fakeProgramListResponse());
+    final response = GradeListResponse.fromJson(_fakeGradeListResponse());
     if (response.mstatus != 200) {
-      throw ProgramException(
+      throw GradeException(
         response.mmessage ?? response.debug ?? 'Tải danh sách lớp thất bại.',
         status: response.mstatus,
       );
@@ -34,8 +34,8 @@ class FakeProgramApi implements ProgramService {
   }
 }
 
-class ProgramApi implements ProgramService {
-  ProgramApi({
+class GradeApi implements GradeService {
+  GradeApi({
     String? baseUrl,
     NetworkApi? networkApi,
   }) : _networkApi =
@@ -44,26 +44,26 @@ class ProgramApi implements ProgramService {
   final NetworkApi _networkApi;
 
   @override
-  Future<List<ProgramGrade>> listGrades({required String userId}) async {
+  Future<List<GradeModel>> listGrades({required String userId}) async {
     final cleanUserId = userId.trim();
     if (cleanUserId.isEmpty) {
-      throw const ProgramException('Thiếu user để tải danh sách lớp.');
+      throw const GradeException('Thiếu user để tải danh sách lớp.');
     }
 
-    final ProgramListResponse response;
+    final GradeListResponse response;
     try {
-      response = await _networkApi.listPrograms(
-        ProgramListRequest(userId: cleanUserId),
+      response = await _networkApi.listGrades(
+        GradeListRequest(userId: cleanUserId),
       );
     } on NetworkException catch (error) {
-      throw ProgramException(error.message, status: error.status);
+      throw GradeException(error.message, status: error.status);
     }
 
     return response.grades;
   }
 }
 
-Map<String, Object?> _fakeProgramListResponse() {
+Map<String, Object?> _fakeGradeListResponse() {
   return <String, Object?>{
     'mstatus': 200,
     'grades': <Object?>[

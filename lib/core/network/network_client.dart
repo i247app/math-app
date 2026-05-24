@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/api_config.dart';
 import 'auth_models.dart';
-import 'program_models.dart';
+import 'grade_models.dart';
 import 'quiz_models.dart';
 
 class NetworkException implements Exception {
@@ -441,25 +441,25 @@ class NetworkApi {
     return quizResponse;
   }
 
-  Future<ProgramListResponse> listPrograms(
-    ProgramListRequest request,
+  Future<GradeListResponse> listGrades(
+    GradeListRequest request,
   ) async {
     final responseJson = await _networkClient.postJson(
       '/grades/list',
       request.toJson(),
     );
-    final programResponse = ProgramListResponse.fromJson(responseJson);
-    if (programResponse.mstatus != 200) {
+    final gradeResponse = GradeListResponse.fromJson(responseJson);
+    if (gradeResponse.mstatus != 200) {
       throw NetworkException(
-        programResponse.mmessage ??
-            programResponse.debug ??
-            programResponse.status ??
+        gradeResponse.mmessage ??
+            gradeResponse.debug ??
+            gradeResponse.status ??
             'Request failed.',
-        status: programResponse.mstatus,
+        status: gradeResponse.mstatus,
       );
     }
 
-    return programResponse;
+    return gradeResponse;
   }
 
   Future<AuthUser> getCurrentUser() async {

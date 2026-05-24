@@ -4,10 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/network/program_models.dart';
+import '../../../../core/network/grade_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
-import '../../data/program_api.dart';
+import '../../data/grade_api.dart';
 import '../tabs/history_tab.dart';
 import 'grade_selection_screen.dart';
 
@@ -16,7 +16,7 @@ const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
 const _mintBackground = Color(0xFFEBFAEC);
-const _useFakeProgramApi = bool.fromEnvironment('USE_FAKE_PROGRAM_API');
+const _useFakeGradeApi = bool.fromEnvironment('USE_FAKE_GRADE_API');
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -35,12 +35,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final ProgramService _programService =
-      _useFakeProgramApi ? const FakeProgramApi() : ProgramApi();
+  late final GradeService _gradeService =
+      _useFakeGradeApi ? const FakeGradeApi() : GradeApi();
   int _activeTab = 0;
   String? _prefetchedGradeUserId;
   bool _isPrefetchingGrades = false;
-  List<ProgramGrade> _prefetchedGrades = const <ProgramGrade>[];
+  List<GradeModel> _prefetchedGrades = const <GradeModel>[];
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void didUpdateWidget(covariant HomeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.user?.id != widget.user?.id) {
-      _prefetchedGrades = const <ProgramGrade>[];
+      _prefetchedGrades = const <GradeModel>[];
       _prefetchedGradeUserId = null;
       _prefetchGrades();
     }
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _prefetchedGradeUserId = userId;
 
     try {
-      final grades = await _programService.listGrades(userId: userId);
+      final grades = await _gradeService.listGrades(userId: userId);
       if (!mounted || widget.user?.id.trim() != userId) {
         return;
       }
@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
 
-      setState(() => _prefetchedGrades = const <ProgramGrade>[]);
+      setState(() => _prefetchedGrades = const <GradeModel>[]);
     } finally {
       _isPrefetchingGrades = false;
     }
@@ -146,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       activeTab: _activeTab,
                       user: widget.user,
                       initialGrades: _prefetchedGrades,
-                      programService: _programService,
+                      gradeService: _gradeService,
                       onLogout: widget.onLogout,
                       bottomPadding: navHeight + s(24),
                       headerHeight: showHeader ? s(98) : 0,
@@ -208,7 +208,7 @@ class _TabContent extends StatelessWidget {
     required this.activeTab,
     required this.user,
     required this.initialGrades,
-    required this.programService,
+    required this.gradeService,
     required this.onLogout,
     required this.bottomPadding,
     required this.headerHeight,
@@ -217,8 +217,8 @@ class _TabContent extends StatelessWidget {
 
   final int activeTab;
   final LoginUser? user;
-  final List<ProgramGrade> initialGrades;
-  final ProgramService programService;
+  final List<GradeModel> initialGrades;
+  final GradeService gradeService;
   final VoidCallback onLogout;
   final double bottomPadding;
   final double headerHeight;
@@ -245,7 +245,7 @@ class _TabContent extends StatelessWidget {
               scale: scale,
               user: user,
               initialGrades: initialGrades,
-              programService: programService,
+              gradeService: gradeService,
             ),
             SizedBox(height: 28 * scale),
             _AchievementsHeader(scale: scale),
@@ -497,14 +497,14 @@ class _TestHeroCard extends StatelessWidget {
     required this.scale,
     required this.user,
     required this.initialGrades,
-    required this.programService,
+    required this.gradeService,
   });
 
   final double height;
   final double scale;
   final LoginUser? user;
-  final List<ProgramGrade> initialGrades;
-  final ProgramService programService;
+  final List<GradeModel> initialGrades;
+  final GradeService gradeService;
 
   @override
   Widget build(BuildContext context) {
@@ -595,7 +595,7 @@ class _TestHeroCard extends StatelessWidget {
                     builder: (_) => GradeSelectionScreen(
                       user: user,
                       initialGrades: initialGrades,
-                      programService: programService,
+                      gradeService: gradeService,
                     ),
                   ),
                 );

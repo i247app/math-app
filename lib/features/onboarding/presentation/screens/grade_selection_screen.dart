@@ -4,10 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/network/program_models.dart';
+import '../../../../core/network/grade_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
-import '../../data/program_api.dart';
+import '../../data/grade_api.dart';
 import 'assessment_screen.dart';
 
 const _gradeMint = Color(0xFFEBFAEC);
@@ -15,19 +15,19 @@ const _gradeTeal = Color(0xFF006762);
 const _gradeInk = Color(0xFF253228);
 const _gradePeach = Color(0xFFFFDCCA);
 const _gradeRust = Color(0xFFA03A0F);
-const _useFakeProgramApi = bool.fromEnvironment('USE_FAKE_PROGRAM_API');
+const _useFakeGradeApi = bool.fromEnvironment('USE_FAKE_GRADE_API');
 
 class GradeSelectionScreen extends StatefulWidget {
   const GradeSelectionScreen({
     super.key,
     this.user,
-    this.initialGrades = const <ProgramGrade>[],
-    this.programService,
+    this.initialGrades = const <GradeModel>[],
+    this.gradeService,
   });
 
   final LoginUser? user;
-  final List<ProgramGrade> initialGrades;
-  final ProgramService? programService;
+  final List<GradeModel> initialGrades;
+  final GradeService? gradeService;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
@@ -37,18 +37,18 @@ class GradeSelectionScreen extends StatefulWidget {
 }
 
 class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
-  late final ProgramService _programService;
+  late final GradeService _gradeService;
   bool showGenerationFailed = false;
   bool isLoadingGrades = false;
   String? gradeLoadError;
-  List<ProgramGrade> grades = const <ProgramGrade>[];
+  List<GradeModel> grades = const <GradeModel>[];
   String? selectedGradeLabel;
 
   @override
   void initState() {
     super.initState();
-    _programService = widget.programService ??
-        (_useFakeProgramApi ? const FakeProgramApi() : ProgramApi());
+    _gradeService = widget.gradeService ??
+        (_useFakeGradeApi ? const FakeGradeApi() : GradeApi());
     grades = widget.initialGrades;
     selectedGradeLabel = _defaultGradeLabel(grades);
     if (grades.isEmpty) {
@@ -62,7 +62,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
       setState(() {
         isLoadingGrades = false;
         gradeLoadError = 'Chưa có thông tin tài khoản để tải danh sách lớp.';
-        grades = const <ProgramGrade>[];
+        grades = const <GradeModel>[];
       });
       return;
     }
@@ -73,7 +73,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     });
 
     try {
-      final loadedGrades = await _programService.listGrades(userId: userId);
+      final loadedGrades = await _gradeService.listGrades(userId: userId);
       if (!mounted) {
         return;
       }
@@ -87,7 +87,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
           selectedGradeLabel = _defaultGradeLabel(loadedGrades);
         }
       });
-    } on ProgramException catch (error) {
+    } on GradeException catch (error) {
       if (!mounted) {
         return;
       }
@@ -371,7 +371,7 @@ class _GradeGrid extends StatelessWidget {
   });
 
   final double scale;
-  final List<ProgramGrade> grades;
+  final List<GradeModel> grades;
   final String? selectedGradeLabel;
   final bool isLoading;
   final String? errorMessage;
@@ -395,7 +395,7 @@ class _GradeGrid extends StatelessWidget {
     final items = grades.where((grade) {
       final label = grade.label?.trim();
       return label != null && label.isNotEmpty;
-    }).map(_GradeOption.fromProgramGrade).toList()
+    }).map(_GradeOption.fromGradeModel).toList()
       ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
     if (items.isEmpty) {
@@ -846,7 +846,7 @@ class _GradeOption {
     this.displayOrder = 0,
   });
 
-  factory _GradeOption.fromProgramGrade(ProgramGrade grade) {
+  factory _GradeOption.fromGradeModel(GradeModel grade) {
     final label = grade.label?.trim() ?? '';
     return _GradeOption(
       _gradeNumberFromLabel(label),
@@ -866,7 +866,7 @@ String? _gradeNumberFromLabel(String label) {
   return match?.group(0);
 }
 
-String? _defaultGradeLabel(List<ProgramGrade> grades) {
+String? _defaultGradeLabel(List<GradeModel> grades) {
   final sortedGrades = grades
       .where((grade) => grade.label?.trim().isNotEmpty == true)
       .toList()
