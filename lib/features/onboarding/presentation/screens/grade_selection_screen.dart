@@ -4,7 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/network/program_models.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../data/otp_auth_api.dart';
+import '../../data/program_api.dart';
 import 'assessment_screen.dart';
 
 const _gradeMint = Color(0xFFEBFAEC);
@@ -12,9 +15,17 @@ const _gradeTeal = Color(0xFF006762);
 const _gradeInk = Color(0xFF253228);
 const _gradePeach = Color(0xFFFFDCCA);
 const _gradeRust = Color(0xFFA03A0F);
+const _useFakeProgramApi = bool.fromEnvironment('USE_FAKE_PROGRAM_API');
 
 class GradeSelectionScreen extends StatefulWidget {
-  const GradeSelectionScreen({super.key});
+  const GradeSelectionScreen({
+    super.key,
+    this.user,
+    this.programService,
+  });
+
+  final LoginUser? user;
+  final ProgramService? programService;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
@@ -24,9 +35,74 @@ class GradeSelectionScreen extends StatefulWidget {
 }
 
 class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
+  late final ProgramService _programService;
   bool showGenerationFailed = false;
+  bool isLoadingGrades = true;
+  String? gradeLoadError;
+  List<ProgramGrade> grades = const <ProgramGrade>[];
+  String? selectedGradeLabel;
 
-  Future<void> openAssessment() async {
+  @override
+  void initState() {
+    super.initState();
+    _programService = widget.programService ??
+        (_useFakeProgramApi ? const FakeProgramApi() : ProgramApi());
+    loadGrades();
+  }
+
+  Future<void> loadGrades() async {
+    final userId = widget.user?.id.trim();
+    if (userId == null || userId.isEmpty) {
+      setState(() {
+        isLoadingGrades = false;
+        gradeLoadError = 'Chưa có thông tin tài khoản để tải danh sách lớp.';
+        grades = const <ProgramGrade>[];
+      });
+      return;
+    }
+
+    setState(() {
+      isLoadingGrades = true;
+      gradeLoadError = null;
+    });
+
+    try {
+      final loadedGrades = await _programService.listGrades(userId: userId);
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        grades = loadedGrades;
+        isLoadingGrades = false;
+        if (!loadedGrades.any(
+          (grade) => grade.label?.trim() == selectedGradeLabel,
+        )) {
+          selectedGradeLabel = _defaultGradeLabel(loadedGrades);
+        }
+      });
+    } on ProgramException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        gradeLoadError = error.message;
+        isLoadingGrades = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        gradeLoadError = 'Tải danh sách lớp thất bại.';
+        isLoadingGrades = false;
+      });
+    }
+  }
+
+  Future<void> openAssessment({String? gradeLabel}) async {
     HapticFeedback.mediumImpact();
     if (showGenerationFailed) {
       setState(() => showGenerationFailed = false);
@@ -34,15 +110,38 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
 
     final result = await Navigator.of(context).push<AiAssessmentResult>(
       MaterialPageRoute<AiAssessmentResult>(
-        builder: (_) => const AiAssessmentScreen(),
+        builder: (_) => AiAssessmentScreen(gradeLabel: gradeLabel),
       ),
     );
 
-    if (!mounted || result != AiAssessmentResult.generationFailed) {
+    if (!mounted) {
       return;
     }
 
-    setState(() => showGenerationFailed = true);
+    if (result == AiAssessmentResult.generationFailed) {
+      setState(() => showGenerationFailed = true);
+      return;
+    }
+
+    setState(() {
+      showGenerationFailed = false;
+      selectedGradeLabel = _defaultGradeLabel(grades);
+    });
+  }
+
+  void selectGrade(_GradeOption option) {
+    HapticFeedback.selectionClick();
+    setState(() => selectedGradeLabel = option.label);
+  }
+
+  void continueWithSelectedGrade() {
+    final gradeLabel = selectedGradeLabel;
+    if (gradeLabel == null || gradeLabel.isEmpty) {
+      HapticFeedback.selectionClick();
+      return;
+    }
+
+    openAssessment(gradeLabel: gradeLabel);
   }
 
   @override
@@ -109,7 +208,15 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                                     : const SizedBox.shrink(),
                               ),
                               SizedBox(height: s(26)),
-                              _GradeGrid(scale: scale),
+                              _GradeGrid(
+                                scale: scale,
+                                grades: grades,
+                                selectedGradeLabel: selectedGradeLabel,
+                                isLoading: isLoadingGrades,
+                                errorMessage: gradeLoadError,
+                                onSelected: selectGrade,
+                                onRetry: loadGrades,
+                              ),
                             ],
                           ),
                         ),
@@ -127,9 +234,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                         child: _GradeBottomBar(
                           scale: scale,
                           onSkip: openAssessment,
-                          onContinue: () {
-                            HapticFeedback.selectionClick();
-                          },
+                          onContinue: continueWithSelectedGrade,
                         ),
                       ),
                     ],
@@ -249,20 +354,51 @@ class _GradeHeader extends StatelessWidget {
 }
 
 class _GradeGrid extends StatelessWidget {
-  const _GradeGrid({required this.scale});
+  const _GradeGrid({
+    required this.scale,
+    required this.grades,
+    required this.selectedGradeLabel,
+    required this.isLoading,
+    required this.errorMessage,
+    required this.onSelected,
+    required this.onRetry,
+  });
 
   final double scale;
+  final List<ProgramGrade> grades;
+  final String? selectedGradeLabel;
+  final bool isLoading;
+  final String? errorMessage;
+  final ValueChanged<_GradeOption> onSelected;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    const items = [
-      _GradeOption(null, 'Mẫu giáo', kindergarten: true),
-      _GradeOption('1', 'Lớp 1'),
-      _GradeOption('2', 'Lớp 2'),
-      _GradeOption('3', 'Lớp 3'),
-      _GradeOption('4', 'Lớp 4'),
-      _GradeOption('5', 'Lớp 5'),
-    ];
+    if (isLoading) {
+      return _GradeLoadState(scale: scale);
+    }
+
+    if (errorMessage != null) {
+      return _GradeLoadError(
+        scale: scale,
+        message: errorMessage!,
+        onRetry: onRetry,
+      );
+    }
+
+    final items = grades.where((grade) {
+      final label = grade.label?.trim();
+      return label != null && label.isNotEmpty;
+    }).map(_GradeOption.fromProgramGrade).toList()
+      ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
+
+    if (items.isEmpty) {
+      return _GradeLoadError(
+        scale: scale,
+        message: 'Chưa có lớp học nào để hiển thị.',
+        onRetry: onRetry,
+      );
+    }
 
     return GridView.builder(
       shrinkWrap: true,
@@ -275,8 +411,100 @@ class _GradeGrid extends StatelessWidget {
         childAspectRatio: 1.12,
       ),
       itemBuilder: (context, index) {
-        return _GradeCard(option: items[index], scale: scale);
+        final option = items[index];
+        return _GradeCard(
+          option: option,
+          scale: scale,
+          isSelected: option.label == selectedGradeLabel,
+          onSelected: () => onSelected(option),
+        );
       },
+    );
+  }
+}
+
+class _GradeLoadState extends StatelessWidget {
+  const _GradeLoadState({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 176 * scale,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(28 * scale),
+      ),
+      child: Center(
+        child: SizedBox(
+          width: 30 * scale,
+          height: 30 * scale,
+          child: const CircularProgressIndicator(
+            color: _gradeTeal,
+            strokeWidth: 3,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GradeLoadError extends StatelessWidget {
+  const _GradeLoadError({
+    required this.scale,
+    required this.message,
+    required this.onRetry,
+  });
+
+  final double scale;
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(24 * scale),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(28 * scale),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.school_outlined,
+            color: _gradeTeal,
+            size: 34 * scale,
+          ),
+          SizedBox(height: 12 * scale),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: _gradeInk,
+              fontFamily: 'Nunito',
+              fontSize: 14 * scale,
+              fontWeight: FontWeight.w800,
+              height: 1.3,
+              letterSpacing: 0,
+            ),
+          ),
+          SizedBox(height: 14 * scale),
+          TextButton(
+            onPressed: onRetry,
+            child: Text(
+              'THỬ LẠI',
+              style: TextStyle(
+                color: _gradeTeal,
+                fontFamily: 'Nunito',
+                fontSize: 13 * scale,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.6,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -285,56 +513,82 @@ class _GradeCard extends StatelessWidget {
   const _GradeCard({
     required this.option,
     required this.scale,
+    required this.isSelected,
+    required this.onSelected,
   });
 
   final _GradeOption option;
   final double scale;
+  final bool isSelected;
+  final VoidCallback onSelected;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       label: option.label,
-      enabled: false,
-      child: Container(
-        padding: EdgeInsets.fromLTRB(
-          20 * scale,
-          20 * scale,
-          20 * scale,
-          17 * scale,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.90),
+      selected: isSelected,
+      button: true,
+      enabled: true,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(28 * scale),
+        child: InkWell(
+          onTap: onSelected,
           borderRadius: BorderRadius.circular(28 * scale),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10 * scale,
-              offset: Offset(0, 4 * scale),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            padding: EdgeInsets.fromLTRB(
+              20 * scale,
+              20 * scale,
+              20 * scale,
+              17 * scale,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _GradeBadge(option: option, scale: scale),
-            const Spacer(),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                option.label,
-                maxLines: 1,
-                style: TextStyle(
-                  color: _gradeInk,
-                  fontFamily: 'Nunito',
-                  fontSize: 17 * scale,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  letterSpacing: 0,
-                ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(28 * scale),
+              border: Border.all(
+                color: isSelected ? _gradeTeal : Colors.transparent,
+                width: 2 * scale,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: isSelected
+                      ? _gradeTeal.withValues(alpha: 0.16)
+                      : Colors.black.withValues(alpha: 0.03),
+                  blurRadius: isSelected ? 16 * scale : 10 * scale,
+                  offset: Offset(0, isSelected ? 7 * scale : 4 * scale),
+                ),
+              ],
             ),
-          ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _GradeBadge(
+                  option: option,
+                  scale: scale,
+                  isSelected: isSelected,
+                ),
+                const Spacer(),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    option.label,
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: _gradeInk,
+                      fontFamily: 'Nunito',
+                      fontSize: 17 * scale,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -345,10 +599,12 @@ class _GradeBadge extends StatelessWidget {
   const _GradeBadge({
     required this.option,
     required this.scale,
+    required this.isSelected,
   });
 
   final _GradeOption option;
   final double scale;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -359,26 +615,36 @@ class _GradeBadge extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: option.kindergarten ? _gradePeach : AppColors.aquaMist,
+        color: isSelected
+            ? _gradeTeal
+            : option.kindergarten
+                ? _gradePeach
+                : AppColors.aquaMist,
         shape: BoxShape.circle,
       ),
       child: option.kindergarten
           ? Icon(
               Icons.face_retouching_natural_rounded,
-              color: _gradeRust,
+              color: isSelected ? Colors.white : _gradeRust,
               size: 20 * scale,
             )
-          : Text(
-              option.number!,
-              style: TextStyle(
-                color: _gradeTeal,
-                fontFamily: 'Nunito',
-                fontSize: 17 * scale,
-                fontWeight: FontWeight.w900,
-                height: 1,
-                letterSpacing: 0,
-              ),
-            ),
+          : option.number == null
+              ? Icon(
+                  Icons.school_rounded,
+                  color: isSelected ? Colors.white : _gradeTeal,
+                  size: 19 * scale,
+                )
+              : Text(
+                  option.number!,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : _gradeTeal,
+                    fontFamily: 'Nunito',
+                    fontSize: 17 * scale,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
     );
   }
 }
@@ -530,9 +796,36 @@ class _GradeOption {
     this.number,
     this.label, {
     this.kindergarten = false,
+    this.displayOrder = 0,
   });
+
+  factory _GradeOption.fromProgramGrade(ProgramGrade grade) {
+    final label = grade.label?.trim() ?? '';
+    return _GradeOption(
+      _gradeNumberFromLabel(label),
+      label,
+      displayOrder: grade.displayOrder ?? 0,
+    );
+  }
 
   final String? number;
   final String label;
   final bool kindergarten;
+  final int displayOrder;
+}
+
+String? _gradeNumberFromLabel(String label) {
+  final match = RegExp(r'\d+').firstMatch(label);
+  return match?.group(0);
+}
+
+String? _defaultGradeLabel(List<ProgramGrade> grades) {
+  final sortedGrades = grades
+      .where((grade) => grade.label?.trim().isNotEmpty == true)
+      .toList()
+    ..sort((a, b) => (a.displayOrder ?? 0).compareTo(b.displayOrder ?? 0));
+  if (sortedGrades.isEmpty) {
+    return null;
+  }
+  return sortedGrades.first.label?.trim();
 }

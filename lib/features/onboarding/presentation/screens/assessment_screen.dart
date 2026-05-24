@@ -26,10 +26,12 @@ class AiAssessmentScreen extends StatefulWidget {
     super.key,
     this.quizService,
     this.initialQuiz,
+    this.gradeLabel,
   });
 
   final QuizService? quizService;
   final GeneratedQuiz? initialQuiz;
+  final String? gradeLabel;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -71,7 +73,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     });
 
     try {
-      final generatedQuiz = await _quizService.generateAssessmentQuiz();
+      final generatedQuiz = await _quizService.generateAssessmentQuiz(
+        gradeLabel: widget.gradeLabel,
+      );
       if (!mounted) {
         return;
       }

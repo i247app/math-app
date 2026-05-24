@@ -16,7 +16,10 @@ class QuizException implements Exception {
 }
 
 abstract class QuizService {
-  Future<GeneratedQuiz> generateAssessmentQuiz({String? previousQuizId});
+  Future<GeneratedQuiz> generateAssessmentQuiz({
+    String? gradeLabel,
+    String? previousQuizId,
+  });
 
   Future<List<GeneratedQuiz>> listQuizzes({
     String? userId,
@@ -33,10 +36,16 @@ class FakeQuizApi implements QuizService {
   const FakeQuizApi();
 
   @override
-  Future<GeneratedQuiz> generateAssessmentQuiz({String? previousQuizId}) async {
+  Future<GeneratedQuiz> generateAssessmentQuiz({
+    String? gradeLabel,
+    String? previousQuizId,
+  }) async {
     await Future<void>.delayed(const Duration(milliseconds: 900));
     final response = GenerateQuizResponse.fromJson(
-      _fakeGenerateQuizResponse(previousQuizId: previousQuizId),
+      _fakeGenerateQuizResponse(
+        gradeLabel: gradeLabel,
+        previousQuizId: previousQuizId,
+      ),
     );
     final quiz = response.quiz;
     if (response.mstatus != 200 || quiz == null || quiz.questions.isEmpty) {
@@ -97,13 +106,21 @@ class QuizApi implements QuizService {
   final NetworkApi _networkApi;
 
   @override
-  Future<GeneratedQuiz> generateAssessmentQuiz({String? previousQuizId}) async {
+  Future<GeneratedQuiz> generateAssessmentQuiz({
+    String? gradeLabel,
+    String? previousQuizId,
+  }) async {
     final GenerateQuizResponse response;
+    final cleanGradeLabel = gradeLabel?.trim();
     try {
       response = await _networkApi.generateQuiz(
         GenerateQuizRequest(
           type: assessmentQuizType,
-          gradeLabel: previousQuizId == null ? assessmentQuizGradeLabel : null,
+          gradeLabel: previousQuizId == null
+              ? cleanGradeLabel?.isNotEmpty == true
+                  ? cleanGradeLabel
+                  : assessmentQuizGradeLabel
+              : null,
           previousQuizId: previousQuizId,
         ),
       );
@@ -172,15 +189,24 @@ class QuizApi implements QuizService {
   }
 }
 
-Map<String, Object?> _fakeGenerateQuizResponse({String? previousQuizId}) {
+Map<String, Object?> _fakeGenerateQuizResponse({
+  String? gradeLabel,
+  String? previousQuizId,
+}) {
   return <String, Object?>{
     'mstatus': 200,
-    'quiz': _fakeGeneratedQuiz(previousQuizId: previousQuizId),
+    'quiz': _fakeGeneratedQuiz(
+      gradeLabel: gradeLabel,
+      previousQuizId: previousQuizId,
+    ),
     'status': 'Success',
   };
 }
 
-Map<String, Object?> _fakeGeneratedQuiz({String? previousQuizId}) {
+Map<String, Object?> _fakeGeneratedQuiz({
+  String? gradeLabel,
+  String? previousQuizId,
+}) {
   return <String, Object?>{
     'create_dt': '2026-05-21T09:24:04Z',
     'id': 2,
@@ -242,6 +268,9 @@ Map<String, Object?> _fakeGeneratedQuiz({String? previousQuizId}) {
         : 'fake-assessment-retake-1',
     'quiz_status': 'GENERATED',
     'type': assessmentQuizType,
+    'grading': gradeLabel == null
+        ? null
+        : <String, Object?>{'ai_detect_grade': gradeLabel},
   };
 }
 

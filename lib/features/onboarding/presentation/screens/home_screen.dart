@@ -180,7 +180,11 @@ class _TabContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _TestHeroCard(height: 430 * scale, scale: scale),
+            _TestHeroCard(
+              height: 430 * scale,
+              scale: scale,
+              user: user,
+            ),
             SizedBox(height: 28 * scale),
             _AchievementsHeader(scale: scale),
             SizedBox(height: 20 * scale),
@@ -426,10 +430,15 @@ class _NotificationButton extends StatelessWidget {
 }
 
 class _TestHeroCard extends StatelessWidget {
-  const _TestHeroCard({required this.height, required this.scale});
+  const _TestHeroCard({
+    required this.height,
+    required this.scale,
+    required this.user,
+  });
 
   final double height;
   final double scale;
+  final LoginUser? user;
 
   @override
   Widget build(BuildContext context) {
@@ -517,7 +526,7 @@ class _TestHeroCard extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => const GradeSelectionScreen(),
+                    builder: (_) => GradeSelectionScreen(user: user),
                   ),
                 );
               },
