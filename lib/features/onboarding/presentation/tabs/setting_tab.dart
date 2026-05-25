@@ -3,16 +3,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/network/grade_models.dart';
+import '../../../../core/network/profile_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/avatar_picker.dart';
+import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
+import '../../data/profile_api.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
 
-enum _AccountView { settings, account, profile }
+enum _AccountView { settings, account, profile, addProfile }
 
 class SettingTab extends StatefulWidget {
   const SettingTab({
@@ -34,20 +38,38 @@ class SettingTab extends StatefulWidget {
 
 class _SettingTabState extends State<SettingTab> {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
+  final ProfileService _profileService = ProfileApi();
+  final GradeService _gradeService = GradeApi();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _profileNameController = TextEditingController();
 
   _AccountView _view = _AccountView.settings;
   bool _isForwardTransition = true;
   bool _isEditing = false;
   bool _isPickingAccountAvatar = false;
+  bool _isLoadingProfiles = false;
+  bool _isLoadingProfileOptions = false;
+  bool _isPickingCreateAvatar = false;
+  bool _isSavingProfile = false;
+  String? _profileLoadError;
+  String? _profileOptionsError;
+  String? _profileCreateError;
   String? _localAvatarPath;
   String? _draftAvatarPath;
+  String? _createAvatarPath;
   String? _snapshotUsername;
   String? _snapshotPhone;
   String? _snapshotEmail;
   String? _snapshotAvatarPath;
+  List<StudentProfile> _profiles = const <StudentProfile>[];
+  List<GradeModel> _gradeOptions = const <GradeModel>[];
+  List<ProfileProgram> _programOptions = const <ProfileProgram>[];
+  List<ProfileSemester> _semesterOptions = const <ProfileSemester>[];
+  GradeModel? _selectedGrade;
+  ProfileProgram? _selectedProgram;
+  ProfileSemester? _selectedSemester;
 
   @override
   void initState() {
@@ -60,6 +82,11 @@ class _SettingTabState extends State<SettingTab> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.user != widget.user && !_isEditing) {
       _applyUser(widget.user);
+      _profiles = const <StudentProfile>[];
+      _profileLoadError = null;
+      if (_view == _AccountView.profile) {
+        _loadProfiles();
+      }
     }
   }
 
@@ -68,6 +95,7 @@ class _SettingTabState extends State<SettingTab> {
     _usernameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
+    _profileNameController.dispose();
     super.dispose();
   }
 
@@ -90,6 +118,9 @@ class _SettingTabState extends State<SettingTab> {
       _draftAvatarPath = null;
     });
     FocusScope.of(context).unfocus();
+    if (view == _AccountView.profile && _profiles.isEmpty) {
+      _loadProfiles();
+    }
   }
 
   void _returnToSettings() {
@@ -105,6 +136,36 @@ class _SettingTabState extends State<SettingTab> {
       _draftAvatarPath = null;
     });
     FocusScope.of(context).unfocus();
+  }
+
+  void _openAddProfile() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _view = _AccountView.addProfile;
+      _isForwardTransition = true;
+      _profileCreateError = null;
+    });
+    FocusScope.of(context).unfocus();
+    if (_gradeOptions.isEmpty ||
+        _programOptions.isEmpty ||
+        _semesterOptions.isEmpty) {
+      _loadProfileOptions();
+    }
+  }
+
+  void _returnToProfileList() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _view = _AccountView.profile;
+      _isForwardTransition = false;
+      _profileCreateError = null;
+    });
+    FocusScope.of(context).unfocus();
+  }
+
+  void _cancelAddProfile() {
+    _resetCreateProfileForm();
+    _returnToProfileList();
   }
 
   void _startEditing() {
@@ -180,95 +241,362 @@ class _SettingTabState extends State<SettingTab> {
     }
   }
 
+  Future<void> _loadProfiles() async {
+    final userId = widget.user?.id.trim();
+    if (userId == null || userId.isEmpty) {
+      setState(() {
+        _isLoadingProfiles = false;
+        _profileLoadError = 'Chưa có thông tin tài khoản để tải hồ sơ.';
+        _profiles = const <StudentProfile>[];
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingProfiles = true;
+      _profileLoadError = null;
+    });
+
+    try {
+      final profiles = await _profileService.listProfiles(userId: userId);
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profiles = profiles;
+        _isLoadingProfiles = false;
+      });
+    } on ProfileException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profileLoadError = error.message;
+        _isLoadingProfiles = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profileLoadError = 'Tải hồ sơ thất bại.';
+        _isLoadingProfiles = false;
+      });
+    }
+  }
+
+  Future<void> _loadProfileOptions() async {
+    final userId = widget.user?.id.trim();
+    if (userId == null || userId.isEmpty) {
+      setState(() {
+        _isLoadingProfileOptions = false;
+        _profileOptionsError = 'Chưa có thông tin tài khoản để tải lựa chọn.';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingProfileOptions = true;
+      _profileOptionsError = null;
+    });
+
+    try {
+      final grades = await _gradeService.listGrades(userId: userId);
+      final programs = await _profileService.listPrograms(userId: userId);
+      final semesters = await _profileService.listSemesters(userId: userId);
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _gradeOptions = grades;
+        _programOptions = programs;
+        _semesterOptions = semesters;
+        _selectedGrade ??= grades.isEmpty ? null : grades.first;
+        _selectedProgram ??= programs.isEmpty ? null : programs.first;
+        _selectedSemester ??= semesters.isEmpty ? null : semesters.first;
+        _isLoadingProfileOptions = false;
+      });
+    } on GradeException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profileOptionsError = error.message;
+        _isLoadingProfileOptions = false;
+      });
+    } on ProfileException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profileOptionsError = error.message;
+        _isLoadingProfileOptions = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profileOptionsError = 'Tải lựa chọn hồ sơ thất bại.';
+        _isLoadingProfileOptions = false;
+      });
+    }
+  }
+
+  Future<void> _pickCreateAvatar() async {
+    if (_isPickingCreateAvatar) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    setState(() => _isPickingCreateAvatar = true);
+
+    try {
+      final path = await _avatarPicker.pickAvatarPath();
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        if (path != null) {
+          _createAvatarPath = path;
+        }
+        _isPickingCreateAvatar = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _isPickingCreateAvatar = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không thể chọn ảnh lúc này.')),
+      );
+    }
+  }
+
+  void _clearCreateAvatar() {
+    HapticFeedback.selectionClick();
+    setState(() => _createAvatarPath = null);
+  }
+
+  Future<void> _createProfile() async {
+    final userId = widget.user?.id.trim();
+    final name = _profileNameController.text.trim();
+    final grade = _selectedGrade;
+    final program = _selectedProgram;
+    final semester = _selectedSemester;
+
+    if (userId == null || userId.isEmpty) {
+      setState(() => _profileCreateError = 'Thiếu thông tin tài khoản.');
+      return;
+    }
+    if (name.isEmpty) {
+      setState(() => _profileCreateError = 'Vui lòng nhập họ tên.');
+      return;
+    }
+    if (grade?.gradeId == null ||
+        program?.programId == null ||
+        semester?.semesterId == null) {
+      setState(() => _profileCreateError = 'Vui lòng chọn đủ thông tin.');
+      return;
+    }
+
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _isSavingProfile = true;
+      _profileCreateError = null;
+    });
+
+    try {
+      await _profileService.createProfile(
+        userId: userId,
+        name: name,
+        gradeId: grade!.gradeId!,
+        programId: program!.programId!,
+        semesterId: semester!.semesterId!,
+        avatarPath: _createAvatarPath,
+      );
+      if (!mounted) {
+        return;
+      }
+
+      _resetCreateProfileForm();
+      setState(() {
+        _isSavingProfile = false;
+        _view = _AccountView.profile;
+        _isForwardTransition = false;
+      });
+      await _loadProfiles();
+    } on ProfileException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profileCreateError = error.message;
+        _isSavingProfile = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profileCreateError = 'Không thể tạo hồ sơ. Vui lòng thử lại.';
+        _isSavingProfile = false;
+      });
+    }
+  }
+
+  void _resetCreateProfileForm() {
+    _profileNameController.clear();
+    _createAvatarPath = null;
+    _profileCreateError = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
+    final backgroundColor =
+        _view == _AccountView.settings ? Colors.transparent : Colors.white;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: EdgeInsets.fromLTRB(
-        24 * scale,
-        26 * scale,
-        24 * scale,
-        widget.bottomPadding,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _AccountTitleRow(
-            title: _view == _AccountView.settings
-                ? 'Cài đặt'
-                : _view == _AccountView.account
-                    ? 'Tài khoản'
-                    : 'Hồ sơ',
-            canGoBack: _view != _AccountView.settings,
-            scale: scale,
-            onBack: _returnToSettings,
-          ),
-          SizedBox(height: 24 * scale),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            layoutBuilder: (currentChild, previousChildren) {
-              return Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  for (final child in previousChildren) child,
-                  if (currentChild != null) currentChild,
-                ],
-              );
-            },
-            transitionBuilder: (child, animation) {
-              final isIncoming = child.key == ValueKey(_viewKey(_view));
-              final forward = _isForwardTransition;
-              final beginX = isIncoming
-                  ? (forward ? 0.10 : -0.10)
-                  : (forward ? -0.08 : 0.08);
-              final offset = Tween<Offset>(
-                begin: Offset(beginX, 0),
-                end: Offset.zero,
-              ).animate(animation);
+    return ColoredBox(
+      color: backgroundColor,
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: EdgeInsets.fromLTRB(
+          24 * scale,
+          26 * scale,
+          24 * scale,
+          widget.bottomPadding,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _AccountTitleRow(
+              title: _view == _AccountView.settings
+                  ? 'Cài đặt'
+                  : _view == _AccountView.account
+                      ? 'Tài khoản'
+                      : _view == _AccountView.profile
+                          ? 'Hồ sơ'
+                          : 'Thêm Hồ Sơ',
+              canGoBack: _view != _AccountView.settings,
+              scale: scale,
+              onBack: _view == _AccountView.addProfile
+                  ? _returnToProfileList
+                  : _returnToSettings,
+            ),
+            SizedBox(height: 24 * scale),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              layoutBuilder: (currentChild, previousChildren) {
+                return Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    for (final child in previousChildren) child,
+                    if (currentChild != null) currentChild,
+                  ],
+                );
+              },
+              transitionBuilder: (child, animation) {
+                final isIncoming = child.key == ValueKey(_viewKey(_view));
+                final forward = _isForwardTransition;
+                final beginX = isIncoming
+                    ? (forward ? 0.10 : -0.10)
+                    : (forward ? -0.08 : 0.08);
+                final offset = Tween<Offset>(
+                  begin: Offset(beginX, 0),
+                  end: Offset.zero,
+                ).animate(animation);
 
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(position: offset, child: child),
-              );
-            },
-            child: switch (_view) {
-              _AccountView.settings => _SettingsMenuPanel(
-                  key: ValueKey(_viewKey(_AccountView.settings)),
-                  avatarUrl: widget.user?.avatarUrl,
-                  avatarPath: _localAvatarPath,
-                  username: _fallbackUsername(widget.user),
-                  scale: scale,
-                  onAccountTap: () => _openView(_AccountView.account),
-                  onProfileTap: () => _openView(_AccountView.profile),
-                  onLogoutTap: widget.onLogout,
-                ),
-              _AccountView.account => _AccountDetailsPanel(
-                  key: ValueKey(_viewKey(_AccountView.account)),
-                  avatarUrl: widget.user?.avatarUrl,
-                  avatarPath: _isEditing ? _draftAvatarPath : _localAvatarPath,
-                  usernameController: _usernameController,
-                  phoneController: _phoneController,
-                  emailController: _emailController,
-                  isEditing: _isEditing,
-                  isPickingAvatar: _isPickingAccountAvatar,
-                  onEdit: _startEditing,
-                  onSave: _saveEditing,
-                  onCancel: _cancelEditing,
-                  onAvatarTap: _pickAccountAvatar,
-                  scale: scale,
-                ),
-              _AccountView.profile => _ProfilePlaceholderPanel(
-                  key: ValueKey(_viewKey(_AccountView.profile)),
-                  scale: scale,
-                ),
-            },
-          ),
-        ],
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(position: offset, child: child),
+                );
+              },
+              child: switch (_view) {
+                _AccountView.settings => _SettingsMenuPanel(
+                    key: ValueKey(_viewKey(_AccountView.settings)),
+                    avatarUrl: widget.user?.avatarUrl,
+                    avatarPath: _localAvatarPath,
+                    username: _fallbackUsername(widget.user),
+                    scale: scale,
+                    onAccountTap: () => _openView(_AccountView.account),
+                    onProfileTap: () => _openView(_AccountView.profile),
+                    onLogoutTap: widget.onLogout,
+                  ),
+                _AccountView.account => _AccountDetailsPanel(
+                    key: ValueKey(_viewKey(_AccountView.account)),
+                    avatarUrl: widget.user?.avatarUrl,
+                    avatarPath:
+                        _isEditing ? _draftAvatarPath : _localAvatarPath,
+                    usernameController: _usernameController,
+                    phoneController: _phoneController,
+                    emailController: _emailController,
+                    isEditing: _isEditing,
+                    isPickingAvatar: _isPickingAccountAvatar,
+                    onEdit: _startEditing,
+                    onSave: _saveEditing,
+                    onCancel: _cancelEditing,
+                    onAvatarTap: _pickAccountAvatar,
+                    scale: scale,
+                  ),
+                _AccountView.profile => _ProfilePlaceholderPanel(
+                    key: ValueKey(_viewKey(_AccountView.profile)),
+                    profiles: _profiles,
+                    isLoading: _isLoadingProfiles,
+                    errorMessage: _profileLoadError,
+                    onRetry: _loadProfiles,
+                    onAdd: _openAddProfile,
+                    scale: scale,
+                  ),
+                _AccountView.addProfile => _AddProfilePanel(
+                    key: ValueKey(_viewKey(_AccountView.addProfile)),
+                    nameController: _profileNameController,
+                    avatarPath: _createAvatarPath,
+                    grades: _gradeOptions,
+                    programs: _programOptions,
+                    semesters: _semesterOptions,
+                    selectedGrade: _selectedGrade,
+                    selectedProgram: _selectedProgram,
+                    selectedSemester: _selectedSemester,
+                    isLoadingOptions: _isLoadingProfileOptions,
+                    isPickingAvatar: _isPickingCreateAvatar,
+                    isSaving: _isSavingProfile,
+                    errorMessage: _profileOptionsError ?? _profileCreateError,
+                    canRetryOptions: _profileOptionsError != null,
+                    onPickAvatar: _pickCreateAvatar,
+                    onClearAvatar: _clearCreateAvatar,
+                    onGradeChanged: (grade) {
+                      setState(() => _selectedGrade = grade);
+                    },
+                    onProgramChanged: (program) {
+                      setState(() => _selectedProgram = program);
+                    },
+                    onSemesterChanged: (semester) {
+                      setState(() => _selectedSemester = semester);
+                    },
+                    onRetryOptions: _loadProfileOptions,
+                    onCancel: _cancelAddProfile,
+                    onSave: _createProfile,
+                    scale: scale,
+                  ),
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -315,6 +643,7 @@ class _SettingTabState extends State<SettingTab> {
       _AccountView.settings => 'settings-menu',
       _AccountView.account => 'account-details',
       _AccountView.profile => 'profile-placeholder',
+      _AccountView.addProfile => 'add-profile',
     };
   }
 }
@@ -1339,18 +1668,905 @@ class _CancelButton extends StatelessWidget {
   }
 }
 
-class _ProfilePlaceholderPanel extends StatelessWidget {
-  const _ProfilePlaceholderPanel({
+class _AddProfilePanel extends StatelessWidget {
+  const _AddProfilePanel({
     super.key,
+    required this.nameController,
+    required this.avatarPath,
+    required this.grades,
+    required this.programs,
+    required this.semesters,
+    required this.selectedGrade,
+    required this.selectedProgram,
+    required this.selectedSemester,
+    required this.isLoadingOptions,
+    required this.isPickingAvatar,
+    required this.isSaving,
+    required this.errorMessage,
+    required this.canRetryOptions,
+    required this.onPickAvatar,
+    required this.onClearAvatar,
+    required this.onGradeChanged,
+    required this.onProgramChanged,
+    required this.onSemesterChanged,
+    required this.onRetryOptions,
+    required this.onCancel,
+    required this.onSave,
     required this.scale,
   });
 
+  final TextEditingController nameController;
+  final String? avatarPath;
+  final List<GradeModel> grades;
+  final List<ProfileProgram> programs;
+  final List<ProfileSemester> semesters;
+  final GradeModel? selectedGrade;
+  final ProfileProgram? selectedProgram;
+  final ProfileSemester? selectedSemester;
+  final bool isLoadingOptions;
+  final bool isPickingAvatar;
+  final bool isSaving;
+  final String? errorMessage;
+  final bool canRetryOptions;
+  final VoidCallback onPickAvatar;
+  final VoidCallback onClearAvatar;
+  final ValueChanged<GradeModel?> onGradeChanged;
+  final ValueChanged<ProfileProgram?> onProgramChanged;
+  final ValueChanged<ProfileSemester?> onSemesterChanged;
+  final VoidCallback onRetryOptions;
+  final VoidCallback onCancel;
+  final VoidCallback onSave;
   final double scale;
 
   @override
   Widget build(BuildContext context) {
+    final error = errorMessage?.trim();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _AddProfileAvatar(
+          avatarPath: avatarPath,
+          isPicking: isPickingAvatar,
+          scale: scale,
+          onTap: onPickAvatar,
+          onClear: onClearAvatar,
+        ),
+        SizedBox(height: 22 * scale),
+        _AddProfileTextField(
+          label: 'Họ Tên',
+          controller: nameController,
+          hintText: "Enter student's full name",
+          scale: scale,
+        ),
+        SizedBox(height: 14 * scale),
+        if (isLoadingOptions)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 58 * scale),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: _teal,
+                strokeWidth: 3 * scale,
+              ),
+            ),
+          )
+        else ...[
+          _AddProfileDropdown<GradeModel>(
+            label: 'Lớp',
+            hintText: 'Chọn lớp',
+            value: selectedGrade,
+            items: grades,
+            itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
+                ? grade.label!.trim()
+                : 'Lớp',
+            onChanged: onGradeChanged,
+            scale: scale,
+          ),
+          SizedBox(height: 14 * scale),
+          _AddProfileDropdown<ProfileProgram>(
+            label: 'Chương Trình Học',
+            hintText: 'Chọn chương trình',
+            value: selectedProgram,
+            items: programs,
+            itemLabel: (program) => program.label?.trim().isNotEmpty == true
+                ? program.label!.trim()
+                : 'Chương trình',
+            onChanged: onProgramChanged,
+            scale: scale,
+          ),
+          SizedBox(height: 14 * scale),
+          _AddProfileDropdown<ProfileSemester>(
+            label: 'Học Kỳ',
+            hintText: 'Chọn học kỳ',
+            value: selectedSemester,
+            items: semesters,
+            itemLabel: (semester) => semester.name?.trim().isNotEmpty == true
+                ? semester.name!.trim()
+                : 'Học kỳ',
+            onChanged: onSemesterChanged,
+            scale: scale,
+          ),
+        ],
+        if (error != null && error.isNotEmpty) ...[
+          SizedBox(height: 14 * scale),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: _orange,
+              fontFamily: 'Nunito',
+              fontSize: 13 * scale,
+              fontWeight: FontWeight.w800,
+              height: 1.25,
+              letterSpacing: 0,
+            ),
+          ),
+          if (canRetryOptions && !isSaving && !isLoadingOptions) ...[
+            SizedBox(height: 10 * scale),
+            Center(
+              child: TextButton(
+                onPressed: onRetryOptions,
+                child: Text(
+                  'Tải lại lựa chọn',
+                  style: TextStyle(
+                    color: _teal,
+                    fontFamily: 'Nunito',
+                    fontSize: 13 * scale,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+        SizedBox(height: 34 * scale),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _CancelButton(scale: scale, onTap: isSaving ? () {} : onCancel),
+            SizedBox(width: 14 * scale),
+            Opacity(
+              opacity: isSaving ? 0.72 : 1,
+              child:
+                  _SaveButton(scale: scale, onTap: isSaving ? () {} : onSave),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _AddProfileAvatar extends StatelessWidget {
+  const _AddProfileAvatar({
+    required this.avatarPath,
+    required this.isPicking,
+    required this.scale,
+    required this.onTap,
+    required this.onClear,
+  });
+
+  final String? avatarPath;
+  final bool isPicking;
+  final double scale;
+  final VoidCallback onTap;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final path = avatarPath?.trim();
+    final size = 116 * scale;
+
+    return Center(
+      child: SizedBox(
+        width: size + 28 * scale,
+        height: size + 28 * scale,
+        child: Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE2EAED),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 14 * scale,
+                    offset: Offset(0, 6 * scale),
+                  ),
+                ],
+                border: Border.all(color: Colors.white, width: 3 * scale),
+              ),
+              child: ClipOval(
+                child: path == null || path.isEmpty
+                    ? Icon(
+                        Icons.person_rounded,
+                        color: const Color(0xFFD3DEE1),
+                        size: 56 * scale,
+                      )
+                    : Image.file(
+                        File(path),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) {
+                          return Icon(
+                            Icons.person_rounded,
+                            color: const Color(0xFFD3DEE1),
+                            size: 56 * scale,
+                          );
+                        },
+                      ),
+              ),
+            ),
+            if (isPicking)
+              Positioned.fill(
+                child: Container(
+                  margin: EdgeInsets.all(12 * scale),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
+                    ),
+                  ),
+                ),
+              ),
+            if (path != null && path.isNotEmpty)
+              Positioned(
+                left: 14 * scale,
+                bottom: 18 * scale,
+                child: Material(
+                  color: const Color(0xFFFFD8D8),
+                  elevation: 5,
+                  shadowColor: const Color(0xFFE83434).withValues(alpha: 0.16),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onClear,
+                    child: SizedBox(
+                      width: 38 * scale,
+                      height: 38 * scale,
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: const Color(0xFFE83434),
+                        size: 22 * scale,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            Positioned(
+              right: 14 * scale,
+              bottom: 18 * scale,
+              child: Material(
+                color: const Color(0xFFFF61AE),
+                elevation: 5,
+                shadowColor: const Color(0xFFFF61AE).withValues(alpha: 0.28),
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onTap,
+                  child: SizedBox(
+                    width: 38 * scale,
+                    height: 38 * scale,
+                    child: Icon(
+                      Icons.photo_camera_outlined,
+                      color: _deepInk,
+                      size: 19 * scale,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AddProfileTextField extends StatelessWidget {
+  const _AddProfileTextField({
+    required this.label,
+    required this.controller,
+    required this.hintText,
+    required this.scale,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final String hintText;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return _AddProfileFieldShell(
+      label: label,
+      scale: scale,
+      child: TextField(
+        controller: controller,
+        textInputAction: TextInputAction.next,
+        onTapOutside: (_) => FocusScope.of(context).unfocus(),
+        style: TextStyle(
+          color: _deepInk,
+          fontFamily: 'Nunito',
+          fontSize: 15 * scale,
+          fontWeight: FontWeight.w800,
+          height: 1,
+          letterSpacing: 0,
+        ),
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color: const Color(0xFFA8B1B2),
+            fontFamily: 'Nunito',
+            fontSize: 14 * scale,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+          isCollapsed: true,
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
+      ),
+    );
+  }
+}
+
+class _AddProfileDropdown<T> extends StatelessWidget {
+  const _AddProfileDropdown({
+    required this.label,
+    required this.hintText,
+    required this.value,
+    required this.items,
+    required this.itemLabel,
+    required this.onChanged,
+    required this.scale,
+  });
+
+  final String label;
+  final String hintText;
+  final T? value;
+  final List<T> items;
+  final String Function(T item) itemLabel;
+  final ValueChanged<T?> onChanged;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return _AddProfileFieldShell(
+      label: label,
+      scale: scale,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          value: items.contains(value) ? value : null,
+          isExpanded: true,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: const Color(0xFFB72D83),
+            size: 24 * scale,
+          ),
+          hint: Text(
+            hintText,
+            style: TextStyle(
+              color: const Color(0xFFA8B1B2),
+              fontFamily: 'Nunito',
+              fontSize: 15 * scale,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0,
+            ),
+          ),
+          items: items.map((item) {
+            return DropdownMenuItem<T>(
+              value: item,
+              child: Text(
+                itemLabel(item),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
+          onChanged: onChanged,
+          style: TextStyle(
+            color: _deepInk,
+            fontFamily: 'Nunito',
+            fontSize: 15 * scale,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddProfileFieldShell extends StatelessWidget {
+  const _AddProfileFieldShell({
+    required this.label,
+    required this.child,
+    required this.scale,
+  });
+
+  final String label;
+  final Widget child;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: const Color(0xFF604950),
+            fontFamily: 'Nunito',
+            fontSize: 14 * scale,
+            fontWeight: FontWeight.w900,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
+        SizedBox(height: 8 * scale),
+        Container(
+          height: 54 * scale,
+          padding: EdgeInsets.symmetric(horizontal: 16 * scale),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEDF7F9),
+            borderRadius: BorderRadius.circular(12 * scale),
+            border: Border.all(color: const Color(0xFFD8E4E7), width: 1.4),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 8 * scale,
+                offset: Offset(0, 3 * scale),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: child,
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfilePlaceholderPanel extends StatelessWidget {
+  const _ProfilePlaceholderPanel({
+    super.key,
+    required this.profiles,
+    required this.isLoading,
+    required this.errorMessage,
+    required this.onRetry,
+    required this.onAdd,
+    required this.scale,
+  });
+
+  final List<StudentProfile> profiles;
+  final bool isLoading;
+  final String? errorMessage;
+  final VoidCallback onRetry;
+  final VoidCallback onAdd;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return SizedBox(
+        height: 360 * scale,
+        child: Center(
+          child: CircularProgressIndicator(
+            color: _teal,
+            strokeWidth: 3 * scale,
+          ),
+        ),
+      );
+    }
+
+    final error = errorMessage?.trim();
+    if (error != null && error.isNotEmpty) {
+      return _ProfileStatePanel(
+        icon: Icons.cloud_off_rounded,
+        title: 'Không tải được hồ sơ',
+        message: error,
+        buttonLabel: 'Thử lại',
+        scale: scale,
+        onTap: onRetry,
+      );
+    }
+
+    if (profiles.isEmpty) {
+      return _ProfileStatePanel(
+        icon: Icons.groups_2_outlined,
+        title: 'Chưa có hồ sơ',
+        message: 'Bạn có thể thêm hồ sơ học tập cho bé.',
+        buttonLabel: 'Thêm hồ sơ',
+        scale: scale,
+        onTap: onAdd,
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: _ProfileAddButton(scale: scale, onTap: onAdd),
+        ),
+        SizedBox(height: 10 * scale),
+        for (var index = 0; index < profiles.length; index++) ...[
+          _ProfileCard(
+            profile: profiles[index],
+            isActive: profiles[index].isDefault || index == 0,
+            scale: scale,
+            onEdit: () => HapticFeedback.selectionClick(),
+            onDelete: () => HapticFeedback.selectionClick(),
+          ),
+          if (index != profiles.length - 1) SizedBox(height: 22 * scale),
+        ],
+      ],
+    );
+  }
+}
+
+class _ProfileAddButton extends StatelessWidget {
+  const _ProfileAddButton({
+    required this.scale,
+    required this.onTap,
+  });
+
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xFFB72D83),
+      elevation: 4,
+      shadowColor: const Color(0xFFB72D83).withValues(alpha: 0.20),
+      borderRadius: BorderRadius.circular(12 * scale),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12 * scale),
+        child: SizedBox(
+          width: 48 * scale,
+          height: 34 * scale,
+          child: Icon(
+            Icons.add_rounded,
+            color: Colors.white,
+            size: 24 * scale,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileCard extends StatelessWidget {
+  const _ProfileCard({
+    required this.profile,
+    required this.isActive,
+    required this.scale,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final StudentProfile profile;
+  final bool isActive;
+  final double scale;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = isActive ? const Color(0xFFC21873) : const Color(0xFF008A52);
+
     return Container(
-      constraints: BoxConstraints(minHeight: 430 * scale),
+      padding:
+          EdgeInsets.fromLTRB(20 * scale, 18 * scale, 16 * scale, 18 * scale),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.86),
+        borderRadius: BorderRadius.circular(18 * scale),
+        border: Border.all(
+          color: isActive
+              ? const Color(0xFFFF61AE)
+              : const Color(0xFFDAEAE5).withValues(alpha: 0.78),
+          width: isActive ? 2 * scale : 1 * scale,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF5E7775).withValues(alpha: 0.08),
+            blurRadius: 18 * scale,
+            offset: Offset(0, 8 * scale),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _ProfileAvatar(
+                avatarUrl: profile.avatarUrl,
+                scale: scale,
+              ),
+              const Spacer(),
+              if (isActive)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 13 * scale,
+                    vertical: 7 * scale,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF61A4FF),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'ACTIVE',
+                    style: TextStyle(
+                      color: const Color(0xFF003C88),
+                      fontFamily: 'Nunito',
+                      fontSize: 11 * scale,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: 18 * scale),
+          Text(
+            _displayProfileName(profile),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: _deepInk,
+              fontFamily: 'Nunito',
+              fontSize: 18 * scale,
+              fontWeight: FontWeight.w900,
+              height: 1,
+              letterSpacing: 0,
+            ),
+          ),
+          SizedBox(height: 17 * scale),
+          _ProfileInfoLine(
+            icon: Icons.school_outlined,
+            iconColor: accent,
+            label: 'Lớp',
+            value: _displayGrade(profile),
+            scale: scale,
+          ),
+          SizedBox(height: 14 * scale),
+          _ProfileInfoLine(
+            icon: Icons.book_outlined,
+            iconColor: accent,
+            label: 'Chương Trình',
+            value: _displayProgram(profile),
+            scale: scale,
+          ),
+          SizedBox(height: 14 * scale),
+          _ProfileInfoLine(
+            icon: Icons.calendar_month_outlined,
+            iconColor: accent,
+            label: 'Học Kỳ',
+            value: _displaySemester(profile),
+            scale: scale,
+          ),
+          SizedBox(height: 18 * scale),
+          Row(
+            children: [
+              _ProfileIconButton(
+                icon: Icons.edit_rounded,
+                foregroundColor: const Color(0xFFD12788),
+                backgroundColor: const Color(0xFFECF6FA),
+                scale: scale,
+                onTap: onEdit,
+              ),
+              SizedBox(width: 12 * scale),
+              _ProfileIconButton(
+                icon: Icons.delete_outline_rounded,
+                foregroundColor: const Color(0xFFE83434),
+                backgroundColor: const Color(0xFFFFD8D8),
+                scale: scale,
+                onTap: onDelete,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _displayProfileName(StudentProfile profile) {
+    final name = profile.name?.trim();
+    return name == null || name.isEmpty ? 'Bé yêu' : name;
+  }
+
+  static String _displayGrade(StudentProfile profile) {
+    final grade = profile.grade?.label?.trim();
+    return grade == null || grade.isEmpty ? 'Chưa chọn' : grade;
+  }
+
+  static String _displayProgram(StudentProfile profile) {
+    final program = profile.program?.label?.trim();
+    return program == null || program.isEmpty ? 'Chưa chọn' : program;
+  }
+
+  static String _displaySemester(StudentProfile profile) {
+    final semester = profile.semester?.name?.trim();
+    return semester == null || semester.isEmpty ? 'Chưa chọn' : semester;
+  }
+}
+
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({
+    required this.avatarUrl,
+    required this.scale,
+  });
+
+  final String? avatarUrl;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = avatarUrl?.trim();
+    final size = 84 * scale;
+
+    return Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(4 * scale),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFD5C6),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: const Color(0xFFFF61AE),
+          width: 4 * scale,
+        ),
+      ),
+      child: ClipOval(
+        child: url == null || url.isEmpty
+            ? Padding(
+                padding: EdgeInsets.all(14 * scale),
+                child: Image.asset(
+                  'assets/images/welcome_numi_character.png',
+                  fit: BoxFit.contain,
+                ),
+              )
+            : Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) {
+                  return Padding(
+                    padding: EdgeInsets.all(14 * scale),
+                    child: Image.asset(
+                      'assets/images/welcome_numi_character.png',
+                      fit: BoxFit.contain,
+                    ),
+                  );
+                },
+              ),
+      ),
+    );
+  }
+}
+
+class _ProfileInfoLine extends StatelessWidget {
+  const _ProfileInfoLine({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+    required this.scale,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: iconColor, size: 18 * scale),
+        SizedBox(width: 8 * scale),
+        Text(
+          '$label : ',
+          style: TextStyle(
+            color: const Color(0xFF604950),
+            fontFamily: 'Nunito',
+            fontSize: 14 * scale,
+            fontWeight: FontWeight.w700,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: const Color(0xFF604950),
+              fontFamily: 'Nunito',
+              fontSize: 14 * scale,
+              fontWeight: FontWeight.w700,
+              height: 1,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileIconButton extends StatelessWidget {
+  const _ProfileIconButton({
+    required this.icon,
+    required this.foregroundColor,
+    required this.backgroundColor,
+    required this.scale,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color foregroundColor;
+  final Color backgroundColor;
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(10 * scale),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10 * scale),
+        child: SizedBox(
+          width: 42 * scale,
+          height: 42 * scale,
+          child: Icon(icon, color: foregroundColor, size: 23 * scale),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileStatePanel extends StatelessWidget {
+  const _ProfileStatePanel({
+    required this.icon,
+    required this.title,
+    required this.message,
+    required this.buttonLabel,
+    required this.scale,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+  final String buttonLabel;
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(minHeight: 360 * scale),
       padding: EdgeInsets.all(28 * scale),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.74),
@@ -1362,14 +2578,10 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.groups_2_outlined,
-            color: _teal,
-            size: 54 * scale,
-          ),
+          Icon(icon, color: _teal, size: 54 * scale),
           SizedBox(height: 18 * scale),
           Text(
-            'Hồ sơ',
+            title,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _deepInk,
@@ -1381,7 +2593,7 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
           ),
           SizedBox(height: 8 * scale),
           Text(
-            'Hồ sơ sẽ được cập nhật sau.',
+            message,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _muted,
@@ -1390,6 +2602,32 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
               fontWeight: FontWeight.w700,
               height: 1.35,
               letterSpacing: 0,
+            ),
+          ),
+          SizedBox(height: 20 * scale),
+          Material(
+            color: _teal,
+            borderRadius: BorderRadius.circular(999),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(999),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 22 * scale,
+                  vertical: 12 * scale,
+                ),
+                child: Text(
+                  buttonLabel,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Nunito',
+                    fontSize: 14 * scale,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
             ),
           ),
         ],

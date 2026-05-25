@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/api_config.dart';
 import 'auth_models.dart';
 import 'grade_models.dart';
+import 'profile_models.dart';
 import 'quiz_models.dart';
 
 class NetworkException implements Exception {
@@ -462,6 +463,101 @@ class NetworkApi {
     }
 
     return gradeResponse;
+  }
+
+  Future<ProfileListResponse> listProfiles(
+    ProfileListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/profiles/list',
+      request.toJson(),
+    );
+    final profileResponse = ProfileListResponse.fromJson(responseJson);
+    if (profileResponse.mstatus != 200) {
+      throw NetworkException(
+        profileResponse.mmessage ??
+            profileResponse.debug ??
+            profileResponse.status ??
+            'Request failed.',
+        status: profileResponse.mstatus,
+      );
+    }
+
+    return profileResponse;
+  }
+
+  Future<ProgramListResponse> listPrograms(
+    ProgramListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/programs/list',
+      request.toJson(),
+    );
+    final programResponse = ProgramListResponse.fromJson(responseJson);
+    if (programResponse.mstatus != 200) {
+      throw NetworkException(
+        programResponse.mmessage ??
+            programResponse.debug ??
+            programResponse.status ??
+            'Request failed.',
+        status: programResponse.mstatus,
+      );
+    }
+
+    return programResponse;
+  }
+
+  Future<SemesterListResponse> listSemesters(
+    SemesterListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/semesters/list',
+      request.toJson(),
+    );
+    final semesterResponse = SemesterListResponse.fromJson(responseJson);
+    if (semesterResponse.mstatus != 200) {
+      throw NetworkException(
+        semesterResponse.mmessage ??
+            semesterResponse.debug ??
+            semesterResponse.status ??
+            'Request failed.',
+        status: semesterResponse.mstatus,
+      );
+    }
+
+    return semesterResponse;
+  }
+
+  Future<CreateProfileResponse> createProfile(
+    CreateProfileRequest request, {
+    String? avatarPath,
+  }) async {
+    final formData = FormData.fromMap({
+      'user_id': request.userId,
+      'name': request.name,
+      if (request.dob?.isNotEmpty == true) 'dob': request.dob,
+      'grade_id': request.gradeId,
+      'program_id': request.programId,
+      'semester_id': request.semesterId,
+      if (avatarPath?.isNotEmpty == true)
+        'avatar': await MultipartFile.fromFile(avatarPath!),
+    });
+    final responseJson = await _networkClient.postMultipart(
+      '/profiles/create',
+      formData,
+    );
+    final createResponse = CreateProfileResponse.fromJson(responseJson);
+    if (createResponse.mstatus != 200) {
+      throw NetworkException(
+        createResponse.mmessage ??
+            createResponse.debug ??
+            createResponse.status ??
+            'Request failed.',
+        status: createResponse.mstatus,
+      );
+    }
+
+    return createResponse;
   }
 
   Future<AuthUser> getCurrentUser() async {
