@@ -132,6 +132,14 @@ abstract class OtpAuthService {
     String? avatarPath,
   });
 
+  Future<LoginUser> updateUser({
+    required String userId,
+    required String name,
+    String? phone,
+    String? email,
+    String? avatarPath,
+  });
+
   Future<SendOtpResult> sendLoginOtp(String phone);
 
   Future<SendOtpResult> sendRegisterOtp(String phone);
@@ -305,6 +313,43 @@ class OtpAuthApi implements OtpAuthService {
       fallbackEmail: email,
     );
     _loginUsers[phone] = user;
+    return user;
+  }
+
+  @override
+  Future<LoginUser> updateUser({
+    required String userId,
+    required String name,
+    String? phone,
+    String? email,
+    String? avatarPath,
+  }) async {
+    final AuthResponse response;
+    try {
+      response = await _networkApi.updateUser(
+        UpdateUserRequest(
+          userId: userId,
+          name: name,
+          phone: phone,
+          email: email,
+        ),
+        avatarPath: avatarPath,
+      );
+    } on NetworkException catch (error) {
+      throw OtpAuthException(error.message, status: error.status);
+    }
+
+    final user = response.user?.toLoginUser(fallbackPhone: phone) ??
+        LoginUser(
+          id: userId,
+          name: name,
+          phone: phone,
+          email: email,
+        );
+    final userPhone = user.phone?.trim();
+    if (userPhone != null && userPhone.isNotEmpty) {
+      _loginUsers[userPhone] = user;
+    }
     return user;
   }
 

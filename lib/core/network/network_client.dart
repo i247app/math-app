@@ -339,6 +339,36 @@ class NetworkApi {
     return authResponse;
   }
 
+  Future<AuthResponse> updateUser(
+    UpdateUserRequest request, {
+    String? avatarPath,
+  }) async {
+    final formData = FormData.fromMap({
+      'user_id': request.userId,
+      if (request.name?.isNotEmpty == true) 'name': request.name,
+      if (request.phone?.isNotEmpty == true) 'phone': request.phone,
+      if (request.email?.isNotEmpty == true) 'email': request.email,
+      if (avatarPath?.isNotEmpty == true)
+        'avatar': await MultipartFile.fromFile(avatarPath!),
+    });
+    final responseJson = await _networkClient.postMultipart(
+      '/users/update',
+      formData,
+    );
+    final authResponse = AuthResponse.fromJson(responseJson);
+    if (authResponse.mstatus != 200) {
+      throw NetworkException(
+        authResponse.mmessage ??
+            authResponse.debug ??
+            authResponse.status ??
+            'Request failed.',
+        status: authResponse.mstatus,
+      );
+    }
+
+    return authResponse;
+  }
+
   Future<AuthResponse> authOtp(LoginRequest request) {
     return _post('/auth/otp', request.toJson());
   }

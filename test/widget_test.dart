@@ -213,4 +213,20 @@ class _FakeOtpAuthService implements OtpAuthService {
   Future<void> logout() async {
     // Fake logout - no-op
   }
+
+  @override
+  Future<LoginUser> updateUser({
+    required String userId,
+    required String name,
+    String? phone,
+    String? email,
+    String? avatarPath,
+  }) async {
+    return LoginUser(
+      id: userId,
+      name: name,
+      phone: phone,
+      email: email,
+    );
+  }
 }

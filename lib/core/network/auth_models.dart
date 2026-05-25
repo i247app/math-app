@@ -20,6 +20,27 @@ class SignupRequest {
   Map<String, dynamic> toJson() => _$SignupRequestToJson(this);
 }
 
+@JsonSerializable(includeIfNull: false)
+class UpdateUserRequest {
+  const UpdateUserRequest({
+    required this.userId,
+    this.name,
+    this.phone,
+    this.email,
+  });
+
+  @JsonKey(name: 'user_id')
+  final String userId;
+  final String? name;
+  final String? phone;
+  final String? email;
+
+  factory UpdateUserRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdateUserRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UpdateUserRequestToJson(this);
+}
+
 @JsonSerializable()
 class LoginRequest {
   const LoginRequest({required this.phone});

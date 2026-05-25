@@ -40,6 +40,7 @@ class SettingTab extends StatefulWidget {
 
 class _SettingTabState extends State<SettingTab> {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
+  final OtpAuthService _authService = OtpAuthApi();
   final ProfileService _profileService = ProfileApi();
   final GradeService _gradeService = GradeApi();
   final TextEditingController _usernameController = TextEditingController();
@@ -50,6 +51,7 @@ class _SettingTabState extends State<SettingTab> {
   _AccountView _view = _AccountView.settings;
   bool _isForwardTransition = true;
   bool _isEditing = false;
+  bool _isSavingAccount = false;
   bool _isPickingAccountAvatar = false;
   bool _isLoadingProfiles = false;
   bool _isLoadingProfileOptions = false;
@@ -66,6 +68,7 @@ class _SettingTabState extends State<SettingTab> {
   String? _snapshotPhone;
   String? _snapshotEmail;
   String? _snapshotAvatarPath;
+  LoginUser? _updatedUser;
   StudentProfile? _editingProfile;
   List<StudentProfile> _profiles = const <StudentProfile>[];
   List<GradeModel> _gradeOptions = const <GradeModel>[];
@@ -85,6 +88,7 @@ class _SettingTabState extends State<SettingTab> {
   void didUpdateWidget(covariant SettingTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.user != widget.user && !_isEditing) {
+      _updatedUser = null;
       _applyUser(widget.user);
       _profiles = const <StudentProfile>[];
       _gradeOptions = const <GradeModel>[];
@@ -116,6 +120,8 @@ class _SettingTabState extends State<SettingTab> {
     _phoneController.text = _displayPhone(user?.phone);
     _emailController.text = user?.email?.trim() ?? '';
   }
+
+  LoginUser? get _effectiveUser => _updatedUser ?? widget.user;
 
   void _openView(_AccountView view) {
     HapticFeedback.selectionClick();
@@ -210,15 +216,72 @@ class _SettingTabState extends State<SettingTab> {
     });
   }
 
-  void _saveEditing() {
+  Future<void> _saveEditing() async {
+    final user = _effectiveUser;
+    final userId = user?.id.trim();
+    if (userId == null || userId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Thiếu thông tin tài khoản.')),
+      );
+      return;
+    }
+
+    final name = _usernameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng nhập tên tài khoản.')),
+      );
+      return;
+    }
+
     HapticFeedback.mediumImpact();
-    setState(() {
-      _localAvatarPath = _draftAvatarPath;
-      _draftAvatarPath = null;
-      _isEditing = false;
-      _isPickingAccountAvatar = false;
-    });
-    FocusScope.of(context).unfocus();
+    setState(() => _isSavingAccount = true);
+
+    try {
+      final avatarPath =
+          _draftAvatarPath != _snapshotAvatarPath ? _draftAvatarPath : null;
+      final updatedUser = await _authService.updateUser(
+        userId: userId,
+        name: name,
+        phone: _normalizedPhone(_phoneController.text),
+        email: _emptyToNull(_emailController.text),
+        avatarPath: avatarPath,
+      );
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _updatedUser = updatedUser;
+        _localAvatarPath = _draftAvatarPath;
+        _draftAvatarPath = null;
+        _isEditing = false;
+        _isPickingAccountAvatar = false;
+        _isSavingAccount = false;
+      });
+      FocusScope.of(context).unfocus();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã cập nhật tài khoản.')),
+      );
+    } on OtpAuthException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _isSavingAccount = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _isSavingAccount = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không thể cập nhật tài khoản.')),
+      );
+    }
   }
 
   void _cancelEditing() {
@@ -227,6 +290,7 @@ class _SettingTabState extends State<SettingTab> {
     setState(() {
       _draftAvatarPath = null;
       _isEditing = false;
+      _isSavingAccount = false;
       _isPickingAccountAvatar = false;
     });
     FocusScope.of(context).unfocus();
@@ -710,9 +774,9 @@ class _SettingTabState extends State<SettingTab> {
               child: switch (_view) {
                 _AccountView.settings => _SettingsMenuPanel(
                     key: ValueKey(_viewKey(_AccountView.settings)),
-                    avatarUrl: widget.user?.avatarUrl,
+                    avatarUrl: _effectiveUser?.avatarUrl,
                     avatarPath: _localAvatarPath,
-                    username: _fallbackUsername(widget.user),
+                    username: _fallbackUsername(_effectiveUser),
                     scale: scale,
                     onAccountTap: () => _openView(_AccountView.account),
                     onProfileTap: () => _openView(_AccountView.profile),
@@ -720,13 +784,14 @@ class _SettingTabState extends State<SettingTab> {
                   ),
                 _AccountView.account => _AccountDetailsPanel(
                     key: ValueKey(_viewKey(_AccountView.account)),
-                    avatarUrl: widget.user?.avatarUrl,
+                    avatarUrl: _effectiveUser?.avatarUrl,
                     avatarPath:
                         _isEditing ? _draftAvatarPath : _localAvatarPath,
                     usernameController: _usernameController,
                     phoneController: _phoneController,
                     emailController: _emailController,
                     isEditing: _isEditing,
+                    isSaving: _isSavingAccount,
                     isPickingAvatar: _isPickingAccountAvatar,
                     onEdit: _startEditing,
                     onSave: _saveEditing,
@@ -811,6 +876,16 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     return _formatLocalPhone(digits);
+  }
+
+  static String? _normalizedPhone(String value) {
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+    return digits.isEmpty ? null : digits;
+  }
+
+  static String? _emptyToNull(String value) {
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
   }
 
   static String _formatLocalPhone(String digits) {
@@ -1321,6 +1396,7 @@ class _AccountDetailsPanel extends StatelessWidget {
     required this.phoneController,
     required this.emailController,
     required this.isEditing,
+    required this.isSaving,
     required this.isPickingAvatar,
     required this.onEdit,
     required this.onSave,
@@ -1335,6 +1411,7 @@ class _AccountDetailsPanel extends StatelessWidget {
   final TextEditingController phoneController;
   final TextEditingController emailController;
   final bool isEditing;
+  final bool isSaving;
   final bool isPickingAvatar;
   final VoidCallback onEdit;
   final VoidCallback onSave;
@@ -1402,12 +1479,15 @@ class _AccountDetailsPanel extends StatelessWidget {
             children: [
               _CancelButton(
                 scale: scale,
-                onTap: onCancel,
+                onTap: isSaving ? () {} : onCancel,
               ),
               SizedBox(width: 14 * scale),
-              _SaveButton(
-                scale: scale,
-                onTap: onSave,
+              Opacity(
+                opacity: isSaving ? 0.72 : 1,
+                child: _SaveButton(
+                  scale: scale,
+                  onTap: isSaving ? () {} : onSave,
+                ),
               ),
             ],
           ),
