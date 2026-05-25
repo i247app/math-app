@@ -129,12 +129,14 @@ class _NumiHomeState extends State<NumiHome> {
     return BlocProvider(
       create: (_) =>
           OnboardingCubit(authService: widget.authService)..restoreSession(),
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.dark,
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          body: AppBackground(
-            child: BlocConsumer<OnboardingCubit, OnboardingState>(
+      child: BlocBuilder<OnboardingCubit, OnboardingState>(
+        builder: (context, scaffoldState) {
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle.dark,
+            child: Scaffold(
+              resizeToAvoidBottomInset: scaffoldState.screen != AppScreen.home,
+              body: AppBackground(
+                child: BlocConsumer<OnboardingCubit, OnboardingState>(
               listenWhen: (previous, current) {
                 final hasNewError = previous.authError != current.authError &&
                     current.authError != null;
@@ -270,9 +272,11 @@ class _NumiHomeState extends State<NumiHome> {
                   ),
                 );
               },
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

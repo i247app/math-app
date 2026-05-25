@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -309,7 +311,7 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'metadata': '{}',
+      'metadata': jsonEncode(_signupMetadata),
       'phone': request.phone,
       if (request.email?.isNotEmpty == true) 'email': request.email,
       if (request.name?.isNotEmpty == true) 'name': request.name,
@@ -529,3 +531,14 @@ class NetworkApi {
     return 'Request failed.';
   }
 }
+
+const _signupMetadata = <String, Object>{
+  'client_info': <String, String>{
+    'platform': 'ios',
+    'app_version': '2.1.0',
+    'device_id': '18092003-18092003-18092003-18092003',
+    'device_name': 'MACBOOK-PRO-M4',
+    'device_push_token': 'ABCDE',
+    'ip_address': '42.118.191.193',
+  },
+};

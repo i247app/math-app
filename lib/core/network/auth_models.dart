@@ -156,6 +156,7 @@ class AuthProfile {
     this.profileId,
     this.userId,
     this.name,
+    this.avatarKey,
     this.avatarUrl,
     this.createDt,
     this.modifyDt,
@@ -166,6 +167,7 @@ class AuthProfile {
   final String? profileId;
   final String? userId;
   final String? name;
+  final String? avatarKey;
   final String? avatarUrl;
   final String? createDt;
   final String? modifyDt;
@@ -184,6 +186,7 @@ class AuthUser {
     this.email,
     this.name,
     this.phone,
+    this.avatarKey,
     this.avatarUrl,
     this.role,
     this.createDt,
@@ -196,6 +199,7 @@ class AuthUser {
   final String? email;
   final String? name;
   final String? phone;
+  final String? avatarKey;
   final String? avatarUrl;
   final String? role;
   final String? createDt;

@@ -77,6 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       imagePath: state.avatarPath,
                       isLoading: state.isPickingAvatar,
                       onTap: cubit.pickAvatar,
+                      onClear: cubit.clearAvatar,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -93,11 +94,11 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   SizedBox(height: compact ? 32 : 38),
-                  const SignupFieldLabel(label: 'Username', isRequired: true),
+                  const SignupFieldLabel(label: 'Name', isRequired: true),
                   const SizedBox(height: 12),
                   SignupTextField(
                     controller: usernameController,
-                    hintText: 'Nhập tên của bé',
+                    hintText: 'Nhập tên',
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 18),
@@ -148,8 +149,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           onPressed: widget.isSigningUp
                               ? null
                               : () {
-                                  FocusManager.instance.primaryFocus
-                                      ?.unfocus();
+                                  FocusManager.instance.primaryFocus?.unfocus();
                                   widget.onContinue(
                                     usernameController.text,
                                     emailController.text,
@@ -191,6 +191,7 @@ class SignupAvatarPicker extends StatelessWidget {
     super.key,
     required this.size,
     required this.onTap,
+    required this.onClear,
     this.imagePath,
     this.isLoading = false,
   });
@@ -199,6 +200,7 @@ class SignupAvatarPicker extends StatelessWidget {
   final String? imagePath;
   final bool isLoading;
   final VoidCallback onTap;
+  final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
@@ -277,6 +279,28 @@ class SignupAvatarPicker extends StatelessWidget {
                   ),
                 ),
               ),
+              if (imagePath != null)
+                Positioned(
+                  left: size * 0.03,
+                  bottom: size * 0.06,
+                  child: GestureDetector(
+                    onTap: isLoading ? null : onClear,
+                    child: Container(
+                      width: size * 0.29,
+                      height: size * 0.29,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE74657),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 3),
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: Colors.white,
+                        size: size * 0.17,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

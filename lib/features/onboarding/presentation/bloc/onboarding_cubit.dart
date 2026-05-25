@@ -101,6 +101,7 @@ class OnboardingState {
     OtpFlow? otpFlow,
     String? authError,
     LoginUser? loginUser,
+    bool clearAvatarPath = false,
     bool clearAvatarError = false,
     bool clearAuthError = false,
     bool clearDevOtp = false,
@@ -113,7 +114,7 @@ class OnboardingState {
       phoneRegion: phoneRegion ?? this.phoneRegion,
       selectedGrade: selectedGrade ?? this.selectedGrade,
       selectedCurriculum: selectedCurriculum ?? this.selectedCurriculum,
-      avatarPath: avatarPath ?? this.avatarPath,
+      avatarPath: clearAvatarPath ? null : avatarPath ?? this.avatarPath,
       isPickingAvatar: isPickingAvatar ?? this.isPickingAvatar,
       avatarError: clearAvatarError ? null : avatarError ?? this.avatarError,
       isRestoringSession: isRestoringSession ?? this.isRestoringSession,
@@ -573,5 +574,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         );
       }
     }
+  }
+
+  void clearAvatar() {
+    emit(state.copyWith(clearAvatarPath: true, clearAvatarError: true));
   }
 }
