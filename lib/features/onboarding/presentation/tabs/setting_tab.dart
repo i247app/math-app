@@ -12,10 +12,10 @@ const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
 
-enum _AccountSection { account, profile }
+enum _AccountView { settings, account, profile }
 
-class AccountTab extends StatefulWidget {
-  const AccountTab({
+class SettingTab extends StatefulWidget {
+  const SettingTab({
     super.key,
     required this.user,
     required this.onLogout,
@@ -29,16 +29,17 @@ class AccountTab extends StatefulWidget {
   final double scale;
 
   @override
-  State<AccountTab> createState() => _AccountTabState();
+  State<SettingTab> createState() => _SettingTabState();
 }
 
-class _AccountTabState extends State<AccountTab> {
+class _SettingTabState extends State<SettingTab> {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  _AccountSection _section = _AccountSection.account;
+  _AccountView _view = _AccountView.settings;
+  bool _isForwardTransition = true;
   bool _isEditing = false;
   bool _isPickingAccountAvatar = false;
   String? _localAvatarPath;
@@ -55,7 +56,7 @@ class _AccountTabState extends State<AccountTab> {
   }
 
   @override
-  void didUpdateWidget(covariant AccountTab oldWidget) {
+  void didUpdateWidget(covariant SettingTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.user != widget.user && !_isEditing) {
       _applyUser(widget.user);
@@ -76,18 +77,29 @@ class _AccountTabState extends State<AccountTab> {
     _emailController.text = user?.email?.trim() ?? '';
   }
 
-  void _selectSection(_AccountSection section) {
-    if (_section == section) {
-      HapticFeedback.selectionClick();
-      return;
-    }
-
+  void _openView(_AccountView view) {
     HapticFeedback.selectionClick();
     if (_isEditing) {
       _restoreEditSnapshot();
     }
     setState(() {
-      _section = section;
+      _view = view;
+      _isForwardTransition = true;
+      _isEditing = false;
+      _isPickingAccountAvatar = false;
+      _draftAvatarPath = null;
+    });
+    FocusScope.of(context).unfocus();
+  }
+
+  void _returnToSettings() {
+    HapticFeedback.selectionClick();
+    if (_isEditing) {
+      _restoreEditSnapshot();
+    }
+    setState(() {
+      _view = _AccountView.settings;
+      _isForwardTransition = false;
       _isEditing = false;
       _isPickingAccountAvatar = false;
       _draftAvatarPath = null;
@@ -184,47 +196,78 @@ class _AccountTabState extends State<AccountTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _AccountTitleRow(scale: scale),
-          SizedBox(height: 26 * scale),
-          _AccountSegmentedTabs(
-            selected: _section,
+          _AccountTitleRow(
+            title: _view == _AccountView.settings
+                ? 'Cài đặt'
+                : _view == _AccountView.account
+                    ? 'Tài khoản'
+                    : 'Hồ sơ',
+            canGoBack: _view != _AccountView.settings,
             scale: scale,
-            onSelected: _selectSection,
+            onBack: _returnToSettings,
           ),
-          SizedBox(height: 28 * scale),
+          SizedBox(height: 24 * scale),
           AnimatedSwitcher(
-            duration: const Duration(milliseconds: 220),
+            duration: const Duration(milliseconds: 300),
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
-            child: _section == _AccountSection.account
-                ? _AccountDetailsPanel(
-                    key: const ValueKey('account-details'),
-                    avatarUrl: widget.user?.avatarUrl,
-                    avatarPath:
-                        _isEditing ? _draftAvatarPath : _localAvatarPath,
-                    usernameController: _usernameController,
-                    phoneController: _phoneController,
-                    emailController: _emailController,
-                    isEditing: _isEditing,
-                    isPickingAvatar: _isPickingAccountAvatar,
-                    onEdit: _startEditing,
-                    onSave: _saveEditing,
-                    onCancel: _cancelEditing,
-                    onAvatarTap: _pickAccountAvatar,
-                    scale: scale,
-                  )
-                : _ProfilePlaceholderPanel(
-                    key: const ValueKey('profile-placeholder'),
-                    scale: scale,
-                  ),
+            layoutBuilder: (currentChild, previousChildren) {
+              return Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  for (final child in previousChildren) child,
+                  if (currentChild != null) currentChild,
+                ],
+              );
+            },
+            transitionBuilder: (child, animation) {
+              final isIncoming = child.key == ValueKey(_viewKey(_view));
+              final forward = _isForwardTransition;
+              final beginX = isIncoming
+                  ? (forward ? 0.10 : -0.10)
+                  : (forward ? -0.08 : 0.08);
+              final offset = Tween<Offset>(
+                begin: Offset(beginX, 0),
+                end: Offset.zero,
+              ).animate(animation);
+
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(position: offset, child: child),
+              );
+            },
+            child: switch (_view) {
+              _AccountView.settings => _SettingsMenuPanel(
+                  key: ValueKey(_viewKey(_AccountView.settings)),
+                  avatarUrl: widget.user?.avatarUrl,
+                  avatarPath: _localAvatarPath,
+                  username: _fallbackUsername(widget.user),
+                  scale: scale,
+                  onAccountTap: () => _openView(_AccountView.account),
+                  onProfileTap: () => _openView(_AccountView.profile),
+                  onLogoutTap: widget.onLogout,
+                ),
+              _AccountView.account => _AccountDetailsPanel(
+                  key: ValueKey(_viewKey(_AccountView.account)),
+                  avatarUrl: widget.user?.avatarUrl,
+                  avatarPath: _isEditing ? _draftAvatarPath : _localAvatarPath,
+                  usernameController: _usernameController,
+                  phoneController: _phoneController,
+                  emailController: _emailController,
+                  isEditing: _isEditing,
+                  isPickingAvatar: _isPickingAccountAvatar,
+                  onEdit: _startEditing,
+                  onSave: _saveEditing,
+                  onCancel: _cancelEditing,
+                  onAvatarTap: _pickAccountAvatar,
+                  scale: scale,
+                ),
+              _AccountView.profile => _ProfilePlaceholderPanel(
+                  key: ValueKey(_viewKey(_AccountView.profile)),
+                  scale: scale,
+                ),
+            },
           ),
-          if (!_isEditing) ...[
-            SizedBox(height: 28 * scale),
-            _AccountLogoutButton(
-              scale: scale,
-              onTap: widget.onLogout,
-            ),
-          ],
         ],
       ),
     );
@@ -266,20 +309,89 @@ class _AccountTabState extends State<AccountTab> {
 
     return digits;
   }
+
+  static String _viewKey(_AccountView view) {
+    return switch (view) {
+      _AccountView.settings => 'settings-menu',
+      _AccountView.account => 'account-details',
+      _AccountView.profile => 'profile-placeholder',
+    };
+  }
 }
 
 class _AccountTitleRow extends StatelessWidget {
-  const _AccountTitleRow({required this.scale});
+  const _AccountTitleRow({
+    required this.title,
+    required this.canGoBack,
+    required this.scale,
+    required this.onBack,
+  });
 
+  final String title;
+  final bool canGoBack;
   final double scale;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
+    if (!canGoBack) {
+      return Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              textAlign: TextAlign.left,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: _teal,
+                fontFamily: 'Nunito',
+                fontSize: 24 * scale,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: HapticFeedback.selectionClick,
+              borderRadius: BorderRadius.circular(999),
+              child: Padding(
+                padding: EdgeInsets.all(2 * scale),
+                child: Icon(
+                  Icons.notifications_none_rounded,
+                  color: _teal,
+                  size: 28 * scale,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Row(
       children: [
+        SizedBox(
+          width: 34 * scale,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onBack,
+              customBorder: const CircleBorder(),
+              child: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: _teal,
+                size: 22 * scale,
+              ),
+            ),
+          ),
+        ),
         Expanded(
           child: Text(
-            'Tài khoản',
+            title,
+            textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -291,17 +403,23 @@ class _AccountTitleRow extends StatelessWidget {
             ),
           ),
         ),
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: HapticFeedback.selectionClick,
-            borderRadius: BorderRadius.circular(999),
-            child: Padding(
-              padding: EdgeInsets.all(2 * scale),
-              child: Icon(
-                Icons.notifications_none_rounded,
-                color: _teal,
-                size: 28 * scale,
+        SizedBox(
+          width: 34 * scale,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: HapticFeedback.selectionClick,
+                borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding: EdgeInsets.all(2 * scale),
+                  child: Icon(
+                    Icons.notifications_none_rounded,
+                    color: _teal,
+                    size: 28 * scale,
+                  ),
+                ),
               ),
             ),
           ),
@@ -394,42 +512,171 @@ class _RoundIconButton extends StatelessWidget {
   }
 }
 
-class _AccountSegmentedTabs extends StatelessWidget {
-  const _AccountSegmentedTabs({
-    required this.selected,
+class _SettingsMenuPanel extends StatelessWidget {
+  const _SettingsMenuPanel({
+    super.key,
+    required this.avatarUrl,
+    required this.avatarPath,
+    required this.username,
     required this.scale,
-    required this.onSelected,
+    required this.onAccountTap,
+    required this.onProfileTap,
+    required this.onLogoutTap,
   });
 
-  final _AccountSection selected;
+  final String? avatarUrl;
+  final String? avatarPath;
+  final String username;
   final double scale;
-  final ValueChanged<_AccountSection> onSelected;
+  final VoidCallback onAccountTap;
+  final VoidCallback onProfileTap;
+  final VoidCallback onLogoutTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 58 * scale,
-      padding: EdgeInsets.all(5 * scale),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEAF3F4),
-        borderRadius: BorderRadius.circular(10 * scale),
-      ),
-      child: Row(
-        children: [
-          _AccountSegmentButton(
-            icon: Icons.person_outline_rounded,
-            label: 'Tài Khoản',
-            active: selected == _AccountSection.account,
-            scale: scale,
-            onTap: () => onSelected(_AccountSection.account),
+    return Column(
+      children: [
+        SizedBox(height: 4 * scale),
+        _SettingsAvatar(
+          avatarUrl: avatarUrl,
+          avatarPath: avatarPath,
+          scale: scale,
+        ),
+        SizedBox(height: 14 * scale),
+        Text(
+          username,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: _deepInk,
+            fontFamily: 'Nunito',
+            fontSize: 26 * scale,
+            fontWeight: FontWeight.w900,
+            height: 1.05,
+            letterSpacing: 0,
           ),
-          SizedBox(width: 10 * scale),
-          _AccountSegmentButton(
-            icon: Icons.groups_2_outlined,
-            label: 'Hồ Sơ',
-            active: selected == _AccountSection.profile,
-            scale: scale,
-            onTap: () => onSelected(_AccountSection.profile),
+        ),
+        SizedBox(height: 34 * scale),
+        _SettingsActionCard(
+          icon: Icons.account_circle_outlined,
+          iconColor: const Color(0xFFC21873),
+          iconBackground: const Color(0xFFFFF0F7),
+          title: 'Tài Khoản',
+          subtitle: 'Quản lý thông tin tài khoản',
+          scale: scale,
+          onTap: onAccountTap,
+        ),
+        SizedBox(height: 12 * scale),
+        _SettingsActionCard(
+          icon: Icons.person_outline_rounded,
+          iconColor: const Color(0xFF008A52),
+          iconBackground: const Color(0xFFD6FFE3),
+          title: 'Hồ Sơ',
+          subtitle: 'Xem và chỉnh sửa hồ sơ',
+          scale: scale,
+          onTap: onProfileTap,
+        ),
+        SizedBox(height: 12 * scale),
+        _SettingsActionCard(
+          icon: Icons.logout_rounded,
+          iconColor: _orange,
+          iconBackground: const Color(0xFFFFD8D8),
+          title: 'Logout',
+          subtitle: 'Đăng xuất khỏi tài khoản',
+          isDestructive: true,
+          scale: scale,
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onLogoutTap();
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _SettingsAvatar extends StatelessWidget {
+  const _SettingsAvatar({
+    required this.avatarUrl,
+    required this.avatarPath,
+    required this.scale,
+  });
+
+  final String? avatarUrl;
+  final String? avatarPath;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = avatarUrl?.trim();
+    final path = avatarPath?.trim();
+    final size = 118 * scale;
+
+    Widget avatarChild;
+    if (path != null && path.isNotEmpty) {
+      avatarChild = Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _AccountDefaultAvatar(scale: scale),
+      );
+    } else if (url != null && url.isNotEmpty) {
+      avatarChild = Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _AccountDefaultAvatar(scale: scale),
+      );
+    } else {
+      avatarChild = Padding(
+        padding: EdgeInsets.all(20 * scale),
+        child: Image.asset(
+          'assets/images/welcome_numi_character.png',
+          fit: BoxFit.contain,
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: size + 22 * scale,
+      height: size + 22 * scale,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Center(
+            child: Container(
+              width: size,
+              height: size,
+              padding: EdgeInsets.all(4 * scale),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFFFF61AE),
+                  width: 4 * scale,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFF61AE).withValues(alpha: 0.18),
+                    blurRadius: 16 * scale,
+                    offset: Offset(0, 7 * scale),
+                  ),
+                ],
+              ),
+              child: ClipOval(child: avatarChild),
+            ),
+          ),
+          Positioned(
+            right: 6 * scale,
+            bottom: 16 * scale,
+            child: Container(
+              width: 26 * scale,
+              height: 26 * scale,
+              decoration: BoxDecoration(
+                color: const Color(0xFF55E66E),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3 * scale),
+              ),
+            ),
           ),
         ],
       ),
@@ -437,71 +684,93 @@ class _AccountSegmentedTabs extends StatelessWidget {
   }
 }
 
-class _AccountSegmentButton extends StatelessWidget {
-  const _AccountSegmentButton({
+class _SettingsActionCard extends StatelessWidget {
+  const _SettingsActionCard({
     required this.icon,
-    required this.label,
-    required this.active,
+    required this.iconColor,
+    required this.iconBackground,
+    required this.title,
+    required this.subtitle,
     required this.scale,
     required this.onTap,
+    this.isDestructive = false,
   });
 
   final IconData icon;
-  final String label;
-  final bool active;
+  final Color iconColor;
+  final Color iconBackground;
+  final String title;
+  final String subtitle;
   final double scale;
   final VoidCallback onTap;
+  final bool isDestructive;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(8 * scale),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              color: active ? _teal : Colors.transparent,
-              borderRadius: BorderRadius.circular(8 * scale),
-              boxShadow: active
-                  ? [
-                      BoxShadow(
-                        color: _teal.withValues(alpha: 0.20),
-                        blurRadius: 12 * scale,
-                        offset: Offset(0, 7 * scale),
+    return Material(
+      color: Colors.white,
+      elevation: 6,
+      shadowColor: const Color(0xFF5E7775).withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(12 * scale),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12 * scale),
+        child: Container(
+          height: 78 * scale,
+          padding: EdgeInsets.symmetric(horizontal: 16 * scale),
+          child: Row(
+            children: [
+              Container(
+                width: 46 * scale,
+                height: 46 * scale,
+                decoration: BoxDecoration(
+                  color: iconBackground,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: iconColor, size: 24 * scale),
+              ),
+              SizedBox(width: 16 * scale),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isDestructive ? _orange : _deepInk,
+                        fontFamily: 'Nunito',
+                        fontSize: 15 * scale,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 0,
                       ),
-                    ]
-                  : null,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  color: active ? Colors.white : const Color(0xFF5F474B),
-                  size: 20 * scale,
-                ),
-                SizedBox(width: 8 * scale),
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: active ? Colors.white : const Color(0xFF5F474B),
-                      fontFamily: 'Nunito',
-                      fontSize: 15 * scale,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      letterSpacing: 0,
                     ),
-                  ),
+                    SizedBox(height: 7 * scale),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: const Color(0xFF604950),
+                        fontFamily: 'Nunito',
+                        fontSize: 13 * scale,
+                        fontWeight: FontWeight.w600,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: const Color(0xFFD5A8BA),
+                size: 28 * scale,
+              ),
+            ],
           ),
         ),
       ),
@@ -1124,65 +1393,6 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AccountLogoutButton extends StatelessWidget {
-  const _AccountLogoutButton({
-    required this.scale,
-    required this.onTap,
-  });
-
-  final double scale;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.72),
-      elevation: 2,
-      shadowColor: _orange.withValues(alpha: 0.10),
-      borderRadius: BorderRadius.circular(18 * scale),
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        borderRadius: BorderRadius.circular(18 * scale),
-        child: Container(
-          height: 56 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18 * scale),
-            border: Border.all(
-              color: _orange.withValues(alpha: 0.28),
-              width: 1.2,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.logout_rounded,
-                color: _orange,
-                size: 21 * scale,
-              ),
-              SizedBox(width: 10 * scale),
-              Text(
-                'ĐĂNG XUẤT',
-                style: TextStyle(
-                  color: _orange,
-                  fontFamily: 'Nunito',
-                  fontSize: 14 * scale,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

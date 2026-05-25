@@ -8,8 +8,8 @@ import '../../../../core/network/grade_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/grade_api.dart';
-import '../tabs/account_tab.dart';
 import '../tabs/history_tab.dart';
+import '../tabs/setting_tab.dart';
 import 'grade_selection_screen.dart';
 
 const _teal = Color(0xFF006762);
@@ -257,7 +257,7 @@ class _TabContent extends StatelessWidget {
     }
 
     if (activeTab == 3) {
-      return AccountTab(
+      return SettingTab(
         user: user,
         onLogout: onLogout,
         bottomPadding: bottomPadding,
@@ -1016,7 +1016,7 @@ class _BottomNavigation extends StatelessWidget {
       _NavItemData(Icons.home_filled, 'HOME'),
       _NavItemData(Icons.explore_outlined, 'ÔN TẬP'),
       _NavItemData(Icons.map_outlined, 'LỊCH SỬ'),
-      _NavItemData(Icons.person_outline_rounded, 'TÀI KHOẢN'),
+      _NavItemData(Icons.person_outline_rounded, 'CÀI ĐẶT'),
     ];
 
     return ClipRRect(
