@@ -1,25 +1,8 @@
+import 'program_models.dart';
+import 'semester_models.dart';
+
 class ProfileListRequest {
   const ProfileListRequest({required this.userId});
-
-  final String userId;
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'user_id': userId};
-  }
-}
-
-class ProgramListRequest {
-  const ProgramListRequest({required this.userId});
-
-  final String userId;
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'user_id': userId};
-  }
-}
-
-class SemesterListRequest {
-  const SemesterListRequest({required this.userId});
 
   final String userId;
 
@@ -69,58 +52,6 @@ class ProfileListResponse {
     return ProfileListResponse(
       mstatus: _intFromJson(json['mstatus']) ?? 0,
       profiles: _profilesFromJson(profilesValue),
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
-    );
-  }
-}
-
-class ProgramListResponse {
-  const ProgramListResponse({
-    required this.mstatus,
-    this.programs = const <ProfileProgram>[],
-    this.status,
-    this.mmessage,
-    this.debug,
-  });
-
-  final int mstatus;
-  final List<ProfileProgram> programs;
-  final String? status;
-  final String? mmessage;
-  final String? debug;
-
-  factory ProgramListResponse.fromJson(Map<String, dynamic> json) {
-    return ProgramListResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      programs: _listFromJson(json['programs'], ProfileProgram.fromJson),
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
-    );
-  }
-}
-
-class SemesterListResponse {
-  const SemesterListResponse({
-    required this.mstatus,
-    this.semesters = const <ProfileSemester>[],
-    this.status,
-    this.mmessage,
-    this.debug,
-  });
-
-  final int mstatus;
-  final List<ProfileSemester> semesters;
-  final String? status;
-  final String? mmessage;
-  final String? debug;
-
-  factory SemesterListResponse.fromJson(Map<String, dynamic> json) {
-    return SemesterListResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      semesters: _listFromJson(json['semesters'], ProfileSemester.fromJson),
       status: json['status'] as String?,
       mmessage: json['mmessage'] as String?,
       debug: json['debug'] as String?,
@@ -184,9 +115,9 @@ class StudentProfile {
   final String? gradeId;
   final ProfileGrade? grade;
   final String? programId;
-  final ProfileProgram? program;
+  final ProgramModel? program;
   final String? semesterId;
-  final ProfileSemester? semester;
+  final SemesterModel? semester;
   final bool isDefault;
   final String? createDt;
   final String? modifyDt;
@@ -203,9 +134,9 @@ class StudentProfile {
       gradeId: json['grade_id'] as String?,
       grade: _objectFromJson(json['grade'], ProfileGrade.fromJson),
       programId: json['program_id'] as String?,
-      program: _objectFromJson(json['program'], ProfileProgram.fromJson),
+      program: _objectFromJson(json['program'], ProgramModel.fromJson),
       semesterId: json['semester_id'] as String?,
-      semester: _objectFromJson(json['semester'], ProfileSemester.fromJson),
+      semester: _objectFromJson(json['semester'], SemesterModel.fromJson),
       isDefault: json['is_default'] == true,
       createDt: json['create_dt'] as String?,
       modifyDt: json['modify_dt'] as String?,
@@ -242,64 +173,6 @@ class ProfileGrade {
   }
 }
 
-class ProfileProgram {
-  const ProfileProgram({
-    this.id,
-    this.programId,
-    this.label,
-    this.description,
-    this.displayOrder,
-    this.imageUrl,
-  });
-
-  final String? id;
-  final String? programId;
-  final String? label;
-  final String? description;
-  final int? displayOrder;
-  final String? imageUrl;
-
-  factory ProfileProgram.fromJson(Map<String, dynamic> json) {
-    return ProfileProgram(
-      id: json['id']?.toString(),
-      programId: json['program_id'] as String?,
-      label: json['label'] as String?,
-      description: json['description'] as String?,
-      displayOrder: _intFromJson(json['display_order']),
-      imageUrl: json['image_url'] as String?,
-    );
-  }
-}
-
-class ProfileSemester {
-  const ProfileSemester({
-    this.id,
-    this.semesterId,
-    this.name,
-    this.description,
-    this.displayOrder,
-    this.imageUrl,
-  });
-
-  final String? id;
-  final String? semesterId;
-  final String? name;
-  final String? description;
-  final int? displayOrder;
-  final String? imageUrl;
-
-  factory ProfileSemester.fromJson(Map<String, dynamic> json) {
-    return ProfileSemester(
-      id: json['id']?.toString(),
-      semesterId: json['semester_id'] as String?,
-      name: json['name'] as String?,
-      description: json['description'] as String?,
-      displayOrder: _intFromJson(json['display_order']),
-      imageUrl: json['image_url'] as String?,
-    );
-  }
-}
-
 List<StudentProfile> _profilesFromJson(Object? value) {
   if (value is List) {
     return value
@@ -310,20 +183,6 @@ List<StudentProfile> _profilesFromJson(Object? value) {
 
   final profile = _objectFromJson(value, StudentProfile.fromJson);
   return profile == null ? const <StudentProfile>[] : <StudentProfile>[profile];
-}
-
-List<T> _listFromJson<T>(
-  Object? value,
-  T Function(Map<String, dynamic> json) fromJson,
-) {
-  if (value is! List) {
-    return <T>[];
-  }
-
-  return value
-      .map((item) => _objectFromJson(item, fromJson))
-      .whereType<T>()
-      .toList();
 }
 
 T? _objectFromJson<T>(

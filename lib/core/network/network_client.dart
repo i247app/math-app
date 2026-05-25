@@ -8,7 +8,9 @@ import '../config/api_config.dart';
 import 'auth_models.dart';
 import 'grade_models.dart';
 import 'profile_models.dart';
+import 'program_models.dart';
 import 'quiz_models.dart';
+import 'semester_models.dart';
 
 class NetworkException implements Exception {
   const NetworkException(this.message, {this.status});

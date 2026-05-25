@@ -1,6 +1,8 @@
 import '../../../core/config/api_config.dart';
 import '../../../core/network/network_client.dart';
 import '../../../core/network/profile_models.dart';
+import '../../../core/network/program_models.dart';
+import '../../../core/network/semester_models.dart';
 
 class ProfileException implements Exception {
   const ProfileException(this.message, {this.status});
@@ -15,9 +17,9 @@ class ProfileException implements Exception {
 abstract class ProfileService {
   Future<List<StudentProfile>> listProfiles({required String userId});
 
-  Future<List<ProfileProgram>> listPrograms({required String userId});
+  Future<List<ProgramModel>> listPrograms({required String userId});
 
-  Future<List<ProfileSemester>> listSemesters({required String userId});
+  Future<List<SemesterModel>> listSemesters({required String userId});
 
   Future<StudentProfile?> createProfile({
     required String userId,
@@ -52,7 +54,7 @@ class ProfileApi implements ProfileService {
   }
 
   @override
-  Future<List<ProfileProgram>> listPrograms({required String userId}) async {
+  Future<List<ProgramModel>> listPrograms({required String userId}) async {
     try {
       final response = await _networkApi.listPrograms(
         ProgramListRequest(userId: userId),
@@ -64,7 +66,7 @@ class ProfileApi implements ProfileService {
   }
 
   @override
-  Future<List<ProfileSemester>> listSemesters({required String userId}) async {
+  Future<List<SemesterModel>> listSemesters({required String userId}) async {
     try {
       final response = await _networkApi.listSemesters(
         SemesterListRequest(userId: userId),

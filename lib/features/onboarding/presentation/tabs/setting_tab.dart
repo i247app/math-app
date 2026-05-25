@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/network/profile_models.dart';
+import '../../../../core/network/program_models.dart';
+import '../../../../core/network/semester_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/avatar_picker.dart';
 import '../../data/grade_api.dart';
@@ -65,11 +67,11 @@ class _SettingTabState extends State<SettingTab> {
   String? _snapshotAvatarPath;
   List<StudentProfile> _profiles = const <StudentProfile>[];
   List<GradeModel> _gradeOptions = const <GradeModel>[];
-  List<ProfileProgram> _programOptions = const <ProfileProgram>[];
-  List<ProfileSemester> _semesterOptions = const <ProfileSemester>[];
+  List<ProgramModel> _programOptions = const <ProgramModel>[];
+  List<SemesterModel> _semesterOptions = const <SemesterModel>[];
   GradeModel? _selectedGrade;
-  ProfileProgram? _selectedProgram;
-  ProfileSemester? _selectedSemester;
+  ProgramModel? _selectedProgram;
+  SemesterModel? _selectedSemester;
 
   @override
   void initState() {
@@ -83,9 +85,17 @@ class _SettingTabState extends State<SettingTab> {
     if (oldWidget.user != widget.user && !_isEditing) {
       _applyUser(widget.user);
       _profiles = const <StudentProfile>[];
+      _gradeOptions = const <GradeModel>[];
+      _programOptions = const <ProgramModel>[];
+      _semesterOptions = const <SemesterModel>[];
+      _selectedGrade = null;
+      _selectedProgram = null;
+      _selectedSemester = null;
       _profileLoadError = null;
+      _profileOptionsError = null;
       if (_view == _AccountView.profile) {
         _loadProfiles();
+        _preloadProfileOptions();
       }
     }
   }
@@ -118,8 +128,11 @@ class _SettingTabState extends State<SettingTab> {
       _draftAvatarPath = null;
     });
     FocusScope.of(context).unfocus();
-    if (view == _AccountView.profile && _profiles.isEmpty) {
-      _loadProfiles();
+    if (view == _AccountView.profile) {
+      if (_profiles.isEmpty) {
+        _loadProfiles();
+      }
+      _preloadProfileOptions();
     }
   }
 
@@ -146,9 +159,7 @@ class _SettingTabState extends State<SettingTab> {
       _profileCreateError = null;
     });
     FocusScope.of(context).unfocus();
-    if (_gradeOptions.isEmpty ||
-        _programOptions.isEmpty ||
-        _semesterOptions.isEmpty) {
+    if (!_hasProfileOptions) {
       _loadProfileOptions();
     }
   }
@@ -288,7 +299,25 @@ class _SettingTabState extends State<SettingTab> {
     }
   }
 
+  bool get _hasProfileOptions {
+    return _gradeOptions.isNotEmpty &&
+        _programOptions.isNotEmpty &&
+        _semesterOptions.isNotEmpty;
+  }
+
+  void _preloadProfileOptions() {
+    if (_hasProfileOptions || _isLoadingProfileOptions) {
+      return;
+    }
+
+    _loadProfileOptions();
+  }
+
   Future<void> _loadProfileOptions() async {
+    if (_isLoadingProfileOptions) {
+      return;
+    }
+
     final userId = widget.user?.id.trim();
     if (userId == null || userId.isEmpty) {
       setState(() {
@@ -304,9 +333,14 @@ class _SettingTabState extends State<SettingTab> {
     });
 
     try {
-      final grades = await _gradeService.listGrades(userId: userId);
-      final programs = await _profileService.listPrograms(userId: userId);
-      final semesters = await _profileService.listSemesters(userId: userId);
+      final results = await Future.wait<Object>([
+        _gradeService.listGrades(userId: userId),
+        _profileService.listPrograms(userId: userId),
+        _profileService.listSemesters(userId: userId),
+      ]);
+      final grades = results[0] as List<GradeModel>;
+      final programs = results[1] as List<ProgramModel>;
+      final semesters = results[2] as List<SemesterModel>;
       if (!mounted) {
         return;
       }
@@ -1698,11 +1732,11 @@ class _AddProfilePanel extends StatelessWidget {
   final TextEditingController nameController;
   final String? avatarPath;
   final List<GradeModel> grades;
-  final List<ProfileProgram> programs;
-  final List<ProfileSemester> semesters;
+  final List<ProgramModel> programs;
+  final List<SemesterModel> semesters;
   final GradeModel? selectedGrade;
-  final ProfileProgram? selectedProgram;
-  final ProfileSemester? selectedSemester;
+  final ProgramModel? selectedProgram;
+  final SemesterModel? selectedSemester;
   final bool isLoadingOptions;
   final bool isPickingAvatar;
   final bool isSaving;
@@ -1711,8 +1745,8 @@ class _AddProfilePanel extends StatelessWidget {
   final VoidCallback onPickAvatar;
   final VoidCallback onClearAvatar;
   final ValueChanged<GradeModel?> onGradeChanged;
-  final ValueChanged<ProfileProgram?> onProgramChanged;
-  final ValueChanged<ProfileSemester?> onSemesterChanged;
+  final ValueChanged<ProgramModel?> onProgramChanged;
+  final ValueChanged<SemesterModel?> onSemesterChanged;
   final VoidCallback onRetryOptions;
   final VoidCallback onCancel;
   final VoidCallback onSave;
@@ -1763,7 +1797,7 @@ class _AddProfilePanel extends StatelessWidget {
             scale: scale,
           ),
           SizedBox(height: 14 * scale),
-          _AddProfileDropdown<ProfileProgram>(
+          _AddProfileDropdown<ProgramModel>(
             label: 'Chương Trình Học',
             hintText: 'Chọn chương trình',
             value: selectedProgram,
@@ -1775,7 +1809,7 @@ class _AddProfilePanel extends StatelessWidget {
             scale: scale,
           ),
           SizedBox(height: 14 * scale),
-          _AddProfileDropdown<ProfileSemester>(
+          _AddProfileDropdown<SemesterModel>(
             label: 'Học Kỳ',
             hintText: 'Chọn học kỳ',
             value: selectedSemester,
