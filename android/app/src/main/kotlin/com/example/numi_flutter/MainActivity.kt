@@ -3,6 +3,8 @@ package com.example.numi_flutter
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
@@ -32,17 +34,24 @@ class MainActivity : FlutterActivity() {
             return
         }
 
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "image/*"
-        }
-
         try {
             pendingAvatarResult = result
-            startActivityForResult(intent, AVATAR_PICKER_REQUEST_CODE)
+            startActivityForResult(createAvatarPickerIntent(), AVATAR_PICKER_REQUEST_CODE)
         } catch (error: Exception) {
             pendingAvatarResult = null
             result.error("picker_unavailable", error.message, null)
+        }
+    }
+
+    private fun createAvatarPickerIntent(): Intent {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+                type = "image/*"
+            }
+        } else {
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+                type = "image/*"
+            }
         }
     }
 

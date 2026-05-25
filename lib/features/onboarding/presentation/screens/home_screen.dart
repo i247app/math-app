@@ -16,7 +16,6 @@ const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _mintBackground = Color(0xFFEBFAEC);
-const _useFakeGradeApi = bool.fromEnvironment('USE_FAKE_GRADE_API');
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -35,8 +34,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final GradeService _gradeService =
-      _useFakeGradeApi ? const FakeGradeApi() : GradeApi();
+  late final GradeService _gradeService = GradeApi();
   int _activeTab = 0;
   String? _prefetchedGradeUserId;
   bool _isPrefetchingGrades = false;

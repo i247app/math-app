@@ -15,7 +15,6 @@ const _gradeTeal = Color(0xFF006762);
 const _gradeInk = Color(0xFF253228);
 const _gradePeach = Color(0xFFFFDCCA);
 const _gradeRust = Color(0xFFA03A0F);
-const _useFakeGradeApi = bool.fromEnvironment('USE_FAKE_GRADE_API');
 
 class GradeSelectionScreen extends StatefulWidget {
   const GradeSelectionScreen({
@@ -47,8 +46,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    _gradeService = widget.gradeService ??
-        (_useFakeGradeApi ? const FakeGradeApi() : GradeApi());
+    _gradeService = widget.gradeService ?? GradeApi();
     grades = widget.initialGrades;
     selectedGradeLabel = _defaultGradeLabel(grades);
     if (grades.isEmpty) {
@@ -392,10 +390,13 @@ class _GradeGrid extends StatelessWidget {
       );
     }
 
-    final items = grades.where((grade) {
-      final label = grade.label?.trim();
-      return label != null && label.isNotEmpty;
-    }).map(_GradeOption.fromGradeModel).toList()
+    final items = grades
+        .where((grade) {
+          final label = grade.label?.trim();
+          return label != null && label.isNotEmpty;
+        })
+        .map(_GradeOption.fromGradeModel)
+        .toList()
       ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
     if (items.isEmpty) {
@@ -662,36 +663,26 @@ class _GradeBadge extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: isSelected
-            ? _gradeTeal
-            : option.kindergarten
-                ? _gradePeach
-                : AppColors.aquaMist,
+        color: isSelected ? _gradeTeal : AppColors.aquaMist,
         shape: BoxShape.circle,
       ),
-      child: option.kindergarten
+      child: option.number == null
           ? Icon(
-              Icons.face_retouching_natural_rounded,
-              color: isSelected ? Colors.white : _gradeRust,
-              size: 20 * scale,
+              Icons.school_rounded,
+              color: isSelected ? Colors.white : _gradeTeal,
+              size: 19 * scale,
             )
-          : option.number == null
-              ? Icon(
-                  Icons.school_rounded,
-                  color: isSelected ? Colors.white : _gradeTeal,
-                  size: 19 * scale,
-                )
-              : Text(
-                  option.number!,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : _gradeTeal,
-                    fontFamily: 'Nunito',
-                    fontSize: 17 * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
+          : Text(
+              option.number!,
+              style: TextStyle(
+                color: isSelected ? Colors.white : _gradeTeal,
+                fontFamily: 'Nunito',
+                fontSize: 17 * scale,
+                fontWeight: FontWeight.w900,
+                height: 1,
+                letterSpacing: 0,
+              ),
+            ),
     );
   }
 }
@@ -842,7 +833,6 @@ class _GradeOption {
   const _GradeOption(
     this.number,
     this.label, {
-    this.kindergarten = false,
     this.displayOrder = 0,
   });
 
@@ -857,7 +847,6 @@ class _GradeOption {
 
   final String? number;
   final String label;
-  final bool kindergarten;
   final int displayOrder;
 }
 
