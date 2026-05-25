@@ -201,7 +201,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               bottom: s(288),
                               child: _ResultBottomBar(
                                 scale: scale,
-                                onTestAgain: generateTestAgain,
+                                onPractice: generateTestAgain,
                               ),
                             ),
                           ],
@@ -541,11 +541,11 @@ class _AiReviewCard extends StatelessWidget {
 class _ResultBottomBar extends StatelessWidget {
   const _ResultBottomBar({
     required this.scale,
-    required this.onTestAgain,
+    required this.onPractice,
   });
 
   final double scale;
-  final VoidCallback onTestAgain;
+  final VoidCallback onPractice;
 
   @override
   Widget build(BuildContext context) {
@@ -572,22 +572,22 @@ class _ResultBottomBar extends StatelessWidget {
             children: [
               Expanded(
                 child: _ResultActionButton(
-                  label: 'THOÁT',
-                  icon: Icons.logout_rounded,
+                  label: 'KIỂM TRA',
+                  icon: Icons.fact_check_outlined,
                   background: _resultPeach,
                   foreground: _resultRust,
                   scale: scale,
-                  onTap: () => _exitToGradeSelection(context),
+                  onTap: () {},
                 ),
               ),
               SizedBox(width: 20 * scale),
               Expanded(
                 child: _ResultActionButton(
-                  label: 'TEST AGAIN',
+                  label: 'LUYỆN TẬP',
                   icon: Icons.arrow_forward_rounded,
                   foreground: const Color(0xFFBEFFF9),
                   scale: scale,
-                  onTap: onTestAgain,
+                  onTap: onPractice,
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
