@@ -29,6 +29,37 @@ class CreateProfileRequest {
   final String? dob;
 }
 
+class UpdateProfileRequest {
+  const UpdateProfileRequest({
+    required this.profileId,
+    required this.name,
+    required this.gradeId,
+    required this.programId,
+    required this.semesterId,
+    this.dob,
+  });
+
+  final String profileId;
+  final String name;
+  final String gradeId;
+  final String programId;
+  final String semesterId;
+  final String? dob;
+}
+
+class DeleteProfileRequest {
+  const DeleteProfileRequest({required this.profileId});
+
+  final String profileId;
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'metadata': _profileMetadata,
+      'profile_id': profileId,
+    };
+  }
+}
+
 class ProfileListResponse {
   const ProfileListResponse({
     required this.mstatus,
@@ -78,6 +109,55 @@ class CreateProfileResponse {
     return CreateProfileResponse(
       mstatus: _intFromJson(json['mstatus']) ?? 0,
       profile: _objectFromJson(json['profile'], StudentProfile.fromJson),
+      status: json['status'] as String?,
+      mmessage: json['mmessage'] as String?,
+      debug: json['debug'] as String?,
+    );
+  }
+}
+
+class UpdateProfileResponse {
+  const UpdateProfileResponse({
+    required this.mstatus,
+    this.profile,
+    this.status,
+    this.mmessage,
+    this.debug,
+  });
+
+  final int mstatus;
+  final StudentProfile? profile;
+  final String? status;
+  final String? mmessage;
+  final String? debug;
+
+  factory UpdateProfileResponse.fromJson(Map<String, dynamic> json) {
+    return UpdateProfileResponse(
+      mstatus: _intFromJson(json['mstatus']) ?? 0,
+      profile: _objectFromJson(json['profile'], StudentProfile.fromJson),
+      status: json['status'] as String?,
+      mmessage: json['mmessage'] as String?,
+      debug: json['debug'] as String?,
+    );
+  }
+}
+
+class DeleteProfileResponse {
+  const DeleteProfileResponse({
+    required this.mstatus,
+    this.status,
+    this.mmessage,
+    this.debug,
+  });
+
+  final int mstatus;
+  final String? status;
+  final String? mmessage;
+  final String? debug;
+
+  factory DeleteProfileResponse.fromJson(Map<String, dynamic> json) {
+    return DeleteProfileResponse(
+      mstatus: _intFromJson(json['mstatus']) ?? 0,
       status: json['status'] as String?,
       mmessage: json['mmessage'] as String?,
       debug: json['debug'] as String?,
@@ -217,3 +297,14 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
+
+const _profileMetadata = <String, Object>{
+  'client_info': <String, String>{
+    'platform': 'ios',
+    'app_version': '2.1.0',
+    'device_id': '18092003-18092003-18092003-18092003',
+    'device_name': 'MACBOOK-PRO-M4',
+    'device_push_token': 'ABCDE',
+    'ip_address': '42.118.191.193',
+  },
+};

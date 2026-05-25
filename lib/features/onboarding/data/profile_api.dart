@@ -30,6 +30,18 @@ abstract class ProfileService {
     String? avatarPath,
     String? dob,
   });
+
+  Future<StudentProfile?> updateProfile({
+    required String profileId,
+    required String name,
+    required String gradeId,
+    required String programId,
+    required String semesterId,
+    String? avatarPath,
+    String? dob,
+  });
+
+  Future<void> forceDeleteProfile({required String profileId});
 }
 
 class ProfileApi implements ProfileService {
@@ -100,6 +112,45 @@ class ProfileApi implements ProfileService {
         avatarPath: avatarPath,
       );
       return response.profile;
+    } on NetworkException catch (error) {
+      throw ProfileException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<StudentProfile?> updateProfile({
+    required String profileId,
+    required String name,
+    required String gradeId,
+    required String programId,
+    required String semesterId,
+    String? avatarPath,
+    String? dob,
+  }) async {
+    try {
+      final response = await _networkApi.updateProfile(
+        UpdateProfileRequest(
+          profileId: profileId,
+          name: name,
+          gradeId: gradeId,
+          programId: programId,
+          semesterId: semesterId,
+          dob: dob,
+        ),
+        avatarPath: avatarPath,
+      );
+      return response.profile;
+    } on NetworkException catch (error) {
+      throw ProfileException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<void> forceDeleteProfile({required String profileId}) async {
+    try {
+      await _networkApi.forceDeleteProfile(
+        DeleteProfileRequest(profileId: profileId),
+      );
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
     }

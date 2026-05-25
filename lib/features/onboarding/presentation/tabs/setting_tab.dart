@@ -55,6 +55,7 @@ class _SettingTabState extends State<SettingTab> {
   bool _isLoadingProfileOptions = false;
   bool _isPickingCreateAvatar = false;
   bool _isSavingProfile = false;
+  bool _isDeletingProfile = false;
   String? _profileLoadError;
   String? _profileOptionsError;
   String? _profileCreateError;
@@ -65,6 +66,7 @@ class _SettingTabState extends State<SettingTab> {
   String? _snapshotPhone;
   String? _snapshotEmail;
   String? _snapshotAvatarPath;
+  StudentProfile? _editingProfile;
   List<StudentProfile> _profiles = const <StudentProfile>[];
   List<GradeModel> _gradeOptions = const <GradeModel>[];
   List<ProgramModel> _programOptions = const <ProgramModel>[];
@@ -129,9 +131,7 @@ class _SettingTabState extends State<SettingTab> {
     });
     FocusScope.of(context).unfocus();
     if (view == _AccountView.profile) {
-      if (_profiles.isEmpty) {
-        _loadProfiles();
-      }
+      _loadProfiles();
       _preloadProfileOptions();
     }
   }
@@ -149,10 +149,12 @@ class _SettingTabState extends State<SettingTab> {
       _draftAvatarPath = null;
     });
     FocusScope.of(context).unfocus();
+    _loadProfiles();
   }
 
   void _openAddProfile() {
     HapticFeedback.selectionClick();
+    _resetCreateProfileForm();
     setState(() {
       _view = _AccountView.addProfile;
       _isForwardTransition = true;
@@ -161,6 +163,23 @@ class _SettingTabState extends State<SettingTab> {
     FocusScope.of(context).unfocus();
     if (!_hasProfileOptions) {
       _loadProfileOptions();
+    }
+  }
+
+  void _openUpdateProfile(StudentProfile profile) {
+    HapticFeedback.selectionClick();
+    _resetCreateProfileForm();
+    _profileNameController.text = profile.name?.trim() ?? '';
+    _editingProfile = profile;
+    _selectOptionsForProfile(profile);
+    setState(() {
+      _view = _AccountView.addProfile;
+      _isForwardTransition = true;
+      _profileCreateError = null;
+    });
+    FocusScope.of(context).unfocus();
+    if (!_hasProfileOptions) {
+      _loadProfileOptions(profileToSelect: profile);
     }
   }
 
@@ -313,7 +332,7 @@ class _SettingTabState extends State<SettingTab> {
     _loadProfileOptions();
   }
 
-  Future<void> _loadProfileOptions() async {
+  Future<void> _loadProfileOptions({StudentProfile? profileToSelect}) async {
     if (_isLoadingProfileOptions) {
       return;
     }
@@ -349,9 +368,14 @@ class _SettingTabState extends State<SettingTab> {
         _gradeOptions = grades;
         _programOptions = programs;
         _semesterOptions = semesters;
-        _selectedGrade ??= grades.isEmpty ? null : grades.first;
-        _selectedProgram ??= programs.isEmpty ? null : programs.first;
-        _selectedSemester ??= semesters.isEmpty ? null : semesters.first;
+        final profile = profileToSelect ?? _editingProfile;
+        if (profile != null) {
+          _selectOptionsForProfile(profile);
+        } else {
+          _selectedGrade ??= grades.isEmpty ? null : grades.first;
+          _selectedProgram ??= programs.isEmpty ? null : programs.first;
+          _selectedSemester ??= semesters.isEmpty ? null : semesters.first;
+        }
         _isLoadingProfileOptions = false;
       });
     } on GradeException catch (error) {
@@ -421,12 +445,13 @@ class _SettingTabState extends State<SettingTab> {
     setState(() => _createAvatarPath = null);
   }
 
-  Future<void> _createProfile() async {
+  Future<void> _saveProfileForm() async {
     final userId = widget.user?.id.trim();
     final name = _profileNameController.text.trim();
     final grade = _selectedGrade;
     final program = _selectedProgram;
     final semester = _selectedSemester;
+    final editingProfile = _editingProfile;
 
     if (userId == null || userId.isEmpty) {
       setState(() => _profileCreateError = 'Thiếu thông tin tài khoản.');
@@ -450,14 +475,31 @@ class _SettingTabState extends State<SettingTab> {
     });
 
     try {
-      await _profileService.createProfile(
-        userId: userId,
-        name: name,
-        gradeId: grade!.gradeId!,
-        programId: program!.programId!,
-        semesterId: semester!.semesterId!,
-        avatarPath: _createAvatarPath,
-      );
+      if (editingProfile == null) {
+        await _profileService.createProfile(
+          userId: userId,
+          name: name,
+          gradeId: grade!.gradeId!,
+          programId: program!.programId!,
+          semesterId: semester!.semesterId!,
+          avatarPath: _createAvatarPath,
+        );
+      } else {
+        final profileId = editingProfile.profileId?.trim();
+        if (profileId == null || profileId.isEmpty) {
+          throw const ProfileException('Hồ sơ này thiếu profile_id.');
+        }
+
+        await _profileService.updateProfile(
+          profileId: profileId,
+          name: name,
+          gradeId: grade!.gradeId!,
+          programId: program!.programId!,
+          semesterId: semester!.semesterId!,
+          dob: _dateOnly(editingProfile.dob),
+          avatarPath: _createAvatarPath,
+        );
+      }
       if (!mounted) {
         return;
       }
@@ -484,16 +526,119 @@ class _SettingTabState extends State<SettingTab> {
       }
 
       setState(() {
-        _profileCreateError = 'Không thể tạo hồ sơ. Vui lòng thử lại.';
+        _profileCreateError = editingProfile == null
+            ? 'Không thể tạo hồ sơ. Vui lòng thử lại.'
+            : 'Không thể cập nhật hồ sơ. Vui lòng thử lại.';
         _isSavingProfile = false;
       });
+    }
+  }
+
+  Future<void> _confirmDeleteProfile(StudentProfile profile) async {
+    final profileId = profile.profileId?.trim();
+    if (profileId == null || profileId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hồ sơ này thiếu profile_id.')),
+      );
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Xóa hồ sơ?'),
+          content: const Text(
+            'Bạn có chắc muốn delete profile này không?',
+            style: TextStyle(
+              color: _deepInk,
+              fontFamily: 'Nunito',
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Xóa'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true || !mounted) {
+      return;
+    }
+
+    await _deleteProfile(profileId);
+  }
+
+  Future<void> _deleteProfile(String profileId) async {
+    setState(() => _isDeletingProfile = true);
+
+    try {
+      await _profileService.forceDeleteProfile(profileId: profileId);
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã xóa hồ sơ.')),
+      );
+      await _loadProfiles();
+    } on ProfileException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không thể xóa hồ sơ. Vui lòng thử lại.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isDeletingProfile = false);
+      }
     }
   }
 
   void _resetCreateProfileForm() {
     _profileNameController.clear();
     _createAvatarPath = null;
+    _editingProfile = null;
     _profileCreateError = null;
+    _selectedGrade = _gradeOptions.isEmpty ? null : _gradeOptions.first;
+    _selectedProgram = _programOptions.isEmpty ? null : _programOptions.first;
+    _selectedSemester =
+        _semesterOptions.isEmpty ? null : _semesterOptions.first;
+  }
+
+  void _selectOptionsForProfile(StudentProfile profile) {
+    _selectedGrade = _firstWhereOrNull(
+      _gradeOptions,
+      (grade) => grade.gradeId == profile.gradeId,
+    );
+    _selectedProgram = _firstWhereOrNull(
+      _programOptions,
+      (program) => program.programId == profile.programId,
+    );
+    _selectedSemester = _firstWhereOrNull(
+      _semesterOptions,
+      (semester) => semester.semesterId == profile.semesterId,
+    );
   }
 
   @override
@@ -523,7 +668,9 @@ class _SettingTabState extends State<SettingTab> {
                       ? 'Tài khoản'
                       : _view == _AccountView.profile
                           ? 'Hồ sơ'
-                          : 'Thêm Hồ Sơ',
+                          : _editingProfile == null
+                              ? 'Thêm Hồ Sơ'
+                              : 'Cập Nhật Hồ Sơ',
               canGoBack: _view != _AccountView.settings,
               scale: scale,
               onBack: _view == _AccountView.addProfile
@@ -590,16 +737,19 @@ class _SettingTabState extends State<SettingTab> {
                 _AccountView.profile => _ProfilePlaceholderPanel(
                     key: ValueKey(_viewKey(_AccountView.profile)),
                     profiles: _profiles,
-                    isLoading: _isLoadingProfiles,
+                    isLoading: _isLoadingProfiles || _isDeletingProfile,
                     errorMessage: _profileLoadError,
                     onRetry: _loadProfiles,
                     onAdd: _openAddProfile,
+                    onEdit: _openUpdateProfile,
+                    onDelete: _confirmDeleteProfile,
                     scale: scale,
                   ),
                 _AccountView.addProfile => _AddProfilePanel(
                     key: ValueKey(_viewKey(_AccountView.addProfile)),
                     nameController: _profileNameController,
                     avatarPath: _createAvatarPath,
+                    avatarUrl: _editingProfile?.avatarUrl,
                     grades: _gradeOptions,
                     programs: _programOptions,
                     semesters: _semesterOptions,
@@ -624,7 +774,7 @@ class _SettingTabState extends State<SettingTab> {
                     },
                     onRetryOptions: _loadProfileOptions,
                     onCancel: _cancelAddProfile,
-                    onSave: _createProfile,
+                    onSave: _saveProfileForm,
                     scale: scale,
                   ),
               },
@@ -679,6 +829,27 @@ class _SettingTabState extends State<SettingTab> {
       _AccountView.profile => 'profile-placeholder',
       _AccountView.addProfile => 'add-profile',
     };
+  }
+
+  static T? _firstWhereOrNull<T>(Iterable<T> items, bool Function(T) test) {
+    for (final item in items) {
+      if (test(item)) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  static String? _dateOnly(String? value) {
+    final date = value?.trim();
+    if (date == null || date.isEmpty) {
+      return null;
+    }
+    final parsed = DateTime.tryParse(date);
+    if (parsed == null) {
+      return date.length >= 10 ? date.substring(0, 10) : date;
+    }
+    return parsed.toIso8601String().substring(0, 10);
   }
 }
 
@@ -1707,6 +1878,7 @@ class _AddProfilePanel extends StatelessWidget {
     super.key,
     required this.nameController,
     required this.avatarPath,
+    required this.avatarUrl,
     required this.grades,
     required this.programs,
     required this.semesters,
@@ -1731,6 +1903,7 @@ class _AddProfilePanel extends StatelessWidget {
 
   final TextEditingController nameController;
   final String? avatarPath;
+  final String? avatarUrl;
   final List<GradeModel> grades;
   final List<ProgramModel> programs;
   final List<SemesterModel> semesters;
@@ -1761,6 +1934,7 @@ class _AddProfilePanel extends StatelessWidget {
       children: [
         _AddProfileAvatar(
           avatarPath: avatarPath,
+          avatarUrl: avatarUrl,
           isPicking: isPickingAvatar,
           scale: scale,
           onTap: onPickAvatar,
@@ -1875,6 +2049,7 @@ class _AddProfilePanel extends StatelessWidget {
 class _AddProfileAvatar extends StatelessWidget {
   const _AddProfileAvatar({
     required this.avatarPath,
+    required this.avatarUrl,
     required this.isPicking,
     required this.scale,
     required this.onTap,
@@ -1882,6 +2057,7 @@ class _AddProfileAvatar extends StatelessWidget {
   });
 
   final String? avatarPath;
+  final String? avatarUrl;
   final bool isPicking;
   final double scale;
   final VoidCallback onTap;
@@ -1890,6 +2066,7 @@ class _AddProfileAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final path = avatarPath?.trim();
+    final url = avatarUrl?.trim();
     final size = 116 * scale;
 
     return Center(
@@ -1916,13 +2093,8 @@ class _AddProfileAvatar extends StatelessWidget {
                 border: Border.all(color: Colors.white, width: 3 * scale),
               ),
               child: ClipOval(
-                child: path == null || path.isEmpty
-                    ? Icon(
-                        Icons.person_rounded,
-                        color: const Color(0xFFD3DEE1),
-                        size: 56 * scale,
-                      )
-                    : Image.file(
+                child: path != null && path.isNotEmpty
+                    ? Image.file(
                         File(path),
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) {
@@ -1932,7 +2104,24 @@ class _AddProfileAvatar extends StatelessWidget {
                             size: 56 * scale,
                           );
                         },
-                      ),
+                      )
+                    : url != null && url.isNotEmpty
+                        ? Image.network(
+                            url,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) {
+                              return Icon(
+                                Icons.person_rounded,
+                                color: const Color(0xFFD3DEE1),
+                                size: 56 * scale,
+                              );
+                            },
+                          )
+                        : Icon(
+                            Icons.person_rounded,
+                            color: const Color(0xFFD3DEE1),
+                            size: 56 * scale,
+                          ),
               ),
             ),
             if (isPicking)
@@ -2181,6 +2370,8 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
     required this.errorMessage,
     required this.onRetry,
     required this.onAdd,
+    required this.onEdit,
+    required this.onDelete,
     required this.scale,
   });
 
@@ -2189,6 +2380,8 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
   final String? errorMessage;
   final VoidCallback onRetry;
   final VoidCallback onAdd;
+  final ValueChanged<StudentProfile> onEdit;
+  final ValueChanged<StudentProfile> onDelete;
   final double scale;
 
   @override
@@ -2241,8 +2434,8 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
             profile: profiles[index],
             isActive: profiles[index].isDefault || index == 0,
             scale: scale,
-            onEdit: () => HapticFeedback.selectionClick(),
-            onDelete: () => HapticFeedback.selectionClick(),
+            onEdit: () => onEdit(profiles[index]),
+            onDelete: () => onDelete(profiles[index]),
           ),
           if (index != profiles.length - 1) SizedBox(height: 22 * scale),
         ],

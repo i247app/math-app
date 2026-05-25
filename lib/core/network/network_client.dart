@@ -562,6 +562,59 @@ class NetworkApi {
     return createResponse;
   }
 
+  Future<UpdateProfileResponse> updateProfile(
+    UpdateProfileRequest request, {
+    String? avatarPath,
+  }) async {
+    final formData = FormData.fromMap({
+      'profile_id': request.profileId,
+      'name': request.name,
+      if (request.dob?.isNotEmpty == true) 'dob': request.dob,
+      'grade_id': request.gradeId,
+      'program_id': request.programId,
+      'semester_id': request.semesterId,
+      if (avatarPath?.isNotEmpty == true)
+        'avatar': await MultipartFile.fromFile(avatarPath!),
+    });
+    final responseJson = await _networkClient.postMultipart(
+      '/profiles/update',
+      formData,
+    );
+    final updateResponse = UpdateProfileResponse.fromJson(responseJson);
+    if (updateResponse.mstatus != 200) {
+      throw NetworkException(
+        updateResponse.mmessage ??
+            updateResponse.debug ??
+            updateResponse.status ??
+            'Request failed.',
+        status: updateResponse.mstatus,
+      );
+    }
+
+    return updateResponse;
+  }
+
+  Future<DeleteProfileResponse> forceDeleteProfile(
+    DeleteProfileRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/profiles/force-delete',
+      request.toJson(),
+    );
+    final deleteResponse = DeleteProfileResponse.fromJson(responseJson);
+    if (deleteResponse.mstatus != 200) {
+      throw NetworkException(
+        deleteResponse.mmessage ??
+            deleteResponse.debug ??
+            deleteResponse.status ??
+            'Request failed.',
+        status: deleteResponse.mstatus,
+      );
+    }
+
+    return deleteResponse;
+  }
+
   Future<AuthUser> getCurrentUser() async {
     final responseJson = await _networkClient.postJson('/users/me', {});
     final userJson = _currentUserJson(responseJson);
