@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/network/quiz_models.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/quiz_api.dart';
+import '../screens/quiz_review_screen.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF5D4A54);
@@ -423,7 +424,11 @@ class _HistoryBody extends StatelessWidget {
     return Column(
       children: [
         for (final quiz in quizzes) ...[
-          _HistoryQuizCard(quiz: quiz, scale: scale),
+          _HistoryQuizCard(
+            quiz: quiz,
+            scale: scale,
+            onTap: () => _openQuizReview(context, quiz),
+          ),
           SizedBox(height: 22 * scale),
         ],
       ],
@@ -431,14 +436,36 @@ class _HistoryBody extends StatelessWidget {
   }
 }
 
+void _openQuizReview(BuildContext context, GeneratedQuiz quiz) {
+  final quizId = (quiz.quizId ?? quiz.id)?.trim();
+  if (quizId == null || quizId.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Bài kiểm tra này thiếu quiz_id.')),
+    );
+    return;
+  }
+
+  HapticFeedback.selectionClick();
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => QuizReviewScreen(
+        quizId: quizId,
+        initialQuiz: quiz,
+      ),
+    ),
+  );
+}
+
 class _HistoryQuizCard extends StatelessWidget {
   const _HistoryQuizCard({
     required this.quiz,
     required this.scale,
+    required this.onTap,
   });
 
   final GeneratedQuiz quiz;
   final double scale;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -447,68 +474,77 @@ class _HistoryQuizCard extends StatelessWidget {
     final scoreColors = _scoreColors(percent);
     final dateParts = _historyDateParts(quiz.createDt);
 
-    return Container(
-      constraints: BoxConstraints(minHeight: 132 * scale),
-      padding: EdgeInsets.fromLTRB(
-        20 * scale,
-        22 * scale,
-        16 * scale,
-        20 * scale,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: _cardBorder, width: 1.3 * scale),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
-            blurRadius: 12 * scale,
-            offset: Offset(0, 4 * scale),
+    final radius = BorderRadius.circular(24 * scale);
+
+    return Material(
+      color: Colors.white,
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Container(
+          constraints: BoxConstraints(minHeight: 132 * scale),
+          padding: EdgeInsets.fromLTRB(
+            20 * scale,
+            22 * scale,
+            16 * scale,
+            20 * scale,
           ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (percent != null)
-            _HistoryScoreBadge(
-              percentage: percent,
-              colors: scoreColors,
-              scale: scale,
-            )
-          else
-            _HistoryIncompleteBadge(scale: scale),
-          SizedBox(width: 14 * scale),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _quizTitle(quiz),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _deepInk,
-                    fontFamily: 'Nunito',
-                    fontSize: 16 * scale,
-                    fontWeight: FontWeight.w800,
-                    height: 1.32,
-                    letterSpacing: 0,
-                  ),
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            border: Border.all(color: _cardBorder, width: 1.3 * scale),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.07),
+                blurRadius: 12 * scale,
+                offset: Offset(0, 4 * scale),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (percent != null)
+                _HistoryScoreBadge(
+                  percentage: percent,
+                  colors: scoreColors,
+                  scale: scale,
+                )
+              else
+                _HistoryIncompleteBadge(scale: scale),
+              SizedBox(width: 14 * scale),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _quizTitle(quiz),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: _deepInk,
+                        fontFamily: 'Nunito',
+                        fontSize: 16 * scale,
+                        fontWeight: FontWeight.w800,
+                        height: 1.32,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    SizedBox(height: 12 * scale),
+                    _HistoryMetaRow(parts: dateParts, scale: scale),
+                  ],
                 ),
-                SizedBox(height: 12 * scale),
-                _HistoryMetaRow(parts: dateParts, scale: scale),
-              ],
-            ),
+              ),
+              SizedBox(width: 4 * scale),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: _muted.withValues(alpha: 0.78),
+                size: 32 * scale,
+              ),
+            ],
           ),
-          SizedBox(width: 4 * scale),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: _muted.withValues(alpha: 0.78),
-            size: 32 * scale,
-          ),
-        ],
+        ),
       ),
     );
   }

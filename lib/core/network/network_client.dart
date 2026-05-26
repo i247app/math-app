@@ -477,9 +477,8 @@ class NetworkApi {
   }
 
   Future<QuizDetailResponse> getQuizDetail(String quizId) async {
-    final responseJson = await _networkClient.postJson(
+    final responseJson = await _networkClient.getJson(
       '/quizzes/$quizId',
-      <String, dynamic>{},
     );
     final quizResponse = QuizDetailResponse.fromJson(responseJson);
     if (quizResponse.mstatus != 200) {

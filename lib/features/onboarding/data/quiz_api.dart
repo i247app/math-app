@@ -259,6 +259,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
         ],
         'question_name': '45 + 37 = ?',
         'question_number': 1,
+        'right_answer': 'B',
       },
       <String, Object?>{
         'answers': <Object?>[
@@ -269,6 +270,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
         ],
         'question_name': '6 * 8 - 15 = ?',
         'question_number': 2,
+        'right_answer': 'B',
       },
       <String, Object?>{
         'answers': <Object?>[
@@ -279,6 +281,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
         ],
         'question_name': '3/4 + 1/8 = ?',
         'question_number': 3,
+        'right_answer': 'B',
       },
       <String, Object?>{
         'answers': <Object?>[
@@ -289,6 +292,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
         ],
         'question_name': '125 / 5 + 75 = ?',
         'question_number': 4,
+        'right_answer': 'A',
       },
       <String, Object?>{
         'answers': <Object?>[
@@ -299,6 +303,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
         ],
         'question_name': '(100 - 25) / 5 = ?',
         'question_number': 5,
+        'right_answer': 'A',
       },
     ],
     'quiz_id': previousQuizId == null
