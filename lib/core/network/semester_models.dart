@@ -1,13 +1,20 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'semester_models.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class SemesterListRequest {
   const SemesterListRequest({required this.userId});
 
   final String userId;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'user_id': userId};
-  }
+  factory SemesterListRequest.fromJson(Map<String, dynamic> json) =>
+      _$SemesterListRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SemesterListRequestToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class SemesterListResponse {
   const SemesterListResponse({
     required this.mstatus,
@@ -17,23 +24,21 @@ class SemesterListResponse {
     this.debug,
   });
 
+  @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
+  @JsonKey(fromJson: _semesterListFromJson)
   final List<SemesterModel> semesters;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory SemesterListResponse.fromJson(Map<String, dynamic> json) {
-    return SemesterListResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      semesters: _listFromJson(json['semesters'], SemesterModel.fromJson),
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
-    );
-  }
+  factory SemesterListResponse.fromJson(Map<String, dynamic> json) =>
+      _$SemesterListResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SemesterListResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class SemesterModel {
   const SemesterModel({
     this.id,
@@ -46,27 +51,25 @@ class SemesterModel {
     this.modifyDt,
   });
 
+  @JsonKey(fromJson: _stringFromJson)
   final String? id;
   final String? semesterId;
   final String? name;
   final String? description;
+  @JsonKey(fromJson: _intFromJson)
   final int? displayOrder;
   final String? imageUrl;
   final String? createDt;
   final String? modifyDt;
 
-  factory SemesterModel.fromJson(Map<String, dynamic> json) {
-    return SemesterModel(
-      id: json['id']?.toString(),
-      semesterId: json['semester_id'] as String?,
-      name: json['name'] as String?,
-      description: json['description'] as String?,
-      displayOrder: _intFromJson(json['display_order']),
-      imageUrl: json['image_url'] as String?,
-      createDt: json['create_dt'] as String?,
-      modifyDt: json['modify_dt'] as String?,
-    );
-  }
+  factory SemesterModel.fromJson(Map<String, dynamic> json) =>
+      _$SemesterModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SemesterModelToJson(this);
+}
+
+List<SemesterModel> _semesterListFromJson(Object? value) {
+  return _listFromJson(value, SemesterModel.fromJson);
 }
 
 List<T> _listFromJson<T>(
@@ -96,6 +99,8 @@ T? _objectFromJson<T>(
   return null;
 }
 
+int _requiredIntFromJson(Object? value) => _intFromJson(value) ?? 0;
+
 int? _intFromJson(Object? value) {
   if (value is int) {
     return value;
@@ -105,3 +110,5 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
+
+String? _stringFromJson(Object? value) => value?.toString();

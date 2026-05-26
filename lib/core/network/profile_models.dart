@@ -1,16 +1,23 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'program_models.dart';
 import 'semester_models.dart';
 
+part 'profile_models.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ProfileListRequest {
   const ProfileListRequest({required this.userId});
 
   final String userId;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'user_id': userId};
-  }
+  factory ProfileListRequest.fromJson(Map<String, dynamic> json) =>
+      _$ProfileListRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProfileListRequestToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class CreateProfileRequest {
   const CreateProfileRequest({
     required this.userId,
@@ -27,8 +34,14 @@ class CreateProfileRequest {
   final String programId;
   final String semesterId;
   final String? dob;
+
+  factory CreateProfileRequest.fromJson(Map<String, dynamic> json) =>
+      _$CreateProfileRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CreateProfileRequestToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class UpdateProfileRequest {
   const UpdateProfileRequest({
     required this.profileId,
@@ -45,21 +58,31 @@ class UpdateProfileRequest {
   final String programId;
   final String semesterId;
   final String? dob;
+
+  factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdateProfileRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UpdateProfileRequestToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class DeleteProfileRequest {
   const DeleteProfileRequest({required this.profileId});
 
   final String profileId;
 
+  factory DeleteProfileRequest.fromJson(Map<String, dynamic> json) =>
+      _$DeleteProfileRequestFromJson(json);
+
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'metadata': _profileMetadata,
-      'profile_id': profileId,
+      ..._$DeleteProfileRequestToJson(this),
     };
   }
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ProfileListResponse {
   const ProfileListResponse({
     required this.mstatus,
@@ -69,7 +92,9 @@ class ProfileListResponse {
     this.debug,
   });
 
+  @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
+  @JsonKey(fromJson: _profilesFromJson)
   final List<StudentProfile> profiles;
   final String? status;
   final String? mmessage;
@@ -80,16 +105,18 @@ class ProfileListResponse {
     final profilesValue =
         json['profiles'] ?? _nestedValue(data, 'profiles') ?? json['profile'];
 
-    return ProfileListResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      profiles: _profilesFromJson(profilesValue),
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
+    return _$ProfileListResponseFromJson(
+      <String, dynamic>{
+        ...json,
+        'profiles': profilesValue,
+      },
     );
   }
+
+  Map<String, dynamic> toJson() => _$ProfileListResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class CreateProfileResponse {
   const CreateProfileResponse({
     required this.mstatus,
@@ -99,23 +126,21 @@ class CreateProfileResponse {
     this.debug,
   });
 
+  @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
+  @JsonKey(fromJson: _studentProfileFromJson)
   final StudentProfile? profile;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory CreateProfileResponse.fromJson(Map<String, dynamic> json) {
-    return CreateProfileResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      profile: _objectFromJson(json['profile'], StudentProfile.fromJson),
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
-    );
-  }
+  factory CreateProfileResponse.fromJson(Map<String, dynamic> json) =>
+      _$CreateProfileResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CreateProfileResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class UpdateProfileResponse {
   const UpdateProfileResponse({
     required this.mstatus,
@@ -125,23 +150,21 @@ class UpdateProfileResponse {
     this.debug,
   });
 
+  @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
+  @JsonKey(fromJson: _studentProfileFromJson)
   final StudentProfile? profile;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory UpdateProfileResponse.fromJson(Map<String, dynamic> json) {
-    return UpdateProfileResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      profile: _objectFromJson(json['profile'], StudentProfile.fromJson),
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
-    );
-  }
+  factory UpdateProfileResponse.fromJson(Map<String, dynamic> json) =>
+      _$UpdateProfileResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UpdateProfileResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class DeleteProfileResponse {
   const DeleteProfileResponse({
     required this.mstatus,
@@ -150,21 +173,19 @@ class DeleteProfileResponse {
     this.debug,
   });
 
+  @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory DeleteProfileResponse.fromJson(Map<String, dynamic> json) {
-    return DeleteProfileResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
-    );
-  }
+  factory DeleteProfileResponse.fromJson(Map<String, dynamic> json) =>
+      _$DeleteProfileResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DeleteProfileResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class StudentProfile {
   const StudentProfile({
     this.id,
@@ -185,6 +206,7 @@ class StudentProfile {
     this.modifyDt,
   });
 
+  @JsonKey(fromJson: _stringFromJson)
   final String? id;
   final String? profileId;
   final String? userId;
@@ -193,37 +215,26 @@ class StudentProfile {
   final String? avatarUrl;
   final String? dob;
   final String? gradeId;
+  @JsonKey(fromJson: _profileGradeFromJson)
   final ProfileGrade? grade;
   final String? programId;
+  @JsonKey(fromJson: _programFromJson)
   final ProgramModel? program;
   final String? semesterId;
+  @JsonKey(fromJson: _semesterFromJson)
   final SemesterModel? semester;
+  @JsonKey(fromJson: _boolFromJson)
   final bool isDefault;
   final String? createDt;
   final String? modifyDt;
 
-  factory StudentProfile.fromJson(Map<String, dynamic> json) {
-    return StudentProfile(
-      id: json['id']?.toString(),
-      profileId: json['profile_id'] as String?,
-      userId: json['user_id'] as String?,
-      name: json['name'] as String?,
-      avatarKey: json['avatar_key'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
-      dob: json['dob'] as String?,
-      gradeId: json['grade_id'] as String?,
-      grade: _objectFromJson(json['grade'], ProfileGrade.fromJson),
-      programId: json['program_id'] as String?,
-      program: _objectFromJson(json['program'], ProgramModel.fromJson),
-      semesterId: json['semester_id'] as String?,
-      semester: _objectFromJson(json['semester'], SemesterModel.fromJson),
-      isDefault: json['is_default'] == true,
-      createDt: json['create_dt'] as String?,
-      modifyDt: json['modify_dt'] as String?,
-    );
-  }
+  factory StudentProfile.fromJson(Map<String, dynamic> json) =>
+      _$StudentProfileFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StudentProfileToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ProfileGrade {
   const ProfileGrade({
     this.id,
@@ -234,23 +245,19 @@ class ProfileGrade {
     this.imageUrl,
   });
 
+  @JsonKey(fromJson: _stringFromJson)
   final String? id;
   final String? gradeId;
   final String? label;
   final String? description;
+  @JsonKey(fromJson: _intFromJson)
   final int? displayOrder;
   final String? imageUrl;
 
-  factory ProfileGrade.fromJson(Map<String, dynamic> json) {
-    return ProfileGrade(
-      id: json['id']?.toString(),
-      gradeId: json['grade_id'] as String?,
-      label: json['label'] as String?,
-      description: json['description'] as String?,
-      displayOrder: _intFromJson(json['display_order']),
-      imageUrl: json['image_url'] as String?,
-    );
-  }
+  factory ProfileGrade.fromJson(Map<String, dynamic> json) =>
+      _$ProfileGradeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProfileGradeToJson(this);
 }
 
 List<StudentProfile> _profilesFromJson(Object? value) {
@@ -263,6 +270,22 @@ List<StudentProfile> _profilesFromJson(Object? value) {
 
   final profile = _objectFromJson(value, StudentProfile.fromJson);
   return profile == null ? const <StudentProfile>[] : <StudentProfile>[profile];
+}
+
+StudentProfile? _studentProfileFromJson(Object? value) {
+  return _objectFromJson(value, StudentProfile.fromJson);
+}
+
+ProfileGrade? _profileGradeFromJson(Object? value) {
+  return _objectFromJson(value, ProfileGrade.fromJson);
+}
+
+ProgramModel? _programFromJson(Object? value) {
+  return _objectFromJson(value, ProgramModel.fromJson);
+}
+
+SemesterModel? _semesterFromJson(Object? value) {
+  return _objectFromJson(value, SemesterModel.fromJson);
 }
 
 T? _objectFromJson<T>(
@@ -288,6 +311,8 @@ Object? _nestedValue(Object? value, String key) {
   return null;
 }
 
+int _requiredIntFromJson(Object? value) => _intFromJson(value) ?? 0;
+
 int? _intFromJson(Object? value) {
   if (value is int) {
     return value;
@@ -297,6 +322,19 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
+
+bool _boolFromJson(Object? value) {
+  if (value is bool) {
+    return value;
+  }
+  if (value is num) {
+    return value != 0;
+  }
+  final text = value?.toString().toLowerCase();
+  return text == 'true' || text == '1';
+}
+
+String? _stringFromJson(Object? value) => value?.toString();
 
 const _profileMetadata = <String, Object>{
   'client_info': <String, String>{

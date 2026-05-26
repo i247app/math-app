@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'grade_models.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GradeListRequest {
   const GradeListRequest({
     required this.userId,
@@ -5,15 +10,13 @@ class GradeListRequest {
 
   final String userId;
 
-  factory GradeListRequest.fromJson(Map<String, dynamic> json) {
-    return GradeListRequest(userId: json['user_id'] as String);
-  }
+  factory GradeListRequest.fromJson(Map<String, dynamic> json) =>
+      _$GradeListRequestFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'user_id': userId};
-  }
+  Map<String, dynamic> toJson() => _$GradeListRequestToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class GradeListResponse {
   const GradeListResponse({
     required this.mstatus,
@@ -24,39 +27,23 @@ class GradeListResponse {
     this.debug,
   });
 
+  @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
+  @JsonKey(fromJson: _gradeListFromJson)
   final List<GradeModel> grades;
+  @JsonKey(fromJson: _gradePaginationFromJson)
   final GradePagination? pagination;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory GradeListResponse.fromJson(Map<String, dynamic> json) {
-    return GradeListResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      grades: _listFromJson(json['grades'], GradeModel.fromJson),
-      pagination: _objectFromJson(
-        json['pagination'],
-        GradePagination.fromJson,
-      ),
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
-    );
-  }
+  factory GradeListResponse.fromJson(Map<String, dynamic> json) =>
+      _$GradeListResponseFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'mstatus': mstatus,
-      'grades': grades.map((grade) => grade.toJson()).toList(),
-      'pagination': pagination?.toJson(),
-      'status': status,
-      'mmessage': mmessage,
-      'debug': debug,
-    };
-  }
+  Map<String, dynamic> toJson() => _$GradeListResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GradePagination {
   const GradePagination({
     this.hasNext,
@@ -71,40 +58,25 @@ class GradePagination {
 
   final bool? hasNext;
   final bool? hasPrevious;
+  @JsonKey(fromJson: _intFromJson)
   final int? page;
+  @JsonKey(fromJson: _intFromJson)
   final int? size;
+  @JsonKey(fromJson: _intFromJson)
   final int? skip;
   final bool? takeAll;
+  @JsonKey(fromJson: _intFromJson)
   final int? totalCount;
+  @JsonKey(fromJson: _intFromJson)
   final int? totalPages;
 
-  factory GradePagination.fromJson(Map<String, dynamic> json) {
-    return GradePagination(
-      hasNext: json['has_next'] as bool?,
-      hasPrevious: json['has_previous'] as bool?,
-      page: _intFromJson(json['page']),
-      size: _intFromJson(json['size']),
-      skip: _intFromJson(json['skip']),
-      takeAll: json['take_all'] as bool?,
-      totalCount: _intFromJson(json['total_count']),
-      totalPages: _intFromJson(json['total_pages']),
-    );
-  }
+  factory GradePagination.fromJson(Map<String, dynamic> json) =>
+      _$GradePaginationFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'has_next': hasNext,
-      'has_previous': hasPrevious,
-      'page': page,
-      'size': size,
-      'skip': skip,
-      'take_all': takeAll,
-      'total_count': totalCount,
-      'total_pages': totalPages,
-    };
-  }
+  Map<String, dynamic> toJson() => _$GradePaginationToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GradeModel {
   const GradeModel({
     this.id,
@@ -117,40 +89,29 @@ class GradeModel {
     this.modifyDt,
   });
 
+  @JsonKey(fromJson: _stringFromJson)
   final String? id;
   final String? gradeId;
   final String? label;
   final String? description;
+  @JsonKey(fromJson: _intFromJson)
   final int? displayOrder;
   final String? imageUrl;
   final String? createDt;
   final String? modifyDt;
 
-  factory GradeModel.fromJson(Map<String, dynamic> json) {
-    return GradeModel(
-      id: json['id']?.toString(),
-      gradeId: json['grade_id'] as String?,
-      label: json['label'] as String?,
-      description: json['description'] as String?,
-      displayOrder: _intFromJson(json['display_order']),
-      imageUrl: json['image_url'] as String?,
-      createDt: json['create_dt'] as String?,
-      modifyDt: json['modify_dt'] as String?,
-    );
-  }
+  factory GradeModel.fromJson(Map<String, dynamic> json) =>
+      _$GradeModelFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'id': id,
-      'grade_id': gradeId,
-      'label': label,
-      'description': description,
-      'display_order': displayOrder,
-      'image_url': imageUrl,
-      'create_dt': createDt,
-      'modify_dt': modifyDt,
-    };
-  }
+  Map<String, dynamic> toJson() => _$GradeModelToJson(this);
+}
+
+GradePagination? _gradePaginationFromJson(Object? value) {
+  return _objectFromJson(value, GradePagination.fromJson);
+}
+
+List<GradeModel> _gradeListFromJson(Object? value) {
+  return _listFromJson(value, GradeModel.fromJson);
 }
 
 T? _objectFromJson<T>(
@@ -180,6 +141,8 @@ List<T> _listFromJson<T>(
       .toList();
 }
 
+int _requiredIntFromJson(Object? value) => _intFromJson(value) ?? 0;
+
 int? _intFromJson(Object? value) {
   if (value is int) {
     return value;
@@ -189,3 +152,5 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
+
+String? _stringFromJson(Object? value) => value?.toString();

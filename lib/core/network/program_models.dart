@@ -1,13 +1,20 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'program_models.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ProgramListRequest {
   const ProgramListRequest({required this.userId});
 
   final String userId;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'user_id': userId};
-  }
+  factory ProgramListRequest.fromJson(Map<String, dynamic> json) =>
+      _$ProgramListRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProgramListRequestToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ProgramListResponse {
   const ProgramListResponse({
     required this.mstatus,
@@ -17,23 +24,21 @@ class ProgramListResponse {
     this.debug,
   });
 
+  @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
+  @JsonKey(fromJson: _programListFromJson)
   final List<ProgramModel> programs;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory ProgramListResponse.fromJson(Map<String, dynamic> json) {
-    return ProgramListResponse(
-      mstatus: _intFromJson(json['mstatus']) ?? 0,
-      programs: _listFromJson(json['programs'], ProgramModel.fromJson),
-      status: json['status'] as String?,
-      mmessage: json['mmessage'] as String?,
-      debug: json['debug'] as String?,
-    );
-  }
+  factory ProgramListResponse.fromJson(Map<String, dynamic> json) =>
+      _$ProgramListResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProgramListResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ProgramModel {
   const ProgramModel({
     this.id,
@@ -46,27 +51,25 @@ class ProgramModel {
     this.modifyDt,
   });
 
+  @JsonKey(fromJson: _stringFromJson)
   final String? id;
   final String? programId;
   final String? label;
   final String? description;
+  @JsonKey(fromJson: _intFromJson)
   final int? displayOrder;
   final String? imageUrl;
   final String? createDt;
   final String? modifyDt;
 
-  factory ProgramModel.fromJson(Map<String, dynamic> json) {
-    return ProgramModel(
-      id: json['id']?.toString(),
-      programId: json['program_id'] as String?,
-      label: json['label'] as String?,
-      description: json['description'] as String?,
-      displayOrder: _intFromJson(json['display_order']),
-      imageUrl: json['image_url'] as String?,
-      createDt: json['create_dt'] as String?,
-      modifyDt: json['modify_dt'] as String?,
-    );
-  }
+  factory ProgramModel.fromJson(Map<String, dynamic> json) =>
+      _$ProgramModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProgramModelToJson(this);
+}
+
+List<ProgramModel> _programListFromJson(Object? value) {
+  return _listFromJson(value, ProgramModel.fromJson);
 }
 
 List<T> _listFromJson<T>(
@@ -96,6 +99,8 @@ T? _objectFromJson<T>(
   return null;
 }
 
+int _requiredIntFromJson(Object? value) => _intFromJson(value) ?? 0;
+
 int? _intFromJson(Object? value) {
   if (value is int) {
     return value;
@@ -105,3 +110,5 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
+
+String? _stringFromJson(Object? value) => value?.toString();
