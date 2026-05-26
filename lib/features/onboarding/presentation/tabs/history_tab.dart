@@ -444,10 +444,7 @@ class _HistoryQuizCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final grading = quiz.grading;
-    final correct = grading?.correctNumber;
-    final total = grading?.totalQuestions ?? quiz.questions.length;
-    final percent = grading?.scorePercentage ?? _scorePercent(correct, total);
-    final hasScore = correct != null && total > 0;
+    final percent = grading?.scorePercentage;
     final scoreColors = _scoreColors(percent);
     final dateParts = _historyDateParts(quiz.createDt);
 
@@ -474,6 +471,15 @@ class _HistoryQuizCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          if (percent != null)
+            _HistoryScoreBadge(
+              percentage: percent,
+              colors: scoreColors,
+              scale: scale,
+            )
+          else
+            _HistoryIncompleteBadge(scale: scale),
+          SizedBox(width: 14 * scale),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -497,16 +503,6 @@ class _HistoryQuizCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 14 * scale),
-          if (hasScore)
-            _HistoryScoreBadge(
-              correct: correct,
-              total: total,
-              colors: scoreColors,
-              scale: scale,
-            )
-          else
-            _HistoryIncompleteBadge(scale: scale),
           SizedBox(width: 4 * scale),
           Icon(
             Icons.chevron_right_rounded,
@@ -586,19 +582,18 @@ class _HistoryMetaItem extends StatelessWidget {
 
 class _HistoryScoreBadge extends StatelessWidget {
   const _HistoryScoreBadge({
-    required this.correct,
-    required this.total,
+    required this.percentage,
     required this.colors,
     required this.scale,
   });
 
-  final int correct;
-  final int total;
+  final int percentage;
   final _ScoreBadgeColors colors;
   final double scale;
 
   @override
   Widget build(BuildContext context) {
+    final scoreOutOf10 = (percentage / 10).round();
     return SizedBox(
       width: 74 * scale,
       child: Column(
@@ -619,7 +614,7 @@ class _HistoryScoreBadge extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  '$correct/$total',
+                  '$scoreOutOf10/10',
                   maxLines: 1,
                   style: TextStyle(
                     color: colors.foreground,
@@ -824,35 +819,37 @@ String _quizTitle(GeneratedQuiz quiz) {
 }
 
 _ScoreBadgeColors _scoreColors(int? percent) {
-  if (percent == null || percent >= 90) {
+  if (percent == null) {
     return const _ScoreBadgeColors(
       foreground: Color(0xFF0A8A4D),
       label: 'Tuyệt vời!',
     );
   }
-  if (percent >= 80) {
+
+  final scoreOutOf10 = (percent / 10).round();
+
+  if (scoreOutOf10 >= 9) {
     return const _ScoreBadgeColors(
-      foreground: Color(0xFF0A8A4D),
+      foreground: Color(0xFF0A8A4D), // Green
+      label: 'Tuyệt vời!',
+    );
+  }
+  if (scoreOutOf10 >= 7) {
+    return const _ScoreBadgeColors(
+      foreground: Color(0xFFFFC107), // Yellow
       label: 'Tốt',
     );
   }
-  if (percent >= 70) {
+  if (scoreOutOf10 >= 5) {
     return const _ScoreBadgeColors(
-      foreground: _blue,
+      foreground: Color(0xFFD2691E), // Brown-red
       label: 'Khá tốt',
     );
   }
   return const _ScoreBadgeColors(
-    foreground: _orange,
+    foreground: Color(0xFFD32F2F), // Red
     label: 'Cần luyện',
   );
-}
-
-int? _scorePercent(int? correct, int total) {
-  if (correct == null || total <= 0) {
-    return null;
-  }
-  return ((correct / total) * 100).round();
 }
 
 _HistoryDateParts _historyDateParts(String? isoDate) {

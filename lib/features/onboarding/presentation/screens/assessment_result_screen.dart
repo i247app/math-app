@@ -686,15 +686,10 @@ void _exitToGradeSelection(BuildContext context) {
 }
 
 String _scoreText(QuizGrading? grading) {
-  final correctNumber = grading?.correctNumber;
-  final totalQuestions = grading?.totalQuestions;
-  if (correctNumber != null && totalQuestions != null && totalQuestions > 0) {
-    return '$correctNumber/$totalQuestions';
-  }
-
   final scorePercentage = grading?.scorePercentage;
   if (scorePercentage != null) {
-    return '$scorePercentage/100';
+    final scoreOutOf10 = (scorePercentage / 10).round();
+    return '$scoreOutOf10/10';
   }
 
   return '9/10';

@@ -120,7 +120,7 @@ class _SettingHeaderButton extends StatelessWidget {
                   ]
                 : null,
           ),
-          child: Icon(icon, color: _teal, size: 29 * scale),
+          child: Icon(icon, color: _navy, size: 29 * scale),
         ),
       ),
     );

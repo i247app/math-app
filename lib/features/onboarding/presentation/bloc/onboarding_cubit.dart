@@ -220,6 +220,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   }
 
   void clearPhoneLookup() {
+    if (!state.isCheckingAuthPhone &&
+        state.checkedPhone == null &&
+        state.phoneExists == null &&
+        state.phoneLookupUser == null &&
+        state.authError == null) {
+      return;
+    }
+
     emit(
       state.copyWith(
         isCheckingAuthPhone: false,
