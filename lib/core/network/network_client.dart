@@ -476,6 +476,25 @@ class NetworkApi {
     return quizResponse;
   }
 
+  Future<QuizDetailResponse> getQuizDetail(String quizId) async {
+    final responseJson = await _networkClient.postJson(
+      '/quizzes/$quizId',
+      <String, dynamic>{},
+    );
+    final quizResponse = QuizDetailResponse.fromJson(responseJson);
+    if (quizResponse.mstatus != 200) {
+      throw NetworkException(
+        quizResponse.mmessage ??
+            quizResponse.debug ??
+            quizResponse.status ??
+            'Request failed.',
+        status: quizResponse.mstatus,
+      );
+    }
+
+    return quizResponse;
+  }
+
   Future<GradeListResponse> listGrades(
     GradeListRequest request,
   ) async {

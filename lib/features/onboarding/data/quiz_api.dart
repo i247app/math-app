@@ -30,6 +30,8 @@ abstract class QuizService {
     required String quizId,
     required List<SubmitQuizAnswer> answers,
   });
+
+  Future<GeneratedQuiz> getQuizDetail(String quizId);
 }
 
 class FakeQuizApi implements QuizService {
@@ -93,6 +95,20 @@ class FakeQuizApi implements QuizService {
     }
 
     return response.quizzes;
+  }
+
+  @override
+  Future<GeneratedQuiz> getQuizDetail(String quizId) async {
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    final response = QuizListResponse.fromJson(_fakeQuizListResponse());
+    if (response.mstatus != 200 || response.quizzes.isEmpty) {
+      throw QuizException(
+        response.mmessage ?? response.debug ?? 'Tải chi tiết quiz thất bại.',
+        status: response.mstatus,
+      );
+    }
+
+    return response.quizzes.first;
   }
 }
 
@@ -186,6 +202,28 @@ class QuizApi implements QuizService {
     }
 
     return response.quizzes;
+  }
+
+  @override
+  Future<GeneratedQuiz> getQuizDetail(String quizId) async {
+    final cleanQuizId = quizId.trim();
+    if (cleanQuizId.isEmpty) {
+      throw const QuizException('Thiếu quiz ID.');
+    }
+
+    final QuizDetailResponse response;
+    try {
+      response = await _networkApi.getQuizDetail(cleanQuizId);
+    } on NetworkException catch (error) {
+      throw QuizException(error.message, status: error.status);
+    }
+
+    final quiz = response.quiz;
+    if (quiz == null) {
+      throw const QuizException('Tải chi tiết quiz thất bại.');
+    }
+
+    return quiz;
   }
 }
 

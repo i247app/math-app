@@ -139,6 +139,28 @@ class QuizListResponse {
   Map<String, dynamic> toJson() => _$QuizListResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class QuizDetailResponse {
+  const QuizDetailResponse({
+    required this.mstatus,
+    this.quiz,
+    this.status,
+    this.mmessage,
+    this.debug,
+  });
+
+  final int mstatus;
+  final GeneratedQuiz? quiz;
+  final String? status;
+  final String? mmessage;
+  final String? debug;
+
+  factory QuizDetailResponse.fromJson(Map<String, dynamic> json) =>
+      _$QuizDetailResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuizDetailResponseToJson(this);
+}
+
 @JsonSerializable(fieldRename: FieldRename.snake)
 class QuizPagination {
   const QuizPagination({

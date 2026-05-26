@@ -6,7 +6,6 @@ import '../../data/otp_auth_api.dart';
 import '../../data/quiz_api.dart';
 
 const _teal = Color(0xFF006762);
-const _blue = Color(0xFF0B74B9);
 const _muted = Color(0xFF5D4A54);
 const _deepInk = Color(0xFF1F2B2B);
 const _navy = Color(0xFF063A7B);
