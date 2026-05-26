@@ -175,6 +175,7 @@ class GeneratedQuiz {
     this.previousQuizId,
     this.quizStatus,
     this.type,
+    this.title,
     this.userId,
     this.createDt,
     this.modifyDt,
@@ -189,6 +190,7 @@ class GeneratedQuiz {
   final String? previousQuizId;
   final String? quizStatus;
   final String? type;
+  final String? title;
   final String? userId;
   final String? createDt;
   final String? modifyDt;

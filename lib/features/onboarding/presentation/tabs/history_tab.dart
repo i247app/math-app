@@ -192,12 +192,7 @@ class _HistoryHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _HistoryHeaderButton(
-                icon: Icons.arrow_back_ios_new_rounded,
-                outlined: false,
-                onTap: HapticFeedback.selectionClick,
-                scale: scale,
-              ),
+              SizedBox(width: 60 * scale),
               Expanded(
                 child: Text(
                   'Lịch Sử',
@@ -376,7 +371,9 @@ class _HistorySearchField extends StatelessWidget {
             ),
           ),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(vertical: 16 * scale),
+          isCollapsed: true,
+          contentPadding: EdgeInsets.symmetric(
+              vertical: 13 * scale, horizontal: 12 * scale),
         ),
       ),
     );
@@ -489,7 +486,7 @@ class _HistoryQuizCard extends StatelessWidget {
                   style: TextStyle(
                     color: _deepInk,
                     fontFamily: 'Nunito',
-                    fontSize: 19 * scale,
+                    fontSize: 16 * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.32,
                     letterSpacing: 0,
@@ -510,7 +507,7 @@ class _HistoryQuizCard extends StatelessWidget {
             )
           else
             _HistoryIncompleteBadge(scale: scale),
-          SizedBox(width: 12 * scale),
+          SizedBox(width: 4 * scale),
           Icon(
             Icons.chevron_right_rounded,
             color: _muted.withValues(alpha: 0.78),
@@ -577,7 +574,7 @@ class _HistoryMetaItem extends StatelessWidget {
           style: TextStyle(
             color: _muted,
             fontFamily: 'Nunito',
-            fontSize: 14 * scale,
+            fontSize: 11 * scale,
             fontWeight: FontWeight.w700,
             letterSpacing: 0,
           ),
@@ -809,6 +806,10 @@ class _HistoryDateParts {
 }
 
 String _quizTitle(GeneratedQuiz quiz) {
+  if (quiz.title != null && quiz.title!.trim().isNotEmpty) {
+    return quiz.title!;
+  }
+
   final grade = quiz.grading?.aiDetectGrade?.trim();
   final suffix = grade != null && grade.isNotEmpty ? ' $grade' : '';
   final type = quiz.type?.toUpperCase();
