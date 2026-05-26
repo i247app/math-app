@@ -13,6 +13,7 @@ import '../tabs/setting_tab.dart';
 import 'grade_selection_screen.dart';
 
 const _teal = Color(0xFF006762);
+const _blue = Color(0xFF063A7B);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _mintBackground = Color(0xFFEBFAEC);
@@ -1104,17 +1105,17 @@ class _AnimatedNavItem extends StatelessWidget {
                     vertical: active ? 8 * scale : 7 * scale,
                   ),
                   decoration: BoxDecoration(
-                    color: Color.lerp(Colors.transparent, _teal, value),
+                    color: Color.lerp(Colors.transparent, _blue, value),
                     borderRadius: BorderRadius.circular(48 * scale),
                     boxShadow: active
                         ? [
                             BoxShadow(
-                              color: _teal.withValues(alpha: 0.26),
+                              color: _blue.withValues(alpha: 0.26),
                               blurRadius: 14 * scale,
                               offset: Offset(0, 10 * scale),
                             ),
                             BoxShadow(
-                              color: _teal.withValues(alpha: 0.18),
+                              color: _blue.withValues(alpha: 0.18),
                               blurRadius: 6 * scale,
                               offset: Offset(0, 3 * scale),
                             ),

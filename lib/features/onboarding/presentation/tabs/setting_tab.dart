@@ -13,10 +13,13 @@ import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/profile_api.dart';
 
+const _navy = Color(0xFF063A7B);
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
+const _settingBackground = Color(0xFFEEF9FB);
+const _cardBorder = Color(0xFFE3DDDF);
 
 enum _AccountView { settings, account, profile, addProfile }
 
@@ -708,141 +711,145 @@ class _SettingTabState extends State<SettingTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
+    final headerTitle = _titleForView(_view, _editingProfile);
+    final canGoBack = _view != _AccountView.settings;
     final backgroundColor =
-        _view == _AccountView.settings ? Colors.transparent : Colors.white;
+        _view == _AccountView.account ? Colors.white : _settingBackground;
 
     return ColoredBox(
       color: backgroundColor,
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: EdgeInsets.fromLTRB(
-          24 * scale,
-          26 * scale,
-          24 * scale,
-          widget.bottomPadding,
+        padding: EdgeInsets.only(
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: widget.bottomPadding,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _AccountTitleRow(
-              title: _view == _AccountView.settings
-                  ? 'Cài đặt'
-                  : _view == _AccountView.account
-                      ? 'Tài khoản'
-                      : _view == _AccountView.profile
-                          ? 'Hồ sơ'
-                          : _editingProfile == null
-                              ? 'Thêm Hồ Sơ'
-                              : 'Cập Nhật Hồ Sơ',
-              canGoBack: _view != _AccountView.settings,
-              scale: scale,
+            _SettingHeader(
+              title: headerTitle,
+              canGoBack: canGoBack,
               onBack: _view == _AccountView.addProfile
                   ? _returnToProfileList
                   : _returnToSettings,
+              backgroundColor: backgroundColor,
+              scale: scale,
             ),
-            SizedBox(height: 24 * scale),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              layoutBuilder: (currentChild, previousChildren) {
-                return Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    for (final child in previousChildren) child,
-                    if (currentChild != null) currentChild,
-                  ],
-                );
-              },
-              transitionBuilder: (child, animation) {
-                final isIncoming = child.key == ValueKey(_viewKey(_view));
-                final forward = _isForwardTransition;
-                final beginX = isIncoming
-                    ? (forward ? 0.10 : -0.10)
-                    : (forward ? -0.08 : 0.08);
-                final offset = Tween<Offset>(
-                  begin: Offset(beginX, 0),
-                  end: Offset.zero,
-                ).animate(animation);
+            SizedBox(height: _topGapForView(_view) * scale),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24 * scale),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          for (final child in previousChildren) child,
+                          if (currentChild != null) currentChild,
+                        ],
+                      );
+                    },
+                    transitionBuilder: (child, animation) {
+                      final isIncoming = child.key == ValueKey(_viewKey(_view));
+                      final forward = _isForwardTransition;
+                      final beginX = isIncoming
+                          ? (forward ? 0.10 : -0.10)
+                          : (forward ? -0.08 : 0.08);
+                      final offset = Tween<Offset>(
+                        begin: Offset(beginX, 0),
+                        end: Offset.zero,
+                      ).animate(animation);
 
-                return FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(position: offset, child: child),
-                );
-              },
-              child: switch (_view) {
-                _AccountView.settings => _SettingsMenuPanel(
-                    key: ValueKey(_viewKey(_AccountView.settings)),
-                    avatarUrl: _effectiveUser?.avatarUrl,
-                    avatarPath: _localAvatarPath,
-                    username: _fallbackUsername(_effectiveUser),
-                    scale: scale,
-                    onAccountTap: () => _openView(_AccountView.account),
-                    onProfileTap: () => _openView(_AccountView.profile),
-                    onLogoutTap: widget.onLogout,
-                  ),
-                _AccountView.account => _AccountDetailsPanel(
-                    key: ValueKey(_viewKey(_AccountView.account)),
-                    avatarUrl: _effectiveUser?.avatarUrl,
-                    avatarPath:
-                        _isEditing ? _draftAvatarPath : _localAvatarPath,
-                    usernameController: _usernameController,
-                    phoneController: _phoneController,
-                    emailController: _emailController,
-                    isEditing: _isEditing,
-                    isSaving: _isSavingAccount,
-                    isPickingAvatar: _isPickingAccountAvatar,
-                    onEdit: _startEditing,
-                    onSave: _saveEditing,
-                    onCancel: _cancelEditing,
-                    onAvatarTap: _pickAccountAvatar,
-                    scale: scale,
-                  ),
-                _AccountView.profile => _ProfilePlaceholderPanel(
-                    key: ValueKey(_viewKey(_AccountView.profile)),
-                    profiles: _profiles,
-                    isLoading: _isLoadingProfiles || _isDeletingProfile,
-                    errorMessage: _profileLoadError,
-                    onRetry: _loadProfiles,
-                    onAdd: _openAddProfile,
-                    onEdit: _openUpdateProfile,
-                    onDelete: _confirmDeleteProfile,
-                    scale: scale,
-                  ),
-                _AccountView.addProfile => _AddProfilePanel(
-                    key: ValueKey(_viewKey(_AccountView.addProfile)),
-                    nameController: _profileNameController,
-                    avatarPath: _createAvatarPath,
-                    avatarUrl: _editingProfile?.avatarUrl,
-                    grades: _gradeOptions,
-                    programs: _programOptions,
-                    semesters: _semesterOptions,
-                    selectedGrade: _selectedGrade,
-                    selectedProgram: _selectedProgram,
-                    selectedSemester: _selectedSemester,
-                    isLoadingOptions: _isLoadingProfileOptions,
-                    isPickingAvatar: _isPickingCreateAvatar,
-                    isSaving: _isSavingProfile,
-                    errorMessage: _profileOptionsError ?? _profileCreateError,
-                    canRetryOptions: _profileOptionsError != null,
-                    onPickAvatar: _pickCreateAvatar,
-                    onClearAvatar: _clearCreateAvatar,
-                    onGradeChanged: (grade) {
-                      setState(() => _selectedGrade = grade);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(position: offset, child: child),
+                      );
                     },
-                    onProgramChanged: (program) {
-                      setState(() => _selectedProgram = program);
+                    child: switch (_view) {
+                      _AccountView.settings => _SettingsMenuPanel(
+                          key: ValueKey(_viewKey(_AccountView.settings)),
+                          avatarUrl: _effectiveUser?.avatarUrl,
+                          avatarPath: _localAvatarPath,
+                          username: _fallbackUsername(_effectiveUser),
+                          scale: scale,
+                          onAccountTap: () => _openView(_AccountView.account),
+                          onProfileTap: () => _openView(_AccountView.profile),
+                          onLogoutTap: widget.onLogout,
+                        ),
+                      _AccountView.account => _AccountDetailsPanel(
+                          key: ValueKey(_viewKey(_AccountView.account)),
+                          avatarUrl: _effectiveUser?.avatarUrl,
+                          avatarPath:
+                              _isEditing ? _draftAvatarPath : _localAvatarPath,
+                          usernameController: _usernameController,
+                          phoneController: _phoneController,
+                          emailController: _emailController,
+                          isEditing: _isEditing,
+                          isSaving: _isSavingAccount,
+                          isPickingAvatar: _isPickingAccountAvatar,
+                          onEdit: _startEditing,
+                          onSave: _saveEditing,
+                          onCancel: _cancelEditing,
+                          onAvatarTap: _pickAccountAvatar,
+                          scale: scale,
+                        ),
+                      _AccountView.profile => _ProfilePlaceholderPanel(
+                          key: ValueKey(_viewKey(_AccountView.profile)),
+                          profiles: _profiles,
+                          isLoading: _isLoadingProfiles || _isDeletingProfile,
+                          errorMessage: _profileLoadError,
+                          onRetry: _loadProfiles,
+                          onAdd: _openAddProfile,
+                          onEdit: _openUpdateProfile,
+                          onDelete: _confirmDeleteProfile,
+                          scale: scale,
+                        ),
+                      _AccountView.addProfile => _AddProfilePanel(
+                          key: ValueKey(_viewKey(_AccountView.addProfile)),
+                          nameController: _profileNameController,
+                          avatarPath: _createAvatarPath,
+                          avatarUrl: _editingProfile?.avatarUrl,
+                          grades: _gradeOptions,
+                          programs: _programOptions,
+                          semesters: _semesterOptions,
+                          selectedGrade: _selectedGrade,
+                          selectedProgram: _selectedProgram,
+                          selectedSemester: _selectedSemester,
+                          isLoadingOptions: _isLoadingProfileOptions,
+                          isPickingAvatar: _isPickingCreateAvatar,
+                          isSaving: _isSavingProfile,
+                          errorMessage:
+                              _profileOptionsError ?? _profileCreateError,
+                          canRetryOptions: _profileOptionsError != null,
+                          onPickAvatar: _pickCreateAvatar,
+                          onClearAvatar: _clearCreateAvatar,
+                          onGradeChanged: (grade) {
+                            setState(() => _selectedGrade = grade);
+                          },
+                          onProgramChanged: (program) {
+                            setState(() => _selectedProgram = program);
+                          },
+                          onSemesterChanged: (semester) {
+                            setState(() => _selectedSemester = semester);
+                          },
+                          onRetryOptions: _loadProfileOptions,
+                          onCancel: _cancelAddProfile,
+                          onSave: _saveProfileForm,
+                          scale: scale,
+                        ),
                     },
-                    onSemesterChanged: (semester) {
-                      setState(() => _selectedSemester = semester);
-                    },
-                    onRetryOptions: _loadProfileOptions,
-                    onCancel: _cancelAddProfile,
-                    onSave: _saveProfileForm,
-                    scale: scale,
                   ),
-              },
+                ],
+              ),
             ),
           ],
         ),
@@ -906,6 +913,26 @@ class _SettingTabState extends State<SettingTab> {
     };
   }
 
+  static String _titleForView(
+      _AccountView view, StudentProfile? editingProfile) {
+    return switch (view) {
+      _AccountView.settings => 'Cài Đặt',
+      _AccountView.account => 'Tài Khoản',
+      _AccountView.profile => 'Hồ Sơ',
+      _AccountView.addProfile =>
+        editingProfile == null ? 'Thêm Hồ Sơ' : 'Cập Nhật Hồ Sơ',
+    };
+  }
+
+  static double _topGapForView(_AccountView view) {
+    return switch (view) {
+      _AccountView.settings => 44,
+      _AccountView.account => 6,
+      _AccountView.profile => 30,
+      _AccountView.addProfile => 30,
+    };
+  }
+
   static T? _firstWhereOrNull<T>(Iterable<T> items, bool Function(T) test) {
     for (final item in items) {
       if (test(item)) {
@@ -928,113 +955,163 @@ class _SettingTabState extends State<SettingTab> {
   }
 }
 
-class _AccountTitleRow extends StatelessWidget {
-  const _AccountTitleRow({
+class _SettingHeader extends StatelessWidget {
+  const _SettingHeader({
     required this.title,
     required this.canGoBack,
-    required this.scale,
     required this.onBack,
+    required this.backgroundColor,
+    required this.scale,
   });
 
   final String title;
   final bool canGoBack;
-  final double scale;
   final VoidCallback onBack;
+  final Color backgroundColor;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
-    if (!canGoBack) {
-      return Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              textAlign: TextAlign.left,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: _teal,
-                fontFamily: 'Nunito',
-                fontSize: 24 * scale,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: HapticFeedback.selectionClick,
-              borderRadius: BorderRadius.circular(999),
-              child: Padding(
-                padding: EdgeInsets.all(2 * scale),
-                child: Icon(
-                  Icons.notifications_none_rounded,
-                  color: _teal,
-                  size: 28 * scale,
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    return Row(
-      children: [
-        SizedBox(
-          width: 34 * scale,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onBack,
-              customBorder: const CircleBorder(),
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: _teal,
-                size: 22 * scale,
-              ),
-            ),
-          ),
+    return SizedBox(
+      height: 124 * scale,
+      child: CustomPaint(
+        painter: _SettingHeaderCurvePainter(
+          backgroundColor: backgroundColor,
+          scale: scale,
         ),
-        Expanded(
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: _teal,
-              fontFamily: 'Nunito',
-              fontSize: 24 * scale,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0,
-            ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            30 * scale,
+            28 * scale,
+            30 * scale,
+            24 * scale,
           ),
-        ),
-        SizedBox(
-          width: 34 * scale,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: HapticFeedback.selectionClick,
-                borderRadius: BorderRadius.circular(999),
-                child: Padding(
-                  padding: EdgeInsets.all(2 * scale),
-                  child: Icon(
-                    Icons.notifications_none_rounded,
-                    color: _teal,
-                    size: 28 * scale,
+          child: Row(
+            children: [
+              _SettingHeaderButton(
+                icon: Icons.arrow_back_ios_new_rounded,
+                outlined: false,
+                onTap: canGoBack ? onBack : HapticFeedback.selectionClick,
+                scale: scale,
+              ),
+              Expanded(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: const Color(0xFF063A7B),
+                    fontFamily: 'Nunito',
+                    fontSize: 26 * scale,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 0,
                   ),
                 ),
               ),
-            ),
+              _SettingHeaderButton(
+                icon: Icons.notifications_none_rounded,
+                outlined: true,
+                onTap: HapticFeedback.selectionClick,
+                scale: scale,
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
+  }
+}
+
+class _SettingHeaderButton extends StatelessWidget {
+  const _SettingHeaderButton({
+    required this.icon,
+    required this.outlined,
+    required this.onTap,
+    required this.scale,
+  });
+
+  final IconData icon;
+  final bool outlined;
+  final VoidCallback onTap;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = 60 * scale;
+    final radius = BorderRadius.circular(outlined ? 22 * scale : size / 2);
+
+    return Material(
+      color: Colors.white,
+      elevation: outlined ? 0 : 2,
+      shadowColor: Colors.black.withValues(alpha: 0.08),
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: radius,
+            border: outlined
+                ? Border.all(
+                    color: _deepInk.withValues(alpha: 0.72),
+                    width: 1.5 * scale,
+                  )
+                : null,
+            boxShadow: outlined
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8 * scale,
+                      offset: Offset(0, 2 * scale),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Icon(icon, color: _teal, size: 29 * scale),
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingHeaderCurvePainter extends CustomPainter {
+  const _SettingHeaderCurvePainter({
+    required this.backgroundColor,
+    required this.scale,
+  });
+
+  final Color backgroundColor;
+  final double scale;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final background = Paint()..color = backgroundColor;
+    canvas.drawRect(Offset.zero & size, background);
+
+    final line = Paint()
+      ..color = _orange.withValues(alpha: 0.72)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.1 * scale;
+    final path = Path()
+      ..moveTo(0, size.height - 17 * scale)
+      ..quadraticBezierTo(
+        size.width * 0.5,
+        size.height + 2 * scale,
+        size.width,
+        size.height - 17 * scale,
+      );
+    canvas.drawPath(path, line);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SettingHeaderCurvePainter oldDelegate) {
+    return oldDelegate.backgroundColor != backgroundColor ||
+        oldDelegate.scale != scale;
   }
 }
 
@@ -1316,17 +1393,30 @@ class _SettingsActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(24 * scale);
+
     return Material(
       color: Colors.white,
-      elevation: 6,
-      shadowColor: const Color(0xFF5E7775).withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(12 * scale),
+      elevation: 0,
+      borderRadius: radius,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12 * scale),
+        borderRadius: radius,
         child: Container(
-          height: 78 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 16 * scale),
+          height: 82 * scale,
+          padding: EdgeInsets.symmetric(horizontal: 17 * scale),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: radius,
+            border: Border.all(color: _cardBorder, width: 1.1 * scale),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.07),
+                blurRadius: 12 * scale,
+                offset: Offset(0, 4 * scale),
+              ),
+            ],
+          ),
           child: Row(
             children: [
               Container(
@@ -1421,22 +1511,22 @@ class _AccountDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fieldGap = (isEditing ? 16 : 22) * scale;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: AnimatedOpacity(
-            opacity: isEditing ? 0 : 1,
-            duration: const Duration(milliseconds: 160),
+        if (!isEditing) ...[
+          Align(
+            alignment: Alignment.centerRight,
             child: _AccountEditButton(
-              enabled: !isEditing,
+              enabled: true,
               scale: scale,
               onTap: onEdit,
             ),
           ),
-        ),
-        SizedBox(height: isEditing ? 4 * scale : 6 * scale),
+          SizedBox(height: 6 * scale),
+        ],
         _AccountAvatar(
           avatarUrl: avatarUrl,
           avatarPath: avatarPath,
@@ -1445,7 +1535,7 @@ class _AccountDetailsPanel extends StatelessWidget {
           scale: scale,
           onCameraTap: onAvatarTap,
         ),
-        SizedBox(height: 8 * scale),
+        SizedBox(height: (isEditing ? 2 : 8) * scale),
         _AccountTextField(
           label: 'Username',
           controller: usernameController,
@@ -1457,14 +1547,14 @@ class _AccountDetailsPanel extends StatelessWidget {
           ),
           scale: scale,
         ),
-        SizedBox(height: 22 * scale),
+        SizedBox(height: fieldGap),
         _AccountPhoneField(
           label: 'Số Điện Thoại',
           controller: phoneController,
           isEditing: isEditing,
           scale: scale,
         ),
-        SizedBox(height: 22 * scale),
+        SizedBox(height: fieldGap),
         _AccountTextField(
           label: 'Email',
           controller: emailController,
@@ -1473,7 +1563,7 @@ class _AccountDetailsPanel extends StatelessWidget {
           scale: scale,
         ),
         if (isEditing) ...[
-          SizedBox(height: 34 * scale),
+          SizedBox(height: 22 * scale),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -1866,7 +1956,7 @@ class _SaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: _teal,
+      color: _navy,
       elevation: 9,
       shadowColor: Colors.black.withValues(alpha: 0.30),
       borderRadius: BorderRadius.circular(999),
@@ -2913,7 +3003,7 @@ class _ProfileStatePanel extends StatelessWidget {
           ),
           SizedBox(height: 20 * scale),
           Material(
-            color: _teal,
+            color: _navy,
             borderRadius: BorderRadius.circular(999),
             child: InkWell(
               onTap: onTap,
