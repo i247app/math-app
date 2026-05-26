@@ -33,12 +33,15 @@ class _SettingHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _SettingHeaderButton(
-                icon: Icons.arrow_back_ios_new_rounded,
-                outlined: false,
-                onTap: canGoBack ? onBack : HapticFeedback.selectionClick,
-                scale: scale,
-              ),
+              if (canGoBack)
+                _SettingHeaderButton(
+                  icon: Icons.arrow_back_ios_new_rounded,
+                  outlined: false,
+                  onTap: onBack,
+                  scale: scale,
+                )
+              else
+                SizedBox(width: 60 * scale),
               Expanded(
                 child: Text(
                   title,

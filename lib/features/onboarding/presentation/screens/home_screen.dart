@@ -37,6 +37,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final GradeService _gradeService = GradeApi();
   int _activeTab = 0;
+  int _previousActiveTab = 0;
   String? _prefetchedGradeUserId;
   bool _isPrefetchingGrades = false;
   List<GradeModel> _prefetchedGrades = const <GradeModel>[];
@@ -102,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final studentName = _displayName(widget.user);
 
         double s(double value) => value * scale;
-        final navHeight = s(88);
+        final navHeight = s(76);
         final showHeader = _activeTab == 0;
 
         return Center(
@@ -130,8 +131,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                     transitionBuilder: (child, animation) {
+                      final isMovingRight = _activeTab > _previousActiveTab;
+                      final beginX = isMovingRight ? 0.035 : -0.035;
                       final offset = Tween<Offset>(
-                        begin: const Offset(0.035, 0),
+                        begin: Offset(beginX, 0),
                         end: Offset.zero,
                       ).animate(animation);
 
@@ -147,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       initialGrades: _prefetchedGrades,
                       gradeService: _gradeService,
                       onLogout: widget.onLogout,
-                      bottomPadding: navHeight + s(24),
+                      bottomPadding: navHeight + s(30),
                       headerHeight: showHeader ? s(98) : 0,
                       scale: scale,
                     ),
@@ -169,19 +172,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: _BottomNavigation(
-                    height: navHeight,
-                    scale: scale,
-                    activeIndex: _activeTab,
-                    onTabSelected: (index) {
-                      if (index == _activeTab) {
-                        HapticFeedback.selectionClick();
-                        return;
-                      }
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        bottom: s(18), left: s(18), right: s(18)),
+                    child: _BottomNavigation(
+                      height: navHeight,
+                      scale: scale,
+                      activeIndex: _activeTab,
+                      user: widget.user,
+                      onTabSelected: (index) {
+                        if (index == _activeTab) {
+                          HapticFeedback.selectionClick();
+                          return;
+                        }
 
-                      HapticFeedback.lightImpact();
-                      setState(() => _activeTab = index);
-                    },
+                        HapticFeedback.lightImpact();
+                        setState(() {
+                          _previousActiveTab = _activeTab;
+                          _activeTab = index;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -1001,58 +1012,75 @@ class _BottomNavigation extends StatelessWidget {
     required this.height,
     required this.scale,
     required this.activeIndex,
+    required this.user,
     required this.onTabSelected,
   });
 
   final double height;
   final double scale;
   final int activeIndex;
+  final LoginUser? user;
   final ValueChanged<int> onTabSelected;
 
   @override
   Widget build(BuildContext context) {
-    const items = [
-      _NavItemData(Icons.home_filled, 'HOME'),
-      _NavItemData(Icons.explore_outlined, 'ÔN TẬP'),
-      _NavItemData(Icons.map_outlined, 'LỊCH SỬ'),
-      _NavItemData(Icons.person_outline_rounded, 'CÀI ĐẶT'),
+    final items = [
+      const _NavItemData(Icons.home_filled, 'HOME', null),
+      const _NavItemData(Icons.explore_outlined, 'ÔN TẬP', null),
+      const _NavItemData(Icons.map_outlined, 'LỊCH SỬ', null),
+      _NavItemData(null, 'CÀI ĐẶT', user),
     ];
 
-    return ClipRRect(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(48 * scale)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          height: height,
-          padding: EdgeInsets.fromLTRB(
-            20 * scale,
-            12 * scale,
-            20 * scale,
-            16 * scale,
+    final radius = BorderRadius.circular(42 * scale);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.14),
+            blurRadius: 28 * scale,
+            offset: Offset(0, 10 * scale),
           ),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.92),
-            borderRadius:
-                BorderRadius.vertical(top: Radius.circular(48 * scale)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 32 * scale,
-                offset: Offset(0, -8 * scale),
+          BoxShadow(
+            color: _blue.withValues(alpha: 0.08),
+            blurRadius: 18 * scale,
+            offset: Offset(0, -2 * scale),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            height: height,
+            padding: EdgeInsets.fromLTRB(
+              16 * scale,
+              8 * scale,
+              16 * scale,
+              10 * scale,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.95),
+              borderRadius: radius,
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.88),
+                width: 1 * scale,
               ),
-            ],
-          ),
-          child: Row(
-            children: List.generate(items.length, (index) {
-              return Expanded(
-                child: _AnimatedNavItem(
-                  data: items[index],
-                  active: activeIndex == index,
-                  scale: scale,
-                  onTap: () => onTabSelected(index),
-                ),
-              );
-            }),
+            ),
+            child: Row(
+              children: List.generate(items.length, (index) {
+                return Expanded(
+                  child: _AnimatedNavItem(
+                    data: items[index],
+                    active: activeIndex == index,
+                    scale: scale,
+                    onTap: () => onTabSelected(index),
+                  ),
+                );
+              }),
+            ),
           ),
         ),
       ),
@@ -1083,7 +1111,7 @@ class _AnimatedNavItem extends StatelessWidget {
       tween: Tween<double>(end: active ? 1 : 0),
       builder: (context, value, child) {
         final color = Color.lerp(inactiveColor, Colors.white, value)!;
-        final lift = -5 * scale * value;
+        final lift = -3 * scale * value;
 
         return Semantics(
           selected: active,
@@ -1098,11 +1126,11 @@ class _AnimatedNavItem extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOutCubic,
-                  height: 60 * scale,
+                  height: 52 * scale,
                   margin: EdgeInsets.symmetric(horizontal: 2 * scale),
                   padding: EdgeInsets.symmetric(
                     horizontal: active ? 14 * scale : 8 * scale,
-                    vertical: active ? 8 * scale : 7 * scale,
+                    vertical: active ? 7 * scale : 6 * scale,
                   ),
                   decoration: BoxDecoration(
                     color: Color.lerp(Colors.transparent, _blue, value),
@@ -1127,11 +1155,17 @@ class _AnimatedNavItem extends StatelessWidget {
                     children: [
                       Transform.scale(
                         scale: 1 + (0.12 * value),
-                        child: Icon(
-                          data.icon,
-                          color: color,
-                          size: (active ? 20 : 19) * scale,
-                        ),
+                        child: data.user != null
+                            ? _UserAvatarWidget(
+                                user: data.user!,
+                                size: (active ? 20 : 19) * scale,
+                                color: color,
+                              )
+                            : Icon(
+                                data.icon,
+                                color: color,
+                                size: (active ? 20 : 19) * scale,
+                              ),
                       ),
                       SizedBox(height: 5 * scale),
                       FittedBox(
@@ -1161,11 +1195,72 @@ class _AnimatedNavItem extends StatelessWidget {
   }
 }
 
-class _NavItemData {
-  const _NavItemData(this.icon, this.label);
+class _UserAvatarWidget extends StatelessWidget {
+  const _UserAvatarWidget({
+    required this.user,
+    required this.size,
+    required this.color,
+  });
 
-  final IconData icon;
+  final LoginUser user;
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final avatarUrl = user.avatarUrl?.trim();
+    final name = (user.name ?? user.phone ?? 'U').trim();
+    final initials = name.isNotEmpty
+        ? name.split(' ').take(2).map((s) => s[0]).join().toUpperCase()
+        : 'U';
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: _blue.withValues(alpha: 0.15),
+        border: Border.all(color: color, width: 1.5),
+      ),
+      child: avatarUrl != null && avatarUrl.isNotEmpty
+          ? ClipOval(
+              child: Image.network(
+                avatarUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) {
+                  return Center(
+                    child: Text(
+                      initials,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: size * 0.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          : Center(
+              child: Text(
+                initials,
+                style: TextStyle(
+                  color: color,
+                  fontSize: size * 0.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+    );
+  }
+}
+
+class _NavItemData {
+  const _NavItemData(this.icon, this.label, this.user);
+
+  final IconData? icon;
   final String label;
+  final LoginUser? user;
 }
 
 class _SoonTab extends StatelessWidget {
