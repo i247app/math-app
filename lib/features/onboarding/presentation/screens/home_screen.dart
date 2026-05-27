@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/grade_api.dart';
 import '../tabs/history_tab.dart';
+import '../tabs/review_tab.dart';
 import '../tabs/setting_tab.dart';
 import 'grade_selection_screen.dart';
 
@@ -275,6 +276,13 @@ class _TabContent extends StatelessWidget {
       );
     }
 
+    if (activeTab == 1) {
+      return ReviewTab(
+        bottomPadding: bottomPadding,
+        scale: scale,
+      );
+    }
+
     if (activeTab == 2) {
       return HistoryTab(
         user: user,
@@ -283,20 +291,7 @@ class _TabContent extends StatelessWidget {
       );
     }
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: horizontalPadding,
-      child: _SoonTab(
-        icon:
-            activeTab == 1 ? Icons.auto_stories_rounded : Icons.history_rounded,
-        title: activeTab == 1 ? 'Ôn tập' : 'Lịch sử',
-        subtitle: activeTab == 1
-            ? 'Các bài luyện tập sẽ xuất hiện tại đây.'
-            : 'Lịch sử học tập sẽ được cập nhật sau mỗi buổi học.',
-        minHeight: 487 * scale,
-        scale: scale,
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }
 
@@ -1261,75 +1256,6 @@ class _NavItemData {
   final IconData? icon;
   final String label;
   final LoginUser? user;
-}
-
-class _SoonTab extends StatelessWidget {
-  const _SoonTab({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.minHeight,
-    required this.scale,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final double minHeight;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: BoxConstraints(minHeight: minHeight),
-      padding: EdgeInsets.all(28 * scale),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(40 * scale),
-        border:
-            Border.all(color: const Color(0xFFA2B1A3).withValues(alpha: 0.12)),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 76 * scale,
-            height: 76 * scale,
-            decoration: BoxDecoration(
-              color: _teal.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(28 * scale),
-            ),
-            child: Icon(icon, color: _teal, size: 36 * scale),
-          ),
-          SizedBox(height: 20 * scale),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _deepInk,
-              fontFamily: 'Nunito',
-              fontSize: 22 * scale,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0,
-            ),
-          ),
-          SizedBox(height: 8 * scale),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _muted,
-              fontFamily: 'Nunito',
-              fontSize: 14 * scale,
-              fontWeight: FontWeight.w700,
-              height: 1.35,
-              letterSpacing: 0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _HeroMathGlyph extends StatelessWidget {
