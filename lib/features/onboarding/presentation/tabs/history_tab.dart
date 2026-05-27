@@ -13,6 +13,7 @@ const _navy = Color(0xFF063A7B);
 const _orange = Color(0xFFDE8C4B);
 const _historyBackground = Color(0xFFEEF9FB);
 const _cardBorder = Color(0xFFE3DDDF);
+const _activeTab = Color(0xFFB72A7F);
 const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
 class HistoryTab extends StatefulWidget {
@@ -40,6 +41,7 @@ class _HistoryTabState extends State<HistoryTab> {
   bool _isLoading = true;
   String? _errorMessage;
   int _loadRequestId = 0;
+  _HistoryQuizFilter _selectedFilter = _HistoryQuizFilter.assessment;
 
   @override
   void initState() {
@@ -115,11 +117,15 @@ class _HistoryTabState extends State<HistoryTab> {
 
   List<GeneratedQuiz> get _filteredQuizzes {
     final query = _searchController.text.trim().toLowerCase();
-    if (query.isEmpty) {
-      return _quizzes;
-    }
-
     return _quizzes.where((quiz) {
+      if (_quizType(quiz) != _selectedFilter.apiType) {
+        return false;
+      }
+
+      if (query.isEmpty) {
+        return true;
+      }
+
       final searchable = <String>[
         _quizTitle(quiz),
         quiz.type ?? '',
@@ -129,6 +135,14 @@ class _HistoryTabState extends State<HistoryTab> {
       ].join(' ').toLowerCase();
       return searchable.contains(query);
     }).toList();
+  }
+
+  void _selectFilter(_HistoryQuizFilter filter) {
+    if (_selectedFilter == filter) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() => _selectedFilter = filter);
   }
 
   @override
@@ -146,7 +160,7 @@ class _HistoryTabState extends State<HistoryTab> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _HistoryHeader(scale: scale),
-            SizedBox(height: 46 * scale),
+            SizedBox(height: 16 * scale),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 26 * scale),
               child: _HistorySearchField(
@@ -154,7 +168,16 @@ class _HistoryTabState extends State<HistoryTab> {
                 scale: scale,
               ),
             ),
-            SizedBox(height: 40 * scale),
+            SizedBox(height: 12 * scale),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 26 * scale),
+              child: _HistoryTypeTabs(
+                selectedFilter: _selectedFilter,
+                onSelected: _selectFilter,
+                scale: scale,
+              ),
+            ),
+            SizedBox(height: 12 * scale),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 26 * scale),
               child: _HistoryBody(
@@ -180,19 +203,19 @@ class _HistoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 124 * scale,
+      height: 70 * scale,
       child: CustomPaint(
         painter: _HistoryHeaderCurvePainter(scale: scale),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            30 * scale,
-            28 * scale,
-            30 * scale,
-            24 * scale,
+            20 * scale,
+            8 * scale,
+            20 * scale,
+            12 * scale,
           ),
           child: Row(
             children: [
-              SizedBox(width: 60 * scale),
+              SizedBox(width: 44 * scale),
               Expanded(
                 child: Text(
                   'Lịch Sử',
@@ -202,14 +225,14 @@ class _HistoryHeader extends StatelessWidget {
                   style: TextStyle(
                     color: _navy,
                     fontFamily: 'Nunito',
-                    fontSize: 26 * scale,
+                    fontSize: 18 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
                   ),
                 ),
               ),
-              SizedBox(width: 60 * scale),
+              SizedBox(width: 44 * scale),
             ],
           ),
         ),
@@ -233,12 +256,12 @@ class _HistoryHeaderCurvePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.1 * scale;
     final path = Path()
-      ..moveTo(0, size.height - 17 * scale)
+      ..moveTo(0, size.height - 6 * scale)
       ..quadraticBezierTo(
         size.width * 0.5,
-        size.height + 2 * scale,
+        size.height + 6 * scale,
         size.width,
-        size.height - 17 * scale,
+        size.height - 6 * scale,
       );
     canvas.drawPath(path, line);
   }
@@ -261,7 +284,7 @@ class _HistorySearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 58 * scale,
+      height: 46 * scale,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30 * scale),
@@ -290,16 +313,16 @@ class _HistorySearchField extends StatelessWidget {
           hintStyle: TextStyle(
             color: const Color(0xFFD8C5CC),
             fontFamily: 'Nunito',
-            fontSize: 20 * scale,
+            fontSize: 16 * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
           ),
           prefixIcon: Padding(
-            padding: EdgeInsets.only(left: 18 * scale, right: 8 * scale),
+            padding: EdgeInsets.only(left: 14 * scale, right: 6 * scale),
             child: Icon(
               Icons.search_rounded,
               color: _navy,
-              size: 30 * scale,
+              size: 22 * scale,
             ),
           ),
           suffixIcon: IconButton(
@@ -307,13 +330,107 @@ class _HistorySearchField extends StatelessWidget {
             icon: Icon(
               Icons.tune_rounded,
               color: _navy,
-              size: 30 * scale,
+              size: 22 * scale,
             ),
           ),
           border: InputBorder.none,
           isCollapsed: true,
           contentPadding: EdgeInsets.symmetric(
-              vertical: 13 * scale, horizontal: 12 * scale),
+              vertical: 11 * scale, horizontal: 10 * scale),
+        ),
+      ),
+    );
+  }
+}
+
+enum _HistoryQuizFilter {
+  assessment('ASSESSMENT', 'Kiểm tra'),
+  practice('PRACTICE', 'Luyện tập');
+
+  const _HistoryQuizFilter(this.apiType, this.label);
+
+  final String apiType;
+  final String label;
+}
+
+class _HistoryTypeTabs extends StatelessWidget {
+  const _HistoryTypeTabs({
+    required this.selectedFilter,
+    required this.onSelected,
+    required this.scale,
+  });
+
+  final _HistoryQuizFilter selectedFilter;
+  final ValueChanged<_HistoryQuizFilter> onSelected;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 36 * scale,
+      padding: EdgeInsets.all(3 * scale),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE0E8EA),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        children: [
+          for (final filter in _HistoryQuizFilter.values)
+            Expanded(
+              child: _HistoryTypeTabButton(
+                filter: filter,
+                selected: selectedFilter == filter,
+                onTap: () => onSelected(filter),
+                scale: scale,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HistoryTypeTabButton extends StatelessWidget {
+  const _HistoryTypeTabButton({
+    required this.filter,
+    required this.selected,
+    required this.onTap,
+    required this.scale,
+  });
+
+  final _HistoryQuizFilter filter;
+  final bool selected;
+  final VoidCallback onTap;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? _activeTab : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            filter.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: selected ? Colors.white : _muted,
+              fontFamily: 'Nunito',
+              fontSize: 13 * scale,
+              fontWeight: FontWeight.w800,
+              height: 1,
+              letterSpacing: 0,
+            ),
+          ),
         ),
       ),
     );
@@ -369,7 +486,7 @@ class _HistoryBody extends StatelessWidget {
             scale: scale,
             onTap: () => _openQuizReview(context, quiz),
           ),
-          SizedBox(height: 22 * scale),
+          SizedBox(height: 14 * scale),
         ],
       ],
     );
@@ -423,12 +540,12 @@ class _HistoryQuizCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: Container(
-          constraints: BoxConstraints(minHeight: 132 * scale),
+          constraints: BoxConstraints(minHeight: 92 * scale),
           padding: EdgeInsets.fromLTRB(
-            20 * scale,
-            22 * scale,
             16 * scale,
-            20 * scale,
+            14 * scale,
+            10 * scale,
+            14 * scale,
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -453,35 +570,34 @@ class _HistoryQuizCard extends StatelessWidget {
                 )
               else
                 _HistoryIncompleteBadge(scale: scale),
-              SizedBox(width: 14 * scale),
+              SizedBox(width: 12 * scale),
               Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _HistoryMetaRow(parts: dateParts, scale: scale),
+                    SizedBox(height: 7 * scale),
                     Text(
                       _quizTitle(quiz),
-                      maxLines: 3,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: _deepInk,
                         fontFamily: 'Nunito',
-                        fontSize: 16 * scale,
-                        fontWeight: FontWeight.w800,
-                        height: 1.32,
+                        fontSize: 14 * scale,
+                        fontWeight: FontWeight.w900,
+                        height: 1.28,
                         letterSpacing: 0,
                       ),
                     ),
-                    SizedBox(height: 12 * scale),
-                    _HistoryMetaRow(parts: dateParts, scale: scale),
                   ],
                 ),
               ),
-              SizedBox(width: 4 * scale),
               Icon(
                 Icons.chevron_right_rounded,
-                color: _muted.withValues(alpha: 0.78),
-                size: 32 * scale,
+                color: _navy,
+                size: 26 * scale,
               ),
             ],
           ),
@@ -504,7 +620,7 @@ class _HistoryMetaRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       spacing: 14 * scale,
-      runSpacing: 8 * scale,
+      runSpacing: 5 * scale,
       children: [
         _HistoryMetaItem(
           icon: Icons.calendar_month_outlined,
@@ -538,7 +654,7 @@ class _HistoryMetaItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: _muted, size: 18 * scale),
-        SizedBox(width: 6 * scale),
+        SizedBox(width: 5 * scale),
         Text(
           label,
           maxLines: 1,
@@ -546,8 +662,8 @@ class _HistoryMetaItem extends StatelessWidget {
           style: TextStyle(
             color: _muted,
             fontFamily: 'Nunito',
-            fontSize: 11 * scale,
-            fontWeight: FontWeight.w700,
+            fontSize: 10 * scale,
+            fontWeight: FontWeight.w800,
             letterSpacing: 0,
           ),
         ),
@@ -571,19 +687,19 @@ class _HistoryScoreBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final scoreOutOf10 = (percentage / 10).round();
     return SizedBox(
-      width: 74 * scale,
+      width: 56 * scale,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 58 * scale,
-            height: 58 * scale,
+            width: 48 * scale,
+            height: 48 * scale,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white,
               border: Border.all(
                 color: colors.foreground,
-                width: 6 * scale,
+                width: 5 * scale,
               ),
             ),
             child: Center(
@@ -595,7 +711,7 @@ class _HistoryScoreBadge extends StatelessWidget {
                   style: TextStyle(
                     color: colors.foreground,
                     fontFamily: 'Nunito',
-                    fontSize: 15 * scale,
+                    fontSize: 13 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -604,18 +720,18 @@ class _HistoryScoreBadge extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 10 * scale),
+          SizedBox(height: 7 * scale),
           Text(
             colors.label,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: colors.foreground,
               fontFamily: 'Nunito',
-              fontSize: 12 * scale,
+              fontSize: 10 * scale,
               fontWeight: FontWeight.w900,
-              height: 1,
+              height: 1.05,
               letterSpacing: 0,
             ),
           ),
@@ -633,7 +749,7 @@ class _HistoryIncompleteBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 74 * scale,
+      width: 56 * scale,
       child: Text(
         'Chưa xong',
         maxLines: 2,
@@ -642,7 +758,7 @@ class _HistoryIncompleteBadge extends StatelessWidget {
         style: TextStyle(
           color: _orange,
           fontFamily: 'Nunito',
-          fontSize: 12 * scale,
+          fontSize: 10 * scale,
           fontWeight: FontWeight.w900,
           height: 1.1,
           letterSpacing: 0,
@@ -812,21 +928,23 @@ _ScoreBadgeColors _scoreColors(int? percent) {
   }
   if (scoreOutOf10 >= 7) {
     return const _ScoreBadgeColors(
-      foreground: Color(0xFFFFC107), // Yellow
-      label: 'Tốt',
+      foreground: Color(0xFF0B73D9),
+      label: 'Giỏi',
     );
   }
   if (scoreOutOf10 >= 5) {
     return const _ScoreBadgeColors(
-      foreground: Color(0xFFD2691E), // Brown-red
-      label: 'Khá tốt',
+      foreground: Color(0xFFF4B62D),
+      label: 'Cố gắng',
     );
   }
   return const _ScoreBadgeColors(
-    foreground: Color(0xFFD32F2F), // Red
-    label: 'Cần luyện',
+    foreground: Color(0xFFD71920),
+    label: 'Luyện Tập',
   );
 }
+
+String _quizType(GeneratedQuiz quiz) => (quiz.type ?? '').trim().toUpperCase();
 
 _HistoryDateParts _historyDateParts(String? isoDate) {
   if (isoDate == null || isoDate.trim().isEmpty) {
