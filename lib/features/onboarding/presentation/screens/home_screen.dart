@@ -8,6 +8,7 @@ import '../../../../core/network/grade_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/grade_api.dart';
+import '../../data/quiz_api.dart';
 import '../tabs/history_tab.dart';
 import '../tabs/review_tab.dart';
 import '../tabs/setting_tab.dart';
@@ -588,22 +589,56 @@ class _TestHeroCard extends StatelessWidget {
           ),
           Positioned(
             bottom: 28 * scale,
-            child: _HeroButton(
-              scale: scale,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => GradeSelectionScreen(
-                      user: user,
-                      initialGrades: initialGrades,
-                      gradeService: gradeService,
-                    ),
+            left: 24 * scale,
+            right: 24 * scale,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: _HeroButton(
+                    scale: scale,
+                    label: 'Bắt đầu ngay',
+                    icon: Icons.rocket_launch_outlined,
+                    onTap: () {
+                      _openGradeSelection(context, quizPurposeAssessment);
+                    },
                   ),
-                );
-              },
+                ),
+                SizedBox(width: 12 * scale),
+                Expanded(
+                  child: _HeroButton(
+                    scale: scale,
+                    label: 'Luyện tập',
+                    icon: Icons.school_outlined,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF34D36F), Color(0xFF0C8F4A)],
+                    ),
+                    depthColor: const Color(0xFF075E31),
+                    shadowColor: const Color(0xFF0C8F4A),
+                    onTap: () {
+                      _openGradeSelection(context, quizPurposePractice);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _openGradeSelection(BuildContext context, String quizPurpose) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => GradeSelectionScreen(
+          user: user,
+          initialGrades: initialGrades,
+          gradeService: gradeService,
+          quizPurpose: quizPurpose,
+        ),
       ),
     );
   }
@@ -729,10 +764,27 @@ class _EquationChip extends StatelessWidget {
 }
 
 class _HeroButton extends StatefulWidget {
-  const _HeroButton({required this.scale, required this.onTap});
+  const _HeroButton({
+    required this.scale,
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.gradient = const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0xFFFF9F7D), Color(0xFFA03A0F)],
+    ),
+    this.depthColor = const Color(0xFF621C00),
+    this.shadowColor = const Color(0xFFA03A0F),
+  });
 
   final double scale;
+  final String label;
+  final IconData icon;
   final VoidCallback onTap;
+  final Gradient gradient;
+  final Color depthColor;
+  final Color shadowColor;
 
   @override
   State<_HeroButton> createState() => _HeroButtonState();
@@ -767,11 +819,11 @@ class _HeroButtonState extends State<_HeroButton> {
                 opacity: pressed ? 0.25 : 1,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF621C00),
+                    color: widget.depthColor,
                     borderRadius: BorderRadius.circular(999),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFA03A0F).withValues(alpha: 0.24),
+                        color: widget.shadowColor.withValues(alpha: 0.24),
                         blurRadius: 12 * widget.scale,
                         offset: Offset(0, 8 * widget.scale),
                       ),
@@ -791,11 +843,7 @@ class _HeroButtonState extends State<_HeroButton> {
               ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(999),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFFF9F7D), Color(0xFFA03A0F)],
-                ),
+                gradient: widget.gradient,
                 boxShadow: [
                   BoxShadow(
                     color:
@@ -806,22 +854,28 @@ class _HeroButtonState extends State<_HeroButton> {
                 ],
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Bắt đầu ngay',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Nunito',
-                      fontSize: 17 * widget.scale,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      letterSpacing: 0,
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        widget.label,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Nunito',
+                          fontSize: 15 * widget.scale,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: 0,
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(width: 10 * widget.scale),
                   Icon(
-                    Icons.rocket_launch_outlined,
+                    widget.icon,
                     color: Colors.white,
                     size: 21 * widget.scale,
                   ),

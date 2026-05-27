@@ -8,6 +8,7 @@ import '../../../../core/network/grade_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/grade_api.dart';
+import '../../data/quiz_api.dart';
 import 'assessment_screen.dart';
 
 const _gradeMint = Color(0xFFEBFAEC);
@@ -22,11 +23,13 @@ class GradeSelectionScreen extends StatefulWidget {
     this.user,
     this.initialGrades = const <GradeModel>[],
     this.gradeService,
+    this.quizPurpose = quizPurposeAssessment,
   });
 
   final LoginUser? user;
   final List<GradeModel> initialGrades;
   final GradeService? gradeService;
+  final String quizPurpose;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
@@ -114,7 +117,11 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
 
     final result = await Navigator.of(context).push<AiAssessmentResult>(
       MaterialPageRoute<AiAssessmentResult>(
-        builder: (_) => AiAssessmentScreen(gradeLabel: gradeLabel),
+        builder: (_) => AiAssessmentScreen(
+          purpose: widget.quizPurpose,
+          typeOfQuiz: quizTypeGeneral,
+          gradeLabel: gradeLabel,
+        ),
       ),
     );
 

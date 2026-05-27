@@ -2,7 +2,11 @@ import '../../../core/config/api_config.dart';
 import '../../../core/network/network_client.dart';
 import '../../../core/network/quiz_models.dart';
 
-const assessmentQuizType = 'ASSESSMENT';
+const quizPurposeAssessment = 'ASSESSMENT';
+const quizPurposePractice = 'PRACTICE';
+const quizTypeGeneral = 'GENERAL';
+const quizTypeReinforcement = 'REINFORCEMENT';
+const assessmentQuizType = quizPurposeAssessment;
 const assessmentQuizGradeLabel = 'Grade 1';
 
 class QuizException implements Exception {
@@ -17,6 +21,8 @@ class QuizException implements Exception {
 
 abstract class QuizService {
   Future<GeneratedQuiz> generateAssessmentQuiz({
+    String purpose = quizPurposeAssessment,
+    String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
     String? previousQuizId,
   });
@@ -39,12 +45,16 @@ class FakeQuizApi implements QuizService {
 
   @override
   Future<GeneratedQuiz> generateAssessmentQuiz({
+    String purpose = quizPurposeAssessment,
+    String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
     String? previousQuizId,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 900));
     final response = GenerateQuizResponse.fromJson(
       _fakeGenerateQuizResponse(
+        purpose: purpose,
+        typeOfQuiz: typeOfQuiz,
         gradeLabel: gradeLabel,
         previousQuizId: previousQuizId,
       ),
@@ -123,6 +133,8 @@ class QuizApi implements QuizService {
 
   @override
   Future<GeneratedQuiz> generateAssessmentQuiz({
+    String purpose = quizPurposeAssessment,
+    String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
     String? previousQuizId,
   }) async {
@@ -131,7 +143,8 @@ class QuizApi implements QuizService {
     try {
       response = await _networkApi.generateQuiz(
         GenerateQuizRequest(
-          type: assessmentQuizType,
+          purpose: purpose,
+          typeOfQuiz: typeOfQuiz,
           gradeLabel: previousQuizId == null
               ? cleanGradeLabel?.isNotEmpty == true
                   ? cleanGradeLabel
@@ -228,12 +241,16 @@ class QuizApi implements QuizService {
 }
 
 Map<String, Object?> _fakeGenerateQuizResponse({
+  String purpose = quizPurposeAssessment,
+  String typeOfQuiz = quizTypeGeneral,
   String? gradeLabel,
   String? previousQuizId,
 }) {
   return <String, Object?>{
     'mstatus': 200,
     'quiz': _fakeGeneratedQuiz(
+      purpose: purpose,
+      typeOfQuiz: typeOfQuiz,
       gradeLabel: gradeLabel,
       previousQuizId: previousQuizId,
     ),
@@ -242,6 +259,8 @@ Map<String, Object?> _fakeGenerateQuizResponse({
 }
 
 Map<String, Object?> _fakeGeneratedQuiz({
+  String purpose = quizPurposeAssessment,
+  String typeOfQuiz = quizTypeGeneral,
   String? gradeLabel,
   String? previousQuizId,
 }) {
@@ -310,7 +329,9 @@ Map<String, Object?> _fakeGeneratedQuiz({
         ? '310f18bc-5933-4517-848f-fe4c096d6492'
         : 'fake-assessment-retake-1',
     'quiz_status': 'GENERATED',
-    'type': assessmentQuizType,
+    'purpose': purpose,
+    'type': purpose,
+    'type_of_quiz': typeOfQuiz,
     'grading': gradeLabel == null
         ? null
         : <String, Object?>{'ai_detect_grade': gradeLabel},
@@ -356,7 +377,9 @@ Map<String, Object?> _fakeQuizListResponse() {
     ..['modify_dt'] = '2026-05-23T11:28:32Z'
     ..['quiz_id'] = 'c02fe348-0540-498c-aaba-e3f9b06484f5'
     ..['quiz_status'] = 'SUBMITTED'
-    ..['type'] = assessmentQuizType
+    ..['purpose'] = quizPurposeAssessment
+    ..['type'] = quizPurposeAssessment
+    ..['type_of_quiz'] = quizTypeGeneral
     ..['user_id'] = 'fake-user'
     ..['grading'] = <String, Object?>{
       'ai_detect_grade': assessmentQuizGradeLabel,
@@ -373,7 +396,9 @@ Map<String, Object?> _fakeQuizListResponse() {
     ..['previous_quiz_id'] = 'c02fe348-0540-498c-aaba-e3f9b06484f5'
     ..['quiz_id'] = '30ae9c4f-254e-44d1-9ed2-28dfe826f5ee'
     ..['quiz_status'] = 'GENERATED'
-    ..['type'] = assessmentQuizType
+    ..['purpose'] = quizPurposeAssessment
+    ..['type'] = quizPurposeAssessment
+    ..['type_of_quiz'] = quizTypeReinforcement
     ..['user_id'] = 'fake-user';
 
   final practiceQuiz = _fakeGeneratedQuiz()
@@ -381,7 +406,9 @@ Map<String, Object?> _fakeQuizListResponse() {
     ..['modify_dt'] = '2026-05-23T05:46:32Z'
     ..['quiz_id'] = '5450848b-fcd2-493d-9e55-ad7180538e2c'
     ..['quiz_status'] = 'SUBMITTED'
-    ..['type'] = 'PRACTICE'
+    ..['purpose'] = quizPurposePractice
+    ..['type'] = quizPurposePractice
+    ..['type_of_quiz'] = quizTypeGeneral
     ..['user_id'] = 'fake-user'
     ..['grading'] = <String, Object?>{
       'ai_review':

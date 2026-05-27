@@ -118,7 +118,7 @@ class _HistoryTabState extends State<HistoryTab> {
   List<GeneratedQuiz> get _filteredQuizzes {
     final query = _searchController.text.trim().toLowerCase();
     return _quizzes.where((quiz) {
-      if (_quizType(quiz) != _selectedFilter.apiType) {
+      if (_quizPurpose(quiz) != _selectedFilter.apiType) {
         return false;
       }
 
@@ -128,6 +128,8 @@ class _HistoryTabState extends State<HistoryTab> {
 
       final searchable = <String>[
         _quizTitle(quiz),
+        quiz.purpose ?? '',
+        quiz.typeOfQuiz ?? '',
         quiz.type ?? '',
         quiz.quizStatus ?? '',
         quiz.grading?.aiDetectGrade ?? '',
@@ -899,7 +901,7 @@ String _quizTitle(GeneratedQuiz quiz) {
 
   final grade = quiz.grading?.aiDetectGrade?.trim();
   final suffix = grade != null && grade.isNotEmpty ? ' $grade' : '';
-  final type = quiz.type?.toUpperCase();
+  final type = _quizPurpose(quiz);
 
   if (type == 'ASSESSMENT') {
     return 'Bài kiểm tra Toán$suffix';
@@ -944,7 +946,13 @@ _ScoreBadgeColors _scoreColors(int? percent) {
   );
 }
 
-String _quizType(GeneratedQuiz quiz) => (quiz.type ?? '').trim().toUpperCase();
+String _quizPurpose(GeneratedQuiz quiz) {
+  final purpose = quiz.purpose?.trim();
+  if (purpose != null && purpose.isNotEmpty) {
+    return purpose.toUpperCase();
+  }
+  return (quiz.type ?? '').trim().toUpperCase();
+}
 
 _HistoryDateParts _historyDateParts(String? isoDate) {
   if (isoDate == null || isoDate.trim().isEmpty) {

@@ -5,12 +5,15 @@ part 'quiz_models.g.dart';
 @JsonSerializable(includeIfNull: false)
 class GenerateQuizRequest {
   const GenerateQuizRequest({
-    required this.type,
+    required this.purpose,
+    required this.typeOfQuiz,
     this.gradeLabel,
     this.previousQuizId,
   });
 
-  final String type;
+  final String purpose;
+  @JsonKey(name: 'type_of_quiz')
+  final String typeOfQuiz;
   @JsonKey(name: 'grade_label')
   final String? gradeLabel;
   @JsonKey(name: 'previous_quiz_id')
@@ -196,6 +199,8 @@ class GeneratedQuiz {
     this.quizId,
     this.previousQuizId,
     this.quizStatus,
+    this.purpose,
+    this.typeOfQuiz,
     this.type,
     this.title,
     this.userId,
@@ -211,6 +216,9 @@ class GeneratedQuiz {
   final String? quizId;
   final String? previousQuizId;
   final String? quizStatus;
+  final String? purpose;
+  @JsonKey(name: 'type_of_quiz')
+  final String? typeOfQuiz;
   final String? type;
   final String? title;
   final String? userId;

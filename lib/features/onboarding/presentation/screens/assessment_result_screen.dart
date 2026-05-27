@@ -46,6 +46,14 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
   }
 
   Future<void> generateTestAgain() async {
+    await generateAgain(
+      purpose: quizPurposeAssessment,
+      typeOfQuiz: quizTypeGeneral,
+      gradeLabel: assessmentQuizGradeLabel,
+    );
+  }
+
+  Future<void> generatePracticeAgain() async {
     final previousQuizId = widget.quiz?.quizId;
     if (previousQuizId == null || previousQuizId.isEmpty) {
       HapticFeedback.selectionClick();
@@ -53,11 +61,27 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
       return;
     }
 
+    await generateAgain(
+      purpose: quizPurposeAssessment,
+      typeOfQuiz: quizTypeReinforcement,
+      previousQuizId: previousQuizId,
+    );
+  }
+
+  Future<void> generateAgain({
+    required String purpose,
+    required String typeOfQuiz,
+    String? gradeLabel,
+    String? previousQuizId,
+  }) async {
     HapticFeedback.mediumImpact();
     setState(() => isGeneratingAgain = true);
 
     try {
       final generatedQuiz = await _quizService.generateAssessmentQuiz(
+        purpose: purpose,
+        typeOfQuiz: typeOfQuiz,
+        gradeLabel: gradeLabel,
         previousQuizId: previousQuizId,
       );
       if (!mounted) {
@@ -201,7 +225,8 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               bottom: s(288),
                               child: _ResultBottomBar(
                                 scale: scale,
-                                onPractice: generateTestAgain,
+                                onTest: generateTestAgain,
+                                onPractice: generatePracticeAgain,
                               ),
                             ),
                           ],
@@ -541,10 +566,12 @@ class _AiReviewCard extends StatelessWidget {
 class _ResultBottomBar extends StatelessWidget {
   const _ResultBottomBar({
     required this.scale,
+    required this.onTest,
     required this.onPractice,
   });
 
   final double scale;
+  final VoidCallback onTest;
   final VoidCallback onPractice;
 
   @override
@@ -577,7 +604,7 @@ class _ResultBottomBar extends StatelessWidget {
                   background: _resultPeach,
                   foreground: _resultRust,
                   scale: scale,
-                  onTap: () {},
+                  onTap: onTest,
                 ),
               ),
               SizedBox(width: 20 * scale),

@@ -26,11 +26,15 @@ class AiAssessmentScreen extends StatefulWidget {
     super.key,
     this.quizService,
     this.initialQuiz,
+    this.purpose = quizPurposeAssessment,
+    this.typeOfQuiz = quizTypeGeneral,
     this.gradeLabel,
   });
 
   final QuizService? quizService;
   final GeneratedQuiz? initialQuiz;
+  final String purpose;
+  final String typeOfQuiz;
   final String? gradeLabel;
 
   @override
@@ -74,6 +78,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
     try {
       final generatedQuiz = await _quizService.generateAssessmentQuiz(
+        purpose: widget.purpose,
+        typeOfQuiz: widget.typeOfQuiz,
         gradeLabel: widget.gradeLabel,
       );
       if (!mounted) {
@@ -247,6 +253,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         builder: (_) => AiAssessmentScreen(
           quizService: _quizService,
           initialQuiz: generatedQuiz,
+          purpose: generatedQuiz.purpose ?? widget.purpose,
+          typeOfQuiz: generatedQuiz.typeOfQuiz ?? widget.typeOfQuiz,
+          gradeLabel: widget.gradeLabel,
         ),
       ),
     );
@@ -378,51 +387,56 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                   ? _GeneratingQuestionLoader(
                                       key: const ValueKey('submit-loader'),
                                       scale: scale,
-                                      message:
-                                          'đợi Numi nộp bài cho bạn nhé!',
+                                      message: 'đợi Numi nộp bài cho bạn nhé!',
                                     )
                                   : isGeneratingQuestion
-                                  ? _GeneratingQuestionLoader(
-                                      key: const ValueKey('question-loader'),
-                                      scale: scale,
-                                      message:
-                                          'Để Numi tạo bài kiểm tra cho bạn nhé',
-                                    )
-                                  : SingleChildScrollView(
-                                      key: const ValueKey('question-content'),
-                                      physics: const BouncingScrollPhysics(),
-                                      padding: EdgeInsets.fromLTRB(
-                                        s(24),
-                                        0,
-                                        s(24),
-                                        s(24),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          _ProgressSection(
-                                            scale: scale,
-                                            currentQuestion: questionIndex + 1,
-                                            totalQuestions: questions.length,
+                                      ? _GeneratingQuestionLoader(
+                                          key:
+                                              const ValueKey('question-loader'),
+                                          scale: scale,
+                                          message:
+                                              'Để Numi tạo bài kiểm tra cho bạn nhé',
+                                        )
+                                      : SingleChildScrollView(
+                                          key: const ValueKey(
+                                              'question-content'),
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          padding: EdgeInsets.fromLTRB(
+                                            s(24),
+                                            0,
+                                            s(24),
+                                            s(24),
                                           ),
-                                          SizedBox(height: s(32)),
-                                          _QuestionCard(
-                                            scale: scale,
-                                            question:
-                                                currentQuestion!.questionName,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              _ProgressSection(
+                                                scale: scale,
+                                                currentQuestion:
+                                                    questionIndex + 1,
+                                                totalQuestions:
+                                                    questions.length,
+                                              ),
+                                              SizedBox(height: s(32)),
+                                              _QuestionCard(
+                                                scale: scale,
+                                                question: currentQuestion!
+                                                    .questionName,
+                                              ),
+                                              SizedBox(height: s(32)),
+                                              _AnswerGrid(
+                                                scale: scale,
+                                                answers:
+                                                    currentQuestion.answers,
+                                                selectedAnswerLabel:
+                                                    selectedAnswerLabel,
+                                                onSelected: selectAnswer,
+                                              ),
+                                            ],
                                           ),
-                                          SizedBox(height: s(32)),
-                                          _AnswerGrid(
-                                            scale: scale,
-                                            answers: currentQuestion.answers,
-                                            selectedAnswerLabel:
-                                                selectedAnswerLabel,
-                                            onSelected: selectAnswer,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                        ),
                         ),
                       ),
                       if (!isGeneratingQuestion && !isSubmittingQuiz)
