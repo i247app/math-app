@@ -209,69 +209,9 @@ class _HistoryHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              _HistoryHeaderButton(
-                icon: Icons.notifications_none_rounded,
-                outlined: true,
-                onTap: HapticFeedback.selectionClick,
-                scale: scale,
-              ),
+              SizedBox(width: 60 * scale),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HistoryHeaderButton extends StatelessWidget {
-  const _HistoryHeaderButton({
-    required this.icon,
-    required this.outlined,
-    required this.onTap,
-    required this.scale,
-  });
-
-  final IconData icon;
-  final bool outlined;
-  final VoidCallback onTap;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = 60 * scale;
-    final radius = BorderRadius.circular(outlined ? 22 * scale : size / 2);
-
-    return Material(
-      color: Colors.white,
-      elevation: outlined ? 0 : 2,
-      shadowColor: Colors.black.withValues(alpha: 0.08),
-      borderRadius: radius,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: radius,
-            border: outlined
-                ? Border.all(
-                    color: _deepInk.withValues(alpha: 0.72),
-                    width: 1.5 * scale,
-                  )
-                : null,
-            boxShadow: outlined
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8 * scale,
-                      offset: Offset(0, 2 * scale),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Icon(icon, color: _teal, size: 29 * scale),
         ),
       ),
     );
@@ -491,6 +431,7 @@ class _HistoryQuizCard extends StatelessWidget {
             20 * scale,
           ),
           decoration: BoxDecoration(
+            color: Colors.white,
             borderRadius: radius,
             border: Border.all(color: _cardBorder, width: 1.3 * scale),
             boxShadow: [

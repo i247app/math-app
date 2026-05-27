@@ -6,7 +6,6 @@ import '../../data/quiz_api.dart';
 
 const _reviewBackground = Color(0xFFEEF9FB);
 const _navy = Color(0xFF063A7B);
-const _teal = Color(0xFF006762);
 const _green = Color(0xFF22C55E);
 const _red = Color(0xFFF04D4D);
 const _orange = Color(0xFFFF8A3D);
@@ -173,7 +172,7 @@ class _ReviewHeader extends StatelessWidget {
                     height: 44,
                     child: Icon(
                       Icons.arrow_back_rounded,
-                      color: _teal,
+                      color: _navy,
                       size: 26,
                     ),
                   ),
@@ -219,7 +218,10 @@ class _ReviewHeaderPainter extends CustomPainter {
     final path = Path()
       ..moveTo(0, size.height - 6)
       ..quadraticBezierTo(
-          size.width * 0.5, size.height + 6, size.width, size.height - 6);
+          size.width * 0.5, 
+          size.height + 6, 
+          size.width, 
+          size.height - 6);
     canvas.drawPath(path, line);
   }
 
@@ -265,7 +267,7 @@ class _ReviewContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (isLoading) const LinearProgressIndicator(color: _teal),
+          if (isLoading) const LinearProgressIndicator(color: _navy),
           if (errorMessage != null && errorMessage!.isNotEmpty) ...[
             _InlineError(message: errorMessage!, onRetry: onRetry),
             const SizedBox(height: 10),
@@ -836,9 +838,9 @@ class _ReviewStatePanel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (isLoading)
-                const CircularProgressIndicator(color: _teal)
+                const CircularProgressIndicator(color: _navy)
               else ...[
-                const Icon(Icons.quiz_outlined, color: _teal, size: 42),
+                const Icon(Icons.quiz_outlined, color: _navy, size: 42),
                 const SizedBox(height: 14),
                 Text(
                   message ?? 'Không tải được chi tiết bài kiểm tra.',

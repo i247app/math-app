@@ -58,12 +58,7 @@ class _SettingHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              _SettingHeaderButton(
-                icon: Icons.notifications_none_rounded,
-                outlined: true,
-                onTap: HapticFeedback.selectionClick,
-                scale: scale,
-              ),
+              SizedBox(width: 60 * scale),
             ],
           ),
         ),
