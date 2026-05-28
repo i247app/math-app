@@ -18,7 +18,7 @@ const _teal = Color(0xFF006762);
 const _blue = Color(0xFF063A7B);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
-const _mintBackground = Color(0xFFEBFAEC);
+const _mintBackground = Color(0xFFEEF9FB);
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -100,12 +100,14 @@ class _HomeScreenState extends State<HomeScreen> {
         final width = math.min(constraints.maxWidth, 430.0);
         final height = constraints.maxHeight;
         final viewportHeight = MediaQuery.sizeOf(context).height;
+        final bottomInset = MediaQuery.paddingOf(context).bottom;
         final scale =
             math.min(width / _designWidth, viewportHeight / _designHeight);
         final studentName = _displayName(widget.user);
 
         double s(double value) => value * scale;
         final navHeight = s(76);
+        final navBottomGap = math.max(s(18), bottomInset + s(8));
         final showHeader = _activeTab == 0;
 
         return Center(
@@ -152,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       initialGrades: _prefetchedGrades,
                       gradeService: _gradeService,
                       onLogout: widget.onLogout,
-                      bottomPadding: navHeight + s(30),
+                      bottomPadding: navHeight + navBottomGap + s(12),
                       headerHeight: showHeader ? s(98) : 0,
                       scale: scale,
                     ),
@@ -176,7 +178,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   bottom: 0,
                   child: Padding(
                     padding: EdgeInsets.only(
-                        bottom: s(18), left: s(18), right: s(18)),
+                      bottom: navBottomGap,
+                      left: s(18),
+                      right: s(18),
+                    ),
                     child: _BottomNavigation(
                       height: navHeight,
                       scale: scale,
@@ -210,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (name != null && name.isNotEmpty) {
       return name;
     }
-    return 'Minh Quân';
+    return 'User';
   }
 }
 

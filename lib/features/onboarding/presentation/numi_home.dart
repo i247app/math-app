@@ -184,7 +184,7 @@ class _NumiHomeState extends State<NumiHome> {
 
                     return SafeArea(
                       top: useSafeArea,
-                      bottom: useSafeArea,
+                      bottom: useSafeArea && state.screen != AppScreen.home,
                       left: useSafeArea,
                       right: useSafeArea,
                       child: AnimatedSwitcher(
