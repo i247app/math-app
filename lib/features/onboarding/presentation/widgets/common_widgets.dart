@@ -62,15 +62,15 @@ class PrimaryButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.teal.withValues(alpha: enabled ? 1 : 0.55),
-              AppColors.tealLight.withValues(alpha: enabled ? 1 : 0.55),
+              AppColors.navy.withValues(alpha: enabled ? 1 : 0.55),
+              AppColors.softBlue.withValues(alpha: enabled ? 1 : 0.55),
             ],
           ),
           borderRadius: BorderRadius.circular(22),
           boxShadow: enabled
               ? [
                   BoxShadow(
-                    color: AppColors.teal.withValues(alpha: 0.22),
+                    color: AppColors.navy.withValues(alpha: 0.22),
                     blurRadius: 14,
                     offset: const Offset(0, 9),
                   ),

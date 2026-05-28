@@ -31,4 +31,5 @@ abstract final class AppColors {
   static const orangeAccent = Color(0xFFD46D47);
   static const timerBg = Color(0xFFF1E5DC);
   static const greenShadow = Color(0x3874B493);
+  static const navy = Color(0xFF063A7B);
 }

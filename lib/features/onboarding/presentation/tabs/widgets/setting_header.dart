@@ -18,7 +18,7 @@ class _SettingHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 124 * scale,
+      height: 70 * scale,
       child: CustomPaint(
         painter: _SettingHeaderCurvePainter(
           backgroundColor: backgroundColor,
@@ -26,10 +26,10 @@ class _SettingHeader extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            30 * scale,
-            28 * scale,
-            30 * scale,
-            24 * scale,
+            20 * scale,
+            8 * scale,
+            20 * scale,
+            12 * scale,
           ),
           child: Row(
             children: [
@@ -41,7 +41,7 @@ class _SettingHeader extends StatelessWidget {
                   scale: scale,
                 )
               else
-                SizedBox(width: 60 * scale),
+                SizedBox(width: 44 * scale),
               Expanded(
                 child: Text(
                   title,
@@ -51,14 +51,14 @@ class _SettingHeader extends StatelessWidget {
                   style: TextStyle(
                     color: const Color(0xFF063A7B),
                     fontFamily: 'Nunito',
-                    fontSize: 26 * scale,
+                    fontSize: 18 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
                   ),
                 ),
               ),
-              SizedBox(width: 60 * scale),
+              SizedBox(width: 44 * scale),
             ],
           ),
         ),
@@ -82,7 +82,7 @@ class _SettingHeaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = 60 * scale;
+    final size = 44 * scale;
     final radius = BorderRadius.circular(outlined ? 22 * scale : size / 2);
 
     return Material(
@@ -115,7 +115,7 @@ class _SettingHeaderButton extends StatelessWidget {
                   ]
                 : null,
           ),
-          child: Icon(icon, color: _navy, size: 29 * scale),
+          child: Icon(icon, color: _navy, size: 26 * scale),
         ),
       ),
     );
@@ -141,12 +141,12 @@ class _SettingHeaderCurvePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.1 * scale;
     final path = Path()
-      ..moveTo(0, size.height - 17 * scale)
+      ..moveTo(0, size.height - 6 * scale)
       ..quadraticBezierTo(
         size.width * 0.5,
-        size.height + 2 * scale,
+        size.height + 6 * scale,
         size.width,
-        size.height - 17 * scale,
+        size.height - 6 * scale,
       );
     canvas.drawPath(path, line);
   }

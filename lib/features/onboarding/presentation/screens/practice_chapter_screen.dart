@@ -161,7 +161,7 @@ class _ChapterHeader extends StatelessWidget {
                     height: 44 * scale,
                     child: Icon(
                       Icons.arrow_back_rounded,
-                      color: const Color(0xFF00776F),
+                      color: _headerNavy,
                       size: 24 * scale,
                     ),
                   ),

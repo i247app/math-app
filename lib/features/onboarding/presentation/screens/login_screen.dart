@@ -5,6 +5,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/phone_input_formatter.dart';
 import '../../domain/phone_region.dart';
 import '../widgets/common_widgets.dart';
+import '../widgets/login_scene_background.dart';
+import '../widgets/numi_brand_mascot.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({
@@ -39,14 +41,14 @@ class LoginScreen extends StatelessWidget {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
-    final mascotSize = width < 370 ? 130.0 : 154.0;
+    final mascotSize = width < 370 ? 230.0 : 260.0;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Stack(
         children: [
-          const Positioned.fill(child: _LoginSceneBackground()),
+          const Positioned.fill(child: LoginSceneBackground()),
           ScreenFrame(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Column(
@@ -57,11 +59,11 @@ class LoginScreen extends StatelessWidget {
                   icon: Icons.arrow_back_rounded,
                   onPressed: onBack,
                 ),
-                SizedBox(height: compact ? 24 : 46),
+                SizedBox(height: compact ? 8 : 24),
                 Center(
-                  child: _LoginBrandMascot(size: mascotSize),
+                  child: NumiBrandMascot(size: mascotSize),
                 ),
-                SizedBox(height: compact ? 18 : 28),
+                SizedBox(height: compact ? 10 : 18),
                 LoginCard(
                   controller: controller,
                   region: region,
@@ -82,246 +84,6 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class _LoginSceneBackground extends StatelessWidget {
-  const _LoginSceneBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: const Color(0xFFEFFBFC),
-      child: Stack(
-        children: [
-          const Positioned(
-            left: -30,
-            top: 128,
-            child: _Cloud(width: 148, opacity: 0.76),
-          ),
-          const Positioned(
-            right: -20,
-            top: 246,
-            child: _Cloud(width: 128, opacity: 0.62),
-          ),
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _LoginHillPainter(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LoginBrandMascot extends StatelessWidget {
-  const _LoginBrandMascot({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.asset(
-          'assets/images/model2.png',
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
-        ),
-        const SizedBox(height: 8),
-        _NumiLogo(width: size * 0.9),
-      ],
-    );
-  }
-}
-
-class _NumiLogo extends StatelessWidget {
-  const _NumiLogo({required this.width});
-
-  final double width;
-
-  @override
-  Widget build(BuildContext context) {
-    final fontSize = width * 0.34;
-
-    return SizedBox(
-      width: width,
-      height: width * 0.47,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            top: 0,
-            child: _OutlinedLogoText(
-              text: 'Numi',
-              fontSize: fontSize,
-              fill: const Color(0xFFD82683),
-            ),
-          ),
-          Positioned(
-            top: width * 0.22,
-            child: _OutlinedLogoText(
-              text: 'Numi',
-              fontSize: fontSize,
-              fill: const Color(0xFFFFD428),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _OutlinedLogoText extends StatelessWidget {
-  const _OutlinedLogoText({
-    required this.text,
-    required this.fontSize,
-    required this.fill,
-  });
-
-  final String text;
-  final double fontSize;
-  final Color fill;
-
-  @override
-  Widget build(BuildContext context) {
-    final strokeStyle = TextStyle(
-      fontFamily: 'Nunito',
-      fontSize: fontSize,
-      fontWeight: FontWeight.w900,
-      height: 0.88,
-      letterSpacing: 0,
-      foreground: Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = fontSize * 0.14
-        ..strokeJoin = StrokeJoin.round
-        ..color = const Color(0xFF074B91),
-    );
-    final fillStyle = TextStyle(
-      color: fill,
-      fontFamily: 'Nunito',
-      fontSize: fontSize,
-      fontWeight: FontWeight.w900,
-      height: 0.88,
-      letterSpacing: 0,
-    );
-
-    return Stack(
-      children: [
-        Text(text, style: strokeStyle),
-        Text(text, style: fillStyle),
-      ],
-    );
-  }
-}
-
-class _Cloud extends StatelessWidget {
-  const _Cloud({
-    required this.width,
-    required this.opacity,
-  });
-
-  final double width;
-  final double opacity;
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-      opacity: opacity,
-      child: CustomPaint(
-        size: Size(width, width * 0.44),
-        painter: _CloudPainter(),
-      ),
-    );
-  }
-}
-
-class _CloudPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final shadowPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.12)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16);
-    final fillPaint = Paint()..color = const Color(0xFFEAF8FB);
-    final strokePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.78)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path()
-      ..moveTo(size.width * 0.05, size.height * 0.7)
-      ..cubicTo(
-        size.width * 0.04,
-        size.height * 0.35,
-        size.width * 0.27,
-        size.height * 0.3,
-        size.width * 0.35,
-        size.height * 0.45,
-      )
-      ..cubicTo(
-        size.width * 0.46,
-        size.height * 0.04,
-        size.width * 0.76,
-        size.height * 0.16,
-        size.width * 0.74,
-        size.height * 0.5,
-      )
-      ..cubicTo(
-        size.width,
-        size.height * 0.48,
-        size.width,
-        size.height * 0.86,
-        size.width * 0.78,
-        size.height * 0.86,
-      )
-      ..lineTo(size.width * 0.16, size.height * 0.86)
-      ..cubicTo(0, size.height * 0.86, 0, size.height * 0.72, size.width * 0.05,
-          size.height * 0.7)
-      ..close();
-
-    canvas.drawPath(path.shift(const Offset(0, 14)), shadowPaint);
-    canvas.drawPath(path, fillPaint);
-    canvas.drawPath(path, strokePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _LoginHillPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = const Color(0xFF43B352);
-    final path = Path()
-      ..moveTo(0, size.height * 0.94)
-      ..cubicTo(
-        size.width * 0.34,
-        size.height * 0.98,
-        size.width * 0.52,
-        size.height * 0.87,
-        size.width * 0.76,
-        size.height * 0.89,
-      )
-      ..cubicTo(
-        size.width * 0.9,
-        size.height * 0.9,
-        size.width,
-        size.height * 0.93,
-        size.width,
-        size.height * 0.94,
-      )
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class LoginCard extends StatelessWidget {

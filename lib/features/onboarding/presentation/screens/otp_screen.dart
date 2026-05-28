@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../widgets/common_widgets.dart';
+import '../widgets/login_scene_background.dart';
+import '../widgets/numi_brand_mascot.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({
@@ -209,57 +211,62 @@ class _OtpScreenState extends State<OtpScreen>
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
-    final mascotSize = width < 370 ? 170.0 : 188.0;
+    final mascotSize = width < 370 ? 230.0 : 260.0;
     final otpError = hideOtpError ? null : widget.otpError;
 
-    return ScreenFrame(
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 12),
-          Row(
+    return Stack(
+      children: [
+        const Positioned.fill(child: LoginSceneBackground()),
+        ScreenFrame(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleIconButton(
-                icon: Icons.arrow_back_rounded,
-                onPressed: widget.onBack,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  CircleIconButton(
+                    icon: Icons.arrow_back_rounded,
+                    onPressed: widget.onBack,
+                  ),
+                  const Spacer(),
+                  const ProgressDots(activeIndex: 2),
+                ],
               ),
-              const Spacer(),
-              const ProgressDots(activeIndex: 2),
+              SizedBox(height: compact ? 34 : 54),
+              Center(
+                child: NumiBrandMascot(size: mascotSize),
+              ),
+              SizedBox(height: compact ? 10 : 18),
+              AnimatedBuilder(
+                animation: errorShakeController,
+                builder: (context, child) {
+                  final offset =
+                      math.sin(errorShakeController.value * math.pi * 6) *
+                          9 *
+                          (1 - errorShakeController.value);
+                  return Transform.translate(
+                    offset: Offset(offset, 0),
+                    child: child,
+                  );
+                },
+                child: OtpCard(
+                  controllers: controllers,
+                  focusNodes: focusNodes,
+                  onChanged: updateDigit,
+                  onEmptyBackspace: handleEmptyBackspace,
+                  onConfirm: handleConfirm,
+                  onResend: handleResend,
+                  isVerifyingOtp: widget.isVerifyingOtp,
+                  resendCountdown: resendCountdown,
+                  errorText: otpError,
+                ),
+              ),
+              const SizedBox(height: 32),
             ],
           ),
-          SizedBox(height: compact ? 34 : 54),
-          Center(
-            child: _OtpBrandMascot(size: mascotSize),
-          ),
-          SizedBox(height: compact ? 28 : 50),
-          AnimatedBuilder(
-            animation: errorShakeController,
-            builder: (context, child) {
-              final offset =
-                  math.sin(errorShakeController.value * math.pi * 6) *
-                      9 *
-                      (1 - errorShakeController.value);
-              return Transform.translate(
-                offset: Offset(offset, 0),
-                child: child,
-              );
-            },
-            child: OtpCard(
-              controllers: controllers,
-              focusNodes: focusNodes,
-              onChanged: updateDigit,
-              onEmptyBackspace: handleEmptyBackspace,
-              onConfirm: handleConfirm,
-              onResend: handleResend,
-              isVerifyingOtp: widget.isVerifyingOtp,
-              resendCountdown: resendCountdown,
-              errorText: otpError,
-            ),
-          ),
-          const SizedBox(height: 32),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -412,39 +419,6 @@ class OtpCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _OtpBrandMascot extends StatelessWidget {
-  const _OtpBrandMascot({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.asset(
-          'assets/images/welcome_numi_character.png',
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-        ),
-        Text(
-          'numinumi',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: const Color(0xFF24594E),
-            fontFamily: 'Nunito',
-            fontSize: size * 0.24,
-            fontWeight: FontWeight.w900,
-            height: 1,
-            letterSpacing: 0,
-          ),
-        ),
-      ],
     );
   }
 }

@@ -925,24 +925,24 @@ _ScoreBadgeColors _scoreColors(int? percent) {
   if (scoreOutOf10 >= 9) {
     return const _ScoreBadgeColors(
       foreground: Color(0xFF0A8A4D), // Green
-      label: 'Tuyệt vời!',
+      label: 'Excellent!',
     );
   }
   if (scoreOutOf10 >= 7) {
     return const _ScoreBadgeColors(
-      foreground: Color(0xFF0B73D9),
-      label: 'Giỏi',
+      foreground: Color(0xFFF4B62D),
+      label: 'Good',
     );
   }
   if (scoreOutOf10 >= 5) {
     return const _ScoreBadgeColors(
-      foreground: Color(0xFFF4B62D),
-      label: 'Cố gắng',
+      foreground: Color.fromARGB(255, 244, 135, 45),
+      label: 'Nice try',
     );
   }
   return const _ScoreBadgeColors(
     foreground: Color(0xFFD71920),
-    label: 'Luyện Tập',
+    label: 'Failed',
   );
 }
 

@@ -1075,8 +1075,8 @@ class _BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       const _NavItemData(Icons.home_filled, 'HOME', null),
-      const _NavItemData(Icons.explore_outlined, 'ÔN TẬP', null),
-      const _NavItemData(Icons.map_outlined, 'LỊCH SỬ', null),
+      const _NavItemData(Icons.explore_outlined, 'ÔN TẬP', null),
+      const _NavItemData(Icons.history, 'LỊCH SỬ', null),
       _NavItemData(null, 'CÀI ĐẶT', user),
     ];
 
