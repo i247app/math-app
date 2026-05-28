@@ -26,6 +26,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
+  String selectedRole = 'Phụ huynh';
 
   @override
   void dispose() {
@@ -40,7 +41,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
     final tight = width < 370;
-    final avatarSize = tight ? 124.0 : 132.0;
+    final avatarSize = tight ? 100.0 : 108.0;
 
     return BlocConsumer<OnboardingCubit, OnboardingState>(
       listenWhen: (previous, current) =>
@@ -64,13 +65,13 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: compact ? 8 : 16),
+                  SizedBox(height: compact ? 4 : 8),
                   CircleIconButton(
                     icon: Icons.arrow_back_rounded,
                     onPressed: widget.onBack,
                     size: 52,
                   ),
-                  SizedBox(height: compact ? 34 : 46),
+                  SizedBox(height: compact ? 20 : 24),
                   Center(
                     child: SignupAvatarPicker(
                       size: avatarSize,
@@ -108,7 +109,19 @@ class _SignupScreenState extends State<SignupScreen> {
                     controller: emailController,
                     hintText: 'Nhập email',
                     keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.done,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  const SizedBox(height: 18),
+                  const SignupFieldLabel(label: 'Bạn là'),
+                  const SizedBox(height: 12),
+                  SignupRoleDropdown(
+                    value: selectedRole,
+                    onChanged: (value) {
+                      if (value == null) {
+                        return;
+                      }
+                      setState(() => selectedRole = value);
+                    },
                   ),
                   const SizedBox(height: 18),
                   const Center(
@@ -119,7 +132,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Color(0xFF5A6E65),
-                          fontSize: 15,
+                          fontSize: 13,
                           height: 1.38,
                           fontStyle: FontStyle.italic,
                           fontWeight: FontWeight.w600,
@@ -175,7 +188,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 34),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -226,8 +239,8 @@ class SignupAvatarPicker extends StatelessWidget {
                     child: imagePath == null
                         ? Center(
                             child: Container(
-                              width: size * 0.36,
-                              height: size * 0.36,
+                              width: size * 0.35,
+                              height: size * 0.35,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -386,6 +399,58 @@ class SignupTextField extends StatelessWidget {
           fontWeight: FontWeight.w800,
           letterSpacing: 0,
         ),
+      ),
+    );
+  }
+}
+
+class SignupRoleDropdown extends StatelessWidget {
+  const SignupRoleDropdown({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  static const options = ['Phụ huynh', 'Giáo viên'];
+
+  final String value;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 58,
+      child: DropdownButtonFormField<String>(
+        initialValue: value,
+        isExpanded: true,
+        icon: const Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: Color(0xFF667A71),
+        ),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: const Color(0xFFCBE2CD),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(22),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        dropdownColor: const Color(0xFFF3FBF4),
+        style: const TextStyle(
+          color: AppColors.ink,
+          fontSize: 16,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0,
+        ),
+        items: [
+          for (final option in options)
+            DropdownMenuItem<String>(
+              value: option,
+              child: Text(option),
+            ),
+        ],
+        onChanged: onChanged,
       ),
     );
   }
