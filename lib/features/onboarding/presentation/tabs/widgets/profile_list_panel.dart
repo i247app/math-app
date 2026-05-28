@@ -220,13 +220,13 @@ class _ProfileCard extends StatelessWidget {
             scale: scale,
           ),
           SizedBox(height: 14 * scale),
-          _ProfileInfoLine(
-            icon: Icons.calendar_month_outlined,
-            iconColor: accent,
-            label: 'Học Kỳ',
-            value: _displaySemester(profile),
-            scale: scale,
-          ),
+          // _ProfileInfoLine(
+          //   icon: Icons.calendar_month_outlined,
+          //   iconColor: accent,
+          //   label: 'Học Kỳ',
+          //   value: _displaySemester(profile),
+          //   scale: scale,
+          // ),
           SizedBox(height: 18 * scale),
           Row(
             children: [
@@ -267,10 +267,10 @@ class _ProfileCard extends StatelessWidget {
     return program == null || program.isEmpty ? 'Chưa chọn' : program;
   }
 
-  static String _displaySemester(StudentProfile profile) {
-    final semester = profile.semester?.name?.trim();
-    return semester == null || semester.isEmpty ? 'Chưa chọn' : semester;
-  }
+  // static String _displaySemester(StudentProfile profile) {
+  //   final semester = profile.semester?.name?.trim();
+  //   return semester == null || semester.isEmpty ? 'Chưa chọn' : semester;
+  // }
 }
 
 class _ProfileAvatar extends StatelessWidget {
