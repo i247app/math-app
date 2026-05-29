@@ -1139,10 +1139,12 @@ List<PracticeChapter> _practiceChaptersFromApi(List<ChapterModel> chapters) {
   return List.generate(sorted.length, (index) {
     final chapter = sorted[index];
     final number = index + 1;
-    final lessonCount = chapter.lessonCount ?? 0;
+    final lessonCount = chapter.lessonCount ??
+        _fallbackPracticeChapter(number)?.lessonCount ??
+        0;
 
     return PracticeChapter(
-      id: _nonEmpty(chapter.chapterId) ?? _nonEmpty(chapter.id),
+      id: _nonEmpty(chapter.chapterId) ?? chapter.id?.toString(),
       number: number,
       title: _chapterDescription(chapter) ?? _chapterLabel(chapter),
       description: _chapterLabel(chapter),
@@ -1152,6 +1154,15 @@ List<PracticeChapter> _practiceChaptersFromApi(List<ChapterModel> chapters) {
       icon: _chapterIcon(number),
     );
   });
+}
+
+PracticeChapter? _fallbackPracticeChapter(int number) {
+  for (final chapter in gradeOnePracticeChapters) {
+    if (chapter.number == number) {
+      return chapter;
+    }
+  }
+  return null;
 }
 
 String _chapterLabel(ChapterModel chapter) {

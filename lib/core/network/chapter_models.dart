@@ -48,6 +48,9 @@ class ChapterModel {
   const ChapterModel({
     this.id,
     this.chapterId,
+    this.programId,
+    this.gradeId,
+    this.semesterId,
     this.label,
     this.description,
     this.lessonCount,
@@ -57,8 +60,11 @@ class ChapterModel {
     this.modifyDt,
   });
 
-  final String? id;
+  final int? id;
   final String? chapterId;
+  final String? programId;
+  final String? gradeId;
+  final String? semesterId;
   final String? label;
   final String? description;
   final int? lessonCount;
