@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
@@ -18,7 +17,7 @@ class SignupScreen extends StatefulWidget {
   });
 
   final VoidCallback onBack;
-  final void Function(String name, String? email) onContinue;
+  final void Function(String name, String? email, String role) onContinue;
   final bool isSigningUp;
 
   @override
@@ -28,10 +27,21 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
-  String selectedRole = SignupRoleDropdown.parentValue;
+  String selectedRole = 'STUDENT';
+
+  @override
+  void initState() {
+    super.initState();
+    usernameController.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    setState(() {});
+  }
 
   @override
   void dispose() {
+    usernameController.removeListener(_onTextChanged);
     usernameController.dispose();
     emailController.dispose();
     super.dispose();
@@ -43,7 +53,9 @@ class _SignupScreenState extends State<SignupScreen> {
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
     final tight = width < 370;
-    final avatarSize = tight ? 100.0 : 108.0;
+    final mascotSize = tight ? 118.0 : 136.0;
+
+    final isFormValid = usernameController.text.trim().isNotEmpty;
 
     return BlocConsumer<OnboardingCubit, OnboardingState>(
       listenWhen: (previous, current) =>
@@ -55,276 +67,153 @@ class _SignupScreenState extends State<SignupScreen> {
         );
       },
       builder: (context, state) {
-        final cubit = context.read<OnboardingCubit>();
-
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: ColoredBox(
-            color: AppColors.mintMist,
-            child: ScreenFrame(
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            body: ScreenFrame(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: compact ? 4 : 8),
-                  CircleIconButton(
-                    icon: Icons.arrow_back_rounded,
-                    onPressed: widget.onBack,
-                    size: 52,
-                  ),
-                  SizedBox(height: compact ? 20 : 24),
-                  Center(
-                    child: SignupAvatarPicker(
-                      size: avatarSize,
-                      imagePath: state.avatarPath,
-                      isLoading: state.isPickingAvatar,
-                      onTap: cubit.pickAvatar,
-                      onClear: cubit.clearAvatar,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: Text(
-                      context.getText(AppKeys.avatarUpper),
-                      style: const TextStyle(
-                        color: Color(0xFF667A71),
-                        fontSize: 16,
-                        height: 1,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.4,
+                  SizedBox(height: compact ? 0 : 8),
+                  Row(
+                    children: [
+                      CircleIconButton(
+                        icon: Icons.arrow_back_rounded,
+                        onPressed: widget.onBack,
                       ),
-                    ),
-                  ),
-                  SizedBox(height: compact ? 32 : 38),
-                  SignupFieldLabel(
-                    label: context.getText(AppKeys.signupNameLabel),
-                    isRequired: true,
-                  ),
-                  const SizedBox(height: 12),
-                  SignupTextField(
-                    controller: usernameController,
-                    hintText: context.getText(AppKeys.signupNameHint),
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 18),
-                  SignupFieldLabel(
-                      label: context.getText(AppKeys.signupEmailLabel)),
-                  const SizedBox(height: 12),
-                  SignupTextField(
-                    controller: emailController,
-                    hintText: context.getText(AppKeys.signupEmailHint),
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 18),
-                  SignupFieldLabel(
-                      label: context.getText(AppKeys.signupRoleLabel)),
-                  const SizedBox(height: 12),
-                  SignupRoleDropdown(
-                    value: selectedRole,
-                    onChanged: (value) {
-                      if (value == null) {
-                        return;
-                      }
-                      setState(() => selectedRole = value);
-                    },
-                  ),
-                  const SizedBox(height: 18),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        context.getText(AppKeys.signupEmailDescription),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFF5A6E65),
-                          fontSize: 13,
-                          height: 1.38,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0,
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            context.getText(AppKeys.signup),
+                            style: GoogleFonts.fredoka(
+                              color: const Color(0xFF339395),
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 52), // To balance the back button
+                    ],
+                  ),
+                  SizedBox(height: compact ? 14 : 24),
+                  // Mascot
+                  Center(
+                    child: Container(
+                      width: mascotSize,
+                      height: mascotSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 24,
+                            offset: const Offset(0, 12),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/images/numi-mascot.png',
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
-                  SizedBox(height: compact ? 54 : 62),
-                  Center(
-                    child: SizedBox(
-                      width: tight ? double.infinity : 292,
-                      height: 70,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF008E84),
-                          borderRadius: BorderRadius.circular(32),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.teal.withValues(alpha: 0.16),
-                              blurRadius: 16,
-                              offset: const Offset(0, 10),
+                  SizedBox(height: compact ? 20 : 30),
+                  // Inputs
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SignupFieldLabel(
+                          label: context.getText(AppKeys.signupNameLabel),
+                          isRequired: true,
+                        ),
+                        const SizedBox(height: 8),
+                        SignupTextField(
+                          controller: usernameController,
+                          hintText: context.getText(AppKeys.signupNameHint),
+                          textInputAction: TextInputAction.next,
+                        ),
+                        const SizedBox(height: 20),
+                        SignupFieldLabel(
+                          label: context.getText(AppKeys.signupEmailLabel),
+                        ),
+                        const SizedBox(height: 8),
+                        SignupTextField(
+                          controller: emailController,
+                          hintText: context.getText(AppKeys.signupEmailHint),
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.done,
+                        ),
+                        SizedBox(height: compact ? 24 : 28),
+                        // Roles
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: _RoleCard(
+                                label:
+                                    context.getText(AppKeys.signupRoleStudent),
+                                imagePath: 'assets/images/student-icon.png',
+                                isSelected: selectedRole == 'STUDENT',
+                                onTap: () =>
+                                    setState(() => selectedRole = 'STUDENT'),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _RoleCard(
+                                label:
+                                    context.getText(AppKeys.signupRoleParent),
+                                imagePath: 'assets/images/parent-icon.png',
+                                isSelected: selectedRole == 'PARENT',
+                                onTap: () =>
+                                    setState(() => selectedRole = 'PARENT'),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _RoleCard(
+                                label:
+                                    context.getText(AppKeys.signupRoleTeacher),
+                                imagePath: 'assets/images/teacher-icon.png',
+                                isSelected: selectedRole == 'TEACHER',
+                                onTap: () =>
+                                    setState(() => selectedRole = 'TEACHER'),
+                              ),
                             ),
                           ],
                         ),
-                        child: TextButton(
-                          onPressed: widget.isSigningUp
+                        SizedBox(height: compact ? 32 : 54),
+                        _TealActionButton(
+                          label: widget.isSigningUp
+                              ? context.getText(AppKeys.signingUp)
+                              : context.getText(AppKeys.continueLabel),
+                          onPressed: (widget.isSigningUp || !isFormValid)
                               ? null
                               : () {
                                   FocusManager.instance.primaryFocus?.unfocus();
                                   widget.onContinue(
                                     usernameController.text,
                                     emailController.text,
+                                    selectedRole,
                                   );
                                 },
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                          ),
-                          child: Text(
-                            widget.isSigningUp
-                                ? context.getText(AppKeys.signingUp)
-                                : '${context.getText(AppKeys.continueLabel)}  →',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0,
-                            ),
-                          ),
                         ),
-                      ),
+                        const SizedBox(height: 32),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 20),
                 ],
               ),
             ),
           ),
         );
       },
-    );
-  }
-}
-
-class SignupAvatarPicker extends StatelessWidget {
-  const SignupAvatarPicker({
-    super.key,
-    required this.size,
-    required this.onTap,
-    required this.onClear,
-    this.imagePath,
-    this.isLoading = false,
-  });
-
-  final double size;
-  final String? imagePath;
-  final bool isLoading;
-  final VoidCallback onTap;
-  final VoidCallback onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: context.getText(AppKeys.chooseAvatar),
-      child: GestureDetector(
-        onTap: isLoading ? null : onTap,
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF687974),
-                    border: Border.all(color: Colors.white, width: 4),
-                  ),
-                  child: ClipOval(
-                    child: imagePath == null
-                        ? Center(
-                            child: Container(
-                              width: size * 0.35,
-                              height: size * 0.35,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xFFF3F8D8),
-                                  width: 3,
-                                ),
-                              ),
-                            ),
-                          )
-                        : Image.file(
-                            File(imagePath!),
-                            fit: BoxFit.cover,
-                            width: size,
-                            height: size,
-                          ),
-                  ),
-                ),
-              ),
-              if (isLoading)
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.18),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 3,
-                      ),
-                    ),
-                  ),
-                ),
-              Positioned(
-                right: size * 0.03,
-                bottom: size * 0.06,
-                child: Container(
-                  width: size * 0.29,
-                  height: size * 0.29,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF008E84),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
-                  ),
-                  child: Icon(
-                    Icons.add_a_photo_outlined,
-                    color: Colors.white,
-                    size: size * 0.15,
-                  ),
-                ),
-              ),
-              if (imagePath != null)
-                Positioned(
-                  left: size * 0.03,
-                  bottom: size * 0.06,
-                  child: GestureDetector(
-                    onTap: isLoading ? null : onClear,
-                    child: Container(
-                      width: size * 0.29,
-                      height: size * 0.29,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE74657),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                      ),
-                      child: Icon(
-                        Icons.close_rounded,
-                        color: Colors.white,
-                        size: size * 0.17,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -343,14 +232,14 @@ class SignupFieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-        style: const TextStyle(
-          color: Color(0xFF1D2B24),
-          fontSize: 14,
-          fontWeight: FontWeight.w900,
+        style: GoogleFonts.fredoka(
+          color: const Color(0xFF1B1B1B),
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
         children: [
-          TextSpan(text: '$label:'),
+          TextSpan(text: label),
           if (isRequired)
             const TextSpan(
               text: ' *',
@@ -384,86 +273,148 @@ class SignupTextField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         textInputAction: textInputAction,
+        textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(
-            color: Color(0xFF7E9088),
+          hintStyle: GoogleFonts.fredoka(
+            color: const Color(0xFF7E9088),
             fontSize: 16,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0,
+            fontWeight: FontWeight.w400,
           ),
           filled: true,
-          fillColor: const Color(0xFFCBE2CD),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(22),
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF339395), width: 2),
           ),
         ),
-        style: const TextStyle(
+        style: GoogleFonts.fredoka(
           color: AppColors.ink,
           fontSize: 16,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 }
 
-class SignupRoleDropdown extends StatelessWidget {
-  const SignupRoleDropdown({
-    super.key,
-    required this.value,
-    required this.onChanged,
+class _RoleCard extends StatelessWidget {
+  const _RoleCard({
+    required this.label,
+    required this.imagePath,
+    required this.isSelected,
+    required this.onTap,
   });
 
-  static const parentValue = 'parent';
-  static const teacherValue = 'teacher';
-  static const options = [parentValue, teacherValue];
-
-  final String value;
-  final ValueChanged<String?> onChanged;
+  final String label;
+  final String imagePath;
+  final bool isSelected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 58,
-      child: DropdownButtonFormField<String>(
-        initialValue: value,
-        isExpanded: true,
-        icon: const Icon(
-          Icons.keyboard_arrow_down_rounded,
-          color: Color(0xFF667A71),
-        ),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: const Color(0xFFCBE2CD),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(22),
-            borderSide: BorderSide.none,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 96,
+        padding: const EdgeInsets.fromLTRB(8, 10, 8, 9),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF339395) : Colors.transparent,
+            width: 2.4,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.14),
+              blurRadius: 12,
+              offset: const Offset(0, 7),
+            ),
+          ],
         ),
-        dropdownColor: const Color(0xFFF3FBF4),
-        style: const TextStyle(
-          color: AppColors.ink,
-          fontSize: 16,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0,
-        ),
-        items: [
-          for (final option in options)
-            DropdownMenuItem<String>(
-              value: option,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: Image.asset(imagePath, fit: BoxFit.contain),
+            ),
+            const SizedBox(height: 5),
+            FittedBox(
+              fit: BoxFit.scaleDown,
               child: Text(
-                option == parentValue
-                    ? context.getText(AppKeys.signupRoleParent)
-                    : context.getText(AppKeys.signupRoleTeacher),
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: GoogleFonts.fredoka(
+                  color: AppColors.ink,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
-        ],
-        onChanged: onChanged,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TealActionButton extends StatelessWidget {
+  const _TealActionButton({
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final cleanLabel = label.replaceAll('→', '').trim();
+
+    return Center(
+      child: SizedBox(
+        width: 230,
+        height: 58,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF339395), // Teal from design
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            disabledBackgroundColor:
+                const Color(0xFFB5BFC2), // Grey when disabled
+            disabledForegroundColor: Colors.white,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                cleanLabel,
+                style: GoogleFonts.fredoka(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_forward_rounded, size: 24),
+            ],
+          ),
+        ),
       ),
     );
   }

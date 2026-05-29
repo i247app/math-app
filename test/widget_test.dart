@@ -164,6 +164,7 @@ class _FakeOtpAuthService implements OtpAuthService {
   Future<LoginUser> signupWithPhone({
     required String phone,
     required String name,
+    required String role,
     String? email,
     String? avatarPath,
   }) async {

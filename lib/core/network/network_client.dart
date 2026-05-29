@@ -328,6 +328,7 @@ class NetworkApi {
       'phone': request.phone,
       if (request.email?.isNotEmpty == true) 'email': request.email,
       if (request.name?.isNotEmpty == true) 'name': request.name,
+      if (request.role?.isNotEmpty == true) 'role': request.role,
       if (avatarPath?.isNotEmpty == true)
         'avatar': await MultipartFile.fromFile(avatarPath!),
     });

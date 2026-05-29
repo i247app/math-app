@@ -557,11 +557,13 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   Future<void> submitSignup({
     required String name,
+    required String role,
     String? email,
   }) async {
     final phone = state.phoneNumber;
     final trimmedName = name.trim();
     final trimmedEmail = email?.trim();
+    final trimmedRole = role.trim().toUpperCase();
     if (state.isSigningUp || phone == null) {
       return;
     }
@@ -581,6 +583,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       final user = await _authService.signupWithPhone(
         phone: phone,
         name: trimmedName,
+        role: trimmedRole,
         email: trimmedEmail?.isEmpty == true ? null : trimmedEmail,
         avatarPath: state.avatarPath,
       );

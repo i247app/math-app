@@ -8,11 +8,13 @@ class SignupRequest {
     required this.phone,
     this.email,
     this.name,
+    this.role,
   });
 
   final String phone;
   final String? email;
   final String? name;
+  final String? role;
 
   factory SignupRequest.fromJson(Map<String, dynamic> json) =>
       _$SignupRequestFromJson(json);

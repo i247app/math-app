@@ -132,6 +132,7 @@ abstract class OtpAuthService {
   Future<LoginUser> signupWithPhone({
     required String phone,
     required String name,
+    required String role,
     String? email,
     String? avatarPath,
   });
@@ -293,6 +294,7 @@ class OtpAuthApi implements OtpAuthService {
   Future<LoginUser> signupWithPhone({
     required String phone,
     required String name,
+    required String role,
     String? email,
     String? avatarPath,
   }) async {
@@ -303,6 +305,7 @@ class OtpAuthApi implements OtpAuthService {
           phone: phone,
           name: name,
           email: email,
+          role: role,
         ),
         avatarPath: avatarPath,
       );

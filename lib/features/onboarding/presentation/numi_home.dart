@@ -342,9 +342,13 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                         key: const ValueKey('signup'),
                         onBack: cubit.openOtp,
                         isSigningUp: state.isSigningUp,
-                        onContinue: (name, email) {
+                        onContinue: (name, email, role) {
                           HapticFeedback.mediumImpact();
-                          cubit.submitSignup(name: name, email: email);
+                          cubit.submitSignup(
+                            name: name,
+                            email: email,
+                            role: role,
+                          );
                         },
                       ),
                     AppScreen.home => HomeScreen(
