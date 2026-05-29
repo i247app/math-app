@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
@@ -7,8 +8,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/phone_input_formatter.dart';
 import '../../domain/phone_region.dart';
 import '../widgets/common_widgets.dart';
-import '../widgets/login_scene_background.dart';
-import '../widgets/numi_brand_mascot.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({
@@ -43,30 +42,77 @@ class LoginScreen extends StatelessWidget {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
-    final mascotSize = width < 370 ? 200.0 : 260.0;
+    final mascotSize = width < 370 ? 160.0 : 200.0;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Stack(
-        children: [
-          const Positioned.fill(child: LoginSceneBackground()),
-          ScreenFrame(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                CircleIconButton(
-                  icon: Icons.arrow_back_rounded,
-                  onPressed: onBack,
+      child: Container(
+        color: Colors.white,
+        child: ScreenFrame(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+              CircleIconButton(
+                icon: Icons.arrow_back_rounded,
+                onPressed: onBack,
+              ),
+              SizedBox(height: compact ? 12 : 24),
+              // Mascot
+              Center(
+                child: Container(
+                  width: mascotSize,
+                  height: mascotSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 30,
+                        offset: const Offset(0, 15),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset(
+                    'assets/images/numi-mascot.png',
+                    fit: BoxFit.contain,
+                  ),
                 ),
-                SizedBox(height: compact ? 8 : 24),
-                Center(
-                  child: NumiBrandMascot(size: mascotSize),
+              ),
+              SizedBox(height: compact ? 16 : 24),
+              // Title
+              Center(
+                child: Text(
+                  'NUMINUMI',
+                  style: GoogleFonts.fredoka(
+                    color: const Color(0xFF339395), // Teal from image
+                    fontSize: 40,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -1,
+                  ),
                 ),
-                SizedBox(height: compact ? 10 : 18),
-                LoginCard(
+              ),
+              const SizedBox(height: 16),
+              // Subtitle
+              Center(
+                child: Text(
+                  'Nhập số điện thoại để\nđăng ký hoặc đăng nhập !',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.fredoka(
+                    color: const Color(0xFF1B1B1B),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              SizedBox(height: compact ? 32 : 48),
+              // Input & Actions
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: LoginCard(
                   controller: controller,
                   region: region,
                   onRegionChanged: onRegionChanged,
@@ -78,11 +124,11 @@ class LoginScreen extends StatelessWidget {
                   phoneExists: phoneExists,
                   phoneErrorText: phoneErrorText,
                 ),
-                const SizedBox(height: 92),
-              ],
-            ),
+              ),
+              const SizedBox(height: 48),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -116,182 +162,141 @@ class LoginCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final tight = width < 370;
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(tight ? 20 : 24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.82)),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.greenShadow,
-            blurRadius: 20,
-            offset: Offset(0, 12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Phone Input
+        Container(
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFB5BFC2), width: 1.5),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 6),
-            child: Text(
-              context.getText(AppKeys.phoneNumberUpper),
-              style: const TextStyle(
-                color: AppColors.grayText,
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.8,
+          child: Row(
+            children: [
+              PhoneRegionMenu(
+                region: region,
+                onChanged: onRegionChanged,
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            height: 58,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.72),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.inputLine),
-            ),
-            child: Row(
-              children: [
-                PhoneRegionMenu(
-                  region: region,
-                  onChanged: onRegionChanged,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Container(
+                  width: 1,
+                  height: 24,
+                  color: const Color(0xFFE2E8F0),
                 ),
-                const SizedBox(width: 10),
-                Text(
-                  region.code,
-                  style: const TextStyle(
+              ),
+              Expanded(
+                child: TextField(
+                  key: ValueKey(region),
+                  controller: controller,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    PhoneInputFormatter(region),
+                  ],
+                  onChanged: onPhoneChanged,
+                  decoration: InputDecoration(
+                    hintText: region.hint,
+                    hintStyle: GoogleFonts.fredoka(
+                      color: const Color(0xFFB9C2C5),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                    ),
+                    border: InputBorder.none,
+                    isCollapsed: true,
+                  ),
+                  style: GoogleFonts.fredoka(
                     color: AppColors.ink,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
                     letterSpacing: 0,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    key: ValueKey(region),
-                    controller: controller,
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      PhoneInputFormatter(region),
-                    ],
-                    onChanged: onPhoneChanged,
-                    decoration: InputDecoration(
-                      hintText: region.hint,
-                      hintStyle: const TextStyle(color: Color(0xFFC8CFCB)),
-                      border: InputBorder.none,
-                      isCollapsed: true,
-                    ),
+              ),
+            ],
+          ),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 180),
+          child: phoneErrorText == null
+              ? const SizedBox(height: 24)
+              : Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 16),
+                  child: Text(
+                    phoneErrorText!,
                     style: const TextStyle(
-                      color: AppColors.ink,
-                      fontSize: 19,
+                      color: Color(0xFFD9534F),
+                      fontSize: 13,
+                      height: 1.25,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 0,
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            child: phoneErrorText == null
-                ? const SizedBox(height: 18)
-                : Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 6),
-                    child: Text(
-                      phoneErrorText!,
-                      style: const TextStyle(
-                        color: Color(0xFFD9534F),
-                        fontSize: 13,
-                        height: 1.25,
-                        fontWeight: FontWeight.w800,
-                      ),
+        ),
+        // Actions
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 220),
+          child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
+              ? const _CheckingDots(key: ValueKey('checking-phone'))
+              : (canSendOtp)
+                  ? _GreyActionButton(
+                      label: phoneExists == false
+                          ? context.getText(AppKeys.signup)
+                          : context.getText(AppKeys.login),
+                      onPressed: onSendOtp,
+                    )
+                  : const SizedBox(
+                      key: ValueKey('send-otp-placeholder'),
+                      height: 56, // same height as button to prevent jumping
                     ),
-                  ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GreyActionButton extends StatelessWidget {
+  const _GreyActionButton({
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 64,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF798B8C), // Grey-blue from design
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          const SizedBox(height: 24),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 220),
-            child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
-                ? const _CheckingDots(key: ValueKey('checking-phone'))
-                : canSendOtp && phoneExists == false
-                    ? Column(
-                        key: const ValueKey('send-otp-actions'),
-                        children: [
-                          Text(
-                            context.getText(AppKeys.newAccountPrompt),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: AppColors.muted,
-                              fontSize: 13,
-                              height: 1.25,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          PrimaryButton(
-                            label: context.getText(AppKeys.signup),
-                            onPressed: onSendOtp,
-                          ),
-                          const SizedBox(height: 16),
-                          Center(
-                            child: SizedBox(
-                              width: 255,
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.timer_outlined,
-                                    size: 20,
-                                    color: AppColors.orangeAccent,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Flexible(
-                                    child: Text(
-                                      context.getText(
-                                        AppKeys.otpWithin30Seconds,
-                                      ),
-                                      style: const TextStyle(
-                                        color: AppColors.muted,
-                                        fontSize: 13,
-                                        height: 1.28,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 0,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : canSendOtp && phoneExists == true
-                        ? Column(
-                            key: const ValueKey('login-otp-actions'),
-                            children: [
-                              PrimaryButton(
-                                label: context.getText(AppKeys.login),
-                                onPressed: onSendOtp,
-                              ),
-                            ],
-                          )
-                        : const SizedBox(
-                            key: ValueKey('send-otp-placeholder'),
-                            height: 0,
-                          ),
-          ),
-        ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label.toUpperCase(),
+              style: GoogleFonts.fredoka(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward_rounded, size: 24),
+          ],
+        ),
       ),
     );
   }
@@ -327,7 +332,7 @@ class _CheckingDotsState extends State<_CheckingDots>
   Widget build(BuildContext context) {
     return SizedBox(
       key: const ValueKey('checking-phone-dots'),
-      height: 58,
+      height: 64, // Matches button height
       child: Center(
         child: AnimatedBuilder(
           animation: controller,
@@ -346,7 +351,7 @@ class _CheckingDotsState extends State<_CheckingDots>
                     height: 9,
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.teal.withValues(alpha: opacity),
+                      color: const Color(0xFF798B8C).withOpacity(opacity),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -375,33 +380,32 @@ class PhoneRegionMenu extends StatelessWidget {
     return PopupMenuButton<PhoneRegion>(
       tooltip: context.getText(AppKeys.chooseCountry),
       onSelected: onChanged,
+      offset: const Offset(0, 48),
       itemBuilder: (context) {
         return PhoneRegion.values.map((item) {
           return PopupMenuItem(
             value: item,
-            child: Text('${item.flag}  ${item.label} ${item.code}'),
+            child: Text(
+              '${item.flag}  ${item.label} ${item.code}',
+              style: GoogleFonts.fredoka(),
+            ),
           );
         }).toList();
       },
-      child: Container(
-        height: 28,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: AppColors.mintMist,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(region.flag, style: const TextStyle(fontSize: 14)),
-            const SizedBox(width: 4),
-            const Icon(
-              Icons.keyboard_arrow_down_rounded,
-              color: AppColors.grayText,
-              size: 16,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(region.flag, style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 8),
+          Text(
+            region.code,
+            style: GoogleFonts.fredoka(
+              color: const Color(0xFF323B3E),
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
