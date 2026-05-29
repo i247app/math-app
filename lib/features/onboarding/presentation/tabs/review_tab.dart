@@ -9,6 +9,8 @@ import '../../data/chapter_api.dart';
 import '../../data/practice_catalog.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/profile_api.dart';
+import '../../data/quiz_api.dart';
+import '../screens/assessment_screen.dart';
 
 const _reviewInk = Color(0xFF14213D);
 const _reviewMuted = Color(0xFF77859A);
@@ -42,11 +44,13 @@ class ReviewTab extends StatefulWidget {
 class _ReviewTabState extends State<ReviewTab> {
   final ProfileService _profileService = ProfileApi();
   final ChapterService _chapterService = ChapterApi();
+  final QuizService _quizService = QuizApi();
 
   List<StudentProfile> _profiles = const <StudentProfile>[];
   List<PracticeChapter> _chapters = const <PracticeChapter>[];
   bool _isLoadingProfiles = true;
   bool _isLoadingChapters = false;
+  bool _isGeneratingPracticeQuiz = false;
   String? _profileLoadError;
   String? _chapterLoadError;
   int _loadRequestId = 0;
@@ -256,18 +260,9 @@ class _ReviewTabState extends State<ReviewTab> {
     });
   }
 
-  void _startSingleTest(PracticeChapter chapter) {
+  Future<void> _startSingleTest(PracticeChapter chapter) async {
     HapticFeedback.mediumImpact();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.readFormatText(
-            AppKeys.startChapterTestMessage,
-            {'chapter': chapter.number},
-          ),
-        ),
-      ),
-    );
+    await _generatePracticeQuiz(<PracticeChapter>[chapter]);
   }
 
   void _clearSelection() {
@@ -275,18 +270,57 @@ class _ReviewTabState extends State<ReviewTab> {
     setState(_selectedChapterNumbers.clear);
   }
 
-  void _startSelectedTest() {
+  Future<void> _startSelectedTest() async {
     HapticFeedback.mediumImpact();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.readFormatText(
-            AppKeys.startSelectedTestMessage,
-            {'count': _selectedChapterNumbers.length},
-          ),
+    final selectedChapters = _chapters
+        .where((chapter) => _selectedChapterNumbers.contains(chapter.number))
+        .toList();
+    await _generatePracticeQuiz(selectedChapters);
+  }
+
+  Future<void> _generatePracticeQuiz(List<PracticeChapter> chapters) async {
+    if (_isGeneratingPracticeQuiz || chapters.isEmpty) {
+      return;
+    }
+
+    final chapterNames = chapters
+        .map((chapter) => chapter.title.trim())
+        .where((chapter) => chapter.isNotEmpty)
+        .toList();
+    if (chapterNames.isEmpty) {
+      return;
+    }
+
+    setState(() => _isGeneratingPracticeQuiz = true);
+
+    final result = await Navigator.of(context).push<AiAssessmentResult>(
+      MaterialPageRoute<AiAssessmentResult>(
+        builder: (_) => AiAssessmentScreen(
+          quizService: _quizService,
+          purpose: quizPurposePractice,
+          typeOfQuiz: quizTypeGeneral,
+          gradeLabel: assessmentQuizGradeLabel,
+          chapters: chapterNames,
         ),
       ),
     );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isGeneratingPracticeQuiz = false;
+      if (result != AiAssessmentResult.generationFailed) {
+        _selectedChapterNumbers.clear();
+      }
+    });
+
+    if (result == AiAssessmentResult.generationFailed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.readText(AppKeys.createQuestionFailed))),
+      );
+    }
   }
 
   Widget _buildBody({
@@ -296,8 +330,8 @@ class _ReviewTabState extends State<ReviewTab> {
     required double scale,
   }) {
     if (_isLoadingProfiles || _isLoadingChapters) {
-      return SizedBox(
-        height: 430 * scale,
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 140 * scale),
         child: Center(
           child: CircularProgressIndicator(
             color: _headerNavy,
@@ -493,9 +527,11 @@ class _ReviewProfileStatePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 430 * scale,
       margin: EdgeInsets.only(top: 78 * scale),
-      padding: EdgeInsets.symmetric(horizontal: 28 * scale),
+      padding: EdgeInsets.symmetric(
+        horizontal: 28 * scale,
+        vertical: 54 * scale,
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(28 * scale),
@@ -511,7 +547,7 @@ class _ReviewProfileStatePanel extends StatelessWidget {
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: const Color(0xFF00776F), size: 58 * scale),
           SizedBox(height: 40 * scale),
@@ -599,8 +635,10 @@ class _StatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 78 * scale,
-      padding: EdgeInsets.symmetric(horizontal: 18 * scale),
+      padding: EdgeInsets.symmetric(
+        horizontal: 18 * scale,
+        vertical: 14 * scale,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22 * scale),
@@ -703,7 +741,6 @@ class _ChapterCard extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOutCubic,
-          height: (showButton ? 248 : 184) * scale,
           padding: EdgeInsets.all(20 * scale),
           decoration: BoxDecoration(
             color: colors.background,
@@ -720,6 +757,7 @@ class _ChapterCard extends StatelessWidget {
             ],
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -729,44 +767,53 @@ class _ChapterCard extends StatelessWidget {
                     icon: chapter.icon,
                     scale: scale,
                   ),
-                  const Spacer(),
+                  SizedBox(width: 14 * scale),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 3 * scale),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _chapterMetaText(context, chapter),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: _reviewMuted,
+                              fontFamily: 'Nunito',
+                              fontSize: 16 * scale,
+                              fontWeight: FontWeight.w900,
+                              height: 1,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                          SizedBox(height: 6 * scale),
+                          Text(
+                            chapter.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: _reviewInk,
+                              fontFamily: 'Nunito',
+                              fontSize: 22 * scale,
+                              fontWeight: FontWeight.w900,
+                              height: 1.08,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10 * scale),
                   _SelectCircle(
                     selected: selected,
                     scale: scale,
                   ),
                 ],
               ),
-              SizedBox(height: 16 * scale),
-              Text(
-                _chapterMetaText(context, chapter),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: _reviewMuted,
-                  fontFamily: 'Nunito',
-                  fontSize: 16 * scale,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  letterSpacing: 0,
-                ),
-              ),
-              SizedBox(height: 6 * scale),
-              Text(
-                chapter.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: _reviewInk,
-                  fontFamily: 'Nunito',
-                  fontSize: 22 * scale,
-                  fontWeight: FontWeight.w900,
-                  height: 1.08,
-                  letterSpacing: 0,
-                ),
-              ),
-              const Spacer(),
               if (showButton) ...[
-                SizedBox(height: 14 * scale),
+                SizedBox(height: 20 * scale),
                 _TestButton(
                   enabled: true,
                   scale: scale,
@@ -866,41 +913,43 @@ class _TestButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Opacity(
       opacity: enabled ? 1 : 0.52,
-      child: SizedBox(
-        height: 67 * scale,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: enabled ? onTap : null,
-              borderRadius: BorderRadius.circular(16 * scale),
-              child: _DepthButtonSurface(
-                height: 67 * scale,
-                radius: 16 * scale,
-                depth: 8 * scale,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.star_rounded,
-                        color: const Color(0xFF3B0031), size: 25 * scale),
-                    SizedBox(width: 14 * scale),
-                    Text(
-                      context.getText(AppKeys.test),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: const Color(0xFF3B0031),
-                        fontFamily: 'Nunito',
-                        fontSize: 20 * scale,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ],
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(16 * scale),
+          child: _DepthButtonSurface(
+            radius: 16 * scale,
+            depth: 8 * scale,
+            padding: EdgeInsets.symmetric(
+              horizontal: 20 * scale,
+              vertical: 17 * scale,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.star_rounded,
+                  color: const Color(0xFF3B0031),
+                  size: 25 * scale,
                 ),
-              ),
+                SizedBox(width: 14 * scale),
+                Flexible(
+                  child: Text(
+                    context.getText(AppKeys.test),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: const Color(0xFF3B0031),
+                      fontFamily: 'Nunito',
+                      fontSize: 20 * scale,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -928,9 +977,12 @@ class _StartSelectedButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(18 * scale),
         child: _DepthButtonSurface(
-          height: 68 * scale,
           radius: 18 * scale,
           depth: 8 * scale,
+          padding: EdgeInsets.symmetric(
+            horizontal: 18 * scale,
+            vertical: 18 * scale,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -979,32 +1031,38 @@ class _ClearSelectionButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(18 * scale),
-        child: SizedBox(
-          width: 106 * scale,
-          height: 68 * scale,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.close_rounded,
-                color: _selectPink,
-                size: 23 * scale,
-              ),
-              SizedBox(width: 7 * scale),
-              Text(
-                context.getText(AppKeys.clearSelection),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minWidth: 106 * scale),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 14 * scale,
+              vertical: 22 * scale,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.close_rounded,
                   color: _selectPink,
-                  fontFamily: 'Nunito',
-                  fontSize: 14 * scale,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  letterSpacing: 0,
+                  size: 23 * scale,
                 ),
-              ),
-            ],
+                SizedBox(width: 7 * scale),
+                Text(
+                  context.getText(AppKeys.clearSelection),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: _selectPink,
+                    fontFamily: 'Nunito',
+                    fontSize: 14 * scale,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1014,43 +1072,35 @@ class _ClearSelectionButton extends StatelessWidget {
 
 class _DepthButtonSurface extends StatelessWidget {
   const _DepthButtonSurface({
-    required this.height,
     required this.radius,
     required this.depth,
+    required this.padding,
     required this.child,
   });
 
-  final double height;
   final double radius;
   final double depth;
+  final EdgeInsetsGeometry padding;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
-      child: SizedBox(
-        height: height,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            const DecoratedBox(
-              decoration: BoxDecoration(color: _testShadow),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(color: _testShadow),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: depth),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: _testYellow,
+              borderRadius: BorderRadius.circular(radius),
             ),
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: depth,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: _testYellow,
-                  borderRadius: BorderRadius.circular(radius),
-                ),
-                child: Center(child: child),
-              ),
+            child: Padding(
+              padding: padding,
+              child: Center(child: child),
             ),
-          ],
+          ),
         ),
       ),
     );

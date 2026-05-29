@@ -13,13 +13,28 @@ class NumiApp extends StatefulWidget {
 
   final OtpAuthService? authService;
 
+  static void restart(BuildContext context) {
+    final element =
+        context.getElementForInheritedWidgetOfExactType<_NumiRestartScope>();
+    final scope = element?.widget as _NumiRestartScope?;
+    assert(scope != null, 'No Numi restart scope found in context.');
+    scope?.restart();
+  }
+
   @override
   State<NumiApp> createState() => _NumiAppState();
 }
 
 class _NumiAppState extends State<NumiApp> {
-  late final LingoProvider _lingoProvider = LingoProvider();
-  late final Future<void> _languageInit = _lingoProvider.initialize();
+  late LingoProvider _lingoProvider;
+  late Future<void> _languageInit;
+  int _restartSeed = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _createLingoProvider();
+  }
 
   @override
   void dispose() {
@@ -27,29 +42,61 @@ class _NumiAppState extends State<NumiApp> {
     super.dispose();
   }
 
+  void _createLingoProvider() {
+    _lingoProvider = LingoProvider();
+    _languageInit = _lingoProvider.initialize();
+  }
+
+  void _restartApp() {
+    final oldProvider = _lingoProvider;
+    setState(() {
+      _restartSeed++;
+      _createLingoProvider();
+    });
+    oldProvider.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LingoScope(
-      lingo: _lingoProvider,
-      child: FutureBuilder<void>(
-        future: _languageInit,
-        builder: (context, snapshot) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: context.getText(AppKeys.appName),
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: AppColors.teal),
-              scaffoldBackgroundColor: AppColors.mintMist,
-              useMaterial3: true,
-            ),
-            home: snapshot.connectionState == ConnectionState.done
-                ? NumiHome(authService: widget.authService)
-                : const Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
-                  ),
-          );
-        },
+    return _NumiRestartScope(
+      restart: _restartApp,
+      child: LingoScope(
+        lingo: _lingoProvider,
+        child: FutureBuilder<void>(
+          future: _languageInit,
+          builder: (context, snapshot) {
+            return MaterialApp(
+              key: ValueKey(_restartSeed),
+              debugShowCheckedModeBanner: false,
+              title: context.getText(AppKeys.appName),
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: AppColors.teal),
+                scaffoldBackgroundColor: AppColors.mintMist,
+                useMaterial3: true,
+              ),
+              home: snapshot.connectionState == ConnectionState.done
+                  ? NumiHome(authService: widget.authService)
+                  : const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    ),
+            );
+          },
+        ),
       ),
     );
+  }
+}
+
+class _NumiRestartScope extends InheritedWidget {
+  const _NumiRestartScope({
+    required this.restart,
+    required super.child,
+  });
+
+  final VoidCallback restart;
+
+  @override
+  bool updateShouldNotify(_NumiRestartScope oldWidget) {
+    return restart != oldWidget.restart;
   }
 }

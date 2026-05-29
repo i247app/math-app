@@ -27,6 +27,7 @@ abstract class QuizService {
     String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
     String? previousQuizId,
+    List<String>? chapters,
   });
 
   Future<List<GeneratedQuiz>> listQuizzes({
@@ -51,6 +52,7 @@ class FakeQuizApi implements QuizService {
     String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
     String? previousQuizId,
+    List<String>? chapters,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 900));
     final response = GenerateQuizResponse.fromJson(
@@ -59,6 +61,7 @@ class FakeQuizApi implements QuizService {
         typeOfQuiz: typeOfQuiz,
         gradeLabel: gradeLabel,
         previousQuizId: previousQuizId,
+        chapters: chapters,
       ),
     );
     final quiz = response.quiz;
@@ -147,6 +150,7 @@ class QuizApi implements QuizService {
     String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
     String? previousQuizId,
+    List<String>? chapters,
   }) async {
     final GenerateQuizResponse response;
     final cleanGradeLabel = gradeLabel?.trim();
@@ -161,6 +165,7 @@ class QuizApi implements QuizService {
                   : assessmentQuizGradeLabel
               : null,
           previousQuizId: previousQuizId,
+          chapters: _cleanChapters(chapters),
         ),
       );
     } on NetworkException catch (error) {
@@ -252,11 +257,20 @@ class QuizApi implements QuizService {
   }
 }
 
+List<String>? _cleanChapters(List<String>? chapters) {
+  final cleanChapters = chapters
+      ?.map((chapter) => chapter.trim())
+      .where((chapter) => chapter.isNotEmpty)
+      .toList();
+  return cleanChapters == null || cleanChapters.isEmpty ? null : cleanChapters;
+}
+
 Map<String, Object?> _fakeGenerateQuizResponse({
   String purpose = quizPurposeAssessment,
   String typeOfQuiz = quizTypeGeneral,
   String? gradeLabel,
   String? previousQuizId,
+  List<String>? chapters,
 }) {
   return <String, Object?>{
     'mstatus': 200,

@@ -9,6 +9,7 @@ class _SettingsMenuPanel extends StatelessWidget {
     required this.scale,
     required this.onAccountTap,
     required this.onProfileTap,
+    required this.onLanguageTap,
     required this.onLogoutTap,
   });
 
@@ -18,6 +19,7 @@ class _SettingsMenuPanel extends StatelessWidget {
   final double scale;
   final VoidCallback onAccountTap;
   final VoidCallback onProfileTap;
+  final VoidCallback onLanguageTap;
   final VoidCallback onLogoutTap;
 
   @override
@@ -66,7 +68,15 @@ class _SettingsMenuPanel extends StatelessWidget {
           onTap: onProfileTap,
         ),
         SizedBox(height: 12 * scale),
-        _LanguageSelectorCard(scale: scale),
+        _SettingsActionCard(
+          icon: Icons.language_rounded,
+          iconColor: _navy,
+          iconBackground: const Color(0xFFEAF4FF),
+          title: context.getText(AppKeys.language),
+          subtitle: context.getText(AppKeys.languageMenuSubtitle),
+          scale: scale,
+          onTap: onLanguageTap,
+        ),
         SizedBox(height: 12 * scale),
         _SettingsActionCard(
           icon: Icons.logout_rounded,
@@ -82,115 +92,6 @@ class _SettingsMenuPanel extends StatelessWidget {
           },
         ),
       ],
-    );
-  }
-}
-
-class _LanguageSelectorCard extends StatelessWidget {
-  const _LanguageSelectorCard({required this.scale});
-
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    final lingo = LingoScope.of(context);
-    return Container(
-      padding: EdgeInsets.all(14 * scale),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: _cardBorder, width: 1.4 * scale),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 46 * scale,
-            height: 46 * scale,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEAF4FF),
-              borderRadius: BorderRadius.circular(16 * scale),
-            ),
-            child: Icon(
-              Icons.language_rounded,
-              color: _navy,
-              size: 25 * scale,
-            ),
-          ),
-          SizedBox(width: 12 * scale),
-          Expanded(
-            child: Text(
-              context.getText(AppKeys.language),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: _deepInk,
-                fontFamily: 'Nunito',
-                fontSize: 16 * scale,
-                fontWeight: FontWeight.w900,
-                height: 1.1,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
-          SizedBox(width: 10 * scale),
-          _LanguageChip(
-            label: context.getText(AppKeys.languageVietnamese),
-            selected: lingo.language == AppLanguage.vi,
-            scale: scale,
-            onTap: () => lingo.setLanguage(AppLanguage.vi),
-          ),
-          SizedBox(width: 8 * scale),
-          _LanguageChip(
-            label: context.getText(AppKeys.languageEnglish),
-            selected: lingo.language == AppLanguage.en,
-            scale: scale,
-            onTap: () => lingo.setLanguage(AppLanguage.en),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LanguageChip extends StatelessWidget {
-  const _LanguageChip({
-    required this.label,
-    required this.selected,
-    required this.scale,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final double scale;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: selected ? _navy : const Color(0xFFF1F5F3),
-      borderRadius: BorderRadius.circular(999),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 10 * scale,
-            vertical: 8 * scale,
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: selected ? Colors.white : _muted,
-              fontFamily: 'Nunito',
-              fontSize: 12 * scale,
-              fontWeight: FontWeight.w900,
-              height: 1,
-              letterSpacing: 0,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

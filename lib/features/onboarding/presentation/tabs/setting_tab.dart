@@ -5,8 +5,6 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
-import '../../../../core/localization/app_language.dart';
-import '../../../../core/localization/lingo_scope.dart';
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/network/profile_models.dart';
 import '../../../../core/network/program_models.dart';
@@ -16,6 +14,7 @@ import '../../data/avatar_picker.dart';
 import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/profile_api.dart';
+import '../screens/language_settings_screen.dart';
 
 part 'widgets/setting_header.dart';
 part 'widgets/settings_menu_panel.dart';
@@ -169,6 +168,15 @@ class _SettingTabState extends State<SettingTab> {
       _loadProfiles();
       _preloadProfileOptions();
     }
+  }
+
+  void _openLanguageScreen() {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const LanguageSettingsScreen(),
+      ),
+    );
   }
 
   void _returnToSettings() {
@@ -819,6 +827,7 @@ class _SettingTabState extends State<SettingTab> {
                           scale: scale,
                           onAccountTap: () => _openView(_AccountView.account),
                           onProfileTap: () => _openView(_AccountView.profile),
+                          onLanguageTap: _openLanguageScreen,
                           onLogoutTap: widget.onLogout,
                         ),
                       _AccountView.account => _AccountDetailsPanel(

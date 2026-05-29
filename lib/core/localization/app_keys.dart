@@ -14,6 +14,7 @@ class AppKeys {
   static const continueUpper = 'continue_upper';
   static const language = 'language';
   static const languageTitle = 'language_title';
+  static const languageMenuSubtitle = 'language_menu_subtitle';
   static const languageVietnamese = 'language_vietnamese';
   static const languageEnglish = 'language_english';
 

@@ -9,6 +9,7 @@ class GenerateQuizRequest {
     required this.typeOfQuiz,
     this.gradeLabel,
     this.previousQuizId,
+    this.chapters,
   });
 
   final String purpose;
@@ -18,6 +19,7 @@ class GenerateQuizRequest {
   final String? gradeLabel;
   @JsonKey(name: 'previous_quiz_id')
   final String? previousQuizId;
+  final List<String>? chapters;
 
   factory GenerateQuizRequest.fromJson(Map<String, dynamic> json) =>
       _$GenerateQuizRequestFromJson(json);

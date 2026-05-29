@@ -32,6 +32,7 @@ class AiAssessmentScreen extends StatefulWidget {
     this.purpose = quizPurposeAssessment,
     this.typeOfQuiz = quizTypeGeneral,
     this.gradeLabel,
+    this.chapters,
   });
 
   final QuizService? quizService;
@@ -39,6 +40,7 @@ class AiAssessmentScreen extends StatefulWidget {
   final String purpose;
   final String typeOfQuiz;
   final String? gradeLabel;
+  final List<String>? chapters;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -84,6 +86,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         purpose: widget.purpose,
         typeOfQuiz: widget.typeOfQuiz,
         gradeLabel: widget.gradeLabel,
+        chapters: widget.chapters,
       );
       if (!mounted) {
         return;
