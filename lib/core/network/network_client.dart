@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/api_config.dart';
 import 'auth_models.dart';
+import 'chapter_models.dart';
 import 'grade_models.dart';
 import 'profile_models.dart';
 import 'program_models.dart';
@@ -513,6 +514,27 @@ class NetworkApi {
     }
 
     return gradeResponse;
+  }
+
+  Future<ChapterListResponse> listChapters(
+    ChapterListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/chapters/list',
+      request.toJson(),
+    );
+    final chapterResponse = ChapterListResponse.fromJson(responseJson);
+    if (chapterResponse.mstatus != 200) {
+      throw NetworkException(
+        chapterResponse.mmessage ??
+            chapterResponse.debug ??
+            chapterResponse.status ??
+            'Request failed.',
+        status: chapterResponse.mstatus,
+      );
+    }
+
+    return chapterResponse;
   }
 
   Future<ProfileListResponse> listProfiles(

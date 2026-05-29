@@ -40,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late final GradeService _gradeService = GradeApi();
   int _activeTab = 0;
   int _previousActiveTab = 0;
+  int _openAddProfileRequestId = 0;
+  bool _returnToReviewAfterProfileSave = false;
   String? _prefetchedGradeUserId;
   bool _isPrefetchingGrades = false;
   List<GradeModel> _prefetchedGrades = const <GradeModel>[];
@@ -154,6 +156,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       initialGrades: _prefetchedGrades,
                       gradeService: _gradeService,
                       onLogout: widget.onLogout,
+                      onAddProfileFromReview: () {
+                        HapticFeedback.selectionClick();
+                        setState(() {
+                          _previousActiveTab = _activeTab;
+                          _activeTab = 3;
+                          _returnToReviewAfterProfileSave = true;
+                          _openAddProfileRequestId++;
+                        });
+                      },
+                      onProfileSaved: () {
+                        if (!_returnToReviewAfterProfileSave) {
+                          return;
+                        }
+
+                        setState(() {
+                          _previousActiveTab = _activeTab;
+                          _activeTab = 1;
+                          _returnToReviewAfterProfileSave = false;
+                        });
+                      },
+                      openAddProfileRequestId: _openAddProfileRequestId,
                       bottomPadding: navHeight + navBottomGap + s(12),
                       headerHeight: showHeader ? s(98) : 0,
                       scale: scale,
@@ -227,6 +250,9 @@ class _TabContent extends StatelessWidget {
     required this.initialGrades,
     required this.gradeService,
     required this.onLogout,
+    required this.onAddProfileFromReview,
+    required this.onProfileSaved,
+    required this.openAddProfileRequestId,
     required this.bottomPadding,
     required this.headerHeight,
     required this.scale,
@@ -237,6 +263,9 @@ class _TabContent extends StatelessWidget {
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final VoidCallback onLogout;
+  final VoidCallback onAddProfileFromReview;
+  final VoidCallback onProfileSaved;
+  final int openAddProfileRequestId;
   final double bottomPadding;
   final double headerHeight;
   final double scale;
@@ -277,6 +306,8 @@ class _TabContent extends StatelessWidget {
       return SettingTab(
         user: user,
         onLogout: onLogout,
+        onProfileSaved: onProfileSaved,
+        openAddProfileRequestId: openAddProfileRequestId,
         bottomPadding: bottomPadding,
         scale: scale,
       );
@@ -284,6 +315,8 @@ class _TabContent extends StatelessWidget {
 
     if (activeTab == 1) {
       return ReviewTab(
+        user: user,
+        onAddProfile: onAddProfileFromReview,
         bottomPadding: bottomPadding,
         scale: scale,
       );

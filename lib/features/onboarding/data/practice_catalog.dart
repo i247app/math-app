@@ -15,21 +15,28 @@ class PracticeChapter {
     required this.lessons,
     required this.completedLessons,
     required this.icon,
+    this.id,
+    this.description,
+    this.lessonCountOverride,
   });
 
+  final String? id;
   final int number;
   final String title;
+  final String? description;
   final List<PracticeLesson> lessons;
   final int completedLessons;
   final String icon;
+  final int? lessonCountOverride;
 
-  int get lessonCount => lessons.length;
+  int get lessonCount => lessonCountOverride ?? lessons.length;
 
   double get progress {
-    if (lessons.isEmpty) {
+    final totalLessons = lessonCount;
+    if (totalLessons <= 0) {
       return 0;
     }
-    return completedLessons.clamp(0, lessons.length) / lessons.length;
+    return completedLessons.clamp(0, totalLessons) / totalLessons;
   }
 
   bool get isLocked => completedLessons == 0 && number > 2;

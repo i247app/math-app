@@ -34,12 +34,16 @@ class SettingTab extends StatefulWidget {
     super.key,
     required this.user,
     required this.onLogout,
+    this.onProfileSaved,
+    this.openAddProfileRequestId = 0,
     required this.bottomPadding,
     required this.scale,
   });
 
   final LoginUser? user;
   final VoidCallback onLogout;
+  final VoidCallback? onProfileSaved;
+  final int openAddProfileRequestId;
   final double bottomPadding;
   final double scale;
 
@@ -91,11 +95,23 @@ class _SettingTabState extends State<SettingTab> {
   void initState() {
     super.initState();
     _applyUser(widget.user);
+    if (widget.openAddProfileRequestId > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _openAddProfile();
+        }
+      });
+    }
   }
 
   @override
   void didUpdateWidget(covariant SettingTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.openAddProfileRequestId != widget.openAddProfileRequestId) {
+      _openAddProfile();
+      return;
+    }
+
     if (oldWidget.user != widget.user && !_isEditing) {
       _updatedUser = null;
       _applyUser(widget.user);
@@ -584,6 +600,7 @@ class _SettingTabState extends State<SettingTab> {
         _isForwardTransition = false;
       });
       await _loadProfiles();
+      widget.onProfileSaved?.call();
     } on ProfileException catch (error) {
       if (!mounted) {
         return;
