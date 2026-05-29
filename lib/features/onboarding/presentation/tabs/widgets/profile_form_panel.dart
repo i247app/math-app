@@ -8,10 +8,8 @@ class _AddProfilePanel extends StatelessWidget {
     required this.avatarUrl,
     required this.grades,
     required this.programs,
-    required this.semesters,
     required this.selectedGrade,
     required this.selectedProgram,
-    required this.selectedSemester,
     required this.isLoadingOptions,
     required this.isPickingAvatar,
     required this.isSaving,
@@ -21,7 +19,6 @@ class _AddProfilePanel extends StatelessWidget {
     required this.onClearAvatar,
     required this.onGradeChanged,
     required this.onProgramChanged,
-    required this.onSemesterChanged,
     required this.onRetryOptions,
     required this.onCancel,
     required this.onSave,
@@ -33,10 +30,8 @@ class _AddProfilePanel extends StatelessWidget {
   final String? avatarUrl;
   final List<GradeModel> grades;
   final List<ProgramModel> programs;
-  final List<SemesterModel> semesters;
   final GradeModel? selectedGrade;
   final ProgramModel? selectedProgram;
-  final SemesterModel? selectedSemester;
   final bool isLoadingOptions;
   final bool isPickingAvatar;
   final bool isSaving;
@@ -46,7 +41,6 @@ class _AddProfilePanel extends StatelessWidget {
   final VoidCallback onClearAvatar;
   final ValueChanged<GradeModel?> onGradeChanged;
   final ValueChanged<ProgramModel?> onProgramChanged;
-  final ValueChanged<SemesterModel?> onSemesterChanged;
   final VoidCallback onRetryOptions;
   final VoidCallback onCancel;
   final VoidCallback onSave;
@@ -67,14 +61,14 @@ class _AddProfilePanel extends StatelessWidget {
           onTap: onPickAvatar,
           onClear: onClearAvatar,
         ),
-        SizedBox(height: 22 * scale),
+        SizedBox(height: 28 * scale),
         _AddProfileTextField(
           label: context.getText(AppKeys.fullName),
           controller: nameController,
           hintText: context.getText(AppKeys.studentNameHint),
           scale: scale,
         ),
-        SizedBox(height: 14 * scale),
+        SizedBox(height: 18 * scale),
         if (isLoadingOptions)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 58 * scale),
@@ -97,7 +91,7 @@ class _AddProfilePanel extends StatelessWidget {
             onChanged: onGradeChanged,
             scale: scale,
           ),
-          SizedBox(height: 14 * scale),
+          SizedBox(height: 18 * scale),
           _AddProfileDropdown<ProgramModel>(
             label: context.getText(AppKeys.learningProgram),
             hintText: context.getText(AppKeys.chooseProgram),
@@ -107,18 +101,6 @@ class _AddProfilePanel extends StatelessWidget {
                 ? program.label!.trim()
                 : context.getText(AppKeys.program),
             onChanged: onProgramChanged,
-            scale: scale,
-          ),
-          SizedBox(height: 14 * scale),
-          _AddProfileDropdown<SemesterModel>(
-            label: context.getText(AppKeys.semester),
-            hintText: context.getText(AppKeys.chooseSemester),
-            value: selectedSemester,
-            items: semesters,
-            itemLabel: (semester) => semester.name?.trim().isNotEmpty == true
-                ? semester.name!.trim()
-                : context.getText(AppKeys.semester),
-            onChanged: onSemesterChanged,
             scale: scale,
           ),
         ],
@@ -153,7 +135,7 @@ class _AddProfilePanel extends StatelessWidget {
             ),
           ],
         ],
-        SizedBox(height: 34 * scale),
+        SizedBox(height: 90 * scale),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -192,12 +174,12 @@ class _AddProfileAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final path = avatarPath?.trim();
     final url = avatarUrl?.trim();
-    final size = 116 * scale;
+    final size = 124 * scale;
 
     return Center(
       child: SizedBox(
-        width: size + 28 * scale,
-        height: size + 28 * scale,
+        width: size + 24 * scale,
+        height: size + 24 * scale,
         child: Stack(
           alignment: Alignment.center,
           clipBehavior: Clip.none,
@@ -211,11 +193,11 @@ class _AddProfileAvatar extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 14 * scale,
-                    offset: Offset(0, 6 * scale),
+                    blurRadius: 12 * scale,
+                    offset: Offset(0, 4 * scale),
                   ),
                 ],
-                border: Border.all(color: Colors.white, width: 3 * scale),
+                border: Border.all(color: Colors.white, width: 4 * scale),
               ),
               child: ClipOval(
                 child: path != null && path.isNotEmpty
@@ -290,23 +272,23 @@ class _AddProfileAvatar extends StatelessWidget {
                 ),
               ),
             Positioned(
-              right: 14 * scale,
+              right: 10 * scale,
               bottom: 18 * scale,
               child: Material(
-                color: const Color(0xFFFF61AE),
+                color: _teal,
                 elevation: 5,
-                shadowColor: const Color(0xFFFF61AE).withValues(alpha: 0.28),
+                shadowColor: _teal.withValues(alpha: 0.24),
                 shape: const CircleBorder(),
                 child: InkWell(
                   customBorder: const CircleBorder(),
                   onTap: onTap,
                   child: SizedBox(
-                    width: 38 * scale,
-                    height: 38 * scale,
+                    width: 36 * scale,
+                    height: 36 * scale,
                     child: Icon(
                       Icons.photo_camera_outlined,
-                      color: _deepInk,
-                      size: 19 * scale,
+                      color: Colors.white,
+                      size: 18 * scale,
                     ),
                   ),
                 ),
@@ -395,7 +377,7 @@ class _AddProfileDropdown<T> extends StatelessWidget {
           isExpanded: true,
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: const Color(0xFFB72D83),
+            color: _teal,
             size: 24 * scale,
           ),
           hint: Text(
@@ -460,19 +442,12 @@ class _AddProfileFieldShell extends StatelessWidget {
         ),
         SizedBox(height: 8 * scale),
         Container(
-          height: 54 * scale,
+          height: 56 * scale,
           padding: EdgeInsets.symmetric(horizontal: 16 * scale),
           decoration: BoxDecoration(
-            color: const Color(0xFFEDF7F9),
-            borderRadius: BorderRadius.circular(12 * scale),
-            border: Border.all(color: const Color(0xFFD8E4E7), width: 1.4),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8 * scale,
-                offset: Offset(0, 3 * scale),
-              ),
-            ],
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14 * scale),
+            border: Border.all(color: const Color(0xFFD8E4E7), width: 1.6),
           ),
           alignment: Alignment.center,
           child: child,

@@ -958,10 +958,8 @@ class _SettingTabState extends State<SettingTab> {
                             avatarUrl: _editingProfile?.avatarUrl,
                             grades: _gradeOptions,
                             programs: _programOptions,
-                            semesters: _semesterOptions,
                             selectedGrade: _selectedGrade,
                             selectedProgram: _selectedProgram,
-                            selectedSemester: _selectedSemester,
                             isLoadingOptions: _isLoadingProfileOptions,
                             isPickingAvatar: _isPickingCreateAvatar,
                             isSaving: _isSavingProfile,
@@ -975,9 +973,6 @@ class _SettingTabState extends State<SettingTab> {
                             },
                             onProgramChanged: (program) {
                               setState(() => _selectedProgram = program);
-                            },
-                            onSemesterChanged: (semester) {
-                              setState(() => _selectedSemester = semester);
                             },
                             onRetryOptions: _loadProfileOptions,
                             onCancel: _cancelAddProfile,
@@ -1061,9 +1056,7 @@ class _SettingTabState extends State<SettingTab> {
       _AccountView.settings => context.getText(AppKeys.settingsTitle),
       _AccountView.account => context.getText(AppKeys.accountTitle),
       _AccountView.profile => context.getText(AppKeys.profileTitle),
-      _AccountView.addProfile => editingProfile == null
-          ? context.getText(AppKeys.addProfileTitle)
-          : context.getText(AppKeys.updateProfileTitle),
+      _AccountView.addProfile => context.getText(AppKeys.profileTitle),
     };
   }
 

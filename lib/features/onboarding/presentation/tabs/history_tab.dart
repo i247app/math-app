@@ -7,6 +7,7 @@ import '../../../../core/network/quiz_models.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/quiz_api.dart';
 import '../screens/quiz_review_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF5D4A54);
@@ -222,12 +223,10 @@ class _HistoryHeader extends StatelessWidget {
         context.getText(AppKeys.historyTitle),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(
+        style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontFamily: 'Fredoka',
-          fontSize: 21 * scale,
+          fontSize: 24,
           fontWeight: FontWeight.w700,
-          height: 1,
           letterSpacing: 0,
         ),
       ),
