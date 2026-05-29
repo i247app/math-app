@@ -653,13 +653,15 @@ class NetworkApi {
     final formData = FormData.fromMap({
       'metadata': jsonEncode(apiMetadata()),
       'profile_id': request.profileId,
-      'name': request.name,
+      if (request.name?.isNotEmpty == true) 'name': request.name,
       if (request.dob?.isNotEmpty == true) 'dob': request.dob,
-      'grade_id': request.gradeId,
-      'program_id': request.programId,
-      'semester_id': request.semesterId,
-      'is_default': request.isDefault,
-      'role': request.role,
+      if (request.gradeId?.isNotEmpty == true) 'grade_id': request.gradeId,
+      if (request.programId?.isNotEmpty == true)
+        'program_id': request.programId,
+      if (request.semesterId?.isNotEmpty == true)
+        'semester_id': request.semesterId,
+      if (request.isDefault != null) 'is_default': request.isDefault,
+      if (request.role?.isNotEmpty == true) 'role': request.role,
       if (avatarPath?.isNotEmpty == true)
         'avatar': await MultipartFile.fromFile(avatarPath!),
     });

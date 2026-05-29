@@ -249,8 +249,12 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
         final blocksPhoneAction =
             lookupMatchesPhone && state.phoneLookupErrorStatus == 4006;
         final phoneComplete = normalizedPhone.isValid && !blocksPhoneAction;
-        final lookupErrorText =
-            lookupMatchesPhone ? state.phoneLookupError : null;
+        final showsSignupAction = lookupMatchesPhone &&
+            state.phoneExists == false &&
+            !blocksPhoneAction;
+        final lookupErrorText = lookupMatchesPhone && !showsSignupAction
+            ? state.phoneLookupError
+            : null;
         final phoneErrorText = phoneHasInput
             ? (normalizedPhone.errorKey != null
                 ? context.getText(normalizedPhone.errorKey!)

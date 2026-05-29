@@ -561,16 +561,17 @@ class _SettingTabState extends State<SettingTab> {
           () => _profileCreateError = context.readText(AppKeys.missingAccount));
       return;
     }
-    if (name.isEmpty) {
+    if (editingProfile == null && name.isEmpty) {
       setState(
         () =>
             _profileCreateError = context.readText(AppKeys.missingProfileName),
       );
       return;
     }
-    if (grade?.gradeId == null ||
-        program?.programId == null ||
-        semester?.semesterId == null) {
+    if (editingProfile == null &&
+        (grade?.gradeId == null ||
+            program?.programId == null ||
+            semester?.semesterId == null)) {
       setState(
         () => _profileCreateError =
             context.readText(AppKeys.missingProfileSelections),
@@ -604,10 +605,10 @@ class _SettingTabState extends State<SettingTab> {
 
         await _profileService.updateProfile(
           profileId: profileId,
-          name: name,
-          gradeId: grade!.gradeId!,
-          programId: program!.programId!,
-          semesterId: semester!.semesterId!,
+          name: _emptyToNull(name),
+          gradeId: grade?.gradeId,
+          programId: program?.programId,
+          semesterId: semester?.semesterId,
           isDefault: editingProfile.isDefault,
           role: _profileRole(editingProfile),
           dob: _dateOnly(editingProfile.dob),
@@ -699,17 +700,16 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
 
-    final previousProfile = _firstWhereOrNull(
-      _profiles,
-      (profile) => profile.isDefault,
+    final previousProfiles = _profiles.where(
+      (profile) =>
+          profile.isDefault && profile.profileId != selectedProfile.profileId,
     );
 
     HapticFeedback.selectionClick();
     setState(() => _isSettingDefaultProfile = true);
 
     try {
-      if (previousProfile != null &&
-          previousProfile.profileId != selectedProfile.profileId) {
+      for (final previousProfile in previousProfiles) {
         await _updateProfileDefault(previousProfile, isDefault: false);
       }
       await _updateProfileDefault(selectedProfile, isDefault: true);
@@ -744,33 +744,14 @@ class _SettingTabState extends State<SettingTab> {
     required bool isDefault,
   }) async {
     final profileId = profile.profileId?.trim();
-    final name = profile.name?.trim();
-    final gradeId = profile.gradeId?.trim();
-    final programId = profile.programId?.trim();
-    final semesterId = profile.semesterId?.trim();
 
-    if (profileId == null ||
-        profileId.isEmpty ||
-        name == null ||
-        name.isEmpty ||
-        gradeId == null ||
-        gradeId.isEmpty ||
-        programId == null ||
-        programId.isEmpty ||
-        semesterId == null ||
-        semesterId.isEmpty) {
+    if (profileId == null || profileId.isEmpty) {
       throw ProfileException(context.readText(AppKeys.profileUpdateFailed));
     }
 
     await _profileService.updateProfile(
       profileId: profileId,
-      name: name,
-      gradeId: gradeId,
-      programId: programId,
-      semesterId: semesterId,
       isDefault: isDefault,
-      role: _profileRole(profile),
-      dob: _dateOnly(profile.dob),
     );
   }
 

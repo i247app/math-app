@@ -35,12 +35,12 @@ abstract class ProfileService {
 
   Future<StudentProfile?> updateProfile({
     required String profileId,
-    required String name,
-    required String gradeId,
-    required String programId,
-    required String semesterId,
-    bool isDefault = false,
-    String role = 'STUDENT',
+    String? name,
+    String? gradeId,
+    String? programId,
+    String? semesterId,
+    bool? isDefault,
+    String? role,
     String? avatarPath,
     String? dob,
   });
@@ -128,12 +128,12 @@ class ProfileApi implements ProfileService {
   @override
   Future<StudentProfile?> updateProfile({
     required String profileId,
-    required String name,
-    required String gradeId,
-    required String programId,
-    required String semesterId,
-    bool isDefault = false,
-    String role = 'STUDENT',
+    String? name,
+    String? gradeId,
+    String? programId,
+    String? semesterId,
+    bool? isDefault,
+    String? role,
     String? avatarPath,
     String? dob,
   }) async {
@@ -146,7 +146,7 @@ class ProfileApi implements ProfileService {
           programId: programId,
           semesterId: semesterId,
           isDefault: isDefault,
-          role: _normalizedRole(role),
+          role: role == null ? null : _normalizedRole(role),
           dob: dob,
         ),
         avatarPath: avatarPath,

@@ -25,7 +25,7 @@ class CreateProfileRequest {
     required this.name,
     required this.gradeId,
     required this.programId,
-    required this.semesterId,
+    this.semesterId,
     this.isDefault = false,
     this.role = 'STUDENT',
     this.dob,
@@ -35,7 +35,7 @@ class CreateProfileRequest {
   final String name;
   final String gradeId;
   final String programId;
-  final String semesterId;
+  final String? semesterId;
   final bool isDefault;
   final String role;
   final String? dob;
@@ -50,22 +50,22 @@ class CreateProfileRequest {
 class UpdateProfileRequest {
   const UpdateProfileRequest({
     required this.profileId,
-    required this.name,
-    required this.gradeId,
-    required this.programId,
-    required this.semesterId,
-    this.isDefault = false,
-    this.role = 'STUDENT',
+    this.name,
+    this.gradeId,
+    this.programId,
+    this.semesterId,
+    this.isDefault,
+    this.role,
     this.dob,
   });
 
   final String profileId;
-  final String name;
-  final String gradeId;
-  final String programId;
-  final String semesterId;
-  final bool isDefault;
-  final String role;
+  final String? name;
+  final String? gradeId;
+  final String? programId;
+  final String? semesterId;
+  final bool? isDefault;
+  final String? role;
   final String? dob;
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>
