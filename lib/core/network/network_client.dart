@@ -623,6 +623,8 @@ class NetworkApi {
       'grade_id': request.gradeId,
       'program_id': request.programId,
       'semester_id': request.semesterId,
+      'is_default': request.isDefault,
+      'role': request.role,
       if (avatarPath?.isNotEmpty == true)
         'avatar': await MultipartFile.fromFile(avatarPath!),
     });
@@ -656,6 +658,8 @@ class NetworkApi {
       'grade_id': request.gradeId,
       'program_id': request.programId,
       'semester_id': request.semesterId,
+      'is_default': request.isDefault,
+      'role': request.role,
       if (avatarPath?.isNotEmpty == true)
         'avatar': await MultipartFile.fromFile(avatarPath!),
     });

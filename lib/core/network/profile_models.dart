@@ -26,6 +26,8 @@ class CreateProfileRequest {
     required this.gradeId,
     required this.programId,
     required this.semesterId,
+    this.isDefault = false,
+    this.role = 'STUDENT',
     this.dob,
   });
 
@@ -34,6 +36,8 @@ class CreateProfileRequest {
   final String gradeId;
   final String programId;
   final String semesterId;
+  final bool isDefault;
+  final String role;
   final String? dob;
 
   factory CreateProfileRequest.fromJson(Map<String, dynamic> json) =>
@@ -50,6 +54,8 @@ class UpdateProfileRequest {
     required this.gradeId,
     required this.programId,
     required this.semesterId,
+    this.isDefault = false,
+    this.role = 'STUDENT',
     this.dob,
   });
 
@@ -58,6 +64,8 @@ class UpdateProfileRequest {
   final String gradeId;
   final String programId;
   final String semesterId;
+  final bool isDefault;
+  final String role;
   final String? dob;
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>
@@ -203,6 +211,7 @@ class StudentProfile {
     this.semesterId,
     this.semester,
     this.isDefault = false,
+    this.role,
     this.createDt,
     this.modifyDt,
   });
@@ -226,6 +235,7 @@ class StudentProfile {
   final SemesterModel? semester;
   @JsonKey(fromJson: _boolFromJson)
   final bool isDefault;
+  final String? role;
   final String? createDt;
   final String? modifyDt;
 

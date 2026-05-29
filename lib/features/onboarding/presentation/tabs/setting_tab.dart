@@ -74,6 +74,7 @@ class _SettingTabState extends State<SettingTab> {
   bool _isPickingCreateAvatar = false;
   bool _isSavingProfile = false;
   bool _isDeletingProfile = false;
+  bool _isSettingDefaultProfile = false;
   String? _profileLoadError;
   String? _profileOptionsError;
   String? _profileCreateError;
@@ -591,6 +592,8 @@ class _SettingTabState extends State<SettingTab> {
           gradeId: grade!.gradeId!,
           programId: program!.programId!,
           semesterId: semester!.semesterId!,
+          isDefault: _profiles.isEmpty,
+          role: 'STUDENT',
           avatarPath: _createAvatarPath,
         );
       } else {
@@ -605,6 +608,8 @@ class _SettingTabState extends State<SettingTab> {
           gradeId: grade!.gradeId!,
           programId: program!.programId!,
           semesterId: semester!.semesterId!,
+          isDefault: editingProfile.isDefault,
+          role: _profileRole(editingProfile),
           dob: _dateOnly(editingProfile.dob),
           avatarPath: _createAvatarPath,
         );
@@ -687,6 +692,86 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     await _deleteProfile(profileId);
+  }
+
+  Future<void> _selectDefaultProfile(StudentProfile selectedProfile) async {
+    if (_isSettingDefaultProfile || selectedProfile.isDefault) {
+      return;
+    }
+
+    final previousProfile = _firstWhereOrNull(
+      _profiles,
+      (profile) => profile.isDefault,
+    );
+
+    HapticFeedback.selectionClick();
+    setState(() => _isSettingDefaultProfile = true);
+
+    try {
+      if (previousProfile != null &&
+          previousProfile.profileId != selectedProfile.profileId) {
+        await _updateProfileDefault(previousProfile, isDefault: false);
+      }
+      await _updateProfileDefault(selectedProfile, isDefault: true);
+      if (!mounted) {
+        return;
+      }
+      await _loadProfiles();
+      widget.onProfileSaved?.call();
+    } on ProfileException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.readText(AppKeys.profileUpdateFailed))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSettingDefaultProfile = false);
+      }
+    }
+  }
+
+  Future<void> _updateProfileDefault(
+    StudentProfile profile, {
+    required bool isDefault,
+  }) async {
+    final profileId = profile.profileId?.trim();
+    final name = profile.name?.trim();
+    final gradeId = profile.gradeId?.trim();
+    final programId = profile.programId?.trim();
+    final semesterId = profile.semesterId?.trim();
+
+    if (profileId == null ||
+        profileId.isEmpty ||
+        name == null ||
+        name.isEmpty ||
+        gradeId == null ||
+        gradeId.isEmpty ||
+        programId == null ||
+        programId.isEmpty ||
+        semesterId == null ||
+        semesterId.isEmpty) {
+      throw ProfileException(context.readText(AppKeys.profileUpdateFailed));
+    }
+
+    await _profileService.updateProfile(
+      profileId: profileId,
+      name: name,
+      gradeId: gradeId,
+      programId: programId,
+      semesterId: semesterId,
+      isDefault: isDefault,
+      role: _profileRole(profile),
+      dob: _dateOnly(profile.dob),
+    );
   }
 
   Future<void> _deleteProfile(String profileId) async {
@@ -855,10 +940,13 @@ class _SettingTabState extends State<SettingTab> {
                         _AccountView.profile => _ProfilePlaceholderPanel(
                             key: ValueKey(_viewKey(_AccountView.profile)),
                             profiles: _profiles,
-                            isLoading: _isLoadingProfiles || _isDeletingProfile,
+                            isLoading: _isLoadingProfiles ||
+                                _isDeletingProfile ||
+                                _isSettingDefaultProfile,
                             errorMessage: _profileLoadError,
                             onRetry: _loadProfiles,
                             onAdd: _openAddProfile,
+                            onSelect: _selectDefaultProfile,
                             onEdit: _openUpdateProfile,
                             onDelete: _confirmDeleteProfile,
                             scale: scale,
@@ -1007,5 +1095,13 @@ class _SettingTabState extends State<SettingTab> {
       return date.length >= 10 ? date.substring(0, 10) : date;
     }
     return parsed.toIso8601String().substring(0, 10);
+  }
+
+  static String _profileRole(StudentProfile profile) {
+    final role = profile.role?.trim().toUpperCase();
+    return switch (role) {
+      'TEACHER' || 'PARENT' || 'STUDENT' => role!,
+      _ => 'STUDENT',
+    };
   }
 }

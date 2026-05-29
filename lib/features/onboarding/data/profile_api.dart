@@ -27,6 +27,8 @@ abstract class ProfileService {
     required String gradeId,
     required String programId,
     required String semesterId,
+    bool isDefault = false,
+    String role = 'STUDENT',
     String? avatarPath,
     String? dob,
   });
@@ -37,6 +39,8 @@ abstract class ProfileService {
     required String gradeId,
     required String programId,
     required String semesterId,
+    bool isDefault = false,
+    String role = 'STUDENT',
     String? avatarPath,
     String? dob,
   });
@@ -96,6 +100,8 @@ class ProfileApi implements ProfileService {
     required String gradeId,
     required String programId,
     required String semesterId,
+    bool isDefault = false,
+    String role = 'STUDENT',
     String? avatarPath,
     String? dob,
   }) async {
@@ -107,6 +113,8 @@ class ProfileApi implements ProfileService {
           gradeId: gradeId,
           programId: programId,
           semesterId: semesterId,
+          isDefault: isDefault,
+          role: _normalizedRole(role),
           dob: dob,
         ),
         avatarPath: avatarPath,
@@ -124,6 +132,8 @@ class ProfileApi implements ProfileService {
     required String gradeId,
     required String programId,
     required String semesterId,
+    bool isDefault = false,
+    String role = 'STUDENT',
     String? avatarPath,
     String? dob,
   }) async {
@@ -135,6 +145,8 @@ class ProfileApi implements ProfileService {
           gradeId: gradeId,
           programId: programId,
           semesterId: semesterId,
+          isDefault: isDefault,
+          role: _normalizedRole(role),
           dob: dob,
         ),
         avatarPath: avatarPath,
@@ -154,5 +166,13 @@ class ProfileApi implements ProfileService {
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
     }
+  }
+
+  static String _normalizedRole(String value) {
+    final role = value.trim().toUpperCase();
+    return switch (role) {
+      'TEACHER' || 'PARENT' || 'STUDENT' => role,
+      _ => 'STUDENT',
+    };
   }
 }
