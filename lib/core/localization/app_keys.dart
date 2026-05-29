@@ -37,6 +37,7 @@ class AppKeys {
   static const restoringSession = 'restoring_session';
   static const newAccountPrompt = 'new_account_prompt';
   static const signup = 'signup';
+  static const login = 'login';
   static const otpWithin30Seconds = 'otp_within_30_seconds';
   static const otpTitle = 'otp_title';
   static const otpSentMessage = 'otp_sent_message';

@@ -263,21 +263,15 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
       emit(
         state.copyWith(
-          screen: result.exists ? AppScreen.otp : state.screen,
           phoneNumber: phone,
           checkedPhone: phone,
           isCheckingAuthPhone: false,
           phoneExists: result.exists,
           phoneLookupUser: result.user,
-          otpExpiresAt: result.expiresAt,
-          otpExpiresIn: result.expiresIn,
-          devOtpCode: result.otpCode,
-          devOtpPurpose: result.purpose,
-          otpPreviewId: state.otpPreviewId + 1,
           otpFlow: OtpFlow.login,
           clearAuthError: true,
-          clearDevOtp: result.otpCode == null,
-          clearOtpExpiry: result.expiresAt == null && result.expiresIn == null,
+          clearDevOtp: true,
+          clearOtpExpiry: true,
           clearOtpError: true,
         ),
       );

@@ -43,7 +43,7 @@ class LoginScreen extends StatelessWidget {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
-    final mascotSize = width < 370 ? 230.0 : 260.0;
+    final mascotSize = width < 370 ? 200.0 : 260.0;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -276,10 +276,20 @@ class LoginCard extends StatelessWidget {
                           ),
                         ],
                       )
-                    : const SizedBox(
-                        key: ValueKey('send-otp-placeholder'),
-                        height: 0,
-                      ),
+                    : canSendOtp && phoneExists == true
+                        ? Column(
+                            key: const ValueKey('login-otp-actions'),
+                            children: [
+                              PrimaryButton(
+                                label: context.getText(AppKeys.login),
+                                onPressed: onSendOtp,
+                              ),
+                            ],
+                          )
+                        : const SizedBox(
+                            key: ValueKey('send-otp-placeholder'),
+                            height: 0,
+                          ),
           ),
         ],
       ),

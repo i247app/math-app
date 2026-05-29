@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/extension/localization_extension.dart';
 import '../../../core/localization/app_keys.dart';
+import '../../../core/utils/phone_number_validator.dart';
 import '../data/otp_auth_api.dart';
 import '../domain/phone_region.dart';
 import 'bloc/onboarding_cubit.dart';
@@ -31,6 +32,15 @@ class _NumiHomeState extends State<NumiHome> {
   String? _lastLookupPhone;
 
   String get _phoneDigits => phoneController.text.replaceAll(RegExp(r'\D'), '');
+
+  PhoneValidationResult _normalizedPhoneInput(PhoneRegion region) {
+    final digits = _phoneDigits;
+    if (digits.isEmpty) {
+      return const PhoneValidationResult.empty();
+    }
+
+    return normalizePhoneInput(region, digits);
+  }
 
   @override
   void initState() {
@@ -74,6 +84,7 @@ class _NumiHomeState extends State<NumiHome> {
     String value,
   ) {
     final digits = value.replaceAll(RegExp(r'\D'), '');
+    final normalized = normalizePhoneInput(region, digits);
     final hasInput = digits.isNotEmpty;
     if (_phoneHasInput != hasInput) {
       setState(() {
@@ -81,7 +92,7 @@ class _NumiHomeState extends State<NumiHome> {
       });
     }
 
-    if (digits.length < region.maxDigits) {
+    if (!normalized.isValid) {
       _lastLookupPhone = null;
       cubit.clearPhoneLookup();
       return;
@@ -89,23 +100,23 @@ class _NumiHomeState extends State<NumiHome> {
 
     FocusScope.of(context).unfocus();
 
-    if (_lastLookupPhone == digits) {
+    if (_lastLookupPhone == normalized.phone) {
       return;
     }
 
-    _lastLookupPhone = digits;
-    cubit.checkAuthPhone(digits);
+    _lastLookupPhone = normalized.phone;
+    cubit.checkAuthPhone(normalized.phone!);
   }
 
   void sendOtp(OnboardingCubit cubit, PhoneRegion region) {
-    final digits = _phoneDigits;
-    if (digits.length < region.maxDigits) {
+    final normalized = _normalizedPhoneInput(region);
+    if (!normalized.isValid) {
       HapticFeedback.selectionClick();
       return;
     }
 
     FocusScope.of(context).unfocus();
-    cubit.submitLoginPhone(digits);
+    cubit.submitLoginPhone(normalized.phone!);
   }
 
   void showDevOtpDialog(OnboardingState state) {
@@ -178,11 +189,13 @@ class _NumiHomeState extends State<NumiHome> {
                   },
                   builder: (context, state) {
                     final cubit = context.read<OnboardingCubit>();
-                    final phoneComplete =
-                        _phoneDigits.length >= state.phoneRegion.maxDigits;
-                    final phoneErrorText = _phoneHasInput && !phoneComplete
-                        ? context.getText(AppKeys.phoneTooShort)
-                        : null;
+                    final normalizedPhone =
+                        _normalizedPhoneInput(state.phoneRegion);
+                    final phoneComplete = normalizedPhone.isValid;
+                    final phoneErrorText =
+                        _phoneHasInput && normalizedPhone.errorKey != null
+                            ? context.getText(normalizedPhone.errorKey!)
+                            : null;
                     final useSafeArea = !state.isRestoringSession &&
                         state.screen != AppScreen.welcome;
 

@@ -215,11 +215,6 @@ class OtpAuthApi implements OtpAuthService {
       phone: phone,
       exists: true,
       user: user,
-      otpCode: response.otpCode,
-      purpose: 'login',
-      expiresAt: response.expiresAt,
-      expiresIn: _expiresInFrom(response.expiresAt),
-      message: response.status,
     );
   }
 
