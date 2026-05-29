@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extension/localization_extension.dart';
+import '../../../core/localization/app_keys.dart';
 import '../data/otp_auth_api.dart';
 import '../domain/phone_region.dart';
 import 'bloc/onboarding_cubit.dart';
@@ -119,12 +121,14 @@ class _NumiHomeState extends State<NumiHome> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('OTP'),
-          content: Text('Mã OTP vừa gửi: $otpCode'),
+          title: Text(context.readText(AppKeys.otpTitle)),
+          content: Text(
+            context.readFormatText(AppKeys.otpSentMessage, {'code': otpCode}),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Đóng'),
+              child: Text(context.readText(AppKeys.close)),
             ),
           ],
         );
@@ -177,7 +181,7 @@ class _NumiHomeState extends State<NumiHome> {
                     final phoneComplete =
                         _phoneDigits.length >= state.phoneRegion.maxDigits;
                     final phoneErrorText = _phoneHasInput && !phoneComplete
-                        ? 'Số điện thoại chưa đủ ký tự.'
+                        ? context.getText(AppKeys.phoneTooShort)
                         : null;
                     final useSafeArea = !state.isRestoringSession &&
                         state.screen != AppScreen.welcome;
@@ -213,9 +217,11 @@ class _NumiHomeState extends State<NumiHome> {
                           );
                         },
                         child: state.isRestoringSession
-                            ? const LoadingScreen(
-                                key: ValueKey('session-loading'),
-                                message: 'Đang kiểm tra phiên đăng nhập...',
+                            ? LoadingScreen(
+                                key: const ValueKey('session-loading'),
+                                message: context.getText(
+                                  AppKeys.restoringSession,
+                                ),
                               )
                             : switch (state.screen) {
                                 AppScreen.welcome => WelcomeScreen(

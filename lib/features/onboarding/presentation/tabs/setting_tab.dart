@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
+import '../../../../core/localization/app_language.dart';
+import '../../../../core/localization/lingo_scope.dart';
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/network/profile_models.dart';
 import '../../../../core/network/program_models.dart';
@@ -246,7 +250,7 @@ class _SettingTabState extends State<SettingTab> {
     final userId = user?.id.trim();
     if (userId == null || userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Thiếu thông tin tài khoản.')),
+        SnackBar(content: Text(context.readText(AppKeys.missingAccount))),
       );
       return;
     }
@@ -254,7 +258,7 @@ class _SettingTabState extends State<SettingTab> {
     final name = _usernameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập tên tài khoản.')),
+        SnackBar(content: Text(context.readText(AppKeys.accountNameRequired))),
       );
       return;
     }
@@ -286,7 +290,7 @@ class _SettingTabState extends State<SettingTab> {
       });
       FocusScope.of(context).unfocus();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã cập nhật tài khoản.')),
+        SnackBar(content: Text(context.readText(AppKeys.accountUpdated))),
       );
     } on OtpAuthException catch (error) {
       if (!mounted) {
@@ -304,7 +308,7 @@ class _SettingTabState extends State<SettingTab> {
 
       setState(() => _isSavingAccount = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể cập nhật tài khoản.')),
+        SnackBar(content: Text(context.readText(AppKeys.accountUpdateFailed))),
       );
     }
   }
@@ -355,7 +359,7 @@ class _SettingTabState extends State<SettingTab> {
 
       setState(() => _isPickingAccountAvatar = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể chọn ảnh lúc này.')),
+        SnackBar(content: Text(context.readText(AppKeys.imagePickFailed))),
       );
     }
   }
@@ -365,7 +369,7 @@ class _SettingTabState extends State<SettingTab> {
     if (userId == null || userId.isEmpty) {
       setState(() {
         _isLoadingProfiles = false;
-        _profileLoadError = 'Chưa có thông tin tài khoản để tải hồ sơ.';
+        _profileLoadError = context.readText(AppKeys.noAccountForProfile);
         _profiles = const <StudentProfile>[];
       });
       return;
@@ -401,7 +405,7 @@ class _SettingTabState extends State<SettingTab> {
       }
 
       setState(() {
-        _profileLoadError = 'Tải hồ sơ thất bại.';
+        _profileLoadError = context.readText(AppKeys.profileLoadFailed);
         _isLoadingProfiles = false;
       });
     }
@@ -430,7 +434,8 @@ class _SettingTabState extends State<SettingTab> {
     if (userId == null || userId.isEmpty) {
       setState(() {
         _isLoadingProfileOptions = false;
-        _profileOptionsError = 'Chưa có thông tin tài khoản để tải lựa chọn.';
+        _profileOptionsError =
+            context.readText(AppKeys.profileOptionsMissingAccount);
       });
       return;
     }
@@ -491,7 +496,8 @@ class _SettingTabState extends State<SettingTab> {
       }
 
       setState(() {
-        _profileOptionsError = 'Tải lựa chọn hồ sơ thất bại.';
+        _profileOptionsError =
+            context.readText(AppKeys.profileOptionsLoadFailed);
         _isLoadingProfileOptions = false;
       });
     }
@@ -524,7 +530,7 @@ class _SettingTabState extends State<SettingTab> {
 
       setState(() => _isPickingCreateAvatar = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể chọn ảnh lúc này.')),
+        SnackBar(content: Text(context.readText(AppKeys.imagePickFailed))),
       );
     }
   }
@@ -543,17 +549,24 @@ class _SettingTabState extends State<SettingTab> {
     final editingProfile = _editingProfile;
 
     if (userId == null || userId.isEmpty) {
-      setState(() => _profileCreateError = 'Thiếu thông tin tài khoản.');
+      setState(
+          () => _profileCreateError = context.readText(AppKeys.missingAccount));
       return;
     }
     if (name.isEmpty) {
-      setState(() => _profileCreateError = 'Vui lòng nhập họ tên.');
+      setState(
+        () =>
+            _profileCreateError = context.readText(AppKeys.missingProfileName),
+      );
       return;
     }
     if (grade?.gradeId == null ||
         program?.programId == null ||
         semester?.semesterId == null) {
-      setState(() => _profileCreateError = 'Vui lòng chọn đủ thông tin.');
+      setState(
+        () => _profileCreateError =
+            context.readText(AppKeys.missingProfileSelections),
+      );
       return;
     }
 
@@ -576,7 +589,7 @@ class _SettingTabState extends State<SettingTab> {
       } else {
         final profileId = editingProfile.profileId?.trim();
         if (profileId == null || profileId.isEmpty) {
-          throw const ProfileException('Hồ sơ này thiếu profile_id.');
+          throw ProfileException(context.readText(AppKeys.missingProfileId));
         }
 
         await _profileService.updateProfile(
@@ -617,8 +630,8 @@ class _SettingTabState extends State<SettingTab> {
 
       setState(() {
         _profileCreateError = editingProfile == null
-            ? 'Không thể tạo hồ sơ. Vui lòng thử lại.'
-            : 'Không thể cập nhật hồ sơ. Vui lòng thử lại.';
+            ? context.readText(AppKeys.profileCreateFailed)
+            : context.readText(AppKeys.profileUpdateFailed);
         _isSavingProfile = false;
       });
     }
@@ -628,7 +641,7 @@ class _SettingTabState extends State<SettingTab> {
     final profileId = profile.profileId?.trim();
     if (profileId == null || profileId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hồ sơ này thiếu profile_id.')),
+        SnackBar(content: Text(context.readText(AppKeys.missingProfileId))),
       );
       return;
     }
@@ -638,10 +651,10 @@ class _SettingTabState extends State<SettingTab> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Xóa hồ sơ?'),
-          content: const Text(
-            'Bạn có chắc muốn delete profile này không?',
-            style: TextStyle(
+          title: Text(context.readText(AppKeys.deleteProfileTitle)),
+          content: Text(
+            context.readText(AppKeys.deleteProfileMessage),
+            style: const TextStyle(
               color: _deepInk,
               fontFamily: 'Nunito',
               fontWeight: FontWeight.w700,
@@ -651,11 +664,11 @@ class _SettingTabState extends State<SettingTab> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Hủy'),
+              child: Text(context.readText(AppKeys.cancel)),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Xóa'),
+              child: Text(context.readText(AppKeys.delete)),
             ),
           ],
         );
@@ -679,7 +692,7 @@ class _SettingTabState extends State<SettingTab> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã xóa hồ sơ.')),
+        SnackBar(content: Text(context.readText(AppKeys.profileDeleted))),
       );
       await _loadProfiles();
     } on ProfileException catch (error) {
@@ -696,7 +709,7 @@ class _SettingTabState extends State<SettingTab> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể xóa hồ sơ. Vui lòng thử lại.')),
+        SnackBar(content: Text(context.readText(AppKeys.profileDeleteFailed))),
       );
     } finally {
       if (mounted) {
@@ -734,7 +747,7 @@ class _SettingTabState extends State<SettingTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
-    final headerTitle = _titleForView(_view, _editingProfile);
+    final headerTitle = _titleForView(context, _view, _editingProfile);
     final canGoBack = _view != _AccountView.settings;
     final backgroundColor =
         _view == _AccountView.account ? Colors.white : _settingBackground;
@@ -937,13 +950,17 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   static String _titleForView(
-      _AccountView view, StudentProfile? editingProfile) {
+    BuildContext context,
+    _AccountView view,
+    StudentProfile? editingProfile,
+  ) {
     return switch (view) {
-      _AccountView.settings => 'Cài Đặt',
-      _AccountView.account => 'Tài Khoản',
-      _AccountView.profile => 'Hồ Sơ',
-      _AccountView.addProfile =>
-        editingProfile == null ? 'Thêm Hồ Sơ' : 'Cập Nhật Hồ Sơ',
+      _AccountView.settings => context.getText(AppKeys.settingsTitle),
+      _AccountView.account => context.getText(AppKeys.accountTitle),
+      _AccountView.profile => context.getText(AppKeys.profileTitle),
+      _AccountView.addProfile => editingProfile == null
+          ? context.getText(AppKeys.addProfileTitle)
+          : context.getText(AppKeys.updateProfileTitle),
     };
   }
 

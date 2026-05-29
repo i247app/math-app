@@ -5,6 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/api_config.dart';
+import '../localization/app_keys.dart';
+import '../localization/app_strings.dart';
+import 'api_metadata.dart';
 import 'auth_models.dart';
 import 'chapter_models.dart';
 import 'grade_models.dart';
@@ -93,11 +96,12 @@ class NetworkClient {
     Duration? receiveTimeout,
   }) async {
     if (_baseUrl.trim().isEmpty) {
-      throw const NetworkException('Chưa cấu hình API_BASE_URL.');
+      throw NetworkException(AppStrings.current(AppKeys.apiBaseUrlMissing));
     }
 
     final Response<Object?> response;
     try {
+      body['metadata'] = apiMetadata();
       response = await _dio.post<Object?>(
         path,
         data: body,
@@ -118,7 +122,7 @@ class NetworkClient {
 
   Future<Map<String, dynamic>> getJson(String path) async {
     if (_baseUrl.trim().isEmpty) {
-      throw const NetworkException('Chưa cấu hình API_BASE_URL.');
+      throw NetworkException(AppStrings.current(AppKeys.apiBaseUrlMissing));
     }
 
     final Response<Object?> response;
@@ -140,7 +144,7 @@ class NetworkClient {
     FormData formData,
   ) async {
     if (_baseUrl.trim().isEmpty) {
-      throw const NetworkException('Chưa cấu hình API_BASE_URL.');
+      throw NetworkException(AppStrings.current(AppKeys.apiBaseUrlMissing));
     }
 
     final Response<Object?> response;
@@ -175,7 +179,9 @@ class NetworkClient {
     return switch (data) {
       final Map<String, dynamic> json => json,
       final Map<Object?, Object?> json => Map<String, dynamic>.from(json),
-      _ => throw const NetworkException('Response từ server không hợp lệ.'),
+      _ => throw NetworkException(
+          AppStrings.current(AppKeys.invalidServerResponse),
+        ),
     };
   }
 
@@ -219,18 +225,21 @@ class NetworkClient {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
-        return 'Kết nối API quá thời gian chờ.';
+        return AppStrings.current(AppKeys.apiConnectTimeout);
       case DioExceptionType.receiveTimeout:
-        return 'API phản hồi quá thời gian chờ.';
+        return AppStrings.current(AppKeys.apiReceiveTimeout);
       case DioExceptionType.connectionError:
-        return 'Không kết nối được API: ${error.message}';
+        return AppStrings.currentFormat(
+          AppKeys.apiConnectFailed,
+          {'message': error.message},
+        );
       case DioExceptionType.badCertificate:
-        return 'Chứng chỉ API không hợp lệ.';
+        return AppStrings.current(AppKeys.apiBadCertificate);
       case DioExceptionType.cancel:
-        return 'Request đã bị hủy.';
+        return AppStrings.current(AppKeys.apiRequestCanceled);
       case DioExceptionType.badResponse:
       case DioExceptionType.unknown:
-        return error.message ?? 'Không kết nối được API.';
+        return error.message ?? AppStrings.current(AppKeys.apiConnectionFailed);
     }
   }
 }
@@ -315,7 +324,7 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'metadata': jsonEncode(_signupMetadata),
+      'metadata': jsonEncode(apiMetadata()),
       'phone': request.phone,
       if (request.email?.isNotEmpty == true) 'email': request.email,
       if (request.name?.isNotEmpty == true) 'name': request.name,
@@ -345,6 +354,7 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
+      'metadata': jsonEncode(apiMetadata()),
       'user_id': request.userId,
       if (request.name?.isNotEmpty == true) 'name': request.name,
       if (request.phone?.isNotEmpty == true) 'phone': request.phone,
@@ -605,6 +615,7 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
+      'metadata': jsonEncode(apiMetadata()),
       'user_id': request.userId,
       'name': request.name,
       if (request.dob?.isNotEmpty == true) 'dob': request.dob,
@@ -637,6 +648,7 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
+      'metadata': jsonEncode(apiMetadata()),
       'profile_id': request.profileId,
       'name': request.name,
       if (request.dob?.isNotEmpty == true) 'dob': request.dob,
@@ -752,14 +764,3 @@ class NetworkApi {
     return 'Request failed.';
   }
 }
-
-const _signupMetadata = <String, Object>{
-  'client_info': <String, String>{
-    'platform': 'ios',
-    'app_version': '2.1.0',
-    'device_id': '18092003-18092003-18092003-18092003',
-    'device_name': 'MACBOOK-PRO-M4',
-    'device_push_token': 'ABCDE',
-    'ip_address': '42.118.191.193',
-  },
-};

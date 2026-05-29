@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/quiz_models.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/quiz_api.dart';
@@ -72,7 +74,7 @@ class _HistoryTabState extends State<HistoryTab> {
     if (userId == null || userId.isEmpty) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Chưa có thông tin tài khoản để tải lịch sử.';
+        _errorMessage = context.readText(AppKeys.noAccountForHistory);
         _quizzes = const <GeneratedQuiz>[];
       });
       return;
@@ -105,7 +107,7 @@ class _HistoryTabState extends State<HistoryTab> {
         return;
       }
       setState(() {
-        _errorMessage = 'Tải lịch sử thất bại.';
+        _errorMessage = context.readText(AppKeys.historyLoadFailed);
         _isLoading = false;
       });
     }
@@ -127,7 +129,7 @@ class _HistoryTabState extends State<HistoryTab> {
       }
 
       final searchable = <String>[
-        _quizTitle(quiz),
+        _quizTitle(context, quiz),
         quiz.purpose ?? '',
         quiz.typeOfQuiz ?? '',
         quiz.type ?? '',
@@ -220,7 +222,7 @@ class _HistoryHeader extends StatelessWidget {
               SizedBox(width: 44 * scale),
               Expanded(
                 child: Text(
-                  'Lịch Sử',
+                  context.getText(AppKeys.historyTitle),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -311,7 +313,7 @@ class _HistorySearchField extends StatelessWidget {
           letterSpacing: 0,
         ),
         decoration: InputDecoration(
-          hintText: 'Tìm kiếm ...',
+          hintText: context.getText(AppKeys.searchHint),
           hintStyle: TextStyle(
             color: const Color(0xFFD8C5CC),
             fontFamily: 'Nunito',
@@ -346,13 +348,13 @@ class _HistorySearchField extends StatelessWidget {
 }
 
 enum _HistoryQuizFilter {
-  assessment('ASSESSMENT', 'Kiểm tra'),
-  practice('PRACTICE', 'Luyện tập');
+  assessment('ASSESSMENT', AppKeys.assessmentTab),
+  practice('PRACTICE', AppKeys.practiceTab);
 
-  const _HistoryQuizFilter(this.apiType, this.label);
+  const _HistoryQuizFilter(this.apiType, this.labelKey);
 
   final String apiType;
-  final String label;
+  final String labelKey;
 }
 
 class _HistoryTypeTabs extends StatelessWidget {
@@ -421,7 +423,7 @@ class _HistoryTypeTabButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
-            filter.label,
+            context.getText(filter.labelKey),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -463,9 +465,9 @@ class _HistoryBody extends StatelessWidget {
     if (errorMessage != null) {
       return _HistoryMessageState(
         icon: Icons.cloud_off_rounded,
-        title: 'Chưa tải được lịch sử',
+        title: context.getText(AppKeys.historyLoadErrorTitle),
         subtitle: errorMessage!,
-        actionLabel: 'THỬ LẠI',
+        actionLabel: context.getText(AppKeys.retry).toUpperCase(),
         onAction: onRetry,
         scale: scale,
       );
@@ -474,8 +476,8 @@ class _HistoryBody extends StatelessWidget {
     if (quizzes.isEmpty) {
       return _HistoryMessageState(
         icon: Icons.history_toggle_off_rounded,
-        title: 'Chưa có bài phù hợp',
-        subtitle: 'Đổi từ khóa để xem các bài khác.',
+        title: context.getText(AppKeys.noHistoryTitle),
+        subtitle: context.getText(AppKeys.noHistoryMessage),
         scale: scale,
       );
     }
@@ -499,7 +501,7 @@ void _openQuizReview(BuildContext context, GeneratedQuiz quiz) {
   final quizId = (quiz.quizId ?? quiz.id)?.trim();
   if (quizId == null || quizId.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Bài kiểm tra này thiếu quiz_id.')),
+      SnackBar(content: Text(context.readText(AppKeys.missingQuizId))),
     );
     return;
   }
@@ -530,7 +532,7 @@ class _HistoryQuizCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final grading = quiz.grading;
     final percent = grading?.scorePercentage;
-    final scoreColors = _scoreColors(percent);
+    final scoreColors = _scoreColors(context, percent);
     final dateParts = _historyDateParts(quiz.createDt);
 
     final radius = BorderRadius.circular(24 * scale);
@@ -581,7 +583,7 @@ class _HistoryQuizCard extends StatelessWidget {
                     _HistoryMetaRow(parts: dateParts, scale: scale),
                     SizedBox(height: 7 * scale),
                     Text(
-                      _quizTitle(quiz),
+                      _quizTitle(context, quiz),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -753,7 +755,7 @@ class _HistoryIncompleteBadge extends StatelessWidget {
     return SizedBox(
       width: 56 * scale,
       child: Text(
-        'Chưa xong',
+        context.getText(AppKeys.incomplete),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
@@ -894,7 +896,7 @@ class _HistoryDateParts {
   final String time;
 }
 
-String _quizTitle(GeneratedQuiz quiz) {
+String _quizTitle(BuildContext context, GeneratedQuiz quiz) {
   if (quiz.title != null && quiz.title!.trim().isNotEmpty) {
     return quiz.title!;
   }
@@ -904,45 +906,45 @@ String _quizTitle(GeneratedQuiz quiz) {
   final type = _quizPurpose(quiz);
 
   if (type == 'ASSESSMENT') {
-    return 'Bài kiểm tra Toán$suffix';
+    return '${context.getText(AppKeys.mathAssessment)}$suffix';
   }
   if (type == 'PRACTICE') {
-    return 'Bài luyện tập Toán$suffix';
+    return '${context.getText(AppKeys.mathPractice)}$suffix';
   }
-  return 'Bài ôn tập Toán$suffix';
+  return '${context.getText(AppKeys.mathReview)}$suffix';
 }
 
-_ScoreBadgeColors _scoreColors(int? percent) {
+_ScoreBadgeColors _scoreColors(BuildContext context, int? percent) {
   if (percent == null) {
-    return const _ScoreBadgeColors(
-      foreground: Color(0xFF0A8A4D),
-      label: 'Tuyệt vời!',
+    return _ScoreBadgeColors(
+      foreground: const Color(0xFF0A8A4D),
+      label: context.getText(AppKeys.excellent),
     );
   }
 
   final scoreOutOf10 = (percent / 10).round();
 
   if (scoreOutOf10 >= 9) {
-    return const _ScoreBadgeColors(
-      foreground: Color(0xFF0A8A4D), // Green
-      label: 'Excellent!',
+    return _ScoreBadgeColors(
+      foreground: const Color(0xFF0A8A4D), // Green
+      label: context.getText(AppKeys.excellent),
     );
   }
   if (scoreOutOf10 >= 7) {
-    return const _ScoreBadgeColors(
-      foreground: Color(0xFFF4B62D),
-      label: 'Good',
+    return _ScoreBadgeColors(
+      foreground: const Color(0xFFF4B62D),
+      label: context.getText(AppKeys.good),
     );
   }
   if (scoreOutOf10 >= 5) {
-    return const _ScoreBadgeColors(
-      foreground: Color.fromARGB(255, 244, 135, 45),
-      label: 'Nice try',
+    return _ScoreBadgeColors(
+      foreground: const Color.fromARGB(255, 244, 135, 45),
+      label: context.getText(AppKeys.niceTry),
     );
   }
-  return const _ScoreBadgeColors(
-    foreground: Color(0xFFD71920),
-    label: 'Failed',
+  return _ScoreBadgeColors(
+    foreground: const Color(0xFFD71920),
+    label: context.getText(AppKeys.failed),
   );
 }
 

@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/localization/app_keys.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../data/avatar_picker.dart';
 import '../../data/otp_auth_api.dart';
 import '../../domain/phone_region.dart';
@@ -299,7 +301,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       emit(
         state.copyWith(
           isCheckingAuthPhone: false,
-          authError: 'Không thể kiểm tra số điện thoại.',
+          authError: AppStrings.current(AppKeys.authPhoneCheckFailed),
           clearPhoneLookup: true,
         ),
       );
@@ -344,7 +346,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         emit(
           state.copyWith(
             isSendingOtp: false,
-            authError: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
+            authError: AppStrings.current(AppKeys.signupOtpFailed),
           ),
         );
       }
@@ -397,7 +399,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       emit(
         state.copyWith(
           isSendingOtp: false,
-          authError: 'Không thể gửi OTP. Vui lòng thử lại.',
+          authError: AppStrings.current(AppKeys.loginOtpFailed),
         ),
       );
     }
@@ -429,7 +431,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         emit(
           state.copyWith(
             isVerifyingOtp: false,
-            otpError: result.message ?? 'Mã OTP không đúng. Vui lòng thử lại.',
+            otpError: result.message ?? AppStrings.current(AppKeys.invalidOtp),
             otpErrorId: state.otpErrorId + 1,
             clearAuthError: true,
           ),
@@ -454,7 +456,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         emit(
           state.copyWith(
             isVerifyingOtp: false,
-            authError: 'Response OTP thiếu thông tin user.',
+            authError: AppStrings.current(AppKeys.missingOtpUser),
           ),
         );
         return;
@@ -492,7 +494,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       emit(
         state.copyWith(
           isVerifyingOtp: false,
-          authError: 'Không thể xác thực OTP. Vui lòng thử lại.',
+          authError: AppStrings.current(AppKeys.verifyOtpFailed),
         ),
       );
     }
@@ -514,7 +516,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
 
     if (trimmedName.isEmpty) {
-      emit(state.copyWith(authError: 'Vui lòng nhập tên của bé.'));
+      emit(
+        state.copyWith(
+          authError: AppStrings.current(AppKeys.childNameRequired),
+        ),
+      );
       return;
     }
 
@@ -546,7 +552,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       emit(
         state.copyWith(
           isSigningUp: false,
-          authError: 'Không thể đăng ký. Vui lòng thử lại.',
+          authError: AppStrings.current(AppKeys.signupFailed),
         ),
       );
     }
@@ -577,7 +583,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         emit(
           state.copyWith(
             isPickingAvatar: false,
-            avatarError: 'Không thể chọn ảnh lúc này.',
+            avatarError: AppStrings.current(AppKeys.imagePickFailed),
           ),
         );
       }

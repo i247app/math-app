@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/chapter_models.dart';
 import '../../../../core/network/profile_models.dart';
 import '../../data/chapter_api.dart';
@@ -71,7 +73,7 @@ class _ReviewTabState extends State<ReviewTab> {
       setState(() {
         _isLoadingProfiles = false;
         _isLoadingChapters = false;
-        _profileLoadError = 'Chưa có thông tin tài khoản để tải hồ sơ.';
+        _profileLoadError = context.readText(AppKeys.noAccountForProfile);
         _profiles = const <StudentProfile>[];
         _chapters = const <PracticeChapter>[];
       });
@@ -113,7 +115,7 @@ class _ReviewTabState extends State<ReviewTab> {
       }
 
       setState(() {
-        _profileLoadError = 'Tải hồ sơ thất bại.';
+        _profileLoadError = context.readText(AppKeys.profileLoadFailed);
         _isLoadingProfiles = false;
       });
     }
@@ -132,7 +134,7 @@ class _ReviewTabState extends State<ReviewTab> {
     final semesterId = _profileSemesterId(profile);
     if (programId == null || gradeId == null || semesterId == null) {
       setState(() {
-        _chapterLoadError = 'Hồ sơ thiếu lớp, chương trình hoặc học kỳ.';
+        _chapterLoadError = context.readText(AppKeys.chapterMissingProfileInfo);
         _chapters = const <PracticeChapter>[];
       });
       return;
@@ -172,7 +174,7 @@ class _ReviewTabState extends State<ReviewTab> {
       }
 
       setState(() {
-        _chapterLoadError = 'Tải danh sách chương thất bại.';
+        _chapterLoadError = context.readText(AppKeys.chapterLoadFailed);
         _isLoadingChapters = false;
       });
     }
@@ -257,7 +259,14 @@ class _ReviewTabState extends State<ReviewTab> {
   void _startSingleTest(PracticeChapter chapter) {
     HapticFeedback.mediumImpact();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Bắt đầu kiểm tra chương ${chapter.number}.')),
+      SnackBar(
+        content: Text(
+          context.readFormatText(
+            AppKeys.startChapterTestMessage,
+            {'chapter': chapter.number},
+          ),
+        ),
+      ),
     );
   }
 
@@ -271,7 +280,10 @@ class _ReviewTabState extends State<ReviewTab> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Bắt đầu kiểm tra ${_selectedChapterNumbers.length} chương.',
+          context.readFormatText(
+            AppKeys.startSelectedTestMessage,
+            {'count': _selectedChapterNumbers.length},
+          ),
         ),
       ),
     );
@@ -299,9 +311,9 @@ class _ReviewTabState extends State<ReviewTab> {
     if (error != null && error.isNotEmpty) {
       return _ReviewProfileStatePanel(
         icon: Icons.cloud_off_rounded,
-        title: 'Không tải được hồ sơ',
+        title: context.getText(AppKeys.profileLoadErrorTitle),
         message: error,
-        buttonLabel: 'Thử lại',
+        buttonLabel: context.getText(AppKeys.retry),
         onTap: _loadProfiles,
         scale: scale,
       );
@@ -310,9 +322,9 @@ class _ReviewTabState extends State<ReviewTab> {
     if (_profiles.isEmpty) {
       return _ReviewProfileStatePanel(
         icon: Icons.groups_2_outlined,
-        title: 'Chưa có hồ sơ',
-        message: 'Bạn có thể thêm hồ sơ học tập cho bé.',
-        buttonLabel: 'Thêm hồ sơ',
+        title: context.getText(AppKeys.noProfileTitle),
+        message: context.getText(AppKeys.noProfileMessage),
+        buttonLabel: context.getText(AppKeys.addProfile),
         onTap: widget.onAddProfile,
         scale: scale,
       );
@@ -322,9 +334,9 @@ class _ReviewTabState extends State<ReviewTab> {
     if (chapterError != null && chapterError.isNotEmpty) {
       return _ReviewProfileStatePanel(
         icon: Icons.cloud_off_rounded,
-        title: 'Không tải được chương',
+        title: context.getText(AppKeys.chapterLoadErrorTitle),
         message: chapterError,
-        buttonLabel: 'Thử lại',
+        buttonLabel: context.getText(AppKeys.retry),
         onTap: _loadProfiles,
         scale: scale,
       );
@@ -333,9 +345,9 @@ class _ReviewTabState extends State<ReviewTab> {
     if (chapters.isEmpty) {
       return _ReviewProfileStatePanel(
         icon: Icons.menu_book_outlined,
-        title: 'Chưa có chương',
-        message: 'Chưa có lộ trình ôn tập cho hồ sơ này.',
-        buttonLabel: 'Thử lại',
+        title: context.getText(AppKeys.noChapterTitle),
+        message: context.getText(AppKeys.noChapterMessage),
+        buttonLabel: context.getText(AppKeys.retry),
         onTap: _loadProfiles,
         scale: scale,
       );
@@ -350,7 +362,7 @@ class _ReviewTabState extends State<ReviewTab> {
               child: _StatTile(
                 icon: '📝',
                 value: '$totalLessons',
-                label: 'Bài tập',
+                label: context.getText(AppKeys.exercises),
                 scale: scale,
               ),
             ),
@@ -359,7 +371,7 @@ class _ReviewTabState extends State<ReviewTab> {
               child: _StatTile(
                 icon: '🔥',
                 value: '365',
-                label: 'Ngày',
+                label: context.getText(AppKeys.days),
                 scale: scale,
               ),
             ),
@@ -407,7 +419,7 @@ class _ReviewHeader extends StatelessWidget {
               SizedBox(width: 44 * scale),
               Expanded(
                 child: Text(
-                  'Lộ trình học tập',
+                  context.getText(AppKeys.reviewTitle),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -726,7 +738,7 @@ class _ChapterCard extends StatelessWidget {
               ),
               SizedBox(height: 16 * scale),
               Text(
-                _chapterMetaText(chapter),
+                _chapterMetaText(context, chapter),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -874,7 +886,7 @@ class _TestButton extends StatelessWidget {
                         color: const Color(0xFF3B0031), size: 25 * scale),
                     SizedBox(width: 14 * scale),
                     Text(
-                      'Kiểm tra',
+                      context.getText(AppKeys.test),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -927,7 +939,7 @@ class _StartSelectedButton extends StatelessWidget {
               SizedBox(width: 10 * scale),
               Flexible(
                 child: Text(
-                  'Bắt đầu kiểm tra ($count)',
+                  context.formatText(AppKeys.startTest, {'count': count}),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -980,7 +992,7 @@ class _ClearSelectionButton extends StatelessWidget {
               ),
               SizedBox(width: 7 * scale),
               Text(
-                'Bỏ chọn',
+                context.getText(AppKeys.clearSelection),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -1076,17 +1088,18 @@ _ChapterCardColors _chapterColors(int number) {
   };
 }
 
-String _chapterMetaText(PracticeChapter chapter) {
+String _chapterMetaText(BuildContext context, PracticeChapter chapter) {
   final label = chapter.description?.trim();
   if (label != null && label.isNotEmpty) {
     return label;
   }
 
   if (chapter.lessonCount <= 0) {
-    return 'Chương ${chapter.number}';
+    return '${context.getText(AppKeys.chapter)} ${chapter.number}';
   }
 
-  return 'Chương ${chapter.number} • ${chapter.lessonCount} bài học';
+  return '${context.getText(AppKeys.chapter)} ${chapter.number} • '
+      '${chapter.lessonCount} ${context.getText(AppKeys.lessons)}';
 }
 
 StudentProfile? _activeProfile(List<StudentProfile> profiles) {
@@ -1166,7 +1179,7 @@ PracticeChapter? _fallbackPracticeChapter(int number) {
 }
 
 String _chapterLabel(ChapterModel chapter) {
-  return _nonEmpty(chapter.label) ?? 'Chương';
+  return _nonEmpty(chapter.label) ?? 'Chapter';
 }
 
 String? _chapterDescription(ChapterModel chapter) {

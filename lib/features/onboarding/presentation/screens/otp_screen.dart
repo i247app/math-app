@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../widgets/common_widgets.dart';
 import '../widgets/login_scene_background.dart';
@@ -324,9 +326,9 @@ class OtpCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'MÃ XÁC NHẬN',
-            style: TextStyle(
+          Text(
+            context.getText(AppKeys.otpTitle),
+            style: const TextStyle(
               color: AppColors.grayText,
               fontSize: 13,
               fontWeight: FontWeight.w900,
@@ -395,7 +397,9 @@ class OtpCard extends StatelessWidget {
                   ),
           ),
           PrimaryButton(
-            label: isVerifyingOtp ? 'Đang xác thực...' : 'Xác nhận  →',
+            label: isVerifyingOtp
+                ? context.getText(AppKeys.otpConfirming)
+                : context.getText(AppKeys.otpConfirm),
             onPressed: isVerifyingOtp ? null : onConfirm,
           ),
           const SizedBox(height: 20),
@@ -405,8 +409,11 @@ class OtpCard extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded, size: 20),
               label: Text(
                 resendCountdown == 0
-                    ? 'Gửi lại mã'
-                    : 'Gửi lại mã sau $resendCountdown giây',
+                    ? context.getText(AppKeys.resendOtp)
+                    : context.formatText(
+                        AppKeys.resendOtpAfter,
+                        {'seconds': resendCountdown},
+                      ),
               ),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.muted,

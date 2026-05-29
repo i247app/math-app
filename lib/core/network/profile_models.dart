@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'api_metadata.dart';
 import 'program_models.dart';
 import 'semester_models.dart';
 
@@ -76,7 +77,7 @@ class DeleteProfileRequest {
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'metadata': _profileMetadata,
+      'metadata': apiMetadata(),
       ..._$DeleteProfileRequestToJson(this),
     };
   }
@@ -335,14 +336,3 @@ bool _boolFromJson(Object? value) {
 }
 
 String? _stringFromJson(Object? value) => value?.toString();
-
-const _profileMetadata = <String, Object>{
-  'client_info': <String, String>{
-    'platform': 'ios',
-    'app_version': '2.1.0',
-    'device_id': '18092003-18092003-18092003-18092003',
-    'device_name': 'MACBOOK-PRO-M4',
-    'device_push_token': 'ABCDE',
-    'ip_address': '42.118.191.193',
-  },
-};

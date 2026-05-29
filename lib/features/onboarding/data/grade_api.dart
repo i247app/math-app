@@ -1,4 +1,6 @@
 import '../../../core/config/api_config.dart';
+import '../../../core/localization/app_keys.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/network/network_client.dart';
 import '../../../core/network/grade_models.dart';
 
@@ -29,7 +31,7 @@ class GradeApi implements GradeService {
   Future<List<GradeModel>> listGrades({required String userId}) async {
     final cleanUserId = userId.trim();
     if (cleanUserId.isEmpty) {
-      throw const GradeException('Thiếu user để tải danh sách lớp.');
+      throw GradeException(AppStrings.current(AppKeys.noAccountForGrades));
     }
 
     final GradeListResponse response;

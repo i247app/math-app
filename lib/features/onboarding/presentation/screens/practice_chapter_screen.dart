@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
 import '../../data/practice_catalog.dart';
 
 const _pathBackground = Color(0xFFF0E4FF);
@@ -169,7 +171,10 @@ class _ChapterHeader extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  'Chương ${chapter.number}',
+                  context.formatText(
+                    AppKeys.chapterNumber,
+                    {'number': chapter.number},
+                  ),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -432,7 +437,12 @@ class _LessonNode extends StatelessWidget {
         HapticFeedback.lightImpact();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Bài ${lesson.number}: ${lesson.title} sẽ mở sau.'),
+            content: Text(
+              context.formatText(AppKeys.lockedLessonMessage, {
+                'number': lesson.number,
+                'title': lesson.title,
+              }),
+            ),
           ),
         );
       },

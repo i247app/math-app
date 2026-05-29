@@ -1,4 +1,6 @@
 import '../../../core/config/api_config.dart';
+import '../../../core/localization/app_keys.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/network/network_client.dart';
 import '../../../core/network/quiz_models.dart';
 
@@ -62,7 +64,9 @@ class FakeQuizApi implements QuizService {
     final quiz = response.quiz;
     if (response.mstatus != 200 || quiz == null || quiz.questions.isEmpty) {
       throw QuizException(
-        response.mmessage ?? response.debug ?? 'Quiz không có câu hỏi.',
+        response.mmessage ??
+            response.debug ??
+            AppStrings.current(AppKeys.quizHasNoQuestions),
         status: response.mstatus,
       );
     }
@@ -82,7 +86,9 @@ class FakeQuizApi implements QuizService {
     final quiz = response.quiz;
     if (response.mstatus != 200 || quiz == null) {
       throw QuizException(
-        response.mmessage ?? response.debug ?? 'Nộp bài thất bại.',
+        response.mmessage ??
+            response.debug ??
+            AppStrings.current(AppKeys.submitQuizFailed),
         status: response.mstatus,
       );
     }
@@ -99,7 +105,9 @@ class FakeQuizApi implements QuizService {
     final response = QuizListResponse.fromJson(_fakeQuizListResponse());
     if (response.mstatus != 200) {
       throw QuizException(
-        response.mmessage ?? response.debug ?? 'Tải lịch sử thất bại.',
+        response.mmessage ??
+            response.debug ??
+            AppStrings.current(AppKeys.historyLoadFailed),
         status: response.mstatus,
       );
     }
@@ -113,7 +121,9 @@ class FakeQuizApi implements QuizService {
     final response = QuizListResponse.fromJson(_fakeQuizListResponse());
     if (response.mstatus != 200 || response.quizzes.isEmpty) {
       throw QuizException(
-        response.mmessage ?? response.debug ?? 'Tải chi tiết quiz thất bại.',
+        response.mmessage ??
+            response.debug ??
+            AppStrings.current(AppKeys.quizDetailLoadFailed),
         status: response.mstatus,
       );
     }
@@ -159,7 +169,7 @@ class QuizApi implements QuizService {
 
     final quiz = response.quiz;
     if (quiz == null || quiz.questions.isEmpty) {
-      throw const QuizException('Quiz không có câu hỏi.');
+      throw QuizException(AppStrings.current(AppKeys.quizHasNoQuestions));
     }
 
     return quiz;
@@ -184,7 +194,7 @@ class QuizApi implements QuizService {
 
     final quiz = response.quiz;
     if (quiz == null) {
-      throw const QuizException('Nộp bài thất bại.');
+      throw QuizException(AppStrings.current(AppKeys.submitQuizFailed));
     }
 
     return quiz;
@@ -199,7 +209,9 @@ class QuizApi implements QuizService {
     final cleanProfileId = profileId?.trim();
     if ((cleanUserId == null || cleanUserId.isEmpty) &&
         (cleanProfileId == null || cleanProfileId.isEmpty)) {
-      throw const QuizException('Thiếu user hoặc profile để tải lịch sử.');
+      throw QuizException(
+        AppStrings.current(AppKeys.missingUserOrProfileForHistory),
+      );
     }
 
     final QuizListResponse response;
@@ -221,7 +233,7 @@ class QuizApi implements QuizService {
   Future<GeneratedQuiz> getQuizDetail(String quizId) async {
     final cleanQuizId = quizId.trim();
     if (cleanQuizId.isEmpty) {
-      throw const QuizException('Thiếu quiz ID.');
+      throw QuizException(AppStrings.current(AppKeys.missingQuizIdShort));
     }
 
     final QuizDetailResponse response;
@@ -233,7 +245,7 @@ class QuizApi implements QuizService {
 
     final quiz = response.quiz;
     if (quiz == null) {
-      throw const QuizException('Tải chi tiết quiz thất bại.');
+      throw QuizException(AppStrings.current(AppKeys.quizDetailLoadFailed));
     }
 
     return quiz;
@@ -350,8 +362,7 @@ Map<String, Object?> _fakeSubmitQuizResponse(
     ..['quiz_status'] = 'SUBMITTED'
     ..['user_id'] = 'fake-user'
     ..['grading'] = <String, Object?>{
-      'ai_review':
-          'Bé làm rất tốt phần phép cộng, hãy tiếp tục phát huy nhé! Chúng ta chỉ cần luyện tập thêm một chút ở các phép trừ có nhớ thôi.',
+      'ai_review': AppStrings.current(AppKeys.defaultAiReview),
       'correct_number': 4,
       'score_percentage': 80,
       'total_questions': 5,

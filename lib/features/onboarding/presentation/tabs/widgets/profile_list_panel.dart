@@ -40,9 +40,9 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
     if (error != null && error.isNotEmpty) {
       return _ProfileStatePanel(
         icon: Icons.cloud_off_rounded,
-        title: 'Không tải được hồ sơ',
+        title: context.getText(AppKeys.profileLoadErrorTitle),
         message: error,
-        buttonLabel: 'Thử lại',
+        buttonLabel: context.getText(AppKeys.retry),
         scale: scale,
         onTap: onRetry,
       );
@@ -51,9 +51,9 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
     if (profiles.isEmpty) {
       return _ProfileStatePanel(
         icon: Icons.groups_2_outlined,
-        title: 'Chưa có hồ sơ',
-        message: 'Bạn có thể thêm hồ sơ học tập cho bé.',
-        buttonLabel: 'Thêm hồ sơ',
+        title: context.getText(AppKeys.noProfileTitle),
+        message: context.getText(AppKeys.noProfileMessage),
+        buttonLabel: context.getText(AppKeys.addProfile),
         scale: scale,
         onTap: onAdd,
       );
@@ -176,7 +176,7 @@ class _ProfileCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    'ACTIVE',
+                    context.getText(AppKeys.active),
                     style: TextStyle(
                       color: const Color(0xFF003C88),
                       fontFamily: 'Nunito',
@@ -191,7 +191,7 @@ class _ProfileCard extends StatelessWidget {
           ),
           SizedBox(height: 18 * scale),
           Text(
-            _displayProfileName(profile),
+            _displayProfileName(context, profile),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -207,26 +207,19 @@ class _ProfileCard extends StatelessWidget {
           _ProfileInfoLine(
             icon: Icons.school_outlined,
             iconColor: accent,
-            label: 'Lớp',
-            value: _displayGrade(profile),
+            label: context.getText(AppKeys.grade),
+            value: _displayGrade(context, profile),
             scale: scale,
           ),
           SizedBox(height: 14 * scale),
           _ProfileInfoLine(
             icon: Icons.book_outlined,
             iconColor: accent,
-            label: 'Chương Trình',
-            value: _displayProgram(profile),
+            label: context.getText(AppKeys.program),
+            value: _displayProgram(context, profile),
             scale: scale,
           ),
           SizedBox(height: 14 * scale),
-          // _ProfileInfoLine(
-          //   icon: Icons.calendar_month_outlined,
-          //   iconColor: accent,
-          //   label: 'Học Kỳ',
-          //   value: _displaySemester(profile),
-          //   scale: scale,
-          // ),
           SizedBox(height: 18 * scale),
           Row(
             children: [
@@ -252,25 +245,27 @@ class _ProfileCard extends StatelessWidget {
     );
   }
 
-  static String _displayProfileName(StudentProfile profile) {
+  static String _displayProfileName(
+      BuildContext context, StudentProfile profile) {
     final name = profile.name?.trim();
-    return name == null || name.isEmpty ? 'Bé yêu' : name;
+    return name == null || name.isEmpty
+        ? context.getText(AppKeys.belovedChild)
+        : name;
   }
 
-  static String _displayGrade(StudentProfile profile) {
+  static String _displayGrade(BuildContext context, StudentProfile profile) {
     final grade = profile.grade?.label?.trim();
-    return grade == null || grade.isEmpty ? 'Chưa chọn' : grade;
+    return grade == null || grade.isEmpty
+        ? context.getText(AppKeys.notSelected)
+        : grade;
   }
 
-  static String _displayProgram(StudentProfile profile) {
+  static String _displayProgram(BuildContext context, StudentProfile profile) {
     final program = profile.program?.label?.trim();
-    return program == null || program.isEmpty ? 'Chưa chọn' : program;
+    return program == null || program.isEmpty
+        ? context.getText(AppKeys.notSelected)
+        : program;
   }
-
-  // static String _displaySemester(StudentProfile profile) {
-  //   final semester = profile.semester?.name?.trim();
-  //   return semester == null || semester.isEmpty ? 'Chưa chọn' : semester;
-  // }
 }
 
 class _ProfileAvatar extends StatelessWidget {

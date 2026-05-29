@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class ScreenFrame extends StatelessWidget {
@@ -177,10 +179,10 @@ class ProgressDots extends StatelessWidget {
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({
     super.key,
-    this.message = 'Đang tải...',
+    this.message,
   });
 
-  final String message;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +204,7 @@ class LoadingScreen extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             Text(
-              message,
+              message ?? context.getText(AppKeys.loading),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.muted,

@@ -4,6 +4,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/network/quiz_models.dart';
 import '../../data/quiz_api.dart';
 
@@ -57,7 +60,8 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
     final previousQuizId = widget.quiz?.quizId;
     if (previousQuizId == null || previousQuizId.isEmpty) {
       HapticFeedback.selectionClick();
-      showTestAgainError('Không tìm thấy bài test trước đó.');
+      showTestAgainError(
+          AppStrings.current(AppKeys.testAgainCreateMissingQuiz));
       return;
     }
 
@@ -107,7 +111,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
       }
 
       setState(() => isGeneratingAgain = false);
-      showTestAgainError('Không thể tạo bài mới. Vui lòng thử lại.');
+      showTestAgainError(AppStrings.current(AppKeys.testAgainCreateFailed));
     }
   }
 
@@ -116,12 +120,12 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Tạo bài mới thất bại'),
+          title: Text(context.getText(AppKeys.testAgainDialogTitle)),
           content: Text(message),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Đóng'),
+              child: Text(context.getText(AppKeys.close)),
             ),
           ],
         );
@@ -180,7 +184,9 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                                     ),
                                     SizedBox(height: s(28)),
                                     Text(
-                                      'Tuyệt vời!',
+                                      context.getText(
+                                        AppKeys.excellentResultTitle,
+                                      ),
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: _resultInk,
@@ -193,7 +199,9 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                                     ),
                                     SizedBox(height: s(12)),
                                     Text(
-                                      'Bé đã hoàn thành xuất sắc thử thách này.',
+                                      context.getText(
+                                        AppKeys.excellentResultMessage,
+                                      ),
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: _resultMuted,
@@ -309,7 +317,7 @@ class _TestAgainLoaderState extends State<_TestAgainLoader>
               ),
               SizedBox(height: 18 * widget.scale),
               Text(
-                'đợi Numi tạo bài mới cho bạn nhé!',
+                context.getText(AppKeys.generatingNewQuiz),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: _resultMuted,
@@ -357,7 +365,7 @@ class _ResultHeader extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  'Kết quả thử thách',
+                  context.getText(AppKeys.assessmentResultTitle),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -452,7 +460,7 @@ class _ScoreRing extends StatelessWidget {
           ),
           SizedBox(height: 7 * scale),
           Text(
-            'ĐIỂM SỐ',
+            context.getText(AppKeys.scoreUpper),
             style: TextStyle(
               color: _resultMuted,
               fontFamily: 'Nunito',
@@ -522,7 +530,7 @@ class _AiReviewCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        'Numi AI nhận xét',
+                        context.getText(AppKeys.numiAiReview),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -599,7 +607,7 @@ class _ResultBottomBar extends StatelessWidget {
             children: [
               Expanded(
                 child: _ResultActionButton(
-                  label: 'KIỂM TRA',
+                  label: context.getText(AppKeys.assessmentUpper),
                   icon: Icons.fact_check_outlined,
                   background: _resultPeach,
                   foreground: _resultRust,
@@ -610,7 +618,7 @@ class _ResultBottomBar extends StatelessWidget {
               SizedBox(width: 20 * scale),
               Expanded(
                 child: _ResultActionButton(
-                  label: 'LUYỆN TẬP',
+                  label: context.getText(AppKeys.practiceUpper),
                   icon: Icons.arrow_forward_rounded,
                   foreground: const Color(0xFFBEFFF9),
                   scale: scale,
@@ -728,5 +736,5 @@ String _reviewText(QuizGrading? grading) {
     return review;
   }
 
-  return 'Bé làm rất tốt phần phép cộng, hãy tiếp tục phát huy nhé! Chúng ta chỉ cần luyện tập thêm một chút ở các phép trừ có nhớ thôi.';
+  return AppStrings.current(AppKeys.defaultAiReview);
 }

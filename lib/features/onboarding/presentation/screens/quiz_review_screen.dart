@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/network/quiz_models.dart';
 import '../../data/quiz_api.dart';
 
@@ -80,7 +83,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
       }
 
       setState(() {
-        _errorMessage = 'Tải chi tiết bài kiểm tra thất bại.';
+        _errorMessage = AppStrings.current(AppKeys.quizDetailLoadFailed);
         _isLoading = false;
       });
     }
@@ -178,13 +181,13 @@ class _ReviewHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Chi Tiết Bài Kiểm Tra',
+                  context.getText(AppKeys.quizDetailTitle),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: _navy,
                     fontFamily: 'Nunito',
                     fontSize: 18,
@@ -218,10 +221,7 @@ class _ReviewHeaderPainter extends CustomPainter {
     final path = Path()
       ..moveTo(0, size.height - 6)
       ..quadraticBezierTo(
-          size.width * 0.5, 
-          size.height + 6, 
-          size.width, 
-          size.height - 6);
+          size.width * 0.5, size.height + 6, size.width, size.height - 6);
     canvas.drawPath(path, line);
   }
 
@@ -283,7 +283,7 @@ class _ReviewContent extends StatelessWidget {
           if (question == null)
             _ReviewStatePanel(
               isLoading: false,
-              message: 'Bài kiểm tra chưa có câu hỏi.',
+              message: context.getText(AppKeys.emptyQuizQuestions),
               onRetry: onRetry,
             )
           else ...[
@@ -336,28 +336,28 @@ class _StatsCard extends StatelessWidget {
             iconColor: const Color(0xFF4E86FF),
             iconBackground: const Color(0xFFEAF1FF),
             value: '$total',
-            label: 'Tổng câu',
+            label: context.getText(AppKeys.totalQuestions),
           ),
           _StatItem(
             icon: Icons.check_circle_outline_rounded,
             iconColor: _green,
             iconBackground: const Color(0xFFE8FFF1),
             value: '$correct',
-            label: 'Đúng',
+            label: context.getText(AppKeys.correct),
           ),
           _StatItem(
             icon: Icons.cancel_outlined,
             iconColor: _red,
             iconBackground: const Color(0xFFFFECEC),
             value: '$wrong',
-            label: 'Sai',
+            label: context.getText(AppKeys.incorrect),
           ),
           _StatItem(
             icon: Icons.schedule_rounded,
             iconColor: _orange,
             iconBackground: const Color(0xFFFFF3EA),
             value: time,
-            label: 'Thời gian',
+            label: context.getText(AppKeys.time),
           ),
         ],
       ),
@@ -507,7 +507,10 @@ class _QuestionCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(7),
             ),
             child: Text(
-              'Câu ${question.questionNumber}',
+              context.formatText(
+                AppKeys.questionNumber,
+                {'number': question.questionNumber},
+              ),
               style: const TextStyle(
                 color: _navy,
                 fontFamily: 'Nunito',
@@ -706,7 +709,9 @@ class _AnswerToggleButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
           child: Text(
-            showAnswer ? 'ẨN ĐÁP ÁN' : 'ĐÁP ÁN',
+            showAnswer
+                ? context.getText(AppKeys.hideAnswerUpper)
+                : context.getText(AppKeys.showAnswerUpper),
             style: const TextStyle(
               color: _navy,
               fontFamily: 'Nunito',
@@ -739,8 +744,8 @@ class _AnswerRevealPanel extends StatelessWidget {
       ),
       child: Text(
         answer == null || answer.isEmpty
-            ? 'Chưa có đáp án.'
-            : 'Đáp án: $answer',
+            ? context.getText(AppKeys.noAnswer)
+            : context.formatText(AppKeys.answer, {'answer': answer}),
         style: const TextStyle(
           color: Color(0xFFD71970),
           fontFamily: 'Nunito',
@@ -809,7 +814,10 @@ class _InlineError extends StatelessWidget {
               ),
             ),
           ),
-          TextButton(onPressed: onRetry, child: const Text('Thử lại')),
+          TextButton(
+            onPressed: onRetry,
+            child: Text(context.getText(AppKeys.retry)),
+          ),
         ],
       ),
     );
@@ -843,7 +851,7 @@ class _ReviewStatePanel extends StatelessWidget {
                 const Icon(Icons.quiz_outlined, color: _navy, size: 42),
                 const SizedBox(height: 14),
                 Text(
-                  message ?? 'Không tải được chi tiết bài kiểm tra.',
+                  message ?? context.getText(AppKeys.quizDetailErrorTitle),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: _deepInk,
@@ -853,7 +861,10 @@ class _ReviewStatePanel extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextButton(onPressed: onRetry, child: const Text('Thử lại')),
+                TextButton(
+                  onPressed: onRetry,
+                  child: Text(context.getText(AppKeys.retry)),
+                ),
               ],
             ],
           ),

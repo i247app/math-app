@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
@@ -396,7 +398,7 @@ class _HeaderBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'HỌC SINH',
+                      context.getText(AppKeys.student),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -594,7 +596,7 @@ class _TestHeroCard extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'KIỂM TRA',
+                  context.getText(AppKeys.assessment),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -607,7 +609,7 @@ class _TestHeroCard extends StatelessWidget {
                 ),
                 SizedBox(height: 15 * scale),
                 Text(
-                  'Cùng AI kiểm tra khả năng toán học\nvượt trội riêng bạn.',
+                  context.getText(AppKeys.assessmentDescription),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.86),
@@ -635,7 +637,7 @@ class _TestHeroCard extends StatelessWidget {
                 Expanded(
                   child: _HeroButton(
                     scale: scale,
-                    label: 'Bắt đầu ngay',
+                    label: context.getText(AppKeys.startNow),
                     icon: Icons.rocket_launch_outlined,
                     onTap: () {
                       _openGradeSelection(context, quizPurposeAssessment);
@@ -646,7 +648,7 @@ class _TestHeroCard extends StatelessWidget {
                 Expanded(
                   child: _HeroButton(
                     scale: scale,
-                    label: 'Luyện tập',
+                    label: context.getText(AppKeys.practice),
                     icon: Icons.school_outlined,
                     gradient: const LinearGradient(
                       begin: Alignment.topCenter,
@@ -957,7 +959,7 @@ class _AchievementsHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Thành tích của bạn',
+                context.getText(AppKeys.yourAchievement),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -984,7 +986,7 @@ class _AchievementsHeader extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(bottom: 3 * scale),
           child: Text(
-            'XEM TẤT CẢ',
+            context.getText(AppKeys.viewAllUpper),
             style: TextStyle(
               color: _teal,
               fontFamily: 'Nunito',
@@ -1045,7 +1047,7 @@ class _AchievementCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tiến độ vượt bậc',
+                  context.getText(AppKeys.progressAchievementTitle),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -1059,7 +1061,7 @@ class _AchievementCard extends StatelessWidget {
                 ),
                 SizedBox(height: 6 * scale),
                 Text(
-                  'Đã hoàn thành 12 bài tập hôm nay',
+                  context.getText(AppKeys.todayCompletedExercises),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -1112,10 +1114,14 @@ class _BottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      const _NavItemData(Icons.home_filled, 'HOME', null),
-      const _NavItemData(Icons.explore_outlined, 'ÔN TẬP', null),
-      const _NavItemData(Icons.history, 'LỊCH SỬ', null),
-      _NavItemData(null, 'CÀI ĐẶT', user),
+      _NavItemData(Icons.home_filled, context.getText(AppKeys.navHome), null),
+      _NavItemData(
+        Icons.explore_outlined,
+        context.getText(AppKeys.navReview),
+        null,
+      ),
+      _NavItemData(Icons.history, context.getText(AppKeys.navHistory), null),
+      _NavItemData(null, context.getText(AppKeys.navSettings), user),
     ];
 
     final radius = BorderRadius.circular(42 * scale);

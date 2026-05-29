@@ -2,6 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key, required this.onStart});
 
@@ -205,11 +208,11 @@ class _WelcomeHeadline extends StatelessWidget {
           height: 1.1,
           letterSpacing: 0,
         ),
-        children: const [
-          TextSpan(text: 'Học Toán cùng\n'),
+        children: [
+          TextSpan(text: context.getText(AppKeys.welcomeTitlePrefix)),
           TextSpan(
-            text: 'NUMI',
-            style: TextStyle(color: WelcomeScreen._teal),
+            text: context.getText(AppKeys.welcomeTitleN),
+            style: const TextStyle(color: WelcomeScreen._teal),
           ),
         ],
       ),
@@ -240,12 +243,12 @@ class _Subtitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = TextStyle(
-        color: WelcomeScreen._headlineInk.withValues(alpha: 0.72),
-        fontFamily: 'Nunito',
-        fontSize: fontSize,
-        fontWeight: FontWeight.w700,
-        height: 1.16,
-        letterSpacing: 0,
+      color: WelcomeScreen._headlineInk.withValues(alpha: 0.72),
+      fontFamily: 'Nunito',
+      fontSize: fontSize,
+      fontWeight: FontWeight.w700,
+      height: 1.16,
+      letterSpacing: 0,
     );
 
     return Column(
@@ -253,12 +256,16 @@ class _Subtitle extends StatelessWidget {
       children: [
         FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text('Hãy cùng Numi', maxLines: 1, style: style),
+          child: Text(
+            context.getText(AppKeys.welcomeSubtitlePrefix),
+            maxLines: 1,
+            style: style,
+          ),
         ),
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            'trở thành "phù thủy" tính toán nhé!',
+            context.getText(AppKeys.welcomeSubtitle),
             maxLines: 1,
             style: style,
           ),
@@ -299,7 +306,7 @@ class _StartButton extends StatelessWidget {
             ),
           ),
           child: Text(
-            'BẮT ĐẦU',
+            context.getText(AppKeys.start),
             style: TextStyle(
               color: Colors.white,
               fontFamily: 'Nunito',

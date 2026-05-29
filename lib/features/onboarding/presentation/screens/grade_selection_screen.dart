@@ -4,6 +4,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/otp_auth_api.dart';
@@ -62,7 +65,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     if (userId == null || userId.isEmpty) {
       setState(() {
         isLoadingGrades = false;
-        gradeLoadError = 'Chưa có thông tin tài khoản để tải danh sách lớp.';
+        gradeLoadError = AppStrings.current(AppKeys.noAccountForGrades);
         grades = const <GradeModel>[];
       });
       return;
@@ -103,7 +106,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
       }
 
       setState(() {
-        gradeLoadError = 'Tải danh sách lớp thất bại.';
+        gradeLoadError = AppStrings.current(AppKeys.gradeLoadFailed);
         isLoadingGrades = false;
       });
     }
@@ -193,7 +196,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Text(
-                                'Bé đang học lớp mấy\nnhỉ?',
+                                context.getText(AppKeys.gradeQuestionTitle),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: _gradeInk,
@@ -289,7 +292,7 @@ class _GradeFailureNotice extends StatelessWidget {
           SizedBox(width: 10 * scale),
           Expanded(
             child: Text(
-              'Tạo test thất bại. Vui lòng thử lại sau.',
+              context.getText(AppKeys.generateTestFailed),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -356,7 +359,7 @@ class _GradeHeader extends StatelessWidget {
               width: 42 * scale,
               height: 42 * scale,
             ),
-            tooltip: 'Quay lại',
+            tooltip: context.getText(AppKeys.back),
           ),
         ),
       ),
@@ -409,7 +412,7 @@ class _GradeGrid extends StatelessWidget {
     if (items.isEmpty) {
       return _GradeLoadError(
         scale: scale,
-        message: 'Chưa có lớp học nào để hiển thị.',
+        message: context.getText(AppKeys.noGrades),
         onRetry: onRetry,
       );
     }
@@ -548,7 +551,7 @@ class _GradeLoadError extends StatelessWidget {
           TextButton(
             onPressed: onRetry,
             child: Text(
-              'THỬ LẠI',
+              context.getText(AppKeys.retryUpper),
               style: TextStyle(
                 color: _gradeTeal,
                 fontFamily: 'Nunito',
@@ -733,7 +736,7 @@ class _GradeBottomBar extends StatelessWidget {
               Expanded(
                 flex: 9,
                 child: _PillActionButton(
-                  label: 'BỎ QUA',
+                  label: context.getText(AppKeys.skipUpper),
                   background: _gradePeach,
                   foreground: _gradeRust,
                   scale: scale,
@@ -744,7 +747,7 @@ class _GradeBottomBar extends StatelessWidget {
               Expanded(
                 flex: 10,
                 child: _PillActionButton(
-                  label: 'TIẾP TỤC',
+                  label: context.getText(AppKeys.continueUpper),
                   icon: Icons.arrow_forward_rounded,
                   background: _gradeTeal,
                   foreground: Colors.white,

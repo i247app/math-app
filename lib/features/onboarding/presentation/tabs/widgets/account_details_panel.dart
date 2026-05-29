@@ -143,7 +143,7 @@ class _AccountDetailsPanel extends StatelessWidget {
         ),
         SizedBox(height: (isEditing ? 2 : 8) * scale),
         _AccountTextField(
-          label: 'Username',
+          label: context.getText(AppKeys.username),
           controller: usernameController,
           isEditing: isEditing,
           trailing: Icon(
@@ -155,14 +155,14 @@ class _AccountDetailsPanel extends StatelessWidget {
         ),
         SizedBox(height: fieldGap),
         _AccountPhoneField(
-          label: 'Số Điện Thoại',
+          label: context.getText(AppKeys.phoneNumber),
           controller: phoneController,
           isEditing: isEditing,
           scale: scale,
         ),
         SizedBox(height: fieldGap),
         _AccountTextField(
-          label: 'Email',
+          label: context.getText(AppKeys.email),
           controller: emailController,
           isEditing: isEditing,
           keyboardType: TextInputType.emailAddress,
@@ -491,7 +491,7 @@ class _AccountFieldShell extends StatelessWidget {
             borderRadius: BorderRadius.circular(11 * scale),
             border: Border.all(
               color: const Color(0xFF0D0D0D).withValues(
-                alpha: label == 'Số Điện Thoại' ? 0.38 : 0,
+                alpha: label == context.getText(AppKeys.phoneNumber) ? 0.38 : 0,
               ),
             ),
           ),
@@ -576,7 +576,7 @@ class _SaveButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Lưu',
+                context.getText(AppKeys.save),
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Nunito',
@@ -631,7 +631,7 @@ class _CancelButton extends StatelessWidget {
               ),
               SizedBox(width: 4 * scale),
               Text(
-                'HỦY',
+                context.getText(AppKeys.cancel).toUpperCase(),
                 style: TextStyle(
                   color: const Color(0xFFB74419),
                   fontFamily: 'Nunito',

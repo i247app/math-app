@@ -4,6 +4,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/network/quiz_models.dart';
 import '../../data/quiz_api.dart';
 import 'assessment_result_screen.dart';
@@ -100,7 +103,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         return;
       }
 
-      handleGenerationFailure('Không thể tạo câu hỏi. Vui lòng thử lại.');
+      handleGenerationFailure(AppStrings.current(AppKeys.createQuestionFailed));
     }
   }
 
@@ -152,7 +155,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     final quizId = currentQuiz?.quizId;
     if (currentQuiz == null || questions.isEmpty || quizId == null) {
       setState(() {
-        errorMessage = 'Không tìm thấy bài test để nộp.';
+        errorMessage = AppStrings.current(AppKeys.missingQuizToSubmit);
         errorRetryAction = null;
       });
       return;
@@ -226,7 +229,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       }
 
       setState(() {
-        errorMessage = 'Nộp bài thất bại. Vui lòng thử lại.';
+        errorMessage = AppStrings.current(AppKeys.submitQuizFailed);
         errorRetryAction = () {
           submitCurrentQuiz();
         };
@@ -271,18 +274,18 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
           ),
-          title: const Text(
-            'Bạn có câu hỏi chưa trả lời',
-            style: TextStyle(
+          title: Text(
+            context.getText(AppKeys.unansweredSubmitTitle),
+            style: const TextStyle(
               color: _assessmentInk,
               fontFamily: 'Nunito',
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
           ),
-          content: const Text(
-            'Bạn có chắc muốn nộp bài không?',
-            style: TextStyle(
+          content: Text(
+            context.getText(AppKeys.unansweredSubmitMessage),
+            style: const TextStyle(
               color: _assessmentMuted,
               fontFamily: 'Nunito',
               fontWeight: FontWeight.w700,
@@ -293,9 +296,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
-                'Ở LẠI',
-                style: TextStyle(
+              child: Text(
+                context.getText(AppKeys.stayUpper),
+                style: const TextStyle(
                   color: _assessmentRust,
                   fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
@@ -309,9 +312,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                 foregroundColor: const Color(0xFFBEFFF9),
               ),
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
-                'NỘP BÀI',
-                style: TextStyle(
+              child: Text(
+                context.getText(AppKeys.submitUpper),
+                style: const TextStyle(
                   fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.8,
@@ -387,15 +390,18 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                   ? _GeneratingQuestionLoader(
                                       key: const ValueKey('submit-loader'),
                                       scale: scale,
-                                      message: 'đợi Numi nộp bài cho bạn nhé!',
+                                      message: context.getText(
+                                        AppKeys.submittingForYou,
+                                      ),
                                     )
                                   : isGeneratingQuestion
                                       ? _GeneratingQuestionLoader(
                                           key:
                                               const ValueKey('question-loader'),
                                           scale: scale,
-                                          message:
-                                              'Để Numi tạo bài kiểm tra cho bạn nhé',
+                                          message: context.getText(
+                                            AppKeys.generatingAssessment,
+                                          ),
                                         )
                                       : SingleChildScrollView(
                                           key: const ValueKey(
@@ -512,7 +518,7 @@ class _AssessmentHeader extends StatelessWidget {
               SizedBox(width: 16 * scale),
               Expanded(
                 child: Text(
-                  'Thử thách AI',
+                  context.getText(AppKeys.aiChallenge),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -592,7 +598,10 @@ class _ProgressSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'CÂU $currentQuestion/$totalQuestions',
+          context.formatText(AppKeys.questionProgress, {
+            'current': currentQuestion,
+            'total': totalQuestions,
+          }),
           style: TextStyle(
             color: _assessmentMuted,
             fontFamily: 'Nunito',
@@ -702,7 +711,7 @@ class _AssessmentErrorState extends StatelessWidget {
             SizedBox(
               width: 168 * scale,
               child: _BottomActionButton(
-                label: 'THỬ LẠI',
+                label: context.getText(AppKeys.retryUpper),
                 icon: Icons.refresh_rounded,
                 foreground: const Color(0xFFBEFFF9),
                 scale: scale,
@@ -1024,7 +1033,7 @@ class _AssessmentBottomBar extends StatelessWidget {
             children: [
               Expanded(
                 child: _BottomActionButton(
-                  label: 'CÂU TRƯỚC',
+                  label: context.getText(AppKeys.previousQuestionUpper),
                   icon: Icons.arrow_back_rounded,
                   background: _assessmentPeach.withValues(alpha: 0.50),
                   foreground: _assessmentRust,
@@ -1036,10 +1045,10 @@ class _AssessmentBottomBar extends StatelessWidget {
               Expanded(
                 child: _BottomActionButton(
                   label: isSubmitting
-                      ? 'ĐANG NỘP'
+                      ? context.getText(AppKeys.submittingUpper)
                       : isLastQuestion
-                          ? 'NỘP BÀI'
-                          : 'TIẾP TỤC',
+                          ? context.getText(AppKeys.submitUpper)
+                          : context.getText(AppKeys.continueUpper),
                   icon: isLastQuestion
                       ? Icons.check_rounded
                       : Icons.arrow_forward_rounded,

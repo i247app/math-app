@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../bloc/onboarding_cubit.dart';
 import '../widgets/common_widgets.dart';
@@ -26,7 +28,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
-  String selectedRole = 'Phụ huynh';
+  String selectedRole = SignupRoleDropdown.parentValue;
 
   @override
   void dispose() {
@@ -82,10 +84,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Center(
+                  Center(
                     child: Text(
-                      'ẢNH ĐẠI DIỆN',
-                      style: TextStyle(
+                      context.getText(AppKeys.avatarUpper),
+                      style: const TextStyle(
                         color: Color(0xFF667A71),
                         fontSize: 16,
                         height: 1,
@@ -95,24 +97,29 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   SizedBox(height: compact ? 32 : 38),
-                  const SignupFieldLabel(label: 'Name', isRequired: true),
+                  SignupFieldLabel(
+                    label: context.getText(AppKeys.signupNameLabel),
+                    isRequired: true,
+                  ),
                   const SizedBox(height: 12),
                   SignupTextField(
                     controller: usernameController,
-                    hintText: 'Nhập tên',
+                    hintText: context.getText(AppKeys.signupNameHint),
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 18),
-                  const SignupFieldLabel(label: 'Email'),
+                  SignupFieldLabel(
+                      label: context.getText(AppKeys.signupEmailLabel)),
                   const SizedBox(height: 12),
                   SignupTextField(
                     controller: emailController,
-                    hintText: 'Nhập email',
+                    hintText: context.getText(AppKeys.signupEmailHint),
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 18),
-                  const SignupFieldLabel(label: 'Bạn là'),
+                  SignupFieldLabel(
+                      label: context.getText(AppKeys.signupRoleLabel)),
                   const SizedBox(height: 12),
                   SignupRoleDropdown(
                     value: selectedRole,
@@ -124,13 +131,13 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   const SizedBox(height: 18),
-                  const Center(
+                  Center(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        'Nhập email để theo dõi kết quả kiểm tra và hành\ntrình học tập của bé',
+                        context.getText(AppKeys.signupEmailDescription),
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFF5A6E65),
                           fontSize: 13,
                           height: 1.38,
@@ -176,8 +183,8 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           child: Text(
                             widget.isSigningUp
-                                ? 'Đang đăng ký...'
-                                : 'Tiếp Tục  →',
+                                ? context.getText(AppKeys.signingUp)
+                                : '${context.getText(AppKeys.continueLabel)}  →',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
@@ -219,7 +226,7 @@ class SignupAvatarPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Chọn ảnh đại diện',
+      label: context.getText(AppKeys.chooseAvatar),
       child: GestureDetector(
         onTap: isLoading ? null : onTap,
         child: SizedBox(
@@ -411,7 +418,9 @@ class SignupRoleDropdown extends StatelessWidget {
     required this.onChanged,
   });
 
-  static const options = ['Phụ huynh', 'Giáo viên'];
+  static const parentValue = 'parent';
+  static const teacherValue = 'teacher';
+  static const options = [parentValue, teacherValue];
 
   final String value;
   final ValueChanged<String?> onChanged;
@@ -447,7 +456,11 @@ class SignupRoleDropdown extends StatelessWidget {
           for (final option in options)
             DropdownMenuItem<String>(
               value: option,
-              child: Text(option),
+              child: Text(
+                option == parentValue
+                    ? context.getText(AppKeys.signupRoleParent)
+                    : context.getText(AppKeys.signupRoleTeacher),
+              ),
             ),
         ],
         onChanged: onChanged,

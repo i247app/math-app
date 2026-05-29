@@ -1,4 +1,6 @@
 import '../../../core/config/api_config.dart';
+import '../../../core/localization/app_keys.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/network/auth_models.dart';
 import '../../../core/network/network_client.dart';
 
@@ -205,7 +207,7 @@ class OtpAuthApi implements OtpAuthService {
 
     final user = response.user?.toLoginUser(fallbackPhone: phone);
     if (user == null) {
-      throw const OtpAuthException('Response OTP thiếu thông tin user.');
+      throw OtpAuthException(AppStrings.current(AppKeys.missingOtpUser));
     }
 
     _loginUsers[phone] = user;
@@ -232,7 +234,7 @@ class OtpAuthApi implements OtpAuthService {
 
     final user = response.user?.toLoginUser(fallbackPhone: phone);
     if (user == null) {
-      throw const OtpAuthException('Response OTP thiếu thông tin user.');
+      throw OtpAuthException(AppStrings.current(AppKeys.missingOtpUser));
     }
 
     _loginUsers[phone] = user;

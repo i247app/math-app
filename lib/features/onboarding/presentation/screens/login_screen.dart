@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/phone_input_formatter.dart';
 import '../../domain/phone_region.dart';
@@ -135,11 +137,11 @@ class LoginCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 6),
             child: Text(
-              'SỐ ĐIỆN THOẠI',
-              style: TextStyle(
+              context.getText(AppKeys.phoneNumberUpper),
+              style: const TextStyle(
                 color: AppColors.grayText,
                 fontSize: 12,
                 fontWeight: FontWeight.w900,
@@ -226,10 +228,10 @@ class LoginCard extends StatelessWidget {
                     ? Column(
                         key: const ValueKey('send-otp-actions'),
                         children: [
-                          const Text(
-                            'Đây là tài khoản MỚI. Tiếp tục đăng ký?',
+                          Text(
+                            context.getText(AppKeys.newAccountPrompt),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: AppColors.muted,
                               fontSize: 13,
                               height: 1.25,
@@ -239,25 +241,27 @@ class LoginCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           PrimaryButton(
-                            label: 'Đăng ký',
+                            label: context.getText(AppKeys.signup),
                             onPressed: onSendOtp,
                           ),
                           const SizedBox(height: 16),
-                          const Center(
+                          Center(
                             child: SizedBox(
                               width: 255,
                               child: Row(
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.timer_outlined,
                                     size: 20,
                                     color: AppColors.orangeAccent,
                                   ),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   Flexible(
                                     child: Text(
-                                      'Bạn sẽ nhận được mã trong vòng 30 giây',
-                                      style: TextStyle(
+                                      context.getText(
+                                        AppKeys.otpWithin30Seconds,
+                                      ),
+                                      style: const TextStyle(
                                         color: AppColors.muted,
                                         fontSize: 13,
                                         height: 1.28,
@@ -359,7 +363,7 @@ class PhoneRegionMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<PhoneRegion>(
-      tooltip: 'Chọn quốc gia',
+      tooltip: context.getText(AppKeys.chooseCountry),
       onSelected: onChanged,
       itemBuilder: (context) {
         return PhoneRegion.values.map((item) {

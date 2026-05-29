@@ -69,9 +69,9 @@ class _AddProfilePanel extends StatelessWidget {
         ),
         SizedBox(height: 22 * scale),
         _AddProfileTextField(
-          label: 'Họ Tên',
+          label: context.getText(AppKeys.fullName),
           controller: nameController,
-          hintText: "Enter student's full name",
+          hintText: context.getText(AppKeys.studentNameHint),
           scale: scale,
         ),
         SizedBox(height: 14 * scale),
@@ -87,37 +87,37 @@ class _AddProfilePanel extends StatelessWidget {
           )
         else ...[
           _AddProfileDropdown<GradeModel>(
-            label: 'Lớp',
-            hintText: 'Chọn lớp',
+            label: context.getText(AppKeys.grade),
+            hintText: context.getText(AppKeys.chooseGrade),
             value: selectedGrade,
             items: grades,
             itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
                 ? grade.label!.trim()
-                : 'Lớp',
+                : context.getText(AppKeys.grade),
             onChanged: onGradeChanged,
             scale: scale,
           ),
           SizedBox(height: 14 * scale),
           _AddProfileDropdown<ProgramModel>(
-            label: 'Chương Trình Học',
-            hintText: 'Chọn chương trình',
+            label: context.getText(AppKeys.learningProgram),
+            hintText: context.getText(AppKeys.chooseProgram),
             value: selectedProgram,
             items: programs,
             itemLabel: (program) => program.label?.trim().isNotEmpty == true
                 ? program.label!.trim()
-                : 'Chương trình',
+                : context.getText(AppKeys.program),
             onChanged: onProgramChanged,
             scale: scale,
           ),
           SizedBox(height: 14 * scale),
           _AddProfileDropdown<SemesterModel>(
-            label: 'Học Kỳ',
-            hintText: 'Chọn học kỳ',
+            label: context.getText(AppKeys.semester),
+            hintText: context.getText(AppKeys.chooseSemester),
             value: selectedSemester,
             items: semesters,
             itemLabel: (semester) => semester.name?.trim().isNotEmpty == true
                 ? semester.name!.trim()
-                : 'Học kỳ',
+                : context.getText(AppKeys.semester),
             onChanged: onSemesterChanged,
             scale: scale,
           ),
@@ -142,7 +142,7 @@ class _AddProfilePanel extends StatelessWidget {
               child: TextButton(
                 onPressed: onRetryOptions,
                 child: Text(
-                  'Tải lại lựa chọn',
+                  context.getText(AppKeys.reloadOptions),
                   style: TextStyle(
                     color: _teal,
                     fontFamily: 'Nunito',
