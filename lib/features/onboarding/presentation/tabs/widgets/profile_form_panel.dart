@@ -127,9 +127,8 @@ class _AddProfilePanel extends StatelessWidget {
           Text(
             error,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.andika(
               color: _orange,
-              fontFamily: 'Nunito',
               fontSize: 13 * scale,
               fontWeight: FontWeight.w800,
               height: 1.25,
@@ -143,9 +142,8 @@ class _AddProfilePanel extends StatelessWidget {
                 onPressed: onRetryOptions,
                 child: Text(
                   context.getText(AppKeys.reloadOptions),
-                  style: TextStyle(
+                  style: GoogleFonts.andika(
                     color: _teal,
-                    fontFamily: 'Nunito',
                     fontSize: 13 * scale,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0,
@@ -343,9 +341,8 @@ class _AddProfileTextField extends StatelessWidget {
         controller: controller,
         textInputAction: TextInputAction.next,
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
-        style: TextStyle(
+        style: GoogleFonts.andika(
           color: _deepInk,
-          fontFamily: 'Nunito',
           fontSize: 15 * scale,
           fontWeight: FontWeight.w800,
           height: 1,
@@ -353,9 +350,8 @@ class _AddProfileTextField extends StatelessWidget {
         ),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(
+          hintStyle: GoogleFonts.andika(
             color: const Color(0xFFA8B1B2),
-            fontFamily: 'Nunito',
             fontSize: 14 * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
@@ -404,9 +400,8 @@ class _AddProfileDropdown<T> extends StatelessWidget {
           ),
           hint: Text(
             hintText,
-            style: TextStyle(
+            style: GoogleFonts.andika(
               color: const Color(0xFFA8B1B2),
-              fontFamily: 'Nunito',
               fontSize: 15 * scale,
               fontWeight: FontWeight.w800,
               letterSpacing: 0,
@@ -423,9 +418,8 @@ class _AddProfileDropdown<T> extends StatelessWidget {
             );
           }).toList(),
           onChanged: onChanged,
-          style: TextStyle(
+          style: GoogleFonts.andika(
             color: _deepInk,
-            fontFamily: 'Nunito',
             fontSize: 15 * scale,
             fontWeight: FontWeight.w900,
             letterSpacing: 0,
@@ -456,9 +450,8 @@ class _AddProfileFieldShell extends StatelessWidget {
           label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
+          style: GoogleFonts.andika(
             color: const Color(0xFF604950),
-            fontFamily: 'Nunito',
             fontSize: 14 * scale,
             fontWeight: FontWeight.w900,
             height: 1,

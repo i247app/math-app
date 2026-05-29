@@ -165,7 +165,7 @@ class AppStrings {
           'Bạn có chắc muốn delete profile này không?',
       AppKeys.profileDeleted: 'Đã xóa hồ sơ.',
       AppKeys.profileDeleteFailed: 'Không thể xóa hồ sơ. Vui lòng thử lại.',
-      AppKeys.username: 'Username',
+      AppKeys.username: 'Tên Người Dùng',
       AppKeys.fullName: 'Họ Tên',
       AppKeys.studentNameHint: 'Nhập họ tên học sinh',
       AppKeys.phoneNumber: 'Số Điện Thoại',

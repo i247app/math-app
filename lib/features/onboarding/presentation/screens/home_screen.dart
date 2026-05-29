@@ -17,7 +17,7 @@ import '../tabs/setting_tab.dart';
 import 'grade_selection_screen.dart';
 
 const _teal = Color(0xFF006762);
-const _blue = Color(0xFF063A7B);
+const _blue = Color(0xFF339395);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _mintBackground = Color(0xFFEEF9FB);
@@ -1268,7 +1268,7 @@ class _AnimatedNavItem extends StatelessWidget {
                           maxLines: 1,
                           style: TextStyle(
                             color: color,
-                            fontFamily: 'Nunito',
+                            fontFamily: 'Fredoka',
                             fontSize: 10 * scale,
                             fontWeight: FontWeight.w900,
                             height: 1,

@@ -177,9 +177,8 @@ class _ProfileCard extends StatelessWidget {
                   ),
                   child: Text(
                     context.getText(AppKeys.active),
-                    style: TextStyle(
+                    style: GoogleFonts.andika(
                       color: const Color(0xFF003C88),
-                      fontFamily: 'Nunito',
                       fontSize: 11 * scale,
                       fontWeight: FontWeight.w900,
                       height: 1,
@@ -194,9 +193,8 @@ class _ProfileCard extends StatelessWidget {
             _displayProfileName(context, profile),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: GoogleFonts.andika(
               color: _deepInk,
-              fontFamily: 'Nunito',
               fontSize: 18 * scale,
               fontWeight: FontWeight.w900,
               height: 1,
@@ -344,9 +342,8 @@ class _ProfileInfoLine extends StatelessWidget {
         SizedBox(width: 8 * scale),
         Text(
           '$label : ',
-          style: TextStyle(
+          style: GoogleFonts.andika(
             color: const Color(0xFF604950),
-            fontFamily: 'Nunito',
             fontSize: 14 * scale,
             fontWeight: FontWeight.w700,
             height: 1,
@@ -358,9 +355,8 @@ class _ProfileInfoLine extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: GoogleFonts.andika(
               color: const Color(0xFF604950),
-              fontFamily: 'Nunito',
               fontSize: 14 * scale,
               fontWeight: FontWeight.w700,
               height: 1,
@@ -443,9 +439,8 @@ class _ProfileStatePanel extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.andika(
               color: _deepInk,
-              fontFamily: 'Nunito',
               fontSize: 22 * scale,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
@@ -455,9 +450,8 @@ class _ProfileStatePanel extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.andika(
               color: _muted,
-              fontFamily: 'Nunito',
               fontSize: 14 * scale,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -478,9 +472,8 @@ class _ProfileStatePanel extends StatelessWidget {
                 ),
                 child: Text(
                   buttonLabel,
-                  style: TextStyle(
+                  style: GoogleFonts.andika(
                     color: Colors.white,
-                    fontFamily: 'Nunito',
                     fontSize: 14 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,

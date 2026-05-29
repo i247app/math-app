@@ -24,16 +24,16 @@ class _AccountEditButton extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(10 * scale),
           child: Container(
-            width: 42 * scale,
-            height: 42 * scale,
+            width: 36 * scale,
+            height: 36 * scale,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10 * scale),
-              border: Border.all(color: const Color(0xFFE4A9C7), width: 1.3),
+              border: Border.all(color: _teal, width: 1.2),
             ),
             child: Icon(
               Icons.edit_rounded,
-              color: const Color(0xFFD12788),
-              size: 22 * scale,
+              color: _teal,
+              size: 19 * scale,
             ),
           ),
         ),
@@ -117,7 +117,7 @@ class _AccountDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fieldGap = (isEditing ? 16 : 22) * scale;
+    final fieldGap = 20 * scale;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -131,7 +131,7 @@ class _AccountDetailsPanel extends StatelessWidget {
               onTap: onEdit,
             ),
           ),
-          SizedBox(height: 6 * scale),
+          SizedBox(height: 10 * scale),
         ],
         _AccountAvatar(
           avatarUrl: avatarUrl,
@@ -141,7 +141,7 @@ class _AccountDetailsPanel extends StatelessWidget {
           scale: scale,
           onCameraTap: onAvatarTap,
         ),
-        SizedBox(height: (isEditing ? 2 : 8) * scale),
+        SizedBox(height: 4 * scale),
         _AccountTextField(
           label: context.getText(AppKeys.username),
           controller: usernameController,
@@ -214,7 +214,7 @@ class _AccountAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final url = avatarUrl?.trim();
     final path = avatarPath?.trim();
-    final size = 142 * scale;
+    final size = 126 * scale;
 
     return Center(
       child: SizedBox(
@@ -231,24 +231,20 @@ class _AccountAvatar extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFFFF61AE),
-                  width: 5 * scale,
+                  color: const Color(0xFFFF7451),
+                  width: 3.8 * scale,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFF61AE).withValues(alpha: 0.20),
-                    blurRadius: 18 * scale,
-                    offset: Offset(0, 8 * scale),
+                    color: const Color(0xFFE8601C).withValues(alpha: 0.16),
+                    blurRadius: 14 * scale,
+                    offset: Offset(0, 5 * scale),
                   ),
                 ],
               ),
               child: DecoratedBox(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFFBDE6FF),
-                    width: 5 * scale,
-                  ),
                   color: Colors.white,
                 ),
                 child: ClipOval(
@@ -264,7 +260,7 @@ class _AccountAvatar extends StatelessWidget {
                           ? Padding(
                               padding: EdgeInsets.all(24 * scale),
                               child: Image.asset(
-                                'assets/images/welcome_numi_character.png',
+                                'assets/images/numi-mascot.png',
                                 fit: BoxFit.contain,
                               ),
                             )
@@ -275,7 +271,7 @@ class _AccountAvatar extends StatelessWidget {
                                 return Padding(
                                   padding: EdgeInsets.all(24 * scale),
                                   child: Image.asset(
-                                    'assets/images/welcome_numi_character.png',
+                                    'assets/images/numi-mascot.png',
                                     fit: BoxFit.contain,
                                   ),
                                 );
@@ -331,7 +327,7 @@ class _AccountDefaultAvatar extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(24 * scale),
       child: Image.asset(
-        'assets/images/welcome_numi_character.png',
+        'assets/images/numi-mascot.png',
         fit: BoxFit.contain,
       ),
     );
@@ -407,9 +403,8 @@ class _AccountPhoneField extends StatelessWidget {
           SizedBox(width: 12 * scale),
           Text(
             '+84',
-            style: TextStyle(
+            style: GoogleFonts.andika(
               color: _deepInk,
-              fontFamily: 'Nunito',
               fontSize: 17 * scale,
               fontWeight: FontWeight.w900,
               height: 1,
@@ -428,9 +423,8 @@ class _AccountPhoneField extends StatelessWidget {
               enabled: isEditing,
               keyboardType: TextInputType.phone,
               scale: scale,
-              textStyle: TextStyle(
+              textStyle: GoogleFonts.andika(
                 color: Colors.black,
-                fontFamily: 'Nunito',
                 fontSize: 21 * scale,
                 fontWeight: FontWeight.w900,
                 height: 1,
@@ -469,9 +463,8 @@ class _AccountFieldShell extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: GoogleFonts.andika(
                   color: const Color(0xFF604950),
-                  fontFamily: 'Nunito',
                   fontSize: 15 * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
@@ -484,15 +477,14 @@ class _AccountFieldShell extends StatelessWidget {
         ),
         SizedBox(height: 12 * scale),
         Container(
-          height: 68 * scale,
+          height: 60 * scale,
           padding: EdgeInsets.symmetric(horizontal: 20 * scale),
           decoration: BoxDecoration(
-            color: const Color(0xFFEDF7F9),
-            borderRadius: BorderRadius.circular(11 * scale),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12 * scale),
             border: Border.all(
-              color: const Color(0xFF0D0D0D).withValues(
-                alpha: label == context.getText(AppKeys.phoneNumber) ? 0.38 : 0,
-              ),
+              color: const Color(0xFFCFCFCF),
+              width: 1.2 * scale,
             ),
           ),
           alignment: Alignment.center,
@@ -521,9 +513,8 @@ class _PlainAccountTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = textStyle ??
-        TextStyle(
+        GoogleFonts.andika(
           color: _deepInk,
-          fontFamily: 'Nunito',
           fontSize: 17 * scale,
           fontWeight: FontWeight.w700,
           height: 1,
@@ -562,7 +553,7 @@ class _SaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: _navy,
+      color: _teal,
       elevation: 9,
       shadowColor: Colors.black.withValues(alpha: 0.30),
       borderRadius: BorderRadius.circular(999),
@@ -577,9 +568,8 @@ class _SaveButton extends StatelessWidget {
             children: [
               Text(
                 context.getText(AppKeys.save),
-                style: TextStyle(
+                style: GoogleFonts.andika(
                   color: Colors.white,
-                  fontFamily: 'Nunito',
                   fontSize: 18 * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
@@ -632,9 +622,8 @@ class _CancelButton extends StatelessWidget {
               SizedBox(width: 4 * scale),
               Text(
                 context.getText(AppKeys.cancel).toUpperCase(),
-                style: TextStyle(
+                style: GoogleFonts.andika(
                   color: const Color(0xFFB74419),
-                  fontFamily: 'Nunito',
                   fontSize: 16 * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,

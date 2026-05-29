@@ -11,11 +11,11 @@ import '../screens/quiz_review_screen.dart';
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF5D4A54);
 const _deepInk = Color(0xFF1F2B2B);
-const _navy = Color(0xFF063A7B);
+const _navy = Color(0xFF083B78);
 const _orange = Color(0xFFDE8C4B);
 const _historyBackground = Color(0xFFEEF9FB);
 const _cardBorder = Color(0xFFE3DDDF);
-const _activeTab = Color(0xFFB72A7F);
+const _activeTab = Color(0xFFFF704D);
 const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
 class HistoryTab extends StatefulWidget {
@@ -164,9 +164,9 @@ class _HistoryTabState extends State<HistoryTab> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _HistoryHeader(scale: scale),
-            SizedBox(height: 16 * scale),
+            SizedBox(height: 12 * scale),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 26 * scale),
+              padding: EdgeInsets.symmetric(horizontal: 20 * scale),
               child: _HistorySearchField(
                 controller: _searchController,
                 scale: scale,
@@ -174,7 +174,7 @@ class _HistoryTabState extends State<HistoryTab> {
             ),
             SizedBox(height: 12 * scale),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 26 * scale),
+              padding: EdgeInsets.symmetric(horizontal: 20 * scale),
               child: _HistoryTypeTabs(
                 selectedFilter: _selectedFilter,
                 onSelected: _selectFilter,
@@ -183,7 +183,7 @@ class _HistoryTabState extends State<HistoryTab> {
             ),
             SizedBox(height: 12 * scale),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 26 * scale),
+              padding: EdgeInsets.symmetric(horizontal: 20 * scale),
               child: _HistoryBody(
                 isLoading: _isLoading,
                 errorMessage: _errorMessage,
@@ -206,73 +206,32 @@ class _HistoryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 70 * scale,
-      child: CustomPaint(
-        painter: _HistoryHeaderCurvePainter(scale: scale),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            20 * scale,
-            8 * scale,
-            20 * scale,
-            12 * scale,
-          ),
-          child: Row(
-            children: [
-              SizedBox(width: 44 * scale),
-              Expanded(
-                child: Text(
-                  context.getText(AppKeys.historyTitle),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _navy,
-                    fontFamily: 'Nunito',
-                    fontSize: 18 * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-              SizedBox(width: 44 * scale),
-            ],
+    return Container(
+      height: 60 * scale,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: const Color(0xFFF2F2F2),
+            width: 4 * scale,
           ),
         ),
       ),
+      alignment: Alignment.center,
+      child: Text(
+        context.getText(AppKeys.historyTitle),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: const Color(0xFF339395),
+          fontFamily: 'Fredoka',
+          fontSize: 21 * scale,
+          fontWeight: FontWeight.w700,
+          height: 1,
+          letterSpacing: 0,
+        ),
+      ),
     );
-  }
-}
-
-class _HistoryHeaderCurvePainter extends CustomPainter {
-  const _HistoryHeaderCurvePainter({required this.scale});
-
-  final double scale;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final background = Paint()..color = _historyBackground;
-    canvas.drawRect(Offset.zero & size, background);
-
-    final line = Paint()
-      ..color = _orange.withValues(alpha: 0.72)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.1 * scale;
-    final path = Path()
-      ..moveTo(0, size.height - 6 * scale)
-      ..quadraticBezierTo(
-        size.width * 0.5,
-        size.height + 6 * scale,
-        size.width,
-        size.height - 6 * scale,
-      );
-    canvas.drawPath(path, line);
-  }
-
-  @override
-  bool shouldRepaint(covariant _HistoryHeaderCurvePainter oldDelegate) {
-    return oldDelegate.scale != scale;
   }
 }
 
@@ -288,7 +247,7 @@ class _HistorySearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 46 * scale,
+      height: 42 * scale,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30 * scale),
@@ -307,8 +266,8 @@ class _HistorySearchField extends StatelessWidget {
         textInputAction: TextInputAction.search,
         style: TextStyle(
           color: _deepInk,
-          fontFamily: 'Nunito',
-          fontSize: 18 * scale,
+          fontFamily: 'Fredoka',
+          fontSize: 15 * scale,
           fontWeight: FontWeight.w800,
           letterSpacing: 0,
         ),
@@ -316,7 +275,7 @@ class _HistorySearchField extends StatelessWidget {
           hintText: context.getText(AppKeys.searchHint),
           hintStyle: TextStyle(
             color: const Color(0xFFD8C5CC),
-            fontFamily: 'Nunito',
+            fontFamily: 'Fredoka',
             fontSize: 16 * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
@@ -428,9 +387,9 @@ class _HistoryTypeTabButton extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: selected ? Colors.white : _muted,
-              fontFamily: 'Nunito',
+              fontFamily: 'Fredoka',
               fontSize: 13 * scale,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w500,
               height: 1,
               letterSpacing: 0,
             ),
@@ -544,7 +503,7 @@ class _HistoryQuizCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: Container(
-          constraints: BoxConstraints(minHeight: 92 * scale),
+          constraints: BoxConstraints(minHeight: 100 * scale),
           padding: EdgeInsets.fromLTRB(
             16 * scale,
             14 * scale,
@@ -588,7 +547,7 @@ class _HistoryQuizCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: _deepInk,
-                        fontFamily: 'Nunito',
+                        fontFamily: 'Fredoka',
                         fontSize: 14 * scale,
                         fontWeight: FontWeight.w900,
                         height: 1.28,
@@ -665,7 +624,7 @@ class _HistoryMetaItem extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: _muted,
-            fontFamily: 'Nunito',
+            fontFamily: 'Fredoka',
             fontSize: 10 * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
@@ -714,7 +673,7 @@ class _HistoryScoreBadge extends StatelessWidget {
                   maxLines: 1,
                   style: TextStyle(
                     color: colors.foreground,
-                    fontFamily: 'Nunito',
+                    fontFamily: 'Fredoka',
                     fontSize: 13 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -732,7 +691,7 @@ class _HistoryScoreBadge extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: colors.foreground,
-              fontFamily: 'Nunito',
+              fontFamily: 'Fredoka',
               fontSize: 10 * scale,
               fontWeight: FontWeight.w900,
               height: 1.05,
@@ -761,7 +720,7 @@ class _HistoryIncompleteBadge extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           color: _orange,
-          fontFamily: 'Nunito',
+          fontFamily: 'Fredoka',
           fontSize: 10 * scale,
           fontWeight: FontWeight.w900,
           height: 1.1,
@@ -835,7 +794,7 @@ class _HistoryMessageState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _deepInk,
-              fontFamily: 'Nunito',
+              fontFamily: 'Fredoka',
               fontSize: 18 * scale,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
@@ -847,7 +806,7 @@ class _HistoryMessageState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _muted,
-              fontFamily: 'Nunito',
+              fontFamily: 'Fredoka',
               fontSize: 13 * scale,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -862,7 +821,7 @@ class _HistoryMessageState extends StatelessWidget {
                 actionLabel!,
                 style: TextStyle(
                   color: _teal,
-                  fontFamily: 'Nunito',
+                  fontFamily: 'Fredoka',
                   fontSize: 13 * scale,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
@@ -14,7 +15,8 @@ import '../../data/avatar_picker.dart';
 import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/profile_api.dart';
-import '../screens/language_settings_screen.dart';
+import '../../../../core/localization/app_language.dart';
+import '../../../../core/localization/lingo_scope.dart';
 
 part 'widgets/setting_header.dart';
 part 'widgets/settings_menu_panel.dart';
@@ -22,13 +24,11 @@ part 'widgets/account_details_panel.dart';
 part 'widgets/profile_form_panel.dart';
 part 'widgets/profile_list_panel.dart';
 
-const _navy = Color(0xFF063A7B);
-const _teal = Color(0xFF006762);
+const _navy = Color(0xFF339395);
+const _teal = Color(0xFF339395);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
-const _settingBackground = Color(0xFFEEF9FB);
-const _cardBorder = Color(0xFFE3DDDF);
 
 enum _AccountView { settings, account, profile, addProfile }
 
@@ -170,13 +170,12 @@ class _SettingTabState extends State<SettingTab> {
     }
   }
 
-  void _openLanguageScreen() {
+  Future<void> _changeLanguage(AppLanguage language) async {
     HapticFeedback.selectionClick();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const LanguageSettingsScreen(),
-      ),
-    );
+    await LingoScope.read(context).setLanguage(language);
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _returnToSettings() {
@@ -662,9 +661,9 @@ class _SettingTabState extends State<SettingTab> {
           title: Text(context.readText(AppKeys.deleteProfileTitle)),
           content: Text(
             context.readText(AppKeys.deleteProfileMessage),
-            style: const TextStyle(
-              color: _deepInk,
-              fontFamily: 'Nunito',
+            style: GoogleFonts.andika(
+              color: const Color(0xFF1B1B1B),
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               letterSpacing: 0,
             ),
@@ -757,146 +756,153 @@ class _SettingTabState extends State<SettingTab> {
     final scale = widget.scale;
     final headerTitle = _titleForView(context, _view, _editingProfile);
     final canGoBack = _view != _AccountView.settings;
-    final backgroundColor =
-        _view == _AccountView.account ? Colors.white : _settingBackground;
+    const backgroundColor = Colors.white;
+    final lingo = LingoScope.of(context);
 
     return ColoredBox(
       color: backgroundColor,
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: EdgeInsets.only(
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: widget.bottomPadding,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _SettingHeader(
-              title: headerTitle,
-              canGoBack: canGoBack,
-              onBack: _view == _AccountView.addProfile
-                  ? _returnToProfileList
-                  : _returnToSettings,
-              backgroundColor: backgroundColor,
-              scale: scale,
-            ),
-            SizedBox(height: _topGapForView(_view) * scale),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24 * scale),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    layoutBuilder: (currentChild, previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topCenter,
-                        children: [
-                          for (final child in previousChildren) child,
-                          if (currentChild != null) currentChild,
-                        ],
-                      );
-                    },
-                    transitionBuilder: (child, animation) {
-                      final isIncoming = child.key == ValueKey(_viewKey(_view));
-                      final forward = _isForwardTransition;
-                      final beginX = isIncoming
-                          ? (forward ? 0.10 : -0.10)
-                          : (forward ? -0.08 : 0.08);
-                      final offset = Tween<Offset>(
-                        begin: Offset(beginX, 0),
-                        end: Offset.zero,
-                      ).animate(animation);
-
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(position: offset, child: child),
-                      );
-                    },
-                    child: switch (_view) {
-                      _AccountView.settings => _SettingsMenuPanel(
-                          key: ValueKey(_viewKey(_AccountView.settings)),
-                          avatarUrl: _effectiveUser?.avatarUrl,
-                          avatarPath: _localAvatarPath,
-                          username: _fallbackUsername(_effectiveUser),
-                          scale: scale,
-                          onAccountTap: () => _openView(_AccountView.account),
-                          onProfileTap: () => _openView(_AccountView.profile),
-                          onLanguageTap: _openLanguageScreen,
-                          onLogoutTap: widget.onLogout,
-                        ),
-                      _AccountView.account => _AccountDetailsPanel(
-                          key: ValueKey(_viewKey(_AccountView.account)),
-                          avatarUrl: _effectiveUser?.avatarUrl,
-                          avatarPath:
-                              _isEditing ? _draftAvatarPath : _localAvatarPath,
-                          usernameController: _usernameController,
-                          phoneController: _phoneController,
-                          emailController: _emailController,
-                          isEditing: _isEditing,
-                          isSaving: _isSavingAccount,
-                          isPickingAvatar: _isPickingAccountAvatar,
-                          onEdit: _startEditing,
-                          onSave: _saveEditing,
-                          onCancel: _cancelEditing,
-                          onAvatarTap: _pickAccountAvatar,
-                          scale: scale,
-                        ),
-                      _AccountView.profile => _ProfilePlaceholderPanel(
-                          key: ValueKey(_viewKey(_AccountView.profile)),
-                          profiles: _profiles,
-                          isLoading: _isLoadingProfiles || _isDeletingProfile,
-                          errorMessage: _profileLoadError,
-                          onRetry: _loadProfiles,
-                          onAdd: _openAddProfile,
-                          onEdit: _openUpdateProfile,
-                          onDelete: _confirmDeleteProfile,
-                          scale: scale,
-                        ),
-                      _AccountView.addProfile => _AddProfilePanel(
-                          key: ValueKey(_viewKey(_AccountView.addProfile)),
-                          nameController: _profileNameController,
-                          avatarPath: _createAvatarPath,
-                          avatarUrl: _editingProfile?.avatarUrl,
-                          grades: _gradeOptions,
-                          programs: _programOptions,
-                          semesters: _semesterOptions,
-                          selectedGrade: _selectedGrade,
-                          selectedProgram: _selectedProgram,
-                          selectedSemester: _selectedSemester,
-                          isLoadingOptions: _isLoadingProfileOptions,
-                          isPickingAvatar: _isPickingCreateAvatar,
-                          isSaving: _isSavingProfile,
-                          errorMessage:
-                              _profileOptionsError ?? _profileCreateError,
-                          canRetryOptions: _profileOptionsError != null,
-                          onPickAvatar: _pickCreateAvatar,
-                          onClearAvatar: _clearCreateAvatar,
-                          onGradeChanged: (grade) {
-                            setState(() => _selectedGrade = grade);
-                          },
-                          onProgramChanged: (program) {
-                            setState(() => _selectedProgram = program);
-                          },
-                          onSemesterChanged: (semester) {
-                            setState(() => _selectedSemester = semester);
-                          },
-                          onRetryOptions: _loadProfileOptions,
-                          onCancel: _cancelAddProfile,
-                          onSave: _saveProfileForm,
-                          scale: scale,
-                        ),
-                    },
-                  ),
-                ],
+      child: DefaultTextStyle.merge(
+        style: GoogleFonts.andika(letterSpacing: 0),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: EdgeInsets.only(
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: widget.bottomPadding,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _SettingHeader(
+                title: headerTitle,
+                canGoBack: canGoBack,
+                onBack: _view == _AccountView.addProfile
+                    ? _returnToProfileList
+                    : _returnToSettings,
+                backgroundColor: backgroundColor,
+                scale: scale,
               ),
-            ),
-          ],
+              SizedBox(height: _topGapForView(_view) * scale),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24 * scale),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return Stack(
+                          alignment: Alignment.topCenter,
+                          children: [
+                            for (final child in previousChildren) child,
+                            if (currentChild != null) currentChild,
+                          ],
+                        );
+                      },
+                      transitionBuilder: (child, animation) {
+                        final isIncoming =
+                            child.key == ValueKey(_viewKey(_view));
+                        final forward = _isForwardTransition;
+                        final beginX = isIncoming
+                            ? (forward ? 0.10 : -0.10)
+                            : (forward ? -0.08 : 0.08);
+                        final offset = Tween<Offset>(
+                          begin: Offset(beginX, 0),
+                          end: Offset.zero,
+                        ).animate(animation);
+
+                        return FadeTransition(
+                          opacity: animation,
+                          child:
+                              SlideTransition(position: offset, child: child),
+                        );
+                      },
+                      child: switch (_view) {
+                        _AccountView.settings => _SettingsMenuPanel(
+                            key: ValueKey(_viewKey(_AccountView.settings)),
+                            avatarUrl: _effectiveUser?.avatarUrl,
+                            avatarPath: _localAvatarPath,
+                            username: _fallbackUsername(_effectiveUser),
+                            scale: scale,
+                            currentLanguage: lingo.language,
+                            onAccountTap: () => _openView(_AccountView.account),
+                            onProfileTap: () => _openView(_AccountView.profile),
+                            onLanguageChanged: _changeLanguage,
+                            onLogoutTap: widget.onLogout,
+                          ),
+                        _AccountView.account => _AccountDetailsPanel(
+                            key: ValueKey(_viewKey(_AccountView.account)),
+                            avatarUrl: _effectiveUser?.avatarUrl,
+                            avatarPath: _isEditing
+                                ? _draftAvatarPath
+                                : _localAvatarPath,
+                            usernameController: _usernameController,
+                            phoneController: _phoneController,
+                            emailController: _emailController,
+                            isEditing: _isEditing,
+                            isSaving: _isSavingAccount,
+                            isPickingAvatar: _isPickingAccountAvatar,
+                            onEdit: _startEditing,
+                            onSave: _saveEditing,
+                            onCancel: _cancelEditing,
+                            onAvatarTap: _pickAccountAvatar,
+                            scale: scale,
+                          ),
+                        _AccountView.profile => _ProfilePlaceholderPanel(
+                            key: ValueKey(_viewKey(_AccountView.profile)),
+                            profiles: _profiles,
+                            isLoading: _isLoadingProfiles || _isDeletingProfile,
+                            errorMessage: _profileLoadError,
+                            onRetry: _loadProfiles,
+                            onAdd: _openAddProfile,
+                            onEdit: _openUpdateProfile,
+                            onDelete: _confirmDeleteProfile,
+                            scale: scale,
+                          ),
+                        _AccountView.addProfile => _AddProfilePanel(
+                            key: ValueKey(_viewKey(_AccountView.addProfile)),
+                            nameController: _profileNameController,
+                            avatarPath: _createAvatarPath,
+                            avatarUrl: _editingProfile?.avatarUrl,
+                            grades: _gradeOptions,
+                            programs: _programOptions,
+                            semesters: _semesterOptions,
+                            selectedGrade: _selectedGrade,
+                            selectedProgram: _selectedProgram,
+                            selectedSemester: _selectedSemester,
+                            isLoadingOptions: _isLoadingProfileOptions,
+                            isPickingAvatar: _isPickingCreateAvatar,
+                            isSaving: _isSavingProfile,
+                            errorMessage:
+                                _profileOptionsError ?? _profileCreateError,
+                            canRetryOptions: _profileOptionsError != null,
+                            onPickAvatar: _pickCreateAvatar,
+                            onClearAvatar: _clearCreateAvatar,
+                            onGradeChanged: (grade) {
+                              setState(() => _selectedGrade = grade);
+                            },
+                            onProgramChanged: (program) {
+                              setState(() => _selectedProgram = program);
+                            },
+                            onSemesterChanged: (semester) {
+                              setState(() => _selectedSemester = semester);
+                            },
+                            onRetryOptions: _loadProfileOptions,
+                            onCancel: _cancelAddProfile,
+                            onSave: _saveProfileForm,
+                            scale: scale,
+                          ),
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -975,8 +981,8 @@ class _SettingTabState extends State<SettingTab> {
 
   static double _topGapForView(_AccountView view) {
     return switch (view) {
-      _AccountView.settings => 44,
-      _AccountView.account => 6,
+      _AccountView.settings => 30,
+      _AccountView.account => 36,
       _AccountView.profile => 30,
       _AccountView.addProfile => 30,
     };
