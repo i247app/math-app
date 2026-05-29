@@ -3,13 +3,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../widgets/common_widgets.dart';
-import '../widgets/login_scene_background.dart';
-import '../widgets/numi_brand_mascot.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({
@@ -213,33 +212,61 @@ class _OtpScreenState extends State<OtpScreen>
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
-    final mascotSize = width < 370 ? 230.0 : 260.0;
+    final mascotSize = width < 370 ? 132.0 : 156.0;
     final otpError = hideOtpError ? null : widget.otpError;
 
-    return Stack(
-      children: [
-        const Positioned.fill(child: LoginSceneBackground()),
-        ScreenFrame(
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: ScreenFrame(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  CircleIconButton(
-                    icon: Icons.arrow_back_rounded,
-                    onPressed: widget.onBack,
+              CircleIconButton(
+                icon: Icons.arrow_back_rounded,
+                onPressed: widget.onBack,
+              ),
+              SizedBox(height: compact ? 20 : 36),
+              // Mascot
+              Center(
+                child: Container(
+                  width: mascotSize,
+                  height: mascotSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 24,
+                        offset: const Offset(0, 12),
+                      ),
+                    ],
                   ),
-                  const Spacer(),
-                  const ProgressDots(activeIndex: 2),
-                ],
+                  child: Image.asset(
+                    'assets/images/numi-mascot.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              SizedBox(height: compact ? 14 : 20),
+              // Title
+              Center(
+                child: Text(
+                  'NUMINUMI',
+                  style: GoogleFonts.fredoka(
+                    color: const Color(0xFF339395), // Teal from image
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0,
+                  ),
+                ),
               ),
               SizedBox(height: compact ? 34 : 54),
-              Center(
-                child: NumiBrandMascot(size: mascotSize),
-              ),
-              SizedBox(height: compact ? 10 : 18),
+              // OTP Card
               AnimatedBuilder(
                 animation: errorShakeController,
                 builder: (context, child) {
@@ -252,23 +279,26 @@ class _OtpScreenState extends State<OtpScreen>
                     child: child,
                   );
                 },
-                child: OtpCard(
-                  controllers: controllers,
-                  focusNodes: focusNodes,
-                  onChanged: updateDigit,
-                  onEmptyBackspace: handleEmptyBackspace,
-                  onConfirm: handleConfirm,
-                  onResend: handleResend,
-                  isVerifyingOtp: widget.isVerifyingOtp,
-                  resendCountdown: resendCountdown,
-                  errorText: otpError,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: OtpCard(
+                    controllers: controllers,
+                    focusNodes: focusNodes,
+                    onChanged: updateDigit,
+                    onEmptyBackspace: handleEmptyBackspace,
+                    onConfirm: handleConfirm,
+                    onResend: handleResend,
+                    isVerifyingOtp: widget.isVerifyingOtp,
+                    resendCountdown: resendCountdown,
+                    errorText: otpError,
+                  ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 48),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -299,133 +329,111 @@ class OtpCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final horizontalPadding = width < 380 ? 20.0 : 30.0;
     final hasError = errorText != null;
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-        horizontalPadding,
-        28,
-        horizontalPadding,
-        32,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.82)),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.greenShadow,
-            blurRadius: 22,
-            offset: Offset(0, 14),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            context.getText(AppKeys.otpTitle),
-            style: const TextStyle(
-              color: AppColors.grayText,
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2.2,
-            ),
-          ),
-          const SizedBox(height: 18),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final gap = constraints.maxWidth < 290 ? 9.0 : 12.0;
-              final boxWidth = (constraints.maxWidth - gap * 3) / 4;
+    // Check if all OTP boxes have a digit
+    final isFull = controllers.every((c) => c.text.isNotEmpty);
 
-              return Row(
-                children: List.generate(4, (index) {
-                  return Padding(
-                    padding: EdgeInsets.only(left: index == 0 ? 0 : gap),
-                    child: SizedBox(
-                      width: boxWidth.clamp(46, 58),
-                      child: OtpDigitBox(
-                        controller: controllers[index],
-                        focusNode: focusNodes[index],
-                        autofocus: index == 0,
-                        textInputAction: index == 3
-                            ? TextInputAction.done
-                            : TextInputAction.next,
-                        onChanged: (value) => onChanged(index, value),
-                        onEmptyBackspace: () => onEmptyBackspace(index),
-                        hasError: hasError,
-                      ),
-                    ),
-                  );
-                }),
-              );
-            },
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            child: errorText == null
-                ? const SizedBox(height: 26)
-                : Padding(
-                    padding:
-                        const EdgeInsets.only(top: 12, bottom: 14, left: 4),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.error_outline_rounded,
-                          color: Color(0xFFD9534F),
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            errorText!,
-                            style: const TextStyle(
-                              color: Color(0xFFD9534F),
-                              fontSize: 13,
-                              height: 1.25,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                        ),
-                      ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // OTP Inputs
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final gap = constraints.maxWidth < 290 ? 10.0 : 12.0;
+            final availableBoxWidth = (constraints.maxWidth - gap * 3) / 4;
+            final boxWidth = availableBoxWidth.clamp(58.0, 64.0);
+            final boxHeight = boxWidth * 1.18;
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(4, (index) {
+                return Padding(
+                  padding: EdgeInsets.only(left: index == 0 ? 0 : gap),
+                  child: SizedBox(
+                    width: boxWidth,
+                    height: boxHeight,
+                    child: OtpDigitBox(
+                      controller: controllers[index],
+                      focusNode: focusNodes[index],
+                      autofocus: index == 0,
+                      textInputAction: index == 3
+                          ? TextInputAction.done
+                          : TextInputAction.next,
+                      onChanged: (value) => onChanged(index, value),
+                      onEmptyBackspace: () => onEmptyBackspace(index),
+                      hasError: hasError,
                     ),
                   ),
-          ),
-          PrimaryButton(
-            label: isVerifyingOtp
-                ? context.getText(AppKeys.otpConfirming)
-                : context.getText(AppKeys.otpConfirm),
-            onPressed: isVerifyingOtp ? null : onConfirm,
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: TextButton.icon(
-              onPressed: resendCountdown == 0 ? onResend : null,
-              icon: const Icon(Icons.refresh_rounded, size: 20),
-              label: Text(
+                );
+              }),
+            );
+          },
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 180),
+          child: errorText == null
+              ? const SizedBox(height: 16)
+              : Padding(
+                  padding: const EdgeInsets.only(top: 12, bottom: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: Color(0xFFD9534F),
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          errorText!,
+                          style: const TextStyle(
+                            color: Color(0xFFD9534F),
+                            fontSize: 13,
+                            height: 1.25,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+        // Resend Timer
+        Center(
+          child: GestureDetector(
+            onTap: resendCountdown == 0 ? onResend : null,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
                 resendCountdown == 0
                     ? context.getText(AppKeys.resendOtp)
                     : context.formatText(
                         AppKeys.resendOtpAfter,
                         {'seconds': resendCountdown},
                       ),
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.muted,
-                textStyle: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
+                style: GoogleFonts.fredoka(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF339395), // Teal
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 24),
+        // Action Button
+        _TealActionButton(
+          label: isVerifyingOtp
+              ? context.getText(AppKeys.otpConfirming)
+              : context.getText(AppKeys.otpConfirm),
+          onPressed: (isVerifyingOtp || !isFull) ? null : onConfirm,
+        ),
+      ],
     );
   }
 }
@@ -463,51 +471,113 @@ class OtpDigitBox extends StatelessWidget {
 
         return KeyEventResult.ignored;
       },
-      child: TextField(
-        controller: controller,
-        focusNode: focusNode,
-        autofocus: autofocus,
-        textAlign: TextAlign.center,
-        keyboardType: TextInputType.number,
-        textInputAction: textInputAction,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: onChanged,
-        onTap: () {
-          controller.selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: controller.text.length,
-          );
-        },
-        style: const TextStyle(
-          color: AppColors.ink,
-          fontSize: 24,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: hasError ? const Color(0xFFD9534F) : const Color(0xFFF47B55),
+            width: 2.3,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFF47B55).withValues(alpha: 0.22),
+              blurRadius: 0,
+              offset: const Offset(0, 5),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 14,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
-        decoration: InputDecoration(
-          counterText: '',
-          filled: true,
-          fillColor: Colors.white.withValues(alpha: 0.82),
-          contentPadding: const EdgeInsets.symmetric(vertical: 15),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide(
-              color: hasError ? const Color(0xFFD9534F) : AppColors.inputLine,
+        child: Center(
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            autofocus: autofocus,
+            textAlign: TextAlign.center,
+            textAlignVertical: TextAlignVertical.center,
+            keyboardType: TextInputType.number,
+            textInputAction: textInputAction,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onChanged: onChanged,
+            onTap: () {
+              controller.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: controller.text.length,
+              );
+            },
+            style: GoogleFonts.fredoka(
+              color: AppColors.ink,
+              fontSize: 36,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0,
+            ),
+            decoration: const InputDecoration(
+              counterText: '',
+              border: InputBorder.none,
+              isCollapsed: true,
+              contentPadding: EdgeInsets.zero,
             ),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide(
-              color: hasError ? const Color(0xFFD9534F) : AppColors.inputLine,
-              width: hasError ? 1.6 : 1,
+        ),
+      ),
+    );
+  }
+}
+
+class _TealActionButton extends StatelessWidget {
+  const _TealActionButton({
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final cleanLabel = label.replaceAll('→', '').trim();
+
+    return Center(
+      child: SizedBox(
+        width: 230,
+        height: 58,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF339395), // Teal from design
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
             ),
+            disabledBackgroundColor:
+                const Color(0xFFB5BFC2), // Grey when disabled
+            disabledForegroundColor: Colors.white,
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide(
-              color: hasError ? const Color(0xFFD9534F) : AppColors.teal,
-              width: 2,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    cleanLabel.toUpperCase(),
+                    maxLines: 1,
+                    style: GoogleFonts.fredoka(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_forward_rounded, size: 22),
+            ],
           ),
         ),
       ),

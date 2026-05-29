@@ -34,6 +34,8 @@ class OnboardingState {
     this.isCheckingAuthPhone = false,
     this.phoneExists,
     this.phoneLookupUser,
+    this.phoneLookupError,
+    this.phoneLookupErrorStatus,
     this.isSendingOtp = false,
     this.isVerifyingOtp = false,
     this.isSigningUp = false,
@@ -62,6 +64,8 @@ class OnboardingState {
   final bool isCheckingAuthPhone;
   final bool? phoneExists;
   final LoginUser? phoneLookupUser;
+  final String? phoneLookupError;
+  final int? phoneLookupErrorStatus;
   final bool isSendingOtp;
   final bool isVerifyingOtp;
   final bool isSigningUp;
@@ -90,6 +94,8 @@ class OnboardingState {
     bool? isCheckingAuthPhone,
     bool? phoneExists,
     LoginUser? phoneLookupUser,
+    String? phoneLookupError,
+    int? phoneLookupErrorStatus,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
@@ -110,6 +116,10 @@ class OnboardingState {
     bool clearOtpError = false,
     bool clearOtpExpiry = false,
     bool clearPhoneLookup = false,
+    bool clearPhoneExists = false,
+    bool clearPhoneLookupUser = false,
+    bool clearPhoneLookupError = false,
+    bool clearPhoneLookupErrorStatus = false,
   }) {
     return OnboardingState(
       screen: screen ?? this.screen,
@@ -123,9 +133,18 @@ class OnboardingState {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       checkedPhone: clearPhoneLookup ? null : checkedPhone ?? this.checkedPhone,
       isCheckingAuthPhone: isCheckingAuthPhone ?? this.isCheckingAuthPhone,
-      phoneExists: clearPhoneLookup ? null : phoneExists ?? this.phoneExists,
-      phoneLookupUser:
-          clearPhoneLookup ? null : phoneLookupUser ?? this.phoneLookupUser,
+      phoneExists: clearPhoneLookup || clearPhoneExists
+          ? null
+          : phoneExists ?? this.phoneExists,
+      phoneLookupUser: clearPhoneLookup || clearPhoneLookupUser
+          ? null
+          : phoneLookupUser ?? this.phoneLookupUser,
+      phoneLookupError: clearPhoneLookup || clearPhoneLookupError
+          ? null
+          : phoneLookupError ?? this.phoneLookupError,
+      phoneLookupErrorStatus: clearPhoneLookup || clearPhoneLookupErrorStatus
+          ? null
+          : phoneLookupErrorStatus ?? this.phoneLookupErrorStatus,
       isSendingOtp: isSendingOtp ?? this.isSendingOtp,
       isVerifyingOtp: isVerifyingOtp ?? this.isVerifyingOtp,
       isSigningUp: isSigningUp ?? this.isSigningUp,
@@ -226,6 +245,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         state.checkedPhone == null &&
         state.phoneExists == null &&
         state.phoneLookupUser == null &&
+        state.phoneLookupError == null &&
+        state.phoneLookupErrorStatus == null &&
         state.authError == null) {
       return;
     }
@@ -249,8 +270,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         phoneNumber: phone,
         checkedPhone: phone,
         isCheckingAuthPhone: true,
-        phoneExists: null,
-        phoneLookupUser: null,
+        clearPhoneExists: true,
+        clearPhoneLookupUser: true,
+        clearPhoneLookupError: true,
+        clearPhoneLookupErrorStatus: true,
         clearAuthError: true,
       ),
     );
@@ -268,8 +291,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isCheckingAuthPhone: false,
           phoneExists: result.exists,
           phoneLookupUser: result.user,
+          phoneLookupError: result.exists ? null : result.message,
+          phoneLookupErrorStatus: result.exists ? null : result.status,
           otpFlow: OtpFlow.login,
           clearAuthError: true,
+          clearPhoneLookupError: result.exists,
+          clearPhoneLookupErrorStatus: result.exists,
           clearDevOtp: true,
           clearOtpExpiry: true,
           clearOtpError: true,
@@ -277,6 +304,21 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       );
     } on OtpAuthException catch (error) {
       if (state.checkedPhone != phone) {
+        return;
+      }
+
+      if (_isUserNotFoundStatus(error.status)) {
+        emit(
+          state.copyWith(
+            phoneNumber: phone,
+            checkedPhone: phone,
+            isCheckingAuthPhone: false,
+            phoneExists: false,
+            phoneLookupError: error.message,
+            phoneLookupErrorStatus: error.status,
+            clearAuthError: true,
+          ),
+        );
         return;
       }
 
@@ -304,6 +346,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   Future<void> submitLoginPhone(String phone) async {
     if (state.isSendingOtp) {
+      return;
+    }
+
+    if (state.checkedPhone == phone &&
+        _blocksLoginActions(state.phoneLookupErrorStatus)) {
       return;
     }
 
@@ -369,13 +416,15 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         ),
       );
     } on OtpAuthException catch (error) {
-      if (error.status == 202) {
+      if (_isUserNotFoundStatus(error.status)) {
         emit(
           state.copyWith(
             screen: AppScreen.login,
             phoneNumber: phone,
             checkedPhone: phone,
             phoneExists: false,
+            phoneLookupError: error.message,
+            phoneLookupErrorStatus: error.status,
             isSendingOtp: false,
             clearAuthError: true,
           ),
@@ -496,6 +545,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   static bool _isOtpValidationError(int? status) {
     return status == 400 || status == 422 || status == 4706;
+  }
+
+  static bool _isUserNotFoundStatus(int? status) {
+    return status == 202 || status == 4006;
+  }
+
+  static bool _blocksLoginActions(int? status) {
+    return status == 4006;
   }
 
   Future<void> submitSignup({

@@ -69,6 +69,7 @@ class AuthPhoneLookupResult {
     this.expiresAt,
     this.expiresIn,
     this.message,
+    this.status,
   });
 
   final String phone;
@@ -79,6 +80,7 @@ class AuthPhoneLookupResult {
   final String? expiresAt;
   final int? expiresIn;
   final String? message;
+  final int? status;
 }
 
 extension on AuthUser {
@@ -197,9 +199,14 @@ class OtpAuthApi implements OtpAuthService {
     try {
       response = await _networkApi.authOtp(LoginRequest(phone: phone));
     } on NetworkException catch (error) {
-      if (error.status == 202) {
+      if (_isUserNotFoundStatus(error.status)) {
         _loginUsers.remove(phone);
-        return AuthPhoneLookupResult(phone: phone, exists: false);
+        return AuthPhoneLookupResult(
+          phone: phone,
+          exists: false,
+          message: error.message,
+          status: error.status,
+        );
       }
 
       throw OtpAuthException(error.message, status: error.status);
@@ -438,4 +445,7 @@ class OtpAuthApi implements OtpAuthService {
   }
 
   static bool _isUnauthorized(int? status) => status == 401 || status == 403;
+
+  static bool _isUserNotFoundStatus(int? status) =>
+      status == 202 || status == 4006;
 }

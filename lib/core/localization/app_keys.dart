@@ -24,6 +24,7 @@ class AppKeys {
   static const start = 'start';
 
   static const phoneLoginTitle = 'phone_login_title';
+  static const phoneLoginBrandName = 'phone_login_brand_name';
   static const phoneLoginSubtitle = 'phone_login_subtitle';
   static const phoneNumberUpper = 'phone_number_upper';
   static const phoneHint = 'phone_hint';

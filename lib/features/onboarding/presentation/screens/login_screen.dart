@@ -47,9 +47,9 @@ class LoginScreen extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Container(
-        color: Colors.white,
-        child: ScreenFrame(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: ScreenFrame(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +69,7 @@ class LoginScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 30,
                         offset: const Offset(0, 15),
                       ),
@@ -85,9 +85,9 @@ class LoginScreen extends StatelessWidget {
               // Title
               Center(
                 child: Text(
-                  'NUMINUMI',
+                  context.getText(AppKeys.phoneLoginBrandName),
                   style: GoogleFonts.fredoka(
-                    color: const Color(0xFF339395), // Teal from image
+                    color: const Color(0xFF339395),
                     fontSize: 40,
                     fontWeight: FontWeight.w700,
                     letterSpacing: -1,
@@ -98,9 +98,9 @@ class LoginScreen extends StatelessWidget {
               // Subtitle
               Center(
                 child: Text(
-                  'Nhập số điện thoại để\nđăng ký hoặc đăng nhập !',
+                  context.getText(AppKeys.phoneLoginSubtitle),
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.fredoka(
+                  style: GoogleFonts.andika(
                     color: const Color(0xFF1B1B1B),
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
@@ -275,7 +275,7 @@ class _GreyActionButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF798B8C), // Grey-blue from design
+          backgroundColor: const Color(0xFF339395),
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -351,7 +351,7 @@ class _CheckingDotsState extends State<_CheckingDots>
                     height: 9,
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF798B8C).withOpacity(opacity),
+                      color: const Color(0xFF798B8C).withValues(alpha: opacity),
                       shape: BoxShape.circle,
                     ),
                   ),

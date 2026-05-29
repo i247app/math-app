@@ -154,162 +154,209 @@ class _NumiHomeState extends State<NumiHome> {
           OnboardingCubit(authService: widget.authService)..restoreSession(),
       child: BlocBuilder<OnboardingCubit, OnboardingState>(
         builder: (context, scaffoldState) {
+          final usePlainLoginBackground =
+              scaffoldState.screen == AppScreen.login;
           return AnnotatedRegion<SystemUiOverlayStyle>(
             value: SystemUiOverlayStyle.dark,
             child: Scaffold(
               resizeToAvoidBottomInset: scaffoldState.screen != AppScreen.home,
-              body: AppBackground(
-                child: BlocConsumer<OnboardingCubit, OnboardingState>(
-                  listenWhen: (previous, current) {
-                    final hasNewError =
-                        previous.authError != current.authError &&
-                            current.authError != null;
-                    final hasNewDevOtp =
-                        previous.otpPreviewId != current.otpPreviewId &&
-                            current.devOtpCode != null;
-                    final leftLoginScreen =
-                        previous.screen == AppScreen.login &&
-                            current.screen != AppScreen.login;
-
-                    return hasNewError || hasNewDevOtp || leftLoginScreen;
-                  },
-                  listener: (context, state) {
-                    if (state.screen != AppScreen.login) {
-                      clearLoginPhoneInput();
-                    }
-
-                    final authError = state.authError;
-                    if (authError != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(authError)),
-                      );
-                    }
-
-                    showDevOtpDialog(state);
-                  },
-                  builder: (context, state) {
-                    final cubit = context.read<OnboardingCubit>();
-                    final normalizedPhone =
-                        _normalizedPhoneInput(state.phoneRegion);
-                    final phoneComplete = normalizedPhone.isValid;
-                    final phoneErrorText =
-                        _phoneHasInput && normalizedPhone.errorKey != null
-                            ? context.getText(normalizedPhone.errorKey!)
-                            : null;
-                    final useSafeArea = !state.isRestoringSession &&
-                        state.screen != AppScreen.welcome;
-
-                    return SafeArea(
-                      top: useSafeArea,
-                      bottom: useSafeArea && state.screen != AppScreen.home,
-                      left: useSafeArea,
-                      right: useSafeArea,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 340),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        layoutBuilder: (currentChild, previousChildren) {
-                          return Stack(
-                            alignment: Alignment.topCenter,
-                            children: [
-                              ...previousChildren,
-                              if (currentChild != null) currentChild,
-                            ],
-                          );
-                        },
-                        transitionBuilder: (child, animation) {
-                          final slide = Tween<Offset>(
-                            begin: const Offset(0.045, 0),
-                            end: Offset.zero,
-                          ).animate(animation);
-
-                          return FadeTransition(
-                            opacity: animation,
-                            child:
-                                SlideTransition(position: slide, child: child),
-                          );
-                        },
-                        child: state.isRestoringSession
-                            ? LoadingScreen(
-                                key: const ValueKey('session-loading'),
-                                message: context.getText(
-                                  AppKeys.restoringSession,
-                                ),
-                              )
-                            : switch (state.screen) {
-                                AppScreen.welcome => WelcomeScreen(
-                                    key: const ValueKey('welcome'),
-                                    onStart: cubit.openLogin,
-                                  ),
-                                AppScreen.login => LoginScreen(
-                                    key: const ValueKey('login'),
-                                    controller: phoneController,
-                                    region: state.phoneRegion,
-                                    onRegionChanged: (region) {
-                                      phoneController.clear();
-                                      _phoneHasInput = false;
-                                      _lastLookupPhone = null;
-                                      cubit.clearPhoneLookup();
-                                      cubit.selectPhoneRegion(region);
-                                    },
-                                    onBack: cubit.openWelcome,
-                                    onSendOtp: () =>
-                                        sendOtp(cubit, state.phoneRegion),
-                                    isSendingOtp: state.isSendingOtp,
-                                    isCheckingAuthPhone:
-                                        state.isCheckingAuthPhone,
-                                    canSendOtp: phoneComplete,
-                                    phoneExists: state.phoneExists,
-                                    onPhoneChanged: (value) =>
-                                        handlePhoneInputChanged(
-                                      cubit,
-                                      state.phoneRegion,
-                                      value,
-                                    ),
-                                    phoneErrorText: phoneErrorText,
-                                  ),
-                                AppScreen.otp => OtpScreen(
-                                    key: const ValueKey('otp'),
-                                    onBack: cubit.openLogin,
-                                    onConfirm: cubit.verifyLoginOtp,
-                                    onResend: () {
-                                      final phone = state.phoneNumber;
-                                      if (phone != null) {
-                                        cubit.submitLoginPhone(phone);
-                                      }
-                                    },
-                                    isVerifyingOtp: state.isVerifyingOtp,
-                                    resendSeconds: state.otpExpiresIn ?? 0,
-                                    resendResetId: state.otpPreviewId,
-                                    otpError: state.otpError,
-                                    otpErrorId: state.otpErrorId,
-                                  ),
-                                AppScreen.signup => SignupScreen(
-                                    key: const ValueKey('signup'),
-                                    onBack: cubit.openOtp,
-                                    isSigningUp: state.isSigningUp,
-                                    onContinue: (name, email) {
-                                      HapticFeedback.mediumImpact();
-                                      cubit.submitSignup(
-                                          name: name, email: email);
-                                    },
-                                  ),
-                                AppScreen.home => HomeScreen(
-                                    key: const ValueKey('home'),
-                                    user: state.loginUser,
-                                    onBack: cubit.openLogin,
-                                    onLogout: cubit.logout,
-                                  ),
-                              },
+              body: usePlainLoginBackground
+                  ? ColoredBox(
+                      color: Colors.white,
+                      child: _OnboardingScreenSwitcher(
+                        phoneController: phoneController,
+                        phoneHasInput: _phoneHasInput,
+                        clearLoginPhoneInput: clearLoginPhoneInput,
+                        normalizedPhoneInput: _normalizedPhoneInput,
+                        handlePhoneInputChanged: handlePhoneInputChanged,
+                        sendOtp: sendOtp,
+                        showDevOtpDialog: showDevOtpDialog,
                       ),
-                    );
-                  },
-                ),
-              ),
+                    )
+                  : AppBackground(
+                      child: _OnboardingScreenSwitcher(
+                        phoneController: phoneController,
+                        phoneHasInput: _phoneHasInput,
+                        clearLoginPhoneInput: clearLoginPhoneInput,
+                        normalizedPhoneInput: _normalizedPhoneInput,
+                        handlePhoneInputChanged: handlePhoneInputChanged,
+                        sendOtp: sendOtp,
+                        showDevOtpDialog: showDevOtpDialog,
+                      ),
+                    ),
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _OnboardingScreenSwitcher extends StatelessWidget {
+  const _OnboardingScreenSwitcher({
+    required this.phoneController,
+    required this.phoneHasInput,
+    required this.clearLoginPhoneInput,
+    required this.normalizedPhoneInput,
+    required this.handlePhoneInputChanged,
+    required this.sendOtp,
+    required this.showDevOtpDialog,
+  });
+
+  final TextEditingController phoneController;
+  final bool phoneHasInput;
+  final VoidCallback clearLoginPhoneInput;
+  final PhoneValidationResult Function(PhoneRegion region) normalizedPhoneInput;
+  final void Function(
+    OnboardingCubit cubit,
+    PhoneRegion region,
+    String value,
+  ) handlePhoneInputChanged;
+  final void Function(OnboardingCubit cubit, PhoneRegion region) sendOtp;
+  final void Function(OnboardingState state) showDevOtpDialog;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<OnboardingCubit, OnboardingState>(
+      listenWhen: (previous, current) {
+        final hasNewError = previous.authError != current.authError &&
+            current.authError != null;
+        final hasNewDevOtp = previous.otpPreviewId != current.otpPreviewId &&
+            current.devOtpCode != null;
+        final leftLoginScreen = previous.screen == AppScreen.login &&
+            current.screen != AppScreen.login;
+
+        return hasNewError || hasNewDevOtp || leftLoginScreen;
+      },
+      listener: (context, state) {
+        if (state.screen != AppScreen.login) {
+          clearLoginPhoneInput();
+        }
+
+        final authError = state.authError;
+        if (authError != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(authError)),
+          );
+        }
+
+        showDevOtpDialog(state);
+      },
+      builder: (context, state) {
+        final cubit = context.read<OnboardingCubit>();
+        final normalizedPhone = normalizedPhoneInput(state.phoneRegion);
+        final lookupMatchesPhone = state.checkedPhone == normalizedPhone.phone;
+        final blocksPhoneAction =
+            lookupMatchesPhone && state.phoneLookupErrorStatus == 4006;
+        final phoneComplete = normalizedPhone.isValid && !blocksPhoneAction;
+        final lookupErrorText =
+            lookupMatchesPhone ? state.phoneLookupError : null;
+        final phoneErrorText = phoneHasInput
+            ? (normalizedPhone.errorKey != null
+                ? context.getText(normalizedPhone.errorKey!)
+                : lookupErrorText)
+            : null;
+        final useSafeArea =
+            !state.isRestoringSession && state.screen != AppScreen.welcome;
+
+        return SafeArea(
+          top: useSafeArea,
+          bottom: useSafeArea && state.screen != AppScreen.home,
+          left: useSafeArea,
+          right: useSafeArea,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 340),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            layoutBuilder: (currentChild, previousChildren) {
+              return Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  ...previousChildren,
+                  if (currentChild != null) currentChild,
+                ],
+              );
+            },
+            transitionBuilder: (child, animation) {
+              final slide = Tween<Offset>(
+                begin: const Offset(0.045, 0),
+                end: Offset.zero,
+              ).animate(animation);
+
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(position: slide, child: child),
+              );
+            },
+            child: state.isRestoringSession
+                ? LoadingScreen(
+                    key: const ValueKey('session-loading'),
+                    message: context.getText(
+                      AppKeys.restoringSession,
+                    ),
+                  )
+                : switch (state.screen) {
+                    AppScreen.welcome => WelcomeScreen(
+                        key: const ValueKey('welcome'),
+                        onStart: cubit.openLogin,
+                      ),
+                    AppScreen.login => LoginScreen(
+                        key: const ValueKey('login'),
+                        controller: phoneController,
+                        region: state.phoneRegion,
+                        onRegionChanged: (region) {
+                          clearLoginPhoneInput();
+                          cubit.clearPhoneLookup();
+                          cubit.selectPhoneRegion(region);
+                        },
+                        onBack: cubit.openWelcome,
+                        onSendOtp: () => sendOtp(cubit, state.phoneRegion),
+                        isSendingOtp: state.isSendingOtp,
+                        isCheckingAuthPhone: state.isCheckingAuthPhone,
+                        canSendOtp: phoneComplete,
+                        phoneExists: state.phoneExists,
+                        onPhoneChanged: (value) => handlePhoneInputChanged(
+                          cubit,
+                          state.phoneRegion,
+                          value,
+                        ),
+                        phoneErrorText: phoneErrorText,
+                      ),
+                    AppScreen.otp => OtpScreen(
+                        key: const ValueKey('otp'),
+                        onBack: cubit.openLogin,
+                        onConfirm: cubit.verifyLoginOtp,
+                        onResend: () {
+                          final phone = state.phoneNumber;
+                          if (phone != null) {
+                            cubit.submitLoginPhone(phone);
+                          }
+                        },
+                        isVerifyingOtp: state.isVerifyingOtp,
+                        resendSeconds: state.otpExpiresIn ?? 0,
+                        resendResetId: state.otpPreviewId,
+                        otpError: state.otpError,
+                        otpErrorId: state.otpErrorId,
+                      ),
+                    AppScreen.signup => SignupScreen(
+                        key: const ValueKey('signup'),
+                        onBack: cubit.openOtp,
+                        isSigningUp: state.isSigningUp,
+                        onContinue: (name, email) {
+                          HapticFeedback.mediumImpact();
+                          cubit.submitSignup(name: name, email: email);
+                        },
+                      ),
+                    AppScreen.home => HomeScreen(
+                        key: const ValueKey('home'),
+                        user: state.loginUser,
+                        onBack: cubit.openLogin,
+                        onLogout: cubit.logout,
+                      ),
+                  },
+          ),
+        );
+      },
     );
   }
 }
