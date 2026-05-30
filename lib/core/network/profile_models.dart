@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'api_metadata.dart';
 import 'program_models.dart';
 import 'semester_models.dart';
 
@@ -87,12 +86,7 @@ class DeleteProfileRequest {
   factory DeleteProfileRequest.fromJson(Map<String, dynamic> json) =>
       _$DeleteProfileRequestFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'metadata': apiMetadata(),
-      ..._$DeleteProfileRequestToJson(this),
-    };
-  }
+  Map<String, dynamic> toJson() => _$DeleteProfileRequestToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)

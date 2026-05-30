@@ -75,6 +75,7 @@ nbproject/
 .flutter-plugins-dependencies
 .metadata
 build/
+macos/Flutter/ephemeral/Packages/
 
 # Flutter/Dart/Pub related
 **/doc/api/

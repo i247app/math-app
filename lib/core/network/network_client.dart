@@ -1,16 +1,15 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/api_config.dart';
 import '../localization/app_keys.dart';
 import '../localization/app_strings.dart';
 import 'api_metadata.dart';
 import 'auth_models.dart';
+import 'auth_token_store.dart';
 import 'chapter_models.dart';
 import 'grade_models.dart';
+import 'network_interceptors.dart';
 import 'profile_models.dart';
 import 'school_models.dart';
 import 'program_models.dart';
@@ -27,53 +26,35 @@ class NetworkException implements Exception {
   String toString() => message;
 }
 
-abstract class AuthTokenStore {
-  Future<String?> readToken();
-
-  Future<void> writeToken(String token);
-
-  Future<void> clearToken();
-}
-
-class SecureAuthTokenStore implements AuthTokenStore {
-  const SecureAuthTokenStore({
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
-  }) : _storage = storage;
-
-  static const _tokenKey = 'auth_token';
-
-  final FlutterSecureStorage _storage;
-
-  @override
-  Future<String?> readToken() => _storage.read(key: _tokenKey);
-
-  @override
-  Future<void> writeToken(String token) {
-    return _storage.write(key: _tokenKey, value: token);
-  }
-
-  @override
-  Future<void> clearToken() => _storage.delete(key: _tokenKey);
-}
-
 class NetworkClient {
   NetworkClient({
     String? baseUrl,
     Dio? dio,
     AuthTokenStore? authTokenStore,
+    AppApiMetadataProvider? metadataProvider,
   })  : _baseUrl = _normalizeBaseUrl(baseUrl ?? ApiConfig.baseUrl),
         _dio = dio ?? Dio(),
-        _authTokenStore = authTokenStore ?? const SecureAuthTokenStore() {
+        _authTokenStore = authTokenStore ?? const SecureAuthTokenStore(),
+        _metadataProvider =
+            metadataProvider ?? AppApiMetadataProvider.instance {
     _dio.options
       ..baseUrl = _baseUrl
       ..connectTimeout = const Duration(seconds: 15)
       ..receiveTimeout = const Duration(seconds: 15)
       ..sendTimeout = const Duration(seconds: 15)
-      ..contentType = Headers.jsonContentType
       ..responseType = ResponseType.json
       ..validateStatus = (_) => true;
     _dio.interceptors.add(
-      _AuthTokenInterceptor(authTokenStore: _authTokenStore),
+      const DefaultHeadersInterceptor(),
+    );
+    _dio.interceptors.add(
+      MetadataInterceptor(metadataProvider: _metadataProvider),
+    );
+    _dio.interceptors.add(
+      ClientInfoHeadersInterceptor(metadataProvider: _metadataProvider),
+    );
+    _dio.interceptors.add(
+      AuthTokenInterceptor(authTokenStore: _authTokenStore),
     );
     _dio.interceptors.add(
       LogInterceptor(
@@ -90,6 +71,7 @@ class NetworkClient {
   final String _baseUrl;
   final Dio _dio;
   final AuthTokenStore _authTokenStore;
+  final AppApiMetadataProvider _metadataProvider;
 
   Future<Map<String, dynamic>> postJson(
     String path,
@@ -102,10 +84,9 @@ class NetworkClient {
 
     final Response<Object?> response;
     try {
-      body['metadata'] = apiMetadata();
       response = await _dio.post<Object?>(
         path,
-        data: body,
+        data: Map<String, dynamic>.from(body),
         options: receiveTimeout == null
             ? null
             : Options(receiveTimeout: receiveTimeout),
@@ -245,72 +226,6 @@ class NetworkClient {
   }
 }
 
-class _AuthTokenInterceptor extends QueuedInterceptor {
-  _AuthTokenInterceptor({required AuthTokenStore authTokenStore})
-      : _authTokenStore = authTokenStore;
-
-  static const _authTokenHeader = 'X-Auth-Token';
-  static const _authorizationHeader = 'Authorization';
-
-  final AuthTokenStore _authTokenStore;
-
-  @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    if (!_hasHeader(options.headers, _authorizationHeader)) {
-      final token = (await _authTokenStore.readToken())?.trim();
-      if (token != null && token.isNotEmpty) {
-        options.headers[_authorizationHeader] = 'Bearer $token';
-      }
-    }
-
-    handler.next(options);
-  }
-
-  @override
-  void onResponse(
-    Response<dynamic> response,
-    ResponseInterceptorHandler handler,
-  ) async {
-    await _storeTokenFromHeaders(response.headers);
-    handler.next(response);
-  }
-
-  @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
-    final response = err.response;
-    if (response != null) {
-      await _storeTokenFromHeaders(response.headers);
-    }
-
-    handler.next(err);
-  }
-
-  Future<void> _storeTokenFromHeaders(Headers headers) async {
-    for (final entry in headers.map.entries) {
-      if (entry.key.toLowerCase() != _authTokenHeader.toLowerCase()) {
-        continue;
-      }
-
-      final firstValue = entry.value.isEmpty ? null : entry.value.first;
-      final token = firstValue?.trim();
-      if (token != null && token.isNotEmpty) {
-        await _authTokenStore.writeToken(token);
-      }
-      return;
-    }
-  }
-
-  static bool _hasHeader(Map<String, dynamic> headers, String name) {
-    return headers.keys.any((key) => key.toLowerCase() == name.toLowerCase());
-  }
-}
-
 class NetworkApi {
   NetworkApi({
     String? baseUrl,
@@ -325,7 +240,6 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'metadata': jsonEncode(apiMetadata()),
       'phone': request.phone,
       if (request.email?.isNotEmpty == true) 'email': request.email,
       if (request.name?.isNotEmpty == true) 'name': request.name,
@@ -356,7 +270,6 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'metadata': jsonEncode(apiMetadata()),
       'user_id': request.userId,
       if (request.name?.isNotEmpty == true) 'name': request.name,
       if (request.phone?.isNotEmpty == true) 'phone': request.phone,
@@ -638,7 +551,6 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'metadata': jsonEncode(apiMetadata()),
       'user_id': request.userId,
       'school_id': request.schoolId,
       'name': request.name,
@@ -674,7 +586,6 @@ class NetworkApi {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'metadata': jsonEncode(apiMetadata()),
       'profile_id': request.profileId,
       if (request.schoolId != null) 'school_id': request.schoolId,
       if (request.name?.isNotEmpty == true) 'name': request.name,
