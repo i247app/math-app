@@ -589,6 +589,7 @@ class _SettingTabState extends State<SettingTab> {
       if (editingProfile == null) {
         await _profileService.createProfile(
           userId: userId,
+          schoolId: '',
           name: name,
           gradeId: grade!.gradeId!,
           programId: program!.programId!,
@@ -605,6 +606,7 @@ class _SettingTabState extends State<SettingTab> {
 
         await _profileService.updateProfile(
           profileId: profileId,
+          schoolId: '',
           name: _emptyToNull(name),
           gradeId: grade?.gradeId,
           programId: program?.programId,
@@ -751,6 +753,7 @@ class _SettingTabState extends State<SettingTab> {
 
     await _profileService.updateProfile(
       profileId: profileId,
+      schoolId: '',
       isDefault: isDefault,
     );
   }

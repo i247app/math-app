@@ -22,6 +22,7 @@ class ProfileListRequest {
 class CreateProfileRequest {
   const CreateProfileRequest({
     required this.userId,
+    required this.schoolId,
     required this.name,
     required this.gradeId,
     required this.programId,
@@ -32,6 +33,7 @@ class CreateProfileRequest {
   });
 
   final String userId;
+  final String schoolId;
   final String name;
   final String gradeId;
   final String programId;
@@ -50,6 +52,7 @@ class CreateProfileRequest {
 class UpdateProfileRequest {
   const UpdateProfileRequest({
     required this.profileId,
+    this.schoolId,
     this.name,
     this.gradeId,
     this.programId,
@@ -60,6 +63,7 @@ class UpdateProfileRequest {
   });
 
   final String profileId;
+  final String? schoolId;
   final String? name;
   final String? gradeId;
   final String? programId;

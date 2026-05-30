@@ -12,6 +12,7 @@ import 'auth_models.dart';
 import 'chapter_models.dart';
 import 'grade_models.dart';
 import 'profile_models.dart';
+import 'school_models.dart';
 import 'program_models.dart';
 import 'quiz_models.dart';
 import 'semester_models.dart';
@@ -569,6 +570,27 @@ class NetworkApi {
     return profileResponse;
   }
 
+  Future<SchoolListResponse> listSchools(
+    SchoolListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/schools/list',
+      request.toJson(),
+    );
+    final schoolResponse = SchoolListResponse.fromJson(responseJson);
+    if (schoolResponse.mstatus != 200) {
+      throw NetworkException(
+        schoolResponse.mmessage ??
+            schoolResponse.debug ??
+            schoolResponse.status ??
+            'Request failed.',
+        status: schoolResponse.mstatus,
+      );
+    }
+
+    return schoolResponse;
+  }
+
   Future<ProgramListResponse> listPrograms(
     ProgramListRequest request,
   ) async {
@@ -618,6 +640,7 @@ class NetworkApi {
     final formData = FormData.fromMap({
       'metadata': jsonEncode(apiMetadata()),
       'user_id': request.userId,
+      'school_id': request.schoolId,
       'name': request.name,
       if (request.dob?.isNotEmpty == true) 'dob': request.dob,
       'grade_id': request.gradeId,
@@ -653,6 +676,7 @@ class NetworkApi {
     final formData = FormData.fromMap({
       'metadata': jsonEncode(apiMetadata()),
       'profile_id': request.profileId,
+      if (request.schoolId != null) 'school_id': request.schoolId,
       if (request.name?.isNotEmpty == true) 'name': request.name,
       if (request.dob?.isNotEmpty == true) 'dob': request.dob,
       if (request.gradeId?.isNotEmpty == true) 'grade_id': request.gradeId,

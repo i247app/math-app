@@ -23,10 +23,11 @@ abstract class ProfileService {
 
   Future<StudentProfile?> createProfile({
     required String userId,
+    required String schoolId,
     required String name,
     required String gradeId,
     required String programId,
-    required String semesterId,
+    String? semesterId,
     bool isDefault = false,
     String role = 'STUDENT',
     String? avatarPath,
@@ -35,6 +36,7 @@ abstract class ProfileService {
 
   Future<StudentProfile?> updateProfile({
     required String profileId,
+    String? schoolId,
     String? name,
     String? gradeId,
     String? programId,
@@ -96,10 +98,11 @@ class ProfileApi implements ProfileService {
   @override
   Future<StudentProfile?> createProfile({
     required String userId,
+    required String schoolId,
     required String name,
     required String gradeId,
     required String programId,
-    required String semesterId,
+    String? semesterId,
     bool isDefault = false,
     String role = 'STUDENT',
     String? avatarPath,
@@ -109,6 +112,7 @@ class ProfileApi implements ProfileService {
       final response = await _networkApi.createProfile(
         CreateProfileRequest(
           userId: userId,
+          schoolId: schoolId,
           name: name,
           gradeId: gradeId,
           programId: programId,
@@ -128,6 +132,7 @@ class ProfileApi implements ProfileService {
   @override
   Future<StudentProfile?> updateProfile({
     required String profileId,
+    String? schoolId,
     String? name,
     String? gradeId,
     String? programId,
@@ -141,6 +146,7 @@ class ProfileApi implements ProfileService {
       final response = await _networkApi.updateProfile(
         UpdateProfileRequest(
           profileId: profileId,
+          schoolId: schoolId,
           name: name,
           gradeId: gradeId,
           programId: programId,
