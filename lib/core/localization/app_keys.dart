@@ -63,6 +63,7 @@ class AppKeys {
   static const navHome = 'nav_home';
   static const navReview = 'nav_review';
   static const navHistory = 'nav_history';
+  static const navReport = 'nav_report';
   static const navSettings = 'nav_settings';
 
   static const student = 'student';

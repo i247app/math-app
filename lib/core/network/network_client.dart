@@ -7,6 +7,7 @@ import 'api_metadata.dart';
 import 'auth_models.dart';
 import 'auth_token_store.dart';
 import 'chapter_models.dart';
+import 'classroom_models.dart';
 import 'grade_models.dart';
 import 'network_interceptors.dart';
 import 'profile_models.dart';
@@ -629,6 +630,84 @@ class NetworkApi {
     }
 
     return deleteResponse;
+  }
+
+  Future<ClassroomListResponse> listClassrooms(
+    ClassroomListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/classrooms/list',
+      request.toJson(),
+    );
+    final classroomResponse = ClassroomListResponse.fromJson(responseJson);
+    if (classroomResponse.mstatus != 200) {
+      throw NetworkException(
+        classroomResponse.mmessage ??
+            classroomResponse.debug ??
+            classroomResponse.status ??
+            'Request failed.',
+        status: classroomResponse.mstatus,
+      );
+    }
+
+    return classroomResponse;
+  }
+
+  Future<ClassroomResponse> createClassroom(
+    CreateClassroomRequest request, {
+    String? filePath,
+  }) async {
+    final formData = FormData.fromMap({
+      'profile_id': request.profileId,
+      'name': request.name,
+      'program_id': request.programId,
+      'grade_id': request.gradeId,
+      'school_id': request.schoolId,
+      'max_members': request.maxMembers.toString(),
+      if (request.description?.isNotEmpty == true)
+        'description': request.description,
+      if (filePath?.isNotEmpty == true)
+        'file': await MultipartFile.fromFile(filePath!),
+    });
+    final responseJson = await _networkClient.postMultipart(
+      '/classrooms/create',
+      formData,
+    );
+    final classroomResponse = ClassroomResponse.fromJson(responseJson);
+    if (classroomResponse.mstatus != 200) {
+      throw NetworkException(
+        classroomResponse.mmessage ??
+            classroomResponse.debug ??
+            classroomResponse.status ??
+            'Request failed.',
+        status: classroomResponse.mstatus,
+      );
+    }
+
+    return classroomResponse;
+  }
+
+  Future<ClassroomResponse> getClassroomDetail({
+    required String classroomId,
+    required String profileId,
+  }) async {
+    final encodedClassroomId = Uri.encodeComponent(classroomId);
+    final encodedProfileId = Uri.encodeQueryComponent(profileId);
+    final responseJson = await _networkClient.getJson(
+      '/classrooms/$encodedClassroomId?profile_id=$encodedProfileId',
+    );
+    final classroomResponse = ClassroomResponse.fromJson(responseJson);
+    if (classroomResponse.mstatus != 200) {
+      throw NetworkException(
+        classroomResponse.mmessage ??
+            classroomResponse.debug ??
+            classroomResponse.status ??
+            'Request failed.',
+        status: classroomResponse.mstatus,
+      );
+    }
+
+    return classroomResponse;
   }
 
   Future<AuthUser> getCurrentUser() async {

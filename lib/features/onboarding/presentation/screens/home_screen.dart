@@ -17,6 +17,7 @@ import '../tabs/history_tab.dart';
 import '../tabs/review_tab.dart';
 import '../tabs/setting_tab.dart';
 import 'grade_selection_screen.dart';
+import 'teacher_classroom_screens.dart';
 
 const _teal = Color(0xFF006762);
 const _blue = Color(0xFF339395);
@@ -77,6 +78,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _prefetchedGradeUserId = null;
       _prefetchGrades();
     }
+    if (oldWidget.activeRole != widget.activeRole &&
+        widget.activeRole == ProfileRole.teacher &&
+        _activeTab > 2) {
+      _previousActiveTab = _activeTab;
+      _activeTab = 0;
+    }
   }
 
   Future<void> _prefetchGrades() async {
@@ -126,7 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
         double s(double value) => value * scale;
         final navHeight = s(88) + bottomInset;
         final headerHeight = s(98) + topInset;
-        final showHeader = _activeTab == 0;
+        final showHeader =
+            widget.activeRole != ProfileRole.teacher && _activeTab == 0;
 
         return Center(
           child: SizedBox(
@@ -226,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     bottomInset: bottomInset,
                     scale: scale,
                     activeIndex: _activeTab,
+                    activeRole: widget.activeRole,
                     user: widget.user,
                     onTabSelected: (index) {
                       if (index == _activeTab) {
@@ -308,8 +317,42 @@ class _TabContent extends StatelessWidget {
     return switch (activeRole) {
       ProfileRole.student => _buildStudentContent(horizontalPadding),
       ProfileRole.parent => _buildStudentContent(horizontalPadding),
-      ProfileRole.teacher => _buildStudentContent(horizontalPadding),
+      ProfileRole.teacher => _buildTeacherContent(),
     };
+  }
+
+  Widget _buildTeacherContent() {
+    if (activeTab == 0) {
+      return TeacherHomeTab(
+        user: user,
+        activeProfile: activeProfile,
+        bottomPadding: bottomPadding,
+        scale: scale,
+      );
+    }
+
+    if (activeTab == 1) {
+      return TeacherReportTab(
+        bottomPadding: bottomPadding,
+        scale: scale,
+      );
+    }
+
+    if (activeTab == 2) {
+      return SettingTab(
+        user: user,
+        profiles: profiles,
+        activeProfile: activeProfile,
+        profileLoadError: profileLoadError,
+        onLogout: onLogout,
+        onProfileSaved: onProfileSaved,
+        openAddProfileRequestId: openAddProfileRequestId,
+        bottomPadding: bottomPadding,
+        scale: scale,
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildStudentContent(EdgeInsets horizontalPadding) {
@@ -1145,6 +1188,7 @@ class _BottomNavigation extends StatelessWidget {
     required this.bottomInset,
     required this.scale,
     required this.activeIndex,
+    required this.activeRole,
     required this.user,
     required this.onTabSelected,
   });
@@ -1153,21 +1197,44 @@ class _BottomNavigation extends StatelessWidget {
   final double bottomInset;
   final double scale;
   final int activeIndex;
+  final ProfileRole activeRole;
   final LoginUser? user;
   final ValueChanged<int> onTabSelected;
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      _NavItemData(Icons.home_filled, context.getText(AppKeys.navHome), null),
-      _NavItemData(
-        Icons.explore_outlined,
-        context.getText(AppKeys.navReview),
-        null,
-      ),
-      _NavItemData(Icons.history, context.getText(AppKeys.navHistory), null),
-      _NavItemData(null, context.getText(AppKeys.navSettings), user),
-    ];
+    final items = activeRole == ProfileRole.teacher
+        ? [
+            _NavItemData(
+              Icons.home_filled,
+              context.getText(AppKeys.navHome),
+              null,
+            ),
+            _NavItemData(
+              Icons.bar_chart_rounded,
+              context.getText(AppKeys.navReport),
+              null,
+            ),
+            _NavItemData(null, context.getText(AppKeys.navSettings), user),
+          ]
+        : [
+            _NavItemData(
+              Icons.home_filled,
+              context.getText(AppKeys.navHome),
+              null,
+            ),
+            _NavItemData(
+              Icons.explore_outlined,
+              context.getText(AppKeys.navReview),
+              null,
+            ),
+            _NavItemData(
+              Icons.history,
+              context.getText(AppKeys.navHistory),
+              null,
+            ),
+            _NavItemData(null, context.getText(AppKeys.navSettings), user),
+          ];
 
     final radius = BorderRadius.vertical(
       top: Radius.circular(48 * scale),
@@ -1178,8 +1245,8 @@ class _BottomNavigation extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 32 * scale,
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 30 * scale,
             offset: Offset(0, -8 * scale),
           ),
         ],
@@ -1206,6 +1273,7 @@ class _BottomNavigation extends StatelessWidget {
                 return _AnimatedNavItem(
                   data: items[index],
                   active: activeIndex == index,
+                  teacherStyle: activeRole == ProfileRole.teacher,
                   scale: scale,
                   onTap: () => onTabSelected(index),
                 );
@@ -1222,12 +1290,14 @@ class _AnimatedNavItem extends StatelessWidget {
   const _AnimatedNavItem({
     required this.data,
     required this.active,
+    required this.teacherStyle,
     required this.scale,
     required this.onTap,
   });
 
   final _NavItemData data;
   final bool active;
+  final bool teacherStyle;
   final double scale;
   final VoidCallback onTap;
 
@@ -1262,7 +1332,7 @@ class _AnimatedNavItem extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Color.lerp(Colors.transparent, activeColor, value),
                   borderRadius: BorderRadius.circular(48 * scale),
-                  boxShadow: active
+                  boxShadow: active && !teacherStyle
                       ? [
                           BoxShadow(
                             color: _teal.withValues(alpha: 0.20),
