@@ -1,10 +1,119 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../localization/app_language.dart';
 import 'api_metadata.dart';
 import 'auth_token_store.dart';
+
+class NetworkLogInterceptor extends Interceptor {
+  const NetworkLogInterceptor();
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    _log('*** Request ***');
+    _log('uri: ${options.uri}');
+    _log('method: ${options.method}');
+    if (options.headers.isNotEmpty) {
+      _log('headers: ${_formatHeaders(options.headers)}');
+    }
+    _log('data:');
+    _log(_formatData(options.data));
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    _log('*** Response ***');
+    _log('uri: ${response.requestOptions.uri}');
+    _log('statusCode: ${response.statusCode}');
+    _log('Response Text:');
+    _log(_formatData(response.data));
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    _log('*** DioException ***');
+    _log('uri: ${err.requestOptions.uri}');
+    _log('type: ${err.type}');
+    _log('message: ${err.message}');
+    final response = err.response;
+    if (response != null) {
+      _log('statusCode: ${response.statusCode}');
+      _log('Response Text:');
+      _log(_formatData(response.data));
+    }
+    handler.next(err);
+  }
+
+  static String _formatHeaders(Map<String, dynamic> headers) {
+    final redacted = <String, dynamic>{};
+    for (final entry in headers.entries) {
+      final key = entry.key;
+      final lowerKey = key.toLowerCase();
+      redacted[key] = lowerKey == 'authorization' || lowerKey == 'x-auth-token'
+          ? '<redacted>'
+          : entry.value;
+    }
+    return _jsonOrString(redacted);
+  }
+
+  static String _formatData(Object? data) {
+    if (data == null) {
+      return 'null';
+    }
+
+    if (data is FormData) {
+      return _formatFormData(data);
+    }
+
+    return _jsonOrString(data);
+  }
+
+  static String _formatFormData(FormData formData) {
+    final fields = <String, Object?>{};
+    for (final field in formData.fields) {
+      final existing = fields[field.key];
+      if (existing == null) {
+        fields[field.key] = field.value;
+      } else if (existing is List<Object?>) {
+        existing.add(field.value);
+      } else {
+        fields[field.key] = <Object?>[existing, field.value];
+      }
+    }
+
+    final files = formData.files.map((entry) {
+      final file = entry.value;
+      return <String, Object?>{
+        'field': entry.key,
+        'filename': file.filename,
+        'length': file.length,
+        if (file.contentType != null) 'content_type': '${file.contentType}',
+      };
+    }).toList();
+
+    return _jsonOrString(<String, Object?>{
+      'fields': fields,
+      'files': files,
+    });
+  }
+
+  static String _jsonOrString(Object? value) {
+    try {
+      return jsonEncode(value);
+    } catch (_) {
+      return value.toString();
+    }
+  }
+
+  static void _log(String message) => debugPrint(message);
+}
 
 class DefaultHeadersInterceptor extends Interceptor {
   const DefaultHeadersInterceptor();

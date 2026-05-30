@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../config/api_config.dart';
 import '../localization/app_keys.dart';
@@ -57,14 +56,7 @@ class NetworkClient {
       AuthTokenInterceptor(authTokenStore: _authTokenStore),
     );
     _dio.interceptors.add(
-      LogInterceptor(
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: false,
-        responseBody: true,
-        error: true,
-        logPrint: (object) => debugPrint(object.toString()),
-      ),
+      const NetworkLogInterceptor(),
     );
   }
 
@@ -672,6 +664,10 @@ class NetworkApi {
         _apiErrorMessage(json),
         status: mstatus,
       );
+    }
+
+    if (json.containsKey('user') && json['user'] == null) {
+      throw const NetworkException('Session expired.', status: 401);
     }
 
     final data = json['data'];

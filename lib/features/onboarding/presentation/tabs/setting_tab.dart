@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../app/numi_app.dart';
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/grade_models.dart';
@@ -12,6 +14,7 @@ import '../../../../core/network/school_models.dart';
 import '../../../../core/network/program_models.dart';
 import '../../../../core/network/semester_models.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../data/active_profile_session.dart';
 import '../../data/avatar_picker.dart';
 import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
@@ -20,6 +23,9 @@ import '../../data/school_api.dart';
 import '../../../../core/localization/app_language.dart';
 import '../../../../core/localization/lingo_scope.dart';
 
+part '../screens/setting_account_screen.dart';
+part '../screens/setting_profile_form_screen.dart';
+part '../screens/setting_profile_list_screen.dart';
 part 'widgets/setting_header.dart';
 part 'widgets/settings_menu_panel.dart';
 part 'widgets/account_details_panel.dart';
@@ -32,25 +38,54 @@ const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
 
-enum _AccountView { settings, account, profile, addProfile }
+enum SettingPageView { settings, account, profile, addProfile }
 
 class SettingTab extends StatefulWidget {
   const SettingTab({
     super.key,
     required this.user,
+    required this.profiles,
+    required this.activeProfile,
+    required this.profileLoadError,
     required this.onLogout,
     this.onProfileSaved,
     this.openAddProfileRequestId = 0,
     required this.bottomPadding,
     required this.scale,
-  });
+  })  : _initialView = SettingPageView.settings,
+        _initialEditingProfile = null,
+        _isPushedPage = false;
+
+  const SettingTab.page({
+    super.key,
+    required this.user,
+    required this.profiles,
+    required this.activeProfile,
+    required this.profileLoadError,
+    required this.onLogout,
+    this.onProfileSaved,
+    required this.bottomPadding,
+    required this.scale,
+    SettingPageView initialView = SettingPageView.settings,
+    StudentProfile? initialEditingProfile,
+    bool isPushedPage = false,
+  })  : openAddProfileRequestId = 0,
+        _initialView = initialView,
+        _initialEditingProfile = initialEditingProfile,
+        _isPushedPage = isPushedPage;
 
   final LoginUser? user;
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final String? profileLoadError;
   final VoidCallback onLogout;
   final VoidCallback? onProfileSaved;
   final int openAddProfileRequestId;
   final double bottomPadding;
   final double scale;
+  final SettingPageView _initialView;
+  final StudentProfile? _initialEditingProfile;
+  final bool _isPushedPage;
 
   @override
   State<SettingTab> createState() => _SettingTabState();
@@ -62,12 +97,14 @@ class _SettingTabState extends State<SettingTab> {
   final ProfileService _profileService = ProfileApi();
   final GradeService _gradeService = GradeApi();
   final SchoolService _schoolService = SchoolApi();
+  final ActiveProfileSession _activeProfileSession =
+      const ActiveProfileSession();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _profileNameController = TextEditingController();
 
-  _AccountView _view = _AccountView.settings;
+  late SettingPageView _view;
   bool _isForwardTransition = true;
   bool _isEditing = false;
   bool _isSavingAccount = false;
@@ -103,7 +140,38 @@ class _SettingTabState extends State<SettingTab> {
   @override
   void initState() {
     super.initState();
+    _view = widget._initialView;
     _applyUser(widget.user);
+    _profiles = widget.profiles;
+    _profileLoadError = widget.profileLoadError;
+    final initialEditingProfile = widget._initialEditingProfile;
+    if (initialEditingProfile != null) {
+      _editingProfile = initialEditingProfile;
+      _profileNameController.text = initialEditingProfile.name?.trim() ?? '';
+    }
+    if (_view == SettingPageView.profile) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        _loadProfiles();
+        _preloadProfileOptions();
+      });
+    } else if (_view == SettingPageView.addProfile) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        if (initialEditingProfile != null) {
+          _selectOptionsForProfile(initialEditingProfile);
+        } else {
+          _resetCreateProfileForm();
+        }
+        if (!_hasProfileOptions) {
+          _loadProfileOptions(profileToSelect: initialEditingProfile);
+        }
+      });
+    }
     if (widget.openAddProfileRequestId > 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -124,7 +192,7 @@ class _SettingTabState extends State<SettingTab> {
     if (oldWidget.user != widget.user && !_isEditing) {
       _updatedUser = null;
       _applyUser(widget.user);
-      _profiles = const <StudentProfile>[];
+      _profiles = widget.profiles;
       _schoolOptions = const <SchoolModel>[];
       _gradeOptions = const <GradeModel>[];
       _programOptions = const <ProgramModel>[];
@@ -133,12 +201,20 @@ class _SettingTabState extends State<SettingTab> {
       _selectedGrade = null;
       _selectedProgram = null;
       _selectedSemester = null;
-      _profileLoadError = null;
+      _profileLoadError = widget.profileLoadError;
       _profileOptionsError = null;
-      if (_view == _AccountView.profile) {
+      if (_view == SettingPageView.profile) {
         _loadProfiles();
         _preloadProfileOptions();
       }
+    }
+
+    if (oldWidget.profiles != widget.profiles) {
+      _profiles = widget.profiles;
+    }
+
+    if (oldWidget.profileLoadError != widget.profileLoadError) {
+      _profileLoadError = widget.profileLoadError;
     }
   }
 
@@ -159,40 +235,79 @@ class _SettingTabState extends State<SettingTab> {
 
   LoginUser? get _effectiveUser => _updatedUser ?? widget.user;
 
-  void _openView(_AccountView view) {
+  Future<void> _pushView(
+    SettingPageView view, {
+    StudentProfile? editingProfile,
+  }) async {
     HapticFeedback.selectionClick();
     if (_isEditing) {
       _restoreEditSnapshot();
     }
-    setState(() {
-      _view = view;
-      _isForwardTransition = true;
-      _isEditing = false;
-      _isPickingAccountAvatar = false;
-      _draftAvatarPath = null;
-    });
+    _isEditing = false;
+    _isPickingAccountAvatar = false;
+    _draftAvatarPath = null;
     FocusScope.of(context).unfocus();
-    if (view == _AccountView.profile) {
-      _loadProfiles();
-      _preloadProfileOptions();
+
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => _settingScreenForView(view, editingProfile),
+      ),
+    );
+
+    if (!mounted) {
+      return;
     }
+    _loadProfiles();
+  }
+
+  Widget _settingScreenForView(
+    SettingPageView view,
+    StudentProfile? editingProfile,
+  ) {
+    final args = _SettingScreenArgs(
+      user: widget.user,
+      profiles: _profiles,
+      activeProfile: widget.activeProfile,
+      profileLoadError: _profileLoadError,
+      onLogout: widget.onLogout,
+      onProfileSaved: widget.onProfileSaved,
+      scale: widget.scale,
+    );
+
+    return switch (view) {
+      SettingPageView.account => _SettingAccountScreen(args: args),
+      SettingPageView.profile => _SettingProfileListScreen(args: args),
+      SettingPageView.addProfile => _SettingProfileFormScreen(
+          args: args,
+          editingProfile: editingProfile,
+        ),
+      SettingPageView.settings => _SettingProfileListScreen(args: args),
+    };
   }
 
   Future<void> _changeLanguage(AppLanguage language) async {
     HapticFeedback.selectionClick();
-    await LingoScope.read(context).setLanguage(language);
+    final lingo = LingoScope.read(context);
+    if (lingo.language == language) {
+      return;
+    }
+    await lingo.setLanguage(language);
     if (mounted) {
-      setState(() {});
+      NumiApp.restart(context);
     }
   }
 
   void _returnToSettings() {
     HapticFeedback.selectionClick();
+    if (widget._isPushedPage) {
+      Navigator.of(context).maybePop();
+      return;
+    }
     if (_isEditing) {
       _restoreEditSnapshot();
     }
     setState(() {
-      _view = _AccountView.settings;
+      _view = SettingPageView.settings;
       _isForwardTransition = false;
       _isEditing = false;
       _isPickingAccountAvatar = false;
@@ -203,10 +318,15 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   void _openAddProfile() {
+    if (!widget._isPushedPage || _view == SettingPageView.profile) {
+      _pushView(SettingPageView.addProfile);
+      return;
+    }
+
     HapticFeedback.selectionClick();
     _resetCreateProfileForm();
     setState(() {
-      _view = _AccountView.addProfile;
+      _view = SettingPageView.addProfile;
       _isForwardTransition = true;
       _profileCreateError = null;
     });
@@ -217,13 +337,18 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   void _openUpdateProfile(StudentProfile profile) {
+    if (!widget._isPushedPage || _view == SettingPageView.profile) {
+      _pushView(SettingPageView.addProfile, editingProfile: profile);
+      return;
+    }
+
     HapticFeedback.selectionClick();
     _resetCreateProfileForm();
     _profileNameController.text = profile.name?.trim() ?? '';
     _editingProfile = profile;
     _selectOptionsForProfile(profile);
     setState(() {
-      _view = _AccountView.addProfile;
+      _view = SettingPageView.addProfile;
       _isForwardTransition = true;
       _profileCreateError = null;
     });
@@ -234,9 +359,15 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   void _returnToProfileList() {
+    if (widget._isPushedPage) {
+      HapticFeedback.selectionClick();
+      Navigator.of(context).maybePop();
+      return;
+    }
+
     HapticFeedback.selectionClick();
     setState(() {
-      _view = _AccountView.profile;
+      _view = SettingPageView.profile;
       _isForwardTransition = false;
       _profileCreateError = null;
     });
@@ -579,6 +710,7 @@ class _SettingTabState extends State<SettingTab> {
     final program = _selectedProgram;
     final semester = _selectedSemester;
     final editingProfile = _editingProfile;
+    final isCreatingFirstProfile = editingProfile == null && _profiles.isEmpty;
 
     if (userId == null || userId.isEmpty) {
       setState(
@@ -618,7 +750,7 @@ class _SettingTabState extends State<SettingTab> {
 
     try {
       if (editingProfile == null) {
-        await _profileService.createProfile(
+        final createdProfile = await _profileService.createProfile(
           userId: userId,
           schoolId: school.schoolId!.trim(),
           name: name,
@@ -629,6 +761,16 @@ class _SettingTabState extends State<SettingTab> {
           role: 'STUDENT',
           avatarPath: _createAvatarPath,
         );
+        if (isCreatingFirstProfile) {
+          final profileId =
+              ActiveProfileSession.profileStableId(createdProfile);
+          if (profileId != null) {
+            await _activeProfileSession.writeActiveProfileId(
+              userId: userId,
+              profileId: profileId,
+            );
+          }
+        }
       } else {
         final profileId = editingProfile.profileId?.trim();
         if (profileId == null || profileId.isEmpty) {
@@ -655,11 +797,14 @@ class _SettingTabState extends State<SettingTab> {
       _resetCreateProfileForm();
       setState(() {
         _isSavingProfile = false;
-        _view = _AccountView.profile;
+        _view = SettingPageView.profile;
         _isForwardTransition = false;
       });
       await _loadProfiles();
       widget.onProfileSaved?.call();
+      if (isCreatingFirstProfile && mounted) {
+        NumiApp.restart(context);
+      }
     } on ProfileException catch (error) {
       if (!mounted) {
         return;
@@ -728,36 +873,29 @@ class _SettingTabState extends State<SettingTab> {
     await _deleteProfile(profileId);
   }
 
-  Future<void> _selectDefaultProfile(StudentProfile selectedProfile) async {
-    if (_isSettingDefaultProfile || selectedProfile.isDefault) {
+  Future<void> _selectActiveProfile(StudentProfile selectedProfile) async {
+    final userId = widget.user?.id.trim();
+    final profileId = ActiveProfileSession.profileStableId(selectedProfile);
+    if (_isSettingDefaultProfile ||
+        userId == null ||
+        userId.isEmpty ||
+        profileId == null ||
+        profileId == _activeProfileId) {
       return;
     }
-
-    final previousProfiles = _profiles.where(
-      (profile) =>
-          profile.isDefault && profile.profileId != selectedProfile.profileId,
-    );
 
     HapticFeedback.selectionClick();
     setState(() => _isSettingDefaultProfile = true);
 
     try {
-      for (final previousProfile in previousProfiles) {
-        await _updateProfileDefault(previousProfile, isDefault: false);
-      }
-      await _updateProfileDefault(selectedProfile, isDefault: true);
-      if (!mounted) {
-        return;
-      }
-      await _loadProfiles();
-      widget.onProfileSaved?.call();
-    } on ProfileException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message)),
+      await _activeProfileSession.writeActiveProfileId(
+        userId: userId,
+        profileId: profileId,
       );
+      if (!mounted) {
+        return;
+      }
+      NumiApp.restart(context);
     } catch (_) {
       if (!mounted) {
         return;
@@ -772,25 +910,9 @@ class _SettingTabState extends State<SettingTab> {
     }
   }
 
-  Future<void> _updateProfileDefault(
-    StudentProfile profile, {
-    required bool isDefault,
-  }) async {
-    final profileId = profile.profileId?.trim();
-
-    if (profileId == null || profileId.isEmpty) {
-      throw ProfileException(context.readText(AppKeys.profileUpdateFailed));
-    }
-
-    await _profileService.updateProfile(
-      profileId: profileId,
-      schoolId: '',
-      isDefault: isDefault,
-    );
-  }
-
   Future<void> _deleteProfile(String profileId) async {
     setState(() => _isDeletingProfile = true);
+    final deletedActiveProfile = profileId == _activeProfileId;
 
     try {
       await _profileService.forceDeleteProfile(profileId: profileId);
@@ -801,7 +923,16 @@ class _SettingTabState extends State<SettingTab> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.readText(AppKeys.profileDeleted))),
       );
+      if (deletedActiveProfile) {
+        final userId = widget.user?.id.trim();
+        if (userId != null && userId.isNotEmpty) {
+          await _activeProfileSession.clearActiveProfileId(userId);
+        }
+      }
       await _loadProfiles();
+      if (deletedActiveProfile && mounted) {
+        NumiApp.restart(context);
+      }
     } on ProfileException catch (error) {
       if (!mounted) {
         return;
@@ -859,8 +990,10 @@ class _SettingTabState extends State<SettingTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
+    final topInset =
+        widget._isPushedPage ? 0.0 : MediaQuery.paddingOf(context).top;
     final headerTitle = _titleForView(context, _view, _editingProfile);
-    final canGoBack = _view != _AccountView.settings;
+    final canGoBack = widget._isPushedPage || _view != SettingPageView.settings;
     const backgroundColor = Colors.white;
     final lingo = LingoScope.of(context);
 
@@ -883,11 +1016,12 @@ class _SettingTabState extends State<SettingTab> {
               _SettingHeader(
                 title: headerTitle,
                 canGoBack: canGoBack,
-                onBack: _view == _AccountView.addProfile
+                onBack: _view == SettingPageView.addProfile
                     ? _returnToProfileList
                     : _returnToSettings,
                 backgroundColor: backgroundColor,
                 scale: scale,
+                topInset: topInset,
               ),
               SizedBox(height: _topGapForView(_view) * scale),
               Padding(
@@ -927,20 +1061,22 @@ class _SettingTabState extends State<SettingTab> {
                         );
                       },
                       child: switch (_view) {
-                        _AccountView.settings => _SettingsMenuPanel(
-                            key: ValueKey(_viewKey(_AccountView.settings)),
+                        SettingPageView.settings => _SettingsMenuPanel(
+                            key: ValueKey(_viewKey(SettingPageView.settings)),
                             avatarUrl: _effectiveUser?.avatarUrl,
                             avatarPath: _localAvatarPath,
                             username: _fallbackUsername(_effectiveUser),
                             scale: scale,
                             currentLanguage: lingo.language,
-                            onAccountTap: () => _openView(_AccountView.account),
-                            onProfileTap: () => _openView(_AccountView.profile),
+                            onAccountTap: () =>
+                                _pushView(SettingPageView.account),
+                            onProfileTap: () =>
+                                _pushView(SettingPageView.profile),
                             onLanguageChanged: _changeLanguage,
                             onLogoutTap: widget.onLogout,
                           ),
-                        _AccountView.account => _AccountDetailsPanel(
-                            key: ValueKey(_viewKey(_AccountView.account)),
+                        SettingPageView.account => _AccountDetailsPanel(
+                            key: ValueKey(_viewKey(SettingPageView.account)),
                             avatarUrl: _effectiveUser?.avatarUrl,
                             avatarPath: _isEditing
                                 ? _draftAvatarPath
@@ -957,22 +1093,23 @@ class _SettingTabState extends State<SettingTab> {
                             onAvatarTap: _pickAccountAvatar,
                             scale: scale,
                           ),
-                        _AccountView.profile => _ProfilePlaceholderPanel(
-                            key: ValueKey(_viewKey(_AccountView.profile)),
+                        SettingPageView.profile => _ProfilePlaceholderPanel(
+                            key: ValueKey(_viewKey(SettingPageView.profile)),
                             profiles: _profiles,
+                            activeProfileId: _activeProfileId,
                             isLoading: _isLoadingProfiles ||
                                 _isDeletingProfile ||
                                 _isSettingDefaultProfile,
                             errorMessage: _profileLoadError,
                             onRetry: _loadProfiles,
                             onAdd: _openAddProfile,
-                            onSelect: _selectDefaultProfile,
+                            onSelect: _selectActiveProfile,
                             onEdit: _openUpdateProfile,
                             onDelete: _confirmDeleteProfile,
                             scale: scale,
                           ),
-                        _AccountView.addProfile => _AddProfilePanel(
-                            key: ValueKey(_viewKey(_AccountView.addProfile)),
+                        SettingPageView.addProfile => _AddProfilePanel(
+                            key: ValueKey(_viewKey(SettingPageView.addProfile)),
                             nameController: _profileNameController,
                             avatarPath: _createAvatarPath,
                             avatarUrl: _editingProfile?.avatarUrl,
@@ -1063,34 +1200,34 @@ class _SettingTabState extends State<SettingTab> {
     return digits;
   }
 
-  static String _viewKey(_AccountView view) {
+  static String _viewKey(SettingPageView view) {
     return switch (view) {
-      _AccountView.settings => 'settings-menu',
-      _AccountView.account => 'account-details',
-      _AccountView.profile => 'profile-placeholder',
-      _AccountView.addProfile => 'add-profile',
+      SettingPageView.settings => 'settings-menu',
+      SettingPageView.account => 'account-details',
+      SettingPageView.profile => 'profile-placeholder',
+      SettingPageView.addProfile => 'add-profile',
     };
   }
 
   static String _titleForView(
     BuildContext context,
-    _AccountView view,
+    SettingPageView view,
     StudentProfile? editingProfile,
   ) {
     return switch (view) {
-      _AccountView.settings => context.getText(AppKeys.settingsTitle),
-      _AccountView.account => context.getText(AppKeys.accountTitle),
-      _AccountView.profile => context.getText(AppKeys.profileTitle),
-      _AccountView.addProfile => context.getText(AppKeys.profileTitle),
+      SettingPageView.settings => context.getText(AppKeys.settingsTitle),
+      SettingPageView.account => context.getText(AppKeys.accountTitle),
+      SettingPageView.profile => context.getText(AppKeys.profileTitle),
+      SettingPageView.addProfile => context.getText(AppKeys.profileTitle),
     };
   }
 
-  static double _topGapForView(_AccountView view) {
+  static double _topGapForView(SettingPageView view) {
     return switch (view) {
-      _AccountView.settings => 30,
-      _AccountView.account => 36,
-      _AccountView.profile => 30,
-      _AccountView.addProfile => 30,
+      SettingPageView.settings => 30,
+      SettingPageView.account => 36,
+      SettingPageView.profile => 30,
+      SettingPageView.addProfile => 30,
     };
   }
 
@@ -1121,5 +1258,9 @@ class _SettingTabState extends State<SettingTab> {
       'TEACHER' || 'PARENT' || 'STUDENT' => role!,
       _ => 'STUDENT',
     };
+  }
+
+  String? get _activeProfileId {
+    return ActiveProfileSession.profileStableId(widget.activeProfile);
   }
 }

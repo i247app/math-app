@@ -7,7 +7,9 @@ import 'package:flutter/services.dart';
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/grade_models.dart';
+import '../../../../core/network/profile_models.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../data/active_profile_session.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/grade_api.dart';
 import '../../data/quiz_api.dart';
@@ -26,11 +28,21 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
     required this.user,
+    required this.profiles,
+    required this.activeProfile,
+    required this.activeRole,
+    required this.profileLoadError,
+    required this.onRefreshProfiles,
     required this.onBack,
     required this.onLogout,
   });
 
   final LoginUser? user;
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final ProfileRole activeRole;
+  final String? profileLoadError;
+  final Future<void> Function() onRefreshProfiles;
   final VoidCallback onBack;
   final VoidCallback onLogout;
 
@@ -101,17 +113,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = math.min(constraints.maxWidth, 430.0);
+        final width = constraints.maxWidth;
+        final layoutWidth = math.min(width, 430.0);
         final height = constraints.maxHeight;
         final viewportHeight = MediaQuery.sizeOf(context).height;
+        final topInset = MediaQuery.paddingOf(context).top;
         final bottomInset = MediaQuery.paddingOf(context).bottom;
-        final scale =
-            math.min(width / _designWidth, viewportHeight / _designHeight);
-        final studentName = _displayName(widget.user);
+        final scale = math.min(
+            layoutWidth / _designWidth, viewportHeight / _designHeight);
+        final studentName = _displayProfileName(widget.activeProfile);
 
         double s(double value) => value * scale;
-        final navHeight = s(76);
-        final navBottomGap = math.max(s(18), bottomInset + s(8));
+        final navHeight = s(88) + bottomInset;
+        final headerHeight = s(98) + topInset;
         final showHeader = _activeTab == 0;
 
         return Center(
@@ -155,6 +169,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       key: ValueKey(_activeTab),
                       activeTab: _activeTab,
                       user: widget.user,
+                      profiles: widget.profiles,
+                      activeProfile: widget.activeProfile,
+                      activeRole: widget.activeRole,
+                      profileLoadError: widget.profileLoadError,
+                      onRefreshProfiles: widget.onRefreshProfiles,
                       initialGrades: _prefetchedGrades,
                       gradeService: _gradeService,
                       onLogout: widget.onLogout,
@@ -179,8 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         });
                       },
                       openAddProfileRequestId: _openAddProfileRequestId,
-                      bottomPadding: navHeight + navBottomGap + s(12),
-                      headerHeight: showHeader ? s(98) : 0,
+                      bottomPadding: navHeight + s(14),
+                      headerHeight: showHeader ? headerHeight : 0,
                       scale: scale,
                     ),
                   ),
@@ -191,40 +210,35 @@ class _HomeScreenState extends State<HomeScreen> {
                     right: 0,
                     top: 0,
                     child: _HeaderBar(
-                      height: s(98),
+                      height: headerHeight,
+                      topInset: topInset,
                       horizontalPadding: s(24),
                       name: studentName,
-                      user: widget.user,
+                      profile: widget.activeProfile,
                     ),
                   ),
                 Positioned(
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      bottom: navBottomGap,
-                      left: s(18),
-                      right: s(18),
-                    ),
-                    child: _BottomNavigation(
-                      height: navHeight,
-                      scale: scale,
-                      activeIndex: _activeTab,
-                      user: widget.user,
-                      onTabSelected: (index) {
-                        if (index == _activeTab) {
-                          HapticFeedback.selectionClick();
-                          return;
-                        }
+                  child: _BottomNavigation(
+                    height: navHeight,
+                    bottomInset: bottomInset,
+                    scale: scale,
+                    activeIndex: _activeTab,
+                    user: widget.user,
+                    onTabSelected: (index) {
+                      if (index == _activeTab) {
+                        HapticFeedback.selectionClick();
+                        return;
+                      }
 
-                        HapticFeedback.lightImpact();
-                        setState(() {
-                          _previousActiveTab = _activeTab;
-                          _activeTab = index;
-                        });
-                      },
-                    ),
+                      HapticFeedback.lightImpact();
+                      setState(() {
+                        _previousActiveTab = _activeTab;
+                        _activeTab = index;
+                      });
+                    },
                   ),
                 ),
               ],
@@ -235,12 +249,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _displayName(LoginUser? user) {
-    final name = user?.name?.trim();
+  String _displayProfileName(StudentProfile? profile) {
+    final name = profile?.name?.trim();
     if (name != null && name.isNotEmpty) {
       return name;
     }
-    return 'User';
+    return 'Student';
   }
 }
 
@@ -249,6 +263,11 @@ class _TabContent extends StatelessWidget {
     super.key,
     required this.activeTab,
     required this.user,
+    required this.profiles,
+    required this.activeProfile,
+    required this.activeRole,
+    required this.profileLoadError,
+    required this.onRefreshProfiles,
     required this.initialGrades,
     required this.gradeService,
     required this.onLogout,
@@ -262,6 +281,11 @@ class _TabContent extends StatelessWidget {
 
   final int activeTab;
   final LoginUser? user;
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final ProfileRole activeRole;
+  final String? profileLoadError;
+  final Future<void> Function() onRefreshProfiles;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final VoidCallback onLogout;
@@ -281,6 +305,14 @@ class _TabContent extends StatelessWidget {
       bottom: bottomPadding,
     );
 
+    return switch (activeRole) {
+      ProfileRole.student => _buildStudentContent(horizontalPadding),
+      ProfileRole.parent => _buildStudentContent(horizontalPadding),
+      ProfileRole.teacher => _buildStudentContent(horizontalPadding),
+    };
+  }
+
+  Widget _buildStudentContent(EdgeInsets horizontalPadding) {
     if (activeTab == 0) {
       return SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -307,6 +339,9 @@ class _TabContent extends StatelessWidget {
     if (activeTab == 3) {
       return SettingTab(
         user: user,
+        profiles: profiles,
+        activeProfile: activeProfile,
+        profileLoadError: profileLoadError,
         onLogout: onLogout,
         onProfileSaved: onProfileSaved,
         openAddProfileRequestId: openAddProfileRequestId,
@@ -318,6 +353,9 @@ class _TabContent extends StatelessWidget {
     if (activeTab == 1) {
       return ReviewTab(
         user: user,
+        activeProfile: activeProfile,
+        profileLoadError: profileLoadError,
+        onRefreshProfiles: onRefreshProfiles,
         onAddProfile: onAddProfileFromReview,
         bottomPadding: bottomPadding,
         scale: scale,
@@ -327,6 +365,7 @@ class _TabContent extends StatelessWidget {
     if (activeTab == 2) {
       return HistoryTab(
         user: user,
+        activeProfile: activeProfile,
         bottomPadding: bottomPadding,
         scale: scale,
       );
@@ -359,18 +398,22 @@ class _HomeBackground extends StatelessWidget {
 class _HeaderBar extends StatelessWidget {
   const _HeaderBar({
     required this.height,
+    required this.topInset,
     required this.horizontalPadding,
     required this.name,
-    required this.user,
+    required this.profile,
   });
 
   final double height;
+  final double topInset;
   final double horizontalPadding;
   final String name;
-  final LoginUser? user;
+  final StudentProfile? profile;
 
   @override
   Widget build(BuildContext context) {
+    final contentHeight = height - topInset;
+
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
@@ -378,9 +421,9 @@ class _HeaderBar extends StatelessWidget {
           height: height,
           padding: EdgeInsets.fromLTRB(
             horizontalPadding,
-            height * 0.20,
+            topInset + contentHeight * 0.20,
             horizontalPadding,
-            height * 0.21,
+            contentHeight * 0.21,
           ),
           decoration: BoxDecoration(
             color: _mintBackground.withValues(alpha: 0.92),
@@ -388,10 +431,10 @@ class _HeaderBar extends StatelessWidget {
           child: Row(
             children: [
               _StudentAvatar(
-                size: height * 0.45,
-                avatarUrl: user?.avatarUrl,
+                size: contentHeight * 0.45,
+                avatarUrl: profile?.avatarUrl,
               ),
-              SizedBox(width: height * 0.14),
+              SizedBox(width: contentHeight * 0.14),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -404,13 +447,13 @@ class _HeaderBar extends StatelessWidget {
                       style: TextStyle(
                         color: _muted.withValues(alpha: 0.6),
                         fontFamily: 'Nunito',
-                        fontSize: height * 0.10,
+                        fontSize: contentHeight * 0.10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.8,
                         height: 1,
                       ),
                     ),
-                    SizedBox(height: height * 0.06),
+                    SizedBox(height: contentHeight * 0.06),
                     Text(
                       name,
                       maxLines: 1,
@@ -418,7 +461,7 @@ class _HeaderBar extends StatelessWidget {
                       style: TextStyle(
                         color: _teal,
                         fontFamily: 'Nunito',
-                        fontSize: height * 0.18,
+                        fontSize: contentHeight * 0.18,
                         fontWeight: FontWeight.w900,
                         height: 1,
                         letterSpacing: 0,
@@ -427,7 +470,7 @@ class _HeaderBar extends StatelessWidget {
                   ],
                 ),
               ),
-              _NotificationButton(size: height * 0.45),
+              _NotificationButton(size: contentHeight * 0.45),
             ],
           ),
         ),
@@ -1099,6 +1142,7 @@ class _AchievementCard extends StatelessWidget {
 class _BottomNavigation extends StatelessWidget {
   const _BottomNavigation({
     required this.height,
+    required this.bottomInset,
     required this.scale,
     required this.activeIndex,
     required this.user,
@@ -1106,6 +1150,7 @@ class _BottomNavigation extends StatelessWidget {
   });
 
   final double height;
+  final double bottomInset;
   final double scale;
   final int activeIndex;
   final LoginUser? user;
@@ -1124,21 +1169,18 @@ class _BottomNavigation extends StatelessWidget {
       _NavItemData(null, context.getText(AppKeys.navSettings), user),
     ];
 
-    final radius = BorderRadius.circular(42 * scale);
+    final radius = BorderRadius.vertical(
+      top: Radius.circular(48 * scale),
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.14),
-            blurRadius: 28 * scale,
-            offset: Offset(0, 10 * scale),
-          ),
-          BoxShadow(
-            color: _blue.withValues(alpha: 0.08),
-            blurRadius: 18 * scale,
-            offset: Offset(0, -2 * scale),
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 32 * scale,
+            offset: Offset(0, -8 * scale),
           ),
         ],
       ),
@@ -1149,28 +1191,23 @@ class _BottomNavigation extends StatelessWidget {
           child: Container(
             height: height,
             padding: EdgeInsets.fromLTRB(
-              16 * scale,
-              8 * scale,
-              16 * scale,
-              10 * scale,
+              20 * scale,
+              12 * scale,
+              20 * scale,
+              bottomInset + 12 * scale,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.95),
+              color: Colors.white.withValues(alpha: 0.92),
               borderRadius: radius,
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.88),
-                width: 1 * scale,
-              ),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(items.length, (index) {
-                return Expanded(
-                  child: _AnimatedNavItem(
-                    data: items[index],
-                    active: activeIndex == index,
-                    scale: scale,
-                    onTap: () => onTabSelected(index),
-                  ),
+                return _AnimatedNavItem(
+                  data: items[index],
+                  active: activeIndex == index,
+                  scale: scale,
+                  onTap: () => onTabSelected(index),
                 );
               }),
             ),
@@ -1196,6 +1233,7 @@ class _AnimatedNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const activeColor = Color(0xFF38898B);
     final inactiveColor = const Color(0xFF515F54).withValues(alpha: 0.68);
 
     return TweenAnimationBuilder<double>(
@@ -1204,8 +1242,6 @@ class _AnimatedNavItem extends StatelessWidget {
       tween: Tween<double>(end: active ? 1 : 0),
       builder: (context, value, child) {
         final color = Color.lerp(inactiveColor, Colors.white, value)!;
-        final lift = -3 * scale * value;
-
         return Semantics(
           selected: active,
           button: true,
@@ -1214,70 +1250,67 @@ class _AnimatedNavItem extends StatelessWidget {
             child: InkWell(
               onTap: onTap,
               borderRadius: BorderRadius.circular(48 * scale),
-              child: Transform.translate(
-                offset: Offset(0, lift),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutCubic,
-                  height: 52 * scale,
-                  margin: EdgeInsets.symmetric(horizontal: 2 * scale),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: active ? 14 * scale : 8 * scale,
-                    vertical: active ? 7 * scale : 6 * scale,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Color.lerp(Colors.transparent, _blue, value),
-                    borderRadius: BorderRadius.circular(48 * scale),
-                    boxShadow: active
-                        ? [
-                            BoxShadow(
-                              color: _blue.withValues(alpha: 0.26),
-                              blurRadius: 14 * scale,
-                              offset: Offset(0, 10 * scale),
-                            ),
-                            BoxShadow(
-                              color: _blue.withValues(alpha: 0.18),
-                              blurRadius: 6 * scale,
-                              offset: Offset(0, 3 * scale),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Transform.scale(
-                        scale: 1 + (0.12 * value),
-                        child: data.user != null
-                            ? _UserAvatarWidget(
-                                user: data.user!,
-                                size: (active ? 20 : 19) * scale,
-                                color: color,
-                              )
-                            : Icon(
-                                data.icon,
-                                color: color,
-                                size: (active ? 20 : 19) * scale,
-                              ),
-                      ),
-                      SizedBox(height: 5 * scale),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          data.label,
-                          maxLines: 1,
-                          style: TextStyle(
-                            color: color,
-                            fontFamily: 'Fredoka',
-                            fontSize: 10 * scale,
-                            fontWeight: FontWeight.w900,
-                            height: 1,
-                            letterSpacing: active ? 0.2 : 0,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                width: active ? 72 * scale : 58 * scale,
+                height: active ? 64 * scale : 56 * scale,
+                padding: EdgeInsets.symmetric(
+                  horizontal: active ? 10 * scale : 8 * scale,
+                  vertical: active ? 10 * scale : 8 * scale,
+                ),
+                decoration: BoxDecoration(
+                  color: Color.lerp(Colors.transparent, activeColor, value),
+                  borderRadius: BorderRadius.circular(48 * scale),
+                  boxShadow: active
+                      ? [
+                          BoxShadow(
+                            color: _teal.withValues(alpha: 0.20),
+                            blurRadius: 15 * scale,
+                            offset: Offset(0, 10 * scale),
                           ),
+                          BoxShadow(
+                            color: _teal.withValues(alpha: 0.20),
+                            blurRadius: 6 * scale,
+                            offset: Offset(0, 4 * scale),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Transform.scale(
+                      scale: 1 + (0.10 * value),
+                      child: data.user != null
+                          ? _UserAvatarWidget(
+                              user: data.user!,
+                              size: (active ? 18 : 18) * scale,
+                              color: color,
+                            )
+                          : Icon(
+                              data.icon,
+                              color: color,
+                              size: (active ? 18 : 18) * scale,
+                            ),
+                    ),
+                    SizedBox(height: 4 * scale),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        data.label,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: color,
+                          fontFamily: 'Fredoka',
+                          fontSize: 10 * scale,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: 0.5,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

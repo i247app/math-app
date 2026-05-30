@@ -260,8 +260,9 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                 ? context.getText(normalizedPhone.errorKey!)
                 : lookupErrorText)
             : null;
-        final useSafeArea =
-            !state.isRestoringSession && state.screen != AppScreen.welcome;
+        final useSafeArea = !state.isRestoringSession &&
+            state.screen != AppScreen.welcome &&
+            state.screen != AppScreen.home;
 
         return SafeArea(
           top: useSafeArea,
@@ -358,6 +359,11 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                     AppScreen.home => HomeScreen(
                         key: const ValueKey('home'),
                         user: state.loginUser,
+                        profiles: state.profiles,
+                        activeProfile: state.activeProfile,
+                        activeRole: state.activeProfileRole,
+                        profileLoadError: state.profileLoadError,
+                        onRefreshProfiles: cubit.refreshProfiles,
                         onBack: cubit.openLogin,
                         onLogout: cubit.logout,
                       ),

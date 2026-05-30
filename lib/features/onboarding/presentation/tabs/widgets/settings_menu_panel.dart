@@ -181,7 +181,6 @@ class _SettingsAvatar extends StatelessWidget {
   }
 }
 
-// Language card with inline dropdown pill
 class _SettingsLanguageCard extends StatelessWidget {
   const _SettingsLanguageCard({
     required this.currentLanguage,
@@ -193,58 +192,86 @@ class _SettingsLanguageCard extends StatelessWidget {
   final double scale;
   final ValueChanged<AppLanguage> onLanguageChanged;
 
+  Future<void> _showLanguageSheet(BuildContext context) async {
+    HapticFeedback.selectionClick();
+    final selected = await showModalBottomSheet<AppLanguage>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.32),
+      builder: (sheetContext) {
+        return _LanguageBottomSheet(
+          currentLanguage: currentLanguage,
+          scale: scale,
+        );
+      },
+    );
+
+    if (selected == null || selected == currentLanguage) {
+      return;
+    }
+    onLanguageChanged(selected);
+  }
+
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(16 * scale);
 
-    return Container(
-      height: 72 * scale,
-      padding: EdgeInsets.symmetric(horizontal: 16 * scale),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      elevation: 0,
+      borderRadius: radius,
+      child: InkWell(
+        onTap: () => _showLanguageSheet(context),
         borderRadius: radius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 10 * scale,
-            offset: Offset(0, 3 * scale),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 42 * scale,
-            height: 42 * scale,
-            decoration: const BoxDecoration(
-              color: Color(0xFFEFF3F8),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.language_rounded,
-              color: const Color(0xFF5B7AA0),
-              size: 22 * scale,
-            ),
-          ),
-          SizedBox(width: 14 * scale),
-          Expanded(
-            child: Text(
-              context.getText(AppKeys.language),
-              style: GoogleFonts.andika(
-                color: _deepInk,
-                fontSize: 15 * scale,
-                fontWeight: FontWeight.w700,
-                height: 1,
-                letterSpacing: 0,
+        child: Container(
+          height: 72 * scale,
+          padding: EdgeInsets.symmetric(horizontal: 16 * scale),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: radius,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 10 * scale,
+                offset: Offset(0, 3 * scale),
               ),
-            ),
+            ],
           ),
-          _LanguagePill(
-            currentLanguage: currentLanguage,
-            scale: scale,
-            onLanguageChanged: onLanguageChanged,
+          child: Row(
+            children: [
+              Container(
+                width: 42 * scale,
+                height: 42 * scale,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEFF3F8),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.language_rounded,
+                  color: const Color(0xFF5B7AA0),
+                  size: 22 * scale,
+                ),
+              ),
+              SizedBox(width: 14 * scale),
+              Expanded(
+                child: Text(
+                  context.getText(AppKeys.language),
+                  style: GoogleFonts.andika(
+                    color: _deepInk,
+                    fontSize: 15 * scale,
+                    fontWeight: FontWeight.w700,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
+              _LanguagePill(
+                currentLanguage: currentLanguage,
+                scale: scale,
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -254,14 +281,12 @@ class _LanguagePill extends StatelessWidget {
   const _LanguagePill({
     required this.currentLanguage,
     required this.scale,
-    required this.onLanguageChanged,
   });
 
   final AppLanguage currentLanguage;
   final double scale;
-  final ValueChanged<AppLanguage> onLanguageChanged;
 
-  String _flagFor(AppLanguage lang) {
+  static String _flagFor(AppLanguage lang) {
     return switch (lang) {
       AppLanguage.vi => '🇻🇳',
       AppLanguage.en => '🇬🇧',
@@ -270,79 +295,215 @@ class _LanguagePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final flag = _flagFor(currentLanguage);
-    final label = currentLanguage.displayName;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 10 * scale,
+        vertical: 7 * scale,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20 * scale),
+        border: Border.all(
+          color: const Color(0xFF006762),
+          width: 1.5 * scale,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            _flagFor(currentLanguage),
+            style: TextStyle(fontSize: 14 * scale),
+          ),
+          SizedBox(width: 5 * scale),
+          Text(
+            currentLanguage.displayName,
+            style: GoogleFonts.andika(
+              fontSize: 13 * scale,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF006762),
+              letterSpacing: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-    return PopupMenuButton<AppLanguage>(
-      tooltip: '',
-      onSelected: (lang) {
-        HapticFeedback.selectionClick();
-        onLanguageChanged(lang);
-      },
-      itemBuilder: (context) {
-        return AppLanguage.values.map((lang) {
-          final isSelected = lang == currentLanguage;
-          return PopupMenuItem<AppLanguage>(
-            value: lang,
-            child: Row(
+class _LanguageBottomSheet extends StatelessWidget {
+  const _LanguageBottomSheet({
+    required this.currentLanguage,
+    required this.scale,
+  });
+
+  final AppLanguage currentLanguage;
+  final double scale;
+
+  static String _flagFor(AppLanguage lang) {
+    return switch (lang) {
+      AppLanguage.vi => '🇻🇳',
+      AppLanguage.en => '🇬🇧',
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          16 * scale,
+          0,
+          16 * scale,
+          math.max(14 * scale, bottomInset + 10 * scale),
+        ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28 * scale),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.14),
+                blurRadius: 24 * scale,
+                offset: Offset(0, 12 * scale),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              18 * scale,
+              12 * scale,
+              18 * scale,
+              18 * scale,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  _flagFor(lang),
-                  style: TextStyle(fontSize: 16 * scale),
-                ),
-                SizedBox(width: 8 * scale),
-                Text(
-                  lang.displayName,
-                  style: GoogleFonts.andika(
-                    fontSize: 14 * scale,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                    color: isSelected ? _teal : _deepInk,
+                Container(
+                  width: 42 * scale,
+                  height: 5 * scale,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD8E2E0),
+                    borderRadius: BorderRadius.circular(999),
                   ),
                 ),
-                if (isSelected) ...[
-                  const Spacer(),
-                  Icon(Icons.check_rounded, color: _teal, size: 18 * scale),
+                SizedBox(height: 18 * scale),
+                Text(
+                  context.getText(AppKeys.languageTitle),
+                  style: GoogleFonts.andika(
+                    color: _deepInk,
+                    fontSize: 20 * scale,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
+                SizedBox(height: 18 * scale),
+                for (final language in AppLanguage.values) ...[
+                  _LanguageSheetOption(
+                    flag: _flagFor(language),
+                    label: switch (language) {
+                      AppLanguage.vi =>
+                        context.getText(AppKeys.languageVietnamese),
+                      AppLanguage.en =>
+                        context.getText(AppKeys.languageEnglish),
+                    },
+                    selected: language == currentLanguage,
+                    scale: scale,
+                    onTap: () => Navigator.of(context).pop(language),
+                  ),
+                  if (language != AppLanguage.values.last)
+                    SizedBox(height: 10 * scale),
                 ],
               ],
             ),
-          );
-        }).toList();
-      },
-      offset: Offset(0, 44 * scale),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14 * scale),
-      ),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10 * scale,
-          vertical: 7 * scale,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20 * scale),
-          border: Border.all(
-            color: const Color(0xFF006762),
-            width: 1.5 * scale,
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              flag,
-              style: TextStyle(fontSize: 14 * scale),
+      ),
+    );
+  }
+}
+
+class _LanguageSheetOption extends StatelessWidget {
+  const _LanguageSheetOption({
+    required this.flag,
+    required this.label,
+    required this.selected,
+    required this.scale,
+    required this.onTap,
+  });
+
+  final String flag;
+  final String label;
+  final bool selected;
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(18 * scale);
+
+    return Material(
+      color: selected ? const Color(0xFFFFF2F8) : const Color(0xFFF7FBFB),
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 16 * scale,
+            vertical: 14 * scale,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            border: Border.all(
+              color:
+                  selected ? const Color(0xFFC1277D) : const Color(0xFFDCE6E3),
+              width: selected ? 2 * scale : 1.2 * scale,
             ),
-            SizedBox(width: 5 * scale),
-            Text(
-              label,
-              style: GoogleFonts.andika(
-                fontSize: 13 * scale,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF006762),
-                letterSpacing: 0,
+          ),
+          child: Row(
+            children: [
+              Text(flag, style: TextStyle(fontSize: 24 * scale)),
+              SizedBox(width: 12 * scale),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.andika(
+                    color: _deepInk,
+                    fontSize: 16 * scale,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
               ),
-            ),
-          ],
+              Container(
+                width: 30 * scale,
+                height: 30 * scale,
+                decoration: BoxDecoration(
+                  color: selected ? const Color(0xFFC1277D) : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFFC1277D),
+                    width: 2 * scale,
+                  ),
+                ),
+                child: selected
+                    ? Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 20 * scale,
+                      )
+                    : null,
+              ),
+            ],
+          ),
         ),
       ),
     );

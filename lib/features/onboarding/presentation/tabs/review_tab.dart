@@ -5,10 +5,10 @@ import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/chapter_models.dart';
 import '../../../../core/network/profile_models.dart';
+import '../../data/active_profile_session.dart';
 import '../../data/chapter_api.dart';
 import '../../data/practice_catalog.dart';
 import '../../data/otp_auth_api.dart';
-import '../../data/profile_api.dart';
 import '../../data/quiz_api.dart';
 import '../screens/assessment_screen.dart';
 
@@ -27,12 +27,18 @@ class ReviewTab extends StatefulWidget {
   const ReviewTab({
     super.key,
     required this.user,
+    required this.activeProfile,
+    required this.profileLoadError,
+    required this.onRefreshProfiles,
     required this.onAddProfile,
     required this.bottomPadding,
     required this.scale,
   });
 
   final LoginUser? user;
+  final StudentProfile? activeProfile;
+  final String? profileLoadError;
+  final Future<void> Function() onRefreshProfiles;
   final VoidCallback onAddProfile;
   final double bottomPadding;
   final double scale;
@@ -42,16 +48,12 @@ class ReviewTab extends StatefulWidget {
 }
 
 class _ReviewTabState extends State<ReviewTab> {
-  final ProfileService _profileService = ProfileApi();
   final ChapterService _chapterService = ChapterApi();
   final QuizService _quizService = QuizApi();
 
-  List<StudentProfile> _profiles = const <StudentProfile>[];
   List<PracticeChapter> _chapters = const <PracticeChapter>[];
-  bool _isLoadingProfiles = true;
   bool _isLoadingChapters = false;
   bool _isGeneratingPracticeQuiz = false;
-  String? _profileLoadError;
   String? _chapterLoadError;
   int _loadRequestId = 0;
   final Set<int> _selectedChapterNumbers = <int>{};
@@ -59,70 +61,43 @@ class _ReviewTabState extends State<ReviewTab> {
   @override
   void initState() {
     super.initState();
-    _loadProfiles();
+    _loadChaptersForActiveProfile();
   }
 
   @override
   void didUpdateWidget(covariant ReviewTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.user?.id != widget.user?.id) {
-      _loadProfiles();
+    final oldProfileId = ActiveProfileSession.profileStableId(
+      oldWidget.activeProfile,
+    );
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (oldWidget.user?.id != widget.user?.id || oldProfileId != profileId) {
+      _loadChaptersForActiveProfile();
     }
   }
 
-  Future<void> _loadProfiles() async {
+  Future<void> _loadChaptersForActiveProfile() async {
     final requestId = ++_loadRequestId;
-    final userId = widget.user?.id.trim();
-    if (userId == null || userId.isEmpty) {
+    final profile = widget.activeProfile;
+    if (profile == null) {
       setState(() {
-        _isLoadingProfiles = false;
         _isLoadingChapters = false;
-        _profileLoadError = context.readText(AppKeys.noAccountForProfile);
-        _profiles = const <StudentProfile>[];
         _chapters = const <PracticeChapter>[];
+        _selectedChapterNumbers.clear();
       });
       return;
     }
 
     setState(() {
-      _isLoadingProfiles = true;
       _isLoadingChapters = false;
-      _profileLoadError = null;
       _chapterLoadError = null;
       _chapters = const <PracticeChapter>[];
       _selectedChapterNumbers.clear();
     });
 
-    try {
-      final profiles = await _profileService.listProfiles(userId: userId);
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-
-      setState(() {
-        _profiles = profiles;
-        _isLoadingProfiles = false;
-      });
-      await _loadChaptersForProfile(_activeProfile(profiles), requestId);
-    } on ProfileException catch (error) {
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-
-      setState(() {
-        _profileLoadError = error.message;
-        _isLoadingProfiles = false;
-      });
-    } catch (_) {
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-
-      setState(() {
-        _profileLoadError = context.readText(AppKeys.profileLoadFailed);
-        _isLoadingProfiles = false;
-      });
-    }
+    await _loadChaptersForProfile(profile, requestId);
   }
 
   Future<void> _loadChaptersForProfile(
@@ -187,6 +162,7 @@ class _ReviewTabState extends State<ReviewTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
+    final topInset = MediaQuery.paddingOf(context).top;
     final totalLessons = _chapters.fold<int>(
       0,
       (sum, chapter) => sum + chapter.lessonCount,
@@ -213,7 +189,7 @@ class _ReviewTabState extends State<ReviewTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _ReviewHeader(scale: scale),
+                _ReviewHeader(scale: scale, topInset: topInset),
                 SizedBox(height: 18 * scale),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24 * scale),
@@ -329,7 +305,7 @@ class _ReviewTabState extends State<ReviewTab> {
     required int completedLessons,
     required double scale,
   }) {
-    if (_isLoadingProfiles || _isLoadingChapters) {
+    if (_isLoadingChapters) {
       return Padding(
         padding: EdgeInsets.symmetric(vertical: 140 * scale),
         child: Center(
@@ -341,19 +317,19 @@ class _ReviewTabState extends State<ReviewTab> {
       );
     }
 
-    final error = _profileLoadError?.trim();
+    final error = widget.profileLoadError?.trim();
     if (error != null && error.isNotEmpty) {
       return _ReviewProfileStatePanel(
         icon: Icons.cloud_off_rounded,
         title: context.getText(AppKeys.profileLoadErrorTitle),
         message: error,
         buttonLabel: context.getText(AppKeys.retry),
-        onTap: _loadProfiles,
+        onTap: widget.onRefreshProfiles,
         scale: scale,
       );
     }
 
-    if (_profiles.isEmpty) {
+    if (widget.activeProfile == null) {
       return _ReviewProfileStatePanel(
         icon: Icons.groups_2_outlined,
         title: context.getText(AppKeys.noProfileTitle),
@@ -371,7 +347,7 @@ class _ReviewTabState extends State<ReviewTab> {
         title: context.getText(AppKeys.chapterLoadErrorTitle),
         message: chapterError,
         buttonLabel: context.getText(AppKeys.retry),
-        onTap: _loadProfiles,
+        onTap: _loadChaptersForActiveProfile,
         scale: scale,
       );
     }
@@ -382,7 +358,7 @@ class _ReviewTabState extends State<ReviewTab> {
         title: context.getText(AppKeys.noChapterTitle),
         message: context.getText(AppKeys.noChapterMessage),
         buttonLabel: context.getText(AppKeys.retry),
-        onTap: _loadProfiles,
+        onTap: _loadChaptersForActiveProfile,
         scale: scale,
       );
     }
@@ -431,20 +407,21 @@ class _ReviewTabState extends State<ReviewTab> {
 }
 
 class _ReviewHeader extends StatelessWidget {
-  const _ReviewHeader({required this.scale});
+  const _ReviewHeader({required this.scale, required this.topInset});
 
   final double scale;
+  final double topInset;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 70 * scale,
+      height: topInset + 70 * scale,
       child: CustomPaint(
         painter: _ReviewHeaderCurvePainter(scale: scale),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             20 * scale,
-            8 * scale,
+            topInset + 8 * scale,
             20 * scale,
             12 * scale,
           ),
@@ -1150,17 +1127,6 @@ String _chapterMetaText(BuildContext context, PracticeChapter chapter) {
 
   return '${context.getText(AppKeys.chapter)} ${chapter.number} • '
       '${chapter.lessonCount} ${context.getText(AppKeys.lessons)}';
-}
-
-StudentProfile? _activeProfile(List<StudentProfile> profiles) {
-  if (profiles.isEmpty) {
-    return null;
-  }
-
-  return profiles.firstWhere(
-    (profile) => profile.isDefault,
-    orElse: () => profiles.first,
-  );
 }
 
 String? _profileProgramId(StudentProfile profile) {

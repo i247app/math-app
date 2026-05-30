@@ -4,6 +4,7 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
   const _ProfilePlaceholderPanel({
     super.key,
     required this.profiles,
+    required this.activeProfileId,
     required this.isLoading,
     required this.errorMessage,
     required this.onRetry,
@@ -15,6 +16,7 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
   });
 
   final List<StudentProfile> profiles;
+  final String? activeProfileId;
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback onRetry;
@@ -72,7 +74,8 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
         for (var index = 0; index < profiles.length; index++) ...[
           _ProfileCard(
             profile: profiles[index],
-            isActive: profiles[index].isDefault,
+            isActive: ActiveProfileSession.profileStableId(profiles[index]) ==
+                activeProfileId,
             scale: scale,
             onSelect: () => onSelect(profiles[index]),
             onEdit: () => onEdit(profiles[index]),

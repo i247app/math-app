@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'api_metadata.dart';
 import 'school_models.dart';
 import 'program_models.dart';
 import 'semester_models.dart';

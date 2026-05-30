@@ -7,6 +7,7 @@ class _SettingHeader extends StatelessWidget {
     required this.onBack,
     required this.backgroundColor,
     required this.scale,
+    required this.topInset,
   });
 
   final String title;
@@ -14,11 +15,12 @@ class _SettingHeader extends StatelessWidget {
   final VoidCallback onBack;
   final Color backgroundColor;
   final double scale;
+  final double topInset;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60 * scale,
+      height: topInset + 60 * scale,
       decoration: BoxDecoration(
         color: backgroundColor,
         border: Border(
@@ -30,7 +32,7 @@ class _SettingHeader extends StatelessWidget {
       ),
       padding: EdgeInsets.fromLTRB(
         18 * scale,
-        6 * scale,
+        topInset + 6 * scale,
         18 * scale,
         6 * scale,
       ),

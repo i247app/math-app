@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
+import '../../../../core/network/profile_models.dart';
 import '../../../../core/network/quiz_models.dart';
+import '../../data/active_profile_session.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/quiz_api.dart';
 import '../screens/quiz_review_screen.dart';
@@ -23,11 +25,13 @@ class HistoryTab extends StatefulWidget {
   const HistoryTab({
     super.key,
     required this.user,
+    required this.activeProfile,
     required this.bottomPadding,
     required this.scale,
   });
 
   final LoginUser? user;
+  final StudentProfile? activeProfile;
   final double bottomPadding;
   final double scale;
 
@@ -56,7 +60,13 @@ class _HistoryTabState extends State<HistoryTab> {
   @override
   void didUpdateWidget(covariant HistoryTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.user?.id != widget.user?.id) {
+    final oldProfileId = ActiveProfileSession.profileStableId(
+      oldWidget.activeProfile,
+    );
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (oldWidget.user?.id != widget.user?.id || oldProfileId != profileId) {
       _loadHistory();
     }
   }
@@ -71,8 +81,10 @@ class _HistoryTabState extends State<HistoryTab> {
 
   Future<void> _loadHistory() async {
     final requestId = ++_loadRequestId;
-    final userId = widget.user?.id.trim();
-    if (userId == null || userId.isEmpty) {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (profileId == null || profileId.isEmpty) {
       setState(() {
         _isLoading = false;
         _errorMessage = context.readText(AppKeys.noAccountForHistory);
@@ -87,7 +99,7 @@ class _HistoryTabState extends State<HistoryTab> {
     });
 
     try {
-      final quizzes = await _quizService.listQuizzes(userId: userId);
+      final quizzes = await _quizService.listQuizzes(profileId: profileId);
       if (!mounted || requestId != _loadRequestId) {
         return;
       }
@@ -153,6 +165,7 @@ class _HistoryTabState extends State<HistoryTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
+    final topInset = MediaQuery.paddingOf(context).top;
     final quizzes = _filteredQuizzes;
 
     return ColoredBox(
@@ -164,7 +177,7 @@ class _HistoryTabState extends State<HistoryTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _HistoryHeader(scale: scale),
+            _HistoryHeader(scale: scale, topInset: topInset),
             SizedBox(height: 12 * scale),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20 * scale),
@@ -201,14 +214,16 @@ class _HistoryTabState extends State<HistoryTab> {
 }
 
 class _HistoryHeader extends StatelessWidget {
-  const _HistoryHeader({required this.scale});
+  const _HistoryHeader({required this.scale, required this.topInset});
 
   final double scale;
+  final double topInset;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60 * scale,
+      height: topInset + 60 * scale,
+      padding: EdgeInsets.only(top: topInset),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(

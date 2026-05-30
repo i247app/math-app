@@ -2,8 +2,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/localization/app_strings.dart';
+import '../../../../core/network/profile_models.dart';
+import '../../data/active_profile_session.dart';
 import '../../data/avatar_picker.dart';
 import '../../data/otp_auth_api.dart';
+import '../../data/profile_api.dart';
 import '../../domain/phone_region.dart';
 
 enum AppScreen {
@@ -49,6 +52,9 @@ class OnboardingState {
     this.otpFlow = OtpFlow.login,
     this.authError,
     this.loginUser,
+    this.profiles = const <StudentProfile>[],
+    this.activeProfile,
+    this.profileLoadError,
   });
 
   final AppScreen screen;
@@ -79,6 +85,11 @@ class OnboardingState {
   final OtpFlow otpFlow;
   final String? authError;
   final LoginUser? loginUser;
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final String? profileLoadError;
+
+  ProfileRole get activeProfileRole => ProfileRole.fromProfile(activeProfile);
 
   OnboardingState copyWith({
     AppScreen? screen,
@@ -109,6 +120,9 @@ class OnboardingState {
     OtpFlow? otpFlow,
     String? authError,
     LoginUser? loginUser,
+    List<StudentProfile>? profiles,
+    StudentProfile? activeProfile,
+    String? profileLoadError,
     bool clearAvatarPath = false,
     bool clearAvatarError = false,
     bool clearAuthError = false,
@@ -120,6 +134,10 @@ class OnboardingState {
     bool clearPhoneLookupUser = false,
     bool clearPhoneLookupError = false,
     bool clearPhoneLookupErrorStatus = false,
+    bool clearLoginUser = false,
+    bool clearProfiles = false,
+    bool clearActiveProfile = false,
+    bool clearProfileLoadError = false,
   }) {
     return OnboardingState(
       screen: screen ?? this.screen,
@@ -157,7 +175,15 @@ class OnboardingState {
       otpErrorId: otpErrorId ?? this.otpErrorId,
       otpFlow: otpFlow ?? this.otpFlow,
       authError: clearAuthError ? null : authError ?? this.authError,
-      loginUser: loginUser ?? this.loginUser,
+      loginUser: clearLoginUser ? null : loginUser ?? this.loginUser,
+      profiles:
+          clearProfiles ? const <StudentProfile>[] : profiles ?? this.profiles,
+      activeProfile: clearProfiles || clearActiveProfile
+          ? null
+          : activeProfile ?? this.activeProfile,
+      profileLoadError: clearProfiles || clearProfileLoadError
+          ? null
+          : profileLoadError ?? this.profileLoadError,
     );
   }
 }
@@ -166,12 +192,18 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   OnboardingCubit({
     AvatarPickerService avatarPicker = const AvatarPickerService(),
     OtpAuthService? authService,
+    ProfileService? profileService,
+    ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
   })  : _avatarPicker = avatarPicker,
         _authService = authService ?? OtpAuthApi(),
+        _profileService = profileService ?? ProfileApi(),
+        _activeProfileSession = activeProfileSession,
         super(const OnboardingState());
 
   final AvatarPickerService _avatarPicker;
   final OtpAuthService _authService;
+  final ProfileService _profileService;
+  final ActiveProfileSession _activeProfileSession;
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
@@ -190,11 +222,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     if (!isClosed) {
       emit(state.copyWith(
         screen: AppScreen.welcome,
-        loginUser: null,
+        clearLoginUser: true,
         phoneNumber: null,
         checkedPhone: null,
         phoneExists: null,
         phoneLookupUser: null,
+        clearProfiles: true,
         clearAuthError: true,
       ));
     }
@@ -213,12 +246,22 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         return;
       }
 
+      final profileResolution = user == null
+          ? const _ResolvedProfiles.empty()
+          : await _profilesForUser(user);
+
       emit(
         state.copyWith(
           screen: user == null ? state.screen : AppScreen.home,
           isRestoringSession: false,
           loginUser: user,
+          profiles: profileResolution.profiles,
+          activeProfile: profileResolution.activeProfile,
+          profileLoadError: profileResolution.errorMessage,
           clearAuthError: true,
+          clearProfiles: user == null,
+          clearActiveProfile: profileResolution.activeProfile == null,
+          clearProfileLoadError: profileResolution.errorMessage == null,
         ),
       );
     } catch (_) {
@@ -483,13 +526,21 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       }
 
       if (otpFlow == OtpFlow.signup) {
+        final profileResolution = result.user == null
+            ? const _ResolvedProfiles.empty()
+            : await _profilesForUser(result.user!);
         emit(
           state.copyWith(
             screen: AppScreen.signup,
             isVerifyingOtp: false,
             loginUser: result.user,
+            profiles: profileResolution.profiles,
+            activeProfile: profileResolution.activeProfile,
+            profileLoadError: profileResolution.errorMessage,
             clearAuthError: true,
             clearOtpError: true,
+            clearActiveProfile: profileResolution.activeProfile == null,
+            clearProfileLoadError: profileResolution.errorMessage == null,
           ),
         );
         return;
@@ -505,13 +556,19 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         return;
       }
 
+      final profileResolution = await _profilesForUser(result.user!);
       emit(
         state.copyWith(
           screen: AppScreen.home,
           isVerifyingOtp: false,
           loginUser: result.user,
+          profiles: profileResolution.profiles,
+          activeProfile: profileResolution.activeProfile,
+          profileLoadError: profileResolution.errorMessage,
           clearAuthError: true,
           clearOtpError: true,
+          clearActiveProfile: profileResolution.activeProfile == null,
+          clearProfileLoadError: profileResolution.errorMessage == null,
         ),
       );
     } on OtpAuthException catch (error) {
@@ -587,12 +644,18 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         email: trimmedEmail?.isEmpty == true ? null : trimmedEmail,
         avatarPath: state.avatarPath,
       );
+      final profileResolution = await _profilesForUser(user);
       emit(
         state.copyWith(
           screen: AppScreen.home,
           isSigningUp: false,
           loginUser: user,
+          profiles: profileResolution.profiles,
+          activeProfile: profileResolution.activeProfile,
+          profileLoadError: profileResolution.errorMessage,
           clearAuthError: true,
+          clearActiveProfile: profileResolution.activeProfile == null,
+          clearProfileLoadError: profileResolution.errorMessage == null,
         ),
       );
     } on OtpAuthException catch (error) {
@@ -610,6 +673,69 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         ),
       );
     }
+  }
+
+  Future<_ResolvedProfiles> _profilesForUser(LoginUser user) async {
+    final userId = user.id.trim();
+    if (userId.isEmpty) {
+      return const _ResolvedProfiles.empty();
+    }
+
+    try {
+      final profiles = await _profileService.listProfiles(userId: userId);
+      final activeProfile = await _activeProfileSession.resolveActiveProfile(
+        userId: userId,
+        profiles: profiles,
+      );
+      final activeProfileId =
+          ActiveProfileSession.profileStableId(activeProfile);
+      if (activeProfileId != null) {
+        await _activeProfileSession.writeActiveProfileId(
+          userId: userId,
+          profileId: activeProfileId,
+        );
+      } else {
+        await _activeProfileSession.clearActiveProfileId(userId);
+      }
+      return _ResolvedProfiles(
+        profiles: profiles,
+        activeProfile: activeProfile,
+      );
+    } on ProfileException catch (error) {
+      return _ResolvedProfiles(
+        profiles: const <StudentProfile>[],
+        activeProfile: null,
+        errorMessage: error.message,
+      );
+    } catch (_) {
+      return _ResolvedProfiles(
+        profiles: const <StudentProfile>[],
+        activeProfile: null,
+        errorMessage: AppStrings.current(AppKeys.profileLoadFailed),
+      );
+    }
+  }
+
+  Future<void> refreshProfiles() async {
+    final user = state.loginUser;
+    if (user == null) {
+      return;
+    }
+
+    final profileResolution = await _profilesForUser(user);
+    if (isClosed) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        profiles: profileResolution.profiles,
+        activeProfile: profileResolution.activeProfile,
+        profileLoadError: profileResolution.errorMessage,
+        clearActiveProfile: profileResolution.activeProfile == null,
+        clearProfileLoadError: profileResolution.errorMessage == null,
+      ),
+    );
   }
 
   Future<void> pickAvatar() async {
@@ -647,4 +773,21 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   void clearAvatar() {
     emit(state.copyWith(clearAvatarPath: true, clearAvatarError: true));
   }
+}
+
+class _ResolvedProfiles {
+  const _ResolvedProfiles({
+    required this.profiles,
+    required this.activeProfile,
+    this.errorMessage,
+  });
+
+  const _ResolvedProfiles.empty()
+      : profiles = const <StudentProfile>[],
+        activeProfile = null,
+        errorMessage = null;
+
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final String? errorMessage;
 }
