@@ -6,8 +6,10 @@ class _AddProfilePanel extends StatelessWidget {
     required this.nameController,
     required this.avatarPath,
     required this.avatarUrl,
+    required this.schools,
     required this.grades,
     required this.programs,
+    required this.selectedSchool,
     required this.selectedGrade,
     required this.selectedProgram,
     required this.isLoadingOptions,
@@ -17,6 +19,7 @@ class _AddProfilePanel extends StatelessWidget {
     required this.canRetryOptions,
     required this.onPickAvatar,
     required this.onClearAvatar,
+    required this.onSchoolChanged,
     required this.onGradeChanged,
     required this.onProgramChanged,
     required this.onRetryOptions,
@@ -28,8 +31,10 @@ class _AddProfilePanel extends StatelessWidget {
   final TextEditingController nameController;
   final String? avatarPath;
   final String? avatarUrl;
+  final List<SchoolModel> schools;
   final List<GradeModel> grades;
   final List<ProgramModel> programs;
+  final SchoolModel? selectedSchool;
   final GradeModel? selectedGrade;
   final ProgramModel? selectedProgram;
   final bool isLoadingOptions;
@@ -39,6 +44,7 @@ class _AddProfilePanel extends StatelessWidget {
   final bool canRetryOptions;
   final VoidCallback onPickAvatar;
   final VoidCallback onClearAvatar;
+  final ValueChanged<SchoolModel?> onSchoolChanged;
   final ValueChanged<GradeModel?> onGradeChanged;
   final ValueChanged<ProgramModel?> onProgramChanged;
   final VoidCallback onRetryOptions;
@@ -80,15 +86,15 @@ class _AddProfilePanel extends StatelessWidget {
             ),
           )
         else ...[
-          _AddProfileDropdown<GradeModel>(
-            label: context.getText(AppKeys.grade),
-            hintText: context.getText(AppKeys.chooseGrade),
-            value: selectedGrade,
-            items: grades,
-            itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
-                ? grade.label!.trim()
-                : context.getText(AppKeys.grade),
-            onChanged: onGradeChanged,
+          _AddProfileDropdown<SchoolModel>(
+            label: context.getText(AppKeys.school),
+            hintText: context.getText(AppKeys.chooseSchool),
+            value: selectedSchool,
+            items: schools,
+            itemLabel: (school) => school.name?.trim().isNotEmpty == true
+                ? school.name!.trim()
+                : context.getText(AppKeys.noSchools),
+            onChanged: onSchoolChanged,
             scale: scale,
           ),
           SizedBox(height: 18 * scale),
@@ -101,6 +107,18 @@ class _AddProfilePanel extends StatelessWidget {
                 ? program.label!.trim()
                 : context.getText(AppKeys.program),
             onChanged: onProgramChanged,
+            scale: scale,
+          ),
+          SizedBox(height: 18 * scale),
+          _AddProfileDropdown<GradeModel>(
+            label: context.getText(AppKeys.grade),
+            hintText: context.getText(AppKeys.chooseGrade),
+            value: selectedGrade,
+            items: grades,
+            itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
+                ? grade.label!.trim()
+                : context.getText(AppKeys.grade),
+            onChanged: onGradeChanged,
             scale: scale,
           ),
         ],

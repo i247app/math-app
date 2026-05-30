@@ -8,6 +8,7 @@ import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/network/profile_models.dart';
+import '../../../../core/network/school_models.dart';
 import '../../../../core/network/program_models.dart';
 import '../../../../core/network/semester_models.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -15,6 +16,7 @@ import '../../data/avatar_picker.dart';
 import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/profile_api.dart';
+import '../../data/school_api.dart';
 import '../../../../core/localization/app_language.dart';
 import '../../../../core/localization/lingo_scope.dart';
 
@@ -59,6 +61,7 @@ class _SettingTabState extends State<SettingTab> {
   final OtpAuthService _authService = OtpAuthApi();
   final ProfileService _profileService = ProfileApi();
   final GradeService _gradeService = GradeApi();
+  final SchoolService _schoolService = SchoolApi();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -88,9 +91,11 @@ class _SettingTabState extends State<SettingTab> {
   LoginUser? _updatedUser;
   StudentProfile? _editingProfile;
   List<StudentProfile> _profiles = const <StudentProfile>[];
+  List<SchoolModel> _schoolOptions = const <SchoolModel>[];
   List<GradeModel> _gradeOptions = const <GradeModel>[];
   List<ProgramModel> _programOptions = const <ProgramModel>[];
   List<SemesterModel> _semesterOptions = const <SemesterModel>[];
+  SchoolModel? _selectedSchool;
   GradeModel? _selectedGrade;
   ProgramModel? _selectedProgram;
   SemesterModel? _selectedSemester;
@@ -120,9 +125,11 @@ class _SettingTabState extends State<SettingTab> {
       _updatedUser = null;
       _applyUser(widget.user);
       _profiles = const <StudentProfile>[];
+      _schoolOptions = const <SchoolModel>[];
       _gradeOptions = const <GradeModel>[];
       _programOptions = const <ProgramModel>[];
       _semesterOptions = const <SemesterModel>[];
+      _selectedSchool = null;
       _selectedGrade = null;
       _selectedProgram = null;
       _selectedSemester = null;
@@ -422,7 +429,8 @@ class _SettingTabState extends State<SettingTab> {
   bool get _hasProfileOptions {
     return _gradeOptions.isNotEmpty &&
         _programOptions.isNotEmpty &&
-        _semesterOptions.isNotEmpty;
+        _semesterOptions.isNotEmpty &&
+        _schoolOptions.isNotEmpty;
   }
 
   void _preloadProfileOptions() {
@@ -455,18 +463,21 @@ class _SettingTabState extends State<SettingTab> {
 
     try {
       final results = await Future.wait<Object>([
+        _schoolService.listSchools(),
         _gradeService.listGrades(userId: userId),
         _profileService.listPrograms(userId: userId),
         _profileService.listSemesters(userId: userId),
       ]);
-      final grades = results[0] as List<GradeModel>;
-      final programs = results[1] as List<ProgramModel>;
-      final semesters = results[2] as List<SemesterModel>;
+      final schools = results[0] as List<SchoolModel>;
+      final grades = results[1] as List<GradeModel>;
+      final programs = results[2] as List<ProgramModel>;
+      final semesters = results[3] as List<SemesterModel>;
       if (!mounted) {
         return;
       }
 
       setState(() {
+        _schoolOptions = schools;
         _gradeOptions = grades;
         _programOptions = programs;
         _semesterOptions = semesters;
@@ -474,6 +485,7 @@ class _SettingTabState extends State<SettingTab> {
         if (profile != null) {
           _selectOptionsForProfile(profile);
         } else {
+          _selectedSchool ??= schools.isEmpty ? null : schools.first;
           _selectedGrade ??= grades.isEmpty ? null : grades.first;
           _selectedProgram ??= programs.isEmpty ? null : programs.first;
           _selectedSemester ??= semesters.isEmpty ? null : semesters.first;
@@ -487,6 +499,17 @@ class _SettingTabState extends State<SettingTab> {
 
       setState(() {
         _profileOptionsError = error.message;
+        _isLoadingProfileOptions = false;
+      });
+    } on SchoolException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _profileOptionsError = error.message.isNotEmpty
+            ? error.message
+            : context.readText(AppKeys.schoolOptionsLoadFailed);
         _isLoadingProfileOptions = false;
       });
     } on ProfileException catch (error) {
@@ -551,6 +574,7 @@ class _SettingTabState extends State<SettingTab> {
   Future<void> _saveProfileForm() async {
     final userId = widget.user?.id.trim();
     final name = _profileNameController.text.trim();
+    final school = _selectedSchool;
     final grade = _selectedGrade;
     final program = _selectedProgram;
     final semester = _selectedSemester;
@@ -565,6 +589,13 @@ class _SettingTabState extends State<SettingTab> {
       setState(
         () =>
             _profileCreateError = context.readText(AppKeys.missingProfileName),
+      );
+      return;
+    }
+    if (school?.schoolId == null || school!.schoolId!.trim().isEmpty) {
+      setState(
+        () => _profileCreateError =
+            context.readText(AppKeys.missingProfileSelections),
       );
       return;
     }
@@ -589,7 +620,7 @@ class _SettingTabState extends State<SettingTab> {
       if (editingProfile == null) {
         await _profileService.createProfile(
           userId: userId,
-          schoolId: '',
+          schoolId: school.schoolId!.trim(),
           name: name,
           gradeId: grade!.gradeId!,
           programId: program!.programId!,
@@ -606,7 +637,7 @@ class _SettingTabState extends State<SettingTab> {
 
         await _profileService.updateProfile(
           profileId: profileId,
-          schoolId: '',
+          schoolId: school.schoolId!.trim(),
           name: _emptyToNull(name),
           gradeId: grade?.gradeId,
           programId: program?.programId,
@@ -799,6 +830,7 @@ class _SettingTabState extends State<SettingTab> {
     _createAvatarPath = null;
     _editingProfile = null;
     _profileCreateError = null;
+    _selectedSchool = _schoolOptions.isEmpty ? null : _schoolOptions.first;
     _selectedGrade = _gradeOptions.isEmpty ? null : _gradeOptions.first;
     _selectedProgram = _programOptions.isEmpty ? null : _programOptions.first;
     _selectedSemester =
@@ -806,6 +838,10 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   void _selectOptionsForProfile(StudentProfile profile) {
+    _selectedSchool = _firstWhereOrNull(
+      _schoolOptions,
+      (school) => school.schoolId == profile.schoolId,
+    );
     _selectedGrade = _firstWhereOrNull(
       _gradeOptions,
       (grade) => grade.gradeId == profile.gradeId,
@@ -940,8 +976,10 @@ class _SettingTabState extends State<SettingTab> {
                             nameController: _profileNameController,
                             avatarPath: _createAvatarPath,
                             avatarUrl: _editingProfile?.avatarUrl,
+                            schools: _schoolOptions,
                             grades: _gradeOptions,
                             programs: _programOptions,
+                            selectedSchool: _selectedSchool,
                             selectedGrade: _selectedGrade,
                             selectedProgram: _selectedProgram,
                             isLoadingOptions: _isLoadingProfileOptions,
@@ -952,6 +990,9 @@ class _SettingTabState extends State<SettingTab> {
                             canRetryOptions: _profileOptionsError != null,
                             onPickAvatar: _pickCreateAvatar,
                             onClearAvatar: _clearCreateAvatar,
+                            onSchoolChanged: (school) {
+                              setState(() => _selectedSchool = school);
+                            },
                             onGradeChanged: (grade) {
                               setState(() => _selectedGrade = grade);
                             },
