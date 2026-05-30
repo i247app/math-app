@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import 'api_metadata.dart';
+import 'school_models.dart';
 import 'program_models.dart';
 import 'semester_models.dart';
 
@@ -204,6 +205,8 @@ class StudentProfile {
     this.id,
     this.profileId,
     this.userId,
+    this.schoolId,
+    this.school,
     this.name,
     this.avatarKey,
     this.avatarUrl,
@@ -224,6 +227,9 @@ class StudentProfile {
   final String? id;
   final String? profileId;
   final String? userId;
+  final String? schoolId;
+  @JsonKey(fromJson: _schoolFromJson)
+  final SchoolModel? school;
   final String? name;
   final String? avatarKey;
   final String? avatarUrl;
@@ -289,6 +295,10 @@ List<StudentProfile> _profilesFromJson(Object? value) {
 
 StudentProfile? _studentProfileFromJson(Object? value) {
   return _objectFromJson(value, StudentProfile.fromJson);
+}
+
+SchoolModel? _schoolFromJson(Object? value) {
+  return _objectFromJson(value, SchoolModel.fromJson);
 }
 
 ProfileGrade? _profileGradeFromJson(Object? value) {

@@ -136,6 +136,7 @@ class AppKeys {
   static const profileTitle = 'profile_title';
   static const addProfileTitle = 'add_profile_title';
   static const updateProfileTitle = 'update_profile_title';
+  static const school = 'school';
   static const accountMenuTitle = 'account_menu_title';
   static const accountMenuSubtitle = 'account_menu_subtitle';
   static const profileMenuTitle = 'profile_menu_title';
@@ -149,6 +150,7 @@ class AppKeys {
   static const imagePickFailed = 'image_pick_failed';
   static const profileOptionsMissingAccount = 'profile_options_missing_account';
   static const profileOptionsLoadFailed = 'profile_options_load_failed';
+  static const schoolOptionsLoadFailed = 'school_options_load_failed';
   static const reloadOptions = 'reload_options';
   static const missingProfileName = 'missing_profile_name';
   static const missingProfileSelections = 'missing_profile_selections';
@@ -168,9 +170,11 @@ class AppKeys {
   static const program = 'program';
   static const learningProgram = 'learning_program';
   static const semester = 'semester';
+  static const chooseSchool = 'choose_school';
   static const chooseGrade = 'choose_grade';
   static const chooseProgram = 'choose_program';
   static const chooseSemester = 'choose_semester';
+  static const noSchools = 'no_schools';
   static const active = 'active';
   static const belovedChild = 'beloved_child';
   static const notSelected = 'not_selected';
