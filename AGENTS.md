@@ -86,10 +86,16 @@ The app is currently Android-focused in the checked-in platform files. The READM
 
 - The app uses a soft mint/teal visual language defined in `AppColors`.
 - Most text is Vietnamese. Preserve existing wording style and accents when editing product copy.
+- The app is multilingual. Any new or changed user-facing string must be added to `AppKeys` and `AppStrings` for both Vietnamese and English, then referenced through `context.getText`, `context.formatText`, `context.readText`, or `AppStrings.current`.
 - Responsive behavior is handled with `MediaQuery` checks such as compact height `< 760` and tight width `< 370`.
 - Screen content is constrained to a phone-sized width through `ScreenFrame`.
 - Screen changes use `AnimatedSwitcher` in `NumiHome`; keep keys stable when adding or changing screens.
 - Haptic feedback is used for invalid or primary interactions. Keep it lightweight and purposeful.
+- For select/dropdown inputs, use a bottom sheet selector by default unless the design or user explicitly asks for another interaction. Prefer creating or reusing a shared bottom-sheet select input widget when multiple screens need the same behavior.
+- When implementing Figma screens, do not blindly translate absolute Figma coordinates into `Stack` + `Positioned`. Prefer normal Flutter layout primitives such as `Column`, `Row`, `Padding`, `SizedBox`, `Spacer`, `Expanded`, `Flexible`, `Align`, `Center`, `AspectRatio`, `FractionallySizedBox`, `ConstrainedBox`, `GridView`, and `ListView`.
+- Use `Stack` / `Positioned` only when the design genuinely requires overlapping or anchored decorative layers. Do not use positional layout for ordinary vertical content, buttons, headers, forms, cards, or lists.
+- Avoid hardcoded canvas dimensions like `_designWidth`, `_designHeight`, or `constraints.maxWidth / 390` for new Figma work. Size and space UI from the actual device constraints, safe-area padding, content constraints, and relative layout rules.
+- Avoid hardcoded width/height unless the element has a real fixed design role such as an icon, avatar, toolbar button, or known asset ratio. Prefer min/max constraints and relative sizing for screen sections.
 
 ## Common Commands
 

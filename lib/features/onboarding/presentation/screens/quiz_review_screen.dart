@@ -189,7 +189,6 @@ class _ReviewHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: _navy,
-                    fontFamily: 'Nunito',
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -403,7 +402,6 @@ class _StatItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: _navy,
-              fontFamily: 'Nunito',
               fontSize: 14,
               fontWeight: FontWeight.w900,
               height: 1,
@@ -417,7 +415,6 @@ class _StatItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: _muted,
-              fontFamily: 'Nunito',
               fontSize: 11,
               fontWeight: FontWeight.w700,
               height: 1,
@@ -471,7 +468,6 @@ class _QuestionSelector extends StatelessWidget {
                       '${index + 1}',
                       style: TextStyle(
                         color: selected ? Colors.white : _navy,
-                        fontFamily: 'Nunito',
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
                         height: 1,
@@ -513,7 +509,6 @@ class _QuestionCard extends StatelessWidget {
               ),
               style: const TextStyle(
                 color: _navy,
-                fontFamily: 'Nunito',
                 fontSize: 14,
                 fontWeight: FontWeight.w900,
                 height: 1,
@@ -529,7 +524,6 @@ class _QuestionCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: _navy,
-                fontFamily: 'Nunito',
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
                 height: 1.05,
@@ -649,7 +643,6 @@ class _AnswerTile extends StatelessWidget {
                       color: isWrongSelected || isRevealedCorrect
                           ? Colors.white
                           : _deepInk,
-                      fontFamily: 'Nunito',
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
                       height: 1,
@@ -666,7 +659,6 @@ class _AnswerTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: foreground,
-                    fontFamily: 'Nunito',
                     fontSize: 14,
                     fontWeight: isWrongSelected || isRevealedCorrect
                         ? FontWeight.w900
@@ -714,7 +706,6 @@ class _AnswerToggleButton extends StatelessWidget {
                 : context.getText(AppKeys.showAnswerUpper),
             style: const TextStyle(
               color: _navy,
-              fontFamily: 'Nunito',
               fontSize: 14,
               fontWeight: FontWeight.w900,
               height: 1,
@@ -748,7 +739,6 @@ class _AnswerRevealPanel extends StatelessWidget {
             : context.formatText(AppKeys.answer, {'answer': answer}),
         style: const TextStyle(
           color: Color(0xFFD71970),
-          fontFamily: 'Nunito',
           fontSize: 14,
           fontWeight: FontWeight.w900,
           height: 1,
@@ -809,7 +799,6 @@ class _InlineError extends StatelessWidget {
               message,
               style: const TextStyle(
                 color: _red,
-                fontFamily: 'Nunito',
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -855,7 +844,6 @@ class _ReviewStatePanel extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: _deepInk,
-                    fontFamily: 'Nunito',
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                   ),

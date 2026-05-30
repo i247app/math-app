@@ -52,7 +52,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       setState(() {
         _loadedProfileId = profileId;
         _classrooms = const <ClassroomModel>[];
-        _error = 'Hồ sơ giáo viên thiếu profile_id.';
+        _error = context.readText(AppKeys.teacherMissingProfileId);
         _isLoading = false;
       });
       return;
@@ -103,7 +103,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
     if (classroomId == null || classroomId.isEmpty || profileId == null) {
-      _showSnack('Không mở được lớp học này.');
+      _showSnack(context.readText(AppKeys.teacherClassOpenFailed));
       return;
     }
 
@@ -213,10 +213,10 @@ class _TeacherTopBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'CHÀO MỪNG TRỞ LẠI',
+                  context.getText(AppKeys.teacherWelcomeBack),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.beVietnamPro(
+                  style: GoogleFonts.andika(
                     color: _teacherBlue.withValues(alpha: 0.60),
                     fontSize: 12 * scale,
                     fontWeight: FontWeight.w700,
@@ -228,7 +228,7 @@ class _TeacherTopBar extends StatelessWidget {
                   '$name 👋',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.andika(
                     color: _teacherBlue,
                     fontSize: 18 * scale,
                     fontWeight: FontWeight.w800,
@@ -310,10 +310,10 @@ class _TeacherHeroCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Sẵn sàng cho ngày mới',
+                context.getText(AppKeys.teacherHeroTitle),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.andika(
                   color: Colors.white,
                   fontSize: 18 * scale,
                   fontWeight: FontWeight.w900,
@@ -322,10 +322,10 @@ class _TeacherHeroCard extends StatelessWidget {
               ),
               SizedBox(height: 3 * scale),
               Text(
-                'chuẩn bị học nhiều hơn',
+                context.getText(AppKeys.teacherHeroSubtitle),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.beVietnamPro(
+                style: GoogleFonts.andika(
                   color: Colors.white,
                   fontSize: 14 * scale,
                   fontWeight: FontWeight.w700,
@@ -360,8 +360,8 @@ class _TeacherClassSectionHeader extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Lớp học của bạn',
-                style: GoogleFonts.plusJakartaSans(
+                context.getText(AppKeys.teacherYourClasses),
+                style: GoogleFonts.andika(
                   color: Colors.black,
                   fontSize: 18 * scale,
                   fontWeight: FontWeight.w800,
@@ -370,8 +370,8 @@ class _TeacherClassSectionHeader extends StatelessWidget {
               ),
             ),
             Text(
-              'Xem tất cả',
-              style: GoogleFonts.beVietnamPro(
+              context.getText(AppKeys.viewAllUpper),
+              style: GoogleFonts.andika(
                 color: _teacherInk,
                 fontSize: 14 * scale,
                 fontWeight: FontWeight.w800,
@@ -425,7 +425,7 @@ class _TeacherNoClassPanel extends StatelessWidget {
           SizedBox(height: 22 * scale),
           _CoralCreateButton(
             scale: scale,
-            label: 'Tạo Lớp Học Mới',
+            label: context.getText(AppKeys.teacherCreateNewClass),
             onTap: onCreate,
           ),
         ],
@@ -486,7 +486,7 @@ class _TeacherClassCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = classroom.name?.trim().isNotEmpty == true
         ? classroom.name!.trim()
-        : 'Lớp học';
+        : context.getText(AppKeys.teacherClassFallback);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -518,7 +518,7 @@ class _TeacherClassCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.andika(
                     color: Colors.black,
                     fontSize: 16 * scale,
                     fontWeight: FontWeight.w800,
@@ -528,10 +528,13 @@ class _TeacherClassCard extends StatelessWidget {
                 const Spacer(),
                 Divider(color: const Color(0x1AC4C6D2), height: 8 * scale),
                 Text(
-                  '${classroom.displayMemberCount} Học sinh',
+                  context.formatText(
+                    AppKeys.teacherStudentCount,
+                    {'count': classroom.displayMemberCount},
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.beVietnamPro(
+                  style: GoogleFonts.andika(
                     color: _teacherBlue.withValues(alpha: 0.60),
                     fontSize: 11 * scale,
                     fontWeight: FontWeight.w800,
@@ -548,9 +551,9 @@ class _TeacherClassCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5 * scale),
                   ),
                   child: Text(
-                    'Vào Lớp',
+                    context.getText(AppKeys.teacherEnterClass),
                     maxLines: 1,
-                    style: GoogleFonts.beVietnamPro(
+                    style: GoogleFonts.andika(
                       color: Colors.white,
                       fontSize: 11 * scale,
                       fontWeight: FontWeight.w800,

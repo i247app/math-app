@@ -25,7 +25,7 @@ class _TeacherErrorPanel extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: GoogleFonts.beVietnamPro(
+            style: GoogleFonts.andika(
               color: _teacherMuted,
               fontSize: 13 * scale,
               fontWeight: FontWeight.w600,
@@ -34,7 +34,7 @@ class _TeacherErrorPanel extends StatelessWidget {
           SizedBox(height: 12 * scale),
           TextButton(
             onPressed: onRetry,
-            child: const Text('Thử lại'),
+            child: Text(context.getText(AppKeys.retry)),
           ),
         ],
       ),
@@ -102,7 +102,7 @@ class _CoralCreateButton extends StatelessWidget {
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.andika(
                       color: Colors.white,
                       fontSize: 20 * scale,
                       fontWeight: FontWeight.w900,
@@ -237,7 +237,7 @@ class _TeacherScreenAppBar extends StatelessWidget {
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.fredoka(
+            style: GoogleFonts.andika(
               color: _teacherTeal,
               fontSize: 25 * scale,
               fontWeight: FontWeight.w700,
@@ -332,8 +332,8 @@ class _ClassAvatarPicker extends StatelessWidget {
         ),
         SizedBox(height: 12 * scale),
         Text(
-          'Ảnh đại diện lớp học',
-          style: GoogleFonts.beVietnamPro(
+          context.getText(AppKeys.teacherClassImageLabel),
+          style: GoogleFonts.andika(
             color: const Color(0xFF444650),
             fontSize: 16 * scale,
             fontWeight: FontWeight.w400,
@@ -368,7 +368,7 @@ class _TeacherTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
-        style: GoogleFonts.beVietnamPro(
+        style: GoogleFonts.andika(
           color: _teacherInk,
           fontSize: 16 * scale,
           fontWeight: FontWeight.w400,
@@ -415,10 +415,16 @@ class _TeacherDropdownField<T> extends StatelessWidget {
           onTap: canSelect ? () => _openSelector(context) : null,
           borderRadius:
               BorderRadius.circular(outlined ? 16 * scale : 12 * scale),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
           child: InputDecorator(
             isEmpty: selectedLabel == null,
             decoration: _teacherInputDecoration(
-              hintText: items.isEmpty ? 'Chưa có lựa chọn' : null,
+              hintText: items.isEmpty
+                  ? context.getText(AppKeys.teacherNoOptions)
+                  : null,
               scale: scale,
               outlined: outlined,
             ),
@@ -426,10 +432,10 @@ class _TeacherDropdownField<T> extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    selectedLabel ?? 'Chưa có lựa chọn',
+                    selectedLabel ?? context.getText(AppKeys.teacherNoOptions),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.beVietnamPro(
+                    style: GoogleFonts.andika(
                       color: selectedLabel == null
                           ? const Color(0x806B7280)
                           : _teacherInk,
@@ -499,7 +505,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                 ),
                 Text(
                   label,
-                  style: GoogleFonts.fredoka(
+                  style: GoogleFonts.andika(
                     color: _teacherTeal,
                     fontSize: 22 * scale,
                     fontWeight: FontWeight.w700,
@@ -520,27 +526,31 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final item = items[index];
                       final isSelected = identical(item, value);
-                      return ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          displayText(item),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.beVietnamPro(
-                            color: _teacherInk,
-                            fontSize: 16 * scale,
-                            fontWeight:
-                                isSelected ? FontWeight.w800 : FontWeight.w500,
+                      return Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            displayText(item),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.andika(
+                              color: _teacherInk,
+                              fontSize: 16 * scale,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w500,
+                            ),
                           ),
+                          trailing: isSelected
+                              ? Icon(
+                                  Icons.check_circle_rounded,
+                                  color: _teacherTeal,
+                                  size: 22 * scale,
+                                )
+                              : null,
+                          onTap: () => Navigator.of(context).pop(item),
                         ),
-                        trailing: isSelected
-                            ? Icon(
-                                Icons.check_circle_rounded,
-                                color: _teacherTeal,
-                                size: 22 * scale,
-                              )
-                            : null,
-                        onTap: () => Navigator.of(context).pop(item),
                       );
                     },
                   ),
@@ -578,7 +588,7 @@ class _TeacherFieldShell extends StatelessWidget {
           padding: EdgeInsets.only(left: 4 * scale, bottom: 8 * scale),
           child: Text(
             label,
-            style: GoogleFonts.beVietnamPro(
+            style: GoogleFonts.andika(
               color: const Color(0xFF564148),
               fontSize: 14 * scale,
               fontWeight: FontWeight.w800,
@@ -603,7 +613,7 @@ InputDecoration _teacherInputDecoration({
       outlined ? const Color(0xFFDDE4E6) : const Color(0xFFC4C6D2);
   return InputDecoration(
     hintText: hintText,
-    hintStyle: GoogleFonts.beVietnamPro(
+    hintStyle: GoogleFonts.andika(
       color: const Color(0x806B7280),
       fontSize: 16 * scale,
       fontWeight: FontWeight.w400,
@@ -679,7 +689,7 @@ class _TeacherPrimaryButton extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.fredoka(
+                    style: GoogleFonts.andika(
                       color: Colors.white,
                       fontSize: 18 * scale,
                       fontWeight: FontWeight.w700,
@@ -779,7 +789,7 @@ String _displayTeacherName(StudentProfile? profile) {
   if (name != null && name.isNotEmpty) {
     return name;
   }
-  return 'Giáo viên';
+  return AppStrings.current(AppKeys.teacherFallback);
 }
 
 String? _gradeStableId(GradeModel? grade) {
@@ -857,16 +867,19 @@ SchoolModel? _matchSchool(List<SchoolModel> schools, String? id) {
   return null;
 }
 
-String _gradeLabel(GradeModel grade) =>
-    grade.label?.trim().isNotEmpty == true ? grade.label!.trim() : 'Lớp';
+String _gradeLabel(GradeModel grade) => grade.label?.trim().isNotEmpty == true
+    ? grade.label!.trim()
+    : AppStrings.current(AppKeys.grade);
 
 String _programLabel(ProgramModel program) =>
     program.label?.trim().isNotEmpty == true
         ? program.label!.trim()
-        : 'Chương trình';
+        : AppStrings.current(AppKeys.program);
 
 String _schoolLabel(SchoolModel school) =>
-    school.name?.trim().isNotEmpty == true ? school.name!.trim() : 'Trường học';
+    school.name?.trim().isNotEmpty == true
+        ? school.name!.trim()
+        : AppStrings.current(AppKeys.school);
 
 String _initials(String name) {
   final words = name

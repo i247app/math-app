@@ -489,7 +489,6 @@ class _HeaderBar extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: _muted.withValues(alpha: 0.6),
-                        fontFamily: 'Nunito',
                         fontSize: contentHeight * 0.10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.8,
@@ -503,7 +502,6 @@ class _HeaderBar extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: _teal,
-                        fontFamily: 'Nunito',
                         fontSize: contentHeight * 0.18,
                         fontWeight: FontWeight.w900,
                         height: 1,
@@ -686,7 +684,6 @@ class _TestHeroCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontFamily: 'Nunito',
                     fontSize: 34 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.05,
@@ -699,7 +696,6 @@ class _TestHeroCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.86),
-                    fontFamily: 'Nunito',
                     fontSize: 14 * scale,
                     fontWeight: FontWeight.w700,
                     height: 1.62,
@@ -877,7 +873,6 @@ class _EquationChip extends StatelessWidget {
           maxLines: 1,
           style: TextStyle(
             color: foreground,
-            fontFamily: 'Nunito',
             fontSize: 19 * scale,
             fontWeight: FontWeight.w900,
             height: 1,
@@ -990,7 +985,6 @@ class _HeroButtonState extends State<_HeroButton> {
                         maxLines: 1,
                         style: TextStyle(
                           color: Colors.white,
-                          fontFamily: 'Nunito',
                           fontSize: 15 * widget.scale,
                           fontWeight: FontWeight.w900,
                           height: 1,
@@ -1050,7 +1044,6 @@ class _AchievementsHeader extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: _deepInk,
-                  fontFamily: 'Nunito',
                   fontSize: 20 * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
@@ -1075,7 +1068,6 @@ class _AchievementsHeader extends StatelessWidget {
             context.getText(AppKeys.viewAllUpper),
             style: TextStyle(
               color: _teal,
-              fontFamily: 'Nunito',
               fontSize: 11 * scale,
               fontWeight: FontWeight.w900,
               height: 1,
@@ -1138,7 +1130,6 @@ class _AchievementCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _deepInk,
-                    fontFamily: 'Nunito',
                     fontSize: 16 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.12,
@@ -1152,7 +1143,6 @@ class _AchievementCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.grayText,
-                    fontFamily: 'Nunito',
                     fontSize: 13 * scale,
                     fontWeight: FontWeight.w700,
                     height: 1,
@@ -1372,7 +1362,6 @@ class _AnimatedNavItem extends StatelessWidget {
                         maxLines: 1,
                         style: TextStyle(
                           color: color,
-                          fontFamily: 'Fredoka',
                           fontSize: 10 * scale,
                           fontWeight: FontWeight.w900,
                           height: 1,
@@ -1470,7 +1459,6 @@ class _HeroMathGlyph extends StatelessWidget {
       'x²',
       style: TextStyle(
         color: Colors.white.withValues(alpha: 0.10),
-        fontFamily: 'Nunito',
         fontSize: 64 * scale,
         fontWeight: FontWeight.w900,
         height: 1,

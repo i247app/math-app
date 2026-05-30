@@ -6,6 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/extension/localization_extension.dart';
+import '../../../../core/localization/app_keys.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/network/classroom_models.dart';
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/network/profile_models.dart';

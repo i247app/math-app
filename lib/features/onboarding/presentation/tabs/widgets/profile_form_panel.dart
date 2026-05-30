@@ -4,6 +4,8 @@ class _AddProfilePanel extends StatelessWidget {
   const _AddProfilePanel({
     super.key,
     required this.nameController,
+    required this.idController,
+    required this.role,
     required this.avatarPath,
     required this.avatarUrl,
     required this.schools,
@@ -12,6 +14,7 @@ class _AddProfilePanel extends StatelessWidget {
     required this.selectedSchool,
     required this.selectedGrade,
     required this.selectedProgram,
+    required this.selectedIdType,
     required this.isLoadingOptions,
     required this.isPickingAvatar,
     required this.isSaving,
@@ -22,6 +25,7 @@ class _AddProfilePanel extends StatelessWidget {
     required this.onSchoolChanged,
     required this.onGradeChanged,
     required this.onProgramChanged,
+    required this.onIdTypeChanged,
     required this.onRetryOptions,
     required this.onCancel,
     required this.onSave,
@@ -29,6 +33,8 @@ class _AddProfilePanel extends StatelessWidget {
   });
 
   final TextEditingController nameController;
+  final TextEditingController idController;
+  final String role;
   final String? avatarPath;
   final String? avatarUrl;
   final List<SchoolModel> schools;
@@ -37,6 +43,7 @@ class _AddProfilePanel extends StatelessWidget {
   final SchoolModel? selectedSchool;
   final GradeModel? selectedGrade;
   final ProgramModel? selectedProgram;
+  final String? selectedIdType;
   final bool isLoadingOptions;
   final bool isPickingAvatar;
   final bool isSaving;
@@ -47,6 +54,7 @@ class _AddProfilePanel extends StatelessWidget {
   final ValueChanged<SchoolModel?> onSchoolChanged;
   final ValueChanged<GradeModel?> onGradeChanged;
   final ValueChanged<ProgramModel?> onProgramChanged;
+  final ValueChanged<String?> onIdTypeChanged;
   final VoidCallback onRetryOptions;
   final VoidCallback onCancel;
   final VoidCallback onSave;
@@ -55,23 +63,34 @@ class _AddProfilePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final error = errorMessage?.trim();
+    final isTeacherProfile = role == 'TEACHER';
+    final idTypeOptions =
+        isTeacherProfile ? _teacherIdTypeOptions : _studentIdTypeOptions;
+    final selectedIdTypeOption = _firstIdTypeOption(
+      idTypeOptions,
+      selectedIdType,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _AddProfileAvatar(
-          avatarPath: avatarPath,
-          avatarUrl: avatarUrl,
-          isPicking: isPickingAvatar,
-          scale: scale,
-          onTap: onPickAvatar,
-          onClear: onClearAvatar,
-        ),
-        SizedBox(height: 28 * scale),
+        if (!isTeacherProfile) ...[
+          _AddProfileAvatar(
+            avatarPath: avatarPath,
+            avatarUrl: avatarUrl,
+            isPicking: isPickingAvatar,
+            scale: scale,
+            onTap: onPickAvatar,
+            onClear: onClearAvatar,
+          ),
+          SizedBox(height: 28 * scale),
+        ],
         _AddProfileTextField(
           label: context.getText(AppKeys.fullName),
           controller: nameController,
-          hintText: context.getText(AppKeys.studentNameHint),
+          hintText: isTeacherProfile
+              ? context.getText(AppKeys.profileTeacherNameHint)
+              : context.getText(AppKeys.studentNameHint),
           scale: scale,
         ),
         SizedBox(height: 18 * scale),
@@ -98,27 +117,50 @@ class _AddProfilePanel extends StatelessWidget {
             scale: scale,
           ),
           SizedBox(height: 18 * scale),
-          _AddProfileDropdown<ProgramModel>(
-            label: context.getText(AppKeys.learningProgram),
-            hintText: context.getText(AppKeys.chooseProgram),
-            value: selectedProgram,
-            items: programs,
-            itemLabel: (program) => program.label?.trim().isNotEmpty == true
-                ? program.label!.trim()
-                : context.getText(AppKeys.program),
-            onChanged: onProgramChanged,
+          if (!isTeacherProfile) ...[
+            _AddProfileDropdown<ProgramModel>(
+              label: context.getText(AppKeys.learningProgram),
+              hintText: context.getText(AppKeys.chooseProgram),
+              value: selectedProgram,
+              items: programs,
+              itemLabel: (program) => program.label?.trim().isNotEmpty == true
+                  ? program.label!.trim()
+                  : context.getText(AppKeys.program),
+              onChanged: onProgramChanged,
+              scale: scale,
+            ),
+            SizedBox(height: 18 * scale),
+            _AddProfileDropdown<GradeModel>(
+              label: context.getText(AppKeys.grade),
+              hintText: context.getText(AppKeys.chooseGrade),
+              value: selectedGrade,
+              items: grades,
+              itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
+                  ? grade.label!.trim()
+                  : context.getText(AppKeys.grade),
+              onChanged: onGradeChanged,
+              scale: scale,
+            ),
+            SizedBox(height: 18 * scale),
+          ],
+          _AddProfileDropdown<_ProfileIdTypeOption>(
+            label: context.getText(AppKeys.profileIdTypeLabel),
+            hintText: context.getText(AppKeys.profileIdTypeHint),
+            value: selectedIdTypeOption,
+            items: idTypeOptions,
+            itemLabel: (option) => context.getText(option.label),
+            onChanged: (option) => onIdTypeChanged(option?.value),
+            allowEmpty: true,
+            emptyLabel: context.getText(AppKeys.profileIdTypeNone),
             scale: scale,
           ),
           SizedBox(height: 18 * scale),
-          _AddProfileDropdown<GradeModel>(
-            label: context.getText(AppKeys.grade),
-            hintText: context.getText(AppKeys.chooseGrade),
-            value: selectedGrade,
-            items: grades,
-            itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
-                ? grade.label!.trim()
-                : context.getText(AppKeys.grade),
-            onChanged: onGradeChanged,
+          _AddProfileTextField(
+            label: context.getText(AppKeys.profileIdValueLabel),
+            controller: idController,
+            hintText: isTeacherProfile
+                ? context.getText(AppKeys.profileTeacherIdHint)
+                : context.getText(AppKeys.profileStudentIdHint),
             scale: scale,
           ),
         ],
@@ -168,6 +210,23 @@ class _AddProfilePanel extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  static _ProfileIdTypeOption? _firstIdTypeOption(
+    List<_ProfileIdTypeOption> options,
+    String? value,
+  ) {
+    final normalized = value?.trim().toUpperCase();
+    if (normalized == null || normalized.isEmpty) {
+      return null;
+    }
+
+    for (final option in options) {
+      if (option.value == normalized) {
+        return option;
+      }
+    }
+    return null;
   }
 }
 
@@ -374,6 +433,8 @@ class _AddProfileDropdown<T> extends StatelessWidget {
     required this.itemLabel,
     required this.onChanged,
     required this.scale,
+    this.allowEmpty = false,
+    this.emptyLabel,
   });
 
   final String label;
@@ -383,51 +444,184 @@ class _AddProfileDropdown<T> extends StatelessWidget {
   final String Function(T item) itemLabel;
   final ValueChanged<T?> onChanged;
   final double scale;
+  final bool allowEmpty;
+  final String? emptyLabel;
 
   @override
   Widget build(BuildContext context) {
+    final selectedValue = items.contains(value) ? value : null;
+    final selectedLabel =
+        selectedValue == null ? null : itemLabel(selectedValue);
+
     return _AddProfileFieldShell(
       label: label,
       scale: scale,
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<T>(
-          value: items.contains(value) ? value : null,
-          isExpanded: true,
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: _teal,
-            size: 24 * scale,
-          ),
-          hint: Text(
-            hintText,
-            style: GoogleFonts.andika(
-              color: const Color(0xFFA8B1B2),
-              fontSize: 15 * scale,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0,
-            ),
-          ),
-          items: items.map((item) {
-            return DropdownMenuItem<T>(
-              value: item,
-              child: Text(
-                itemLabel(item),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _openBottomSheet(context, selectedValue),
+          borderRadius: BorderRadius.circular(14 * scale),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  selectedLabel ?? hintText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.andika(
+                    color: selectedLabel == null
+                        ? const Color(0xFFA8B1B2)
+                        : _deepInk,
+                    fontSize: 15 * scale,
+                    fontWeight: selectedLabel == null
+                        ? FontWeight.w800
+                        : FontWeight.w900,
+                    letterSpacing: 0,
+                  ),
+                ),
               ),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          style: GoogleFonts.andika(
-            color: _deepInk,
-            fontSize: 15 * scale,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 0,
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: _teal,
+                size: 24 * scale,
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+
+  Future<void> _openBottomSheet(BuildContext context, T? selectedValue) async {
+    final result = await showModalBottomSheet<_AddProfileSelectResult<T>>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        final bottomInset = MediaQuery.paddingOf(context).bottom;
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            20 * scale,
+            10 * scale,
+            20 * scale,
+            bottomInset + 18 * scale,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(28 * scale),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.10),
+                blurRadius: 24 * scale,
+                offset: Offset(0, -8 * scale),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 46 * scale,
+                    height: 5 * scale,
+                    margin: EdgeInsets.only(bottom: 14 * scale),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE2E9EC),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                Text(
+                  label,
+                  style: GoogleFonts.andika(
+                    color: _teal,
+                    fontSize: 22 * scale,
+                    fontWeight: FontWeight.w900,
+                    height: 1.15,
+                  ),
+                ),
+                SizedBox(height: 10 * scale),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: 360 * scale),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: items.length + (allowEmpty ? 1 : 0),
+                    separatorBuilder: (_, __) => const Divider(
+                      height: 1,
+                      color: Color(0xFFEFF4F5),
+                    ),
+                    itemBuilder: (context, index) {
+                      final isEmptyOption = allowEmpty && index == 0;
+                      final item = isEmptyOption
+                          ? null
+                          : items[index - (allowEmpty ? 1 : 0)];
+                      final optionLabel = isEmptyOption
+                          ? emptyLabel ??
+                              context.getText(AppKeys.profileIdTypeNone)
+                          : itemLabel(item as T);
+                      final isSelected = isEmptyOption
+                          ? selectedValue == null
+                          : identical(item, selectedValue) ||
+                              item == selectedValue;
+
+                      return Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            optionLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.andika(
+                              color: _deepInk,
+                              fontSize: 16 * scale,
+                              fontWeight: isSelected
+                                  ? FontWeight.w900
+                                  : FontWeight.w700,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                          trailing: isSelected
+                              ? Icon(
+                                  Icons.check_circle_rounded,
+                                  color: _teal,
+                                  size: 22 * scale,
+                                )
+                              : null,
+                          onTap: () => Navigator.of(context).pop(
+                            _AddProfileSelectResult<T>(item),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (result != null) {
+      onChanged(result.value);
+    }
+  }
+}
+
+class _AddProfileSelectResult<T> {
+  const _AddProfileSelectResult(this.value);
+
+  final T? value;
 }
 
 class _AddProfileFieldShell extends StatelessWidget {

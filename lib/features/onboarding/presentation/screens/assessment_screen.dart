@@ -281,7 +281,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             context.getText(AppKeys.unansweredSubmitTitle),
             style: const TextStyle(
               color: _assessmentInk,
-              fontFamily: 'Nunito',
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
@@ -290,7 +289,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             context.getText(AppKeys.unansweredSubmitMessage),
             style: const TextStyle(
               color: _assessmentMuted,
-              fontFamily: 'Nunito',
               fontWeight: FontWeight.w700,
               letterSpacing: 0,
             ),
@@ -303,7 +301,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                 context.getText(AppKeys.stayUpper),
                 style: const TextStyle(
                   color: _assessmentRust,
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.8,
                 ),
@@ -318,7 +315,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
               child: Text(
                 context.getText(AppKeys.submitUpper),
                 style: const TextStyle(
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.8,
                 ),
@@ -526,7 +522,6 @@ class _AssessmentHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _assessmentTeal,
-                    fontFamily: 'Nunito',
                     fontSize: 20 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -607,7 +602,6 @@ class _ProgressSection extends StatelessWidget {
           }),
           style: TextStyle(
             color: _assessmentMuted,
-            fontFamily: 'Nunito',
             fontSize: 16 * scale,
             fontWeight: FontWeight.w900,
             height: 1.5,
@@ -703,7 +697,6 @@ class _AssessmentErrorState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _assessmentMuted,
-                fontFamily: 'Nunito',
                 fontSize: 15 * scale,
                 fontWeight: FontWeight.w800,
                 height: 1.35,
@@ -795,7 +788,6 @@ class _GeneratingQuestionLoaderState extends State<_GeneratingQuestionLoader>
                       letters[index],
                       style: TextStyle(
                         color: _assessmentTeal,
-                        fontFamily: 'Nunito',
                         fontSize: 40 * widget.scale,
                         fontWeight: FontWeight.w900,
                         height: 1,
@@ -814,7 +806,6 @@ class _GeneratingQuestionLoaderState extends State<_GeneratingQuestionLoader>
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: _assessmentMuted,
-                      fontFamily: 'Nunito',
                       fontSize: 16 * widget.scale,
                       fontWeight: FontWeight.w800,
                       height: 1.35,
@@ -858,7 +849,6 @@ class _QuestionCard extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: _assessmentInk,
-            fontFamily: 'Nunito',
             fontSize: 72 * scale,
             fontWeight: FontWeight.w900,
             height: 1,
@@ -967,7 +957,6 @@ class _AnswerButton extends StatelessWidget {
                 answer.content,
                 style: TextStyle(
                   color: textColor,
-                  fontFamily: 'Nunito',
                   fontSize: 30 * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
@@ -1130,7 +1119,6 @@ class _BottomActionButton extends StatelessWidget {
                 maxLines: 1,
                 style: TextStyle(
                   color: effectiveForeground,
-                  fontFamily: 'Nunito',
                   fontSize: 12 * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,

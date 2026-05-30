@@ -180,7 +180,6 @@ class _ChapterHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _headerNavy,
-                    fontFamily: 'Nunito',
                     fontSize: 18 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -473,7 +472,6 @@ class _LessonNode extends StatelessWidget {
                   'GO!',
                   style: TextStyle(
                     color: _pathInk,
-                    fontFamily: 'Nunito',
                     fontSize: 12 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -510,7 +508,6 @@ class _LessonNode extends StatelessWidget {
                       maxLines: 1,
                       style: TextStyle(
                         color: foreground,
-                        fontFamily: 'Nunito',
                         fontSize: 22 * scale,
                         fontWeight: FontWeight.w900,
                         height: 1,
@@ -526,7 +523,6 @@ class _LessonNode extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _locked ? _pathMuted : const Color(0xFF6B1FC8),
-                fontFamily: 'Nunito',
                 fontSize: 14 * scale,
                 fontWeight: FontWeight.w900,
                 height: 1.08,

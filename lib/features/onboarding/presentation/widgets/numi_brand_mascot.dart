@@ -77,7 +77,6 @@ class _OutlinedLogoText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strokeStyle = TextStyle(
-      fontFamily: 'Nunito',
       fontSize: fontSize,
       fontWeight: FontWeight.w900,
       height: 0.88,
@@ -90,7 +89,6 @@ class _OutlinedLogoText extends StatelessWidget {
     );
     final fillStyle = TextStyle(
       color: fill,
-      fontFamily: 'Nunito',
       fontSize: fontSize,
       fontWeight: FontWeight.w900,
       height: 0.88,

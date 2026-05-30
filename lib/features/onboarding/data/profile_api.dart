@@ -25,13 +25,16 @@ abstract class ProfileService {
     required String userId,
     required String schoolId,
     required String name,
-    required String gradeId,
-    required String programId,
+    String? gradeId,
+    String? programId,
     String? semesterId,
     bool isDefault = false,
     String role = 'STUDENT',
     String? avatarPath,
     String? dob,
+    String? idType,
+    String? studentId,
+    String? teacherId,
   });
 
   Future<StudentProfile?> updateProfile({
@@ -45,6 +48,9 @@ abstract class ProfileService {
     String? role,
     String? avatarPath,
     String? dob,
+    String? idType,
+    String? studentId,
+    String? teacherId,
   });
 
   Future<void> forceDeleteProfile({required String profileId});
@@ -100,13 +106,16 @@ class ProfileApi implements ProfileService {
     required String userId,
     required String schoolId,
     required String name,
-    required String gradeId,
-    required String programId,
+    String? gradeId,
+    String? programId,
     String? semesterId,
     bool isDefault = false,
     String role = 'STUDENT',
     String? avatarPath,
     String? dob,
+    String? idType,
+    String? studentId,
+    String? teacherId,
   }) async {
     try {
       final response = await _networkApi.createProfile(
@@ -120,6 +129,9 @@ class ProfileApi implements ProfileService {
           isDefault: isDefault,
           role: _normalizedRole(role),
           dob: dob,
+          idType: _emptyToNull(idType)?.toUpperCase(),
+          studentId: _emptyToNull(studentId),
+          teacherId: _emptyToNull(teacherId),
         ),
         avatarPath: avatarPath,
       );
@@ -141,6 +153,9 @@ class ProfileApi implements ProfileService {
     String? role,
     String? avatarPath,
     String? dob,
+    String? idType,
+    String? studentId,
+    String? teacherId,
   }) async {
     try {
       final response = await _networkApi.updateProfile(
@@ -154,6 +169,9 @@ class ProfileApi implements ProfileService {
           isDefault: isDefault,
           role: role == null ? null : _normalizedRole(role),
           dob: dob,
+          idType: _emptyToNull(idType)?.toUpperCase(),
+          studentId: _emptyToNull(studentId),
+          teacherId: _emptyToNull(teacherId),
         ),
         avatarPath: avatarPath,
       );
@@ -180,5 +198,10 @@ class ProfileApi implements ProfileService {
       'TEACHER' || 'PARENT' || 'STUDENT' => role,
       _ => 'STUDENT',
     };
+  }
+
+  static String? _emptyToNull(String? value) {
+    final trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
   }
 }

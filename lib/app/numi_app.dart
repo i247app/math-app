@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../core/extension/localization_extension.dart';
 import '../core/localization/app_keys.dart';
@@ -72,6 +73,7 @@ class _NumiAppState extends State<NumiApp> {
               theme: ThemeData(
                 colorScheme: ColorScheme.fromSeed(seedColor: AppColors.teal),
                 scaffoldBackgroundColor: AppColors.mintMist,
+                textTheme: GoogleFonts.andikaTextTheme(),
                 useMaterial3: true,
               ),
               home: snapshot.connectionState == ConnectionState.done

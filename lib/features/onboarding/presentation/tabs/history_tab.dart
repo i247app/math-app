@@ -280,7 +280,6 @@ class _HistorySearchField extends StatelessWidget {
         textInputAction: TextInputAction.search,
         style: TextStyle(
           color: _deepInk,
-          fontFamily: 'Fredoka',
           fontSize: 15 * scale,
           fontWeight: FontWeight.w800,
           letterSpacing: 0,
@@ -289,7 +288,6 @@ class _HistorySearchField extends StatelessWidget {
           hintText: context.getText(AppKeys.searchHint),
           hintStyle: TextStyle(
             color: const Color(0xFFD8C5CC),
-            fontFamily: 'Fredoka',
             fontSize: 16 * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
@@ -401,7 +399,6 @@ class _HistoryTypeTabButton extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: selected ? Colors.white : _muted,
-              fontFamily: 'Fredoka',
               fontSize: 13 * scale,
               fontWeight: FontWeight.w500,
               height: 1,
@@ -561,7 +558,6 @@ class _HistoryQuizCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: _deepInk,
-                        fontFamily: 'Fredoka',
                         fontSize: 14 * scale,
                         fontWeight: FontWeight.w900,
                         height: 1.28,
@@ -638,7 +634,6 @@ class _HistoryMetaItem extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: _muted,
-            fontFamily: 'Fredoka',
             fontSize: 10 * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
@@ -687,7 +682,6 @@ class _HistoryScoreBadge extends StatelessWidget {
                   maxLines: 1,
                   style: TextStyle(
                     color: colors.foreground,
-                    fontFamily: 'Fredoka',
                     fontSize: 13 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -705,7 +699,6 @@ class _HistoryScoreBadge extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: colors.foreground,
-              fontFamily: 'Fredoka',
               fontSize: 10 * scale,
               fontWeight: FontWeight.w900,
               height: 1.05,
@@ -734,7 +727,6 @@ class _HistoryIncompleteBadge extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           color: _orange,
-          fontFamily: 'Fredoka',
           fontSize: 10 * scale,
           fontWeight: FontWeight.w900,
           height: 1.1,
@@ -808,7 +800,6 @@ class _HistoryMessageState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _deepInk,
-              fontFamily: 'Fredoka',
               fontSize: 18 * scale,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
@@ -820,7 +811,6 @@ class _HistoryMessageState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _muted,
-              fontFamily: 'Fredoka',
               fontSize: 13 * scale,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -835,7 +825,6 @@ class _HistoryMessageState extends StatelessWidget {
                 actionLabel!,
                 style: TextStyle(
                   color: _teal,
-                  fontFamily: 'Fredoka',
                   fontSize: 13 * scale,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0,

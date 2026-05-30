@@ -37,6 +37,24 @@ const _teal = Color(0xFF339395);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
+const _idTypeMoet = 'MOET';
+const _idTypePublicId = 'PUBLIC_ID';
+
+class _ProfileIdTypeOption {
+  const _ProfileIdTypeOption(this.value, this.label);
+
+  final String value;
+  final String label;
+}
+
+const _studentIdTypeOptions = <_ProfileIdTypeOption>[
+  _ProfileIdTypeOption(_idTypeMoet, AppKeys.idTypeMoetLabel),
+];
+
+const _teacherIdTypeOptions = <_ProfileIdTypeOption>[
+  _ProfileIdTypeOption(_idTypeMoet, AppKeys.idTypeTeacherMoetLabel),
+  _ProfileIdTypeOption(_idTypePublicId, AppKeys.idTypePublicIdLabel),
+];
 
 enum SettingPageView { settings, account, profile, addProfile }
 
@@ -103,6 +121,7 @@ class _SettingTabState extends State<SettingTab> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _profileNameController = TextEditingController();
+  final TextEditingController _profileIdController = TextEditingController();
 
   late SettingPageView _view;
   bool _isForwardTransition = true;
@@ -136,6 +155,7 @@ class _SettingTabState extends State<SettingTab> {
   GradeModel? _selectedGrade;
   ProgramModel? _selectedProgram;
   SemesterModel? _selectedSemester;
+  String? _selectedProfileIdType;
 
   @override
   void initState() {
@@ -148,6 +168,7 @@ class _SettingTabState extends State<SettingTab> {
     if (initialEditingProfile != null) {
       _editingProfile = initialEditingProfile;
       _profileNameController.text = initialEditingProfile.name?.trim() ?? '';
+      _applyProfileIdFields(initialEditingProfile);
     }
     if (_view == SettingPageView.profile) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -224,6 +245,7 @@ class _SettingTabState extends State<SettingTab> {
     _phoneController.dispose();
     _emailController.dispose();
     _profileNameController.dispose();
+    _profileIdController.dispose();
     super.dispose();
   }
 
@@ -347,6 +369,7 @@ class _SettingTabState extends State<SettingTab> {
     _profileNameController.text = profile.name?.trim() ?? '';
     _editingProfile = profile;
     _selectOptionsForProfile(profile);
+    _applyProfileIdFields(profile);
     setState(() {
       _view = SettingPageView.addProfile;
       _isForwardTransition = true;
@@ -710,6 +733,13 @@ class _SettingTabState extends State<SettingTab> {
     final program = _selectedProgram;
     final semester = _selectedSemester;
     final editingProfile = _editingProfile;
+    final formRole = _profileFormRole(editingProfile);
+    final isTeacherProfile = formRole == 'TEACHER';
+    final normalizedIdType = _normalizedProfileIdType(
+      _selectedProfileIdType,
+      formRole,
+    );
+    final profileIdValue = _profileIdController.text.trim();
     final isCreatingFirstProfile = editingProfile == null && _profiles.isEmpty;
 
     if (userId == null || userId.isEmpty) {
@@ -731,7 +761,8 @@ class _SettingTabState extends State<SettingTab> {
       );
       return;
     }
-    if (editingProfile == null &&
+    if (!isTeacherProfile &&
+        editingProfile == null &&
         (grade?.gradeId == null ||
             program?.programId == null ||
             semester?.semesterId == null)) {
@@ -754,12 +785,15 @@ class _SettingTabState extends State<SettingTab> {
           userId: userId,
           schoolId: school.schoolId!.trim(),
           name: name,
-          gradeId: grade!.gradeId!,
-          programId: program!.programId!,
-          semesterId: semester!.semesterId!,
+          gradeId: isTeacherProfile ? null : grade!.gradeId!,
+          programId: isTeacherProfile ? null : program!.programId!,
+          semesterId: isTeacherProfile ? null : semester!.semesterId!,
           isDefault: _profiles.isEmpty,
-          role: 'STUDENT',
-          avatarPath: _createAvatarPath,
+          role: formRole,
+          avatarPath: isTeacherProfile ? null : _createAvatarPath,
+          idType: normalizedIdType,
+          studentId: isTeacherProfile ? null : profileIdValue,
+          teacherId: isTeacherProfile ? profileIdValue : null,
         );
         if (isCreatingFirstProfile) {
           final profileId =
@@ -781,13 +815,16 @@ class _SettingTabState extends State<SettingTab> {
           profileId: profileId,
           schoolId: school.schoolId!.trim(),
           name: _emptyToNull(name),
-          gradeId: grade?.gradeId,
-          programId: program?.programId,
-          semesterId: semester?.semesterId,
+          gradeId: isTeacherProfile ? null : grade?.gradeId,
+          programId: isTeacherProfile ? null : program?.programId,
+          semesterId: isTeacherProfile ? null : semester?.semesterId,
           isDefault: editingProfile.isDefault,
-          role: _profileRole(editingProfile),
+          role: formRole,
           dob: _dateOnly(editingProfile.dob),
-          avatarPath: _createAvatarPath,
+          avatarPath: isTeacherProfile ? null : _createAvatarPath,
+          idType: normalizedIdType,
+          studentId: isTeacherProfile ? null : profileIdValue,
+          teacherId: isTeacherProfile ? profileIdValue : null,
         );
       }
       if (!mounted) {
@@ -958,9 +995,11 @@ class _SettingTabState extends State<SettingTab> {
 
   void _resetCreateProfileForm() {
     _profileNameController.clear();
+    _profileIdController.clear();
     _createAvatarPath = null;
     _editingProfile = null;
     _profileCreateError = null;
+    _selectedProfileIdType = null;
     _selectedSchool = _schoolOptions.isEmpty ? null : _schoolOptions.first;
     _selectedGrade = _gradeOptions.isEmpty ? null : _gradeOptions.first;
     _selectedProgram = _programOptions.isEmpty ? null : _programOptions.first;
@@ -985,6 +1024,7 @@ class _SettingTabState extends State<SettingTab> {
       _semesterOptions,
       (semester) => semester.semesterId == profile.semesterId,
     );
+    _applyProfileIdFields(profile);
   }
 
   @override
@@ -1111,6 +1151,8 @@ class _SettingTabState extends State<SettingTab> {
                         SettingPageView.addProfile => _AddProfilePanel(
                             key: ValueKey(_viewKey(SettingPageView.addProfile)),
                             nameController: _profileNameController,
+                            idController: _profileIdController,
+                            role: _profileFormRole(_editingProfile),
                             avatarPath: _createAvatarPath,
                             avatarUrl: _editingProfile?.avatarUrl,
                             schools: _schoolOptions,
@@ -1119,6 +1161,7 @@ class _SettingTabState extends State<SettingTab> {
                             selectedSchool: _selectedSchool,
                             selectedGrade: _selectedGrade,
                             selectedProgram: _selectedProgram,
+                            selectedIdType: _selectedProfileIdType,
                             isLoadingOptions: _isLoadingProfileOptions,
                             isPickingAvatar: _isPickingCreateAvatar,
                             isSaving: _isSavingProfile,
@@ -1135,6 +1178,9 @@ class _SettingTabState extends State<SettingTab> {
                             },
                             onProgramChanged: (program) {
                               setState(() => _selectedProgram = program);
+                            },
+                            onIdTypeChanged: (idType) {
+                              setState(() => _selectedProfileIdType = idType);
                             },
                             onRetryOptions: _loadProfileOptions,
                             onCancel: _cancelAddProfile,
@@ -1258,6 +1304,37 @@ class _SettingTabState extends State<SettingTab> {
       'TEACHER' || 'PARENT' || 'STUDENT' => role!,
       _ => 'STUDENT',
     };
+  }
+
+  String _profileFormRole(StudentProfile? editingProfile) {
+    if (editingProfile != null) {
+      return _profileRole(editingProfile);
+    }
+
+    final userRole = widget.user?.role?.trim().toUpperCase();
+    return userRole == 'TEACHER' ? 'TEACHER' : 'STUDENT';
+  }
+
+  void _applyProfileIdFields(StudentProfile profile) {
+    final role = _profileRole(profile);
+    final idType = _normalizedProfileIdType(profile.idType, role);
+    _selectedProfileIdType = idType;
+    _profileIdController.text = role == 'TEACHER'
+        ? profile.teacherId?.trim() ?? ''
+        : profile.studentId?.trim() ?? '';
+  }
+
+  static String? _normalizedProfileIdType(String? value, String role) {
+    final normalized = value?.trim().toUpperCase();
+    if (normalized == null || normalized.isEmpty) {
+      return null;
+    }
+
+    final allowedOptions =
+        role == 'TEACHER' ? _teacherIdTypeOptions : _studentIdTypeOptions;
+    final isAllowed =
+        allowedOptions.any((option) => option.value == normalized);
+    return isAllowed ? normalized : null;
   }
 
   String? get _activeProfileId {

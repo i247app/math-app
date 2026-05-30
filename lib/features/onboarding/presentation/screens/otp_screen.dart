@@ -257,7 +257,7 @@ class _OtpScreenState extends State<OtpScreen>
               Center(
                 child: Text(
                   'NUMINUMI',
-                  style: GoogleFonts.fredoka(
+                  style: GoogleFonts.andika(
                     color: const Color(0xFF339395), // Teal from image
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
@@ -416,7 +416,7 @@ class OtpCard extends StatelessWidget {
                         AppKeys.resendOtpAfter,
                         {'seconds': resendCountdown},
                       ),
-                style: GoogleFonts.fredoka(
+                style: GoogleFonts.andika(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: const Color(0xFF339395), // Teal
@@ -509,7 +509,7 @@ class OtpDigitBox extends StatelessWidget {
                 extentOffset: controller.text.length,
               );
             },
-            style: GoogleFonts.fredoka(
+            style: GoogleFonts.andika(
               color: AppColors.ink,
               fontSize: 36,
               fontWeight: FontWeight.w600,
@@ -567,7 +567,7 @@ class _TealActionButton extends StatelessWidget {
                   child: Text(
                     cleanLabel.toUpperCase(),
                     maxLines: 1,
-                    style: GoogleFonts.fredoka(
+                    style: GoogleFonts.andika(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0,

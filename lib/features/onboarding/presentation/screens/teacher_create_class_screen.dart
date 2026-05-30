@@ -72,7 +72,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     if (userId == null || userId.isEmpty) {
       setState(() {
         _isLoadingOptions = false;
-        _optionsError = 'Thiếu thông tin tài khoản.';
+        _optionsError = context.readText(AppKeys.missingAccount);
       });
       return;
     }
@@ -111,7 +111,11 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _optionsError = 'Tải lựa chọn tạo lớp thất bại.');
+      setState(
+        () => _optionsError = context.readText(
+          AppKeys.teacherCreateOptionsFailed,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoadingOptions = false);
@@ -127,7 +131,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       }
       setState(() => _avatarPath = avatarPath);
     } catch (_) {
-      _showSnack('Không thể chọn ảnh lúc này.');
+      _showSnack(context.readText(AppKeys.imagePickFailed));
     }
   }
 
@@ -141,14 +145,14 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     final description = _descriptionController.text.trim();
 
     if (profileId == null || profileId.isEmpty) {
-      _showSnack('Hồ sơ giáo viên thiếu profile_id.');
+      _showSnack(context.readText(AppKeys.teacherMissingProfileId));
       return;
     }
     if (name.isEmpty ||
         gradeId == null ||
         programId == null ||
         schoolId == null) {
-      _showSnack('Vui lòng nhập đủ thông tin lớp học.');
+      _showSnack(context.readText(AppKeys.teacherClassMissingInfo));
       return;
     }
 
@@ -193,7 +197,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
             return Column(
               children: [
                 _TeacherScreenAppBar(
-                  title: 'Tạo Lớp',
+                  title: context.getText(AppKeys.teacherCreateClassTitle),
                   scale: scale,
                   onBack: () => Navigator.of(context).maybePop(),
                 ),
@@ -228,7 +232,8 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                                   ),
                                   SizedBox(height: 20 * scale),
                                   _TeacherDropdownField<GradeModel>(
-                                    label: 'Khối lớp',
+                                    label: context
+                                        .getText(AppKeys.teacherGradeLevel),
                                     value: _selectedGrade,
                                     items: _grades,
                                     displayText: _gradeLabel,
@@ -238,14 +243,18 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                                   ),
                                   SizedBox(height: 14 * scale),
                                   _TeacherTextField(
-                                    label: 'Tên lớp học',
-                                    hintText: 'Ví dụ: 1A2, 2A3,...',
+                                    label: context
+                                        .getText(AppKeys.teacherClassName),
+                                    hintText: context.getText(
+                                      AppKeys.teacherClassNameHint,
+                                    ),
                                     controller: _nameController,
                                     scale: scale,
                                   ),
                                   SizedBox(height: 14 * scale),
                                   _TeacherDropdownField<ProgramModel>(
-                                    label: 'Chương trình',
+                                    label: context
+                                        .getText(AppKeys.learningProgram),
                                     value: _selectedProgram,
                                     items: _programs,
                                     displayText: _programLabel,
@@ -255,7 +264,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                                   ),
                                   SizedBox(height: 14 * scale),
                                   _TeacherDropdownField<SchoolModel>(
-                                    label: 'Trường Học',
+                                    label: context.getText(AppKeys.school),
                                     value: _selectedSchool,
                                     items: _schools,
                                     displayText: _schoolLabel,
@@ -266,8 +275,12 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                                   ),
                                   SizedBox(height: 14 * scale),
                                   _TeacherTextField(
-                                    label: 'Mô tả lớp học (không bắt buộc)',
-                                    hintText: 'Giới thiệu mục tiêu của lớp...',
+                                    label: context.getText(
+                                      AppKeys.teacherClassDescription,
+                                    ),
+                                    hintText: context.getText(
+                                      AppKeys.teacherClassDescriptionHint,
+                                    ),
                                     controller: _descriptionController,
                                     scale: scale,
                                     maxLines: 4,
@@ -275,8 +288,13 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                                   SizedBox(height: 28 * scale),
                                   Center(
                                     child: _TeacherPrimaryButton(
-                                      label:
-                                          _isSubmitting ? 'Đang tạo...' : 'Tạo',
+                                      label: _isSubmitting
+                                          ? context.getText(
+                                              AppKeys.teacherCreating,
+                                            )
+                                          : context.getText(
+                                              AppKeys.teacherCreate,
+                                            ),
                                       icon: Icons.arrow_forward_rounded,
                                       width: 230 * scale,
                                       height: 56 * scale,

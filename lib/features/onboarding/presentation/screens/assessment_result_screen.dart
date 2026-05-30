@@ -624,7 +624,7 @@ class _ReviewText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = '"$reviewText"';
-    const highlight = 'phép cộng';
+    final highlight = context.getText(AppKeys.defaultAiReviewHighlight);
     final highlightIndex = text.toLowerCase().indexOf(highlight);
     final bodyStyle = GoogleFonts.andika(
       color: _resultMuted,

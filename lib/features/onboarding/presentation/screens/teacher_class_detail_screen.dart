@@ -76,7 +76,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
             return Column(
               children: [
                 _TeacherScreenAppBar(
-                  title: 'Lớp Học',
+                  title: context.getText(AppKeys.teacherClassDetailTitle),
                   scale: scale,
                   onBack: () => Navigator.of(context).maybePop(),
                 ),
@@ -150,10 +150,14 @@ class _ClassDetailInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = _nonEmpty(classroom?.name) ?? 'Lớp học';
-    final grade = _detailLabel('Lớp', classroom?.gradeId);
-    final program = _nonEmpty(classroom?.programId) ?? 'Chương trình';
-    final description = _nonEmpty(classroom?.description) ?? 'Thông tin lớp';
+    final title = _nonEmpty(classroom?.name) ??
+        context.getText(AppKeys.teacherClassFallback);
+    final grade =
+        _detailLabel(context.getText(AppKeys.grade), classroom?.gradeId);
+    final program = _nonEmpty(classroom?.programId) ??
+        context.getText(AppKeys.teacherProgramFallback);
+    final description = _nonEmpty(classroom?.description) ??
+        context.getText(AppKeys.teacherDescriptionFallback);
     final code = _classCode(classroom);
     final joinLink = 'numinumi.vn/join/$code';
 
@@ -213,8 +217,7 @@ class _ClassDetailInfoCard extends StatelessWidget {
                                   title,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: 'Nunito',
+                                  style: GoogleFonts.andika(
                                     color: _teacherInk,
                                     fontSize: 20 * scale,
                                     fontWeight: FontWeight.w700,
@@ -226,7 +229,8 @@ class _ClassDetailInfoCard extends StatelessWidget {
                                 onTap: () => _copyClassroomInfo(
                                   context,
                                   joinLink,
-                                  'Đã sao chép liên kết lớp học.',
+                                  context
+                                      .getText(AppKeys.teacherCopiedClassLink),
                                 ),
                                 borderRadius: BorderRadius.circular(8 * scale),
                                 child: Padding(
@@ -283,7 +287,7 @@ class _ClassDetailInfoCard extends StatelessWidget {
                         onCopy: () => _copyClassroomInfo(
                           context,
                           code,
-                          'Đã sao chép mã lớp.',
+                          context.getText(AppKeys.teacherCopiedClassCode),
                         ),
                       ),
                       const Spacer(),
@@ -311,8 +315,7 @@ class _ClassDetailInfoCard extends StatelessWidget {
                           joinLink,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontFamily: 'Nunito',
+                          style: GoogleFonts.andika(
                             color: const Color(0xFF1E3A5F),
                             fontSize: 14 * scale,
                             fontWeight: FontWeight.w400,
@@ -325,7 +328,7 @@ class _ClassDetailInfoCard extends StatelessWidget {
                         onTap: () => _copyClassroomInfo(
                           context,
                           joinLink,
-                          'Đã sao chép liên kết lớp học.',
+                          context.getText(AppKeys.teacherCopiedClassLink),
                         ),
                         borderRadius: BorderRadius.circular(8 * scale),
                         child: Padding(
@@ -375,8 +378,7 @@ class _ClassDetailMetaRow extends StatelessWidget {
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'Nunito',
+              style: GoogleFonts.andika(
                 color: const Color(0xFF001741),
                 fontSize: 14 * scale,
                 fontWeight: FontWeight.w400,
@@ -425,8 +427,7 @@ class _ClassCodeChip extends StatelessWidget {
               child: Text(
                 code,
                 maxLines: 1,
-                style: TextStyle(
-                  fontFamily: 'Nunito',
+                style: GoogleFonts.andika(
                   color: const Color(0xFF1E3A5F),
                   fontSize: 15 * scale,
                   fontWeight: FontWeight.w700,
@@ -483,11 +484,13 @@ class _StudentListCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Học sinh đã tham gia ($count)',
+                  context.formatText(
+                    AppKeys.teacherJoinedStudents,
+                    {'count': count},
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Nunito',
+                  style: GoogleFonts.andika(
                     color: _teacherInk,
                     fontSize: 15 * scale,
                     fontWeight: FontWeight.w700,
@@ -496,9 +499,8 @@ class _StudentListCard extends StatelessWidget {
                 ),
               ),
               Text(
-                'Xem tất cả',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
+                context.getText(AppKeys.viewAllUpper),
+                style: GoogleFonts.andika(
                   color: _teacherInk,
                   fontSize: 14 * scale,
                   fontWeight: FontWeight.w800,
@@ -518,9 +520,8 @@ class _StudentListCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 18 * scale),
               child: Text(
-                'Chưa có học sinh tham gia.',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
+                context.getText(AppKeys.teacherNoJoinedStudents),
+                style: GoogleFonts.andika(
                   color: _teacherMuted,
                   fontSize: 13 * scale,
                   fontWeight: FontWeight.w500,
@@ -556,7 +557,7 @@ class _StudentRow extends StatelessWidget {
     final colors = _studentAvatarColors(index);
     final name = student.name?.trim().isNotEmpty == true
         ? student.name!.trim()
-        : 'Học sinh';
+        : context.getText(AppKeys.teacherStudentFallback);
     return Container(
       padding: EdgeInsets.only(top: index == 0 ? 0 : 16 * scale),
       margin: EdgeInsets.only(top: index == 0 ? 0 : 16 * scale),
@@ -582,8 +583,7 @@ class _StudentRow extends StatelessWidget {
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Nunito',
+                  style: GoogleFonts.andika(
                     color: const Color(0xFF1E3A5F),
                     fontSize: 16 * scale,
                     fontWeight: FontWeight.w700,
@@ -591,11 +591,10 @@ class _StudentRow extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Vừa tham gia',
+                  context.getText(AppKeys.teacherJustJoined),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Nunito',
+                  style: GoogleFonts.andika(
                     color: _teacherMuted,
                     fontSize: 12 * scale,
                     fontWeight: FontWeight.w400,
@@ -645,8 +644,7 @@ class _InitialsAvatar extends StatelessWidget {
       ),
       child: Text(
         initials,
-        style: TextStyle(
-          fontFamily: 'Nunito',
+        style: GoogleFonts.andika(
           color: foreground,
           fontSize: 14 * scale,
           fontWeight: FontWeight.w700,
@@ -705,7 +703,7 @@ void _copyClassroomInfo(BuildContext context, String value, String message) {
       SnackBar(
         content: Text(
           message,
-          style: const TextStyle(fontFamily: 'Nunito'),
+          style: GoogleFonts.andika(),
         ),
         duration: const Duration(milliseconds: 1400),
       ),

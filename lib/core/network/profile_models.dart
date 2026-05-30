@@ -24,23 +24,29 @@ class CreateProfileRequest {
     required this.userId,
     required this.schoolId,
     required this.name,
-    required this.gradeId,
-    required this.programId,
+    this.gradeId,
+    this.programId,
     this.semesterId,
     this.isDefault = false,
     this.role = 'STUDENT',
     this.dob,
+    this.idType,
+    this.studentId,
+    this.teacherId,
   });
 
   final String userId;
   final String schoolId;
   final String name;
-  final String gradeId;
-  final String programId;
+  final String? gradeId;
+  final String? programId;
   final String? semesterId;
   final bool isDefault;
   final String role;
   final String? dob;
+  final String? idType;
+  final String? studentId;
+  final String? teacherId;
 
   factory CreateProfileRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateProfileRequestFromJson(json);
@@ -60,6 +66,9 @@ class UpdateProfileRequest {
     this.isDefault,
     this.role,
     this.dob,
+    this.idType,
+    this.studentId,
+    this.teacherId,
   });
 
   final String profileId;
@@ -71,6 +80,9 @@ class UpdateProfileRequest {
   final bool? isDefault;
   final String? role;
   final String? dob;
+  final String? idType;
+  final String? studentId;
+  final String? teacherId;
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateProfileRequestFromJson(json);
@@ -213,6 +225,9 @@ class StudentProfile {
     this.semester,
     this.isDefault = false,
     this.role,
+    this.idType,
+    this.studentId,
+    this.teacherId,
     this.createDt,
     this.modifyDt,
   });
@@ -240,6 +255,9 @@ class StudentProfile {
   @JsonKey(fromJson: _boolFromJson)
   final bool isDefault;
   final String? role;
+  final String? idType;
+  final String? studentId;
+  final String? teacherId;
   final String? createDt;
   final String? modifyDt;
 

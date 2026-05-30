@@ -88,7 +88,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         child: Center(
                           child: Text(
                             context.getText(AppKeys.signup),
-                            style: GoogleFonts.fredoka(
+                            style: GoogleFonts.andika(
                               color: const Color(0xFF339395),
                               fontSize: 26,
                               fontWeight: FontWeight.w700,
@@ -232,7 +232,7 @@ class SignupFieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-        style: GoogleFonts.fredoka(
+        style: GoogleFonts.andika(
           color: const Color(0xFF1B1B1B),
           fontSize: 16,
           fontWeight: FontWeight.w700,
@@ -276,7 +276,7 @@ class SignupTextField extends StatelessWidget {
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: GoogleFonts.fredoka(
+          hintStyle: GoogleFonts.andika(
             color: const Color(0xFF7E9088),
             fontSize: 16,
             fontWeight: FontWeight.w400,
@@ -297,7 +297,7 @@ class SignupTextField extends StatelessWidget {
             borderSide: const BorderSide(color: Color(0xFF339395), width: 2),
           ),
         ),
-        style: GoogleFonts.fredoka(
+        style: GoogleFonts.andika(
           color: AppColors.ink,
           fontSize: 16,
           fontWeight: FontWeight.w500,
@@ -355,7 +355,7 @@ class _RoleCard extends StatelessWidget {
                 label,
                 textAlign: TextAlign.center,
                 maxLines: 1,
-                style: GoogleFonts.fredoka(
+                style: GoogleFonts.andika(
                   color: AppColors.ink,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -404,7 +404,7 @@ class _TealActionButton extends StatelessWidget {
             children: [
               Text(
                 cleanLabel,
-                style: GoogleFonts.fredoka(
+                style: GoogleFonts.andika(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0,

@@ -24,8 +24,8 @@ class TeacherReportTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Báo Cáo',
-            style: GoogleFonts.fredoka(
+            context.getText(AppKeys.teacherReportTitle),
+            style: GoogleFonts.andika(
               color: _teacherTeal,
               fontSize: 28 * scale,
               fontWeight: FontWeight.w700,
@@ -71,9 +71,9 @@ class TeacherReportTab extends StatelessWidget {
                   ),
                   SizedBox(height: 18 * scale),
                   Text(
-                    'Báo cáo lớp học sẽ sớm có mặt',
+                    context.getText(AppKeys.teacherReportComingSoon),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.andika(
                       color: _teacherInk,
                       fontSize: 18 * scale,
                       fontWeight: FontWeight.w800,
@@ -82,9 +82,9 @@ class TeacherReportTab extends StatelessWidget {
                   ),
                   SizedBox(height: 8 * scale),
                   Text(
-                    'Numi đang chuẩn bị số liệu học tập cho giáo viên.',
+                    context.getText(AppKeys.teacherReportPlaceholder),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.beVietnamPro(
+                    style: GoogleFonts.andika(
                       color: _teacherMuted,
                       fontSize: 13 * scale,
                       fontWeight: FontWeight.w500,

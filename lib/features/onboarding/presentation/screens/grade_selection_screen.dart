@@ -200,7 +200,6 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: _gradeInk,
-                                  fontFamily: 'Nunito',
                                   fontSize: s(31),
                                   fontWeight: FontWeight.w900,
                                   height: 1.08,
@@ -297,7 +296,6 @@ class _GradeFailureNotice extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: _gradeRust,
-                fontFamily: 'Nunito',
                 fontSize: 13 * scale,
                 fontWeight: FontWeight.w900,
                 height: 1.25,
@@ -540,7 +538,6 @@ class _GradeLoadError extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _gradeInk,
-              fontFamily: 'Nunito',
               fontSize: 14 * scale,
               fontWeight: FontWeight.w800,
               height: 1.3,
@@ -554,7 +551,6 @@ class _GradeLoadError extends StatelessWidget {
               context.getText(AppKeys.retryUpper),
               style: TextStyle(
                 color: _gradeTeal,
-                fontFamily: 'Nunito',
                 fontSize: 13 * scale,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.6,
@@ -636,7 +632,6 @@ class _GradeCard extends StatelessWidget {
                     maxLines: 1,
                     style: TextStyle(
                       color: _gradeInk,
-                      fontFamily: 'Nunito',
                       fontSize: 17 * scale,
                       fontWeight: FontWeight.w900,
                       height: 1,
@@ -686,7 +681,6 @@ class _GradeBadge extends StatelessWidget {
               option.number!,
               style: TextStyle(
                 color: isSelected ? Colors.white : _gradeTeal,
-                fontFamily: 'Nunito',
                 fontSize: 17 * scale,
                 fontWeight: FontWeight.w900,
                 height: 1,
@@ -819,7 +813,6 @@ class _PillActionButton extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontFamily: 'Nunito',
                     fontSize: 12 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,

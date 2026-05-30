@@ -86,7 +86,7 @@ class LoginScreen extends StatelessWidget {
               Center(
                 child: Text(
                   context.getText(AppKeys.phoneLoginBrandName),
-                  style: GoogleFonts.fredoka(
+                  style: GoogleFonts.andika(
                     color: const Color(0xFF339395),
                     fontSize: 40,
                     fontWeight: FontWeight.w700,
@@ -200,7 +200,7 @@ class LoginCard extends StatelessWidget {
                   onChanged: onPhoneChanged,
                   decoration: InputDecoration(
                     hintText: region.hint,
-                    hintStyle: GoogleFonts.fredoka(
+                    hintStyle: GoogleFonts.andika(
                       color: const Color(0xFFB9C2C5),
                       fontWeight: FontWeight.w500,
                       fontSize: 18,
@@ -208,7 +208,7 @@ class LoginCard extends StatelessWidget {
                     border: InputBorder.none,
                     isCollapsed: true,
                   ),
-                  style: GoogleFonts.fredoka(
+                  style: GoogleFonts.andika(
                     color: AppColors.ink,
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
@@ -287,7 +287,7 @@ class _GreyActionButton extends StatelessWidget {
           children: [
             Text(
               label.toUpperCase(),
-              style: GoogleFonts.fredoka(
+              style: GoogleFonts.andika(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.2,
@@ -387,7 +387,7 @@ class PhoneRegionMenu extends StatelessWidget {
             value: item,
             child: Text(
               '${item.flag}  ${item.label} ${item.code}',
-              style: GoogleFonts.fredoka(),
+              style: GoogleFonts.andika(),
             ),
           );
         }).toList();
@@ -399,7 +399,7 @@ class PhoneRegionMenu extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             region.code,
-            style: GoogleFonts.fredoka(
+            style: GoogleFonts.andika(
               color: const Color(0xFF323B3E),
               fontSize: 18,
               fontWeight: FontWeight.w600,

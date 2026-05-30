@@ -436,7 +436,6 @@ class _ReviewHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _headerNavy,
-                    fontFamily: 'Nunito',
                     fontSize: 18 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -535,7 +534,6 @@ class _ReviewProfileStatePanel extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: const Color(0xFF253228),
-              fontFamily: 'Nunito',
               fontSize: 28 * scale,
               fontWeight: FontWeight.w900,
               height: 1,
@@ -550,7 +548,6 @@ class _ReviewProfileStatePanel extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: const Color(0xFF515F54),
-              fontFamily: 'Nunito',
               fontSize: 17 * scale,
               fontWeight: FontWeight.w800,
               height: 1.25,
@@ -580,7 +577,6 @@ class _ReviewProfileStatePanel extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontFamily: 'Nunito',
                     fontSize: 18 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -654,7 +650,6 @@ class _StatTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _reviewInk,
-                    fontFamily: 'Nunito',
                     fontSize: 24 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -668,7 +663,6 @@ class _StatTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _reviewMuted,
-                    fontFamily: 'Nunito',
                     fontSize: 15 * scale,
                     fontWeight: FontWeight.w800,
                     height: 1,
@@ -757,7 +751,6 @@ class _ChapterCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: _reviewMuted,
-                              fontFamily: 'Nunito',
                               fontSize: 16 * scale,
                               fontWeight: FontWeight.w900,
                               height: 1,
@@ -771,7 +764,6 @@ class _ChapterCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: _reviewInk,
-                              fontFamily: 'Nunito',
                               fontSize: 22 * scale,
                               fontWeight: FontWeight.w900,
                               height: 1.08,
@@ -918,7 +910,6 @@ class _TestButton extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: const Color(0xFF3B0031),
-                      fontFamily: 'Nunito',
                       fontSize: 20 * scale,
                       fontWeight: FontWeight.w900,
                       height: 1,
@@ -973,7 +964,6 @@ class _StartSelectedButton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: const Color(0xFF3B0031),
-                    fontFamily: 'Nunito',
                     fontSize: 18 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -1031,7 +1021,6 @@ class _ClearSelectionButton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _selectPink,
-                    fontFamily: 'Nunito',
                     fontSize: 14 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,

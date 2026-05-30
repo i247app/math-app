@@ -120,7 +120,6 @@ class _LanguageHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _languageNavy,
-                    fontFamily: 'Nunito',
                     fontSize: 18 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -241,7 +240,6 @@ class _LanguageOptionCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _languageInk,
-                    fontFamily: 'Nunito',
                     fontSize: 18 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
