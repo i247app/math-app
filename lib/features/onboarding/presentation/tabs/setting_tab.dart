@@ -718,6 +718,9 @@ class _SettingTabState extends State<SettingTab> {
       formRole,
     );
     final profileIdValue = _profileIdController.text.trim();
+    final shouldSubmitTeacherId = isTeacherProfile &&
+        normalizedIdType != null &&
+        profileIdValue.isNotEmpty;
     final isCreatingFirstProfile = editingProfile == null && _profiles.isEmpty;
 
     if (userId == null || userId <= 0) {
@@ -751,7 +754,8 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
     if (isTeacherProfile &&
-        (normalizedIdType == null || profileIdValue.isEmpty)) {
+        ((normalizedIdType == null && profileIdValue.isNotEmpty) ||
+            (normalizedIdType != null && profileIdValue.isEmpty))) {
       setState(
         () => _profileCreateError =
             context.readText(AppKeys.missingProfileSelections),
@@ -777,9 +781,9 @@ class _SettingTabState extends State<SettingTab> {
           isDefault: _profiles.isEmpty,
           role: formRole,
           avatarKey: _selectedProfileAvatarKey,
-          idType: normalizedIdType,
+          idType: isTeacherProfile ? normalizedIdType : _idTypeMoet,
           studentId: isTeacherProfile ? null : profileIdValue,
-          teacherId: isTeacherProfile ? profileIdValue : null,
+          teacherId: shouldSubmitTeacherId ? profileIdValue : null,
         );
         if (isCreatingFirstProfile) {
           final profileId =
@@ -808,9 +812,9 @@ class _SettingTabState extends State<SettingTab> {
           role: formRole,
           dob: _dateOnly(editingProfile.dob),
           avatarKey: _selectedProfileAvatarKey,
-          idType: normalizedIdType,
+          idType: isTeacherProfile ? normalizedIdType : _idTypeMoet,
           studentId: isTeacherProfile ? null : profileIdValue,
-          teacherId: isTeacherProfile ? profileIdValue : null,
+          teacherId: shouldSubmitTeacherId ? profileIdValue : null,
         );
       }
       if (!mounted) {
