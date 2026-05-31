@@ -132,7 +132,7 @@ class _FakeAvatarPickerService extends AvatarPickerService {
 class _FakeOtpAuthService implements OtpAuthService {
   @override
   Future<PhoneCheckResult> checkPhone(String phone) async {
-    return PhoneCheckResult(phone: phone, exists: true, userId: 'user-1');
+    return PhoneCheckResult(phone: phone, exists: true, userId: 1);
   }
 
   @override
@@ -144,7 +144,7 @@ class _FakeOtpAuthService implements OtpAuthService {
     return AuthPhoneLookupResult(
       phone: phone,
       exists: true,
-      user: LoginUser(id: 'user-1', phone: phone),
+      user: LoginUser(id: 1, phone: phone),
     );
   }
 
@@ -157,7 +157,7 @@ class _FakeOtpAuthService implements OtpAuthService {
       throw const OtpAuthException('User not found', status: 202);
     }
 
-    return LoginUser(id: 'user-1', phone: phone);
+    return LoginUser(id: 1, phone: phone);
   }
 
   @override
@@ -169,7 +169,7 @@ class _FakeOtpAuthService implements OtpAuthService {
     String? avatarPath,
   }) async {
     return LoginUser(
-      id: 'user-register-1',
+      id: 2,
       name: name,
       phone: phone,
       email: email,
@@ -205,7 +205,7 @@ class _FakeOtpAuthService implements OtpAuthService {
     return VerifyOtpResult(
       isValid: otpCode == '7152',
       user: otpCode == '7152' && otpType == loginOtpType
-          ? const LoginUser(id: 'user-1', phone: '0901234567')
+          ? const LoginUser(id: 1, phone: '0901234567')
           : null,
     );
   }
@@ -217,7 +217,7 @@ class _FakeOtpAuthService implements OtpAuthService {
 
   @override
   Future<LoginUser> updateUser({
-    required String userId,
+    required int userId,
     required String name,
     String? phone,
     String? email,

@@ -13,22 +13,22 @@ class ClassroomException implements Exception {
 }
 
 abstract class ClassroomService {
-  Future<List<ClassroomModel>> listClassrooms({required String profileId});
+  Future<List<ClassroomModel>> listClassrooms({required int profileId});
 
   Future<ClassroomModel?> createClassroom({
-    required String profileId,
+    required int profileId,
     required String name,
-    required List<String> programIds,
-    required String gradeId,
-    required String schoolId,
+    required List<int> programIds,
+    required int gradeId,
+    required int schoolId,
     int maxMembers = 50,
     String? description,
     String? filePath,
   });
 
   Future<ClassroomModel?> getClassroomDetail({
-    required String classroomId,
-    required String profileId,
+    required int classroomId,
+    required int profileId,
   });
 }
 
@@ -43,7 +43,7 @@ class ClassroomApi implements ClassroomService {
 
   @override
   Future<List<ClassroomModel>> listClassrooms({
-    required String profileId,
+    required int profileId,
   }) async {
     try {
       final response = await _networkApi.listClassrooms(
@@ -57,11 +57,11 @@ class ClassroomApi implements ClassroomService {
 
   @override
   Future<ClassroomModel?> createClassroom({
-    required String profileId,
+    required int profileId,
     required String name,
-    required List<String> programIds,
-    required String gradeId,
-    required String schoolId,
+    required List<int> programIds,
+    required int gradeId,
+    required int schoolId,
     int maxMembers = 50,
     String? description,
     String? filePath,
@@ -87,8 +87,8 @@ class ClassroomApi implements ClassroomService {
 
   @override
   Future<ClassroomModel?> getClassroomDetail({
-    required String classroomId,
-    required String profileId,
+    required int classroomId,
+    required int profileId,
   }) async {
     try {
       final response = await _networkApi.getClassroomDetail(

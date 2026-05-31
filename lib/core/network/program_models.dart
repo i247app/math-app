@@ -6,7 +6,7 @@ part 'program_models.g.dart';
 class ProgramListRequest {
   const ProgramListRequest({required this.userId});
 
-  final String userId;
+  final int userId;
 
   factory ProgramListRequest.fromJson(Map<String, dynamic> json) =>
       _$ProgramListRequestFromJson(json);
@@ -51,9 +51,10 @@ class ProgramModel {
     this.modifyDt,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? programId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? programId;
   final String? label;
   final String? description;
   @JsonKey(fromJson: _intFromJson)
@@ -110,5 +111,3 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
-
-String? _stringFromJson(Object? value) => value?.toString();

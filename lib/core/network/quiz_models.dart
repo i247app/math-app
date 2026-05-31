@@ -18,7 +18,7 @@ class GenerateQuizRequest {
   @JsonKey(name: 'grade_label')
   final String? gradeLabel;
   @JsonKey(name: 'previous_quiz_id')
-  final String? previousQuizId;
+  final int? previousQuizId;
   final List<String>? chapters;
 
   factory GenerateQuizRequest.fromJson(Map<String, dynamic> json) =>
@@ -34,7 +34,7 @@ class SubmitQuizRequest {
     required this.answers,
   });
 
-  final String quizId;
+  final int quizId;
   final List<SubmitQuizAnswer> answers;
 
   factory SubmitQuizRequest.fromJson(Map<String, dynamic> json) =>
@@ -66,8 +66,8 @@ class QuizListRequest {
     this.profileId,
   });
 
-  final String? userId;
-  final String? profileId;
+  final int? userId;
+  final int? profileId;
 
   factory QuizListRequest.fromJson(Map<String, dynamic> json) =>
       _$QuizListRequestFromJson(json);
@@ -213,17 +213,20 @@ class GeneratedQuiz {
     required this.questions,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? quizId;
-  final String? previousQuizId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? quizId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? previousQuizId;
   final String? quizStatus;
   final String? purpose;
   @JsonKey(name: 'type_of_quiz')
   final String? typeOfQuiz;
   final String? type;
   final String? title;
-  final String? userId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? userId;
   final String? createDt;
   final String? modifyDt;
   final QuizGrading? grading;
@@ -297,4 +300,12 @@ class QuizAnswer {
   Map<String, dynamic> toJson() => _$QuizAnswerToJson(this);
 }
 
-String? _stringFromJson(Object? value) => value?.toString();
+int? _intFromJson(Object? value) {
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  return int.tryParse(value?.toString() ?? '');
+}

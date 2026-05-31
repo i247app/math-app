@@ -6,7 +6,7 @@ part 'semester_models.g.dart';
 class SemesterListRequest {
   const SemesterListRequest({required this.userId});
 
-  final String userId;
+  final int userId;
 
   factory SemesterListRequest.fromJson(Map<String, dynamic> json) =>
       _$SemesterListRequestFromJson(json);
@@ -51,9 +51,10 @@ class SemesterModel {
     this.modifyDt,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? semesterId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? semesterId;
   final String? name;
   final String? description;
   @JsonKey(fromJson: _intFromJson)
@@ -110,5 +111,3 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
-
-String? _stringFromJson(Object? value) => value?.toString();

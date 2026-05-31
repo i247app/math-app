@@ -15,19 +15,19 @@ class ProfileException implements Exception {
 }
 
 abstract class ProfileService {
-  Future<List<StudentProfile>> listProfiles({required String userId});
+  Future<List<StudentProfile>> listProfiles({required int userId});
 
-  Future<List<ProgramModel>> listPrograms({required String userId});
+  Future<List<ProgramModel>> listPrograms({required int userId});
 
-  Future<List<SemesterModel>> listSemesters({required String userId});
+  Future<List<SemesterModel>> listSemesters({required int userId});
 
   Future<StudentProfile?> createProfile({
-    required String userId,
-    required String schoolId,
+    required int userId,
+    required int schoolId,
     required String name,
-    String? gradeId,
-    String? programId,
-    String? semesterId,
+    int? gradeId,
+    int? programId,
+    int? semesterId,
     bool isDefault = false,
     String role = 'STUDENT',
     String? avatarPath,
@@ -39,12 +39,12 @@ abstract class ProfileService {
   });
 
   Future<StudentProfile?> updateProfile({
-    required String profileId,
-    String? schoolId,
+    required int profileId,
+    int? schoolId,
     String? name,
-    String? gradeId,
-    String? programId,
-    String? semesterId,
+    int? gradeId,
+    int? programId,
+    int? semesterId,
     bool? isDefault,
     String? role,
     String? avatarPath,
@@ -55,7 +55,7 @@ abstract class ProfileService {
     String? teacherId,
   });
 
-  Future<void> forceDeleteProfile({required String profileId});
+  Future<void> forceDeleteProfile({required int profileId});
 }
 
 class ProfileApi implements ProfileService {
@@ -68,7 +68,7 @@ class ProfileApi implements ProfileService {
   final NetworkApi _networkApi;
 
   @override
-  Future<List<StudentProfile>> listProfiles({required String userId}) async {
+  Future<List<StudentProfile>> listProfiles({required int userId}) async {
     try {
       final response = await _networkApi.listProfiles(
         ProfileListRequest(userId: userId),
@@ -80,7 +80,7 @@ class ProfileApi implements ProfileService {
   }
 
   @override
-  Future<List<ProgramModel>> listPrograms({required String userId}) async {
+  Future<List<ProgramModel>> listPrograms({required int userId}) async {
     try {
       final response = await _networkApi.listPrograms(
         ProgramListRequest(userId: userId),
@@ -92,7 +92,7 @@ class ProfileApi implements ProfileService {
   }
 
   @override
-  Future<List<SemesterModel>> listSemesters({required String userId}) async {
+  Future<List<SemesterModel>> listSemesters({required int userId}) async {
     try {
       final response = await _networkApi.listSemesters(
         SemesterListRequest(userId: userId),
@@ -105,12 +105,12 @@ class ProfileApi implements ProfileService {
 
   @override
   Future<StudentProfile?> createProfile({
-    required String userId,
-    required String schoolId,
+    required int userId,
+    required int schoolId,
     required String name,
-    String? gradeId,
-    String? programId,
-    String? semesterId,
+    int? gradeId,
+    int? programId,
+    int? semesterId,
     bool isDefault = false,
     String role = 'STUDENT',
     String? avatarPath,
@@ -147,12 +147,12 @@ class ProfileApi implements ProfileService {
 
   @override
   Future<StudentProfile?> updateProfile({
-    required String profileId,
-    String? schoolId,
+    required int profileId,
+    int? schoolId,
     String? name,
-    String? gradeId,
-    String? programId,
-    String? semesterId,
+    int? gradeId,
+    int? programId,
+    int? semesterId,
     bool? isDefault,
     String? role,
     String? avatarPath,
@@ -188,7 +188,7 @@ class ProfileApi implements ProfileService {
   }
 
   @override
-  Future<void> forceDeleteProfile({required String profileId}) async {
+  Future<void> forceDeleteProfile({required int profileId}) async {
     try {
       await _networkApi.forceDeleteProfile(
         DeleteProfileRequest(profileId: profileId),

@@ -26,21 +26,21 @@ abstract class QuizService {
     String purpose = quizPurposeAssessment,
     String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
-    String? previousQuizId,
+    int? previousQuizId,
     List<String>? chapters,
   });
 
   Future<List<GeneratedQuiz>> listQuizzes({
-    String? userId,
-    String? profileId,
+    int? userId,
+    int? profileId,
   });
 
   Future<GeneratedQuiz> submitQuiz({
-    required String quizId,
+    required int quizId,
     required List<SubmitQuizAnswer> answers,
   });
 
-  Future<GeneratedQuiz> getQuizDetail(String quizId);
+  Future<GeneratedQuiz> getQuizDetail(int quizId);
 }
 
 class FakeQuizApi implements QuizService {
@@ -51,7 +51,7 @@ class FakeQuizApi implements QuizService {
     String purpose = quizPurposeAssessment,
     String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
-    String? previousQuizId,
+    int? previousQuizId,
     List<String>? chapters,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 900));
@@ -79,7 +79,7 @@ class FakeQuizApi implements QuizService {
 
   @override
   Future<GeneratedQuiz> submitQuiz({
-    required String quizId,
+    required int quizId,
     required List<SubmitQuizAnswer> answers,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 700));
@@ -101,8 +101,8 @@ class FakeQuizApi implements QuizService {
 
   @override
   Future<List<GeneratedQuiz>> listQuizzes({
-    String? userId,
-    String? profileId,
+    int? userId,
+    int? profileId,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     final response = QuizListResponse.fromJson(_fakeQuizListResponse());
@@ -119,7 +119,7 @@ class FakeQuizApi implements QuizService {
   }
 
   @override
-  Future<GeneratedQuiz> getQuizDetail(String quizId) async {
+  Future<GeneratedQuiz> getQuizDetail(int quizId) async {
     await Future<void>.delayed(const Duration(milliseconds: 400));
     final response = QuizListResponse.fromJson(_fakeQuizListResponse());
     if (response.mstatus != 200 || response.quizzes.isEmpty) {
@@ -149,7 +149,7 @@ class QuizApi implements QuizService {
     String purpose = quizPurposeAssessment,
     String typeOfQuiz = quizTypeGeneral,
     String? gradeLabel,
-    String? previousQuizId,
+    int? previousQuizId,
     List<String>? chapters,
   }) async {
     final GenerateQuizResponse response;
@@ -182,7 +182,7 @@ class QuizApi implements QuizService {
 
   @override
   Future<GeneratedQuiz> submitQuiz({
-    required String quizId,
+    required int quizId,
     required List<SubmitQuizAnswer> answers,
   }) async {
     final SubmitQuizResponse response;
@@ -207,13 +207,10 @@ class QuizApi implements QuizService {
 
   @override
   Future<List<GeneratedQuiz>> listQuizzes({
-    String? userId,
-    String? profileId,
+    int? userId,
+    int? profileId,
   }) async {
-    final cleanUserId = userId?.trim();
-    final cleanProfileId = profileId?.trim();
-    if ((cleanUserId == null || cleanUserId.isEmpty) &&
-        (cleanProfileId == null || cleanProfileId.isEmpty)) {
+    if (userId == null && profileId == null) {
       throw QuizException(
         AppStrings.current(AppKeys.missingUserOrProfileForHistory),
       );
@@ -223,8 +220,8 @@ class QuizApi implements QuizService {
     try {
       response = await _networkApi.listQuizzes(
         QuizListRequest(
-          userId: cleanUserId?.isEmpty == true ? null : cleanUserId,
-          profileId: cleanProfileId?.isEmpty == true ? null : cleanProfileId,
+          userId: userId,
+          profileId: profileId,
         ),
       );
     } on NetworkException catch (error) {
@@ -235,15 +232,14 @@ class QuizApi implements QuizService {
   }
 
   @override
-  Future<GeneratedQuiz> getQuizDetail(String quizId) async {
-    final cleanQuizId = quizId.trim();
-    if (cleanQuizId.isEmpty) {
+  Future<GeneratedQuiz> getQuizDetail(int quizId) async {
+    if (quizId <= 0) {
       throw QuizException(AppStrings.current(AppKeys.missingQuizIdShort));
     }
 
     final QuizDetailResponse response;
     try {
-      response = await _networkApi.getQuizDetail(cleanQuizId);
+      response = await _networkApi.getQuizDetail(quizId);
     } on NetworkException catch (error) {
       throw QuizException(error.message, status: error.status);
     }
@@ -269,7 +265,7 @@ Map<String, Object?> _fakeGenerateQuizResponse({
   String purpose = quizPurposeAssessment,
   String typeOfQuiz = quizTypeGeneral,
   String? gradeLabel,
-  String? previousQuizId,
+  int? previousQuizId,
   List<String>? chapters,
 }) {
   return <String, Object?>{
@@ -288,7 +284,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
   String purpose = quizPurposeAssessment,
   String typeOfQuiz = quizTypeGeneral,
   String? gradeLabel,
-  String? previousQuizId,
+  int? previousQuizId,
 }) {
   return <String, Object?>{
     'create_dt': '2026-05-21T09:24:04Z',
@@ -351,9 +347,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
         'right_answer': 'A',
       },
     ],
-    'quiz_id': previousQuizId == null
-        ? '310f18bc-5933-4517-848f-fe4c096d6492'
-        : 'fake-assessment-retake-1',
+    'quiz_id': previousQuizId ?? 310,
     'quiz_status': 'GENERATED',
     'purpose': purpose,
     'type': purpose,
@@ -365,7 +359,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
 }
 
 Map<String, Object?> _fakeSubmitQuizResponse(
-  String quizId,
+  int quizId,
   List<SubmitQuizAnswer> answers,
 ) {
   final quiz = _fakeGeneratedQuiz();
@@ -374,7 +368,7 @@ Map<String, Object?> _fakeSubmitQuizResponse(
     ..['modify_dt'] = '2026-05-22T05:02:31Z'
     ..['quiz_id'] = quizId
     ..['quiz_status'] = 'SUBMITTED'
-    ..['user_id'] = 'fake-user'
+    ..['user_id'] = 1
     ..['grading'] = <String, Object?>{
       'ai_review': AppStrings.current(AppKeys.defaultAiReview),
       'correct_number': 4,
@@ -400,12 +394,12 @@ Map<String, Object?> _fakeQuizListResponse() {
     ]
     ..['create_dt'] = '2026-05-23T11:28:10Z'
     ..['modify_dt'] = '2026-05-23T11:28:32Z'
-    ..['quiz_id'] = 'c02fe348-0540-498c-aaba-e3f9b06484f5'
+    ..['quiz_id'] = 201
     ..['quiz_status'] = 'SUBMITTED'
     ..['purpose'] = quizPurposeAssessment
     ..['type'] = quizPurposeAssessment
     ..['type_of_quiz'] = quizTypeGeneral
-    ..['user_id'] = 'fake-user'
+    ..['user_id'] = 1
     ..['grading'] = <String, Object?>{
       'ai_detect_grade': assessmentQuizGradeLabel,
       'ai_review':
@@ -418,23 +412,23 @@ Map<String, Object?> _fakeQuizListResponse() {
   final generatedAssessment = _fakeGeneratedQuiz()
     ..['create_dt'] = '2026-05-23T11:28:43Z'
     ..['modify_dt'] = '2026-05-23T11:28:43Z'
-    ..['previous_quiz_id'] = 'c02fe348-0540-498c-aaba-e3f9b06484f5'
-    ..['quiz_id'] = '30ae9c4f-254e-44d1-9ed2-28dfe826f5ee'
+    ..['previous_quiz_id'] = 201
+    ..['quiz_id'] = 202
     ..['quiz_status'] = 'GENERATED'
     ..['purpose'] = quizPurposeAssessment
     ..['type'] = quizPurposeAssessment
     ..['type_of_quiz'] = quizTypeReinforcement
-    ..['user_id'] = 'fake-user';
+    ..['user_id'] = 1;
 
   final practiceQuiz = _fakeGeneratedQuiz()
     ..['create_dt'] = '2026-05-23T05:46:05Z'
     ..['modify_dt'] = '2026-05-23T05:46:32Z'
-    ..['quiz_id'] = '5450848b-fcd2-493d-9e55-ad7180538e2c'
+    ..['quiz_id'] = 203
     ..['quiz_status'] = 'SUBMITTED'
     ..['purpose'] = quizPurposePractice
     ..['type'] = quizPurposePractice
     ..['type_of_quiz'] = quizTypeGeneral
-    ..['user_id'] = 'fake-user'
+    ..['user_id'] = 1
     ..['grading'] = <String, Object?>{
       'ai_review':
           'Strong understanding of addition and subtraction; practice more on addition with larger numbers.',

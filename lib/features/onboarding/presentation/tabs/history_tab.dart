@@ -84,7 +84,7 @@ class _HistoryTabState extends State<HistoryTab> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
-    if (profileId == null || profileId.isEmpty) {
+    if (profileId == null) {
       setState(() {
         _isLoading = false;
         _errorMessage = context.readText(AppKeys.noAccountForHistory);
@@ -468,8 +468,8 @@ class _HistoryBody extends StatelessWidget {
 }
 
 void _openQuizReview(BuildContext context, GeneratedQuiz quiz) {
-  final quizId = (quiz.quizId ?? quiz.id)?.trim();
-  if (quizId == null || quizId.isEmpty) {
+  final quizId = quiz.quizId ?? quiz.id;
+  if (quizId == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.readText(AppKeys.missingQuizId))),
     );

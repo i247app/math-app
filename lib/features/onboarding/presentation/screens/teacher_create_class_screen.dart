@@ -68,8 +68,8 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
   }
 
   Future<void> _loadOptions() async {
-    final userId = widget.user?.id.trim();
-    if (userId == null || userId.isEmpty) {
+    final userId = widget.user?.id;
+    if (userId == null || userId <= 0) {
       setState(() {
         _isLoadingOptions = false;
         _optionsError = context.readText(AppKeys.missingAccount);
@@ -139,14 +139,13 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     final gradeId = _gradeStableId(_selectedGrade);
     final programIds = _selectedPrograms
         .map(_programStableId)
-        .whereType<String>()
-        .where((id) => id.isNotEmpty)
+        .whereType<int>()
         .toList(growable: false);
     final schoolId = _schoolStableId(_selectedSchool);
     final name = _nameController.text.trim();
     final description = _descriptionController.text.trim();
 
-    if (profileId == null || profileId.isEmpty) {
+    if (profileId == null) {
       _showSnack(context.readText(AppKeys.teacherMissingProfileId));
       return;
     }
@@ -260,8 +259,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                                     values: _selectedPrograms,
                                     items: _programs,
                                     displayText: _programLabel,
-                                    itemId: (program) =>
-                                        _programStableId(program) ?? '',
+                                    itemId: _programStableId,
                                     emptyText:
                                         context.getText(AppKeys.chooseProgram),
                                     onChanged: (values) => setState(

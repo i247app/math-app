@@ -395,9 +395,9 @@ class NetworkApi {
     return quizResponse;
   }
 
-  Future<QuizDetailResponse> getQuizDetail(String quizId) async {
+  Future<QuizDetailResponse> getQuizDetail(int quizId) async {
     final responseJson = await _networkClient.getJson(
-      '/quizzes/$quizId',
+      '/quizzes/${_encodePathId(quizId)}',
     );
     final quizResponse = QuizDetailResponse.fromJson(responseJson);
     if (quizResponse.mstatus != 200) {
@@ -548,11 +548,9 @@ class NetworkApi {
       'school_id': request.schoolId,
       'name': request.name,
       if (request.dob?.isNotEmpty == true) 'dob': request.dob,
-      if (request.gradeId?.isNotEmpty == true) 'grade_id': request.gradeId,
-      if (request.programId?.isNotEmpty == true)
-        'program_id': request.programId,
-      if (request.semesterId?.isNotEmpty == true)
-        'semester_id': request.semesterId,
+      if (request.gradeId != null) 'grade_id': request.gradeId,
+      if (request.programId != null) 'program_id': request.programId,
+      if (request.semesterId != null) 'semester_id': request.semesterId,
       'is_default': request.isDefault,
       'role': request.role,
       if (request.avatarKey?.isNotEmpty == true)
@@ -592,11 +590,9 @@ class NetworkApi {
       if (request.schoolId != null) 'school_id': request.schoolId,
       if (request.name?.isNotEmpty == true) 'name': request.name,
       if (request.dob?.isNotEmpty == true) 'dob': request.dob,
-      if (request.gradeId?.isNotEmpty == true) 'grade_id': request.gradeId,
-      if (request.programId?.isNotEmpty == true)
-        'program_id': request.programId,
-      if (request.semesterId?.isNotEmpty == true)
-        'semester_id': request.semesterId,
+      if (request.gradeId != null) 'grade_id': request.gradeId,
+      if (request.programId != null) 'program_id': request.programId,
+      if (request.semesterId != null) 'semester_id': request.semesterId,
       if (request.isDefault != null) 'is_default': request.isDefault,
       if (request.role?.isNotEmpty == true) 'role': request.role,
       if (request.avatarKey?.isNotEmpty == true)
@@ -704,13 +700,12 @@ class NetworkApi {
   }
 
   Future<ClassroomResponse> getClassroomDetail({
-    required String classroomId,
-    required String profileId,
+    required int classroomId,
+    required int profileId,
   }) async {
-    final encodedClassroomId = Uri.encodeComponent(classroomId);
-    final encodedProfileId = Uri.encodeQueryComponent(profileId);
     final responseJson = await _networkClient.getJson(
-      '/classrooms/$encodedClassroomId?profile_id=$encodedProfileId',
+      '/classrooms/${_encodePathId(classroomId)}'
+      '?profile_id=${_encodeQueryId(profileId)}',
     );
     final classroomResponse = ClassroomResponse.fromJson(responseJson);
     if (classroomResponse.mstatus != 200) {
@@ -796,4 +791,8 @@ class NetworkApi {
 
     return 'Request failed.';
   }
+
+  static String _encodePathId(int id) => Uri.encodeComponent('$id');
+
+  static String _encodeQueryId(int id) => Uri.encodeQueryComponent('$id');
 }

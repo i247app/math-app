@@ -28,7 +28,7 @@ class ActiveProfileResolution {
 
   ProfileRole get role => ProfileRole.fromProfile(activeProfile);
 
-  String? get activeProfileId =>
+  int? get activeProfileId =>
       ActiveProfileSession.profileStableId(activeProfile);
 }
 
@@ -39,27 +39,26 @@ class ActiveProfileSession {
 
   final FlutterSecureStorage _storage;
 
-  Future<String?> readActiveProfileId(String userId) async {
+  Future<int?> readActiveProfileId(int userId) async {
     final key = _storageKey(userId);
     if (key == null) {
       return null;
     }
-    return (await _storage.read(key: key))?.trim();
+    return _decodeStoredProfileId(await _storage.read(key: key));
   }
 
   Future<void> writeActiveProfileId({
-    required String userId,
-    required String profileId,
+    required int userId,
+    required int profileId,
   }) async {
     final key = _storageKey(userId);
-    final normalizedProfileId = profileId.trim();
-    if (key == null || normalizedProfileId.isEmpty) {
+    if (key == null) {
       return;
     }
-    await _storage.write(key: key, value: normalizedProfileId);
+    await _storage.write(key: key, value: _encodeStoredProfileId(profileId));
   }
 
-  Future<void> clearActiveProfileId(String userId) async {
+  Future<void> clearActiveProfileId(int userId) async {
     final key = _storageKey(userId);
     if (key == null) {
       return;
@@ -68,7 +67,7 @@ class ActiveProfileSession {
   }
 
   Future<StudentProfile?> resolveActiveProfile({
-    required String userId,
+    required int userId,
     required List<StudentProfile> profiles,
   }) async {
     final storedProfileId = await readActiveProfileId(userId);
@@ -80,16 +79,15 @@ class ActiveProfileSession {
 
   static StudentProfile? resolveActiveProfileFromProfiles({
     required List<StudentProfile> profiles,
-    String? storedProfileId,
+    int? storedProfileId,
   }) {
     if (profiles.isEmpty) {
       return null;
     }
 
-    final normalizedStoredId = storedProfileId?.trim();
-    if (normalizedStoredId != null && normalizedStoredId.isNotEmpty) {
+    if (storedProfileId != null) {
       for (final profile in profiles) {
-        if (profileStableId(profile) == normalizedStoredId) {
+        if (profileStableId(profile) == storedProfileId) {
           return profile;
         }
       }
@@ -104,25 +102,23 @@ class ActiveProfileSession {
     return profiles.first;
   }
 
-  static String? profileStableId(StudentProfile? profile) {
-    final profileId = profile?.profileId?.trim();
-    if (profileId != null && profileId.isNotEmpty) {
-      return profileId;
-    }
-
-    final id = profile?.id?.trim();
-    if (id != null && id.isNotEmpty) {
-      return id;
-    }
-
-    return null;
+  static int? profileStableId(StudentProfile? profile) {
+    return profile?.profileId ?? profile?.id;
   }
 
-  static String? _storageKey(String userId) {
-    final normalizedUserId = userId.trim();
-    if (normalizedUserId.isEmpty) {
+  static String? _storageKey(int userId) {
+    if (userId <= 0) {
       return null;
     }
-    return 'active_profile_id:$normalizedUserId';
+    return 'active_profile_id:${_encodeStoredUserId(userId)}';
+  }
+
+  static String _encodeStoredUserId(int userId) => '$userId';
+
+  static String _encodeStoredProfileId(int profileId) => '$profileId';
+
+  static int? _decodeStoredProfileId(String? value) {
+    final stored = value?.trim();
+    return stored == null || stored.isEmpty ? null : int.tryParse(stored);
   }
 }

@@ -61,8 +61,8 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   }
 
   Future<void> loadGrades() async {
-    final userId = widget.user?.id.trim();
-    if (userId == null || userId.isEmpty) {
+    final userId = widget.user?.id;
+    if (userId == null || userId <= 0) {
       setState(() {
         isLoadingGrades = false;
         gradeLoadError = AppStrings.current(AppKeys.noAccountForGrades);

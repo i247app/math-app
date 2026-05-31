@@ -1118,31 +1118,14 @@ String _chapterMetaText(BuildContext context, PracticeChapter chapter) {
       '${chapter.lessonCount} ${context.getText(AppKeys.lessons)}';
 }
 
-String? _profileProgramId(StudentProfile profile) {
-  return _nonEmpty(profile.program?.programId) ??
-      _nonEmpty(profile.program?.id) ??
-      _nonEmpty(profile.programId);
-}
+int? _profileProgramId(StudentProfile profile) =>
+    profile.program?.programId ?? profile.program?.id ?? profile.programId;
 
-String? _profileGradeId(StudentProfile profile) {
-  return _nonEmpty(profile.grade?.gradeId) ??
-      _nonEmpty(profile.grade?.id) ??
-      _nonEmpty(profile.gradeId);
-}
+int? _profileGradeId(StudentProfile profile) =>
+    profile.grade?.gradeId ?? profile.grade?.id ?? profile.gradeId;
 
-String? _profileSemesterId(StudentProfile profile) {
-  return _nonEmpty(profile.semester?.semesterId) ??
-      _nonEmpty(profile.semester?.id) ??
-      _nonEmpty(profile.semesterId);
-}
-
-String? _nonEmpty(String? value) {
-  final trimmed = value?.trim();
-  if (trimmed == null || trimmed.isEmpty) {
-    return null;
-  }
-  return trimmed;
-}
+int? _profileSemesterId(StudentProfile profile) =>
+    profile.semester?.semesterId ?? profile.semester?.id ?? profile.semesterId;
 
 List<PracticeChapter> _practiceChaptersFromApi(List<ChapterModel> chapters) {
   final sorted = [...chapters]..sort((a, b) {
@@ -1162,7 +1145,7 @@ List<PracticeChapter> _practiceChaptersFromApi(List<ChapterModel> chapters) {
         0;
 
     return PracticeChapter(
-      id: _nonEmpty(chapter.chapterId) ?? chapter.id?.toString(),
+      id: _practiceChapterId(chapter),
       number: number,
       title: _chapterDescription(chapter) ?? _chapterLabel(chapter),
       description: _chapterLabel(chapter),
@@ -1189,6 +1172,19 @@ String _chapterLabel(ChapterModel chapter) {
 
 String? _chapterDescription(ChapterModel chapter) {
   return _nonEmpty(chapter.description);
+}
+
+String _practiceChapterId(ChapterModel chapter) {
+  final id = chapter.chapterId ?? chapter.id;
+  return id == null ? 'chapter-${chapter.displayOrder ?? 0}' : '$id';
+}
+
+String? _nonEmpty(String? value) {
+  final trimmed = value?.trim();
+  if (trimmed == null || trimmed.isEmpty) {
+    return null;
+  }
+  return trimmed;
 }
 
 String _chapterIcon(int number) {

@@ -61,7 +61,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
 
   Future<void> generatePracticeAgain() async {
     final previousQuizId = widget.quiz?.quizId;
-    if (previousQuizId == null || previousQuizId.isEmpty) {
+    if (previousQuizId == null) {
       HapticFeedback.selectionClick();
       showTestAgainError(
           AppStrings.current(AppKeys.testAgainCreateMissingQuiz));
@@ -79,7 +79,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
     required String purpose,
     required String typeOfQuiz,
     String? gradeLabel,
-    String? previousQuizId,
+    int? previousQuizId,
   }) async {
     HapticFeedback.mediumImpact();
     setState(() => isGeneratingAgain = true);

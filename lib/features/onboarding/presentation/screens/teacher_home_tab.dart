@@ -28,7 +28,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
 
   bool _isLoading = false;
   String? _error;
-  String? _loadedProfileId;
+  int? _loadedProfileId;
   List<ClassroomModel> _classrooms = const <ClassroomModel>[];
 
   @override
@@ -50,7 +50,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   Future<void> _loadClassrooms() async {
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
-    if (profileId == null || profileId.isEmpty) {
+    if (profileId == null) {
       setState(() {
         _loadedProfileId = profileId;
         _classrooms = const <ClassroomModel>[];
@@ -114,7 +114,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     final classroomId = classroom.stableId;
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
-    if (classroomId == null || classroomId.isEmpty || profileId == null) {
+    if (classroomId == null || profileId == null) {
       _showSnack(context.readText(AppKeys.teacherClassOpenFailed));
       return;
     }

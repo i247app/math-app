@@ -93,9 +93,10 @@ class SchoolModel {
     this.modifyDt,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? schoolId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? schoolId;
   final String? name;
   final String? imageUrl;
   final String? createDt;
@@ -153,5 +154,3 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
-
-String? _stringFromJson(Object? value) => value?.toString();

@@ -10,7 +10,7 @@ part 'profile_models.g.dart';
 class ProfileListRequest {
   const ProfileListRequest({required this.userId});
 
-  final String userId;
+  final int userId;
 
   factory ProfileListRequest.fromJson(Map<String, dynamic> json) =>
       _$ProfileListRequestFromJson(json);
@@ -36,12 +36,12 @@ class CreateProfileRequest {
     this.teacherId,
   });
 
-  final String userId;
-  final String schoolId;
+  final int userId;
+  final int schoolId;
   final String name;
-  final String? gradeId;
-  final String? programId;
-  final String? semesterId;
+  final int? gradeId;
+  final int? programId;
+  final int? semesterId;
   final bool isDefault;
   final String role;
   final String? dob;
@@ -74,12 +74,12 @@ class UpdateProfileRequest {
     this.teacherId,
   });
 
-  final String profileId;
-  final String? schoolId;
+  final int profileId;
+  final int? schoolId;
   final String? name;
-  final String? gradeId;
-  final String? programId;
-  final String? semesterId;
+  final int? gradeId;
+  final int? programId;
+  final int? semesterId;
   final bool? isDefault;
   final String? role;
   final String? dob;
@@ -98,7 +98,7 @@ class UpdateProfileRequest {
 class DeleteProfileRequest {
   const DeleteProfileRequest({required this.profileId});
 
-  final String profileId;
+  final int profileId;
 
   factory DeleteProfileRequest.fromJson(Map<String, dynamic> json) =>
       _$DeleteProfileRequestFromJson(json);
@@ -237,24 +237,30 @@ class StudentProfile {
     this.modifyDt,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? profileId;
-  final String? userId;
-  final String? schoolId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? profileId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? userId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? schoolId;
   @JsonKey(fromJson: _schoolFromJson)
   final SchoolModel? school;
   final String? name;
   final String? avatarKey;
   final String? avatarUrl;
   final String? dob;
-  final String? gradeId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? gradeId;
   @JsonKey(fromJson: _profileGradeFromJson)
   final ProfileGrade? grade;
-  final String? programId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? programId;
   @JsonKey(fromJson: _programFromJson)
   final ProgramModel? program;
-  final String? semesterId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? semesterId;
   @JsonKey(fromJson: _semesterFromJson)
   final SemesterModel? semester;
   @JsonKey(fromJson: _boolFromJson)
@@ -284,9 +290,10 @@ class ProfileGrade {
     this.imageUrl,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? gradeId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? gradeId;
   final String? label;
   final String? description;
   @JsonKey(fromJson: _intFromJson)
@@ -376,5 +383,3 @@ bool _boolFromJson(Object? value) {
   final text = value?.toString().toLowerCase();
   return text == 'true' || text == '1';
 }
-
-String? _stringFromJson(Object? value) => value?.toString();

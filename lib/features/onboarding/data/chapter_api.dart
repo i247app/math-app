@@ -14,9 +14,9 @@ class ChapterException implements Exception {
 
 abstract class ChapterService {
   Future<List<ChapterModel>> listChapters({
-    required String programId,
-    required String gradeId,
-    required String semesterId,
+    required int programId,
+    required int gradeId,
+    required int semesterId,
   });
 }
 
@@ -31,9 +31,9 @@ class ChapterApi implements ChapterService {
 
   @override
   Future<List<ChapterModel>> listChapters({
-    required String programId,
-    required String gradeId,
-    required String semesterId,
+    required int programId,
+    required int gradeId,
+    required int semesterId,
   }) async {
     try {
       final response = await _networkApi.listChapters(

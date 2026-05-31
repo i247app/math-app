@@ -676,8 +676,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   }
 
   Future<_ResolvedProfiles> _profilesForUser(LoginUser user) async {
-    final userId = user.id.trim();
-    if (userId.isEmpty) {
+    final userId = user.id;
+    if (userId <= 0) {
       return const _ResolvedProfiles.empty();
     }
 

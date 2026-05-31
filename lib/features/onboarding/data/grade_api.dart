@@ -15,7 +15,7 @@ class GradeException implements Exception {
 }
 
 abstract class GradeService {
-  Future<List<GradeModel>> listGrades({required String userId});
+  Future<List<GradeModel>> listGrades({required int userId});
 }
 
 class GradeApi implements GradeService {
@@ -28,16 +28,15 @@ class GradeApi implements GradeService {
   final NetworkApi _networkApi;
 
   @override
-  Future<List<GradeModel>> listGrades({required String userId}) async {
-    final cleanUserId = userId.trim();
-    if (cleanUserId.isEmpty) {
+  Future<List<GradeModel>> listGrades({required int userId}) async {
+    if (userId <= 0) {
       throw GradeException(AppStrings.current(AppKeys.noAccountForGrades));
     }
 
     final GradeListResponse response;
     try {
       response = await _networkApi.listGrades(
-        GradeListRequest(userId: cleanUserId),
+        GradeListRequest(userId: userId),
       );
     } on NetworkException catch (error) {
       throw GradeException(error.message, status: error.status);

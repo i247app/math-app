@@ -32,7 +32,7 @@ class UpdateUserRequest {
   });
 
   @JsonKey(name: 'user_id')
-  final String userId;
+  final int userId;
   final String? name;
   final String? phone;
   final String? email;
@@ -185,10 +185,12 @@ class AuthProfile {
     this.modifyDt,
   });
 
-  @JsonKey(fromJson: AuthUser._stringFromJson)
-  final String? id;
-  final String? profileId;
-  final String? userId;
+  @JsonKey(fromJson: AuthUser._intFromJson)
+  final int? id;
+  @JsonKey(fromJson: AuthUser._intFromJson)
+  final int? profileId;
+  @JsonKey(fromJson: AuthUser._intFromJson)
+  final int? userId;
   final String? name;
   final String? avatarKey;
   final String? avatarUrl;
@@ -216,9 +218,10 @@ class AuthUser {
     this.modifyDt,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? userId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? userId;
   final String? email;
   final String? name;
   final String? phone;
@@ -233,5 +236,13 @@ class AuthUser {
 
   Map<String, dynamic> toJson() => _$AuthUserToJson(this);
 
-  static String? _stringFromJson(Object? value) => value?.toString();
+  static int? _intFromJson(Object? value) {
+    if (value is int) {
+      return value;
+    }
+    if (value is num) {
+      return value.toInt();
+    }
+    return int.tryParse(value?.toString() ?? '');
+  }
 }

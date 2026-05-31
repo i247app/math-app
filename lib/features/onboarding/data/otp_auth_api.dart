@@ -16,7 +16,7 @@ class PhoneCheckResult {
 
   final String phone;
   final bool exists;
-  final String? userId;
+  final int? userId;
 }
 
 class SendOtpResult {
@@ -49,7 +49,7 @@ class LoginUser {
     this.modifyDt,
   });
 
-  final String id;
+  final int id;
   final String? email;
   final String? name;
   final String? phone;
@@ -86,7 +86,7 @@ class AuthPhoneLookupResult {
 extension on AuthUser {
   LoginUser toLoginUser({String? fallbackPhone}) {
     return LoginUser(
-      id: userId ?? id ?? '',
+      id: userId ?? id ?? 0,
       email: email,
       name: name,
       phone: phone ?? fallbackPhone,
@@ -138,7 +138,7 @@ abstract class OtpAuthService {
   });
 
   Future<LoginUser> updateUser({
-    required String userId,
+    required int userId,
     required String name,
     String? phone,
     String? email,
@@ -176,7 +176,7 @@ class OtpAuthApi implements OtpAuthService {
 
     try {
       final user = (await _networkApi.getCurrentUser()).toLoginUser();
-      if (user.id.trim().isEmpty) {
+      if (user.id <= 0) {
         await _networkApi.clearAuthToken();
         return null;
       }
@@ -330,7 +330,7 @@ class OtpAuthApi implements OtpAuthService {
 
   @override
   Future<LoginUser> updateUser({
-    required String userId,
+    required int userId,
     required String name,
     String? phone,
     String? email,
@@ -423,7 +423,7 @@ class OtpAuthApi implements OtpAuthService {
     final profile = response.profile;
 
     return LoginUser(
-      id: user?.userId ?? user?.id ?? profile?.userId ?? fallbackPhone,
+      id: user?.userId ?? user?.id ?? profile?.userId ?? 0,
       email: user?.email ?? fallbackEmail,
       name: profile?.name ?? user?.name ?? fallbackName,
       phone: user?.phone ?? fallbackPhone,

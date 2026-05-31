@@ -9,8 +9,8 @@ class TeacherClassDetailScreen extends StatefulWidget {
     ClassroomService? classroomService,
   }) : _classroomService = classroomService;
 
-  final String classroomId;
-  final String profileId;
+  final int classroomId;
+  final int profileId;
   final ClassroomModel? initialClassroom;
   final ClassroomService? _classroomService;
 
@@ -153,8 +153,8 @@ class _ClassDetailInfoCard extends StatelessWidget {
     final title = _nonEmpty(classroom?.name) ??
         context.getText(AppKeys.teacherClassFallback);
     final grade =
-        _detailLabel(context.getText(AppKeys.grade), classroom?.gradeId);
-    final program = _nonEmpty(classroom?.programId) ??
+        _detailIdLabel(context.getText(AppKeys.grade), classroom?.gradeId);
+    final program = _displayBackendId(classroom?.programId) ??
         context.getText(AppKeys.teacherProgramFallback);
     final description = _nonEmpty(classroom?.description) ??
         context.getText(AppKeys.teacherDescriptionFallback);
@@ -663,28 +663,26 @@ String? _nonEmpty(String? value) {
   return trimmed;
 }
 
-String _detailLabel(String prefix, String? value) {
-  final trimmed = _nonEmpty(value);
-  if (trimmed == null) {
+String _detailIdLabel(String prefix, int? value) {
+  final displayValue = _displayBackendId(value);
+  if (displayValue == null) {
     return prefix;
   }
-  final lower = trimmed.toLowerCase();
-  if (lower.startsWith(prefix.toLowerCase())) {
-    return trimmed;
-  }
-  return '$prefix $trimmed';
+  return '$prefix $displayValue';
 }
+
+String? _displayBackendId(int? value) => value == null ? null : '$value';
 
 String _classCode(ClassroomModel? classroom) {
   final inviteCode = _nonEmpty(classroom?.inviteCode);
   if (inviteCode != null) {
     return inviteCode;
   }
-  final stableId = _nonEmpty(classroom?.stableId);
+  final stableId = classroom?.stableId;
   if (stableId == null) {
     return 'NM-9988';
   }
-  final cleaned = stableId.replaceAll(RegExp('[^A-Za-z0-9]'), '').toUpperCase();
+  final cleaned = _displayClassStableId(stableId);
   if (cleaned.isEmpty) {
     return 'NM-9988';
   }
@@ -693,6 +691,8 @@ String _classCode(ClassroomModel? classroom) {
       : cleaned.padLeft(4, '0');
   return 'NM-$suffix';
 }
+
+String _displayClassStableId(int value) => '$value';
 
 void _copyClassroomInfo(BuildContext context, String value, String message) {
   Clipboard.setData(ClipboardData(text: value));

@@ -8,7 +8,7 @@ class GradeListRequest {
     required this.userId,
   });
 
-  final String userId;
+  final int userId;
 
   factory GradeListRequest.fromJson(Map<String, dynamic> json) =>
       _$GradeListRequestFromJson(json);
@@ -89,9 +89,10 @@ class GradeModel {
     this.modifyDt,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? gradeId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? gradeId;
   final String? label;
   final String? description;
   @JsonKey(fromJson: _intFromJson)
@@ -152,5 +153,3 @@ int? _intFromJson(Object? value) {
   }
   return int.tryParse(value?.toString() ?? '');
 }
-
-String? _stringFromJson(Object? value) => value?.toString();

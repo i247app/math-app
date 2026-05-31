@@ -10,9 +10,9 @@ class ChapterListRequest {
     required this.semesterId,
   });
 
-  final String programId;
-  final String gradeId;
-  final String semesterId;
+  final int programId;
+  final int gradeId;
+  final int semesterId;
 
   factory ChapterListRequest.fromJson(Map<String, dynamic> json) =>
       _$ChapterListRequestFromJson(json);
@@ -61,10 +61,14 @@ class ChapterModel {
   });
 
   final int? id;
-  final String? chapterId;
-  final String? programId;
-  final String? gradeId;
-  final String? semesterId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? chapterId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? programId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? gradeId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? semesterId;
   final String? label;
   final String? description;
   final int? lessonCount;
@@ -77,4 +81,14 @@ class ChapterModel {
       _$ChapterModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$ChapterModelToJson(this);
+}
+
+int? _intFromJson(Object? value) {
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  return int.tryParse(value?.toString() ?? '');
 }

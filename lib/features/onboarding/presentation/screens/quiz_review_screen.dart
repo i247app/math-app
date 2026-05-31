@@ -24,7 +24,7 @@ class QuizReviewScreen extends StatefulWidget {
     this.initialQuiz,
   });
 
-  final String quizId;
+  final int quizId;
   final GeneratedQuiz? initialQuiz;
 
   @override

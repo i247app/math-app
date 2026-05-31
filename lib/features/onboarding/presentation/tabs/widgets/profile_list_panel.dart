@@ -16,7 +16,7 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
   });
 
   final List<StudentProfile> profiles;
-  final String? activeProfileId;
+  final int? activeProfileId;
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback onRetry;
@@ -91,14 +91,13 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
   }
 
   List<StudentProfile> get _activeFirstProfiles {
-    final normalizedActiveId = activeProfileId?.trim();
-    if (normalizedActiveId == null || normalizedActiveId.isEmpty) {
+    if (activeProfileId == null) {
       return profiles;
     }
 
     final activeIndex = profiles.indexWhere(
       (profile) =>
-          ActiveProfileSession.profileStableId(profile) == normalizedActiveId,
+          ActiveProfileSession.profileStableId(profile) == activeProfileId,
     );
     if (activeIndex <= 0) {
       return profiles;
@@ -408,8 +407,8 @@ class _ProfileIdLine extends StatelessWidget {
   final bool isActive;
   final double scale;
 
-  Future<void> _copyProfileId(BuildContext context, String id) async {
-    await Clipboard.setData(ClipboardData(text: id));
+  Future<void> _copyProfileId(BuildContext context, int id) async {
+    await Clipboard.setData(ClipboardData(text: _displayProfileId(id)));
     if (!context.mounted) {
       return;
     }
@@ -423,8 +422,8 @@ class _ProfileIdLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final id = profile.id?.trim();
-    if (id == null || id.isEmpty) {
+    final id = profile.id;
+    if (id == null) {
       return const SizedBox.shrink();
     }
 
@@ -434,7 +433,7 @@ class _ProfileIdLine extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            'ID: $id',
+            'ID: ${_displayProfileId(id)}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
@@ -481,6 +480,8 @@ class _ProfileIdLine extends StatelessWidget {
     );
   }
 }
+
+String _displayProfileId(int id) => '$id';
 
 class _ProfileInfoLine extends StatelessWidget {
   const _ProfileInfoLine({

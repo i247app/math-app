@@ -584,7 +584,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
   final List<T> values;
   final List<T> items;
   final String Function(T item) displayText;
-  final String Function(T item) itemId;
+  final int? Function(T item) itemId;
   final ValueChanged<List<T>> onChanged;
   final double scale;
   final String? emptyText;
@@ -687,7 +687,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
           MediaQuery.sizeOf(context).height * 0.78,
           620 * scale,
         );
-        var selectedIds = values.map(itemId).toSet();
+        var selectedIds = values.map(itemId).whereType<int>().toSet();
         return StatefulBuilder(
           builder: (context, setSheetState) {
             final selectedValues = items
@@ -754,6 +754,9 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final item = items[index];
                           final id = itemId(item);
+                          if (id == null) {
+                            return const SizedBox.shrink();
+                          }
                           final isSelected = selectedIds.contains(id);
                           return Material(
                             color: Colors.transparent,
@@ -780,7 +783,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                               ),
                               onTap: () {
                                 setSheetState(() {
-                                  selectedIds = Set<String>.from(selectedIds);
+                                  selectedIds = Set<int>.from(selectedIds);
                                   if (isSelected) {
                                     selectedIds.remove(id);
                                   } else {
@@ -1074,62 +1077,31 @@ String _displayTeacherName(StudentProfile? profile) {
   return AppStrings.current(AppKeys.teacherFallback);
 }
 
-String? _gradeStableId(GradeModel? grade) {
-  final gradeId = grade?.gradeId?.trim();
-  if (gradeId != null && gradeId.isNotEmpty) {
-    return gradeId;
-  }
-  final id = grade?.id?.trim();
-  if (id != null && id.isNotEmpty) {
-    return id;
-  }
-  return null;
-}
+int? _gradeStableId(GradeModel? grade) => grade?.gradeId ?? grade?.id;
 
-String? _programStableId(ProgramModel? program) {
-  final programId = program?.programId?.trim();
-  if (programId != null && programId.isNotEmpty) {
-    return programId;
-  }
-  final id = program?.id?.trim();
-  if (id != null && id.isNotEmpty) {
-    return id;
-  }
-  return null;
-}
+int? _programStableId(ProgramModel? program) =>
+    program?.programId ?? program?.id;
 
-String? _schoolStableId(SchoolModel? school) {
-  final schoolId = school?.schoolId?.trim();
-  if (schoolId != null && schoolId.isNotEmpty) {
-    return schoolId;
-  }
-  final id = school?.id?.trim();
-  if (id != null && id.isNotEmpty) {
-    return id;
-  }
-  return null;
-}
+int? _schoolStableId(SchoolModel? school) => school?.schoolId ?? school?.id;
 
-GradeModel? _matchGrade(List<GradeModel> grades, String? id) {
-  final normalized = id?.trim();
-  if (normalized == null || normalized.isEmpty) {
+GradeModel? _matchGrade(List<GradeModel> grades, int? id) {
+  if (id == null) {
     return null;
   }
   for (final grade in grades) {
-    if (_gradeStableId(grade) == normalized) {
+    if (_gradeStableId(grade) == id) {
       return grade;
     }
   }
   return null;
 }
 
-SchoolModel? _matchSchool(List<SchoolModel> schools, String? id) {
-  final normalized = id?.trim();
-  if (normalized == null || normalized.isEmpty) {
+SchoolModel? _matchSchool(List<SchoolModel> schools, int? id) {
+  if (id == null) {
     return null;
   }
   for (final school in schools) {
-    if (_schoolStableId(school) == normalized) {
+    if (_schoolStableId(school) == id) {
       return school;
     }
   }

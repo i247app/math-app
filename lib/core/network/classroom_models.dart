@@ -6,7 +6,7 @@ part 'classroom_models.g.dart';
 class ClassroomListRequest {
   const ClassroomListRequest({required this.profileId});
 
-  final String profileId;
+  final int profileId;
 
   factory ClassroomListRequest.fromJson(Map<String, dynamic> json) =>
       _$ClassroomListRequestFromJson(json);
@@ -26,12 +26,12 @@ class CreateClassroomRequest {
     this.maxMembers = 50,
   });
 
-  final String profileId;
+  final int profileId;
   final String name;
-  @JsonKey(defaultValue: <String>[])
-  final List<String> programIds;
-  final String gradeId;
-  final String schoolId;
+  @JsonKey(defaultValue: <int>[])
+  final List<int> programIds;
+  final int gradeId;
+  final int schoolId;
   final String? description;
   @JsonKey(fromJson: _requiredIntFromJson)
   final int maxMembers;
@@ -141,15 +141,20 @@ class ClassroomModel {
     this.modifyDt,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? classroomId;
-  final String? profileId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? classroomId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? profileId;
   final String? name;
   final String? description;
-  final String? programId;
-  final String? gradeId;
-  final String? schoolId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? programId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? gradeId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? schoolId;
   @JsonKey(fromJson: _stringFromJson)
   final String? inviteCode;
   @JsonKey(fromJson: _intFromJson)
@@ -188,17 +193,7 @@ class ClassroomModel {
 
   Map<String, dynamic> toJson() => _$ClassroomModelToJson(this);
 
-  String? get stableId {
-    final candidate = classroomId?.trim();
-    if (candidate != null && candidate.isNotEmpty) {
-      return candidate;
-    }
-    final fallback = id?.trim();
-    if (fallback != null && fallback.isNotEmpty) {
-      return fallback;
-    }
-    return null;
-  }
+  int? get stableId => classroomId ?? id;
 
   int get displayStudentCount =>
       studentCount ?? (students.isNotEmpty ? students.length : 0);
@@ -217,9 +212,10 @@ class ClassroomStudent {
     this.status,
   });
 
-  @JsonKey(fromJson: _stringFromJson)
-  final String? id;
-  final String? profileId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? profileId;
   final String? name;
   final String? avatarUrl;
   final String? joinedAt;

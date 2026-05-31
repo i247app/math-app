@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _previousActiveTab = 0;
   int _openAddProfileRequestId = 0;
   bool _returnToReviewAfterProfileSave = false;
-  String? _prefetchedGradeUserId;
+  int? _prefetchedGradeUserId;
   bool _isPrefetchingGrades = false;
   List<GradeModel> _prefetchedGrades = const <GradeModel>[];
 
@@ -87,9 +87,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _prefetchGrades() async {
-    final userId = widget.user?.id.trim();
+    final userId = widget.user?.id;
     if (userId == null ||
-        userId.isEmpty ||
+        userId <= 0 ||
         _isPrefetchingGrades ||
         (_prefetchedGradeUserId == userId && _prefetchedGrades.isNotEmpty)) {
       return;
@@ -100,13 +100,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final grades = await _gradeService.listGrades(userId: userId);
-      if (!mounted || widget.user?.id.trim() != userId) {
+      if (!mounted || widget.user?.id != userId) {
         return;
       }
 
       setState(() => _prefetchedGrades = grades);
     } catch (_) {
-      if (!mounted || widget.user?.id.trim() != userId) {
+      if (!mounted || widget.user?.id != userId) {
         return;
       }
 

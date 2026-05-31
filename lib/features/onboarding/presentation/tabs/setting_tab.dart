@@ -421,8 +421,8 @@ class _SettingTabState extends State<SettingTab> {
 
   Future<void> _saveEditing() async {
     final user = _effectiveUser;
-    final userId = user?.id.trim();
-    if (userId == null || userId.isEmpty) {
+    final userId = user?.id;
+    if (userId == null || userId <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.readText(AppKeys.missingAccount))),
       );
@@ -539,8 +539,8 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   Future<void> _loadProfiles() async {
-    final userId = widget.user?.id.trim();
-    if (userId == null || userId.isEmpty) {
+    final userId = widget.user?.id;
+    if (userId == null || userId <= 0) {
       setState(() {
         _isLoadingProfiles = false;
         _profileLoadError = context.readText(AppKeys.noAccountForProfile);
@@ -605,8 +605,8 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
 
-    final userId = widget.user?.id.trim();
-    if (userId == null || userId.isEmpty) {
+    final userId = widget.user?.id;
+    if (userId == null || userId <= 0) {
       setState(() {
         _isLoadingProfileOptions = false;
         _profileOptionsError =
@@ -704,7 +704,7 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   Future<void> _saveProfileForm() async {
-    final userId = widget.user?.id.trim();
+    final userId = widget.user?.id;
     final name = _profileNameController.text.trim();
     final school = _selectedSchool;
     final grade = _selectedGrade;
@@ -720,7 +720,7 @@ class _SettingTabState extends State<SettingTab> {
     final profileIdValue = _profileIdController.text.trim();
     final isCreatingFirstProfile = editingProfile == null && _profiles.isEmpty;
 
-    if (userId == null || userId.isEmpty) {
+    if (userId == null || userId <= 0) {
       setState(
           () => _profileCreateError = context.readText(AppKeys.missingAccount));
       return;
@@ -732,7 +732,7 @@ class _SettingTabState extends State<SettingTab> {
       );
       return;
     }
-    if (school?.schoolId == null || school!.schoolId!.trim().isEmpty) {
+    if (school?.schoolId == null) {
       setState(
         () => _profileCreateError =
             context.readText(AppKeys.missingProfileSelections),
@@ -769,7 +769,7 @@ class _SettingTabState extends State<SettingTab> {
       if (editingProfile == null) {
         final createdProfile = await _profileService.createProfile(
           userId: userId,
-          schoolId: school.schoolId!.trim(),
+          schoolId: school!.schoolId!,
           name: name,
           gradeId: isTeacherProfile ? null : grade!.gradeId!,
           programId: isTeacherProfile ? null : program!.programId!,
@@ -792,14 +792,14 @@ class _SettingTabState extends State<SettingTab> {
           }
         }
       } else {
-        final profileId = editingProfile.profileId?.trim();
-        if (profileId == null || profileId.isEmpty) {
+        final profileId = editingProfile.profileId;
+        if (profileId == null) {
           throw ProfileException(context.readText(AppKeys.missingProfileId));
         }
 
         await _profileService.updateProfile(
           profileId: profileId,
-          schoolId: school.schoolId!.trim(),
+          schoolId: school!.schoolId!,
           name: _emptyToNull(name),
           gradeId: isTeacherProfile ? null : grade?.gradeId,
           programId: isTeacherProfile ? null : program?.programId,
@@ -856,8 +856,8 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   Future<void> _confirmDeleteProfile(StudentProfile profile) async {
-    final profileId = profile.profileId?.trim();
-    if (profileId == null || profileId.isEmpty) {
+    final profileId = profile.profileId;
+    if (profileId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.readText(AppKeys.missingProfileId))),
       );
@@ -901,11 +901,11 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   Future<void> _selectActiveProfile(StudentProfile selectedProfile) async {
-    final userId = widget.user?.id.trim();
+    final userId = widget.user?.id;
     final profileId = ActiveProfileSession.profileStableId(selectedProfile);
     if (_isSettingDefaultProfile ||
         userId == null ||
-        userId.isEmpty ||
+        userId <= 0 ||
         profileId == null ||
         profileId == _activeProfileId) {
       return;
@@ -937,7 +937,7 @@ class _SettingTabState extends State<SettingTab> {
     }
   }
 
-  Future<void> _deleteProfile(String profileId) async {
+  Future<void> _deleteProfile(int profileId) async {
     setState(() => _isDeletingProfile = true);
     final deletedActiveProfile = profileId == _activeProfileId;
 
@@ -951,8 +951,8 @@ class _SettingTabState extends State<SettingTab> {
         SnackBar(content: Text(context.readText(AppKeys.profileDeleted))),
       );
       if (deletedActiveProfile) {
-        final userId = widget.user?.id.trim();
-        if (userId != null && userId.isNotEmpty) {
+        final userId = widget.user?.id;
+        if (userId != null && userId > 0) {
           await _activeProfileSession.clearActiveProfileId(userId);
         }
       }
@@ -1320,6 +1320,9 @@ class _SettingTabState extends State<SettingTab> {
 
   static String? _normalizedProfileIdType(String? value, String role) {
     final normalized = value?.trim().toUpperCase();
+    if (role != 'TEACHER' && (normalized == null || normalized.isEmpty)) {
+      return _idTypeMoet;
+    }
     if (normalized == null || normalized.isEmpty) {
       return null;
     }
@@ -1331,7 +1334,7 @@ class _SettingTabState extends State<SettingTab> {
     return isAllowed ? normalized : null;
   }
 
-  String? get _activeProfileId {
+  int? get _activeProfileId {
     return ActiveProfileSession.profileStableId(widget.activeProfile);
   }
 }
