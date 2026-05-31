@@ -30,6 +30,7 @@ class CreateProfileRequest {
     this.isDefault = false,
     this.role = 'STUDENT',
     this.dob,
+    this.avatarKey,
     this.idType,
     this.studentId,
     this.teacherId,
@@ -44,6 +45,7 @@ class CreateProfileRequest {
   final bool isDefault;
   final String role;
   final String? dob;
+  final String? avatarKey;
   final String? idType;
   final String? studentId;
   final String? teacherId;
@@ -66,6 +68,7 @@ class UpdateProfileRequest {
     this.isDefault,
     this.role,
     this.dob,
+    this.avatarKey,
     this.idType,
     this.studentId,
     this.teacherId,
@@ -80,6 +83,7 @@ class UpdateProfileRequest {
   final bool? isDefault;
   final String? role;
   final String? dob;
+  final String? avatarKey;
   final String? idType;
   final String? studentId;
   final String? teacherId;

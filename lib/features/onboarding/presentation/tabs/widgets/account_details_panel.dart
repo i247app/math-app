@@ -212,8 +212,6 @@ class _AccountAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = avatarUrl?.trim();
-    final path = avatarPath?.trim();
     final size = 126 * scale;
 
     return Center(
@@ -224,16 +222,9 @@ class _AccountAvatar extends StatelessWidget {
           clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
-            Container(
-              width: size,
-              height: size,
-              padding: EdgeInsets.all(6 * scale),
+            DecoratedBox(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFFFF7451),
-                  width: 3.8 * scale,
-                ),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFFE8601C).withValues(alpha: 0.16),
@@ -242,42 +233,13 @@ class _AccountAvatar extends StatelessWidget {
                   ),
                 ],
               ),
-              child: DecoratedBox(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-                child: ClipOval(
-                  child: path != null && path.isNotEmpty
-                      ? Image.file(
-                          File(path),
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) {
-                            return _AccountDefaultAvatar(scale: scale);
-                          },
-                        )
-                      : url == null || url.isEmpty
-                          ? Padding(
-                              padding: EdgeInsets.all(24 * scale),
-                              child: Image.asset(
-                                'assets/images/numi-mascot.png',
-                                fit: BoxFit.contain,
-                              ),
-                            )
-                          : Image.network(
-                              url,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) {
-                                return Padding(
-                                  padding: EdgeInsets.all(24 * scale),
-                                  child: Image.asset(
-                                    'assets/images/numi-mascot.png',
-                                    fit: BoxFit.contain,
-                                  ),
-                                );
-                              },
-                            ),
-                ),
+              child: ProfileAvatarImage(
+                size: size,
+                avatarPath: avatarPath,
+                avatarUrl: avatarUrl,
+                borderColor: const Color(0xFFFF7451),
+                borderWidth: 3.8 * scale,
+                padding: EdgeInsets.all(6 * scale),
               ),
             ),
             if (isPickingAvatar)
@@ -312,23 +274,6 @@ class _AccountAvatar extends StatelessWidget {
               ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _AccountDefaultAvatar extends StatelessWidget {
-  const _AccountDefaultAvatar({required this.scale});
-
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(24 * scale),
-      child: Image.asset(
-        'assets/images/numi-mascot.png',
-        fit: BoxFit.contain,
       ),
     );
   }

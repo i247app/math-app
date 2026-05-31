@@ -745,41 +745,12 @@ class _TeacherAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final avatarUrl = profile?.avatarUrl?.trim();
-    return Container(
-      width: size,
-      height: size,
-      padding: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border:
-            Border.all(color: _teacherBlue.withValues(alpha: 0.10), width: 2),
-      ),
-      child: ClipOval(
-        child: avatarUrl?.isNotEmpty == true
-            ? Image.network(
-                avatarUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _TeacherDefaultAvatar(size: size),
-              )
-            : _TeacherDefaultAvatar(size: size),
-      ),
-    );
-  }
-}
-
-class _TeacherDefaultAvatar extends StatelessWidget {
-  const _TeacherDefaultAvatar({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Image.asset(
-      'assets/images/teacher-icon.png',
-      width: size,
-      height: size,
-      fit: BoxFit.cover,
+    return ProfileAvatarImage(
+      size: size,
+      avatarKey: profile?.avatarKey,
+      avatarUrl: profile?.avatarUrl,
+      borderColor: _teacherBlue.withValues(alpha: 0.10),
+      borderWidth: 2,
     );
   }
 }

@@ -555,6 +555,8 @@ class NetworkApi {
         'semester_id': request.semesterId,
       'is_default': request.isDefault,
       'role': request.role,
+      if (request.avatarKey?.isNotEmpty == true)
+        'avatar_key': request.avatarKey,
       if (request.idType?.isNotEmpty == true) 'id_type': request.idType,
       if (request.studentId?.isNotEmpty == true)
         'student_id': request.studentId,
@@ -597,6 +599,8 @@ class NetworkApi {
         'semester_id': request.semesterId,
       if (request.isDefault != null) 'is_default': request.isDefault,
       if (request.role?.isNotEmpty == true) 'role': request.role,
+      if (request.avatarKey?.isNotEmpty == true)
+        'avatar_key': request.avatarKey,
       if (request.idType?.isNotEmpty == true) 'id_type': request.idType,
       if (request.studentId?.isNotEmpty == true)
         'student_id': request.studentId,

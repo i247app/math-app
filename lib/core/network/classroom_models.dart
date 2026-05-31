@@ -131,6 +131,7 @@ class ClassroomModel {
     this.inviteCode,
     this.maxMembers,
     this.memberCount,
+    this.studentCount,
     this.students = const <ClassroomStudent>[],
     this.imageUrl,
     this.avatarUrl,
@@ -154,6 +155,8 @@ class ClassroomModel {
   final int? maxMembers;
   @JsonKey(fromJson: _intFromJson)
   final int? memberCount;
+  @JsonKey(fromJson: _intFromJson)
+  final int? studentCount;
   @JsonKey(fromJson: _studentListFromJson)
   final List<ClassroomStudent> students;
   final String? imageUrl;
@@ -167,9 +170,8 @@ class ClassroomModel {
         json['members'] ??
         json['student_profiles'] ??
         _nestedValue(json['data'], 'students');
-    final memberCountValue = json['member_count'] ??
-        json['members_count'] ??
-        json['student_count'] ??
+    final memberCountValue = json['member_count'] ?? json['members_count'];
+    final studentCountValue = json['student_count'] ??
         json['students_count'] ??
         (studentsValue is List ? studentsValue.length : null);
 
@@ -178,6 +180,7 @@ class ClassroomModel {
         ...json,
         'students': studentsValue,
         'member_count': memberCountValue,
+        'student_count': studentCountValue,
       },
     );
   }
@@ -196,8 +199,10 @@ class ClassroomModel {
     return null;
   }
 
-  int get displayMemberCount =>
-      memberCount ?? (students.isNotEmpty ? students.length : 0);
+  int get displayStudentCount =>
+      studentCount ?? (students.isNotEmpty ? students.length : 0);
+
+  int get displayMemberCount => memberCount ?? displayStudentCount;
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)

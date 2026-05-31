@@ -176,6 +176,7 @@ class _ProfileCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _ProfileAvatar(
+                    avatarKey: profile.avatarKey,
                     avatarUrl: profile.avatarUrl,
                     isActive: isActive,
                     scale: scale,
@@ -272,55 +273,27 @@ class _ProfileCard extends StatelessWidget {
 
 class _ProfileAvatar extends StatelessWidget {
   const _ProfileAvatar({
+    required this.avatarKey,
     required this.avatarUrl,
     required this.isActive,
     required this.scale,
   });
 
+  final String? avatarKey;
   final String? avatarUrl;
   final bool isActive;
   final double scale;
 
   @override
   Widget build(BuildContext context) {
-    final url = avatarUrl?.trim();
     final size = 84 * scale;
 
-    return Container(
-      width: size,
-      height: size,
-      padding: EdgeInsets.all(4 * scale),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFD5C6),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: isActive ? _teal : const Color(0xFFC8D0CC),
-          width: 4 * scale,
-        ),
-      ),
-      child: ClipOval(
-        child: url == null || url.isEmpty
-            ? Padding(
-                padding: EdgeInsets.all(14 * scale),
-                child: Image.asset(
-                  'assets/images/welcome_numi_character.png',
-                  fit: BoxFit.contain,
-                ),
-              )
-            : Image.network(
-                url,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) {
-                  return Padding(
-                    padding: EdgeInsets.all(14 * scale),
-                    child: Image.asset(
-                      'assets/images/welcome_numi_character.png',
-                      fit: BoxFit.contain,
-                    ),
-                  );
-                },
-              ),
-      ),
+    return ProfileAvatarImage(
+      size: size,
+      avatarKey: avatarKey,
+      avatarUrl: avatarUrl,
+      borderColor: isActive ? _teal : const Color(0xFFC8D0CC),
+      borderWidth: 4 * scale,
     );
   }
 }

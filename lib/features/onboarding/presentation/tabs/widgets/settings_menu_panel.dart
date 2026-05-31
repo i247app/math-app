@@ -3,8 +3,9 @@ part of '../setting_tab.dart';
 class _SettingsMenuPanel extends StatelessWidget {
   const _SettingsMenuPanel({
     super.key,
-    required this.avatarUrl,
-    required this.avatarPath,
+    required this.activeProfile,
+    required this.fallbackAvatarUrl,
+    required this.fallbackAvatarPath,
     required this.username,
     required this.scale,
     required this.currentLanguage,
@@ -14,8 +15,9 @@ class _SettingsMenuPanel extends StatelessWidget {
     required this.onLogoutTap,
   });
 
-  final String? avatarUrl;
-  final String? avatarPath;
+  final StudentProfile? activeProfile;
+  final String? fallbackAvatarUrl;
+  final String? fallbackAvatarPath;
   final String username;
   final double scale;
   final AppLanguage currentLanguage;
@@ -30,13 +32,15 @@ class _SettingsMenuPanel extends StatelessWidget {
       children: [
         SizedBox(height: 4 * scale),
         _SettingsAvatar(
-          avatarUrl: avatarUrl,
-          avatarPath: avatarPath,
+          activeProfile: activeProfile,
+          fallbackAvatarUrl: fallbackAvatarUrl,
+          fallbackAvatarPath: fallbackAvatarPath,
           scale: scale,
+          onSwitchTap: onProfileTap,
         ),
         SizedBox(height: 14 * scale),
         Text(
-          username,
+          _displayName(context),
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -91,47 +95,34 @@ class _SettingsMenuPanel extends StatelessWidget {
       ],
     );
   }
+
+  String _displayName(BuildContext context) {
+    final name = activeProfile?.name?.trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+    return username;
+  }
 }
 
 class _SettingsAvatar extends StatelessWidget {
   const _SettingsAvatar({
-    required this.avatarUrl,
-    required this.avatarPath,
+    required this.activeProfile,
+    required this.fallbackAvatarUrl,
+    required this.fallbackAvatarPath,
     required this.scale,
+    required this.onSwitchTap,
   });
 
-  final String? avatarUrl;
-  final String? avatarPath;
+  final StudentProfile? activeProfile;
+  final String? fallbackAvatarUrl;
+  final String? fallbackAvatarPath;
   final double scale;
+  final VoidCallback onSwitchTap;
 
   @override
   Widget build(BuildContext context) {
-    final url = avatarUrl?.trim();
-    final path = avatarPath?.trim();
     final size = 92 * scale;
-
-    Widget avatarChild;
-    if (path != null && path.isNotEmpty) {
-      avatarChild = Image.file(
-        File(path),
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _AccountDefaultAvatar(scale: scale),
-      );
-    } else if (url != null && url.isNotEmpty) {
-      avatarChild = Image.network(
-        url,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _AccountDefaultAvatar(scale: scale),
-      );
-    } else {
-      avatarChild = Padding(
-        padding: EdgeInsets.all(16 * scale),
-        child: Image.asset(
-          'assets/images/numi-mascot.png',
-          fit: BoxFit.contain,
-        ),
-      );
-    }
 
     return SizedBox(
       width: size + 20 * scale,
@@ -140,17 +131,9 @@ class _SettingsAvatar extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Center(
-            child: Container(
-              width: size,
-              height: size,
-              padding: EdgeInsets.all(4 * scale),
+            child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.white,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFFE8601C),
-                  width: 3.2 * scale,
-                ),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFFE8601C).withValues(alpha: 0.15),
@@ -159,19 +142,43 @@ class _SettingsAvatar extends StatelessWidget {
                   ),
                 ],
               ),
-              child: ClipOval(child: avatarChild),
+              child: ProfileAvatarImage(
+                size: size,
+                avatarKey: activeProfile?.avatarKey,
+                avatarUrl: activeProfile?.avatarUrl ?? fallbackAvatarUrl,
+                avatarPath: activeProfile == null ? fallbackAvatarPath : null,
+                borderColor: const Color(0xFFE8601C),
+                borderWidth: 3.2 * scale,
+                padding: EdgeInsets.all(4 * scale),
+              ),
             ),
           ),
           Positioned(
             right: 8 * scale,
             bottom: 14 * scale,
-            child: Container(
-              width: 22 * scale,
-              height: 22 * scale,
-              decoration: BoxDecoration(
-                color: const Color(0xFF55E66E),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2.5 * scale),
+            child: Semantics(
+              button: true,
+              label: context.getText(AppKeys.profileMenuTitle),
+              child: Material(
+                color: _teal,
+                elevation: 5,
+                shadowColor: _teal.withValues(alpha: 0.22),
+                shape: CircleBorder(
+                  side: BorderSide(color: Colors.white, width: 2.5 * scale),
+                ),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onSwitchTap,
+                  child: SizedBox(
+                    width: 30 * scale,
+                    height: 30 * scale,
+                    child: Icon(
+                      Icons.swap_horiz_rounded,
+                      color: Colors.white,
+                      size: 18 * scale,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
