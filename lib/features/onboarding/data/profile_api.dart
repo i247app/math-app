@@ -17,6 +17,8 @@ class ProfileException implements Exception {
 abstract class ProfileService {
   Future<List<StudentProfile>> listProfiles({required int userId});
 
+  Future<List<StudentProfile>> searchProfiles({required String search});
+
   Future<List<ProgramModel>> listPrograms({required int userId});
 
   Future<List<SemesterModel>> listSemesters({required int userId});
@@ -72,6 +74,18 @@ class ProfileApi implements ProfileService {
     try {
       final response = await _networkApi.listProfiles(
         ProfileListRequest(userId: userId),
+      );
+      return response.profiles;
+    } on NetworkException catch (error) {
+      throw ProfileException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<List<StudentProfile>> searchProfiles({required String search}) async {
+    try {
+      final response = await _networkApi.listProfiles(
+        ProfileListRequest(search: search),
       );
       return response.profiles;
     } on NetworkException catch (error) {

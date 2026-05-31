@@ -123,16 +123,13 @@ class _SmallCoralAddButton extends StatelessWidget {
   const _SmallCoralAddButton({
     required this.scale,
     required this.onTap,
-    this.width,
   });
 
   final double scale;
   final VoidCallback onTap;
-  final double? width;
 
   @override
   Widget build(BuildContext context) {
-    final buttonWidth = width ?? 91 * scale;
     final radius = BorderRadius.circular(12 * scale);
     return Padding(
       padding: EdgeInsets.only(bottom: 4 * scale),
@@ -153,7 +150,7 @@ class _SmallCoralAddButton extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: SizedBox(
-              width: buttonWidth,
+              width: 91 * scale,
               height: 31 * scale,
               child: Stack(
                 alignment: Alignment.center,
@@ -1121,24 +1118,3 @@ String _schoolLabel(SchoolModel school) =>
     school.name?.trim().isNotEmpty == true
         ? school.name!.trim()
         : AppStrings.current(AppKeys.school);
-
-String _initials(String name) {
-  final words = name
-      .trim()
-      .split(RegExp(r'\s+'))
-      .where((part) => part.isNotEmpty)
-      .toList();
-  if (words.isEmpty) {
-    return 'HS';
-  }
-  return words.take(2).map((word) => word.substring(0, 1)).join().toUpperCase();
-}
-
-(Color, Color) _studentAvatarColors(int index) {
-  final palettes = [
-    (const Color(0xFFF0F7FF), const Color(0xFF2D5A9E)),
-    (const Color(0xFFFCE4EC), const Color(0xFFF06292)),
-    (const Color(0xFFF3F4F6), const Color(0xFF6B7280)),
-  ];
-  return palettes[index % palettes.length];
-}

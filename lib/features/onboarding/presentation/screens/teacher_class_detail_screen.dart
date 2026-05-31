@@ -95,7 +95,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                         MediaQuery.paddingOf(context).bottom + 28 * scale,
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           if (_error != null && classroom == null)
                             _TeacherErrorPanel(
@@ -109,19 +109,17 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                               classroom: classroom,
                               isLoading: _isLoading && classroom == null,
                             ),
-                          SizedBox(height: 23 * scale),
-                          _SmallCoralAddButton(
-                            scale: scale,
-                            onTap: () {},
-                            width: 79 * scale,
-                          ),
-                          SizedBox(height: 9 * scale),
                           if (_error == null || classroom != null)
-                            _StudentListCard(
+                            _ClassDetailLowerContent(
                               scale: scale,
-                              students: students,
-                              count: count,
-                              isLoading: _isLoading && classroom == null,
+                              memberCount: count,
+                              requestCount: 0,
+                              onOpenMembers: () => Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) =>
+                                      const TeacherClassMembersScreen(),
+                                ),
+                              ),
                             ),
                         ],
                       ),
@@ -455,202 +453,230 @@ class _ClassCodeChip extends StatelessWidget {
   }
 }
 
-class _StudentListCard extends StatelessWidget {
-  const _StudentListCard({
+class _ClassDetailLowerContent extends StatelessWidget {
+  const _ClassDetailLowerContent({
     required this.scale,
-    required this.students,
-    required this.count,
-    required this.isLoading,
+    required this.memberCount,
+    required this.requestCount,
+    required this.onOpenMembers,
   });
 
   final double scale;
-  final List<ClassroomStudent> students;
-  final int count;
-  final bool isLoading;
+  final int memberCount;
+  final int requestCount;
+  final VoidCallback onOpenMembers;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding:
-          EdgeInsets.fromLTRB(16 * scale, 16 * scale, 16 * scale, 22 * scale),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: const Color(0x80CCCCCC)),
-      ),
+    return Padding(
+      padding: EdgeInsets.only(top: 40 * scale),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  context.formatText(
-                    AppKeys.teacherJoinedStudents,
-                    {'count': count},
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.andika(
-                    color: _teacherInk,
-                    fontSize: 15 * scale,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                  ),
-                ),
-              ),
-              Text(
-                context.getText(AppKeys.viewAllUpper),
-                style: GoogleFonts.andika(
-                  color: _teacherInk,
-                  fontSize: 14 * scale,
-                  fontWeight: FontWeight.w800,
-                  decoration: TextDecoration.underline,
-                  height: 1.2,
-                ),
-              ),
-            ],
+          _MemberManagementCard(
+            scale: scale,
+            memberCount: memberCount,
+            requestCount: requestCount,
+            onTap: onOpenMembers,
           ),
-          SizedBox(height: 14 * scale),
-          if (isLoading)
-            const Padding(
-              padding: EdgeInsets.all(18),
-              child: CircularProgressIndicator(color: _teacherTeal),
-            )
-          else if (students.isEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 18 * scale),
-              child: Text(
-                context.getText(AppKeys.teacherNoJoinedStudents),
-                style: GoogleFonts.andika(
-                  color: _teacherMuted,
-                  fontSize: 13 * scale,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            )
-          else
-            for (var index = 0; index < students.length; index++)
-              _StudentRow(
-                student: students[index],
-                index: index,
-                scale: scale,
-              ),
+          SizedBox(height: 27 * scale),
+          Text(
+            context.getText(AppKeys.teacherClassFunctions),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.andika(
+              color: const Color(0xFF1E3A5F),
+              fontSize: 18 * scale,
+              fontWeight: FontWeight.w700,
+              height: 1.55,
+            ),
+          ),
+          SizedBox(height: 7 * scale),
+          _ClassFunctionGrid(scale: scale),
         ],
       ),
     );
   }
 }
 
-class _StudentRow extends StatelessWidget {
-  const _StudentRow({
-    required this.student,
-    required this.index,
+class _MemberManagementCard extends StatelessWidget {
+  const _MemberManagementCard({
     required this.scale,
+    required this.memberCount,
+    required this.requestCount,
+    required this.onTap,
   });
 
-  final ClassroomStudent student;
-  final int index;
   final double scale;
+  final int memberCount;
+  final int requestCount;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final colors = _studentAvatarColors(index);
-    final name = student.name?.trim().isNotEmpty == true
-        ? student.name!.trim()
-        : context.getText(AppKeys.teacherStudentFallback);
-    return Container(
-      padding: EdgeInsets.only(top: index == 0 ? 0 : 16 * scale),
-      margin: EdgeInsets.only(top: index == 0 ? 0 : 16 * scale),
-      decoration: BoxDecoration(
-        border: index == 0
-            ? null
-            : const Border(top: BorderSide(color: Color(0xFFF9FAFB))),
-      ),
-      child: Row(
-        children: [
-          _InitialsAvatar(
-            initials: _initials(name),
-            background: colors.$1,
-            foreground: colors.$2,
-            scale: scale,
-          ),
-          SizedBox(width: 12 * scale),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    final radius = BorderRadius.circular(16 * scale);
+    return Material(
+      color: Colors.white,
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: 77 * scale),
+          child: Ink(
+            padding: EdgeInsets.symmetric(
+              horizontal: 21 * scale,
+              vertical: 14 * scale,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              border: Border.all(color: const Color(0xFFF3F4F6)),
+            ),
+            child: Row(
               children: [
-                Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.andika(
-                    color: const Color(0xFF1E3A5F),
-                    fontSize: 16 * scale,
-                    fontWeight: FontWeight.w700,
-                    height: 1.15,
+                Container(
+                  width: 48 * scale,
+                  height: 48 * scale,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0F7FF),
+                    borderRadius: BorderRadius.circular(12 * scale),
+                  ),
+                  child: Image.asset(
+                    'assets/images/teacher_class_members.png',
+                    width: 28 * scale,
+                    height: 28 * scale,
                   ),
                 ),
-                Text(
-                  context.getText(AppKeys.teacherJustJoined),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.andika(
-                    color: _teacherMuted,
-                    fontSize: 12 * scale,
-                    fontWeight: FontWeight.w400,
-                    height: 1.2,
+                SizedBox(width: 16 * scale),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        context.getText(AppKeys.teacherMemberManagement),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.andika(
+                          color: const Color(0xFF1E3A5F),
+                          fontSize: 18 * scale,
+                          fontWeight: FontWeight.w700,
+                          height: 1.22,
+                        ),
+                      ),
+                      SizedBox(height: 2 * scale),
+                      Text(
+                        context.formatText(
+                          AppKeys.teacherMemberSummary,
+                          {
+                            'members': memberCount,
+                            'requests': requestCount,
+                          },
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.andika(
+                          color: _teacherMuted,
+                          fontSize: 14 * scale,
+                          fontWeight: FontWeight.w400,
+                          height: 1.25,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                SvgPicture.asset(
+                  'assets/images/teacher_class_chevron.svg',
+                  width: 20 * scale,
+                  height: 20 * scale,
                 ),
               ],
             ),
           ),
-          Container(
-            width: 8 * scale,
-            height: 8 * scale,
-            decoration: const BoxDecoration(
-              color: Color(0xFF22C55E),
-              shape: BoxShape.circle,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _InitialsAvatar extends StatelessWidget {
-  const _InitialsAvatar({
-    required this.initials,
-    required this.background,
-    required this.foreground,
-    required this.scale,
-  });
+class _ClassFunctionGrid extends StatelessWidget {
+  const _ClassFunctionGrid({required this.scale});
 
-  final String initials;
-  final Color background;
-  final Color foreground;
   final double scale;
 
   @override
   Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 10 * scale,
+      mainAxisSpacing: 10 * scale,
+      childAspectRatio: 148 / 90,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      children: [
+        _ClassFunctionTile(
+          scale: scale,
+          iconAsset: 'assets/images/teacher_class_assignment.png',
+          label: context.getText(AppKeys.teacherAssignments),
+        ),
+        _ClassFunctionTile(scale: scale),
+        _ClassFunctionTile(scale: scale),
+        _ClassFunctionTile(scale: scale),
+      ],
+    );
+  }
+}
+
+class _ClassFunctionTile extends StatelessWidget {
+  const _ClassFunctionTile({
+    required this.scale,
+    this.iconAsset,
+    this.label,
+  });
+
+  final double scale;
+  final String? iconAsset;
+  final String? label;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: 40 * scale,
-      height: 40 * scale,
-      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: background,
-        shape: BoxShape.circle,
-        border: Border.all(color: foreground.withValues(alpha: 0.15)),
-      ),
-      child: Text(
-        initials,
-        style: GoogleFonts.andika(
-          color: foreground,
-          fontSize: 14 * scale,
-          fontWeight: FontWeight.w700,
-          height: 1,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16 * scale),
+        border: Border.all(
+          color: const Color(0xFFDDE4E6),
+          width: 2 * scale,
         ),
       ),
+      child: iconAsset == null
+          ? const SizedBox.shrink()
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  iconAsset!,
+                  width: 44 * scale,
+                  height: 44 * scale,
+                ),
+                SizedBox(height: 1 * scale),
+                Text(
+                  label ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.andika(
+                    color: _teacherInk,
+                    fontSize: 14 * scale,
+                    fontWeight: FontWeight.w700,
+                    height: 1.42,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

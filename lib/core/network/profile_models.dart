@@ -6,11 +6,15 @@ import 'semester_models.dart';
 
 part 'profile_models.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class ProfileListRequest {
-  const ProfileListRequest({required this.userId});
+  const ProfileListRequest({
+    this.userId,
+    this.search,
+  });
 
-  final int userId;
+  final int? userId;
+  final String? search;
 
   factory ProfileListRequest.fromJson(Map<String, dynamic> json) =>
       _$ProfileListRequestFromJson(json);

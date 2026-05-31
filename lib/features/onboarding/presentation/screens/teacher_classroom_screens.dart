@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -27,6 +28,7 @@ part 'teacher_home_tab.dart';
 part 'teacher_report_tab.dart';
 part 'teacher_create_class_screen.dart';
 part 'teacher_class_detail_screen.dart';
+part 'teacher_class_members_screen.dart';
 part 'teacher_shared_widgets.dart';
 
 const _teacherTeal = Color(0xFF38898B);
