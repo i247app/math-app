@@ -16,11 +16,11 @@ import '../../data/quiz_api.dart';
 import '../tabs/history_tab.dart';
 import '../tabs/review_tab.dart';
 import '../tabs/setting_tab.dart';
+import '../widgets/profile_avatar_image.dart';
 import 'grade_selection_screen.dart';
 import 'teacher_classroom_screens.dart';
 
 const _teal = Color(0xFF006762);
-const _blue = Color(0xFF339395);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _mintBackground = Color(0xFFEEF9FB);
@@ -475,6 +475,7 @@ class _HeaderBar extends StatelessWidget {
             children: [
               _StudentAvatar(
                 size: contentHeight * 0.45,
+                avatarKey: profile?.avatarKey,
                 avatarUrl: profile?.avatarUrl,
               ),
               SizedBox(width: contentHeight * 0.14),
@@ -521,24 +522,20 @@ class _HeaderBar extends StatelessWidget {
 }
 
 class _StudentAvatar extends StatelessWidget {
-  const _StudentAvatar({required this.size, this.avatarUrl});
+  const _StudentAvatar({required this.size, this.avatarKey, this.avatarUrl});
 
   final double size;
+  final String? avatarKey;
   final String? avatarUrl;
 
   @override
   Widget build(BuildContext context) {
-    final url = avatarUrl?.trim();
-
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Container(
-          width: size,
-          height: size,
+        DecoratedBox(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.peach,
             boxShadow: [
               BoxShadow(
                 color: _teal.withValues(alpha: 0.05),
@@ -551,24 +548,11 @@ class _StudentAvatar extends StatelessWidget {
               ),
             ],
           ),
-          clipBehavior: Clip.antiAlias,
-          child: url == null || url.isEmpty
-              ? Icon(
-                  Icons.person_rounded,
-                  color: const Color(0xFF2A7D75),
-                  size: size * 0.66,
-                )
-              : Image.network(
-                  url,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return Icon(
-                      Icons.person_rounded,
-                      color: const Color(0xFF2A7D75),
-                      size: size * 0.66,
-                    );
-                  },
-                ),
+          child: ProfileAvatarImage(
+            size: size,
+            avatarKey: avatarKey,
+            avatarUrl: avatarUrl,
+          ),
         ),
         Positioned(
           right: -size * 0.05,
@@ -1393,49 +1377,13 @@ class _UserAvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final avatarUrl = user.avatarUrl?.trim();
-    final name = (user.name ?? user.phone ?? 'U').trim();
-    final initials = name.isNotEmpty
-        ? name.split(' ').take(2).map((s) => s[0]).join().toUpperCase()
-        : 'U';
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: _blue.withValues(alpha: 0.15),
-        border: Border.all(color: color, width: 1.5),
-      ),
-      child: avatarUrl != null && avatarUrl.isNotEmpty
-          ? ClipOval(
-              child: Image.network(
-                avatarUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) {
-                  return Center(
-                    child: Text(
-                      initials,
-                      style: TextStyle(
-                        color: color,
-                        fontSize: size * 0.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            )
-          : Center(
-              child: Text(
-                initials,
-                style: TextStyle(
-                  color: color,
-                  fontSize: size * 0.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+    return ProfileAvatarImage(
+      size: size,
+      avatarUrl: user.avatarUrl,
+      foregroundColor: color,
+      borderColor: color,
+      borderWidth: 1.5,
+      iconScale: 0.58,
     );
   }
 }

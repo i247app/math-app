@@ -71,7 +71,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
             final scale = math.min(constraints.maxWidth / 390, 1.12);
             final classroom = _classroom;
             final students = classroom?.students ?? const <ClassroomStudent>[];
-            final count = classroom?.displayMemberCount ?? students.length;
+            final count = classroom?.displayStudentCount ?? students.length;
 
             return Column(
               children: [

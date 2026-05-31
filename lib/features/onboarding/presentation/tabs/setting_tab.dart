@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -20,6 +19,8 @@ import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/profile_api.dart';
 import '../../data/school_api.dart';
+import '../../domain/profile_avatar.dart';
+import '../widgets/profile_avatar_image.dart';
 import '../../../../core/localization/app_language.dart';
 import '../../../../core/localization/lingo_scope.dart';
 
@@ -130,7 +131,6 @@ class _SettingTabState extends State<SettingTab> {
   bool _isPickingAccountAvatar = false;
   bool _isLoadingProfiles = false;
   bool _isLoadingProfileOptions = false;
-  bool _isPickingCreateAvatar = false;
   bool _isSavingProfile = false;
   bool _isDeletingProfile = false;
   bool _isSettingDefaultProfile = false;
@@ -139,7 +139,7 @@ class _SettingTabState extends State<SettingTab> {
   String? _profileCreateError;
   String? _localAvatarPath;
   String? _draftAvatarPath;
-  String? _createAvatarPath;
+  String? _selectedProfileAvatarKey;
   String? _snapshotUsername;
   String? _snapshotPhone;
   String? _snapshotEmail;
@@ -168,6 +168,7 @@ class _SettingTabState extends State<SettingTab> {
     if (initialEditingProfile != null) {
       _editingProfile = initialEditingProfile;
       _profileNameController.text = initialEditingProfile.name?.trim() ?? '';
+      _selectedProfileAvatarKey = initialEditingProfile.avatarKey?.trim();
       _applyProfileIdFields(initialEditingProfile);
     }
     if (_view == SettingPageView.profile) {
@@ -688,41 +689,14 @@ class _SettingTabState extends State<SettingTab> {
     }
   }
 
-  Future<void> _pickCreateAvatar() async {
-    if (_isPickingCreateAvatar) {
-      return;
-    }
-
+  void _selectProfileAvatar(String avatarKey) {
     HapticFeedback.selectionClick();
-    setState(() => _isPickingCreateAvatar = true);
-
-    try {
-      final path = await _avatarPicker.pickAvatarPath();
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        if (path != null) {
-          _createAvatarPath = path;
-        }
-        _isPickingCreateAvatar = false;
-      });
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
-      setState(() => _isPickingCreateAvatar = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.imagePickFailed))),
-      );
-    }
+    setState(() => _selectedProfileAvatarKey = avatarKey);
   }
 
-  void _clearCreateAvatar() {
+  void _clearProfileAvatar() {
     HapticFeedback.selectionClick();
-    setState(() => _createAvatarPath = null);
+    setState(() => _selectedProfileAvatarKey = null);
   }
 
   Future<void> _saveProfileForm() async {
@@ -790,7 +764,7 @@ class _SettingTabState extends State<SettingTab> {
           semesterId: isTeacherProfile ? null : semester!.semesterId!,
           isDefault: _profiles.isEmpty,
           role: formRole,
-          avatarPath: isTeacherProfile ? null : _createAvatarPath,
+          avatarKey: _selectedProfileAvatarKey,
           idType: normalizedIdType,
           studentId: isTeacherProfile ? null : profileIdValue,
           teacherId: isTeacherProfile ? profileIdValue : null,
@@ -821,7 +795,7 @@ class _SettingTabState extends State<SettingTab> {
           isDefault: editingProfile.isDefault,
           role: formRole,
           dob: _dateOnly(editingProfile.dob),
-          avatarPath: isTeacherProfile ? null : _createAvatarPath,
+          avatarKey: _selectedProfileAvatarKey,
           idType: normalizedIdType,
           studentId: isTeacherProfile ? null : profileIdValue,
           teacherId: isTeacherProfile ? profileIdValue : null,
@@ -996,7 +970,7 @@ class _SettingTabState extends State<SettingTab> {
   void _resetCreateProfileForm() {
     _profileNameController.clear();
     _profileIdController.clear();
-    _createAvatarPath = null;
+    _selectedProfileAvatarKey = null;
     _editingProfile = null;
     _profileCreateError = null;
     _selectedProfileIdType = null;
@@ -1024,6 +998,7 @@ class _SettingTabState extends State<SettingTab> {
       _semesterOptions,
       (semester) => semester.semesterId == profile.semesterId,
     );
+    _selectedProfileAvatarKey = profile.avatarKey?.trim();
     _applyProfileIdFields(profile);
   }
 
@@ -1103,8 +1078,9 @@ class _SettingTabState extends State<SettingTab> {
                       child: switch (_view) {
                         SettingPageView.settings => _SettingsMenuPanel(
                             key: ValueKey(_viewKey(SettingPageView.settings)),
-                            avatarUrl: _effectiveUser?.avatarUrl,
-                            avatarPath: _localAvatarPath,
+                            activeProfile: widget.activeProfile,
+                            fallbackAvatarUrl: _effectiveUser?.avatarUrl,
+                            fallbackAvatarPath: _localAvatarPath,
                             username: _fallbackUsername(_effectiveUser),
                             scale: scale,
                             currentLanguage: lingo.language,
@@ -1153,7 +1129,7 @@ class _SettingTabState extends State<SettingTab> {
                             nameController: _profileNameController,
                             idController: _profileIdController,
                             role: _profileFormRole(_editingProfile),
-                            avatarPath: _createAvatarPath,
+                            avatarKey: _selectedProfileAvatarKey,
                             avatarUrl: _editingProfile?.avatarUrl,
                             schools: _schoolOptions,
                             grades: _gradeOptions,
@@ -1163,13 +1139,12 @@ class _SettingTabState extends State<SettingTab> {
                             selectedProgram: _selectedProgram,
                             selectedIdType: _selectedProfileIdType,
                             isLoadingOptions: _isLoadingProfileOptions,
-                            isPickingAvatar: _isPickingCreateAvatar,
                             isSaving: _isSavingProfile,
                             errorMessage:
                                 _profileOptionsError ?? _profileCreateError,
                             canRetryOptions: _profileOptionsError != null,
-                            onPickAvatar: _pickCreateAvatar,
-                            onClearAvatar: _clearCreateAvatar,
+                            onAvatarChanged: _selectProfileAvatar,
+                            onClearAvatar: _clearProfileAvatar,
                             onSchoolChanged: (school) {
                               setState(() => _selectedSchool = school);
                             },

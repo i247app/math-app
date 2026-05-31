@@ -6,7 +6,7 @@ class _AddProfilePanel extends StatelessWidget {
     required this.nameController,
     required this.idController,
     required this.role,
-    required this.avatarPath,
+    required this.avatarKey,
     required this.avatarUrl,
     required this.schools,
     required this.grades,
@@ -16,11 +16,10 @@ class _AddProfilePanel extends StatelessWidget {
     required this.selectedProgram,
     required this.selectedIdType,
     required this.isLoadingOptions,
-    required this.isPickingAvatar,
     required this.isSaving,
     required this.errorMessage,
     required this.canRetryOptions,
-    required this.onPickAvatar,
+    required this.onAvatarChanged,
     required this.onClearAvatar,
     required this.onSchoolChanged,
     required this.onGradeChanged,
@@ -35,7 +34,7 @@ class _AddProfilePanel extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController idController;
   final String role;
-  final String? avatarPath;
+  final String? avatarKey;
   final String? avatarUrl;
   final List<SchoolModel> schools;
   final List<GradeModel> grades;
@@ -45,11 +44,10 @@ class _AddProfilePanel extends StatelessWidget {
   final ProgramModel? selectedProgram;
   final String? selectedIdType;
   final bool isLoadingOptions;
-  final bool isPickingAvatar;
   final bool isSaving;
   final String? errorMessage;
   final bool canRetryOptions;
-  final VoidCallback onPickAvatar;
+  final ValueChanged<String> onAvatarChanged;
   final VoidCallback onClearAvatar;
   final ValueChanged<SchoolModel?> onSchoolChanged;
   final ValueChanged<GradeModel?> onGradeChanged;
@@ -74,17 +72,14 @@ class _AddProfilePanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (!isTeacherProfile) ...[
-          _AddProfileAvatar(
-            avatarPath: avatarPath,
-            avatarUrl: avatarUrl,
-            isPicking: isPickingAvatar,
-            scale: scale,
-            onTap: onPickAvatar,
-            onClear: onClearAvatar,
-          ),
-          SizedBox(height: 28 * scale),
-        ],
+        _AddProfileAvatar(
+          avatarKey: avatarKey,
+          avatarUrl: avatarUrl,
+          scale: scale,
+          onChanged: onAvatarChanged,
+          onClear: onClearAvatar,
+        ),
+        SizedBox(height: 28 * scale),
         _AddProfileTextField(
           label: context.getText(AppKeys.fullName),
           controller: nameController,
@@ -232,149 +227,233 @@ class _AddProfilePanel extends StatelessWidget {
 
 class _AddProfileAvatar extends StatelessWidget {
   const _AddProfileAvatar({
-    required this.avatarPath,
+    required this.avatarKey,
     required this.avatarUrl,
-    required this.isPicking,
     required this.scale,
-    required this.onTap,
+    required this.onChanged,
     required this.onClear,
   });
 
-  final String? avatarPath;
+  final String? avatarKey;
   final String? avatarUrl;
-  final bool isPicking;
   final double scale;
-  final VoidCallback onTap;
+  final ValueChanged<String> onChanged;
   final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
-    final path = avatarPath?.trim();
+    final key = avatarKey?.trim();
     final url = avatarUrl?.trim();
+    final hasCatalogAvatar = ProfileAvatarCatalog.urlForKey(key) != null;
     final size = 124 * scale;
 
     return Center(
-      child: SizedBox(
-        width: size + 24 * scale,
-        height: size + 24 * scale,
-        child: Stack(
-          alignment: Alignment.center,
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE2EAED),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 12 * scale,
-                    offset: Offset(0, 4 * scale),
-                  ),
-                ],
-                border: Border.all(color: Colors.white, width: 4 * scale),
-              ),
-              child: ClipOval(
-                child: path != null && path.isNotEmpty
-                    ? Image.file(
-                        File(path),
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) {
-                          return Icon(
-                            Icons.person_rounded,
-                            color: const Color(0xFFD3DEE1),
-                            size: 56 * scale,
-                          );
-                        },
-                      )
-                    : url != null && url.isNotEmpty
-                        ? Image.network(
-                            url,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) {
-                              return Icon(
-                                Icons.person_rounded,
-                                color: const Color(0xFFD3DEE1),
-                                size: 56 * scale,
-                              );
-                            },
-                          )
-                        : Icon(
-                            Icons.person_rounded,
-                            color: const Color(0xFFD3DEE1),
-                            size: 56 * scale,
-                          ),
-              ),
-            ),
-            if (isPicking)
-              Positioned.fill(
+      child: Semantics(
+        button: true,
+        label: context.getText(AppKeys.chooseAvatar),
+        child: SizedBox(
+          width: size + 24 * scale,
+          height: size + 24 * scale,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              GestureDetector(
+                onTap: () => _openAvatarSheet(context, key),
                 child: Container(
-                  margin: EdgeInsets.all(12 * scale),
+                  width: size,
+                  height: size,
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.18),
+                    color: const Color(0xFFE2EAED),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.12),
+                        blurRadius: 12 * scale,
+                        offset: Offset(0, 4 * scale),
+                      ),
+                    ],
                   ),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 3,
-                    ),
+                  child: ProfileAvatarImage(
+                    size: size,
+                    avatarKey: key,
+                    avatarUrl: hasCatalogAvatar ? null : url,
+                    foregroundColor: const Color(0xFFD3DEE1),
+                    borderColor: Colors.white,
+                    borderWidth: 4 * scale,
                   ),
                 ),
               ),
-            if (path != null && path.isNotEmpty)
+              if (key != null && key.isNotEmpty)
+                Positioned(
+                  left: 14 * scale,
+                  bottom: 18 * scale,
+                  child: Material(
+                    color: const Color(0xFFFFD8D8),
+                    elevation: 5,
+                    shadowColor:
+                        const Color(0xFFE83434).withValues(alpha: 0.16),
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: onClear,
+                      child: SizedBox(
+                        width: 38 * scale,
+                        height: 38 * scale,
+                        child: Icon(
+                          Icons.close_rounded,
+                          color: const Color(0xFFE83434),
+                          size: 22 * scale,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
-                left: 14 * scale,
+                right: 10 * scale,
                 bottom: 18 * scale,
                 child: Material(
-                  color: const Color(0xFFFFD8D8),
+                  color: _teal,
                   elevation: 5,
-                  shadowColor: const Color(0xFFE83434).withValues(alpha: 0.16),
+                  shadowColor: _teal.withValues(alpha: 0.24),
                   shape: const CircleBorder(),
                   child: InkWell(
                     customBorder: const CircleBorder(),
-                    onTap: onClear,
+                    onTap: () => _openAvatarSheet(context, key),
                     child: SizedBox(
-                      width: 38 * scale,
-                      height: 38 * scale,
+                      width: 36 * scale,
+                      height: 36 * scale,
                       child: Icon(
-                        Icons.close_rounded,
-                        color: const Color(0xFFE83434),
-                        size: 22 * scale,
+                        Icons.photo_camera_outlined,
+                        color: Colors.white,
+                        size: 18 * scale,
                       ),
                     ),
                   ),
                 ),
               ),
-            Positioned(
-              right: 10 * scale,
-              bottom: 18 * scale,
-              child: Material(
-                color: _teal,
-                elevation: 5,
-                shadowColor: _teal.withValues(alpha: 0.24),
-                shape: const CircleBorder(),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: onTap,
-                  child: SizedBox(
-                    width: 36 * scale,
-                    height: 36 * scale,
-                    child: Icon(
-                      Icons.photo_camera_outlined,
-                      color: Colors.white,
-                      size: 18 * scale,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _openAvatarSheet(
+      BuildContext context, String? selectedKey) async {
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        final bottomInset = MediaQuery.paddingOf(context).bottom;
+        return FractionallySizedBox(
+          heightFactor: 0.68,
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: EdgeInsets.fromLTRB(
+              20 * scale,
+              10 * scale,
+              20 * scale,
+              bottomInset + 20 * scale,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(28 * scale),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.10),
+                  blurRadius: 24 * scale,
+                  offset: Offset(0, -8 * scale),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 46 * scale,
+                      height: 5 * scale,
+                      margin: EdgeInsets.only(bottom: 14 * scale),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE2E9EC),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    context.getText(AppKeys.chooseAvatar),
+                    style: GoogleFonts.andika(
+                      color: _teal,
+                      fontSize: 22 * scale,
+                      fontWeight: FontWeight.w900,
+                      height: 1.15,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  SizedBox(height: 18 * scale),
+                  Expanded(
+                    child: GridView.builder(
+                      padding: EdgeInsets.zero,
+                      physics: const BouncingScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        mainAxisSpacing: 16 * scale,
+                        crossAxisSpacing: 16 * scale,
+                      ),
+                      itemCount: ProfileAvatarCatalog.options.length,
+                      itemBuilder: (context, index) {
+                        final option = ProfileAvatarCatalog.options[index];
+                        final isSelected = option.key == selectedKey;
+
+                        return Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: () => Navigator.of(context).pop(option.key),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                ProfileAvatarImage(
+                                  size: 82 * scale,
+                                  avatarKey: option.key,
+                                  borderColor:
+                                      isSelected ? _teal : Colors.transparent,
+                                  borderWidth: 4 * scale,
+                                ),
+                                if (isSelected)
+                                  Positioned(
+                                    right: 4 * scale,
+                                    bottom: 4 * scale,
+                                    child: Icon(
+                                      Icons.check_circle_rounded,
+                                      color: _teal,
+                                      size: 24 * scale,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (result != null) {
+      onChanged(result);
+    }
   }
 }
 

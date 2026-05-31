@@ -21,6 +21,7 @@ import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/profile_api.dart';
 import '../../data/school_api.dart';
+import '../widgets/profile_avatar_image.dart';
 
 part 'teacher_home_tab.dart';
 part 'teacher_report_tab.dart';
