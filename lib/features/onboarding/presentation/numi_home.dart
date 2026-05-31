@@ -215,6 +215,19 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
   final void Function(OnboardingCubit cubit, PhoneRegion region) sendOtp;
   final void Function(OnboardingState state) showDevOtpDialog;
 
+  static bool _isInlineSignupUsernameError(OnboardingState state) {
+    if (state.screen != AppScreen.signup) {
+      return false;
+    }
+
+    final normalized = state.authError?.toLowerCase().trim();
+    if (normalized == null || normalized.isEmpty) {
+      return false;
+    }
+
+    return normalized.contains('username already exists');
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<OnboardingCubit, OnboardingState>(
@@ -234,7 +247,7 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
         }
 
         final authError = state.authError;
-        if (authError != null) {
+        if (authError != null && !_isInlineSignupUsernameError(state)) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(authError)),
           );

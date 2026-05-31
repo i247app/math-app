@@ -29,6 +29,15 @@ class _SignupScreenState extends State<SignupScreen> {
   final emailController = TextEditingController();
   String selectedRole = 'STUDENT';
 
+  static bool _isUsernameExistsError(String? message) {
+    final normalized = message?.toLowerCase().trim();
+    if (normalized == null || normalized.isEmpty) {
+      return false;
+    }
+
+    return normalized.contains('username already exists');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -67,6 +76,9 @@ class _SignupScreenState extends State<SignupScreen> {
         );
       },
       builder: (context, state) {
+        final usernameErrorText =
+            _isUsernameExistsError(state.authError) ? state.authError : null;
+
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -137,6 +149,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           controller: usernameController,
                           hintText: context.getText(AppKeys.signupNameHint),
                           textInputAction: TextInputAction.next,
+                          errorText: usernameErrorText,
                         ),
                         const SizedBox(height: 20),
                         SignupFieldLabel(
@@ -258,51 +271,75 @@ class SignupTextField extends StatelessWidget {
     required this.hintText,
     this.keyboardType,
     this.textInputAction,
+    this.errorText,
   });
 
   final TextEditingController controller;
   final String hintText;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 58,
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        textInputAction: textInputAction,
-        textAlignVertical: TextAlignVertical.center,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: GoogleFonts.andika(
-            color: const Color(0xFF7E9088),
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF339395), width: 2),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 58,
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            textAlignVertical: TextAlignVertical.center,
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: GoogleFonts.andika(
+                color: const Color(0xFF7E9088),
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide:
+                    const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide:
+                    const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide:
+                    const BorderSide(color: Color(0xFF339395), width: 2),
+              ),
+            ),
+            style: GoogleFonts.andika(
+              color: AppColors.ink,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
-        style: GoogleFonts.andika(
-          color: AppColors.ink,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
+        if (errorText != null) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 2),
+            child: Text(
+              errorText!,
+              style: GoogleFonts.andika(
+                color: const Color(0xFFE74657),
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

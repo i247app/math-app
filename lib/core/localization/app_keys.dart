@@ -211,6 +211,7 @@ class AppKeys {
   static const teacherClassInfoFallback = 'teacher_class_info_fallback';
   static const teacherCopiedClassLink = 'teacher_copied_class_link';
   static const teacherCopiedClassCode = 'teacher_copied_class_code';
+  static const profileIdCopied = 'profile_id_copied';
   static const teacherJoinedStudents = 'teacher_joined_students';
   static const teacherNoJoinedStudents = 'teacher_no_joined_students';
   static const teacherStudentFallback = 'teacher_student_fallback';

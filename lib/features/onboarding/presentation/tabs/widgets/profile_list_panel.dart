@@ -100,9 +100,9 @@ class _ProfileAddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFFB72D83),
+      color: const Color(0xFFFF8A3D),
       elevation: 4,
-      shadowColor: const Color(0xFFB72D83).withValues(alpha: 0.20),
+      shadowColor: const Color(0xFFFF8A3D).withValues(alpha: 0.20),
       borderRadius: BorderRadius.circular(12 * scale),
       child: InkWell(
         onTap: onTap,
@@ -364,6 +364,19 @@ class _ProfileIdLine extends StatelessWidget {
   final bool isActive;
   final double scale;
 
+  Future<void> _copyProfileId(BuildContext context, String id) async {
+    await Clipboard.setData(ClipboardData(text: id));
+    if (!context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.getText(AppKeys.profileIdCopied)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final id = profile.id?.trim();
@@ -390,28 +403,34 @@ class _ProfileIdLine extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8 * scale),
-        Container(
-          height: 24 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 8 * scale),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE9ECEF),
+        Material(
+          color: const Color(0xFFE9ECEF),
+          borderRadius: BorderRadius.circular(8 * scale),
+          child: InkWell(
+            onTap: () => _copyProfileId(context, id),
             borderRadius: BorderRadius.circular(8 * scale),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.copy_rounded,
-                color: const Color(0xFF5E6A70),
-                size: 15 * scale,
+            child: SizedBox(
+              height: 24 * scale,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.copy_rounded,
+                      color: const Color(0xFF5E6A70),
+                      size: 15 * scale,
+                    ),
+                    SizedBox(width: 7 * scale),
+                    Icon(
+                      Icons.qr_code_2_rounded,
+                      color: const Color(0xFF5E6A70),
+                      size: 15 * scale,
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(width: 7 * scale),
-              Icon(
-                Icons.qr_code_2_rounded,
-                color: const Color(0xFF5E6A70),
-                size: 15 * scale,
-              ),
-            ],
+            ),
           ),
         ),
       ],
