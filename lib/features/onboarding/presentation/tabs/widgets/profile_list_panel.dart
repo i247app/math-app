@@ -63,6 +63,8 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
       );
     }
 
+    final sortedProfiles = _activeFirstProfiles;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -71,20 +73,42 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
           child: _ProfileAddButton(scale: scale, onTap: onAdd),
         ),
         SizedBox(height: 10 * scale),
-        for (var index = 0; index < profiles.length; index++) ...[
+        for (var index = 0; index < sortedProfiles.length; index++) ...[
           _ProfileCard(
-            profile: profiles[index],
-            isActive: ActiveProfileSession.profileStableId(profiles[index]) ==
-                activeProfileId,
+            profile: sortedProfiles[index],
+            isActive:
+                ActiveProfileSession.profileStableId(sortedProfiles[index]) ==
+                    activeProfileId,
             scale: scale,
-            onSelect: () => onSelect(profiles[index]),
-            onEdit: () => onEdit(profiles[index]),
-            onDelete: () => onDelete(profiles[index]),
+            onSelect: () => onSelect(sortedProfiles[index]),
+            onEdit: () => onEdit(sortedProfiles[index]),
+            onDelete: () => onDelete(sortedProfiles[index]),
           ),
-          if (index != profiles.length - 1) SizedBox(height: 22 * scale),
+          if (index != sortedProfiles.length - 1) SizedBox(height: 16 * scale),
         ],
       ],
     );
+  }
+
+  List<StudentProfile> get _activeFirstProfiles {
+    final normalizedActiveId = activeProfileId?.trim();
+    if (normalizedActiveId == null || normalizedActiveId.isEmpty) {
+      return profiles;
+    }
+
+    final activeIndex = profiles.indexWhere(
+      (profile) =>
+          ActiveProfileSession.profileStableId(profile) == normalizedActiveId,
+    );
+    if (activeIndex <= 0) {
+      return profiles;
+    }
+
+    return <StudentProfile>[
+      profiles[activeIndex],
+      ...profiles.take(activeIndex),
+      ...profiles.skip(activeIndex + 1),
+    ];
   }
 }
 
@@ -140,8 +164,10 @@ class _ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isActive ? _teal : const Color(0xFF9CAAA5);
+    final accent = isActive ? _teal : _muted;
     final radius = BorderRadius.circular(18 * scale);
+    final role = ProfileRole.fromProfile(profile);
+    final isTeacher = role == ProfileRole.teacher;
 
     return Material(
       color: Colors.white,
@@ -151,9 +177,9 @@ class _ProfileCard extends StatelessWidget {
         borderRadius: radius,
         child: Container(
           padding: EdgeInsets.fromLTRB(
-              20 * scale, 18 * scale, 16 * scale, 18 * scale),
+              18 * scale, 16 * scale, 16 * scale, 16 * scale),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: isActive ? 0.96 : 0.84),
+            color: Colors.white.withValues(alpha: 0.96),
             borderRadius: radius,
             border: Border.all(
               color: isActive
@@ -181,49 +207,74 @@ class _ProfileCard extends StatelessWidget {
                     isActive: isActive,
                     scale: scale,
                   ),
-                  const Spacer(),
+                  SizedBox(width: 14 * scale),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _displayProfileName(context, profile),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.andika(
+                            color: _deepInk,
+                            fontSize: 18 * scale,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                        SizedBox(height: 10 * scale),
+                        _ProfileIdLine(
+                          profile: profile,
+                          isActive: isActive,
+                          scale: scale,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 10 * scale),
                   _ProfileRadio(isActive: isActive, scale: scale),
                 ],
               ),
-              SizedBox(height: 18 * scale),
-              Text(
-                _displayProfileName(context, profile),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: isActive ? _deepInk : const Color(0xFF9CAAA5),
-                  fontSize: 18 * scale,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  letterSpacing: 0,
+              SizedBox(height: 14 * scale),
+              _ProfileInfoLine(
+                icon: _roleIcon(role),
+                iconColor: accent,
+                label: context.getText(AppKeys.profileRole),
+                value: _localizedRole(context, role),
+                scale: scale,
+              ),
+              SizedBox(height: 14 * scale),
+              _ProfileInfoLine(
+                icon:
+                    isTeacher ? Icons.apartment_rounded : Icons.school_outlined,
+                iconColor: accent,
+                label: isTeacher
+                    ? context.getText(AppKeys.school)
+                    : context.getText(AppKeys.grade),
+                value: isTeacher
+                    ? _displaySchool(context, profile)
+                    : _displayGrade(context, profile),
+                scale: scale,
+              ),
+              if (!isTeacher) ...[
+                SizedBox(height: 12 * scale),
+                _ProfileInfoLine(
+                  icon: Icons.book_outlined,
+                  iconColor: accent,
+                  label: context.getText(AppKeys.program),
+                  value: _displayProgram(context, profile),
+                  scale: scale,
                 ),
-              ),
-              SizedBox(height: 17 * scale),
-              _ProfileIdLine(
-                  profile: profile, isActive: isActive, scale: scale),
+              ],
               SizedBox(height: 14 * scale),
-              _ProfileInfoLine(
-                icon: Icons.school_outlined,
-                iconColor: accent,
-                label: context.getText(AppKeys.grade),
-                value: _displayGrade(context, profile),
-                scale: scale,
-              ),
-              SizedBox(height: 14 * scale),
-              _ProfileInfoLine(
-                icon: Icons.book_outlined,
-                iconColor: accent,
-                label: context.getText(AppKeys.program),
-                value: _displayProgram(context, profile),
-                scale: scale,
-              ),
-              SizedBox(height: 18 * scale),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   _ProfileIconButton(
                     icon: Icons.edit_rounded,
-                    foregroundColor: isActive ? _teal : const Color(0xFF9CAAA5),
+                    foregroundColor: _teal,
                     backgroundColor: const Color(0xFFECF6FA),
                     scale: scale,
                     onTap: onEdit,
@@ -231,11 +282,8 @@ class _ProfileCard extends StatelessWidget {
                   SizedBox(width: 12 * scale),
                   _ProfileIconButton(
                     icon: Icons.delete_outline_rounded,
-                    foregroundColor:
-                        isActive ? const Color(0xFFE83434) : Colors.white,
-                    backgroundColor: isActive
-                        ? const Color(0xFFFFD8D8)
-                        : const Color(0xFFFFCACA),
+                    foregroundColor: const Color(0xFFE83434),
+                    backgroundColor: const Color(0xFFFFD8D8),
                     scale: scale,
                     onTap: onDelete,
                   ),
@@ -269,6 +317,29 @@ class _ProfileCard extends StatelessWidget {
         ? context.getText(AppKeys.notSelected)
         : program;
   }
+
+  static String _displaySchool(BuildContext context, StudentProfile profile) {
+    final school = profile.school?.name?.trim();
+    return school == null || school.isEmpty
+        ? context.getText(AppKeys.notSelected)
+        : school;
+  }
+}
+
+IconData _roleIcon(ProfileRole role) {
+  return switch (role) {
+    ProfileRole.teacher => Icons.co_present_rounded,
+    ProfileRole.parent => Icons.family_restroom_rounded,
+    ProfileRole.student => Icons.person_rounded,
+  };
+}
+
+String _localizedRole(BuildContext context, ProfileRole role) {
+  return switch (role) {
+    ProfileRole.teacher => context.getText(AppKeys.roleTeacher),
+    ProfileRole.parent => context.getText(AppKeys.roleParent),
+    ProfileRole.student => context.getText(AppKeys.roleStudent),
+  };
 }
 
 class _ProfileAvatar extends StatelessWidget {
@@ -286,7 +357,7 @@ class _ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = 84 * scale;
+    final size = 72 * scale;
 
     return ProfileAvatarImage(
       size: size,
@@ -357,7 +428,7 @@ class _ProfileIdLine extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final color = isActive ? const Color(0xFF604950) : const Color(0xFF9CAAA5);
+    final color = isActive ? const Color(0xFF604950) : _muted;
 
     return Row(
       children: [

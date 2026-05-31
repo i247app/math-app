@@ -7,6 +7,7 @@ class TeacherHomeTab extends StatefulWidget {
     required this.activeProfile,
     required this.bottomPadding,
     required this.scale,
+    required this.onCompleteProfile,
     ClassroomService? classroomService,
   }) : _classroomService = classroomService;
 
@@ -14,6 +15,7 @@ class TeacherHomeTab extends StatefulWidget {
   final StudentProfile? activeProfile;
   final double bottomPadding;
   final double scale;
+  final Future<void> Function() onCompleteProfile;
   final ClassroomService? _classroomService;
 
   @override
@@ -98,6 +100,16 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     }
   }
 
+  Future<void> _handleClassCreateAction() async {
+    if (!_isTeacherProfileComplete(widget.activeProfile)) {
+      HapticFeedback.selectionClick();
+      await widget.onCompleteProfile();
+      return;
+    }
+
+    await _openCreateClass();
+  }
+
   Future<void> _openClassDetail(ClassroomModel classroom) async {
     final classroomId = classroom.stableId;
     final profileId =
@@ -128,6 +140,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
+    final isProfileComplete = _isTeacherProfileComplete(widget.activeProfile);
 
     return RefreshIndicator(
       color: _teacherTeal,
@@ -156,7 +169,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
             _TeacherClassSectionHeader(
               scale: scale,
               hasClasses: _classrooms.isNotEmpty,
-              onAdd: _openCreateClass,
+              onAdd: _handleClassCreateAction,
             ),
             SizedBox(height: (_classrooms.isNotEmpty ? 5 : 12) * scale),
             if (_isLoading && _classrooms.isEmpty)
@@ -168,7 +181,11 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                 onRetry: _loadClassrooms,
               )
             else if (_classrooms.isEmpty)
-              _TeacherNoClassPanel(scale: scale, onCreate: _openCreateClass)
+              _TeacherNoClassPanel(
+                scale: scale,
+                isProfileComplete: isProfileComplete,
+                onCreate: _handleClassCreateAction,
+              )
             else
               _TeacherClassGrid(
                 scale: scale,
@@ -180,6 +197,10 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       ),
     );
   }
+}
+
+bool _isTeacherProfileComplete(StudentProfile? profile) {
+  return profile?.profileStatus?.trim().toUpperCase() == 'OFFICIAL';
 }
 
 class _TeacherTopBar extends StatelessWidget {
@@ -393,10 +414,12 @@ class _TeacherClassSectionHeader extends StatelessWidget {
 class _TeacherNoClassPanel extends StatelessWidget {
   const _TeacherNoClassPanel({
     required this.scale,
+    required this.isProfileComplete,
     required this.onCreate,
   });
 
   final double scale;
+  final bool isProfileComplete;
   final VoidCallback onCreate;
 
   @override
@@ -425,7 +448,11 @@ class _TeacherNoClassPanel extends StatelessWidget {
           SizedBox(height: 22 * scale),
           _CoralCreateButton(
             scale: scale,
-            label: context.getText(AppKeys.teacherCreateNewClass),
+            label: context.getText(
+              isProfileComplete
+                  ? AppKeys.teacherCreateNewClass
+                  : AppKeys.teacherCompleteProfile,
+            ),
             onTap: onCreate,
           ),
         ],

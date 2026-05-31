@@ -73,7 +73,8 @@ class SettingTab extends StatefulWidget {
     required this.scale,
   })  : _initialView = SettingPageView.settings,
         _initialEditingProfile = null,
-        _isPushedPage = false;
+        _isPushedPage = false,
+        _popAfterProfileSave = false;
 
   const SettingTab.page({
     super.key,
@@ -88,10 +89,12 @@ class SettingTab extends StatefulWidget {
     SettingPageView initialView = SettingPageView.settings,
     StudentProfile? initialEditingProfile,
     bool isPushedPage = false,
+    bool popAfterProfileSave = false,
   })  : openAddProfileRequestId = 0,
         _initialView = initialView,
         _initialEditingProfile = initialEditingProfile,
-        _isPushedPage = isPushedPage;
+        _isPushedPage = isPushedPage,
+        _popAfterProfileSave = popAfterProfileSave;
 
   final LoginUser? user;
   final List<StudentProfile> profiles;
@@ -105,6 +108,7 @@ class SettingTab extends StatefulWidget {
   final SettingPageView _initialView;
   final StudentProfile? _initialEditingProfile;
   final bool _isPushedPage;
+  final bool _popAfterProfileSave;
 
   @override
   State<SettingTab> createState() => _SettingTabState();
@@ -746,6 +750,14 @@ class _SettingTabState extends State<SettingTab> {
       );
       return;
     }
+    if (isTeacherProfile &&
+        (normalizedIdType == null || profileIdValue.isEmpty)) {
+      setState(
+        () => _profileCreateError =
+            context.readText(AppKeys.missingProfileSelections),
+      );
+      return;
+    }
 
     HapticFeedback.mediumImpact();
     setState(() {
@@ -813,6 +825,10 @@ class _SettingTabState extends State<SettingTab> {
       });
       await _loadProfiles();
       widget.onProfileSaved?.call();
+      if (widget._popAfterProfileSave && mounted) {
+        Navigator.of(context).maybePop();
+        return;
+      }
       if (isCreatingFirstProfile && mounted) {
         NumiApp.restart(context);
       }
@@ -1155,7 +1171,10 @@ class _SettingTabState extends State<SettingTab> {
                               setState(() => _selectedProgram = program);
                             },
                             onIdTypeChanged: (idType) {
-                              setState(() => _selectedProfileIdType = idType);
+                              setState(() {
+                                _selectedProfileIdType = idType;
+                                _profileIdController.clear();
+                              });
                             },
                             onRetryOptions: _loadProfileOptions,
                             onCancel: _cancelAddProfile,

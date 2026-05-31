@@ -177,6 +177,10 @@ class AppKeys {
   static const chooseSemester = 'choose_semester';
   static const noSchools = 'no_schools';
   static const active = 'active';
+  static const profileRole = 'profile_role';
+  static const roleStudent = 'role_student';
+  static const roleParent = 'role_parent';
+  static const roleTeacher = 'role_teacher';
   static const belovedChild = 'beloved_child';
   static const notSelected = 'not_selected';
   static const teacherFallback = 'teacher_fallback';
@@ -187,6 +191,7 @@ class AppKeys {
   static const teacherHeroSubtitle = 'teacher_hero_subtitle';
   static const teacherYourClasses = 'teacher_your_classes';
   static const teacherCreateNewClass = 'teacher_create_new_class';
+  static const teacherCompleteProfile = 'teacher_complete_profile';
   static const teacherClassFallback = 'teacher_class_fallback';
   static const teacherStudentCount = 'teacher_student_count';
   static const teacherEnterClass = 'teacher_enter_class';

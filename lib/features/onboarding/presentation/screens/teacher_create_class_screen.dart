@@ -51,7 +51,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
   List<ProgramModel> _programs = const <ProgramModel>[];
   List<SchoolModel> _schools = const <SchoolModel>[];
   GradeModel? _selectedGrade;
-  ProgramModel? _selectedProgram;
+  List<ProgramModel> _selectedPrograms = const <ProgramModel>[];
   SchoolModel? _selectedSchool;
 
   @override
@@ -100,9 +100,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         _schools = schools;
         _selectedGrade = _matchGrade(grades, widget.activeProfile?.gradeId) ??
             (grades.isEmpty ? null : grades.first);
-        _selectedProgram =
-            _matchProgram(programs, widget.activeProfile?.programId) ??
-                (programs.isEmpty ? null : programs.first);
+        _selectedPrograms = const <ProgramModel>[];
         _selectedSchool =
             _matchSchool(schools, widget.activeProfile?.schoolId) ??
                 (schools.isEmpty ? null : schools.first);
@@ -139,7 +137,11 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
     final gradeId = _gradeStableId(_selectedGrade);
-    final programId = _programStableId(_selectedProgram);
+    final programIds = _selectedPrograms
+        .map(_programStableId)
+        .whereType<String>()
+        .where((id) => id.isNotEmpty)
+        .toList(growable: false);
     final schoolId = _schoolStableId(_selectedSchool);
     final name = _nameController.text.trim();
     final description = _descriptionController.text.trim();
@@ -150,7 +152,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     }
     if (name.isEmpty ||
         gradeId == null ||
-        programId == null ||
+        programIds.isEmpty ||
         schoolId == null) {
       _showSnack(context.readText(AppKeys.teacherClassMissingInfo));
       return;
@@ -162,7 +164,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         profileId: profileId,
         name: name,
         gradeId: gradeId,
-        programId: programId,
+        programIds: programIds,
         schoolId: schoolId,
         description: description.isEmpty ? null : description,
         filePath: _avatarPath,
@@ -252,14 +254,19 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                                     scale: scale,
                                   ),
                                   SizedBox(height: 14 * scale),
-                                  _TeacherDropdownField<ProgramModel>(
+                                  _TeacherMultiSelectField<ProgramModel>(
                                     label: context
                                         .getText(AppKeys.learningProgram),
-                                    value: _selectedProgram,
+                                    values: _selectedPrograms,
                                     items: _programs,
                                     displayText: _programLabel,
-                                    onChanged: (value) => setState(
-                                        () => _selectedProgram = value),
+                                    itemId: (program) =>
+                                        _programStableId(program) ?? '',
+                                    emptyText:
+                                        context.getText(AppKeys.chooseProgram),
+                                    onChanged: (values) => setState(
+                                      () => _selectedPrograms = values,
+                                    ),
                                     scale: scale,
                                   ),
                                   SizedBox(height: 14 * scale),

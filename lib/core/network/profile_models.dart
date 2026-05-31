@@ -229,6 +229,7 @@ class StudentProfile {
     this.semester,
     this.isDefault = false,
     this.role,
+    this.profileStatus,
     this.idType,
     this.studentId,
     this.teacherId,
@@ -259,6 +260,7 @@ class StudentProfile {
   @JsonKey(fromJson: _boolFromJson)
   final bool isDefault;
   final String? role;
+  final String? profileStatus;
   final String? idType;
   final String? studentId;
   final String? teacherId;

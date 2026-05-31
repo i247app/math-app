@@ -19,7 +19,7 @@ class CreateClassroomRequest {
   const CreateClassroomRequest({
     required this.profileId,
     required this.name,
-    required this.programId,
+    required this.programIds,
     required this.gradeId,
     required this.schoolId,
     this.description,
@@ -28,7 +28,8 @@ class CreateClassroomRequest {
 
   final String profileId;
   final String name;
-  final String programId;
+  @JsonKey(defaultValue: <String>[])
+  final List<String> programIds;
   final String gradeId;
   final String schoolId;
   final String? description;

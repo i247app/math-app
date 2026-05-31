@@ -206,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         });
                       },
                       openAddProfileRequestId: _openAddProfileRequestId,
+                      onCompleteTeacherProfile: _openTeacherProfileForm,
                       bottomPadding: navHeight + s(14),
                       headerHeight: showHeader ? headerHeight : 0,
                       scale: scale,
@@ -265,6 +266,46 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     return 'Student';
   }
+
+  Future<void> _openTeacherProfileForm() async {
+    final profile = widget.activeProfile;
+    if (profile == null) {
+      return;
+    }
+    final size = MediaQuery.sizeOf(context);
+    final scale = math.min(
+      math.min(size.width, 430.0) / _designWidth,
+      size.height / _designHeight,
+    );
+
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => Material(
+          color: Colors.white,
+          child: SafeArea(
+            child: SettingTab.page(
+              user: widget.user,
+              profiles: widget.profiles,
+              activeProfile: widget.activeProfile,
+              profileLoadError: widget.profileLoadError,
+              onLogout: widget.onLogout,
+              onProfileSaved: () {
+                widget.onRefreshProfiles();
+              },
+              bottomPadding: 0,
+              scale: scale,
+              initialView: SettingPageView.addProfile,
+              initialEditingProfile: profile,
+              isPushedPage: true,
+              popAfterProfileSave: true,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await widget.onRefreshProfiles();
+  }
 }
 
 class _TabContent extends StatelessWidget {
@@ -283,6 +324,7 @@ class _TabContent extends StatelessWidget {
     required this.onAddProfileFromReview,
     required this.onProfileSaved,
     required this.openAddProfileRequestId,
+    required this.onCompleteTeacherProfile,
     required this.bottomPadding,
     required this.headerHeight,
     required this.scale,
@@ -301,6 +343,7 @@ class _TabContent extends StatelessWidget {
   final VoidCallback onAddProfileFromReview;
   final VoidCallback onProfileSaved;
   final int openAddProfileRequestId;
+  final Future<void> Function() onCompleteTeacherProfile;
   final double bottomPadding;
   final double headerHeight;
   final double scale;
@@ -328,6 +371,7 @@ class _TabContent extends StatelessWidget {
         activeProfile: activeProfile,
         bottomPadding: bottomPadding,
         scale: scale,
+        onCompleteProfile: onCompleteTeacherProfile,
       );
     }
 

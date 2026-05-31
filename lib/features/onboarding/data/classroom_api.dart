@@ -18,7 +18,7 @@ abstract class ClassroomService {
   Future<ClassroomModel?> createClassroom({
     required String profileId,
     required String name,
-    required String programId,
+    required List<String> programIds,
     required String gradeId,
     required String schoolId,
     int maxMembers = 50,
@@ -59,7 +59,7 @@ class ClassroomApi implements ClassroomService {
   Future<ClassroomModel?> createClassroom({
     required String profileId,
     required String name,
-    required String programId,
+    required List<String> programIds,
     required String gradeId,
     required String schoolId,
     int maxMembers = 50,
@@ -71,7 +71,7 @@ class ClassroomApi implements ClassroomService {
         CreateClassroomRequest(
           profileId: profileId,
           name: name,
-          programId: programId,
+          programIds: programIds,
           gradeId: gradeId,
           schoolId: schoolId,
           maxMembers: maxMembers,

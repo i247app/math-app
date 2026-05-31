@@ -676,7 +676,7 @@ class NetworkApi {
     final formData = FormData.fromMap({
       'profile_id': request.profileId,
       'name': request.name,
-      'program_id': request.programId,
+      'program_ids': request.programIds,
       'grade_id': request.gradeId,
       'school_id': request.schoolId,
       'max_members': request.maxMembers.toString(),
