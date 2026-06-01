@@ -49,6 +49,7 @@ class CreateClassroomExerciseRequest {
     required this.classroomId,
     required this.programId,
     required this.title,
+    required this.description,
     required this.numQuestions,
     required this.chapterName,
     required this.lessonName,
@@ -63,6 +64,7 @@ class CreateClassroomExerciseRequest {
   final int classroomId;
   final int programId;
   final String title;
+  final String description;
   final int numQuestions;
   final String chapterName;
   final String lessonName;

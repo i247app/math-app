@@ -94,10 +94,8 @@ class _TeacherCreateHomeworkScreenState
         profileId: widget.profileId,
         classroomId: _selectedClassroomId,
         programId: _selectedProgramId!,
-        title: _trimOrDefault(
-          _titleController.text,
-          'Phép cộng trong phạm vi 20',
-        ),
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
         numQuestions: 4,
         chapterName: _trimOrDefault(_chapterController.text, 'Phép cộng'),
         lessonName: _trimOrDefault(
