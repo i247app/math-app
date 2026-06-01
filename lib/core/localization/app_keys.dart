@@ -6,6 +6,8 @@ class AppKeys {
   static const save = 'save';
   static const retry = 'retry';
   static const retryUpper = 'retry_upper';
+  static const accept = 'accept';
+  static const reject = 'reject';
   static const delete = 'delete';
   static const update = 'update';
   static const add = 'add';
@@ -72,6 +74,51 @@ class AppKeys {
   static const startNow = 'start_now';
   static const practice = 'practice';
   static const yourAchievement = 'your_achievement';
+  static const studentHomework = 'student_homework';
+  static const studentClassroom = 'student_classroom';
+  static const studentNoHomeworkTitle = 'student_no_homework_title';
+  static const studentNoHomeworkMessage = 'student_no_homework_message';
+  static const studentNoClassroomsTitle = 'student_no_classrooms_title';
+  static const studentNoClassroomsMessage = 'student_no_classrooms_message';
+  static const studentJoinNewClassroom = 'student_join_new_classroom';
+  static const studentJoinClassroomSoon = 'student_join_classroom_soon';
+  static const studentClassroomLoadFailed = 'student_classroom_load_failed';
+  static const studentMissingProfileId = 'student_missing_profile_id';
+  static const studentFindClassTitle = 'student_find_class_title';
+  static const studentClassCodeHint = 'student_class_code_hint';
+  static const studentSearchClass = 'student_search_class';
+  static const studentSearchResults = 'student_search_results';
+  static const studentDefaultSchoolFilter = 'student_default_school_filter';
+  static const studentGradeFilter = 'student_grade_filter';
+  static const studentClassSearchFailed = 'student_class_search_failed';
+  static const studentClassSearchLoading = 'student_class_search_loading';
+  static const studentClassSearchRetry = 'student_class_search_retry';
+  static const studentNoClassSearchResults = 'student_no_class_search_results';
+  static const studentNoClassSearchResultsMessage =
+      'student_no_class_search_results_message';
+  static const studentEnterClassCodeTitle = 'student_enter_class_code_title';
+  static const studentEnterClassCodeMessage =
+      'student_enter_class_code_message';
+  static const studentClassMissingCode = 'student_class_missing_code';
+  static const studentJoinClassSuccess = 'student_join_class_success';
+  static const studentJoinClassFailed = 'student_join_class_failed';
+  static const studentAlreadyJoinedClass = 'student_already_joined_class';
+  static const studentClassJoinRequestPending =
+      'student_class_join_request_pending';
+  static const studentClassCodeLabel = 'student_class_code_label';
+  static const studentClassRelationshipMember =
+      'student_class_relationship_member';
+  static const studentClassRelationshipPendingInvitation =
+      'student_class_relationship_pending_invitation';
+  static const studentClassRelationshipPendingRequest =
+      'student_class_relationship_pending_request';
+  static const studentClassRelationshipNone = 'student_class_relationship_none';
+  static const studentClassInvitations = 'student_class_invitations';
+  static const studentViewAllInvitations = 'student_view_all_invitations';
+  static const studentInviteSubtitle = 'student_invite_subtitle';
+  static const studentJoinClassroomUpper = 'student_join_classroom_upper';
+  static const assessmentAction = 'assessment_action';
+  static const viewAll = 'view_all';
   static const viewAllUpper = 'view_all_upper';
   static const progressAchievementTitle = 'progress_achievement_title';
   static const todayCompletedExercises = 'today_completed_exercises';

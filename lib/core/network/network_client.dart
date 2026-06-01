@@ -665,6 +665,36 @@ class NetworkApi {
     return classroomResponse;
   }
 
+  Future<ClassroomListResponse> listMyJoinedClassrooms(
+    ClassroomListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/classrooms/my-joined',
+      request.toJson(),
+    );
+    final classroomResponse = ClassroomListResponse.fromJson(responseJson);
+    if (classroomResponse.mstatus != 200) {
+      throw NetworkException(
+        classroomResponse.mmessage ??
+            classroomResponse.debug ??
+            classroomResponse.status ??
+            'Request failed.',
+        status: classroomResponse.mstatus,
+      );
+    }
+
+    return classroomResponse;
+  }
+
+  Future<ClassroomActionResponse> joinClassroomByCode(
+    ClassroomJoinByCodeRequest request,
+  ) {
+    return _classroomAction(
+      '/classrooms/join-by-code',
+      request.toJson(),
+    );
+  }
+
   Future<ClassroomMemberListResponse> listClassroomJoinRequests(
     ClassroomMembersListRequest request,
   ) async {

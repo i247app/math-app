@@ -3,13 +3,16 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
+import '../../../../core/network/classroom_models.dart';
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/network/profile_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/active_profile_session.dart';
+import '../../data/classroom_api.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/grade_api.dart';
 import '../../data/quiz_api.dart';
@@ -18,12 +21,19 @@ import '../tabs/review_tab.dart';
 import '../tabs/setting_tab.dart';
 import '../widgets/profile_avatar_image.dart';
 import 'grade_selection_screen.dart';
+import 'student_join_class_screen.dart';
 import 'teacher_classroom_screens.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _mintBackground = Color(0xFFEEF9FB);
+const _studentHomeMascot = 'assets/images/student_home_mascot.png';
+const _studentHomeClassIcon = 'assets/images/student_home_class_icon.png';
+const _studentHomeBell = 'assets/images/student_home_bell.svg';
+const _studentHomeInvite = 'assets/images/student_home_invite.svg';
+const _studentHomePracticeIcon = 'assets/images/student_home_practice.svg';
+const _studentHomeAssessmentIcon = 'assets/images/student_home_assessment.svg';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -401,25 +411,13 @@ class _TabContent extends StatelessWidget {
 
   Widget _buildStudentContent(EdgeInsets horizontalPadding) {
     if (activeTab == 0) {
-      return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
+      return _StudentHomeContent(
         padding: horizontalPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _TestHeroCard(
-              height: 430 * scale,
-              scale: scale,
-              user: user,
-              initialGrades: initialGrades,
-              gradeService: gradeService,
-            ),
-            SizedBox(height: 28 * scale),
-            _AchievementsHeader(scale: scale),
-            SizedBox(height: 20 * scale),
-            _AchievementCard(scale: scale),
-          ],
-        ),
+        scale: scale,
+        user: user,
+        activeProfile: activeProfile,
+        initialGrades: initialGrades,
+        gradeService: gradeService,
       );
     }
 
@@ -469,7 +467,7 @@ class _HomeBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return const DecoratedBox(
       decoration: BoxDecoration(
-        color: _mintBackground,
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Color(0x3300504B),
@@ -542,7 +540,7 @@ class _HeaderBar extends StatelessWidget {
                     ),
                     SizedBox(height: contentHeight * 0.06),
                     Text(
-                      name,
+                      '$name👋',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -634,10 +632,12 @@ class _NotificationButton extends StatelessWidget {
         child: SizedBox(
           width: size,
           height: size,
-          child: Icon(
-            Icons.notifications_none_rounded,
-            color: _teal,
-            size: size * 0.50,
+          child: Center(
+            child: SvgPicture.asset(
+              _studentHomeBell,
+              width: size * 0.40,
+              height: size * 0.50,
+            ),
           ),
         ),
       ),
@@ -645,6 +645,7 @@ class _NotificationButton extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _TestHeroCard extends StatelessWidget {
   const _TestHeroCard({
     required this.height,
@@ -1047,6 +1048,1387 @@ class _HeroButtonState extends State<_HeroButton> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+enum _StudentHomePanel { homework, classroom, achievement }
+
+class _StudentHomeContent extends StatefulWidget {
+  const _StudentHomeContent({
+    required this.padding,
+    required this.scale,
+    required this.user,
+    required this.activeProfile,
+    required this.initialGrades,
+    required this.gradeService,
+  });
+
+  final EdgeInsets padding;
+  final double scale;
+  final LoginUser? user;
+  final StudentProfile? activeProfile;
+  final List<GradeModel> initialGrades;
+  final GradeService gradeService;
+
+  @override
+  State<_StudentHomeContent> createState() => _StudentHomeContentState();
+}
+
+class _StudentHomeContentState extends State<_StudentHomeContent> {
+  final ClassroomService _classroomService = ClassroomApi();
+  final _StudentHomePanel _activePanel = _StudentHomePanel.homework;
+  int? _loadedProfileId;
+  bool _isLoadingClassrooms = false;
+  String? _classroomError;
+  List<ClassroomModel> _classrooms = const <ClassroomModel>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadClassrooms();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StudentHomeContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldProfileId = ActiveProfileSession.profileStableId(
+      oldWidget.activeProfile,
+    );
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (oldProfileId != profileId) {
+      _loadedProfileId = null;
+      _classrooms = const <ClassroomModel>[];
+      _classroomError = null;
+      _loadClassrooms();
+    }
+  }
+
+  Future<void> _loadClassrooms() async {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (profileId == null || profileId <= 0 || _isLoadingClassrooms) {
+      return;
+    }
+    if (_loadedProfileId == profileId && _classrooms.isNotEmpty) {
+      return;
+    }
+
+    setState(() {
+      _isLoadingClassrooms = true;
+      _classroomError = null;
+    });
+
+    try {
+      final classrooms = await _classroomService.listMyJoinedClassrooms(
+        profileId: profileId,
+      );
+      if (!mounted ||
+          ActiveProfileSession.profileStableId(widget.activeProfile) !=
+              profileId) {
+        return;
+      }
+
+      setState(() {
+        _loadedProfileId = profileId;
+        _classrooms = classrooms;
+      });
+    } catch (_) {
+      if (!mounted ||
+          ActiveProfileSession.profileStableId(widget.activeProfile) !=
+              profileId) {
+        return;
+      }
+
+      setState(() {
+        _loadedProfileId = profileId;
+        _classroomError = context.readText(AppKeys.studentClassroomLoadFailed);
+        _classrooms = const <ClassroomModel>[];
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingClassrooms = false);
+      } else {
+        _isLoadingClassrooms = false;
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: widget.padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const _StudentFigmaHeroCard(),
+          const SizedBox(height: 22),
+          _StudentJoinClassCta(onTap: _openJoinClassroom),
+          const SizedBox(height: 11),
+          _StudentClassGridSection(
+            classrooms: _classrooms,
+            isLoading: _isLoadingClassrooms,
+            error: _classroomError,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ignore: unused_element
+  Widget _buildPanel(BuildContext context) {
+    return switch (_activePanel) {
+      _StudentHomePanel.homework => _HomeworkPanel(
+          key: const ValueKey(_StudentHomePanel.homework),
+          scale: widget.scale,
+        ),
+      _StudentHomePanel.classroom => _StudentClassroomPanel(
+          key: const ValueKey(_StudentHomePanel.classroom),
+          scale: widget.scale,
+          classrooms: _classrooms,
+          isLoading: _isLoadingClassrooms,
+          error: _classroomError,
+          onRetry: _loadClassrooms,
+          onJoinClassroom: _openJoinClassroom,
+        ),
+      _StudentHomePanel.achievement => _AchievementPanel(
+          key: const ValueKey(_StudentHomePanel.achievement),
+          scale: widget.scale,
+        ),
+    };
+  }
+
+  Future<void> _openJoinClassroom() async {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (profileId == null || profileId <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.readText(AppKeys.studentMissingProfileId)),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    HapticFeedback.lightImpact();
+    final joined = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => StudentJoinClassScreen(
+          profileId: profileId,
+          classroomService: _classroomService,
+        ),
+      ),
+    );
+    if (joined == true) {
+      _loadedProfileId = null;
+      await _loadClassrooms();
+    }
+  }
+}
+
+// ignore: unused_element
+class _StudentInvitationsSection extends StatelessWidget {
+  const _StudentInvitationsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                context.getText(AppKeys.studentClassInvitations),
+                style: const TextStyle(
+                  color: Color(0xFF181C1E),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  height: 1.2,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+            Text(
+              context.getText(AppKeys.studentViewAllInvitations),
+              style: const TextStyle(
+                color: Color(0xFFF87851),
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                decoration: TextDecoration.underline,
+                height: 1.2,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFC4C6D2).withValues(alpha: 0.5),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  SvgPicture.asset(
+                    _studentHomeInvite,
+                    width: 36,
+                    height: 32,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Toán 6A1',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Color(0xFF181C1E),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          context.getText(AppKeys.studentInviteSubtitle),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFF444650),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 11),
+              Row(
+                children: [
+                  Expanded(
+                    child: _StudentInviteButton(
+                      label: context.getText(AppKeys.accept),
+                      color: const Color(0xFF38898C),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _StudentInviteButton(
+                      label: context.getText(AppKeys.reject),
+                      color: const Color(0xFFF37850),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StudentInviteButton extends StatelessWidget {
+  const _StudentInviteButton({
+    required this.label,
+    required this.color,
+  });
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 27,
+      child: FilledButton(
+        onPressed: HapticFeedback.selectionClick,
+        style: FilledButton.styleFrom(
+          backgroundColor: color,
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.w900,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentFigmaHeroCard extends StatelessWidget {
+  const _StudentFigmaHeroCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 365,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(40),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF78C6B4),
+            Color(0xFFF4B7A3),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.22),
+            blurRadius: 36,
+            offset: const Offset(0, 18),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: 22,
+            top: 12,
+            child: Text(
+              'x²',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.10),
+                fontSize: 72,
+                fontWeight: FontWeight.w900,
+                height: 1,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 28,
+            right: 28,
+            top: 24,
+            child: Column(
+              children: [
+                Text(
+                  context.getText(AppKeys.assessment),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    height: 1.15,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  context.getText(AppKeys.assessmentDescription),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    height: 1.45,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            left: 60,
+            right: 44,
+            top: 105,
+            bottom: 58,
+            child: Image.asset(_studentHomeMascot, fit: BoxFit.contain),
+          ),
+          const Positioned(
+            right: 12,
+            top: 107,
+            child: _MathBubble(
+              text: '5 + 3 = 8',
+              color: Color(0xFF4A6B5D),
+            ),
+          ),
+          Positioned(
+            left: 20,
+            bottom: 65,
+            child: Transform.rotate(
+              angle: -0.20,
+              child: const _MathBubble(
+                text: '2 × 2 = 4',
+                color: Color(0xFF856404),
+                backgroundColor: Color(0xFFF8D7DA),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 23,
+            right: 29,
+            bottom: 16,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _HeroActionButton(
+                    label: context.getText(AppKeys.assessmentAction),
+                    color: const Color(0xFFFB7651),
+                    icon: _studentHomeAssessmentIcon,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _HeroActionButton(
+                    label: context.getText(AppKeys.practice),
+                    color: const Color(0xFF38898C),
+                    icon: _studentHomePracticeIcon,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MathBubble extends StatelessWidget {
+  const _MathBubble({
+    required this.text,
+    required this.color,
+    this.backgroundColor = Colors.white,
+  });
+
+  final String text;
+  final Color color;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
+      decoration: BoxDecoration(
+        color: backgroundColor.withValues(alpha: 0.90),
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 18,
+          fontWeight: FontWeight.w900,
+          height: 1,
+          letterSpacing: 0,
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroActionButton extends StatelessWidget {
+  const _HeroActionButton({
+    required this.label,
+    required this.color,
+    required this.icon,
+  });
+
+  final String label;
+  final Color color;
+  final String icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 44,
+      child: FilledButton(
+        onPressed: HapticFeedback.selectionClick,
+        style: FilledButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SvgPicture.asset(icon, width: 16, height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentJoinClassCta extends StatelessWidget {
+  const _StudentJoinClassCta({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 54,
+      child: FilledButton(
+        onPressed: onTap,
+        style: FilledButton.styleFrom(
+          backgroundColor: const Color(0xFFFB7651),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
+        ),
+        child: Text(
+          context.getText(AppKeys.studentJoinClassroomUpper),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w900,
+            height: 1,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentClassGridSection extends StatelessWidget {
+  const _StudentClassGridSection({
+    required this.classrooms,
+    required this.isLoading,
+    required this.error,
+  });
+
+  final List<ClassroomModel> classrooms;
+  final bool isLoading;
+  final String? error;
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleClassrooms = classrooms.take(2).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                context.getText(AppKeys.teacherYourClasses),
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+            Text(
+              context.getText(AppKeys.viewAll),
+              style: const TextStyle(
+                color: Color(0xFF161D1F),
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                decoration: TextDecoration.underline,
+                height: 1,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        if (isLoading && classrooms.isEmpty)
+          const _StudentFigmaStateCard(
+            titleKey: AppKeys.loading,
+            messageKey: AppKeys.studentClassroomLoadFailed,
+          )
+        else if (error != null && classrooms.isEmpty)
+          _StudentFigmaStateCard(title: error!, messageKey: AppKeys.retry)
+        else if (visibleClassrooms.isEmpty)
+          const _StudentFigmaStateCard(
+            titleKey: AppKeys.studentNoClassroomsTitle,
+            messageKey: AppKeys.studentNoClassroomsMessage,
+          )
+        else
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              mainAxisExtent: 176,
+            ),
+            itemCount: visibleClassrooms.length,
+            itemBuilder: (context, index) {
+              return _StudentFigmaClassCard(
+                classroom: visibleClassrooms[index],
+              );
+            },
+          ),
+      ],
+    );
+  }
+}
+
+class _StudentFigmaStateCard extends StatelessWidget {
+  const _StudentFigmaStateCard({
+    this.title,
+    this.titleKey,
+    required this.messageKey,
+  });
+
+  final String? title;
+  final String? titleKey;
+  final String messageKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFC4C6D2).withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 84,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFDF2F8),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Image.asset(_studentHomeClassIcon, fit: BoxFit.contain),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title ?? context.getText(titleKey!),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              height: 1.1,
+              letterSpacing: 0,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            context.getText(messageKey),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: const Color(0xFF002B6A).withValues(alpha: 0.6),
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              height: 1.2,
+              letterSpacing: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudentFigmaClassCard extends StatelessWidget {
+  const _StudentFigmaClassCard({
+    required this.classroom,
+  });
+
+  final ClassroomModel classroom;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = classroom.name?.trim().isNotEmpty == true
+        ? classroom.name!.trim()
+        : context.getText(AppKeys.teacherClassFallback);
+    final teacher = classroom.teacherName?.trim().isNotEmpty == true
+        ? classroom.teacherName!.trim()
+        : context.getText(AppKeys.teacherFallback);
+
+    return Container(
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFC4C6D2).withValues(alpha: 0.2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF002B6A).withValues(alpha: 0.10),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 84,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFDF2F8),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Image.asset(_studentHomeClassIcon, fit: BoxFit.contain),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              height: 1.1,
+              letterSpacing: 0,
+            ),
+          ),
+          const Spacer(),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(top: 9),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: const Color(0xFFC4C6D2).withValues(alpha: 0.1),
+                ),
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  teacher,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: const Color(0xFF002B6A).withValues(alpha: 0.6),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Container(
+                  width: 69,
+                  height: 24,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3F8F92),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    context.getText(AppKeys.teacherEnterClass),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ignore: unused_element
+class _StudentHomeTabs extends StatelessWidget {
+  const _StudentHomeTabs({
+    required this.activePanel,
+    required this.scale,
+    required this.onChanged,
+  });
+
+  final _StudentHomePanel activePanel;
+  final double scale;
+  final ValueChanged<_StudentHomePanel> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final tabs = <(_StudentHomePanel, String)>[
+      (_StudentHomePanel.homework, context.getText(AppKeys.studentHomework)),
+      (_StudentHomePanel.classroom, context.getText(AppKeys.studentClassroom)),
+      (_StudentHomePanel.achievement, context.getText(AppKeys.yourAchievement)),
+    ];
+    final activeIndex = tabs.indexWhere((tab) => tab.$1 == activePanel);
+
+    return Container(
+      padding: EdgeInsets.all(5 * scale),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.74),
+        borderRadius: BorderRadius.circular(24 * scale),
+        border: Border.all(
+          color: const Color(0xFFA2B1A3).withValues(alpha: 0.14),
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final tabWidth = constraints.maxWidth / tabs.length;
+
+          return SizedBox(
+            height: 42 * scale,
+            child: Stack(
+              children: [
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutCubic,
+                  left: tabWidth * activeIndex,
+                  top: 0,
+                  bottom: 0,
+                  width: tabWidth,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: _teal,
+                      borderRadius: BorderRadius.circular(20 * scale),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _teal.withValues(alpha: 0.18),
+                          blurRadius: 12 * scale,
+                          offset: Offset(0, 6 * scale),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    for (final tab in tabs)
+                      Expanded(
+                        child: _StudentHomeTabButton(
+                          label: tab.$2,
+                          selected: tab.$1 == activePanel,
+                          scale: scale,
+                          onTap: () => onChanged(tab.$1),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _StudentHomeTabButton extends StatelessWidget {
+  const _StudentHomeTabButton({
+    required this.label,
+    required this.selected,
+    required this.scale,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20 * scale),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20 * scale),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            height: 42 * scale,
+            padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+            alignment: Alignment.center,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(
+                  color: selected ? Colors.white : _muted,
+                  fontSize: 12 * scale,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeworkPanel extends StatelessWidget {
+  const _HomeworkPanel({super.key, required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return _StudentEmptyPanel(
+      scale: scale,
+      icon: Icons.assignment_rounded,
+      title: context.getText(AppKeys.studentNoHomeworkTitle),
+      message: context.getText(AppKeys.studentNoHomeworkMessage),
+    );
+  }
+}
+
+class _StudentClassroomPanel extends StatelessWidget {
+  const _StudentClassroomPanel({
+    super.key,
+    required this.scale,
+    required this.classrooms,
+    required this.isLoading,
+    required this.error,
+    required this.onRetry,
+    required this.onJoinClassroom,
+  });
+
+  final double scale;
+  final List<ClassroomModel> classrooms;
+  final bool isLoading;
+  final String? error;
+  final VoidCallback onRetry;
+  final VoidCallback onJoinClassroom;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: _JoinClassroomButton(
+            scale: scale,
+            onTap: onJoinClassroom,
+          ),
+        ),
+        SizedBox(height: 14 * scale),
+        if (isLoading && classrooms.isEmpty)
+          _StudentLoadingPanel(scale: scale)
+        else if (error != null && classrooms.isEmpty)
+          _StudentErrorPanel(
+            scale: scale,
+            message: error!,
+            onRetry: onRetry,
+          )
+        else if (classrooms.isEmpty)
+          _StudentEmptyPanel(
+            scale: scale,
+            icon: Icons.groups_rounded,
+            title: context.getText(AppKeys.studentNoClassroomsTitle),
+            message: context.getText(AppKeys.studentNoClassroomsMessage),
+          )
+        else
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var index = 0; index < classrooms.length; index++) ...[
+                _StudentClassroomCard(
+                  scale: scale,
+                  classroom: classrooms[index],
+                ),
+                if (index != classrooms.length - 1)
+                  SizedBox(height: 12 * scale),
+              ],
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+class _JoinClassroomButton extends StatelessWidget {
+  const _JoinClassroomButton({
+    required this.scale,
+    required this.onTap,
+  });
+
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xFFFF7B54),
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 16 * scale,
+            vertical: 11 * scale,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.add_rounded, color: Colors.white, size: 18 * scale),
+              SizedBox(width: 6 * scale),
+              Text(
+                context.getText(AppKeys.studentJoinNewClassroom),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12 * scale,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  letterSpacing: 0,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentClassroomCard extends StatelessWidget {
+  const _StudentClassroomCard({
+    required this.scale,
+    required this.classroom,
+  });
+
+  final double scale;
+  final ClassroomModel classroom;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = classroom.name?.trim().isNotEmpty == true
+        ? classroom.name!.trim()
+        : context.getText(AppKeys.teacherClassFallback);
+    final description = classroom.description?.trim();
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(18 * scale),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.88),
+        borderRadius: BorderRadius.circular(26 * scale),
+        border: Border.all(
+          color: const Color(0xFFA2B1A3).withValues(alpha: 0.12),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 12 * scale,
+            offset: Offset(0, 6 * scale),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 56 * scale,
+            height: 56 * scale,
+            decoration: BoxDecoration(
+              color: _teal.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(22 * scale),
+            ),
+            child: Icon(
+              Icons.school_rounded,
+              color: _teal,
+              size: 27 * scale,
+            ),
+          ),
+          SizedBox(width: 15 * scale),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: _deepInk,
+                    fontSize: 16 * scale,
+                    fontWeight: FontWeight.w900,
+                    height: 1.1,
+                    letterSpacing: 0,
+                  ),
+                ),
+                SizedBox(height: 6 * scale),
+                Text(
+                  description != null && description.isNotEmpty
+                      ? description
+                      : context.formatText(
+                          AppKeys.teacherStudentCount,
+                          {'count': classroom.displayStudentCount},
+                        ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.grayText,
+                    fontSize: 12 * scale,
+                    fontWeight: FontWeight.w700,
+                    height: 1.1,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 10 * scale),
+          Icon(
+            Icons.chevron_right_rounded,
+            color: _teal,
+            size: 26 * scale,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AchievementPanel extends StatelessWidget {
+  const _AchievementPanel({super.key, required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      key: const ValueKey('achievement_panel_content'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _AchievementsHeader(scale: scale),
+        SizedBox(height: 20 * scale),
+        _AchievementCard(scale: scale),
+      ],
+    );
+  }
+}
+
+class _StudentLoadingPanel extends StatelessWidget {
+  const _StudentLoadingPanel({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 132 * scale,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.76),
+        borderRadius: BorderRadius.circular(28 * scale),
+      ),
+      child: SizedBox(
+        width: 26 * scale,
+        height: 26 * scale,
+        child: const CircularProgressIndicator(strokeWidth: 3),
+      ),
+    );
+  }
+}
+
+class _StudentErrorPanel extends StatelessWidget {
+  const _StudentErrorPanel({
+    required this.scale,
+    required this.message,
+    required this.onRetry,
+  });
+
+  final double scale;
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return _StudentMessagePanel(
+      scale: scale,
+      icon: Icons.wifi_off_rounded,
+      title: message,
+      message: context.getText(AppKeys.retry),
+      actionLabel: context.getText(AppKeys.retryUpper),
+      onAction: onRetry,
+    );
+  }
+}
+
+class _StudentEmptyPanel extends StatelessWidget {
+  const _StudentEmptyPanel({
+    required this.scale,
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final double scale;
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return _StudentMessagePanel(
+      scale: scale,
+      icon: icon,
+      title: title,
+      message: message,
+    );
+  }
+}
+
+class _StudentMessagePanel extends StatelessWidget {
+  const _StudentMessagePanel({
+    required this.scale,
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final double scale;
+  final IconData icon;
+  final String title;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(22 * scale),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(30 * scale),
+        border: Border.all(
+          color: const Color(0xFFA2B1A3).withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 58 * scale,
+            height: 58 * scale,
+            decoration: BoxDecoration(
+              color: _teal.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(24 * scale),
+            ),
+            child: Icon(icon, color: _teal, size: 28 * scale),
+          ),
+          SizedBox(height: 14 * scale),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: _deepInk,
+              fontSize: 16 * scale,
+              fontWeight: FontWeight.w900,
+              height: 1.15,
+              letterSpacing: 0,
+            ),
+          ),
+          SizedBox(height: 8 * scale),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.grayText,
+              fontSize: 13 * scale,
+              fontWeight: FontWeight.w700,
+              height: 1.25,
+              letterSpacing: 0,
+            ),
+          ),
+          if (actionLabel != null && onAction != null) ...[
+            SizedBox(height: 16 * scale),
+            TextButton(
+              onPressed: onAction,
+              child: Text(actionLabel!),
+            ),
+          ],
+        ],
       ),
     );
   }

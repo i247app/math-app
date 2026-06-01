@@ -850,7 +850,6 @@ class _JoinRequestRow extends StatelessWidget {
         _ClassroomMemberAvatar(
           member: request,
           size: 40 * scale,
-          fontSize: 14 * scale,
         ),
         SizedBox(width: 12 * scale),
         Expanded(
@@ -998,17 +997,7 @@ class _JoinedMemberAvatar extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: _hasClassroomMemberAvatar(member)
-                ? ProfileAvatarImage(
-                    size: 56 * scale,
-                    avatarKey: member.avatarKey,
-                    avatarUrl: member.avatarUrl,
-                  )
-                : _ClassroomMemberAvatar(
-                    member: member,
-                    size: 56 * scale,
-                    fontSize: 24 * scale,
-                  ),
+            child: _ClassroomMemberAvatar(member: member, size: 56 * scale),
           ),
           Positioned(
             right: 0,
@@ -1033,44 +1022,17 @@ class _ClassroomMemberAvatar extends StatelessWidget {
   const _ClassroomMemberAvatar({
     required this.member,
     required this.size,
-    required this.fontSize,
   });
 
   final ClassroomStudent member;
   final double size;
-  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
-    if (_hasClassroomMemberAvatar(member)) {
-      return ProfileAvatarImage(
-        size: size,
-        avatarKey: member.avatarKey,
-        avatarUrl: member.avatarUrl,
-      );
-    }
-
-    final initials = _classroomMemberInitials(context, member);
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0F7FF),
-        shape: BoxShape.circle,
-        border: Border.all(color: const Color(0xFFDDEBFF)),
-      ),
-      child: Text(
-        initials,
-        maxLines: 1,
-        overflow: TextOverflow.clip,
-        style: GoogleFonts.andika(
-          color: const Color(0xFF1E3A5F),
-          fontSize: fontSize,
-          fontWeight: FontWeight.w700,
-          height: 1,
-        ),
-      ),
+    return ProfileAvatarImage(
+      size: size,
+      avatarKey: member.avatarKey,
+      avatarUrl: member.avatarUrl,
     );
   }
 }
@@ -1182,11 +1144,6 @@ String? _studentSearchSubtitle(BuildContext context, StudentProfile profile) {
   return null;
 }
 
-bool _hasClassroomMemberAvatar(ClassroomStudent member) {
-  return _nonEmpty(member.avatarKey) != null ||
-      _nonEmpty(member.avatarUrl) != null;
-}
-
 String _classroomMemberName(BuildContext context, ClassroomStudent member) {
   return _nonEmpty(member.name) ??
       context.getText(AppKeys.teacherStudentFallback);
@@ -1198,23 +1155,4 @@ String _classroomMemberStatus(BuildContext context, ClassroomStudent member) {
     return context.getText(AppKeys.teacherJustJoined);
   }
   return status;
-}
-
-String _classroomMemberInitials(
-  BuildContext context,
-  ClassroomStudent member,
-) {
-  final name = _classroomMemberName(context, member);
-  final words = name
-      .split(RegExp(r'\s+'))
-      .where((word) => word.trim().isNotEmpty)
-      .toList();
-  if (words.isEmpty) {
-    return '?';
-  }
-  if (words.length == 1) {
-    return words.first.characters.take(1).toString().toUpperCase();
-  }
-  return '${words.first.characters.take(1)}${words.last.characters.take(1)}'
-      .toUpperCase();
 }

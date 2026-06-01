@@ -15,6 +15,20 @@ class ClassroomException implements Exception {
 abstract class ClassroomService {
   Future<List<ClassroomModel>> listClassrooms({required int profileId});
 
+  Future<List<ClassroomModel>> listMyJoinedClassrooms({
+    required int profileId,
+  });
+
+  Future<List<ClassroomModel>> searchClassrooms({
+    required int profileId,
+    required String search,
+  });
+
+  Future<void> joinClassroomByCode({
+    required int profileId,
+    required String classroomCode,
+  });
+
   Future<List<ClassroomStudent>> listJoinRequests({
     required int profileId,
     required int classroomId,
@@ -72,6 +86,52 @@ class ClassroomApi implements ClassroomService {
         ClassroomListRequest(profileId: profileId),
       );
       return response.classrooms;
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<List<ClassroomModel>> listMyJoinedClassrooms({
+    required int profileId,
+  }) async {
+    try {
+      final response = await _networkApi.listMyJoinedClassrooms(
+        ClassroomListRequest(profileId: profileId),
+      );
+      return response.classrooms;
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<List<ClassroomModel>> searchClassrooms({
+    required int profileId,
+    required String search,
+  }) async {
+    try {
+      final response = await _networkApi.listClassrooms(
+        ClassroomListRequest(profileId: profileId, search: search),
+      );
+      return response.classrooms;
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<void> joinClassroomByCode({
+    required int profileId,
+    required String classroomCode,
+  }) async {
+    try {
+      await _networkApi.joinClassroomByCode(
+        ClassroomJoinByCodeRequest(
+          profileId: profileId,
+          classroomCode: classroomCode,
+        ),
+      );
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }

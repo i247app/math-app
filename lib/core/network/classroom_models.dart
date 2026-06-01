@@ -2,16 +2,56 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classroom_models.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+enum ClassroomRelationship {
+  member,
+  pendingInvitation,
+  pendingRequest,
+  none,
+  unknown;
+
+  static ClassroomRelationship fromWire(String? value) {
+    switch (value?.trim().toUpperCase()) {
+      case 'MEMBER':
+        return ClassroomRelationship.member;
+      case 'PENDING_INVITATION':
+        return ClassroomRelationship.pendingInvitation;
+      case 'PENDING_REQUEST':
+        return ClassroomRelationship.pendingRequest;
+      case 'NONE':
+        return ClassroomRelationship.none;
+      default:
+        return ClassroomRelationship.unknown;
+    }
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class ClassroomListRequest {
-  const ClassroomListRequest({required this.profileId});
+  const ClassroomListRequest({required this.profileId, this.search});
 
   final int profileId;
+  final String? search;
 
   factory ClassroomListRequest.fromJson(Map<String, dynamic> json) =>
       _$ClassroomListRequestFromJson(json);
 
   Map<String, dynamic> toJson() => _$ClassroomListRequestToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ClassroomJoinByCodeRequest {
+  const ClassroomJoinByCodeRequest({
+    required this.profileId,
+    required this.classroomCode,
+  });
+
+  final int profileId;
+  final String classroomCode;
+
+  factory ClassroomJoinByCodeRequest.fromJson(Map<String, dynamic> json) =>
+      _$ClassroomJoinByCodeRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassroomJoinByCodeRequestToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
@@ -88,6 +128,7 @@ class ClassroomListResponse {
   const ClassroomListResponse({
     required this.mstatus,
     this.classrooms = const <ClassroomModel>[],
+    this.pagination,
     this.status,
     this.mmessage,
     this.debug,
@@ -97,6 +138,7 @@ class ClassroomListResponse {
   final int mstatus;
   @JsonKey(fromJson: _classroomListFromJson)
   final List<ClassroomModel> classrooms;
+  final ClassroomPagination? pagination;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -122,11 +164,45 @@ class ClassroomListResponse {
   Map<String, dynamic> toJson() => _$ClassroomListResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ClassroomPagination {
+  const ClassroomPagination({
+    this.hasNext,
+    this.hasPrevious,
+    this.page,
+    this.size,
+    this.skip,
+    this.takeAll,
+    this.totalCount,
+    this.totalPages,
+  });
+
+  final bool? hasNext;
+  final bool? hasPrevious;
+  @JsonKey(fromJson: _intFromJson)
+  final int? page;
+  @JsonKey(fromJson: _intFromJson)
+  final int? size;
+  @JsonKey(fromJson: _intFromJson)
+  final int? skip;
+  final bool? takeAll;
+  @JsonKey(fromJson: _intFromJson)
+  final int? totalCount;
+  @JsonKey(fromJson: _intFromJson)
+  final int? totalPages;
+
+  factory ClassroomPagination.fromJson(Map<String, dynamic> json) =>
+      _$ClassroomPaginationFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassroomPaginationToJson(this);
+}
+
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ClassroomMemberListResponse {
   const ClassroomMemberListResponse({
     required this.mstatus,
     this.members = const <ClassroomStudent>[],
+    this.pagination,
     this.status,
     this.mmessage,
     this.debug,
@@ -136,6 +212,7 @@ class ClassroomMemberListResponse {
   final int mstatus;
   @JsonKey(fromJson: _studentListFromJson)
   final List<ClassroomStudent> members;
+  final ClassroomPagination? pagination;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -234,12 +311,19 @@ class ClassroomModel {
     this.name,
     this.description,
     this.programId,
+    this.programIds = const <int>[],
     this.gradeId,
     this.schoolId,
     this.classroomCode,
+    this.owner,
+    this.ownerProfileId,
+    this.relationship,
+    this.teacherName,
+    this.schoolName,
     this.maxMembers,
     this.memberCount,
     this.studentCount,
+    this.teacherCount,
     this.students = const <ClassroomStudent>[],
     this.imageUrl,
     this.avatarUrl,
@@ -258,18 +342,32 @@ class ClassroomModel {
   final String? description;
   @JsonKey(fromJson: _intFromJson)
   final int? programId;
+  @JsonKey(fromJson: _intListFromJson)
+  final List<int> programIds;
   @JsonKey(fromJson: _intFromJson)
   final int? gradeId;
   @JsonKey(fromJson: _intFromJson)
   final int? schoolId;
   @JsonKey(fromJson: _stringFromJson)
   final String? classroomCode;
+  @JsonKey(fromJson: _ownerFromJson)
+  final ClassroomOwner? owner;
+  @JsonKey(fromJson: _intFromJson)
+  final int? ownerProfileId;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? relationship;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? teacherName;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? schoolName;
   @JsonKey(fromJson: _intFromJson)
   final int? maxMembers;
   @JsonKey(fromJson: _intFromJson)
   final int? memberCount;
   @JsonKey(fromJson: _intFromJson)
   final int? studentCount;
+  @JsonKey(fromJson: _intFromJson)
+  final int? teacherCount;
   @JsonKey(fromJson: _studentListFromJson)
   final List<ClassroomStudent> students;
   final String? imageUrl;
@@ -292,6 +390,19 @@ class ClassroomModel {
       <String, dynamic>{
         ...json,
         'classroom_code': json['classroom_code'] ?? json['invite_code'],
+        'program_ids': json['program_ids'] ??
+            json['programIds'] ??
+            (json['program_id'] == null ? null : <Object?>[json['program_id']]),
+        'owner_profile_id': json['owner_profile_id'] ??
+            _nestedValue(json['owner'], 'profile_id') ??
+            _nestedValue(json['teacher'], 'profile_id'),
+        'teacher_name': json['teacher_name'] ??
+            json['owner_name'] ??
+            _nestedValue(json['owner'], 'name') ??
+            _nestedValue(json['teacher'], 'name') ??
+            _nestedValue(json['profile'], 'name'),
+        'school_name':
+            json['school_name'] ?? _nestedValue(json['school'], 'name'),
         'students': studentsValue,
         'member_count': memberCountValue,
         'student_count': studentCountValue,
@@ -307,6 +418,28 @@ class ClassroomModel {
       studentCount ?? (students.isNotEmpty ? students.length : 0);
 
   int get displayMemberCount => memberCount ?? displayStudentCount;
+
+  ClassroomRelationship get relationshipStatus =>
+      ClassroomRelationship.fromWire(relationship);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ClassroomOwner {
+  const ClassroomOwner({
+    this.profileId,
+    this.name,
+    this.role,
+  });
+
+  @JsonKey(fromJson: _intFromJson)
+  final int? profileId;
+  final String? name;
+  final String? role;
+
+  factory ClassroomOwner.fromJson(Map<String, dynamic> json) =>
+      _$ClassroomOwnerFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassroomOwnerToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
@@ -334,33 +467,56 @@ class ClassroomStudent {
   final String? role;
 
   factory ClassroomStudent.fromJson(Map<String, dynamic> json) {
+    final requester = json['requester'];
+    final memberProfile = json['member_profile'];
     final profile = json['profile'];
     final user = json['user'];
+    final id = json['id'] ?? json['request_id'] ?? json['member_id'];
     final profileId = json['profile_id'] ??
+        _nestedValue(requester, 'profile_id') ??
+        _nestedValue(requester, 'id') ??
+        _nestedValue(memberProfile, 'profile_id') ??
+        _nestedValue(memberProfile, 'id') ??
         json['target_profile_id'] ??
         json['student_profile_id'] ??
         _nestedValue(profile, 'id') ??
         _nestedValue(profile, 'profile_id');
     final name = json['name'] ??
+        _nestedValue(requester, 'name') ??
+        _nestedValue(memberProfile, 'name') ??
         json['profile_name'] ??
         json['student_name'] ??
         _nestedValue(profile, 'name') ??
         _nestedValue(user, 'name');
-    final avatarKey = json['avatar_key'] ?? _nestedValue(profile, 'avatar_key');
+    final avatarKey = json['avatar_key'] ??
+        _nestedValue(requester, 'avatar_key') ??
+        _nestedValue(memberProfile, 'avatar_key') ??
+        _nestedValue(profile, 'avatar_key');
     final avatarUrl = json['avatar_url'] ??
+        _nestedValue(requester, 'avatar_url') ??
+        _nestedValue(memberProfile, 'avatar_url') ??
         json['profile_avatar_url'] ??
         _nestedValue(profile, 'avatar_url') ??
         _nestedValue(user, 'avatar_url');
-    final role = json['role'] ?? _nestedValue(profile, 'role');
+    final role = json['role'] ??
+        json['member_role'] ??
+        _nestedValue(requester, 'role') ??
+        _nestedValue(memberProfile, 'role') ??
+        _nestedValue(profile, 'role');
+    final status = json['status'] ?? json['member_status'];
+    final joinedAt = json['joined_at'] ?? json['joined_dt'];
 
     return _$ClassroomStudentFromJson(
       <String, dynamic>{
         ...json,
+        'id': id,
         'profile_id': profileId,
         'name': name,
         'avatar_key': avatarKey,
         'avatar_url': avatarUrl,
         'role': role,
+        'status': status,
+        'joined_at': joinedAt,
       },
     );
   }
@@ -374,6 +530,10 @@ List<ClassroomModel> _classroomListFromJson(Object? value) {
 
 ClassroomModel? _classroomFromJson(Object? value) {
   return _objectFromJson(value, ClassroomModel.fromJson);
+}
+
+ClassroomOwner? _ownerFromJson(Object? value) {
+  return _objectFromJson(value, ClassroomOwner.fromJson);
 }
 
 List<ClassroomStudent> _studentListFromJson(Object? value) {
@@ -418,6 +578,13 @@ List<T> _listFromJson<T>(
 }
 
 int _requiredIntFromJson(Object? value) => _intFromJson(value) ?? 0;
+
+List<int> _intListFromJson(Object? value) {
+  if (value is! List) {
+    return const <int>[];
+  }
+  return value.map(_intFromJson).whereType<int>().toList();
+}
 
 int? _intFromJson(Object? value) {
   if (value is int) {
