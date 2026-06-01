@@ -7,6 +7,7 @@ import 'api_metadata.dart';
 import 'auth_models.dart';
 import 'auth_token_store.dart';
 import 'chapter_models.dart';
+import 'classroom_exercise_models.dart';
 import 'classroom_models.dart';
 import 'grade_models.dart';
 import 'network_interceptors.dart';
@@ -40,7 +41,7 @@ class NetworkClient {
     _dio.options
       ..baseUrl = _baseUrl
       ..connectTimeout = const Duration(seconds: 15)
-      ..receiveTimeout = const Duration(seconds: 15)
+      ..receiveTimeout = const Duration(seconds: 60)
       ..sendTimeout = const Duration(seconds: 15)
       ..responseType = ResponseType.json
       ..validateStatus = (_) => true;
@@ -863,6 +864,72 @@ class NetworkApi {
     }
 
     return classroomResponse;
+  }
+
+  Future<ClassroomExerciseListResponse> listClassroomExercises(
+    ClassroomExerciseListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/classroom-exercises/list',
+      request.toJson(),
+    );
+    final exerciseResponse = ClassroomExerciseListResponse.fromJson(
+      responseJson,
+    );
+    if (exerciseResponse.mstatus != 200) {
+      throw NetworkException(
+        exerciseResponse.mmessage ??
+            exerciseResponse.debug ??
+            exerciseResponse.status ??
+            'Request failed.',
+        status: exerciseResponse.mstatus,
+      );
+    }
+
+    return exerciseResponse;
+  }
+
+  Future<ClassroomExerciseResponse> createClassroomExercise(
+    CreateClassroomExerciseRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/classroom-exercises/create',
+      request.toJson(),
+    );
+    final exerciseResponse = ClassroomExerciseResponse.fromJson(responseJson);
+    if (exerciseResponse.mstatus != 200) {
+      throw NetworkException(
+        exerciseResponse.mmessage ??
+            exerciseResponse.debug ??
+            exerciseResponse.status ??
+            'Request failed.',
+        status: exerciseResponse.mstatus,
+      );
+    }
+
+    return exerciseResponse;
+  }
+
+  Future<ClassroomExerciseResponse> getClassroomExerciseDetail({
+    required int exerciseId,
+    required int profileId,
+  }) async {
+    final responseJson = await _networkClient.getJson(
+      '/classroom-exercises/${_encodePathId(exerciseId)}'
+      '?profile_id=${_encodeQueryId(profileId)}',
+    );
+    final exerciseResponse = ClassroomExerciseResponse.fromJson(responseJson);
+    if (exerciseResponse.mstatus != 200) {
+      throw NetworkException(
+        exerciseResponse.mmessage ??
+            exerciseResponse.debug ??
+            exerciseResponse.status ??
+            'Request failed.',
+        status: exerciseResponse.mstatus,
+      );
+    }
+
+    return exerciseResponse;
   }
 
   Future<ClassroomActionResponse> _classroomAction(

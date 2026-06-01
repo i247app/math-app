@@ -5,14 +5,25 @@ class TeacherClassDetailScreen extends StatefulWidget {
     super.key,
     required this.classroomId,
     required this.profileId,
+    this.userId,
     this.initialClassroom,
     ClassroomService? classroomService,
-  }) : _classroomService = classroomService;
+    GradeService? gradeService,
+    ProfileService? profileService,
+    SchoolService? schoolService,
+  })  : _classroomService = classroomService,
+        _gradeService = gradeService,
+        _profileService = profileService,
+        _schoolService = schoolService;
 
   final int classroomId;
   final int profileId;
+  final int? userId;
   final ClassroomModel? initialClassroom;
   final ClassroomService? _classroomService;
+  final GradeService? _gradeService;
+  final ProfileService? _profileService;
+  final SchoolService? _schoolService;
 
   @override
   State<TeacherClassDetailScreen> createState() =>
@@ -22,16 +33,26 @@ class TeacherClassDetailScreen extends StatefulWidget {
 class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
+  late final GradeService _gradeService = widget._gradeService ?? GradeApi();
+  late final ProfileService _profileService =
+      widget._profileService ?? ProfileApi();
+  late final SchoolService _schoolService =
+      widget._schoolService ?? SchoolApi();
 
   bool _isLoading = false;
+  bool _isLoadingLookups = false;
   String? _error;
   ClassroomModel? _classroom;
+  List<GradeModel> _grades = const <GradeModel>[];
+  List<ProgramModel> _programs = const <ProgramModel>[];
+  List<SchoolModel> _schools = const <SchoolModel>[];
 
   @override
   void initState() {
     super.initState();
     _classroom = widget.initialClassroom;
     _loadDetail();
+    _loadLookupOptions();
   }
 
   Future<void> _loadDetail() async {
@@ -58,6 +79,36 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _loadLookupOptions() async {
+    final userId = widget.userId;
+    if (userId == null || userId <= 0) {
+      return;
+    }
+
+    setState(() => _isLoadingLookups = true);
+    try {
+      final results = await Future.wait<Object>([
+        _gradeService.listGrades(userId: userId),
+        _profileService.listPrograms(userId: userId),
+        _schoolService.listSchools(),
+      ]);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _grades = results[0] as List<GradeModel>;
+        _programs = results[1] as List<ProgramModel>;
+        _schools = results[2] as List<SchoolModel>;
+      });
+    } catch (_) {
+      // Detail can still render backend ids if lookup endpoints fail.
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingLookups = false);
       }
     }
   }
@@ -110,13 +161,29 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                             _ClassDetailInfoCard(
                               scale: scale,
                               classroom: classroom,
-                              isLoading: _isLoading && classroom == null,
+                              grades: _grades,
+                              programs: _programs,
+                              schools: _schools,
+                              isLoading: (_isLoading && classroom == null) ||
+                                  _isLoadingLookups,
                             ),
                           if (_error == null || classroom != null)
                             _ClassDetailLowerContent(
                               scale: scale,
                               memberCount: count,
                               requestCount: requestCount,
+                              onOpenAssignments: () {
+                                Navigator.of(context).push<void>(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => TeacherHomeworkScreen(
+                                      classroomId: widget.classroomId,
+                                      profileId: widget.profileId,
+                                      userId: widget.userId,
+                                      initialClassroom: classroom,
+                                    ),
+                                  ),
+                                );
+                              },
                               onOpenMembers: () async {
                                 await Navigator.of(context).push(
                                   MaterialPageRoute<void>(
@@ -150,23 +217,27 @@ class _ClassDetailInfoCard extends StatelessWidget {
   const _ClassDetailInfoCard({
     required this.scale,
     required this.classroom,
+    required this.grades,
+    required this.programs,
+    required this.schools,
     required this.isLoading,
   });
 
   final double scale;
   final ClassroomModel? classroom;
+  final List<GradeModel> grades;
+  final List<ProgramModel> programs;
+  final List<SchoolModel> schools;
   final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final title = _nonEmpty(classroom?.name) ??
         context.getText(AppKeys.teacherClassFallback);
-    final grade =
-        _detailIdLabel(context.getText(AppKeys.grade), classroom?.gradeId);
-    final program = _displayBackendId(classroom?.programId) ??
+    final grade = _classroomGradeLabel(context, classroom, grades);
+    final program = _classroomProgramLabel(context, classroom, programs) ??
         context.getText(AppKeys.teacherProgramFallback);
-    final description = _nonEmpty(classroom?.description) ??
-        context.getText(AppKeys.teacherDescriptionFallback);
+    final schoolName = _classroomSchoolLabel(context, classroom, schools);
     final code = _classCode(classroom);
     final joinLink = 'numinumi.vn/join/$code';
 
@@ -280,7 +351,7 @@ class _ClassDetailInfoCard extends StatelessWidget {
                         scale: scale,
                         iconAsset:
                             'assets/images/teacher_class_description.png',
-                        text: description,
+                        text: schoolName,
                       ),
                     ],
                   ),
@@ -469,12 +540,14 @@ class _ClassDetailLowerContent extends StatelessWidget {
     required this.scale,
     required this.memberCount,
     required this.requestCount,
+    required this.onOpenAssignments,
     required this.onOpenMembers,
   });
 
   final double scale;
   final int memberCount;
   final int requestCount;
+  final VoidCallback onOpenAssignments;
   final VoidCallback onOpenMembers;
 
   @override
@@ -503,7 +576,10 @@ class _ClassDetailLowerContent extends StatelessWidget {
             ),
           ),
           SizedBox(height: 7 * scale),
-          _ClassFunctionGrid(scale: scale),
+          _ClassFunctionGrid(
+            scale: scale,
+            onOpenAssignments: onOpenAssignments,
+          ),
         ],
       ),
     );
@@ -611,9 +687,13 @@ class _MemberManagementCard extends StatelessWidget {
 }
 
 class _ClassFunctionGrid extends StatelessWidget {
-  const _ClassFunctionGrid({required this.scale});
+  const _ClassFunctionGrid({
+    required this.scale,
+    required this.onOpenAssignments,
+  });
 
   final double scale;
+  final VoidCallback onOpenAssignments;
 
   @override
   Widget build(BuildContext context) {
@@ -630,6 +710,7 @@ class _ClassFunctionGrid extends StatelessWidget {
           scale: scale,
           iconAsset: 'assets/images/teacher_class_assignment.png',
           label: context.getText(AppKeys.teacherAssignments),
+          onTap: onOpenAssignments,
         ),
         _ClassFunctionTile(scale: scale),
         _ClassFunctionTile(scale: scale),
@@ -644,48 +725,58 @@ class _ClassFunctionTile extends StatelessWidget {
     required this.scale,
     this.iconAsset,
     this.label,
+    this.onTap,
   });
 
   final double scale;
   final String? iconAsset;
   final String? label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16 * scale),
-        border: Border.all(
-          color: const Color(0xFFDDE4E6),
-          width: 2 * scale,
+    final radius = BorderRadius.circular(16 * scale);
+    return Material(
+      color: Colors.white,
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            border: Border.all(
+              color: const Color(0xFFDDE4E6),
+              width: 2 * scale,
+            ),
+          ),
+          child: iconAsset == null
+              ? const SizedBox.shrink()
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      iconAsset!,
+                      width: 44 * scale,
+                      height: 44 * scale,
+                    ),
+                    SizedBox(height: 1 * scale),
+                    Text(
+                      label ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.andika(
+                        color: _teacherInk,
+                        fontSize: 14 * scale,
+                        fontWeight: FontWeight.w700,
+                        height: 1.42,
+                      ),
+                    ),
+                  ],
+                ),
         ),
       ),
-      child: iconAsset == null
-          ? const SizedBox.shrink()
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  iconAsset!,
-                  width: 44 * scale,
-                  height: 44 * scale,
-                ),
-                SizedBox(height: 1 * scale),
-                Text(
-                  label ?? '',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.andika(
-                    color: _teacherInk,
-                    fontSize: 14 * scale,
-                    fontWeight: FontWeight.w700,
-                    height: 1.42,
-                  ),
-                ),
-              ],
-            ),
     );
   }
 }
@@ -707,6 +798,71 @@ String _detailIdLabel(String prefix, int? value) {
 }
 
 String? _displayBackendId(int? value) => value == null ? null : '$value';
+
+String _classroomGradeLabel(
+  BuildContext context,
+  ClassroomModel? classroom,
+  List<GradeModel> grades,
+) {
+  final grade = _matchGrade(grades, classroom?.gradeId);
+  if (grade != null) {
+    return _gradeLabel(grade);
+  }
+  return _detailIdLabel(context.getText(AppKeys.grade), classroom?.gradeId);
+}
+
+String? _classroomProgramLabel(
+  BuildContext context,
+  ClassroomModel? classroom,
+  List<ProgramModel> programs,
+) {
+  final ids = _classroomProgramIds(classroom);
+  final labels = <String>[];
+  for (final id in ids) {
+    final program = _matchProgram(programs, id);
+    labels.add(
+      program == null
+          ? '${context.getText(AppKeys.teacherProgramFallback)} $id'
+          : _programLabel(program),
+    );
+  }
+  if (labels.isNotEmpty) {
+    return labels.join(', ');
+  }
+  return null;
+}
+
+List<int> _classroomProgramIds(ClassroomModel? classroom) {
+  if (classroom == null) {
+    return const <int>[];
+  }
+
+  final ids = <int>[];
+  void addId(int? id) {
+    if (id != null && !ids.contains(id)) {
+      ids.add(id);
+    }
+  }
+
+  addId(classroom.programId);
+  for (final id in classroom.programIds) {
+    addId(id);
+  }
+  return ids;
+}
+
+String _classroomSchoolLabel(
+  BuildContext context,
+  ClassroomModel? classroom,
+  List<SchoolModel> schools,
+) {
+  final school = _matchSchool(schools, classroom?.schoolId);
+  if (school != null) {
+    return _schoolLabel(school);
+  }
+  return _displayBackendId(classroom?.schoolId) ??
+      context.getText(AppKeys.school);
+}
 
 String _classCode(ClassroomModel? classroom) {
   final classroomCode = _nonEmpty(classroom?.classroomCode);

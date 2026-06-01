@@ -424,6 +424,7 @@ class ClassroomModel {
     this.ownerProfileId,
     this.relationship,
     this.teacherName,
+    this.programName,
     this.schoolName,
     this.maxMembers,
     this.memberCount,
@@ -464,6 +465,8 @@ class ClassroomModel {
   final String? relationship;
   @JsonKey(fromJson: _stringFromJson)
   final String? teacherName;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? programName;
   @JsonKey(fromJson: _stringFromJson)
   final String? schoolName;
   @JsonKey(fromJson: _intFromJson)
@@ -513,6 +516,10 @@ class ClassroomModel {
             _nestedValue(json['owner'], 'name') ??
             _nestedValue(json['teacher'], 'name') ??
             _nestedValue(json['profile'], 'name'),
+        'program_name': json['program_name'] ??
+            json['program_label'] ??
+            _nestedValue(json['program'], 'label') ??
+            _nestedValue(json['program'], 'name'),
         'school_name':
             json['school_name'] ?? _nestedValue(json['school'], 'name'),
         'students': studentsValue,

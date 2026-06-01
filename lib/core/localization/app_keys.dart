@@ -125,14 +125,33 @@ class AppKeys {
       'student_invitation_reject_success';
   static const studentJoinClassroomUpper = 'student_join_classroom_upper';
   static const studentClassDetailTitle = 'student_class_detail_title';
-  static const studentClassTeacher = 'student_class_teacher';
-  static const studentClassLearningInfo = 'student_class_learning_info';
-  static const studentClassActivities = 'student_class_activities';
+  static const studentClassTeacherRole = 'student_class_teacher_role';
+  static const studentClassLearningCategories =
+      'student_class_learning_categories';
   static const studentClassAssignments = 'student_class_assignments';
-  static const studentClassMembers = 'student_class_members';
-  static const studentClassProgress = 'student_class_progress';
+  static const studentClassAssignmentsSubtitle =
+      'student_class_assignments_subtitle';
+  static const studentClassQuizzes = 'student_class_quizzes';
+  static const studentClassQuizzesSubtitle = 'student_class_quizzes_subtitle';
   static const studentClassMaterials = 'student_class_materials';
+  static const studentClassMaterialsSubtitle =
+      'student_class_materials_subtitle';
+  static const studentClassGrades = 'student_class_grades';
+  static const studentClassGradesSubtitle = 'student_class_grades_subtitle';
+  static const studentClassUpcomingDeadlines =
+      'student_class_upcoming_deadlines';
+  static const studentClassAll = 'student_class_all';
+  static const studentClassReview15Minutes = 'student_class_review_15_minutes';
+  static const studentClassDeadlineSample = 'student_class_deadline_sample';
   static const studentClassComingSoon = 'student_class_coming_soon';
+  static const studentHomeworkSearchHint = 'student_homework_search_hint';
+  static const studentHomeworkNotSubmitted = 'student_homework_not_submitted';
+  static const studentHomeworkSubmitted = 'student_homework_submitted';
+  static const studentHomeworkOverdue = 'student_homework_overdue';
+  static const studentHomeworkAssignedAt = 'student_homework_assigned_at';
+  static const studentHomeworkReviewTitle = 'student_homework_review_title';
+  static const studentHomeworkQuestionCount = 'student_homework_question_count';
+  static const studentHomeworkDueDate = 'student_homework_due_date';
   static const assessmentAction = 'assessment_action';
   static const viewAll = 'view_all';
   static const viewAllUpper = 'view_all_upper';
@@ -300,6 +319,87 @@ class AppKeys {
   static const teacherFiveMinutesAgo = 'teacher_five_minutes_ago';
   static const teacherClassFunctions = 'teacher_class_functions';
   static const teacherAssignments = 'teacher_assignments';
+  static const teacherCreatedAssignments = 'teacher_created_assignments';
+  static const teacherAssignmentSearchHint = 'teacher_assignment_search_hint';
+  static const teacherAssignmentNewest = 'teacher_assignment_newest';
+  static const teacherAssignmentListLoadFailed =
+      'teacher_assignment_list_load_failed';
+  static const teacherAssignmentDetailLoadFailed =
+      'teacher_assignment_detail_load_failed';
+  static const teacherAssignmentCreateFailed =
+      'teacher_assignment_create_failed';
+  static const teacherAssignmentPickerSoon = 'teacher_assignment_picker_soon';
+  static const teacherNoAssignments = 'teacher_no_assignments';
+  static const teacherAssignmentGeometryTitle =
+      'teacher_assignment_geometry_title';
+  static const teacherAssignmentId = 'teacher_assignment_id';
+  static const teacherCreateAssignmentSoon = 'teacher_create_assignment_soon';
+  static const teacherAssignmentClassName = 'teacher_assignment_class_name';
+  static const teacherAssignmentReviewTitle = 'teacher_assignment_review_title';
+  static const teacherAssignmentChapterRange =
+      'teacher_assignment_chapter_range';
+  static const teacherAssignmentDueLabel = 'teacher_assignment_due_label';
+  static const teacherAssignmentDueValue = 'teacher_assignment_due_value';
+  static const teacherAssignmentQuestionCountLabel =
+      'teacher_assignment_question_count_label';
+  static const teacherAssignmentQuestionCountValue =
+      'teacher_assignment_question_count_value';
+  static const teacherAssignmentQuestionCountFormat =
+      'teacher_assignment_question_count_format';
+  static const teacherAssignmentQuestionContent =
+      'teacher_assignment_question_content';
+  static const teacherAssignmentQuestionNumber =
+      'teacher_assignment_question_number';
+  static const teacherAssignmentEquationPrompt =
+      'teacher_assignment_equation_prompt';
+  static const teacherCreateAssignmentTitle = 'teacher_create_assignment_title';
+  static const teacherAssignmentClassOption = 'teacher_assignment_class_option';
+  static const teacherAssignmentSelectClass = 'teacher_assignment_select_class';
+  static const teacherAssignmentClassSummaryName =
+      'teacher_assignment_class_summary_name';
+  static const teacherAssignmentClassStudentCount =
+      'teacher_assignment_class_student_count';
+  static const teacherAssignmentClassStudentCountFormat =
+      'teacher_assignment_class_student_count_format';
+  static const teacherAssignmentClassGrade = 'teacher_assignment_class_grade';
+  static const teacherAssignmentClassProgram =
+      'teacher_assignment_class_program';
+  static const teacherAssignmentClassDescription =
+      'teacher_assignment_class_description';
+  static const teacherAssignmentVolumeOne = 'teacher_assignment_volume_one';
+  static const teacherAssignmentVolumeTwo = 'teacher_assignment_volume_two';
+  static const teacherAssignmentTitleHint = 'teacher_assignment_title_hint';
+  static const teacherAssignmentProgramLabel =
+      'teacher_assignment_program_label';
+  static const teacherAssignmentProgramValue =
+      'teacher_assignment_program_value';
+  static const teacherAssignmentProgramRequired =
+      'teacher_assignment_program_required';
+  static const teacherAssignmentPublishLabel =
+      'teacher_assignment_publish_label';
+  static const teacherAssignmentVisibilityPublic =
+      'teacher_assignment_visibility_public';
+  static const teacherAssignmentVisibilityPrivate =
+      'teacher_assignment_visibility_private';
+  static const teacherAssignmentDeadline = 'teacher_assignment_deadline';
+  static const teacherAssignmentStartDateHint =
+      'teacher_assignment_start_date_hint';
+  static const teacherAssignmentEndDateHint =
+      'teacher_assignment_end_date_hint';
+  static const teacherAssignmentStartDateRequired =
+      'teacher_assignment_start_date_required';
+  static const teacherAssignmentEndDateRequired =
+      'teacher_assignment_end_date_required';
+  static const teacherAssignmentFutureDateRequired =
+      'teacher_assignment_future_date_required';
+  static const teacherAssignmentEndAfterStart =
+      'teacher_assignment_end_after_start';
+  static const teacherAssignmentChapterLabel =
+      'teacher_assignment_chapter_label';
+  static const teacherAssignmentLessonLabel = 'teacher_assignment_lesson_label';
+  static const teacherAssignmentDescriptionHint =
+      'teacher_assignment_description_hint';
+  static const teacherAssignmentCreated = 'teacher_assignment_created';
   static const teacherJoinedStudents = 'teacher_joined_students';
   static const teacherNoJoinedStudents = 'teacher_no_joined_students';
   static const teacherStudentFallback = 'teacher_student_fallback';

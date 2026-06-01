@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/localization/app_strings.dart';
+import '../../../../core/network/classroom_exercise_models.dart';
 import '../../../../core/network/classroom_models.dart';
 import '../../../../core/network/grade_models.dart';
 import '../../../../core/network/profile_models.dart';
@@ -18,6 +20,7 @@ import '../../../../core/network/school_models.dart';
 import '../../data/active_profile_session.dart';
 import '../../data/avatar_picker.dart';
 import '../../data/classroom_api.dart';
+import '../../data/classroom_exercise_api.dart';
 import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/profile_api.dart';
@@ -28,6 +31,9 @@ part 'teacher_home_tab.dart';
 part 'teacher_report_tab.dart';
 part 'teacher_create_class_screen.dart';
 part 'teacher_class_detail_screen.dart';
+part 'teacher_homework_screen.dart';
+part 'teacher_homework_detail_screen.dart';
+part 'teacher_create_homework_screen.dart';
 part 'teacher_class_members_screen.dart';
 part 'teacher_shared_widgets.dart';
 

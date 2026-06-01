@@ -125,6 +125,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         builder: (_) => TeacherClassDetailScreen(
           classroomId: classroomId,
           profileId: profileId,
+          userId: widget.user?.id,
           initialClassroom: classroom,
         ),
       ),

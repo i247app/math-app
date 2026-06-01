@@ -1093,6 +1093,18 @@ GradeModel? _matchGrade(List<GradeModel> grades, int? id) {
   return null;
 }
 
+ProgramModel? _matchProgram(List<ProgramModel> programs, int? id) {
+  if (id == null) {
+    return null;
+  }
+  for (final program in programs) {
+    if (_programStableId(program) == id) {
+      return program;
+    }
+  }
+  return null;
+}
+
 SchoolModel? _matchSchool(List<SchoolModel> schools, int? id) {
   if (id == null) {
     return null;

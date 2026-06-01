@@ -21,6 +21,7 @@ import '../tabs/review_tab.dart';
 import '../tabs/setting_tab.dart';
 import '../widgets/profile_avatar_image.dart';
 import 'grade_selection_screen.dart';
+import 'student_class_detail_screen.dart';
 import 'student_join_class_screen.dart';
 import 'teacher_classroom_screens.dart';
 
@@ -1314,6 +1315,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             classrooms: _classrooms,
             isLoading: _isLoadingClassrooms,
             error: _classroomError,
+            onOpenClassroom: _openClassDetail,
           ),
         ],
       ),
@@ -1370,6 +1372,34 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       _loadedProfileId = null;
       await _loadClassrooms();
     }
+  }
+
+  Future<void> _openClassDetail(ClassroomModel classroom) async {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    final classroomId = classroom.stableId;
+    if (profileId == null || profileId <= 0 || classroomId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.readText(AppKeys.teacherClassOpenFailed)),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => StudentClassDetailScreen(
+          classroomId: classroomId,
+          profileId: profileId,
+          initialClassroom: classroom,
+          classroomService: _classroomService,
+        ),
+      ),
+    );
   }
 }
 
@@ -1938,11 +1968,13 @@ class _StudentClassGridSection extends StatelessWidget {
     required this.classrooms,
     required this.isLoading,
     required this.error,
+    required this.onOpenClassroom,
   });
 
   final List<ClassroomModel> classrooms;
   final bool isLoading;
   final String? error;
+  final ValueChanged<ClassroomModel> onOpenClassroom;
 
   @override
   Widget build(BuildContext context) {
@@ -2006,6 +2038,7 @@ class _StudentClassGridSection extends StatelessWidget {
             itemBuilder: (context, index) {
               return _StudentFigmaClassCard(
                 classroom: visibleClassrooms[index],
+                onTap: () => onOpenClassroom(visibleClassrooms[index]),
               );
             },
           ),
@@ -2081,9 +2114,11 @@ class _StudentFigmaStateCard extends StatelessWidget {
 class _StudentFigmaClassCard extends StatelessWidget {
   const _StudentFigmaClassCard({
     required this.classroom,
+    required this.onTap,
   });
 
   final ClassroomModel classroom;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -2094,98 +2129,105 @@ class _StudentFigmaClassCard extends StatelessWidget {
         ? classroom.teacherName!.trim()
         : context.getText(AppKeys.teacherFallback);
 
-    return Container(
-      padding: const EdgeInsets.all(17),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(24),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: const Color(0xFFC4C6D2).withValues(alpha: 0.2),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF002B6A).withValues(alpha: 0.10),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 84,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFDF2F8),
-              borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          padding: const EdgeInsets.all(17),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: const Color(0xFFC4C6D2).withValues(alpha: 0.2),
             ),
-            child: Image.asset(_studentHomeClassIcon, fit: BoxFit.contain),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF002B6A).withValues(alpha: 0.10),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              height: 1.1,
-              letterSpacing: 0,
-            ),
-          ),
-          const Spacer(),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(top: 9),
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: const Color(0xFFC4C6D2).withValues(alpha: 0.1),
+          child: Column(
+            children: [
+              Container(
+                width: 84,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDF2F8),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Image.asset(_studentHomeClassIcon, fit: BoxFit.contain),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                  letterSpacing: 0,
                 ),
               ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  teacher,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: const Color(0xFF002B6A).withValues(alpha: 0.6),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Container(
-                  width: 69,
-                  height: 24,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3F8F92),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Text(
-                    context.getText(AppKeys.teacherEnterClass),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      letterSpacing: 0,
+              const Spacer(),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(top: 9),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: const Color(0xFFC4C6D2).withValues(alpha: 0.1),
                     ),
                   ),
                 ),
-              ],
-            ),
+                child: Column(
+                  children: [
+                    Text(
+                      teacher,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: const Color(0xFF002B6A).withValues(alpha: 0.6),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Container(
+                      width: 69,
+                      height: 24,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3F8F92),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        context.getText(AppKeys.teacherEnterClass),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
