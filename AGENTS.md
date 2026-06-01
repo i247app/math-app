@@ -96,6 +96,7 @@ The app is currently Android-focused in the checked-in platform files. The READM
 - Use `Stack` / `Positioned` only when the design genuinely requires overlapping or anchored decorative layers. Do not use positional layout for ordinary vertical content, buttons, headers, forms, cards, or lists.
 - Avoid hardcoded canvas dimensions like `_designWidth`, `_designHeight`, or `constraints.maxWidth / 390` for new Figma work. Size and space UI from the actual device constraints, safe-area padding, content constraints, and relative layout rules.
 - Avoid hardcoded width/height unless the element has a real fixed design role such as an icon, avatar, toolbar button, or known asset ratio. Prefer min/max constraints and relative sizing for screen sections.
+- Avoid fixed heights and fixed aspect ratios for containers with text or dynamic content unless the design truly requires clipping. Use intrinsic layout, padding, min/max constraints, `Flexible`/`Expanded`, and scrollable content where appropriate so localization, font metrics, and backend data do not cause overflow.
 
 ## Common Commands
 

@@ -27,7 +27,6 @@ class NumiHome extends StatefulWidget {
 
 class _NumiHomeState extends State<NumiHome> {
   final phoneController = TextEditingController();
-  int _shownOtpPreviewId = 0;
   bool _phoneHasInput = false;
   String? _lastLookupPhone;
 
@@ -119,34 +118,6 @@ class _NumiHomeState extends State<NumiHome> {
     cubit.submitLoginPhone(normalized.phone!);
   }
 
-  void showDevOtpDialog(OnboardingState state) {
-    final otpCode = state.devOtpCode;
-    if (otpCode == null ||
-        otpCode.isEmpty ||
-        _shownOtpPreviewId == state.otpPreviewId) {
-      return;
-    }
-
-    _shownOtpPreviewId = state.otpPreviewId;
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(context.readText(AppKeys.otpTitle)),
-          content: Text(
-            context.readFormatText(AppKeys.otpSentMessage, {'code': otpCode}),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(context.readText(AppKeys.close)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -170,7 +141,6 @@ class _NumiHomeState extends State<NumiHome> {
                         normalizedPhoneInput: _normalizedPhoneInput,
                         handlePhoneInputChanged: handlePhoneInputChanged,
                         sendOtp: sendOtp,
-                        showDevOtpDialog: showDevOtpDialog,
                       ),
                     )
                   : AppBackground(
@@ -181,7 +151,6 @@ class _NumiHomeState extends State<NumiHome> {
                         normalizedPhoneInput: _normalizedPhoneInput,
                         handlePhoneInputChanged: handlePhoneInputChanged,
                         sendOtp: sendOtp,
-                        showDevOtpDialog: showDevOtpDialog,
                       ),
                     ),
             ),
@@ -200,7 +169,6 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
     required this.normalizedPhoneInput,
     required this.handlePhoneInputChanged,
     required this.sendOtp,
-    required this.showDevOtpDialog,
   });
 
   final TextEditingController phoneController;
@@ -213,7 +181,6 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
     String value,
   ) handlePhoneInputChanged;
   final void Function(OnboardingCubit cubit, PhoneRegion region) sendOtp;
-  final void Function(OnboardingState state) showDevOtpDialog;
 
   static bool _isInlineSignupUsernameError(OnboardingState state) {
     if (state.screen != AppScreen.signup) {
@@ -234,12 +201,10 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
       listenWhen: (previous, current) {
         final hasNewError = previous.authError != current.authError &&
             current.authError != null;
-        final hasNewDevOtp = previous.otpPreviewId != current.otpPreviewId &&
-            current.devOtpCode != null;
         final leftLoginScreen = previous.screen == AppScreen.login &&
             current.screen != AppScreen.login;
 
-        return hasNewError || hasNewDevOtp || leftLoginScreen;
+        return hasNewError || leftLoginScreen;
       },
       listener: (context, state) {
         if (state.screen != AppScreen.login) {
@@ -252,8 +217,6 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
             SnackBar(content: Text(authError)),
           );
         }
-
-        showDevOtpDialog(state);
       },
       builder: (context, state) {
         final cubit = context.read<OnboardingCubit>();
@@ -353,6 +316,7 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                         isVerifyingOtp: state.isVerifyingOtp,
                         resendSeconds: state.otpExpiresIn ?? 0,
                         resendResetId: state.otpPreviewId,
+                        devOtpCode: state.devOtpCode,
                         otpError: state.otpError,
                         otpErrorId: state.otpErrorId,
                       ),

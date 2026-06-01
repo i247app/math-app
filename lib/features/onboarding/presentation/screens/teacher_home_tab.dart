@@ -557,7 +557,7 @@ class _TeacherClassCard extends StatelessWidget {
                 Text(
                   context.formatText(
                     AppKeys.teacherStudentCount,
-                    {'count': classroom.displayMemberCount},
+                    {'count': classroom.displayStudentCount},
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

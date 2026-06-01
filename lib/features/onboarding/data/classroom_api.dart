@@ -15,6 +15,28 @@ class ClassroomException implements Exception {
 abstract class ClassroomService {
   Future<List<ClassroomModel>> listClassrooms({required int profileId});
 
+  Future<List<ClassroomStudent>> listJoinRequests({
+    required int profileId,
+    required int classroomId,
+  });
+
+  Future<List<ClassroomStudent>> listStudents({
+    required int profileId,
+    required int classroomId,
+  });
+
+  Future<void> approveJoinRequest({
+    required int profileId,
+    required int classroomId,
+    required int targetProfileId,
+  });
+
+  Future<void> rejectJoinRequest({
+    required int profileId,
+    required int classroomId,
+    required int targetProfileId,
+  });
+
   Future<ClassroomModel?> createClassroom({
     required int profileId,
     required String name,
@@ -50,6 +72,82 @@ class ClassroomApi implements ClassroomService {
         ClassroomListRequest(profileId: profileId),
       );
       return response.classrooms;
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<List<ClassroomStudent>> listJoinRequests({
+    required int profileId,
+    required int classroomId,
+  }) async {
+    try {
+      final response = await _networkApi.listClassroomJoinRequests(
+        ClassroomMembersListRequest(
+          profileId: profileId,
+          classroomId: classroomId,
+        ),
+      );
+      return response.members;
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<List<ClassroomStudent>> listStudents({
+    required int profileId,
+    required int classroomId,
+  }) async {
+    try {
+      final response = await _networkApi.listClassroomMembers(
+        ClassroomMembersListRequest(
+          profileId: profileId,
+          classroomId: classroomId,
+          role: 'STUDENT',
+          status: 'ACTIVE',
+        ),
+      );
+      return response.members;
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<void> approveJoinRequest({
+    required int profileId,
+    required int classroomId,
+    required int targetProfileId,
+  }) async {
+    try {
+      await _networkApi.approveClassroomJoinRequest(
+        ClassroomJoinRequestActionRequest(
+          profileId: profileId,
+          classroomId: classroomId,
+          targetProfileId: targetProfileId,
+        ),
+      );
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<void> rejectJoinRequest({
+    required int profileId,
+    required int classroomId,
+    required int targetProfileId,
+  }) async {
+    try {
+      await _networkApi.rejectClassroomJoinRequest(
+        ClassroomJoinRequestActionRequest(
+          profileId: profileId,
+          classroomId: classroomId,
+          targetProfileId: targetProfileId,
+        ),
+      );
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }

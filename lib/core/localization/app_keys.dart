@@ -221,6 +221,7 @@ class AppKeys {
   static const teacherMemberSummary = 'teacher_member_summary';
   static const teacherMembersTitle = 'teacher_members_title';
   static const teacherJoinRequests = 'teacher_join_requests';
+  static const teacherNoJoinRequests = 'teacher_no_join_requests';
   static const teacherPendingApproval = 'teacher_pending_approval';
   static const teacherJoinedStudentsTitle = 'teacher_joined_students_title';
   static const teacherSearchStudentTitle = 'teacher_search_student_title';

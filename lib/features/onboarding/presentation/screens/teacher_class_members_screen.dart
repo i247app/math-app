@@ -1,49 +1,118 @@
 part of 'teacher_classroom_screens.dart';
 
-class TeacherClassMembersScreen extends StatelessWidget {
+class TeacherClassMembersScreen extends StatefulWidget {
   const TeacherClassMembersScreen({
     super.key,
+    required this.classroomId,
+    required this.profileId,
+    ClassroomService? classroomService,
     ProfileService? profileService,
-  }) : _profileService = profileService;
+  })  : _classroomService = classroomService,
+        _profileService = profileService;
 
+  final int classroomId;
+  final int profileId;
+  final ClassroomService? _classroomService;
   final ProfileService? _profileService;
 
-  static const _fakeJoinRequests = <_FakeClassMember>[
-    _FakeClassMember(
-      name: 'Nguyễn Thị D',
-      initials: 'ND',
-      avatarBackground: Color(0xFFE0F2F1),
-      avatarBorder: Color(0xFFB2DFDB),
-      initialsColor: Color(0xFF00796B),
-    ),
-    _FakeClassMember(
-      name: 'Mai Văn T',
-      initials: 'MT',
-      avatarBackground: Color(0xFFFCE4EC),
-      avatarBorder: Color(0xFFFCE7F3),
-      initialsColor: Color(0xFFF06292),
-    ),
-  ];
+  @override
+  State<TeacherClassMembersScreen> createState() =>
+      _TeacherClassMembersScreenState();
+}
 
-  static const _fakeMembers = <_FakeClassMember>[
-    _FakeClassMember(
-      name: 'Nguyễn Văn A',
-      statusKey: AppKeys.teacherJustJoined,
-      avatarAsset: 'assets/images/teacher_member_avatar_1.png',
-    ),
-    _FakeClassMember(
-      name: 'Trần Thị B',
-      statusKey: AppKeys.teacherTwoMinutesAgo,
-      avatarAsset: 'assets/images/teacher_member_avatar_2.png',
-    ),
-    _FakeClassMember(
-      name: 'Lê Văn C',
-      statusKey: AppKeys.teacherFiveMinutesAgo,
-      initials: 'L',
-      avatarBackground: Color(0x1A7895D9),
-      initialsColor: Color(0xFF7895D9),
-    ),
-  ];
+class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
+  late final ClassroomService _classroomService =
+      widget._classroomService ?? ClassroomApi();
+
+  List<ClassroomStudent> _joinRequests = const <ClassroomStudent>[];
+  List<ClassroomStudent> _members = const <ClassroomStudent>[];
+  final Set<int> _processingProfileIds = <int>{};
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMembers();
+  }
+
+  Future<void> _loadMembers() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final results = await Future.wait([
+        _classroomService.listJoinRequests(
+          profileId: widget.profileId,
+          classroomId: widget.classroomId,
+        ),
+        _classroomService.listStudents(
+          profileId: widget.profileId,
+          classroomId: widget.classroomId,
+        ),
+      ]);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _joinRequests = results[0];
+        _members = results[1];
+      });
+    } on ClassroomException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _error = error.message);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _handleJoinRequest(
+    ClassroomStudent request, {
+    required bool approve,
+  }) async {
+    final targetProfileId = request.profileId;
+    if (targetProfileId == null) {
+      return;
+    }
+    setState(() => _processingProfileIds.add(targetProfileId));
+    try {
+      if (approve) {
+        await _classroomService.approveJoinRequest(
+          profileId: widget.profileId,
+          classroomId: widget.classroomId,
+          targetProfileId: targetProfileId,
+        );
+      } else {
+        await _classroomService.rejectJoinRequest(
+          profileId: widget.profileId,
+          classroomId: widget.classroomId,
+          targetProfileId: targetProfileId,
+        );
+      }
+      await _loadMembers();
+    } on ClassroomException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error.message, style: GoogleFonts.andika()),
+            duration: const Duration(milliseconds: 1600),
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _processingProfileIds.remove(targetProfileId));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,57 +131,101 @@ class TeacherClassMembersScreen extends StatelessWidget {
                   onBack: () => Navigator.of(context).maybePop(),
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.fromLTRB(
-                      15 * scale,
-                      31 * scale,
-                      15 * scale,
-                      MediaQuery.paddingOf(context).bottom + 32 * scale,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: _TeacherMemberAddButton(
-                            scale: scale,
-                            onTap: () => _openStudentSearchSheet(context),
+                  child: RefreshIndicator(
+                    color: _teacherTeal,
+                    onRefresh: _loadMembers,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      padding: EdgeInsets.fromLTRB(
+                        15 * scale,
+                        31 * scale,
+                        15 * scale,
+                        MediaQuery.paddingOf(context).bottom + 32 * scale,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: _TeacherMemberAddButton(
+                              scale: scale,
+                              onTap: () => _openStudentSearchSheet(context),
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 15 * scale),
-                        _TeacherMemberSectionTitle(
-                          scale: scale,
-                          title: context.formatText(
-                            AppKeys.teacherJoinRequests,
-                            {'count': _fakeJoinRequests.length},
-                          ),
-                        ),
-                        SizedBox(height: 10 * scale),
-                        _JoinRequestCard(
-                          scale: scale,
-                          requests: _fakeJoinRequests,
-                        ),
-                        SizedBox(height: 28 * scale),
-                        _TeacherMemberSectionTitle(
-                          scale: scale,
-                          title: context.formatText(
-                            AppKeys.teacherJoinedStudentsTitle,
-                            {'count': _fakeMembers.length},
-                          ),
-                        ),
-                        SizedBox(height: 8 * scale),
-                        for (var index = 0;
-                            index < _fakeMembers.length;
-                            index++) ...[
-                          _JoinedMemberCard(
-                            scale: scale,
-                            member: _fakeMembers[index],
-                          ),
-                          if (index != _fakeMembers.length - 1)
-                            SizedBox(height: 12 * scale),
+                          SizedBox(height: 15 * scale),
+                          if (_isLoading &&
+                              _joinRequests.isEmpty &&
+                              _members.isEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(top: 80 * scale),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: _teacherTeal,
+                                ),
+                              ),
+                            )
+                          else if (_error != null &&
+                              _joinRequests.isEmpty &&
+                              _members.isEmpty)
+                            _TeacherErrorPanel(
+                              scale: scale,
+                              message: _error!,
+                              onRetry: _loadMembers,
+                            )
+                          else ...[
+                            _TeacherMemberSectionTitle(
+                              scale: scale,
+                              title: context.formatText(
+                                AppKeys.teacherJoinRequests,
+                                {'count': _joinRequests.length},
+                              ),
+                            ),
+                            SizedBox(height: 10 * scale),
+                            _JoinRequestCard(
+                              scale: scale,
+                              requests: _joinRequests,
+                              processingProfileIds: _processingProfileIds,
+                              onApprove: (request) => _handleJoinRequest(
+                                request,
+                                approve: true,
+                              ),
+                              onReject: (request) => _handleJoinRequest(
+                                request,
+                                approve: false,
+                              ),
+                            ),
+                            SizedBox(height: 28 * scale),
+                            _TeacherMemberSectionTitle(
+                              scale: scale,
+                              title: context.formatText(
+                                AppKeys.teacherJoinedStudentsTitle,
+                                {'count': _members.length},
+                              ),
+                            ),
+                            SizedBox(height: 8 * scale),
+                            if (_members.isEmpty)
+                              _TeacherEmptyMemberText(
+                                scale: scale,
+                                text: context.getText(
+                                  AppKeys.teacherNoJoinedStudents,
+                                ),
+                              )
+                            else
+                              for (var index = 0;
+                                  index < _members.length;
+                                  index++) ...[
+                                _JoinedMemberCard(
+                                  scale: scale,
+                                  member: _members[index],
+                                ),
+                                if (index != _members.length - 1)
+                                  SizedBox(height: 12 * scale),
+                              ],
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -131,7 +244,7 @@ class TeacherClassMembersScreen extends StatelessWidget {
       useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => _StudentInviteSearchSheet(
-        profileService: _profileService ?? ProfileApi(),
+        profileService: widget._profileService ?? ProfileApi(),
       ),
     );
     if (selected == null || selected.isEmpty || !context.mounted) {
@@ -658,13 +771,26 @@ class _JoinRequestCard extends StatelessWidget {
   const _JoinRequestCard({
     required this.scale,
     required this.requests,
+    required this.processingProfileIds,
+    required this.onApprove,
+    required this.onReject,
   });
 
   final double scale;
-  final List<_FakeClassMember> requests;
+  final List<ClassroomStudent> requests;
+  final Set<int> processingProfileIds;
+  final ValueChanged<ClassroomStudent> onApprove;
+  final ValueChanged<ClassroomStudent> onReject;
 
   @override
   Widget build(BuildContext context) {
+    if (requests.isEmpty) {
+      return _TeacherEmptyMemberText(
+        scale: scale,
+        text: context.getText(AppKeys.teacherNoJoinRequests),
+      );
+    }
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 25 * scale,
@@ -684,7 +810,15 @@ class _JoinRequestCard extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 10 * scale),
                 child: const Divider(height: 1, color: Color(0xFFF9FAFB)),
               ),
-            _JoinRequestRow(scale: scale, request: requests[index]),
+            _JoinRequestRow(
+              scale: scale,
+              request: requests[index],
+              isProcessing: processingProfileIds.contains(
+                requests[index].profileId,
+              ),
+              onApprove: () => onApprove(requests[index]),
+              onReject: () => onReject(requests[index]),
+            ),
             if (index != requests.length - 1) SizedBox(height: 16 * scale),
           ],
         ],
@@ -697,16 +831,23 @@ class _JoinRequestRow extends StatelessWidget {
   const _JoinRequestRow({
     required this.scale,
     required this.request,
+    required this.isProcessing,
+    required this.onApprove,
+    required this.onReject,
   });
 
   final double scale;
-  final _FakeClassMember request;
+  final ClassroomStudent request;
+  final bool isProcessing;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
 
   @override
   Widget build(BuildContext context) {
+    final name = _classroomMemberName(context, request);
     return Row(
       children: [
-        _FakeMemberInitialsAvatar(
+        _ClassroomMemberAvatar(
           member: request,
           size: 40 * scale,
           fontSize: 14 * scale,
@@ -714,7 +855,7 @@ class _JoinRequestRow extends StatelessWidget {
         SizedBox(width: 12 * scale),
         Expanded(
           child: _MemberTextBlock(
-            name: request.name,
+            name: name,
             status: context.getText(AppKeys.teacherPendingApproval),
             nameFontSize: 16 * scale,
             statusFontSize: 12 * scale,
@@ -723,15 +864,33 @@ class _JoinRequestRow extends StatelessWidget {
           ),
         ),
         SizedBox(width: 10 * scale),
-        _RequestActionIcon(
-          asset: 'assets/images/teacher_member_accept.png',
-          size: 25 * scale,
-        ),
-        SizedBox(width: 5 * scale),
-        _RequestActionIcon(
-          asset: 'assets/images/teacher_member_reject.png',
-          size: 23 * scale,
-        ),
+        if (isProcessing)
+          SizedBox(
+            width: 53 * scale,
+            child: Center(
+              child: SizedBox(
+                width: 18 * scale,
+                height: 18 * scale,
+                child: const CircularProgressIndicator(
+                  color: _teacherTeal,
+                  strokeWidth: 2,
+                ),
+              ),
+            ),
+          )
+        else ...[
+          _RequestActionIcon(
+            asset: 'assets/images/teacher_member_accept.png',
+            size: 25 * scale,
+            onTap: request.profileId == null ? null : onApprove,
+          ),
+          SizedBox(width: 5 * scale),
+          _RequestActionIcon(
+            asset: 'assets/images/teacher_member_reject.png',
+            size: 23 * scale,
+            onTap: request.profileId == null ? null : onReject,
+          ),
+        ],
       ],
     );
   }
@@ -741,18 +900,20 @@ class _RequestActionIcon extends StatelessWidget {
   const _RequestActionIcon({
     required this.asset,
     required this.size,
+    required this.onTap,
   });
 
   final String asset;
   final double size;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkResponse(
-      onTap: () {},
+      onTap: onTap,
       radius: size,
       child: Opacity(
-        opacity: 0.8,
+        opacity: onTap == null ? 0.35 : 0.8,
         child: Image.asset(
           asset,
           width: size,
@@ -770,10 +931,12 @@ class _JoinedMemberCard extends StatelessWidget {
   });
 
   final double scale;
-  final _FakeClassMember member;
+  final ClassroomStudent member;
 
   @override
   Widget build(BuildContext context) {
+    final name = _classroomMemberName(context, member);
+    final status = _classroomMemberStatus(context, member);
     return Container(
       constraints: BoxConstraints(minHeight: 82 * scale),
       padding: EdgeInsets.all(13 * scale),
@@ -795,8 +958,8 @@ class _JoinedMemberCard extends StatelessWidget {
           SizedBox(width: 24 * scale),
           Expanded(
             child: _MemberTextBlock(
-              name: member.name,
-              status: context.getText(member.statusKey),
+              name: name,
+              status: status,
               nameFontSize: 14 * scale,
               statusFontSize: 12 * scale,
               nameColor: const Color(0xFF181C1E),
@@ -824,7 +987,7 @@ class _JoinedMemberAvatar extends StatelessWidget {
     required this.scale,
   });
 
-  final _FakeClassMember member;
+  final ClassroomStudent member;
   final double scale;
 
   @override
@@ -835,17 +998,16 @@ class _JoinedMemberAvatar extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: member.avatarAsset == null
-                ? _FakeMemberInitialsAvatar(
+            child: _hasClassroomMemberAvatar(member)
+                ? ProfileAvatarImage(
+                    size: 56 * scale,
+                    avatarKey: member.avatarKey,
+                    avatarUrl: member.avatarUrl,
+                  )
+                : _ClassroomMemberAvatar(
                     member: member,
                     size: 56 * scale,
                     fontSize: 24 * scale,
-                  )
-                : ClipOval(
-                    child: Image.asset(
-                      member.avatarAsset!,
-                      fit: BoxFit.cover,
-                    ),
                   ),
           ),
           Positioned(
@@ -867,37 +1029,81 @@ class _JoinedMemberAvatar extends StatelessWidget {
   }
 }
 
-class _FakeMemberInitialsAvatar extends StatelessWidget {
-  const _FakeMemberInitialsAvatar({
+class _ClassroomMemberAvatar extends StatelessWidget {
+  const _ClassroomMemberAvatar({
     required this.member,
     required this.size,
     required this.fontSize,
   });
 
-  final _FakeClassMember member;
+  final ClassroomStudent member;
   final double size;
   final double fontSize;
 
   @override
   Widget build(BuildContext context) {
+    if (_hasClassroomMemberAvatar(member)) {
+      return ProfileAvatarImage(
+        size: size,
+        avatarKey: member.avatarKey,
+        avatarUrl: member.avatarUrl,
+      );
+    }
+
+    final initials = _classroomMemberInitials(context, member);
     return Container(
       width: size,
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: member.avatarBackground,
+        color: const Color(0xFFF0F7FF),
         shape: BoxShape.circle,
-        border: Border.all(color: member.avatarBorder),
+        border: Border.all(color: const Color(0xFFDDEBFF)),
       ),
       child: Text(
-        member.initials,
+        initials,
         maxLines: 1,
         overflow: TextOverflow.clip,
         style: GoogleFonts.andika(
-          color: member.initialsColor,
+          color: const Color(0xFF1E3A5F),
           fontSize: fontSize,
           fontWeight: FontWeight.w700,
           height: 1,
+        ),
+      ),
+    );
+  }
+}
+
+class _TeacherEmptyMemberText extends StatelessWidget {
+  const _TeacherEmptyMemberText({
+    required this.scale,
+    required this.text,
+  });
+
+  final double scale;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 18 * scale,
+        vertical: 18 * scale,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16 * scale),
+        border: Border.all(color: const Color(0xFFF3F4F6)),
+      ),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.andika(
+          color: _teacherMuted,
+          fontSize: 14 * scale,
+          fontWeight: FontWeight.w600,
+          height: 1.35,
         ),
       ),
     );
@@ -957,26 +1163,6 @@ class _MemberTextBlock extends StatelessWidget {
   }
 }
 
-class _FakeClassMember {
-  const _FakeClassMember({
-    required this.name,
-    this.statusKey = AppKeys.teacherPendingApproval,
-    this.initials = '',
-    this.avatarAsset,
-    this.avatarBackground = const Color(0xFFF0F7FF),
-    this.avatarBorder = Colors.transparent,
-    this.initialsColor = const Color(0xFF1E3A5F),
-  });
-
-  final String name;
-  final String statusKey;
-  final String initials;
-  final String? avatarAsset;
-  final Color avatarBackground;
-  final Color avatarBorder;
-  final Color initialsColor;
-}
-
 bool _isStudentProfile(StudentProfile profile) {
   final role = profile.role?.trim().toUpperCase();
   return role == null || role.isEmpty || role == 'STUDENT';
@@ -994,4 +1180,41 @@ String? _studentSearchSubtitle(BuildContext context, StudentProfile profile) {
   }
 
   return null;
+}
+
+bool _hasClassroomMemberAvatar(ClassroomStudent member) {
+  return _nonEmpty(member.avatarKey) != null ||
+      _nonEmpty(member.avatarUrl) != null;
+}
+
+String _classroomMemberName(BuildContext context, ClassroomStudent member) {
+  return _nonEmpty(member.name) ??
+      context.getText(AppKeys.teacherStudentFallback);
+}
+
+String _classroomMemberStatus(BuildContext context, ClassroomStudent member) {
+  final status = _nonEmpty(member.status);
+  if (status == null || status.toUpperCase() == 'ACTIVE') {
+    return context.getText(AppKeys.teacherJustJoined);
+  }
+  return status;
+}
+
+String _classroomMemberInitials(
+  BuildContext context,
+  ClassroomStudent member,
+) {
+  final name = _classroomMemberName(context, member);
+  final words = name
+      .split(RegExp(r'\s+'))
+      .where((word) => word.trim().isNotEmpty)
+      .toList();
+  if (words.isEmpty) {
+    return '?';
+  }
+  if (words.length == 1) {
+    return words.first.characters.take(1).toString().toUpperCase();
+  }
+  return '${words.first.characters.take(1)}${words.last.characters.take(1)}'
+      .toUpperCase();
 }

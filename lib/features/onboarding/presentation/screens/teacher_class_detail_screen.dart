@@ -26,6 +26,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   bool _isLoading = false;
   String? _error;
   ClassroomModel? _classroom;
+  int _requestCount = 0;
 
   @override
   void initState() {
@@ -44,10 +45,17 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
         classroomId: widget.classroomId,
         profileId: widget.profileId,
       );
+      final joinRequests = await _classroomService.listJoinRequests(
+        classroomId: widget.classroomId,
+        profileId: widget.profileId,
+      );
       if (!mounted) {
         return;
       }
-      setState(() => _classroom = classroom ?? _classroom);
+      setState(() {
+        _classroom = classroom ?? _classroom;
+        _requestCount = joinRequests.length;
+      });
     } on ClassroomException catch (error) {
       if (!mounted) {
         return;
@@ -113,13 +121,21 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                             _ClassDetailLowerContent(
                               scale: scale,
                               memberCount: count,
-                              requestCount: 0,
-                              onOpenMembers: () => Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) =>
-                                      const TeacherClassMembersScreen(),
-                                ),
-                              ),
+                              requestCount: _requestCount,
+                              onOpenMembers: () async {
+                                await Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => TeacherClassMembersScreen(
+                                      classroomId: widget.classroomId,
+                                      profileId: widget.profileId,
+                                      classroomService: _classroomService,
+                                    ),
+                                  ),
+                                );
+                                if (mounted) {
+                                  _loadDetail();
+                                }
+                              },
                             ),
                         ],
                       ),
@@ -700,9 +716,9 @@ String _detailIdLabel(String prefix, int? value) {
 String? _displayBackendId(int? value) => value == null ? null : '$value';
 
 String _classCode(ClassroomModel? classroom) {
-  final inviteCode = _nonEmpty(classroom?.inviteCode);
-  if (inviteCode != null) {
-    return inviteCode;
+  final classroomCode = _nonEmpty(classroom?.classroomCode);
+  if (classroomCode != null) {
+    return classroomCode;
   }
   final stableId = classroom?.stableId;
   if (stableId == null) {

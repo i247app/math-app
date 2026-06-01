@@ -15,6 +15,47 @@ class ClassroomListRequest {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
+class ClassroomMembersListRequest {
+  const ClassroomMembersListRequest({
+    required this.profileId,
+    required this.classroomId,
+    this.role,
+    this.status,
+  });
+
+  final int profileId;
+  final int classroomId;
+  final String? role;
+  final String? status;
+
+  factory ClassroomMembersListRequest.fromJson(Map<String, dynamic> json) =>
+      _$ClassroomMembersListRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassroomMembersListRequestToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ClassroomJoinRequestActionRequest {
+  const ClassroomJoinRequestActionRequest({
+    required this.profileId,
+    required this.classroomId,
+    required this.targetProfileId,
+  });
+
+  final int profileId;
+  final int classroomId;
+  final int targetProfileId;
+
+  factory ClassroomJoinRequestActionRequest.fromJson(
+    Map<String, dynamic> json,
+  ) =>
+      _$ClassroomJoinRequestActionRequestFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$ClassroomJoinRequestActionRequestToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class CreateClassroomRequest {
   const CreateClassroomRequest({
     required this.profileId,
@@ -82,6 +123,51 @@ class ClassroomListResponse {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class ClassroomMemberListResponse {
+  const ClassroomMemberListResponse({
+    required this.mstatus,
+    this.members = const <ClassroomStudent>[],
+    this.status,
+    this.mmessage,
+    this.debug,
+  });
+
+  @JsonKey(fromJson: _requiredIntFromJson)
+  final int mstatus;
+  @JsonKey(fromJson: _studentListFromJson)
+  final List<ClassroomStudent> members;
+  final String? status;
+  final String? mmessage;
+  final String? debug;
+
+  factory ClassroomMemberListResponse.fromJson(Map<String, dynamic> json) {
+    final data = json['data'];
+    final membersValue = json['members'] ??
+        json['students'] ??
+        json['profiles'] ??
+        json['items'] ??
+        json['join_requests'] ??
+        json['requests'] ??
+        _nestedValue(data, 'members') ??
+        _nestedValue(data, 'students') ??
+        _nestedValue(data, 'profiles') ??
+        _nestedValue(data, 'items') ??
+        _nestedValue(data, 'join_requests') ??
+        _nestedValue(data, 'requests') ??
+        data;
+
+    return _$ClassroomMemberListResponseFromJson(
+      <String, dynamic>{
+        ...json,
+        'members': membersValue,
+      },
+    );
+  }
+
+  Map<String, dynamic> toJson() => _$ClassroomMemberListResponseToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ClassroomResponse {
   const ClassroomResponse({
     required this.mstatus,
@@ -118,6 +204,27 @@ class ClassroomResponse {
   Map<String, dynamic> toJson() => _$ClassroomResponseToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ClassroomActionResponse {
+  const ClassroomActionResponse({
+    required this.mstatus,
+    this.status,
+    this.mmessage,
+    this.debug,
+  });
+
+  @JsonKey(fromJson: _requiredIntFromJson)
+  final int mstatus;
+  final String? status;
+  final String? mmessage;
+  final String? debug;
+
+  factory ClassroomActionResponse.fromJson(Map<String, dynamic> json) =>
+      _$ClassroomActionResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassroomActionResponseToJson(this);
+}
+
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ClassroomModel {
   const ClassroomModel({
@@ -129,7 +236,7 @@ class ClassroomModel {
     this.programId,
     this.gradeId,
     this.schoolId,
-    this.inviteCode,
+    this.classroomCode,
     this.maxMembers,
     this.memberCount,
     this.studentCount,
@@ -156,7 +263,7 @@ class ClassroomModel {
   @JsonKey(fromJson: _intFromJson)
   final int? schoolId;
   @JsonKey(fromJson: _stringFromJson)
-  final String? inviteCode;
+  final String? classroomCode;
   @JsonKey(fromJson: _intFromJson)
   final int? maxMembers;
   @JsonKey(fromJson: _intFromJson)
@@ -184,6 +291,7 @@ class ClassroomModel {
     return _$ClassroomModelFromJson(
       <String, dynamic>{
         ...json,
+        'classroom_code': json['classroom_code'] ?? json['invite_code'],
         'students': studentsValue,
         'member_count': memberCountValue,
         'student_count': studentCountValue,
@@ -207,9 +315,11 @@ class ClassroomStudent {
     this.id,
     this.profileId,
     this.name,
+    this.avatarKey,
     this.avatarUrl,
     this.joinedAt,
     this.status,
+    this.role,
   });
 
   @JsonKey(fromJson: _intFromJson)
@@ -217,12 +327,43 @@ class ClassroomStudent {
   @JsonKey(fromJson: _intFromJson)
   final int? profileId;
   final String? name;
+  final String? avatarKey;
   final String? avatarUrl;
   final String? joinedAt;
   final String? status;
+  final String? role;
 
-  factory ClassroomStudent.fromJson(Map<String, dynamic> json) =>
-      _$ClassroomStudentFromJson(json);
+  factory ClassroomStudent.fromJson(Map<String, dynamic> json) {
+    final profile = json['profile'];
+    final user = json['user'];
+    final profileId = json['profile_id'] ??
+        json['target_profile_id'] ??
+        json['student_profile_id'] ??
+        _nestedValue(profile, 'id') ??
+        _nestedValue(profile, 'profile_id');
+    final name = json['name'] ??
+        json['profile_name'] ??
+        json['student_name'] ??
+        _nestedValue(profile, 'name') ??
+        _nestedValue(user, 'name');
+    final avatarKey = json['avatar_key'] ?? _nestedValue(profile, 'avatar_key');
+    final avatarUrl = json['avatar_url'] ??
+        json['profile_avatar_url'] ??
+        _nestedValue(profile, 'avatar_url') ??
+        _nestedValue(user, 'avatar_url');
+    final role = json['role'] ?? _nestedValue(profile, 'role');
+
+    return _$ClassroomStudentFromJson(
+      <String, dynamic>{
+        ...json,
+        'profile_id': profileId,
+        'name': name,
+        'avatar_key': avatarKey,
+        'avatar_url': avatarUrl,
+        'role': role,
+      },
+    );
+  }
 
   Map<String, dynamic> toJson() => _$ClassroomStudentToJson(this);
 }

@@ -19,6 +19,7 @@ class OtpScreen extends StatefulWidget {
     required this.isVerifyingOtp,
     required this.resendSeconds,
     required this.resendResetId,
+    this.devOtpCode,
     this.otpError,
     this.otpErrorId = 0,
   });
@@ -29,6 +30,7 @@ class OtpScreen extends StatefulWidget {
   final bool isVerifyingOtp;
   final int resendSeconds;
   final int resendResetId;
+  final String? devOtpCode;
   final String? otpError;
   final int otpErrorId;
 
@@ -290,6 +292,7 @@ class _OtpScreenState extends State<OtpScreen>
                     onResend: handleResend,
                     isVerifyingOtp: widget.isVerifyingOtp,
                     resendCountdown: resendCountdown,
+                    devOtpCode: widget.devOtpCode,
                     errorText: otpError,
                   ),
                 ),
@@ -314,6 +317,7 @@ class OtpCard extends StatelessWidget {
     required this.onResend,
     required this.isVerifyingOtp,
     required this.resendCountdown,
+    this.devOtpCode,
     this.errorText,
   });
 
@@ -325,11 +329,13 @@ class OtpCard extends StatelessWidget {
   final VoidCallback onResend;
   final bool isVerifyingOtp;
   final int resendCountdown;
+  final String? devOtpCode;
   final String? errorText;
 
   @override
   Widget build(BuildContext context) {
     final hasError = errorText != null;
+    final otpCode = devOtpCode?.trim();
 
     // Check if all OTP boxes have a digit
     final isFull = controllers.every((c) => c.text.isNotEmpty);
@@ -370,6 +376,23 @@ class OtpCard extends StatelessWidget {
             );
           },
         ),
+        if (otpCode != null && otpCode.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Text(
+              context.formatText(AppKeys.otpSentMessage, {'code': otpCode}),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.andika(
+                color: const Color(0xFF339395),
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                height: 1.25,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           child: errorText == null

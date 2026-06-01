@@ -665,6 +665,70 @@ class NetworkApi {
     return classroomResponse;
   }
 
+  Future<ClassroomMemberListResponse> listClassroomJoinRequests(
+    ClassroomMembersListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/classrooms/join-requests/list',
+      request.toJson(),
+    );
+    final classroomResponse = ClassroomMemberListResponse.fromJson(
+      responseJson,
+    );
+    if (classroomResponse.mstatus != 200) {
+      throw NetworkException(
+        classroomResponse.mmessage ??
+            classroomResponse.debug ??
+            classroomResponse.status ??
+            'Request failed.',
+        status: classroomResponse.mstatus,
+      );
+    }
+
+    return classroomResponse;
+  }
+
+  Future<ClassroomMemberListResponse> listClassroomMembers(
+    ClassroomMembersListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/classrooms/members/list',
+      request.toJson(),
+    );
+    final classroomResponse = ClassroomMemberListResponse.fromJson(
+      responseJson,
+    );
+    if (classroomResponse.mstatus != 200) {
+      throw NetworkException(
+        classroomResponse.mmessage ??
+            classroomResponse.debug ??
+            classroomResponse.status ??
+            'Request failed.',
+        status: classroomResponse.mstatus,
+      );
+    }
+
+    return classroomResponse;
+  }
+
+  Future<ClassroomActionResponse> approveClassroomJoinRequest(
+    ClassroomJoinRequestActionRequest request,
+  ) {
+    return _classroomAction(
+      '/classrooms/join-requests/approve',
+      request.toJson(),
+    );
+  }
+
+  Future<ClassroomActionResponse> rejectClassroomJoinRequest(
+    ClassroomJoinRequestActionRequest request,
+  ) {
+    return _classroomAction(
+      '/classrooms/join-requests/reject',
+      request.toJson(),
+    );
+  }
+
   Future<ClassroomResponse> createClassroom(
     CreateClassroomRequest request, {
     String? filePath,
@@ -708,6 +772,25 @@ class NetworkApi {
       '?profile_id=${_encodeQueryId(profileId)}',
     );
     final classroomResponse = ClassroomResponse.fromJson(responseJson);
+    if (classroomResponse.mstatus != 200) {
+      throw NetworkException(
+        classroomResponse.mmessage ??
+            classroomResponse.debug ??
+            classroomResponse.status ??
+            'Request failed.',
+        status: classroomResponse.mstatus,
+      );
+    }
+
+    return classroomResponse;
+  }
+
+  Future<ClassroomActionResponse> _classroomAction(
+    String path,
+    Map<String, dynamic> body,
+  ) async {
+    final responseJson = await _networkClient.postJson(path, body);
+    final classroomResponse = ClassroomActionResponse.fromJson(responseJson);
     if (classroomResponse.mstatus != 200) {
       throw NetworkException(
         classroomResponse.mmessage ??
