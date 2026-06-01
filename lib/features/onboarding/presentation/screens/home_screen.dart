@@ -1081,13 +1081,18 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   final _StudentHomePanel _activePanel = _StudentHomePanel.homework;
   int? _loadedProfileId;
   bool _isLoadingClassrooms = false;
+  bool _isLoadingInvitations = false;
   String? _classroomError;
+  String? _invitationError;
   List<ClassroomModel> _classrooms = const <ClassroomModel>[];
+  List<ClassroomInvitation> _invitations = const <ClassroomInvitation>[];
+  final Set<int> _processingInvitationClassIds = <int>{};
 
   @override
   void initState() {
     super.initState();
     _loadClassrooms();
+    _loadInvitations();
   }
 
   @override
@@ -1102,8 +1107,11 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     if (oldProfileId != profileId) {
       _loadedProfileId = null;
       _classrooms = const <ClassroomModel>[];
+      _invitations = const <ClassroomInvitation>[];
       _classroomError = null;
+      _invitationError = null;
       _loadClassrooms();
+      _loadInvitations();
     }
   }
 
@@ -1158,6 +1166,122 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     }
   }
 
+  Future<void> _loadInvitations() async {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (profileId == null || profileId <= 0 || _isLoadingInvitations) {
+      return;
+    }
+
+    setState(() {
+      _isLoadingInvitations = true;
+      _invitationError = null;
+    });
+
+    try {
+      final invitations = await _classroomService.listMyPendingInvitations(
+        profileId: profileId,
+      );
+      if (!mounted ||
+          ActiveProfileSession.profileStableId(widget.activeProfile) !=
+              profileId) {
+        return;
+      }
+
+      setState(() {
+        _invitations = invitations;
+      });
+    } catch (_) {
+      if (!mounted ||
+          ActiveProfileSession.profileStableId(widget.activeProfile) !=
+              profileId) {
+        return;
+      }
+
+      setState(() {
+        _invitationError =
+            context.readText(AppKeys.studentInvitationLoadFailed);
+        _invitations = const <ClassroomInvitation>[];
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingInvitations = false);
+      } else {
+        _isLoadingInvitations = false;
+      }
+    }
+  }
+
+  Future<void> _handleInvitation(
+    ClassroomInvitation invitation, {
+    required bool accept,
+  }) async {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    final classroomId = invitation.stableClassroomId;
+    if (profileId == null || profileId <= 0 || classroomId == null) {
+      return;
+    }
+    final inviterProfileId = invitation.inviterProfileId ?? profileId;
+
+    setState(() => _processingInvitationClassIds.add(classroomId));
+    try {
+      if (accept) {
+        await _classroomService.acceptInvitation(
+          inviteeProfileId: profileId,
+          inviterProfileId: inviterProfileId,
+          classroomId: classroomId,
+        );
+      } else {
+        await _classroomService.rejectInvitation(
+          inviteeProfileId: profileId,
+          inviterProfileId: inviterProfileId,
+          classroomId: classroomId,
+        );
+      }
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              context.readText(
+                accept
+                    ? AppKeys.studentInvitationAcceptSuccess
+                    : AppKeys.studentInvitationRejectSuccess,
+              ),
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      await _loadInvitations();
+      if (accept) {
+        _loadedProfileId = null;
+        await _loadClassrooms();
+      }
+    } on ClassroomException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _processingInvitationClassIds.remove(classroomId));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -1169,6 +1293,22 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
           const _StudentFigmaHeroCard(),
           const SizedBox(height: 22),
           _StudentJoinClassCta(onTap: _openJoinClassroom),
+          const SizedBox(height: 11),
+          _StudentInvitationsSection(
+            invitations: _invitations,
+            isLoading: _isLoadingInvitations,
+            error: _invitationError,
+            processingClassroomIds: _processingInvitationClassIds,
+            onAccept: (invitation) => _handleInvitation(
+              invitation,
+              accept: true,
+            ),
+            onReject: (invitation) => _handleInvitation(
+              invitation,
+              accept: false,
+            ),
+            onRetry: _loadInvitations,
+          ),
           const SizedBox(height: 11),
           _StudentClassGridSection(
             classrooms: _classrooms,
@@ -1233,12 +1373,31 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   }
 }
 
-// ignore: unused_element
 class _StudentInvitationsSection extends StatelessWidget {
-  const _StudentInvitationsSection();
+  const _StudentInvitationsSection({
+    required this.invitations,
+    required this.isLoading,
+    required this.error,
+    required this.processingClassroomIds,
+    required this.onAccept,
+    required this.onReject,
+    required this.onRetry,
+  });
+
+  final List<ClassroomInvitation> invitations;
+  final bool isLoading;
+  final String? error;
+  final Set<int> processingClassroomIds;
+  final ValueChanged<ClassroomInvitation> onAccept;
+  final ValueChanged<ClassroomInvitation> onReject;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
+    if (!isLoading && error == null && invitations.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -1257,7 +1416,10 @@ class _StudentInvitationsSection extends StatelessWidget {
               ),
             ),
             Text(
-              context.getText(AppKeys.studentViewAllInvitations),
+              context.formatText(
+                AppKeys.studentViewAllInvitations,
+                {'count': invitations.length},
+              ),
               style: const TextStyle(
                 color: Color(0xFFF87851),
                 fontSize: 14,
@@ -1270,89 +1432,204 @@ class _StudentInvitationsSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(13),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFFC4C6D2).withValues(alpha: 0.5),
+        if (isLoading && invitations.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 18),
+            child: Center(
+              child: CircularProgressIndicator(color: _teal),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
+          )
+        else if (error != null && invitations.isEmpty)
+          _StudentInlineErrorPanel(
+            message: error!,
+            onRetry: onRetry,
+          )
+        else
+          for (var index = 0; index < invitations.length; index++) ...[
+            _StudentInvitationCard(
+              invitation: invitations[index],
+              isProcessing: processingClassroomIds.contains(
+                invitations[index].stableClassroomId,
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    _studentHomeInvite,
-                    width: 36,
-                    height: 32,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Toán 6A1',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Color(0xFF181C1E),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            height: 1.2,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          context.getText(AppKeys.studentInviteSubtitle),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF444650),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            height: 1.2,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 11),
-              Row(
-                children: [
-                  Expanded(
-                    child: _StudentInviteButton(
-                      label: context.getText(AppKeys.accept),
-                      color: const Color(0xFF38898C),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _StudentInviteButton(
-                      label: context.getText(AppKeys.reject),
-                      color: const Color(0xFFF37850),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+              onAccept: () => onAccept(invitations[index]),
+              onReject: () => onReject(invitations[index]),
+            ),
+            if (index != invitations.length - 1) const SizedBox(height: 10),
+          ],
       ],
+    );
+  }
+}
+
+class _StudentInlineErrorPanel extends StatelessWidget {
+  const _StudentInlineErrorPanel({
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFC4C6D2).withValues(alpha: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFF444650),
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                height: 1.25,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onRetry,
+            child: Text(context.getText(AppKeys.studentClassSearchRetry)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudentInvitationCard extends StatelessWidget {
+  const _StudentInvitationCard({
+    required this.invitation,
+    required this.isProcessing,
+    required this.onAccept,
+    required this.onReject,
+  });
+
+  final ClassroomInvitation invitation;
+  final bool isProcessing;
+  final VoidCallback onAccept;
+  final VoidCallback onReject;
+
+  @override
+  Widget build(BuildContext context) {
+    final classroom = invitation.classroom;
+    final title = classroom?.name?.trim().isNotEmpty == true
+        ? classroom!.name!.trim()
+        : context.getText(AppKeys.teacherClassFallback);
+    final inviterName = invitation.inviterName?.trim();
+    final subtitle = inviterName != null && inviterName.isNotEmpty
+        ? context.formatText(
+            AppKeys.studentInviteSubtitle,
+            {'name': inviterName},
+          )
+        : context.getText(AppKeys.studentInviteSubtitleFallback);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFC4C6D2).withValues(alpha: 0.5),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              SvgPicture.asset(
+                _studentHomeInvite,
+                width: 36,
+                height: 32,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF181C1E),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF444650),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 11),
+          if (isProcessing)
+            const SizedBox(
+              height: 27,
+              child: Center(
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    color: _teal,
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: _StudentInviteButton(
+                    label: context.getText(AppKeys.accept),
+                    color: const Color(0xFF38898C),
+                    onTap: onAccept,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _StudentInviteButton(
+                    label: context.getText(AppKeys.reject),
+                    color: const Color(0xFFF37850),
+                    onTap: onReject,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }
@@ -1361,17 +1638,22 @@ class _StudentInviteButton extends StatelessWidget {
   const _StudentInviteButton({
     required this.label,
     required this.color,
+    required this.onTap,
   });
 
   final String label;
   final Color color;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 27,
       child: FilledButton(
-        onPressed: HapticFeedback.selectionClick,
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
         style: FilledButton.styleFrom(
           backgroundColor: color,
           padding: EdgeInsets.zero,

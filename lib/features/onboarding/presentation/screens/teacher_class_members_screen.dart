@@ -28,6 +28,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
   List<ClassroomStudent> _members = const <ClassroomStudent>[];
   final Set<int> _processingProfileIds = <int>{};
   bool _isLoading = true;
+  bool _isSendingInvites = false;
   String? _error;
 
   @override
@@ -120,118 +121,125 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
       backgroundColor: _teacherPaleMint,
       body: SafeArea(
         bottom: false,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final scale = math.min(constraints.maxWidth / 390, 1.12);
-            return Column(
-              children: [
-                _TeacherScreenAppBar(
-                  title: context.getText(AppKeys.teacherMembersTitle),
-                  scale: scale,
-                  onBack: () => Navigator.of(context).maybePop(),
-                ),
-                Expanded(
-                  child: RefreshIndicator(
-                    color: _teacherTeal,
-                    onRefresh: _loadMembers,
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      padding: EdgeInsets.fromLTRB(
-                        15 * scale,
-                        31 * scale,
-                        15 * scale,
-                        MediaQuery.paddingOf(context).bottom + 32 * scale,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: _TeacherMemberAddButton(
-                              scale: scale,
-                              onTap: () => _openStudentSearchSheet(context),
-                            ),
+        child: Stack(
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final scale = math.min(constraints.maxWidth / 390, 1.12);
+                return Column(
+                  children: [
+                    _TeacherScreenAppBar(
+                      title: context.getText(AppKeys.teacherMembersTitle),
+                      scale: scale,
+                      onBack: () => Navigator.of(context).maybePop(),
+                    ),
+                    Expanded(
+                      child: RefreshIndicator(
+                        color: _teacherTeal,
+                        onRefresh: _loadMembers,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics(),
                           ),
-                          SizedBox(height: 15 * scale),
-                          if (_isLoading &&
-                              _joinRequests.isEmpty &&
-                              _members.isEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(top: 80 * scale),
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  color: _teacherTeal,
-                                ),
-                              ),
-                            )
-                          else if (_error != null &&
-                              _joinRequests.isEmpty &&
-                              _members.isEmpty)
-                            _TeacherErrorPanel(
-                              scale: scale,
-                              message: _error!,
-                              onRetry: _loadMembers,
-                            )
-                          else ...[
-                            _TeacherMemberSectionTitle(
-                              scale: scale,
-                              title: context.formatText(
-                                AppKeys.teacherJoinRequests,
-                                {'count': _joinRequests.length},
-                              ),
-                            ),
-                            SizedBox(height: 10 * scale),
-                            _JoinRequestCard(
-                              scale: scale,
-                              requests: _joinRequests,
-                              processingProfileIds: _processingProfileIds,
-                              onApprove: (request) => _handleJoinRequest(
-                                request,
-                                approve: true,
-                              ),
-                              onReject: (request) => _handleJoinRequest(
-                                request,
-                                approve: false,
-                              ),
-                            ),
-                            SizedBox(height: 28 * scale),
-                            _TeacherMemberSectionTitle(
-                              scale: scale,
-                              title: context.formatText(
-                                AppKeys.teacherJoinedStudentsTitle,
-                                {'count': _members.length},
-                              ),
-                            ),
-                            SizedBox(height: 8 * scale),
-                            if (_members.isEmpty)
-                              _TeacherEmptyMemberText(
-                                scale: scale,
-                                text: context.getText(
-                                  AppKeys.teacherNoJoinedStudents,
-                                ),
-                              )
-                            else
-                              for (var index = 0;
-                                  index < _members.length;
-                                  index++) ...[
-                                _JoinedMemberCard(
+                          padding: EdgeInsets.fromLTRB(
+                            15 * scale,
+                            31 * scale,
+                            15 * scale,
+                            MediaQuery.paddingOf(context).bottom + 32 * scale,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: _TeacherMemberAddButton(
                                   scale: scale,
-                                  member: _members[index],
+                                  onTap: _isSendingInvites
+                                      ? null
+                                      : () => _openStudentSearchSheet(context),
                                 ),
-                                if (index != _members.length - 1)
-                                  SizedBox(height: 12 * scale),
+                              ),
+                              SizedBox(height: 15 * scale),
+                              if (_isLoading &&
+                                  _joinRequests.isEmpty &&
+                                  _members.isEmpty)
+                                Padding(
+                                  padding: EdgeInsets.only(top: 80 * scale),
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      color: _teacherTeal,
+                                    ),
+                                  ),
+                                )
+                              else if (_error != null &&
+                                  _joinRequests.isEmpty &&
+                                  _members.isEmpty)
+                                _TeacherErrorPanel(
+                                  scale: scale,
+                                  message: _error!,
+                                  onRetry: _loadMembers,
+                                )
+                              else ...[
+                                _TeacherMemberSectionTitle(
+                                  scale: scale,
+                                  title: context.formatText(
+                                    AppKeys.teacherJoinRequests,
+                                    {'count': _joinRequests.length},
+                                  ),
+                                ),
+                                SizedBox(height: 10 * scale),
+                                _JoinRequestCard(
+                                  scale: scale,
+                                  requests: _joinRequests,
+                                  processingProfileIds: _processingProfileIds,
+                                  onApprove: (request) => _handleJoinRequest(
+                                    request,
+                                    approve: true,
+                                  ),
+                                  onReject: (request) => _handleJoinRequest(
+                                    request,
+                                    approve: false,
+                                  ),
+                                ),
+                                SizedBox(height: 28 * scale),
+                                _TeacherMemberSectionTitle(
+                                  scale: scale,
+                                  title: context.formatText(
+                                    AppKeys.teacherJoinedStudentsTitle,
+                                    {'count': _members.length},
+                                  ),
+                                ),
+                                SizedBox(height: 8 * scale),
+                                if (_members.isEmpty)
+                                  _TeacherEmptyMemberText(
+                                    scale: scale,
+                                    text: context.getText(
+                                      AppKeys.teacherNoJoinedStudents,
+                                    ),
+                                  )
+                                else
+                                  for (var index = 0;
+                                      index < _members.length;
+                                      index++) ...[
+                                    _JoinedMemberCard(
+                                      scale: scale,
+                                      member: _members[index],
+                                    ),
+                                    if (index != _members.length - 1)
+                                      SizedBox(height: 12 * scale),
+                                  ],
                               ],
-                          ],
-                        ],
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ],
-            );
-          },
+                  ],
+                );
+              },
+            ),
+            if (_isSendingInvites) const _TeacherSendingInviteOverlay(),
+          ],
         ),
       ),
     );
@@ -250,20 +258,89 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
     if (selected == null || selected.isEmpty || !context.mounted) {
       return;
     }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            context.formatText(
-              AppKeys.teacherInviteRequestQueued,
-              {'count': selected.length},
-            ),
-            style: GoogleFonts.andika(),
-          ),
-          duration: const Duration(milliseconds: 1400),
-        ),
+    final targetProfileIds = selected
+        .map(ActiveProfileSession.profileStableId)
+        .whereType<int>()
+        .toList(growable: false);
+    if (targetProfileIds.isEmpty) {
+      return;
+    }
+    setState(() => _isSendingInvites = true);
+    try {
+      await _classroomService.sendInvitations(
+        inviterProfileId: widget.profileId,
+        classroomId: widget.classroomId,
+        targetProfileIds: targetProfileIds,
       );
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              context.formatText(
+                AppKeys.teacherInviteRequestQueued,
+                {'count': targetProfileIds.length},
+              ),
+              style: GoogleFonts.andika(),
+            ),
+            duration: const Duration(milliseconds: 1400),
+          ),
+        );
+    } on ClassroomException catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error.message, style: GoogleFonts.andika()),
+            duration: const Duration(milliseconds: 1600),
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _isSendingInvites = false);
+      }
+    }
+  }
+}
+
+class _TeacherSendingInviteOverlay extends StatelessWidget {
+  const _TeacherSendingInviteOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: AbsorbPointer(
+        child: ColoredBox(
+          color: Colors.black38,
+          child: Center(
+            child: Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(color: _teacherTeal),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -274,7 +351,7 @@ class _TeacherMemberAddButton extends StatelessWidget {
   });
 
   final double scale;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

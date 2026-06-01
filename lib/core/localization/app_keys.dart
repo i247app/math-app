@@ -116,7 +116,23 @@ class AppKeys {
   static const studentClassInvitations = 'student_class_invitations';
   static const studentViewAllInvitations = 'student_view_all_invitations';
   static const studentInviteSubtitle = 'student_invite_subtitle';
+  static const studentInviteSubtitleFallback =
+      'student_invite_subtitle_fallback';
+  static const studentInvitationLoadFailed = 'student_invitation_load_failed';
+  static const studentInvitationAcceptSuccess =
+      'student_invitation_accept_success';
+  static const studentInvitationRejectSuccess =
+      'student_invitation_reject_success';
   static const studentJoinClassroomUpper = 'student_join_classroom_upper';
+  static const studentClassDetailTitle = 'student_class_detail_title';
+  static const studentClassTeacher = 'student_class_teacher';
+  static const studentClassLearningInfo = 'student_class_learning_info';
+  static const studentClassActivities = 'student_class_activities';
+  static const studentClassAssignments = 'student_class_assignments';
+  static const studentClassMembers = 'student_class_members';
+  static const studentClassProgress = 'student_class_progress';
+  static const studentClassMaterials = 'student_class_materials';
+  static const studentClassComingSoon = 'student_class_coming_soon';
   static const assessmentAction = 'assessment_action';
   static const viewAll = 'view_all';
   static const viewAllUpper = 'view_all_upper';
@@ -266,6 +282,8 @@ class AppKeys {
   static const profileIdCopied = 'profile_id_copied';
   static const teacherMemberManagement = 'teacher_member_management';
   static const teacherMemberSummary = 'teacher_member_summary';
+  static const teacherMemberSummaryNoRequests =
+      'teacher_member_summary_no_requests';
   static const teacherMembersTitle = 'teacher_members_title';
   static const teacherJoinRequests = 'teacher_join_requests';
   static const teacherNoJoinRequests = 'teacher_no_join_requests';

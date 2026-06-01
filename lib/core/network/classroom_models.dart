@@ -27,9 +27,14 @@ enum ClassroomRelationship {
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class ClassroomListRequest {
-  const ClassroomListRequest({required this.profileId, this.search});
+  const ClassroomListRequest({
+    required this.profileId,
+    this.ownerProfileId,
+    this.search,
+  });
 
   final int profileId;
+  final int? ownerProfileId;
   final String? search;
 
   factory ClassroomListRequest.fromJson(Map<String, dynamic> json) =>
@@ -93,6 +98,58 @@ class ClassroomJoinRequestActionRequest {
 
   Map<String, dynamic> toJson() =>
       _$ClassroomJoinRequestActionRequestToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ClassroomInvitationSendRequest {
+  const ClassroomInvitationSendRequest({
+    required this.inviterProfileId,
+    required this.classroomId,
+    required this.targets,
+  });
+
+  final int inviterProfileId;
+  final int classroomId;
+  @JsonKey(defaultValue: <int>[])
+  final List<int> targets;
+
+  factory ClassroomInvitationSendRequest.fromJson(Map<String, dynamic> json) =>
+      _$ClassroomInvitationSendRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassroomInvitationSendRequestToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ClassroomInvitationListRequest {
+  const ClassroomInvitationListRequest({required this.profileId});
+
+  final int profileId;
+
+  factory ClassroomInvitationListRequest.fromJson(Map<String, dynamic> json) =>
+      _$ClassroomInvitationListRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ClassroomInvitationListRequestToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ClassroomInvitationActionRequest {
+  const ClassroomInvitationActionRequest({
+    required this.inviteeProfileId,
+    required this.inviterProfileId,
+    required this.classroomId,
+  });
+
+  final int inviteeProfileId;
+  final int inviterProfileId;
+  final int classroomId;
+
+  factory ClassroomInvitationActionRequest.fromJson(
+    Map<String, dynamic> json,
+  ) =>
+      _$ClassroomInvitationActionRequestFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$ClassroomInvitationActionRequestToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
@@ -245,6 +302,54 @@ class ClassroomMemberListResponse {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class ClassroomInvitationListResponse {
+  const ClassroomInvitationListResponse({
+    required this.mstatus,
+    this.invitations = const <ClassroomInvitation>[],
+    this.pagination,
+    this.status,
+    this.mmessage,
+    this.debug,
+  });
+
+  @JsonKey(fromJson: _requiredIntFromJson)
+  final int mstatus;
+  @JsonKey(fromJson: _invitationListFromJson)
+  final List<ClassroomInvitation> invitations;
+  final ClassroomPagination? pagination;
+  final String? status;
+  final String? mmessage;
+  final String? debug;
+
+  factory ClassroomInvitationListResponse.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    final data = json['data'];
+    final invitationsValue = json['invitations'] ??
+        json['classroom_invitations'] ??
+        json['items'] ??
+        json['classes'] ??
+        json['classrooms'] ??
+        _nestedValue(data, 'invitations') ??
+        _nestedValue(data, 'classroom_invitations') ??
+        _nestedValue(data, 'items') ??
+        _nestedValue(data, 'classes') ??
+        _nestedValue(data, 'classrooms') ??
+        data;
+
+    return _$ClassroomInvitationListResponseFromJson(
+      <String, dynamic>{
+        ...json,
+        'invitations': invitationsValue,
+      },
+    );
+  }
+
+  Map<String, dynamic> toJson() =>
+      _$ClassroomInvitationListResponseToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ClassroomResponse {
   const ClassroomResponse({
     required this.mstatus,
@@ -324,6 +429,7 @@ class ClassroomModel {
     this.memberCount,
     this.studentCount,
     this.teacherCount,
+    this.pendingRequestCount,
     this.students = const <ClassroomStudent>[],
     this.imageUrl,
     this.avatarUrl,
@@ -368,6 +474,8 @@ class ClassroomModel {
   final int? studentCount;
   @JsonKey(fromJson: _intFromJson)
   final int? teacherCount;
+  @JsonKey(fromJson: _intFromJson)
+  final int? pendingRequestCount;
   @JsonKey(fromJson: _studentListFromJson)
   final List<ClassroomStudent> students;
   final String? imageUrl;
@@ -385,6 +493,10 @@ class ClassroomModel {
     final studentCountValue = json['student_count'] ??
         json['students_count'] ??
         (studentsValue is List ? studentsValue.length : null);
+    final pendingRequestCountValue = json['pending_request_count'] ??
+        json['pending_requests_count'] ??
+        json['join_request_count'] ??
+        json['join_requests_count'];
 
     return _$ClassroomModelFromJson(
       <String, dynamic>{
@@ -406,6 +518,7 @@ class ClassroomModel {
         'students': studentsValue,
         'member_count': memberCountValue,
         'student_count': studentCountValue,
+        'pending_request_count': pendingRequestCountValue,
       },
     );
   }
@@ -418,6 +531,8 @@ class ClassroomModel {
       studentCount ?? (students.isNotEmpty ? students.length : 0);
 
   int get displayMemberCount => memberCount ?? displayStudentCount;
+
+  int get displayPendingRequestCount => pendingRequestCount ?? 0;
 
   ClassroomRelationship get relationshipStatus =>
       ClassroomRelationship.fromWire(relationship);
@@ -524,8 +639,83 @@ class ClassroomStudent {
   Map<String, dynamic> toJson() => _$ClassroomStudentToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class ClassroomInvitation {
+  const ClassroomInvitation({
+    this.id,
+    this.invitationId,
+    this.classroomId,
+    this.inviterProfileId,
+    this.inviterName,
+    this.status,
+    this.createdAt,
+    this.classroom,
+  });
+
+  @JsonKey(fromJson: _intFromJson)
+  final int? id;
+  @JsonKey(fromJson: _intFromJson)
+  final int? invitationId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? classroomId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? inviterProfileId;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? inviterName;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? status;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? createdAt;
+  @JsonKey(fromJson: _classroomFromJson)
+  final ClassroomModel? classroom;
+
+  factory ClassroomInvitation.fromJson(Map<String, dynamic> json) {
+    final classroom = json['classroom'] ?? json['class'];
+    final inviter = json['inviter'] ?? json['teacher'] ?? json['owner'];
+    final classroomId = json['classroom_id'] ??
+        _nestedValue(classroom, 'classroom_id') ??
+        _nestedValue(classroom, 'id');
+    final inviterProfileId = json['inviter_profile_id'] ??
+        json['teacher_profile_id'] ??
+        json['owner_profile_id'] ??
+        _nestedValue(inviter, 'profile_id') ??
+        _nestedValue(classroom, 'owner_profile_id');
+    final classroomValue = classroom ??
+        <String, dynamic>{
+          ...json,
+          'classroom_id': classroomId,
+        };
+
+    return _$ClassroomInvitationFromJson(
+      <String, dynamic>{
+        ...json,
+        'invitation_id': json['invitation_id'] ?? json['request_id'],
+        'classroom_id': classroomId,
+        'inviter_profile_id': inviterProfileId,
+        'inviter_name': json['inviter_name'] ??
+            json['teacher_name'] ??
+            _nestedValue(inviter, 'name') ??
+            _nestedValue(classroom, 'teacher_name'),
+        'created_at': json['created_at'] ??
+            json['created_dt'] ??
+            json['invited_dt'] ??
+            json['requested_dt'],
+        'classroom': classroomValue,
+      },
+    );
+  }
+
+  Map<String, dynamic> toJson() => _$ClassroomInvitationToJson(this);
+
+  int? get stableClassroomId => classroomId ?? classroom?.stableId;
+}
+
 List<ClassroomModel> _classroomListFromJson(Object? value) {
   return _listFromJson(value, ClassroomModel.fromJson);
+}
+
+List<ClassroomInvitation> _invitationListFromJson(Object? value) {
+  return _listFromJson(value, ClassroomInvitation.fromJson);
 }
 
 ClassroomModel? _classroomFromJson(Object? value) {

@@ -759,6 +759,56 @@ class NetworkApi {
     );
   }
 
+  Future<ClassroomActionResponse> sendClassroomInvitations(
+    ClassroomInvitationSendRequest request,
+  ) {
+    return _classroomAction(
+      '/classrooms/invitations/send',
+      request.toJson(),
+    );
+  }
+
+  Future<ClassroomInvitationListResponse> listMyPendingClassroomInvitations(
+    ClassroomInvitationListRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/classrooms/invitations/my-pending',
+      request.toJson(),
+    );
+    final classroomResponse = ClassroomInvitationListResponse.fromJson(
+      responseJson,
+    );
+    if (classroomResponse.mstatus != 200) {
+      throw NetworkException(
+        classroomResponse.mmessage ??
+            classroomResponse.debug ??
+            classroomResponse.status ??
+            'Request failed.',
+        status: classroomResponse.mstatus,
+      );
+    }
+
+    return classroomResponse;
+  }
+
+  Future<ClassroomActionResponse> acceptClassroomInvitation(
+    ClassroomInvitationActionRequest request,
+  ) {
+    return _classroomAction(
+      '/classrooms/invitations/accept',
+      request.toJson(),
+    );
+  }
+
+  Future<ClassroomActionResponse> rejectClassroomInvitation(
+    ClassroomInvitationActionRequest request,
+  ) {
+    return _classroomAction(
+      '/classrooms/invitations/reject',
+      request.toJson(),
+    );
+  }
+
   Future<ClassroomResponse> createClassroom(
     CreateClassroomRequest request, {
     String? filePath,

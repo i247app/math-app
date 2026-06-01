@@ -51,6 +51,28 @@ abstract class ClassroomService {
     required int targetProfileId,
   });
 
+  Future<void> sendInvitations({
+    required int inviterProfileId,
+    required int classroomId,
+    required List<int> targetProfileIds,
+  });
+
+  Future<List<ClassroomInvitation>> listMyPendingInvitations({
+    required int profileId,
+  });
+
+  Future<void> acceptInvitation({
+    required int inviteeProfileId,
+    required int inviterProfileId,
+    required int classroomId,
+  });
+
+  Future<void> rejectInvitation({
+    required int inviteeProfileId,
+    required int inviterProfileId,
+    required int classroomId,
+  });
+
   Future<ClassroomModel?> createClassroom({
     required int profileId,
     required String name,
@@ -83,7 +105,10 @@ class ClassroomApi implements ClassroomService {
   }) async {
     try {
       final response = await _networkApi.listClassrooms(
-        ClassroomListRequest(profileId: profileId),
+        ClassroomListRequest(
+          profileId: profileId,
+          ownerProfileId: profileId,
+        ),
       );
       return response.classrooms;
     } on NetworkException catch (error) {
@@ -206,6 +231,77 @@ class ClassroomApi implements ClassroomService {
           profileId: profileId,
           classroomId: classroomId,
           targetProfileId: targetProfileId,
+        ),
+      );
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<void> sendInvitations({
+    required int inviterProfileId,
+    required int classroomId,
+    required List<int> targetProfileIds,
+  }) async {
+    try {
+      await _networkApi.sendClassroomInvitations(
+        ClassroomInvitationSendRequest(
+          inviterProfileId: inviterProfileId,
+          classroomId: classroomId,
+          targets: targetProfileIds,
+        ),
+      );
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<List<ClassroomInvitation>> listMyPendingInvitations({
+    required int profileId,
+  }) async {
+    try {
+      final response = await _networkApi.listMyPendingClassroomInvitations(
+        ClassroomInvitationListRequest(profileId: profileId),
+      );
+      return response.invitations;
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<void> acceptInvitation({
+    required int inviteeProfileId,
+    required int inviterProfileId,
+    required int classroomId,
+  }) async {
+    try {
+      await _networkApi.acceptClassroomInvitation(
+        ClassroomInvitationActionRequest(
+          inviteeProfileId: inviteeProfileId,
+          inviterProfileId: inviterProfileId,
+          classroomId: classroomId,
+        ),
+      );
+    } on NetworkException catch (error) {
+      throw ClassroomException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<void> rejectInvitation({
+    required int inviteeProfileId,
+    required int inviterProfileId,
+    required int classroomId,
+  }) async {
+    try {
+      await _networkApi.rejectClassroomInvitation(
+        ClassroomInvitationActionRequest(
+          inviteeProfileId: inviteeProfileId,
+          inviterProfileId: inviterProfileId,
+          classroomId: classroomId,
         ),
       );
     } on NetworkException catch (error) {

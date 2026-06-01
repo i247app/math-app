@@ -484,7 +484,7 @@ class _TeacherClassGrid extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: 16 * scale,
         mainAxisSpacing: 16 * scale,
-        mainAxisExtent: 168 * scale,
+        mainAxisExtent: 180 * scale,
       ),
       itemBuilder: (context, index) {
         final classroom = classrooms[index];
@@ -555,12 +555,14 @@ class _TeacherClassCard extends StatelessWidget {
                 const Spacer(),
                 Divider(color: const Color(0x1AC4C6D2), height: 8 * scale),
                 Text(
-                  context.formatText(
-                    AppKeys.teacherStudentCount,
-                    {'count': classroom.displayStudentCount},
+                  _teacherMemberSummaryText(
+                    context,
+                    members: classroom.displayStudentCount,
+                    requests: classroom.displayPendingRequestCount,
                   ),
-                  maxLines: 1,
+                  maxLines: classroom.displayPendingRequestCount > 0 ? 2 : 1,
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: GoogleFonts.andika(
                     color: _teacherBlue.withValues(alpha: 0.60),
                     fontSize: 11 * scale,

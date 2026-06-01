@@ -26,7 +26,6 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   bool _isLoading = false;
   String? _error;
   ClassroomModel? _classroom;
-  int _requestCount = 0;
 
   @override
   void initState() {
@@ -45,16 +44,11 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
         classroomId: widget.classroomId,
         profileId: widget.profileId,
       );
-      final joinRequests = await _classroomService.listJoinRequests(
-        classroomId: widget.classroomId,
-        profileId: widget.profileId,
-      );
       if (!mounted) {
         return;
       }
       setState(() {
         _classroom = classroom ?? _classroom;
-        _requestCount = joinRequests.length;
       });
     } on ClassroomException catch (error) {
       if (!mounted) {
@@ -80,6 +74,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
             final classroom = _classroom;
             final students = classroom?.students ?? const <ClassroomStudent>[];
             final count = classroom?.displayStudentCount ?? students.length;
+            final requestCount = classroom?.displayPendingRequestCount ?? 0;
 
             return Column(
               children: [
@@ -121,7 +116,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                             _ClassDetailLowerContent(
                               scale: scale,
                               memberCount: count,
-                              requestCount: _requestCount,
+                              requestCount: requestCount,
                               onOpenMembers: () async {
                                 await Navigator.of(context).push(
                                   MaterialPageRoute<void>(
@@ -584,14 +579,12 @@ class _MemberManagementCard extends StatelessWidget {
                       ),
                       SizedBox(height: 2 * scale),
                       Text(
-                        context.formatText(
-                          AppKeys.teacherMemberSummary,
-                          {
-                            'members': memberCount,
-                            'requests': requestCount,
-                          },
+                        _teacherMemberSummaryText(
+                          context,
+                          members: memberCount,
+                          requests: requestCount,
                         ),
-                        maxLines: 1,
+                        maxLines: requestCount > 0 ? 2 : 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: _teacherMuted,

@@ -40,3 +40,23 @@ const _teacherBlue = Color(0xFF002B6A);
 const _teacherInk = Color(0xFF161D1F);
 const _teacherMuted = Color(0xFF718096);
 const _teacherCoral = Color(0xFFFB7651);
+
+String _teacherMemberSummaryText(
+  BuildContext context, {
+  required int members,
+  required int requests,
+}) {
+  if (requests <= 0) {
+    return context.formatText(
+      AppKeys.teacherMemberSummaryNoRequests,
+      {'members': members},
+    );
+  }
+  return context.formatText(
+    AppKeys.teacherMemberSummary,
+    {
+      'members': members,
+      'requests': requests,
+    },
+  );
+}
