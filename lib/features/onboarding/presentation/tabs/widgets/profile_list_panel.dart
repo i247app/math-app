@@ -407,23 +407,23 @@ class _ProfileIdLine extends StatelessWidget {
   final bool isActive;
   final double scale;
 
-  Future<void> _copyProfileId(BuildContext context, int id) async {
-    await Clipboard.setData(ClipboardData(text: _displayProfileId(id)));
+  Future<void> _copyProfileCode(BuildContext context, String code) async {
+    await Clipboard.setData(ClipboardData(text: code));
     if (!context.mounted) {
       return;
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(context.getText(AppKeys.profileIdCopied)),
+        content: Text(context.getText(AppKeys.profileCodeCopied)),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final id = profile.id;
-    if (id == null) {
+    final profileCode = profile.profileCode?.trim();
+    if (profileCode == null || profileCode.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -433,7 +433,7 @@ class _ProfileIdLine extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            'ID: ${_displayProfileId(id)}',
+            '${context.getText(AppKeys.profileCodeLabel)}: $profileCode',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
@@ -450,7 +450,7 @@ class _ProfileIdLine extends StatelessWidget {
           color: const Color(0xFFE9ECEF),
           borderRadius: BorderRadius.circular(8 * scale),
           child: InkWell(
-            onTap: () => _copyProfileId(context, id),
+            onTap: () => _copyProfileCode(context, profileCode),
             borderRadius: BorderRadius.circular(8 * scale),
             child: SizedBox(
               height: 24 * scale,
@@ -480,8 +480,6 @@ class _ProfileIdLine extends StatelessWidget {
     );
   }
 }
-
-String _displayProfileId(int id) => '$id';
 
 class _ProfileInfoLine extends StatelessWidget {
   const _ProfileInfoLine({

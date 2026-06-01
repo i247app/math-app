@@ -511,6 +511,7 @@ class ClassroomModel {
         'owner_profile_id': json['owner_profile_id'] ??
             _nestedValue(json['owner'], 'profile_id') ??
             _nestedValue(json['teacher'], 'profile_id'),
+        'owner': json['owner'] ?? json['teacher'],
         'teacher_name': json['teacher_name'] ??
             json['owner_name'] ??
             _nestedValue(json['owner'], 'name') ??
@@ -551,15 +552,41 @@ class ClassroomOwner {
     this.profileId,
     this.name,
     this.role,
+    this.avatarUrl,
+    this.imageUrl,
+    this.fileUrl,
   });
 
   @JsonKey(fromJson: _intFromJson)
   final int? profileId;
   final String? name;
   final String? role;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? avatarUrl;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? imageUrl;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? fileUrl;
 
-  factory ClassroomOwner.fromJson(Map<String, dynamic> json) =>
-      _$ClassroomOwnerFromJson(json);
+  factory ClassroomOwner.fromJson(Map<String, dynamic> json) {
+    return _$ClassroomOwnerFromJson(
+      <String, dynamic>{
+        ...json,
+        'avatar_url': json['avatar_url'] ??
+            json['profile_avatar_url'] ??
+            _nestedValue(json['profile'], 'avatar_url') ??
+            _nestedValue(json['user'], 'avatar_url'),
+        'image_url': json['image_url'] ??
+            json['profile_image_url'] ??
+            _nestedValue(json['profile'], 'image_url') ??
+            _nestedValue(json['user'], 'image_url'),
+        'file_url': json['file_url'] ??
+            json['profile_file_url'] ??
+            _nestedValue(json['profile'], 'file_url') ??
+            _nestedValue(json['user'], 'file_url'),
+      },
+    );
+  }
 
   Map<String, dynamic> toJson() => _$ClassroomOwnerToJson(this);
 }

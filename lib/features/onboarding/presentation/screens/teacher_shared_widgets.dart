@@ -195,11 +195,13 @@ class _TeacherScreenAppBar extends StatelessWidget {
     required this.title,
     required this.scale,
     required this.onBack,
+    this.action,
   });
 
   final String title;
   final double scale;
   final VoidCallback onBack;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -241,6 +243,11 @@ class _TeacherScreenAppBar extends StatelessWidget {
               height: 1,
             ),
           ),
+          if (action != null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: action,
+            ),
         ],
       ),
     );

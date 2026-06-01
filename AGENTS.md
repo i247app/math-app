@@ -80,6 +80,7 @@ The app is currently Android-focused in the checked-in platform files. The READM
 - Widgets and cubits must not call Dio, `NetworkClient`, or endpoint paths directly. They should call feature services or cubit methods.
 - Keep endpoint paths, payload construction, timeout policy, logging, and transport error mapping out of UI code.
 - Treat backend logical errors separately from HTTP transport errors: `NetworkClient` handles transport/invalid JSON; `NetworkApi` validates API response envelopes such as `mstatus`.
+- Do not keep placeholder or mock values for fields that should come from a real API response. Show loading, empty, or error states until real data is available, and display only mapped backend data for real API-backed values.
 - When adding or changing a request/response model, run `dart run build_runner build --delete-conflicting-outputs`.
 
 ## UI Conventions

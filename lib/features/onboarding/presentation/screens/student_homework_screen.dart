@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
+import '../../../../core/network/classroom_exercise_models.dart';
+import '../../data/classroom_exercise_api.dart';
 
 const _studentHomeworkBg = Color(0xFFF6FFFF);
 const _studentHomeworkTeal = Color(0xFF38898C);
@@ -12,8 +14,63 @@ const _studentHomeworkActive = Color(0xFF2E6F70);
 const _studentHomeworkInk = Color(0xFF001741);
 const _studentHomeworkMuted = Color(0xFF444650);
 
-class StudentHomeworkScreen extends StatelessWidget {
-  const StudentHomeworkScreen({super.key});
+class StudentHomeworkScreen extends StatefulWidget {
+  const StudentHomeworkScreen({
+    super.key,
+    required this.classroomId,
+    required this.profileId,
+    ClassroomExerciseService? exerciseService,
+  }) : _exerciseService = exerciseService;
+
+  final int classroomId;
+  final int profileId;
+  final ClassroomExerciseService? _exerciseService;
+
+  @override
+  State<StudentHomeworkScreen> createState() => _StudentHomeworkScreenState();
+}
+
+class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
+  late final ClassroomExerciseService _exerciseService =
+      widget._exerciseService ?? ClassroomExerciseApi();
+
+  bool _isLoading = false;
+  String? _error;
+  List<ClassroomExercise> _exercises = const <ClassroomExercise>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExercises();
+  }
+
+  Future<void> _loadExercises({String? search}) async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final exercises = await _exerciseService.listExercises(
+        classroomId: widget.classroomId,
+        profileId: widget.profileId,
+        search: search,
+        visibility: 'PUBLIC',
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() => _exercises = exercises);
+    } on ClassroomExerciseException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _error = error.message);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,19 +93,67 @@ class StudentHomeworkScreen extends StatelessWidget {
                   20,
                   MediaQuery.paddingOf(context).bottom + 40,
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _HomeworkSearchField(),
-                    SizedBox(height: 17),
-                    _HomeworkFilterTabs(),
-                    SizedBox(height: 18),
-                    _HomeworkAssignmentCard(),
+                    const _HomeworkSearchField(),
+                    const SizedBox(height: 17),
+                    const _HomeworkFilterTabs(),
+                    const SizedBox(height: 18),
+                    if (_isLoading)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 80),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: _studentHomeworkTeal,
+                          ),
+                        ),
+                      )
+                    else if (_error != null)
+                      _StudentHomeworkMessage(message: _error!)
+                    else if (_exercises.isEmpty)
+                      _StudentHomeworkMessage(
+                        message:
+                            context.getText(AppKeys.studentNoHomeworkMessage),
+                      )
+                    else
+                      for (var index = 0; index < _exercises.length; index++)
+                        Padding(
+                          padding: EdgeInsets.only(
+                            bottom: index == _exercises.length - 1 ? 0 : 14,
+                          ),
+                          child: _HomeworkAssignmentCard(
+                            exercise: _exercises[index],
+                          ),
+                        ),
                   ],
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentHomeworkMessage extends StatelessWidget {
+  const _StudentHomeworkMessage({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 80),
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.andika(
+          color: _studentHomeworkMuted,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          height: 22 / 15,
         ),
       ),
     );
@@ -223,7 +328,9 @@ class _HomeworkFilterChip extends StatelessWidget {
 }
 
 class _HomeworkAssignmentCard extends StatelessWidget {
-  const _HomeworkAssignmentCard();
+  const _HomeworkAssignmentCard({required this.exercise});
+
+  final ClassroomExercise exercise;
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +371,7 @@ class _HomeworkAssignmentCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                context.getText(AppKeys.studentHomeworkAssignedAt),
+                _studentHomeworkCreatedDate(exercise),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
@@ -276,7 +383,7 @@ class _HomeworkAssignmentCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                context.getText(AppKeys.studentHomeworkReviewTitle),
+                _studentHomeworkTitle(exercise),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
@@ -290,7 +397,7 @@ class _HomeworkAssignmentCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  context.getText(AppKeys.studentHomeworkQuestionCount),
+                  _studentHomeworkQuestionCount(context, exercise),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
@@ -321,7 +428,7 @@ class _HomeworkAssignmentCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        context.getText(AppKeys.studentHomeworkDueDate),
+                        _studentHomeworkDueDate(context, exercise),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
@@ -342,3 +449,55 @@ class _HomeworkAssignmentCard extends StatelessWidget {
     );
   }
 }
+
+String _studentHomeworkTitle(ClassroomExercise exercise) {
+  final title = exercise.title?.trim();
+  if (title != null && title.isNotEmpty) {
+    return title;
+  }
+  final id = exercise.stableId;
+  return id == null ? '' : 'ID: $id';
+}
+
+String _studentHomeworkQuestionCount(
+  BuildContext context,
+  ClassroomExercise exercise,
+) {
+  final count = exercise.numQuestions ?? exercise.questions.length;
+  if (count > 0) {
+    return context.formatText(
+      AppKeys.teacherAssignmentQuestionCountFormat,
+      {'count': count},
+    );
+  }
+  return '';
+}
+
+String _studentHomeworkDueDate(
+  BuildContext context,
+  ClassroomExercise exercise,
+) {
+  final date = _studentHomeworkDateLabel(exercise.endDate);
+  if (date == null) {
+    return '';
+  }
+  return '${context.getText(AppKeys.teacherAssignmentDueLabel)}: $date';
+}
+
+String _studentHomeworkCreatedDate(ClassroomExercise exercise) {
+  return _studentHomeworkDateLabel(exercise.createDt) ?? '';
+}
+
+String? _studentHomeworkDateLabel(String? value) {
+  final parsed = DateTime.tryParse(value?.trim() ?? '');
+  if (parsed == null) {
+    return null;
+  }
+  final local = parsed.toLocal();
+  return '${_studentHomeworkTwoDigits(local.hour)}:'
+      '${_studentHomeworkTwoDigits(local.minute)} '
+      '${_studentHomeworkTwoDigits(local.day)}/'
+      '${_studentHomeworkTwoDigits(local.month)}/${local.year}';
+}
+
+String _studentHomeworkTwoDigits(int value) => value.toString().padLeft(2, '0');

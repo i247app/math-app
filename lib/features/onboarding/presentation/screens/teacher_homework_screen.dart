@@ -520,28 +520,11 @@ String _teacherExerciseTitle(
   if (title != null && title.isNotEmpty) {
     return title;
   }
-  return context.getText(AppKeys.teacherAssignmentGeometryTitle);
-}
-
-String _teacherExerciseChapterRange(
-  BuildContext context,
-  ClassroomExercise? exercise,
-) {
-  final chapter = exercise?.chapterName?.trim();
-  final lesson = exercise?.lessonName?.trim();
-  if (chapter != null &&
-      chapter.isNotEmpty &&
-      lesson != null &&
-      lesson.isNotEmpty) {
-    return '$chapter, $lesson';
+  final id = exercise?.stableId;
+  if (id != null) {
+    return context.formatText(AppKeys.teacherAssignmentId, {'id': id});
   }
-  if (chapter != null && chapter.isNotEmpty) {
-    return chapter;
-  }
-  if (lesson != null && lesson.isNotEmpty) {
-    return lesson;
-  }
-  return context.getText(AppKeys.teacherAssignmentChapterRange);
+  return '';
 }
 
 String _teacherExerciseQuestionCount(
@@ -555,15 +538,14 @@ String _teacherExerciseQuestionCount(
       {'count': count},
     );
   }
-  return context.getText(AppKeys.teacherAssignmentQuestionCountValue);
+  return '';
 }
 
 String _teacherExerciseDueDate(
   BuildContext context,
   ClassroomExercise? exercise,
 ) {
-  return _teacherExerciseDateTimeLabel(exercise?.endDate) ??
-      context.getText(AppKeys.teacherAssignmentDueValue);
+  return _teacherExerciseDateTimeLabel(exercise?.endDate) ?? '';
 }
 
 String? _teacherExerciseDateTimeLabel(String? value) {

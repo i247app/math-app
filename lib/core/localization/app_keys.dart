@@ -131,6 +131,8 @@ class AppKeys {
   static const studentClassAssignments = 'student_class_assignments';
   static const studentClassAssignmentsSubtitle =
       'student_class_assignments_subtitle';
+  static const studentClassAssignmentsCountFormat =
+      'student_class_assignments_count_format';
   static const studentClassQuizzes = 'student_class_quizzes';
   static const studentClassQuizzesSubtitle = 'student_class_quizzes_subtitle';
   static const studentClassMaterials = 'student_class_materials';
@@ -152,6 +154,7 @@ class AppKeys {
   static const studentHomeworkReviewTitle = 'student_homework_review_title';
   static const studentHomeworkQuestionCount = 'student_homework_question_count';
   static const studentHomeworkDueDate = 'student_homework_due_date';
+  static const studentHomeworkDueFormat = 'student_homework_due_format';
   static const assessmentAction = 'assessment_action';
   static const viewAll = 'view_all';
   static const viewAllUpper = 'view_all_upper';
@@ -299,6 +302,8 @@ class AppKeys {
   static const teacherCopiedClassLink = 'teacher_copied_class_link';
   static const teacherCopiedClassCode = 'teacher_copied_class_code';
   static const profileIdCopied = 'profile_id_copied';
+  static const profileCodeLabel = 'profile_code_label';
+  static const profileCodeCopied = 'profile_code_copied';
   static const teacherMemberManagement = 'teacher_member_management';
   static const teacherMemberSummary = 'teacher_member_summary';
   static const teacherMemberSummaryNoRequests =
@@ -397,6 +402,8 @@ class AppKeys {
   static const teacherAssignmentChapterLabel =
       'teacher_assignment_chapter_label';
   static const teacherAssignmentLessonLabel = 'teacher_assignment_lesson_label';
+  static const teacherAssignmentDescriptionLabel =
+      'teacher_assignment_description_label';
   static const teacherAssignmentDescriptionHint =
       'teacher_assignment_description_hint';
   static const teacherAssignmentCreated = 'teacher_assignment_created';

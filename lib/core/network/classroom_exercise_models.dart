@@ -2,20 +2,44 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classroom_exercise_models.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class ClassroomExerciseListRequest {
   const ClassroomExerciseListRequest({
     required this.classroomId,
     required this.profileId,
+    this.search,
+    this.visibility,
   });
 
   final int classroomId;
   final int profileId;
+  final String? search;
+  final String? visibility;
 
   factory ClassroomExerciseListRequest.fromJson(Map<String, dynamic> json) =>
       _$ClassroomExerciseListRequestFromJson(json);
 
   Map<String, dynamic> toJson() => _$ClassroomExerciseListRequestToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
+class UpdateClassroomExerciseRequest {
+  const UpdateClassroomExerciseRequest({
+    required this.profileId,
+    required this.classroomExerciseId,
+    required this.visibility,
+  });
+
+  final int profileId;
+  final int classroomExerciseId;
+  final String visibility;
+
+  factory UpdateClassroomExerciseRequest.fromJson(
+    Map<String, dynamic> json,
+  ) =>
+      _$UpdateClassroomExerciseRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UpdateClassroomExerciseRequestToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
@@ -124,6 +148,7 @@ class ClassroomExerciseResponse {
     return _$ClassroomExerciseResponseFromJson(
       <String, dynamic>{
         ...json,
+        'mstatus': json['mstatus'] ?? (exerciseValue == null ? null : 200),
         'exercise': exerciseValue,
       },
     );
@@ -173,10 +198,13 @@ class ClassroomExercise {
     this.numQuestions,
     this.chapterName,
     this.lessonName,
+    this.description,
     this.visibility,
     this.status,
     this.startDate,
     this.endDate,
+    this.createDt,
+    this.modifyDt,
     this.metadata,
     this.questions = const <ClassroomExerciseQuestion>[],
   });
@@ -202,6 +230,8 @@ class ClassroomExercise {
   @JsonKey(fromJson: _stringFromJson)
   final String? lessonName;
   @JsonKey(fromJson: _stringFromJson)
+  final String? description;
+  @JsonKey(fromJson: _stringFromJson)
   final String? visibility;
   @JsonKey(fromJson: _stringFromJson)
   final String? status;
@@ -209,6 +239,10 @@ class ClassroomExercise {
   final String? startDate;
   @JsonKey(fromJson: _stringFromJson)
   final String? endDate;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? createDt;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? modifyDt;
   final Map<String, dynamic>? metadata;
   @JsonKey(fromJson: _questionListFromJson)
   final List<ClassroomExerciseQuestion> questions;
@@ -226,6 +260,12 @@ class ClassroomExercise {
         'exercise_id': json['exercise_id'] ?? json['assignment_id'],
         'classroom_exercise_id':
             json['classroom_exercise_id'] ?? json['assignment_id'],
+        'profile_id': json['profile_id'] ?? json['creator_profile_id'],
+        'description': json['description'] ??
+            json['assignment_description'] ??
+            json['exercise_description'] ??
+            _nestedValue(json['metadata'], 'description'),
+        'status': json['status'] ?? json['exercise_status'],
         'questions': questionsValue,
       },
     );
@@ -241,6 +281,7 @@ class ClassroomExerciseQuestion {
   const ClassroomExerciseQuestion({
     this.id,
     this.questionId,
+    this.questionNumber,
     this.content,
     this.prompt,
     this.question,
@@ -252,6 +293,8 @@ class ClassroomExerciseQuestion {
   final int? id;
   @JsonKey(fromJson: _intFromJson)
   final int? questionId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? questionNumber;
   @JsonKey(fromJson: _stringFromJson)
   final String? content;
   @JsonKey(fromJson: _stringFromJson)
@@ -268,12 +311,15 @@ class ClassroomExerciseQuestion {
       <String, dynamic>{
         ...json,
         'question_id': json['question_id'] ?? json['id'],
+        'question_number': json['question_number'] ?? json['number'],
         'content': json['content'] ??
             json['question_content'] ??
             json['question_text'] ??
+            json['question_name'] ??
             json['text'],
         'answers': json['answers'] ?? json['options'] ?? json['choices'],
-        'correct_answer': json['correct_answer'] ?? json['answer'],
+        'correct_answer':
+            json['correct_answer'] ?? json['right_answer'] ?? json['answer'],
       },
     );
   }
@@ -368,5 +414,19 @@ List<String> _stringListFromJson(Object? value) {
   if (value is! List) {
     return const <String>[];
   }
-  return value.map(_stringFromJson).whereType<String>().toList(growable: false);
+  return value
+      .map((item) {
+        if (item case final Map<String, dynamic> json) {
+          return _stringFromJson(
+              json['content'] ?? json['value'] ?? json['label']);
+        }
+        if (item case final Map<Object?, Object?> json) {
+          return _stringFromJson(
+            json['content'] ?? json['value'] ?? json['label'],
+          );
+        }
+        return _stringFromJson(item);
+      })
+      .whereType<String>()
+      .toList(growable: false);
 }

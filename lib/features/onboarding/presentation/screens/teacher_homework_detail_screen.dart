@@ -25,13 +25,15 @@ class _TeacherHomeworkDetailScreenState
       widget._exerciseService ?? ClassroomExerciseApi();
 
   bool _isLoading = false;
+  bool _isSaving = false;
   String? _error;
   ClassroomExercise? _exercise;
+  String? _savedVisibility;
+  String? _editingVisibility;
 
   @override
   void initState() {
     super.initState();
-    _exercise = widget.initialExercise;
     _loadDetail();
   }
 
@@ -49,7 +51,12 @@ class _TeacherHomeworkDetailScreenState
       if (!mounted) {
         return;
       }
-      setState(() => _exercise = exercise ?? _exercise);
+      final visibility = _normalizeExerciseVisibility(exercise?.visibility);
+      setState(() {
+        _exercise = exercise ?? _exercise;
+        _savedVisibility = visibility;
+        _editingVisibility = visibility;
+      });
     } on ClassroomExerciseException catch (error) {
       if (!mounted) {
         return;
@@ -62,6 +69,59 @@ class _TeacherHomeworkDetailScreenState
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  bool get _hasVisibilityChange =>
+      _editingVisibility != null && _editingVisibility != _savedVisibility;
+
+  Future<void> _saveVisibility() async {
+    final visibility = _editingVisibility;
+    final exerciseId = _exercise?.stableId ?? widget.exerciseId;
+    if (_isSaving || visibility == null || !_hasVisibilityChange) {
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+      _error = null;
+    });
+    try {
+      final updated = await _exerciseService.updateExerciseVisibility(
+        profileId: widget.profileId,
+        classroomExerciseId: exerciseId,
+        visibility: visibility,
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _exercise = updated ?? _exercise;
+        _savedVisibility =
+            _normalizeExerciseVisibility(updated?.visibility) ?? visibility;
+        _editingVisibility = _savedVisibility;
+      });
+    } on ClassroomExerciseException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              error.message.trim().isEmpty
+                  ? context.readText(AppKeys.teacherAssignmentCreateFailed)
+                  : error.message,
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(milliseconds: 1400),
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
       }
     }
   }
@@ -81,6 +141,28 @@ class _TeacherHomeworkDetailScreenState
               title: context.getText(AppKeys.teacherAssignments),
               scale: 1,
               onBack: () => Navigator.of(context).maybePop(),
+              action: _hasVisibilityChange
+                  ? TextButton(
+                      onPressed: _isSaving ? null : _saveVisibility,
+                      child: _isSaving
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: _teacherTeal,
+                              ),
+                            )
+                          : Text(
+                              context.getText(AppKeys.save),
+                              style: GoogleFonts.andika(
+                                color: _teacherTeal,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                    )
+                  : null,
             ),
             Expanded(
               child: RefreshIndicator(
@@ -99,7 +181,7 @@ class _TeacherHomeworkDetailScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (_isLoading && exercise == null)
+                      if (_isLoading)
                         const Padding(
                           padding: EdgeInsets.only(top: 80),
                           child: Center(
@@ -108,14 +190,20 @@ class _TeacherHomeworkDetailScreenState
                             ),
                           ),
                         )
-                      else if (_error != null && exercise == null)
+                      else if (_error != null)
                         _TeacherErrorPanel(
                           scale: 1,
                           message: _error!,
                           onRetry: _loadDetail,
                         )
                       else ...[
-                        _TeacherAssignmentInfoCard(exercise: exercise),
+                        _TeacherAssignmentInfoCard(
+                          exercise: exercise,
+                          visibility: _editingVisibility,
+                          onVisibilityChanged: (visibility) {
+                            setState(() => _editingVisibility = visibility);
+                          },
+                        ),
                         const SizedBox(height: 13),
                         Padding(
                           padding: const EdgeInsets.only(left: 7),
@@ -132,19 +220,17 @@ class _TeacherHomeworkDetailScreenState
                           ),
                         ),
                         const SizedBox(height: 12),
-                        if (questions.isEmpty)
-                          const _TeacherQuestionCard(questionNumber: 1)
-                        else
-                          for (var index = 0; index < questions.length; index++)
-                            Padding(
-                              padding: EdgeInsets.only(
-                                bottom: index == questions.length - 1 ? 0 : 15,
-                              ),
-                              child: _TeacherQuestionCard(
-                                questionNumber: index + 1,
-                                question: questions[index],
-                              ),
+                        for (var index = 0; index < questions.length; index++)
+                          Padding(
+                            padding: EdgeInsets.only(
+                              bottom: index == questions.length - 1 ? 0 : 15,
                             ),
+                            child: _TeacherQuestionCard(
+                              questionNumber:
+                                  questions[index].questionNumber ?? index + 1,
+                              question: questions[index],
+                            ),
+                          ),
                       ],
                     ],
                   ),
@@ -159,9 +245,15 @@ class _TeacherHomeworkDetailScreenState
 }
 
 class _TeacherAssignmentInfoCard extends StatelessWidget {
-  const _TeacherAssignmentInfoCard({required this.exercise});
+  const _TeacherAssignmentInfoCard({
+    required this.exercise,
+    required this.visibility,
+    required this.onVisibilityChanged,
+  });
 
   final ClassroomExercise? exercise;
+  final String? visibility;
+  final ValueChanged<String> onVisibilityChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +290,7 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      context.getText(AppKeys.teacherAssignmentClassName),
+                      _teacherExerciseClassLabel(context, exercise),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
@@ -209,7 +301,10 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const _TeacherAssignmentSwitch(),
+                  _TeacherAssignmentSwitch(
+                    visibility: visibility,
+                    onChanged: onVisibilityChanged,
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -224,18 +319,15 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                   height: 36 / 18,
                 ),
               ),
-              Text(
-                _teacherExerciseChapterRange(context, exercise),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: const Color(0xFF444650),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  height: 24 / 14,
-                ),
-              ),
-              const SizedBox(height: 12),
+              if (_exerciseInfoRows(context, exercise).isNotEmpty) ...[
+                const SizedBox(height: 6),
+                for (final row in _exerciseInfoRows(context, exercise))
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: _TeacherAssignmentInfoRow(row),
+                  ),
+              ],
+              const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.only(top: 19),
                 decoration: BoxDecoration(
@@ -262,29 +354,119 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
   }
 }
 
-class _TeacherAssignmentSwitch extends StatelessWidget {
-  const _TeacherAssignmentSwitch();
+class _TeacherAssignmentInfoRow extends StatelessWidget {
+  const _TeacherAssignmentInfoRow(this.row);
+
+  final _TeacherAssignmentLabeledValue row;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 44,
-      height: 24,
-      alignment: Alignment.centerRight,
-      padding: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE87151),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Container(
-        width: 20,
-        height: 20,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white),
+    return RichText(
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        style: GoogleFonts.andika(
+          color: const Color(0xFF444650),
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          height: 24 / 14,
         ),
+        children: [
+          TextSpan(
+            text: '${row.label}: ',
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+          TextSpan(text: row.value),
+        ],
       ),
+    );
+  }
+}
+
+List<_TeacherAssignmentLabeledValue> _exerciseInfoRows(
+  BuildContext context,
+  ClassroomExercise? exercise,
+) {
+  final rows = <_TeacherAssignmentLabeledValue>[];
+  final chapter = exercise?.chapterName?.trim();
+  final lesson = exercise?.lessonName?.trim();
+  final description = exercise?.description?.trim();
+
+  if (chapter != null && chapter.isNotEmpty) {
+    rows.add(
+      _TeacherAssignmentLabeledValue(
+        context.getText(AppKeys.teacherAssignmentChapterLabel),
+        chapter,
+      ),
+    );
+  }
+  if (lesson != null && lesson.isNotEmpty) {
+    rows.add(
+      _TeacherAssignmentLabeledValue(
+        context.getText(AppKeys.teacherAssignmentLessonLabel),
+        lesson,
+      ),
+    );
+  }
+  if (description != null && description.isNotEmpty) {
+    rows.add(
+      _TeacherAssignmentLabeledValue(
+        context.getText(AppKeys.teacherAssignmentDescriptionLabel),
+        description,
+      ),
+    );
+  }
+
+  return rows;
+}
+
+class _TeacherAssignmentLabeledValue {
+  const _TeacherAssignmentLabeledValue(this.label, this.value);
+
+  final String label;
+  final String value;
+}
+
+String _teacherExerciseClassLabel(
+  BuildContext context,
+  ClassroomExercise? exercise,
+) {
+  final classroomId = exercise?.classroomId;
+  if (classroomId == null) {
+    return '';
+  }
+  return context.formatText(
+    AppKeys.teacherAssignmentId,
+    {'id': classroomId},
+  );
+}
+
+String? _normalizeExerciseVisibility(String? value) {
+  final normalized = value?.trim().toUpperCase();
+  if (normalized == 'PUBLIC' || normalized == 'PRIVATE') {
+    return normalized;
+  }
+  return null;
+}
+
+class _TeacherAssignmentSwitch extends StatelessWidget {
+  const _TeacherAssignmentSwitch({
+    required this.visibility,
+    required this.onChanged,
+  });
+
+  final String? visibility;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Switch.adaptive(
+      value: visibility == 'PUBLIC',
+      activeThumbColor: Colors.white,
+      activeTrackColor: _teacherTeal,
+      inactiveThumbColor: Colors.white,
+      inactiveTrackColor: const Color(0xFFE87151),
+      onChanged: (value) => onChanged(value ? 'PUBLIC' : 'PRIVATE'),
     );
   }
 }
@@ -440,27 +622,14 @@ class _TeacherQuestionCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              if (answers.isEmpty) ...[
-                const _TeacherAnswerOption(letter: 'A', text: 'x = 1; x = 6'),
-                const SizedBox(height: 8),
-                const _TeacherAnswerOption(
-                  letter: 'B',
-                  text: 'x = 2; x = 3',
-                  selected: true,
+              for (var index = 0; index < answers.length; index++) ...[
+                _TeacherAnswerOption(
+                  letter: _answerLetter(index),
+                  text: answers[index],
+                  selected: _isCorrectAnswer(question, answers[index], index),
                 ),
-                const SizedBox(height: 8),
-                const _TeacherAnswerOption(letter: 'C', text: 'x = 1; x = 6'),
-                const SizedBox(height: 8),
-                const _TeacherAnswerOption(letter: 'D', text: 'x = 1; x = 6'),
-              ] else
-                for (var index = 0; index < answers.length; index++) ...[
-                  _TeacherAnswerOption(
-                    letter: _answerLetter(index),
-                    text: answers[index],
-                    selected: _isCorrectAnswer(question, answers[index]),
-                  ),
-                  if (index != answers.length - 1) const SizedBox(height: 8),
-                ],
+                if (index != answers.length - 1) const SizedBox(height: 8),
+              ],
             ],
           ),
         ),
@@ -477,9 +646,16 @@ String _answerLetter(int index) {
   return letters[index];
 }
 
-bool _isCorrectAnswer(ClassroomExerciseQuestion? question, String answer) {
+bool _isCorrectAnswer(
+  ClassroomExerciseQuestion? question,
+  String answer,
+  int index,
+) {
   final correct = question?.correctAnswer?.trim();
-  return correct != null && correct.isNotEmpty && correct == answer.trim();
+  if (correct == null || correct.isEmpty) {
+    return false;
+  }
+  return correct == answer.trim() || correct == _answerLetter(index);
 }
 
 class _TeacherAnswerOption extends StatelessWidget {

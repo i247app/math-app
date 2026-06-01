@@ -16,6 +16,8 @@ abstract class ClassroomExerciseService {
   Future<List<ClassroomExercise>> listExercises({
     required int classroomId,
     required int profileId,
+    String? search,
+    String? visibility,
   });
 
   Future<ClassroomExercise?> createExercise({
@@ -35,6 +37,12 @@ abstract class ClassroomExerciseService {
     required int exerciseId,
     required int profileId,
   });
+
+  Future<ClassroomExercise?> updateExerciseVisibility({
+    required int profileId,
+    required int classroomExerciseId,
+    required String visibility,
+  });
 }
 
 class ClassroomExerciseApi implements ClassroomExerciseService {
@@ -50,12 +58,17 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
   Future<List<ClassroomExercise>> listExercises({
     required int classroomId,
     required int profileId,
+    String? search,
+    String? visibility,
   }) async {
     try {
       final response = await _networkApi.listClassroomExercises(
         ClassroomExerciseListRequest(
           classroomId: classroomId,
           profileId: profileId,
+          search: search?.trim().isEmpty == true ? null : search?.trim(),
+          visibility:
+              visibility?.trim().isEmpty == true ? null : visibility?.trim(),
         ),
       );
       return response.exercises;
@@ -107,6 +120,26 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
       final response = await _networkApi.getClassroomExerciseDetail(
         exerciseId: exerciseId,
         profileId: profileId,
+      );
+      return response.exercise;
+    } on NetworkException catch (error) {
+      throw ClassroomExerciseException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<ClassroomExercise?> updateExerciseVisibility({
+    required int profileId,
+    required int classroomExerciseId,
+    required String visibility,
+  }) async {
+    try {
+      final response = await _networkApi.updateClassroomExercise(
+        UpdateClassroomExerciseRequest(
+          profileId: profileId,
+          classroomExerciseId: classroomExerciseId,
+          visibility: visibility,
+        ),
       );
       return response.exercise;
     } on NetworkException catch (error) {

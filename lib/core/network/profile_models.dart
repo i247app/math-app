@@ -218,6 +218,7 @@ class StudentProfile {
   const StudentProfile({
     this.id,
     this.profileId,
+    this.profileCode,
     this.userId,
     this.schoolId,
     this.school,
@@ -245,6 +246,7 @@ class StudentProfile {
   final int? id;
   @JsonKey(fromJson: _intFromJson)
   final int? profileId;
+  final String? profileCode;
   @JsonKey(fromJson: _intFromJson)
   final int? userId;
   @JsonKey(fromJson: _intFromJson)

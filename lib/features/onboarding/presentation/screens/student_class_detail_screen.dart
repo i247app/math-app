@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/classroom_models.dart';
+import '../../../../core/network/classroom_exercise_models.dart';
 import '../../data/classroom_api.dart';
+import '../../data/classroom_exercise_api.dart';
 import 'student_homework_screen.dart';
 
 const _studentClassBg = Color(0xFFF6FFFF);
@@ -22,12 +24,15 @@ class StudentClassDetailScreen extends StatefulWidget {
     required this.profileId,
     this.initialClassroom,
     ClassroomService? classroomService,
-  }) : _classroomService = classroomService;
+    ClassroomExerciseService? exerciseService,
+  })  : _classroomService = classroomService,
+        _exerciseService = exerciseService;
 
   final int classroomId;
   final int profileId;
   final ClassroomModel? initialClassroom;
   final ClassroomService? _classroomService;
+  final ClassroomExerciseService? _exerciseService;
 
   @override
   State<StudentClassDetailScreen> createState() =>
@@ -37,9 +42,13 @@ class StudentClassDetailScreen extends StatefulWidget {
 class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
+  late final ClassroomExerciseService _exerciseService =
+      widget._exerciseService ?? ClassroomExerciseApi();
 
   ClassroomModel? _classroom;
+  List<ClassroomExercise> _homeworkExercises = const <ClassroomExercise>[];
   bool _isLoading = false;
+  bool _isLoadingHomework = false;
   String? _error;
 
   @override
@@ -47,6 +56,14 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
     super.initState();
     _classroom = widget.initialClassroom;
     _loadDetail();
+    _loadHomeworkExercises();
+  }
+
+  Future<void> _refresh() {
+    return Future.wait<void>([
+      _loadDetail(),
+      _loadHomeworkExercises(),
+    ]);
   }
 
   Future<void> _loadDetail() async {
@@ -76,6 +93,31 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
     }
   }
 
+  Future<void> _loadHomeworkExercises() async {
+    setState(() => _isLoadingHomework = true);
+
+    try {
+      final exercises = await _exerciseService.listExercises(
+        classroomId: widget.classroomId,
+        profileId: widget.profileId,
+        visibility: 'PUBLIC',
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() => _homeworkExercises = exercises);
+    } on ClassroomExerciseException {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _homeworkExercises = const <ClassroomExercise>[]);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingHomework = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final classroom = _classroom;
@@ -95,7 +137,7 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
             Expanded(
               child: RefreshIndicator(
                 color: _studentClassTeal,
-                onRefresh: _loadDetail,
+                onRefresh: _refresh,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
                     parent: BouncingScrollPhysics(),
@@ -120,9 +162,19 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                           isLoading: _isLoading && classroom == null,
                         ),
                         const SizedBox(height: 26),
-                        const _LearningCategorySection(),
+                        _LearningCategorySection(
+                          classroomId: widget.classroomId,
+                          profileId: widget.profileId,
+                          homeworkCount: _homeworkExercises.length,
+                          isLoadingHomework: _isLoadingHomework,
+                        ),
                         const SizedBox(height: 23),
-                        const _UpcomingDeadlineSection(),
+                        _UpcomingDeadlineSection(
+                          classroomId: widget.classroomId,
+                          profileId: widget.profileId,
+                          exercises: _homeworkExercises,
+                          isLoading: _isLoadingHomework,
+                        ),
                       ],
                     ],
                   ),
@@ -215,6 +267,7 @@ class _TeacherProfileCard extends StatelessWidget {
     final teacherName = _nonEmpty(classroom?.teacherName) ??
         _nonEmpty(classroom?.owner?.name) ??
         context.getText(AppKeys.teacherFallback);
+    final teacherAvatarUrl = _teacherAvatarUrl(classroom);
 
     return Container(
       width: double.infinity,
@@ -245,22 +298,9 @@ class _TeacherProfileCard extends StatelessWidget {
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFFAA2A6C).withValues(alpha: 0.1),
-                          width: 2,
-                        ),
-                        image: const DecorationImage(
-                          image: AssetImage(
-                            'assets/images/student_class_teacher.png',
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    _TeacherAvatar(
+                      name: teacherName,
+                      imageUrl: teacherAvatarUrl,
                     ),
                     Positioned(
                       right: 0,
@@ -318,6 +358,66 @@ class _TeacherProfileCard extends StatelessWidget {
   }
 }
 
+class _TeacherAvatar extends StatelessWidget {
+  const _TeacherAvatar({
+    required this.name,
+    required this.imageUrl,
+  });
+
+  final String name;
+  final String? imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = _teacherInitial(name);
+    return Container(
+      width: 56,
+      height: 56,
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: const Color(0xFFAA2A6C).withValues(alpha: 0.1),
+          width: 2,
+        ),
+      ),
+      child: ClipOval(
+        child: imageUrl == null
+            ? _TeacherAvatarInitial(initial: initial)
+            : Image.network(
+                imageUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    _TeacherAvatarInitial(initial: initial),
+              ),
+      ),
+    );
+  }
+}
+
+class _TeacherAvatarInitial extends StatelessWidget {
+  const _TeacherAvatarInitial({required this.initial});
+
+  final String initial;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFFFDF0F5),
+      alignment: Alignment.center,
+      child: Text(
+        initial,
+        style: GoogleFonts.andika(
+          color: _studentClassPink,
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          height: 1,
+        ),
+      ),
+    );
+  }
+}
+
 class _MessageButton extends StatelessWidget {
   const _MessageButton({required this.onTap});
 
@@ -348,7 +448,17 @@ class _MessageButton extends StatelessWidget {
 }
 
 class _LearningCategorySection extends StatelessWidget {
-  const _LearningCategorySection();
+  const _LearningCategorySection({
+    required this.classroomId,
+    required this.profileId,
+    required this.homeworkCount,
+    required this.isLoadingHomework,
+  });
+
+  final int classroomId;
+  final int profileId;
+  final int homeworkCount;
+  final bool isLoadingHomework;
 
   @override
   Widget build(BuildContext context) {
@@ -370,11 +480,18 @@ class _LearningCategorySection extends StatelessWidget {
               backgroundColor: const Color(0xFFFDF0F5),
               iconAsset: 'assets/images/student_class_assignment.svg',
               title: context.getText(AppKeys.studentClassAssignments),
-              subtitle:
-                  context.getText(AppKeys.studentClassAssignmentsSubtitle),
+              subtitle: isLoadingHomework
+                  ? ''
+                  : context.formatText(
+                      AppKeys.studentClassAssignmentsCountFormat,
+                      {'count': homeworkCount},
+                    ),
               onTap: () => Navigator.of(context).push<void>(
                 MaterialPageRoute<void>(
-                  builder: (_) => const StudentHomeworkScreen(),
+                  builder: (_) => StudentHomeworkScreen(
+                    classroomId: classroomId,
+                    profileId: profileId,
+                  ),
                 ),
               ),
             ),
@@ -513,10 +630,21 @@ class _CategoryTile extends StatelessWidget {
 }
 
 class _UpcomingDeadlineSection extends StatelessWidget {
-  const _UpcomingDeadlineSection();
+  const _UpcomingDeadlineSection({
+    required this.classroomId,
+    required this.profileId,
+    required this.exercises,
+    required this.isLoading,
+  });
+
+  final int classroomId;
+  final int profileId;
+  final List<ClassroomExercise> exercises;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
+    final upcomingExercises = _upcomingHomeworkExercises(exercises);
     return Column(
       children: [
         Row(
@@ -538,84 +666,158 @@ class _UpcomingDeadlineSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Material(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          child: InkWell(
-            onTap: () => _showComingSoon(context),
-            borderRadius: BorderRadius.circular(16),
-            child: Ink(
-              height: 72,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFFC4C6D2).withValues(alpha: 0.1),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+        if (isLoading)
+          const SizedBox(
+            height: 72,
+            child: Center(
+              child: CircularProgressIndicator(color: _studentClassTeal),
+            ),
+          )
+        else if (upcomingExercises.isEmpty)
+          _StudentClassEmptyPanel(
+            message: context.getText(AppKeys.studentNoHomeworkMessage),
+          )
+        else
+          for (var index = 0; index < upcomingExercises.length; index++)
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: index == upcomingExercises.length - 1 ? 0 : 10,
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 4,
-                    height: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: _studentClassPink,
-                      borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(16),
-                      ),
+              child: _UpcomingDeadlineTile(
+                exercise: upcomingExercises[index],
+                onTap: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
+                    builder: (_) => StudentHomeworkScreen(
+                      classroomId: classroomId,
+                      profileId: profileId,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          context.getText(AppKeys.studentClassReview15Minutes),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.andika(
-                            color: _studentClassInk,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            height: 1.5,
-                          ),
-                        ),
-                        Text(
-                          context.getText(AppKeys.studentClassDeadlineSample),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.andika(
-                            color: _studentClassMuted,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            height: 16 / 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  SvgPicture.asset(
-                    'assets/images/student_class_chevron.svg',
-                    width: 7,
-                    height: 10,
-                  ),
-                  const SizedBox(width: 28),
-                ],
+                ),
               ),
             ),
+      ],
+    );
+  }
+}
+
+class _UpcomingDeadlineTile extends StatelessWidget {
+  const _UpcomingDeadlineTile({
+    required this.exercise,
+    required this.onTap,
+  });
+
+  final ClassroomExercise exercise;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          height: 72,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFC4C6D2).withValues(alpha: 0.1),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: double.infinity,
+                decoration: const BoxDecoration(
+                  color: _studentClassPink,
+                  borderRadius: BorderRadius.horizontal(
+                    left: Radius.circular(16),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _studentClassHomeworkTitle(exercise),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.andika(
+                        color: _studentClassInk,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    ),
+                    Text(
+                      _studentClassHomeworkDueDate(context, exercise),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.andika(
+                        color: _studentClassMuted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        height: 16 / 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              SvgPicture.asset(
+                'assets/images/student_class_chevron.svg',
+                width: 7,
+                height: 10,
+              ),
+              const SizedBox(width: 28),
+            ],
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _StudentClassEmptyPanel extends StatelessWidget {
+  const _StudentClassEmptyPanel({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFC4C6D2).withValues(alpha: 0.1),
+        ),
+      ),
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.andika(
+          color: _studentClassMuted,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          height: 20 / 14,
+        ),
+      ),
     );
   }
 }
@@ -677,6 +879,95 @@ String? _nonEmpty(String? value) {
   }
   return trimmed;
 }
+
+String? _teacherAvatarUrl(ClassroomModel? classroom) {
+  final values = <String?>[
+    classroom?.owner?.avatarUrl,
+    classroom?.owner?.imageUrl,
+    classroom?.owner?.fileUrl,
+    classroom?.avatarUrl,
+    classroom?.imageUrl,
+    classroom?.fileUrl,
+  ];
+  for (final value in values) {
+    final trimmed = value?.trim();
+    if (trimmed != null && trimmed.isNotEmpty) {
+      return trimmed;
+    }
+  }
+  return null;
+}
+
+String _teacherInitial(String name) {
+  final trimmed = name.trim();
+  if (trimmed.isEmpty) {
+    return '';
+  }
+  return trimmed.characters.first.toUpperCase();
+}
+
+List<ClassroomExercise> _upcomingHomeworkExercises(
+  List<ClassroomExercise> exercises,
+) {
+  final now = DateTime.now();
+  final upcoming = exercises.where((exercise) {
+    final endDate = DateTime.tryParse(exercise.endDate?.trim() ?? '');
+    return endDate != null && endDate.toLocal().isAfter(now);
+  }).toList(growable: false);
+
+  return upcoming
+    ..sort((first, second) {
+      final firstEnd = DateTime.tryParse(first.endDate?.trim() ?? '');
+      final secondEnd = DateTime.tryParse(second.endDate?.trim() ?? '');
+      if (firstEnd == null && secondEnd == null) {
+        return 0;
+      }
+      if (firstEnd == null) {
+        return 1;
+      }
+      if (secondEnd == null) {
+        return -1;
+      }
+      return firstEnd.compareTo(secondEnd);
+    });
+}
+
+String _studentClassHomeworkTitle(ClassroomExercise exercise) {
+  final title = exercise.title?.trim();
+  if (title != null && title.isNotEmpty) {
+    return title;
+  }
+  final id = exercise.stableId;
+  return id == null ? '' : 'ID: $id';
+}
+
+String _studentClassHomeworkDueDate(
+  BuildContext context,
+  ClassroomExercise exercise,
+) {
+  final date = _studentClassDateTimeLabel(exercise.endDate);
+  if (date == null) {
+    return '';
+  }
+  return context.formatText(
+    AppKeys.studentHomeworkDueFormat,
+    {'date': date},
+  );
+}
+
+String? _studentClassDateTimeLabel(String? value) {
+  final parsed = DateTime.tryParse(value?.trim() ?? '');
+  if (parsed == null) {
+    return null;
+  }
+  final local = parsed.toLocal();
+  return '${_studentClassTwoDigits(local.hour)}:'
+      '${_studentClassTwoDigits(local.minute)} '
+      '${_studentClassTwoDigits(local.day)}/'
+      '${_studentClassTwoDigits(local.month)}/${local.year}';
+}
+
+String _studentClassTwoDigits(int value) => value.toString().padLeft(2, '0');
 
 void _showComingSoon(BuildContext context) {
   HapticFeedback.selectionClick();
