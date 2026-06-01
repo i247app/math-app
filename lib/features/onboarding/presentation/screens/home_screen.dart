@@ -1291,7 +1291,10 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _StudentFigmaHeroCard(),
+          _StudentFigmaHeroCard(
+            onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
+            onPracticeTap: () => _openGradeSelection(quizPurposePractice),
+          ),
           const SizedBox(height: 22),
           _StudentJoinClassCta(onTap: _openJoinClassroom),
           const SizedBox(height: 11),
@@ -1372,6 +1375,20 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       _loadedProfileId = null;
       await _loadClassrooms();
     }
+  }
+
+  void _openGradeSelection(String quizPurpose) {
+    HapticFeedback.lightImpact();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => GradeSelectionScreen(
+          user: widget.user,
+          initialGrades: widget.initialGrades,
+          gradeService: widget.gradeService,
+          quizPurpose: quizPurpose,
+        ),
+      ),
+    );
   }
 
   Future<void> _openClassDetail(ClassroomModel classroom) async {
@@ -1707,7 +1724,13 @@ class _StudentInviteButton extends StatelessWidget {
 }
 
 class _StudentFigmaHeroCard extends StatelessWidget {
-  const _StudentFigmaHeroCard();
+  const _StudentFigmaHeroCard({
+    required this.onAssessmentTap,
+    required this.onPracticeTap,
+  });
+
+  final VoidCallback onAssessmentTap;
+  final VoidCallback onPracticeTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1818,6 +1841,7 @@ class _StudentFigmaHeroCard extends StatelessWidget {
                     label: context.getText(AppKeys.assessmentAction),
                     color: const Color(0xFFFB7651),
                     icon: _studentHomeAssessmentIcon,
+                    onTap: onAssessmentTap,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1826,6 +1850,7 @@ class _StudentFigmaHeroCard extends StatelessWidget {
                     label: context.getText(AppKeys.practice),
                     color: const Color(0xFF38898C),
                     icon: _studentHomePracticeIcon,
+                    onTap: onPracticeTap,
                   ),
                 ),
               ],
@@ -1885,18 +1910,20 @@ class _HeroActionButton extends StatelessWidget {
     required this.label,
     required this.color,
     required this.icon,
+    required this.onTap,
   });
 
   final String label;
   final Color color;
   final String icon;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 44,
       child: FilledButton(
-        onPressed: HapticFeedback.selectionClick,
+        onPressed: onTap,
         style: FilledButton.styleFrom(
           backgroundColor: color,
           padding: const EdgeInsets.symmetric(horizontal: 12),
