@@ -9,8 +9,11 @@ class _SettingsMenuPanel extends StatelessWidget {
     required this.username,
     required this.scale,
     required this.currentLanguage,
+    required this.hasPasscode,
+    required this.isLoadingPasscode,
     required this.onAccountTap,
     required this.onProfileTap,
+    required this.onPasscodeTap,
     required this.onLanguageChanged,
     required this.onLogoutTap,
   });
@@ -21,8 +24,11 @@ class _SettingsMenuPanel extends StatelessWidget {
   final String username;
   final double scale;
   final AppLanguage currentLanguage;
+  final bool hasPasscode;
+  final bool isLoadingPasscode;
   final VoidCallback onAccountTap;
   final VoidCallback onProfileTap;
+  final VoidCallback onPasscodeTap;
   final ValueChanged<AppLanguage> onLanguageChanged;
   final VoidCallback onLogoutTap;
 
@@ -73,6 +79,22 @@ class _SettingsMenuPanel extends StatelessWidget {
           onTap: onProfileTap,
         ),
         SizedBox(height: 12 * scale),
+        _SettingsActionCard(
+          icon: Icons.lock_outline_rounded,
+          iconColor: const Color(0xFF327F84),
+          iconBackground: const Color(0xFFE5F7F8),
+          title: context.getText(AppKeys.passcodeMenuTitle),
+          subtitle: isLoadingPasscode
+              ? context.getText(AppKeys.loading)
+              : context.getText(
+                  hasPasscode
+                      ? AppKeys.passcodeMenuSubtitleManage
+                      : AppKeys.passcodeMenuSubtitleSet,
+                ),
+          scale: scale,
+          onTap: onPasscodeTap,
+        ),
+        SizedBox(height: 12 * scale),
         _SettingsLanguageCard(
           currentLanguage: currentLanguage,
           scale: scale,
@@ -102,6 +124,70 @@ class _SettingsMenuPanel extends StatelessWidget {
       return name;
     }
     return username;
+  }
+}
+
+enum _PasscodeSettingsAction {
+  change,
+  remove,
+}
+
+class _PasscodeSettingsSheet extends StatelessWidget {
+  const _PasscodeSettingsSheet({
+    required this.scale,
+    required this.onChange,
+    required this.onRemove,
+  });
+
+  final double scale;
+  final VoidCallback onChange;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        margin: EdgeInsets.all(16 * scale),
+        padding: EdgeInsets.all(18 * scale),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24 * scale),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 18 * scale,
+              offset: Offset(0, 8 * scale),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _SettingsActionCard(
+              icon: Icons.edit_outlined,
+              iconColor: const Color(0xFF327F84),
+              iconBackground: const Color(0xFFE5F7F8),
+              title: context.getText(AppKeys.passcodeChange),
+              subtitle: context.getText(AppKeys.passcodeMenuSubtitleManage),
+              scale: scale,
+              onTap: onChange,
+            ),
+            SizedBox(height: 12 * scale),
+            _SettingsActionCard(
+              icon: Icons.lock_open_rounded,
+              iconColor: _orange,
+              iconBackground: const Color(0xFFFFEAEA),
+              title: context.getText(AppKeys.passcodeRemove),
+              subtitle: context.getText(AppKeys.passcodeRemove),
+              isDestructive: true,
+              scale: scale,
+              onTap: onRemove,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

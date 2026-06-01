@@ -17,9 +17,11 @@ import '../../data/active_profile_session.dart';
 import '../../data/avatar_picker.dart';
 import '../../data/grade_api.dart';
 import '../../data/otp_auth_api.dart';
+import '../../data/passcode_service.dart';
 import '../../data/profile_api.dart';
 import '../../data/school_api.dart';
 import '../../domain/profile_avatar.dart';
+import '../screens/passcode_screen.dart';
 import '../widgets/profile_avatar_image.dart';
 import '../../../../core/localization/app_language.dart';
 import '../../../../core/localization/lingo_scope.dart';
@@ -117,6 +119,7 @@ class SettingTab extends StatefulWidget {
 class _SettingTabState extends State<SettingTab> {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
   final OtpAuthService _authService = OtpAuthApi();
+  final PasscodeService _passcodeService = const SecurePasscodeService();
   final ProfileService _profileService = ProfileApi();
   final GradeService _gradeService = GradeApi();
   final SchoolService _schoolService = SchoolApi();
@@ -138,6 +141,8 @@ class _SettingTabState extends State<SettingTab> {
   bool _isSavingProfile = false;
   bool _isDeletingProfile = false;
   bool _isSettingDefaultProfile = false;
+  bool _isLoadingPasscode = false;
+  bool _hasPasscode = false;
   String? _profileLoadError;
   String? _profileOptionsError;
   String? _profileCreateError;
@@ -205,6 +210,11 @@ class _SettingTabState extends State<SettingTab> {
         }
       });
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadPasscodeStatus();
+      }
+    });
   }
 
   @override
@@ -242,6 +252,10 @@ class _SettingTabState extends State<SettingTab> {
     if (oldWidget.profileLoadError != widget.profileLoadError) {
       _profileLoadError = widget.profileLoadError;
     }
+
+    if (oldWidget.user?.id != widget.user?.id) {
+      _loadPasscodeStatus();
+    }
   }
 
   @override
@@ -261,6 +275,209 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   LoginUser? get _effectiveUser => _updatedUser ?? widget.user;
+
+  int? get _effectiveUserId {
+    final userId = _effectiveUser?.id;
+    return userId != null && userId > 0 ? userId : null;
+  }
+
+  Future<void> _loadPasscodeStatus() async {
+    final userId = _effectiveUserId;
+    if (userId == null) {
+      if (mounted) {
+        setState(() {
+          _hasPasscode = false;
+          _isLoadingPasscode = false;
+        });
+      }
+      return;
+    }
+
+    setState(() => _isLoadingPasscode = true);
+    final hasPasscode = await _passcodeService.hasPasscode(userId);
+    if (!mounted || _effectiveUserId != userId) {
+      return;
+    }
+    setState(() {
+      _hasPasscode = hasPasscode;
+      _isLoadingPasscode = false;
+    });
+  }
+
+  Future<void> _openPasscodeSettings() async {
+    HapticFeedback.selectionClick();
+    final userId = _effectiveUserId;
+    if (userId == null || _isLoadingPasscode) {
+      return;
+    }
+
+    if (!_hasPasscode) {
+      await _setPasscode(userId);
+      return;
+    }
+
+    final action = await showModalBottomSheet<_PasscodeSettingsAction>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.32),
+      builder: (sheetContext) {
+        return _PasscodeSettingsSheet(
+          scale: widget.scale,
+          onChange: () =>
+              Navigator.of(sheetContext).pop(_PasscodeSettingsAction.change),
+          onRemove: () =>
+              Navigator.of(sheetContext).pop(_PasscodeSettingsAction.remove),
+        );
+      },
+    );
+
+    if (!mounted || action == null) {
+      return;
+    }
+
+    switch (action) {
+      case _PasscodeSettingsAction.change:
+        await _changePasscode(userId);
+      case _PasscodeSettingsAction.remove:
+        await _removePasscode(userId);
+    }
+  }
+
+  Future<void> _setPasscode(int userId) async {
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (routeContext) {
+          return PasscodeScreen(
+            mode: PasscodeScreenMode.setup,
+            titleKey: AppKeys.createPasscodeTitle,
+            primaryLabelKey: AppKeys.passcodeContinue,
+            onBack: () => Navigator.of(routeContext).pop(false),
+            onSubmit: (passcode) async {
+              await _passcodeService.setPasscode(
+                userId: userId,
+                passcode: passcode,
+              );
+              if (routeContext.mounted) {
+                Navigator.of(routeContext).pop(true);
+              }
+              return null;
+            },
+          );
+        },
+      ),
+    );
+
+    if (!mounted || saved != true) {
+      return;
+    }
+    setState(() => _hasPasscode = true);
+    _showSettingsSnack(AppKeys.passcodeSet);
+  }
+
+  Future<void> _changePasscode(int userId) async {
+    final verified = await _verifyCurrentPasscode(
+      userId: userId,
+      titleKey: AppKeys.enterCurrentPasscodeTitle,
+      primaryLabelKey: AppKeys.passcodeContinue,
+    );
+    if (!mounted || !verified) {
+      return;
+    }
+
+    final changed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (routeContext) {
+          return PasscodeScreen(
+            mode: PasscodeScreenMode.setup,
+            titleKey: AppKeys.changePasscodeTitle,
+            primaryLabelKey: AppKeys.passcodeContinue,
+            onBack: () => Navigator.of(routeContext).pop(false),
+            onSubmit: (passcode) async {
+              await _passcodeService.setPasscode(
+                userId: userId,
+                passcode: passcode,
+              );
+              if (routeContext.mounted) {
+                Navigator.of(routeContext).pop(true);
+              }
+              return null;
+            },
+          );
+        },
+      ),
+    );
+
+    if (!mounted || changed != true) {
+      return;
+    }
+    setState(() => _hasPasscode = true);
+    _showSettingsSnack(AppKeys.passcodeChanged);
+  }
+
+  Future<void> _removePasscode(int userId) async {
+    final verified = await _verifyCurrentPasscode(
+      userId: userId,
+      titleKey: AppKeys.verifyPasscodeTitle,
+      primaryLabelKey: AppKeys.passcodeRemove,
+    );
+    if (!mounted || !verified) {
+      return;
+    }
+
+    try {
+      await _passcodeService.clearPasscode(userId);
+      if (!mounted) {
+        return;
+      }
+      setState(() => _hasPasscode = false);
+      _showSettingsSnack(AppKeys.passcodeRemoved);
+    } catch (_) {
+      _showSettingsSnack(AppKeys.passcodeRemoveFailed);
+    }
+  }
+
+  Future<bool> _verifyCurrentPasscode({
+    required int userId,
+    required String titleKey,
+    required String primaryLabelKey,
+  }) async {
+    final incorrectMessage = context.getText(AppKeys.passcodeIncorrect);
+    final verified = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (routeContext) {
+          return PasscodeScreen(
+            mode: PasscodeScreenMode.verify,
+            titleKey: titleKey,
+            primaryLabelKey: primaryLabelKey,
+            onBack: () => Navigator.of(routeContext).pop(false),
+            onSubmit: (passcode) async {
+              final isValid = await _passcodeService.verifyPasscode(
+                userId: userId,
+                passcode: passcode,
+              );
+              if (!isValid) {
+                return incorrectMessage;
+              }
+              if (routeContext.mounted) {
+                Navigator.of(routeContext).pop(true);
+              }
+              return null;
+            },
+          );
+        },
+      ),
+    );
+    return verified == true;
+  }
+
+  void _showSettingsSnack(String messageKey) {
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.getText(messageKey))),
+    );
+  }
 
   Future<void> _pushView(
     SettingPageView view, {
@@ -1104,10 +1321,13 @@ class _SettingTabState extends State<SettingTab> {
                             username: _fallbackUsername(_effectiveUser),
                             scale: scale,
                             currentLanguage: lingo.language,
+                            hasPasscode: _hasPasscode,
+                            isLoadingPasscode: _isLoadingPasscode,
                             onAccountTap: () =>
                                 _pushView(SettingPageView.account),
                             onProfileTap: () =>
                                 _pushView(SettingPageView.profile),
+                            onPasscodeTap: _openPasscodeSettings,
                             onLanguageChanged: _changeLanguage,
                             onLogoutTap: widget.onLogout,
                           ),

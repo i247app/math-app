@@ -11,6 +11,7 @@ import 'bloc/onboarding_cubit.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/otp_screen.dart';
+import 'screens/passcode_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'widgets/app_background.dart';
@@ -332,6 +333,25 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                             role: role,
                           );
                         },
+                      ),
+                    AppScreen.passcode => PasscodeScreen(
+                        key: ValueKey(
+                          'passcode-${state.passcodeFlow.name}',
+                        ),
+                        mode: state.passcodeFlow == PasscodeFlow.setup
+                            ? PasscodeScreenMode.setup
+                            : PasscodeScreenMode.unlock,
+                        onBack: cubit.cancelPasscodeUnlock,
+                        onSubmit: (passcode) async {
+                          await cubit.submitPasscode(passcode);
+                          return null;
+                        },
+                        onSkip: state.passcodeCanSkip
+                            ? cubit.skipPasscodeSetup
+                            : null,
+                        isBusy: state.isPasscodeBusy,
+                        errorText: state.passcodeError,
+                        errorId: state.passcodeErrorId,
                       ),
                     AppScreen.home => HomeScreen(
                         key: const ValueKey('home'),

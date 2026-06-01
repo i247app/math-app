@@ -6,6 +6,7 @@ import '../../../../core/network/profile_models.dart';
 import '../../data/active_profile_session.dart';
 import '../../data/avatar_picker.dart';
 import '../../data/otp_auth_api.dart';
+import '../../data/passcode_service.dart';
 import '../../data/profile_api.dart';
 import '../../domain/phone_region.dart';
 
@@ -14,12 +15,18 @@ enum AppScreen {
   login,
   otp,
   signup,
+  passcode,
   home,
 }
 
 enum OtpFlow {
   login,
   signup,
+}
+
+enum PasscodeFlow {
+  setup,
+  unlock,
 }
 
 class OnboardingState {
@@ -55,6 +62,15 @@ class OnboardingState {
     this.profiles = const <StudentProfile>[],
     this.activeProfile,
     this.profileLoadError,
+    this.passcodeFlow = PasscodeFlow.setup,
+    this.passcodeCanSkip = false,
+    this.isPasscodeBusy = false,
+    this.passcodeError,
+    this.passcodeErrorId = 0,
+    this.pendingLoginUser,
+    this.pendingProfiles = const <StudentProfile>[],
+    this.pendingActiveProfile,
+    this.pendingProfileLoadError,
   });
 
   final AppScreen screen;
@@ -88,6 +104,15 @@ class OnboardingState {
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
   final String? profileLoadError;
+  final PasscodeFlow passcodeFlow;
+  final bool passcodeCanSkip;
+  final bool isPasscodeBusy;
+  final String? passcodeError;
+  final int passcodeErrorId;
+  final LoginUser? pendingLoginUser;
+  final List<StudentProfile> pendingProfiles;
+  final StudentProfile? pendingActiveProfile;
+  final String? pendingProfileLoadError;
 
   ProfileRole get activeProfileRole => ProfileRole.fromProfile(activeProfile);
 
@@ -123,6 +148,15 @@ class OnboardingState {
     List<StudentProfile>? profiles,
     StudentProfile? activeProfile,
     String? profileLoadError,
+    PasscodeFlow? passcodeFlow,
+    bool? passcodeCanSkip,
+    bool? isPasscodeBusy,
+    String? passcodeError,
+    int? passcodeErrorId,
+    LoginUser? pendingLoginUser,
+    List<StudentProfile>? pendingProfiles,
+    StudentProfile? pendingActiveProfile,
+    String? pendingProfileLoadError,
     bool clearAvatarPath = false,
     bool clearAvatarError = false,
     bool clearAuthError = false,
@@ -138,6 +172,10 @@ class OnboardingState {
     bool clearProfiles = false,
     bool clearActiveProfile = false,
     bool clearProfileLoadError = false,
+    bool clearPasscodeError = false,
+    bool clearPendingSession = false,
+    bool clearPendingActiveProfile = false,
+    bool clearPendingProfileLoadError = false,
   }) {
     return OnboardingState(
       screen: screen ?? this.screen,
@@ -184,6 +222,25 @@ class OnboardingState {
       profileLoadError: clearProfiles || clearProfileLoadError
           ? null
           : profileLoadError ?? this.profileLoadError,
+      passcodeFlow: passcodeFlow ?? this.passcodeFlow,
+      passcodeCanSkip: passcodeCanSkip ?? this.passcodeCanSkip,
+      isPasscodeBusy: isPasscodeBusy ?? this.isPasscodeBusy,
+      passcodeError:
+          clearPasscodeError ? null : passcodeError ?? this.passcodeError,
+      passcodeErrorId: passcodeErrorId ?? this.passcodeErrorId,
+      pendingLoginUser: clearPendingSession
+          ? null
+          : pendingLoginUser ?? this.pendingLoginUser,
+      pendingProfiles: clearPendingSession
+          ? const <StudentProfile>[]
+          : pendingProfiles ?? this.pendingProfiles,
+      pendingActiveProfile: clearPendingSession || clearPendingActiveProfile
+          ? null
+          : pendingActiveProfile ?? this.pendingActiveProfile,
+      pendingProfileLoadError:
+          clearPendingSession || clearPendingProfileLoadError
+              ? null
+              : pendingProfileLoadError ?? this.pendingProfileLoadError,
     );
   }
 }
@@ -194,16 +251,19 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     OtpAuthService? authService,
     ProfileService? profileService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
+    PasscodeService passcodeService = const SecurePasscodeService(),
   })  : _avatarPicker = avatarPicker,
         _authService = authService ?? OtpAuthApi(),
         _profileService = profileService ?? ProfileApi(),
         _activeProfileSession = activeProfileSession,
+        _passcodeService = passcodeService,
         super(const OnboardingState());
 
   final AvatarPickerService _avatarPicker;
   final OtpAuthService _authService;
   final ProfileService _profileService;
   final ActiveProfileSession _activeProfileSession;
+  final PasscodeService _passcodeService;
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
@@ -229,6 +289,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         phoneLookupUser: null,
         clearProfiles: true,
         clearAuthError: true,
+        clearPendingSession: true,
+        clearPasscodeError: true,
       ));
     }
   }
@@ -250,20 +312,41 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           ? const _ResolvedProfiles.empty()
           : await _profilesForUser(user);
 
-      emit(
-        state.copyWith(
-          screen: user == null ? state.screen : AppScreen.home,
-          isRestoringSession: false,
-          loginUser: user,
-          profiles: profileResolution.profiles,
-          activeProfile: profileResolution.activeProfile,
-          profileLoadError: profileResolution.errorMessage,
-          clearAuthError: true,
-          clearProfiles: user == null,
-          clearActiveProfile: profileResolution.activeProfile == null,
-          clearProfileLoadError: profileResolution.errorMessage == null,
-        ),
-      );
+      if (user == null) {
+        emit(
+          state.copyWith(
+            isRestoringSession: false,
+            clearAuthError: true,
+            clearProfiles: true,
+            clearPendingSession: true,
+            clearPasscodeError: true,
+          ),
+        );
+        return;
+      }
+
+      if (await _passcodeService.hasPasscode(user.id)) {
+        emit(
+          state.copyWith(
+            screen: AppScreen.passcode,
+            isRestoringSession: false,
+            pendingLoginUser: user,
+            pendingProfiles: profileResolution.profiles,
+            pendingActiveProfile: profileResolution.activeProfile,
+            pendingProfileLoadError: profileResolution.errorMessage,
+            passcodeFlow: PasscodeFlow.unlock,
+            passcodeCanSkip: false,
+            clearAuthError: true,
+            clearPasscodeError: true,
+            clearPendingActiveProfile: profileResolution.activeProfile == null,
+            clearPendingProfileLoadError:
+                profileResolution.errorMessage == null,
+          ),
+        );
+        return;
+      }
+
+      _emitAuthenticatedHome(user, profileResolution);
     } catch (_) {
       if (!isClosed) {
         emit(state.copyWith(isRestoringSession: false));
@@ -557,19 +640,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       }
 
       final profileResolution = await _profilesForUser(result.user!);
-      emit(
-        state.copyWith(
-          screen: AppScreen.home,
-          isVerifyingOtp: false,
-          loginUser: result.user,
-          profiles: profileResolution.profiles,
-          activeProfile: profileResolution.activeProfile,
-          profileLoadError: profileResolution.errorMessage,
-          clearAuthError: true,
-          clearOtpError: true,
-          clearActiveProfile: profileResolution.activeProfile == null,
-          clearProfileLoadError: profileResolution.errorMessage == null,
-        ),
+      await _emitHomeOrPasscodeSetup(
+        user: result.user!,
+        profileResolution: profileResolution,
+        isVerifyingOtp: false,
       );
     } on OtpAuthException catch (error) {
       if (_isOtpValidationError(error.status)) {
@@ -645,18 +719,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         avatarPath: state.avatarPath,
       );
       final profileResolution = await _profilesForUser(user);
-      emit(
-        state.copyWith(
-          screen: AppScreen.home,
-          isSigningUp: false,
-          loginUser: user,
-          profiles: profileResolution.profiles,
-          activeProfile: profileResolution.activeProfile,
-          profileLoadError: profileResolution.errorMessage,
-          clearAuthError: true,
-          clearActiveProfile: profileResolution.activeProfile == null,
-          clearProfileLoadError: profileResolution.errorMessage == null,
-        ),
+      await _emitHomeOrPasscodeSetup(
+        user: user,
+        profileResolution: profileResolution,
+        isSigningUp: false,
       );
     } on OtpAuthException catch (error) {
       emit(
@@ -673,6 +739,165 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         ),
       );
     }
+  }
+
+  Future<void> submitPasscode(String passcode) async {
+    final user = state.pendingLoginUser;
+    if (state.isPasscodeBusy || user == null) {
+      return;
+    }
+
+    emit(state.copyWith(isPasscodeBusy: true, clearPasscodeError: true));
+
+    try {
+      switch (state.passcodeFlow) {
+        case PasscodeFlow.setup:
+          await _passcodeService.setPasscode(
+            userId: user.id,
+            passcode: passcode,
+          );
+          _completePendingHome(isPasscodeBusy: false);
+        case PasscodeFlow.unlock:
+          final isValid = await _passcodeService.verifyPasscode(
+            userId: user.id,
+            passcode: passcode,
+          );
+          if (!isValid) {
+            emit(
+              state.copyWith(
+                isPasscodeBusy: false,
+                passcodeError: AppStrings.current(AppKeys.passcodeIncorrect),
+                passcodeErrorId: state.passcodeErrorId + 1,
+              ),
+            );
+            return;
+          }
+          _completePendingHome(isPasscodeBusy: false);
+      }
+    } catch (_) {
+      emit(
+        state.copyWith(
+          isPasscodeBusy: false,
+          passcodeError: AppStrings.current(AppKeys.passcodeSaveFailed),
+          passcodeErrorId: state.passcodeErrorId + 1,
+        ),
+      );
+    }
+  }
+
+  void skipPasscodeSetup() {
+    if (state.passcodeFlow != PasscodeFlow.setup || !state.passcodeCanSkip) {
+      return;
+    }
+    _completePendingHome();
+  }
+
+  Future<void> cancelPasscodeUnlock() async {
+    if (state.passcodeFlow == PasscodeFlow.setup && state.passcodeCanSkip) {
+      skipPasscodeSetup();
+      return;
+    }
+
+    await logout();
+  }
+
+  Future<void> _emitHomeOrPasscodeSetup({
+    required LoginUser user,
+    required _ResolvedProfiles profileResolution,
+    bool? isVerifyingOtp,
+    bool? isSigningUp,
+  }) async {
+    final hasPasscode = await _passcodeService.hasPasscode(user.id);
+    if (hasPasscode) {
+      emit(
+        state.copyWith(
+          screen: AppScreen.home,
+          isVerifyingOtp: isVerifyingOtp,
+          isSigningUp: isSigningUp,
+          loginUser: user,
+          profiles: profileResolution.profiles,
+          activeProfile: profileResolution.activeProfile,
+          profileLoadError: profileResolution.errorMessage,
+          clearAuthError: true,
+          clearOtpError: true,
+          clearActiveProfile: profileResolution.activeProfile == null,
+          clearProfileLoadError: profileResolution.errorMessage == null,
+          clearPendingSession: true,
+          clearPasscodeError: true,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        screen: AppScreen.passcode,
+        isVerifyingOtp: isVerifyingOtp,
+        isSigningUp: isSigningUp,
+        pendingLoginUser: user,
+        pendingProfiles: profileResolution.profiles,
+        pendingActiveProfile: profileResolution.activeProfile,
+        pendingProfileLoadError: profileResolution.errorMessage,
+        passcodeFlow: PasscodeFlow.setup,
+        passcodeCanSkip: true,
+        clearAuthError: true,
+        clearOtpError: true,
+        clearPasscodeError: true,
+        clearPendingActiveProfile: profileResolution.activeProfile == null,
+        clearPendingProfileLoadError: profileResolution.errorMessage == null,
+      ),
+    );
+  }
+
+  void _emitAuthenticatedHome(
+    LoginUser user,
+    _ResolvedProfiles profileResolution,
+  ) {
+    emit(
+      state.copyWith(
+        screen: AppScreen.home,
+        isRestoringSession: false,
+        loginUser: user,
+        profiles: profileResolution.profiles,
+        activeProfile: profileResolution.activeProfile,
+        profileLoadError: profileResolution.errorMessage,
+        clearAuthError: true,
+        clearActiveProfile: profileResolution.activeProfile == null,
+        clearProfileLoadError: profileResolution.errorMessage == null,
+        clearPendingSession: true,
+        clearPasscodeError: true,
+      ),
+    );
+  }
+
+  void _completePendingHome({bool? isPasscodeBusy}) {
+    final user = state.pendingLoginUser;
+    if (user == null) {
+      emit(
+        state.copyWith(
+          screen: AppScreen.welcome,
+          isPasscodeBusy: isPasscodeBusy ?? false,
+          clearPendingSession: true,
+          clearPasscodeError: true,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        screen: AppScreen.home,
+        isPasscodeBusy: isPasscodeBusy ?? false,
+        loginUser: user,
+        profiles: state.pendingProfiles,
+        activeProfile: state.pendingActiveProfile,
+        profileLoadError: state.pendingProfileLoadError,
+        clearPendingSession: true,
+        clearPasscodeError: true,
+        clearActiveProfile: state.pendingActiveProfile == null,
+        clearProfileLoadError: state.pendingProfileLoadError == null,
+      ),
+    );
   }
 
   Future<_ResolvedProfiles> _profilesForUser(LoginUser user) async {
