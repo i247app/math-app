@@ -44,6 +44,12 @@ abstract class ClassroomExerciseService {
     required int classroomExerciseId,
     required String visibility,
   });
+
+  Future<ClassroomExerciseSubmissionResponse> submitExercise({
+    required int profileId,
+    required int classroomExerciseId,
+    required List<SubmitClassroomExerciseAnswer> answers,
+  });
 }
 
 class ClassroomExerciseApi implements ClassroomExerciseService {
@@ -145,6 +151,25 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
         ),
       );
       return response.exercise;
+    } on NetworkException catch (error) {
+      throw ClassroomExerciseException(error.message, status: error.status);
+    }
+  }
+
+  @override
+  Future<ClassroomExerciseSubmissionResponse> submitExercise({
+    required int profileId,
+    required int classroomExerciseId,
+    required List<SubmitClassroomExerciseAnswer> answers,
+  }) async {
+    try {
+      return await _networkApi.submitClassroomExercise(
+        SubmitClassroomExerciseRequest(
+          profileId: profileId,
+          classroomExerciseId: classroomExerciseId,
+          answers: answers,
+        ),
+      );
     } on NetworkException catch (error) {
       throw ClassroomExerciseException(error.message, status: error.status);
     }

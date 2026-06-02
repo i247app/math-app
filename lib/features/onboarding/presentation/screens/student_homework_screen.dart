@@ -7,6 +7,7 @@ import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/classroom_exercise_models.dart';
 import '../../data/classroom_exercise_api.dart';
+import 'student_homework_attempt_screen.dart';
 
 const _studentHomeworkBg = Color(0xFFF6FFFF);
 const _studentHomeworkTeal = Color(0xFF38898C);
@@ -72,6 +73,37 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
     }
   }
 
+  Future<void> _openExercise(ClassroomExercise exercise) async {
+    final exerciseId = exercise.stableId;
+    if (exerciseId == null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content:
+                Text(context.getText(AppKeys.studentHomeworkMissingExercise)),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(milliseconds: 1400),
+          ),
+        );
+      return;
+    }
+
+    final submitted = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => StudentHomeworkAttemptScreen(
+          exerciseId: exerciseId,
+          profileId: widget.profileId,
+          initialExercise: exercise,
+          exerciseService: _exerciseService,
+        ),
+      ),
+    );
+    if (submitted == true) {
+      _loadExercises();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,6 +156,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                           ),
                           child: _HomeworkAssignmentCard(
                             exercise: _exercises[index],
+                            onTap: () => _openExercise(_exercises[index]),
                           ),
                         ),
                   ],
@@ -328,9 +361,13 @@ class _HomeworkFilterChip extends StatelessWidget {
 }
 
 class _HomeworkAssignmentCard extends StatelessWidget {
-  const _HomeworkAssignmentCard({required this.exercise});
+  const _HomeworkAssignmentCard({
+    required this.exercise,
+    required this.onTap,
+  });
 
   final ClassroomExercise exercise;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -340,15 +377,7 @@ class _HomeworkAssignmentCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           HapticFeedback.selectionClick();
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(context.getText(AppKeys.studentClassComingSoon)),
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(milliseconds: 1400),
-              ),
-            );
+          onTap();
         },
         borderRadius: BorderRadius.circular(16),
         child: Ink(

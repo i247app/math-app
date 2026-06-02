@@ -150,6 +150,15 @@ class AppStrings {
       AppKeys.studentHomeworkQuestionCount: '30 câu hỏi',
       AppKeys.studentHomeworkDueDate: 'Hạn nộp: 31/05/2026',
       AppKeys.studentHomeworkDueFormat: 'Hạn nộp: {date}',
+      AppKeys.studentHomeworkLoadFailed:
+          'Không thể tải bài tập. Vui lòng thử lại.',
+      AppKeys.studentHomeworkNoQuestions: 'Bài tập chưa có câu hỏi.',
+      AppKeys.studentHomeworkQuestionMissingAnswers:
+          'Bài tập có câu hỏi chưa có đáp án.',
+      AppKeys.studentHomeworkSubmitSuccess: 'Đã nộp bài tập.',
+      AppKeys.studentHomeworkSubmitFailed:
+          'Nộp bài tập thất bại. Vui lòng thử lại.',
+      AppKeys.studentHomeworkMissingExercise: 'Không tìm thấy bài tập để nộp.',
       AppKeys.assessmentAction: 'Đánh Giá',
       AppKeys.viewAll: 'Xem tất cả',
       AppKeys.viewAllUpper: 'XEM TẤT CẢ',
@@ -619,6 +628,16 @@ class AppStrings {
       AppKeys.studentHomeworkQuestionCount: '30 questions',
       AppKeys.studentHomeworkDueDate: 'Due: 05/31/2026',
       AppKeys.studentHomeworkDueFormat: 'Due: {date}',
+      AppKeys.studentHomeworkLoadFailed:
+          'Could not load homework. Please try again.',
+      AppKeys.studentHomeworkNoQuestions: 'This homework has no questions yet.',
+      AppKeys.studentHomeworkQuestionMissingAnswers:
+          'This homework has a question with no answers.',
+      AppKeys.studentHomeworkSubmitSuccess: 'Homework submitted.',
+      AppKeys.studentHomeworkSubmitFailed:
+          'Failed to submit homework. Please try again.',
+      AppKeys.studentHomeworkMissingExercise:
+          'Could not find homework to submit.',
       AppKeys.assessmentAction: 'Assessment',
       AppKeys.viewAll: 'View all',
       AppKeys.viewAllUpper: 'VIEW ALL',

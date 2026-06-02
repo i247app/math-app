@@ -931,6 +931,28 @@ class NetworkApi {
     return exerciseResponse;
   }
 
+  Future<ClassroomExerciseSubmissionResponse> submitClassroomExercise(
+    SubmitClassroomExerciseRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/classroom-exercise/submissions/submit',
+      request.toJson(),
+    );
+    final submissionResponse =
+        ClassroomExerciseSubmissionResponse.fromJson(responseJson);
+    if (submissionResponse.mstatus != 200) {
+      throw NetworkException(
+        submissionResponse.mmessage ??
+            submissionResponse.debug ??
+            submissionResponse.status ??
+            'Request failed.',
+        status: submissionResponse.mstatus,
+      );
+    }
+
+    return submissionResponse;
+  }
+
   Future<ClassroomExerciseResponse> getClassroomExerciseDetail({
     required int exerciseId,
     required int profileId,

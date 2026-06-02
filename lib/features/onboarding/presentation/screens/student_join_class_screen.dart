@@ -7,8 +7,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/network/classroom_models.dart';
+import '../../../../core/network/grade_models.dart';
+import '../../../../core/network/school_models.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/classroom_api.dart';
+import '../../data/grade_api.dart';
+import '../../data/school_api.dart';
 
 const _joinTeal = Color(0xFF38898B);
 const _joinDeepTeal = Color(0xFF2E6F70);
@@ -30,11 +34,19 @@ class StudentJoinClassScreen extends StatefulWidget {
   const StudentJoinClassScreen({
     super.key,
     required this.profileId,
+    this.userId,
     ClassroomService? classroomService,
-  }) : _classroomService = classroomService;
+    GradeService? gradeService,
+    SchoolService? schoolService,
+  })  : _classroomService = classroomService,
+        _gradeService = gradeService,
+        _schoolService = schoolService;
 
   final int profileId;
+  final int? userId;
   final ClassroomService? _classroomService;
+  final GradeService? _gradeService;
+  final SchoolService? _schoolService;
 
   @override
   State<StudentJoinClassScreen> createState() => _StudentJoinClassScreenState();
@@ -43,13 +55,28 @@ class StudentJoinClassScreen extends StatefulWidget {
 class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
+  late final GradeService _gradeService = widget._gradeService ?? GradeApi();
+  late final SchoolService _schoolService =
+      widget._schoolService ?? SchoolApi();
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   List<ClassroomModel> _results = const <ClassroomModel>[];
+  List<GradeModel> _grades = const <GradeModel>[];
+  List<SchoolModel> _schools = const <SchoolModel>[];
   bool _isSearching = false;
   bool _hasSearched = false;
+  bool _isLoadingFilters = false;
   int? _joiningClassroomId;
+  final Set<int> _selectedGradeIds = <int>{};
+  final Set<int> _selectedSchoolIds = <int>{};
   String? _error;
+  String? _filterError;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFilterOptions();
+  }
 
   @override
   void dispose() {
@@ -61,13 +88,15 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
   void _onSearchChanged(String value) {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 450), () {
-      _search(value);
+      _search();
     });
   }
 
-  Future<void> _search(String rawValue) async {
-    final search = rawValue.trim();
-    if (search.isEmpty) {
+  Future<void> _search([String? rawValue]) async {
+    final search = (rawValue ?? _searchController.text).trim();
+    final gradeIds = Set<int>.from(_selectedGradeIds);
+    final schoolIds = Set<int>.from(_selectedSchoolIds);
+    if (search.isEmpty && gradeIds.isEmpty && schoolIds.isEmpty) {
       setState(() {
         _results = const <ClassroomModel>[];
         _hasSearched = false;
@@ -85,14 +114,22 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
     try {
       final results = await _classroomService.searchClassrooms(
         profileId: widget.profileId,
-        search: search,
+        search: search.isEmpty ? null : search,
+        gradeIds: gradeIds.toList(growable: false),
+        schoolIds: schoolIds.toList(growable: false),
       );
-      if (!mounted || _searchController.text.trim() != search) {
+      if (!mounted ||
+          _searchController.text.trim() != search ||
+          !_setEquals(_selectedGradeIds, gradeIds) ||
+          !_setEquals(_selectedSchoolIds, schoolIds)) {
         return;
       }
       setState(() => _results = results);
     } catch (error) {
-      if (!mounted || _searchController.text.trim() != search) {
+      if (!mounted ||
+          _searchController.text.trim() != search ||
+          !_setEquals(_selectedGradeIds, gradeIds) ||
+          !_setEquals(_selectedSchoolIds, schoolIds)) {
         return;
       }
       setState(() {
@@ -102,10 +139,121 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
             : context.readText(AppKeys.studentClassSearchFailed);
       });
     } finally {
-      if (mounted && _searchController.text.trim() == search) {
+      if (mounted &&
+          _searchController.text.trim() == search &&
+          _setEquals(_selectedGradeIds, gradeIds) &&
+          _setEquals(_selectedSchoolIds, schoolIds)) {
         setState(() => _isSearching = false);
       }
     }
+  }
+
+  Future<void> _loadFilterOptions() async {
+    final userId = widget.userId;
+    setState(() {
+      _isLoadingFilters = true;
+      _filterError = null;
+    });
+
+    try {
+      final results = await Future.wait<Object>([
+        if (userId != null && userId > 0)
+          _gradeService.listGrades(userId: userId)
+        else
+          Future<List<GradeModel>>.value(const <GradeModel>[]),
+        _schoolService.listSchools(),
+      ]);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _grades = (results[0] as List<GradeModel>)
+            .where((grade) => _gradeStableId(grade) != null)
+            .toList(growable: false);
+        _schools = (results[1] as List<SchoolModel>)
+            .where((school) => _schoolStableId(school) != null)
+            .toList(growable: false);
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _filterError = error is GradeException || error is SchoolException
+            ? error.toString()
+            : context.readText(AppKeys.studentClassSearchFailed);
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingFilters = false);
+      }
+    }
+  }
+
+  void _selectGrade(GradeModel grade) {
+    final gradeId = _gradeStableId(grade);
+    if (gradeId == null) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() {
+      if (!_selectedGradeIds.add(gradeId)) {
+        _selectedGradeIds.remove(gradeId);
+      }
+    });
+    _search();
+  }
+
+  void _removeGrade(int gradeId) {
+    if (!_selectedGradeIds.contains(gradeId)) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() => _selectedGradeIds.remove(gradeId));
+    _search();
+  }
+
+  Future<void> _openSchoolPicker() async {
+    if (_schools.isEmpty) {
+      HapticFeedback.selectionClick();
+      return;
+    }
+    final selectedSchoolIds = await showModalBottomSheet<Set<int>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return _SchoolFilterBottomSheet(
+          schools: _schools,
+          selectedSchoolIds: _selectedSchoolIds,
+        );
+      },
+    );
+    if (!mounted || selectedSchoolIds == null) {
+      return;
+    }
+    if (_setEquals(_selectedSchoolIds, selectedSchoolIds)) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() {
+      _selectedSchoolIds
+        ..clear()
+        ..addAll(selectedSchoolIds);
+    });
+    _search();
+  }
+
+  void _removeSchool(int schoolId) {
+    if (!_selectedSchoolIds.contains(schoolId)) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() => _selectedSchoolIds.remove(schoolId));
+    _search();
   }
 
   Future<void> _joinClassroom(ClassroomModel classroom) async {
@@ -198,7 +346,18 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
                   const SizedBox(height: 26),
                   const _SearchSectionTitle(),
                   const SizedBox(height: 10),
-                  const _JoinFilterPanel(),
+                  _JoinFilterPanel(
+                    grades: _grades,
+                    schools: _schools,
+                    selectedGradeIds: _selectedGradeIds,
+                    selectedSchoolIds: _selectedSchoolIds,
+                    isLoading: _isLoadingFilters,
+                    error: _filterError,
+                    onGradeTap: _selectGrade,
+                    onGradeRemove: _removeGrade,
+                    onSchoolTap: _openSchoolPicker,
+                    onSchoolRemove: _removeSchool,
+                  ),
                   const SizedBox(height: 17),
                   Text(
                     context.getText(AppKeys.studentSearchResults),
@@ -261,8 +420,7 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
         for (var index = 0; index < _results.length; index++) ...[
           _JoinClassCard(
             classroom: _results[index],
-            isJoining:
-                _joiningClassroomId == (_results[index].stableId ?? -1),
+            isJoining: _joiningClassroomId == (_results[index].stableId ?? -1),
             onJoin: () => _joinClassroom(_results[index]),
           ),
           if (index != _results.length - 1) const SizedBox(height: 16),
@@ -443,11 +601,33 @@ class _SearchSectionTitle extends StatelessWidget {
 }
 
 class _JoinFilterPanel extends StatelessWidget {
-  const _JoinFilterPanel();
+  const _JoinFilterPanel({
+    required this.grades,
+    required this.schools,
+    required this.selectedGradeIds,
+    required this.selectedSchoolIds,
+    required this.isLoading,
+    required this.error,
+    required this.onGradeTap,
+    required this.onGradeRemove,
+    required this.onSchoolTap,
+    required this.onSchoolRemove,
+  });
+
+  final List<GradeModel> grades;
+  final List<SchoolModel> schools;
+  final Set<int> selectedGradeIds;
+  final Set<int> selectedSchoolIds;
+  final bool isLoading;
+  final String? error;
+  final ValueChanged<GradeModel> onGradeTap;
+  final ValueChanged<int> onGradeRemove;
+  final VoidCallback onSchoolTap;
+  final ValueChanged<int> onSchoolRemove;
 
   @override
   Widget build(BuildContext context) {
-    final grades = <String>['1', '2', '3', '4', '5'];
+    final selectedSchools = _selectedSchools(schools, selectedSchoolIds);
 
     return Container(
       width: double.infinity,
@@ -464,54 +644,308 @@ class _JoinFilterPanel extends StatelessWidget {
         children: [
           _FilterLabel(context.getText(AppKeys.school)),
           const SizedBox(height: 7),
-          Container(
-            height: 43,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFC4C6D2)),
-            ),
-            child: Row(
+          _SchoolFilterField(
+            valueText: selectedSchools.isEmpty
+                ? context.getText(AppKeys.chooseSchool)
+                : selectedSchools
+                    .map((school) => _schoolName(context, school))
+                    .join(', '),
+            selected: selectedSchools.isNotEmpty,
+            isLoading: isLoading,
+            onTap: onSchoolTap,
+          ),
+          if (selectedSchools.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                Expanded(
-                  child: Text(
-                    context.getText(AppKeys.studentDefaultSchoolFilter),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: _joinInk,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+                for (final school in selectedSchools)
+                  _SelectedFilterPill(
+                    label: _schoolName(context, school),
+                    onRemove: () {
+                      final schoolId = _schoolStableId(school);
+                      if (schoolId != null) {
+                        onSchoolRemove(schoolId);
+                      }
+                    },
+                  ),
+              ],
+            ),
+          ],
+          if (error != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              error!,
+              style: const TextStyle(
+                color: Color(0xFFA03A0F),
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+          const SizedBox(height: 13),
+          _FilterLabel(context.getText(AppKeys.grade)),
+          const SizedBox(height: 7),
+          if (isLoading && grades.isEmpty)
+            const SizedBox(
+              height: 30,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            )
+          else if (grades.isEmpty)
+            Text(
+              context.getText(AppKeys.noGrades),
+              style: const TextStyle(
+                color: _joinMuted,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            )
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: grades.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 10,
+                mainAxisExtent: 30,
+              ),
+              itemBuilder: (context, index) {
+                final grade = grades[index];
+                return _GradeChip(
+                  label: _gradeLabel(context, grade),
+                  selected: selectedGradeIds.contains(_gradeStableId(grade)),
+                  onTap: () => onGradeTap(grade),
+                  onRemove: () {
+                    final gradeId = _gradeStableId(grade);
+                    if (gradeId != null) {
+                      onGradeRemove(gradeId);
+                    }
+                  },
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SchoolFilterField extends StatelessWidget {
+  const _SchoolFilterField({
+    required this.valueText,
+    required this.selected,
+    required this.isLoading,
+    required this.onTap,
+  });
+
+  final String valueText;
+  final bool selected;
+  final bool isLoading;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: isLoading ? null : onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Ink(
+          height: 43,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFC4C6D2)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  valueText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: selected ? _joinInk : _joinMuted,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
+              ),
+              if (isLoading)
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
                 SvgPicture.asset(
                   _studentJoinDropdownIcon,
                   width: 10,
                   height: 5,
                 ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SchoolFilterBottomSheet extends StatelessWidget {
+  const _SchoolFilterBottomSheet({
+    required this.schools,
+    required this.selectedSchoolIds,
+  });
+
+  final List<SchoolModel> schools;
+  final Set<int> selectedSchoolIds;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final draftSelectedIds = Set<int>.from(selectedSchoolIds);
+    return StatefulBuilder(
+      builder: (context, setModalState) {
+        return SafeArea(
+          top: false,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height * 0.72,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
+                  child: Text(
+                    context.getText(AppKeys.chooseSchool),
+                    style: const TextStyle(
+                      color: _joinBlue,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.fromLTRB(8, 0, 8, bottomInset + 12),
+                    children: [
+                      _SchoolOptionTile(
+                        label: context.getText(AppKeys.studentClassAll),
+                        selected: draftSelectedIds.isEmpty,
+                        onTap: () => setModalState(draftSelectedIds.clear),
+                      ),
+                      for (final school in schools)
+                        _SchoolOptionTile(
+                          label: _schoolName(context, school),
+                          selected: draftSelectedIds.contains(
+                            _schoolStableId(school),
+                          ),
+                          onTap: () {
+                            final schoolId = _schoolStableId(school);
+                            if (schoolId == null) {
+                              return;
+                            }
+                            setModalState(() {
+                              if (!draftSelectedIds.add(schoolId)) {
+                                draftSelectedIds.remove(schoolId);
+                              }
+                            });
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(20, 8, 20, bottomInset + 16),
+                  child: ElevatedButton(
+                    onPressed: () =>
+                        Navigator.of(context).pop(draftSelectedIds),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _joinDeepTeal,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(46),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    child: Text(
+                      context.getText(AppKeys.continueUpper),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          const SizedBox(height: 13),
-          _FilterLabel(context.getText(AppKeys.grade)),
-          const SizedBox(height: 7),
-          Wrap(
-            spacing: 8,
-            runSpacing: 10,
+        );
+      },
+    );
+  }
+}
+
+class _SchoolOptionTile extends StatelessWidget {
+  const _SchoolOptionTile({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Row(
             children: [
-              for (final grade in grades)
-                _GradeChip(
-                  label: context.formatText(
-                    AppKeys.studentGradeFilter,
-                    {'grade': grade},
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: selected ? _joinTeal : _joinInk,
+                    fontSize: 15,
+                    fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
                   ),
-                  selected: grade == '1',
+                ),
+              ),
+              if (selected)
+                const Icon(
+                  Icons.check_rounded,
+                  color: _joinTeal,
+                  size: 20,
                 ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -537,42 +971,175 @@ class _FilterLabel extends StatelessWidget {
   }
 }
 
+List<SchoolModel> _selectedSchools(
+  List<SchoolModel> schools,
+  Set<int> selectedSchoolIds,
+) {
+  if (selectedSchoolIds.isEmpty) {
+    return const <SchoolModel>[];
+  }
+  return schools
+      .where((school) => selectedSchoolIds.contains(_schoolStableId(school)))
+      .toList(growable: false);
+}
+
+int? _gradeStableId(GradeModel grade) => grade.gradeId ?? grade.id;
+
+int? _schoolStableId(SchoolModel school) => school.schoolId ?? school.id;
+
+String _gradeLabel(BuildContext context, GradeModel grade) {
+  final label = grade.label?.trim();
+  if (label != null && label.isNotEmpty) {
+    return label;
+  }
+  final description = grade.description?.trim();
+  if (description != null && description.isNotEmpty) {
+    return description;
+  }
+  final id = _gradeStableId(grade);
+  return id == null
+      ? context.getText(AppKeys.grade)
+      : context.formatText(AppKeys.studentGradeFilter, {'grade': id});
+}
+
+String _schoolName(BuildContext context, SchoolModel school) {
+  final name = school.name?.trim();
+  if (name != null && name.isNotEmpty) {
+    return name;
+  }
+  final id = _schoolStableId(school);
+  return id == null ? context.getText(AppKeys.school) : 'ID: $id';
+}
+
+bool _setEquals(Set<int> first, Set<int> second) {
+  if (first.length != second.length) {
+    return false;
+  }
+  for (final value in first) {
+    if (!second.contains(value)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 class _GradeChip extends StatelessWidget {
   const _GradeChip({
     required this.label,
     required this.selected,
+    required this.onTap,
+    required this.onRemove,
   });
 
   final String label;
   final bool selected;
+  final VoidCallback onTap;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: 66,
+            minHeight: 30,
+            maxHeight: 30,
+          ),
+          child: Ink(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: selected ? _joinTeal : const Color(0xFFE0E3E6),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: selected ? Colors.white : _joinMuted,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                ),
+                if (selected) ...[
+                  const SizedBox(width: 4),
+                  GestureDetector(
+                    onTap: onRemove,
+                    child: const Icon(
+                      Icons.close_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SelectedFilterPill extends StatelessWidget {
+  const _SelectedFilterPill({
+    required this.label,
+    required this.onRemove,
+  });
+
+  final String label;
+  final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(
-        minWidth: 66,
-        maxWidth: 72,
-      ),
+      constraints: const BoxConstraints(maxWidth: 220),
       height: 30,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      alignment: Alignment.center,
+      padding: const EdgeInsets.only(left: 12, right: 8),
       decoration: BoxDecoration(
-        color: selected ? _joinTeal : const Color(0xFFE0E3E6),
+        color: _joinTeal,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          label,
-          maxLines: 1,
-          style: TextStyle(
-            color: selected ? Colors.white : _joinMuted,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            height: 1,
-            letterSpacing: 0,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
-        ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: onRemove,
+            child: const Icon(
+              Icons.close_rounded,
+              color: Colors.white,
+              size: 14,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -31,11 +31,15 @@ class ClassroomListRequest {
     required this.profileId,
     this.ownerProfileId,
     this.search,
+    this.gradeIds,
+    this.schoolIds,
   });
 
   final int profileId;
   final int? ownerProfileId;
   final String? search;
+  final List<int>? gradeIds;
+  final List<int>? schoolIds;
 
   factory ClassroomListRequest.fromJson(Map<String, dynamic> json) =>
       _$ClassroomListRequestFromJson(json);

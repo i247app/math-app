@@ -1367,6 +1367,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       MaterialPageRoute<bool>(
         builder: (_) => StudentJoinClassScreen(
           profileId: profileId,
+          userId: widget.user?.id,
           classroomService: _classroomService,
         ),
       ),

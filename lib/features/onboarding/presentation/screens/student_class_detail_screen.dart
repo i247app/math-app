@@ -9,6 +9,7 @@ import '../../../../core/network/classroom_models.dart';
 import '../../../../core/network/classroom_exercise_models.dart';
 import '../../data/classroom_api.dart';
 import '../../data/classroom_exercise_api.dart';
+import 'student_homework_attempt_screen.dart';
 import 'student_homework_screen.dart';
 
 const _studentClassBg = Color(0xFFF6FFFF);
@@ -685,14 +686,35 @@ class _UpcomingDeadlineSection extends StatelessWidget {
               ),
               child: _UpcomingDeadlineTile(
                 exercise: upcomingExercises[index],
-                onTap: () => Navigator.of(context).push<void>(
-                  MaterialPageRoute<void>(
-                    builder: (_) => StudentHomeworkScreen(
-                      classroomId: classroomId,
-                      profileId: profileId,
+                onTap: () {
+                  final exercise = upcomingExercises[index];
+                  final exerciseId = exercise.stableId;
+                  if (exerciseId == null) {
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            context.getText(
+                              AppKeys.studentHomeworkMissingExercise,
+                            ),
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(milliseconds: 1400),
+                        ),
+                      );
+                    return;
+                  }
+                  Navigator.of(context).push<void>(
+                    MaterialPageRoute<void>(
+                      builder: (_) => StudentHomeworkAttemptScreen(
+                        exerciseId: exerciseId,
+                        profileId: profileId,
+                        initialExercise: exercise,
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
       ],

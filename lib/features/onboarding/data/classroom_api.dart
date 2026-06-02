@@ -21,7 +21,9 @@ abstract class ClassroomService {
 
   Future<List<ClassroomModel>> searchClassrooms({
     required int profileId,
-    required String search,
+    String? search,
+    List<int>? gradeIds,
+    List<int>? schoolIds,
   });
 
   Future<void> joinClassroomByCode({
@@ -133,11 +135,18 @@ class ClassroomApi implements ClassroomService {
   @override
   Future<List<ClassroomModel>> searchClassrooms({
     required int profileId,
-    required String search,
+    String? search,
+    List<int>? gradeIds,
+    List<int>? schoolIds,
   }) async {
     try {
       final response = await _networkApi.listClassrooms(
-        ClassroomListRequest(profileId: profileId, search: search),
+        ClassroomListRequest(
+          profileId: profileId,
+          search: search?.trim().isEmpty == true ? null : search?.trim(),
+          gradeIds: gradeIds?.isEmpty == true ? null : gradeIds,
+          schoolIds: schoolIds?.isEmpty == true ? null : schoolIds,
+        ),
       );
       return response.classrooms;
     } on NetworkException catch (error) {

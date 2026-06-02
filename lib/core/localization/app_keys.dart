@@ -155,6 +155,14 @@ class AppKeys {
   static const studentHomeworkQuestionCount = 'student_homework_question_count';
   static const studentHomeworkDueDate = 'student_homework_due_date';
   static const studentHomeworkDueFormat = 'student_homework_due_format';
+  static const studentHomeworkLoadFailed = 'student_homework_load_failed';
+  static const studentHomeworkNoQuestions = 'student_homework_no_questions';
+  static const studentHomeworkQuestionMissingAnswers =
+      'student_homework_question_missing_answers';
+  static const studentHomeworkSubmitSuccess = 'student_homework_submit_success';
+  static const studentHomeworkSubmitFailed = 'student_homework_submit_failed';
+  static const studentHomeworkMissingExercise =
+      'student_homework_missing_exercise';
   static const assessmentAction = 'assessment_action';
   static const viewAll = 'view_all';
   static const viewAllUpper = 'view_all_upper';
