@@ -688,6 +688,22 @@ class _UpcomingDeadlineSection extends StatelessWidget {
                 exercise: upcomingExercises[index],
                 onTap: () {
                   final exercise = upcomingExercises[index];
+                  if (_studentClassHomeworkIsSubmitted(exercise)) {
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            context.getText(
+                              AppKeys.studentHomeworkAlreadySubmitted,
+                            ),
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(milliseconds: 1400),
+                        ),
+                      );
+                    return;
+                  }
                   final exerciseId = exercise.stableId;
                   if (exerciseId == null) {
                     ScaffoldMessenger.of(context)
@@ -975,6 +991,10 @@ String _studentClassHomeworkDueDate(
     AppKeys.studentHomeworkDueFormat,
     {'date': date},
   );
+}
+
+bool _studentClassHomeworkIsSubmitted(ClassroomExercise exercise) {
+  return exercise.submissionStatus?.trim().toUpperCase() == 'SUBMITTED';
 }
 
 String? _studentClassDateTimeLabel(String? value) {

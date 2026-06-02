@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -64,29 +62,36 @@ class _WelcomeComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Stack(
-          clipBehavior: Clip.hardEdge,
-          children: [
-            const Positioned.fill(
-              child: ColoredBox(color: WelcomeScreen._background),
-            ),
-            Positioned(
-              left: math.max(0, (constraints.maxWidth - 284) / 2),
-              top: 75,
+    return Stack(
+      clipBehavior: Clip.hardEdge,
+      children: [
+        const Positioned.fill(
+          child: ColoredBox(color: WelcomeScreen._background),
+        ),
+        const Positioned(
+          left: 0,
+          right: 0,
+          top: 75,
+          height: 284,
+          child: Center(
+            child: SizedBox(
               width: 284,
               height: 284,
-              child: const Image(
+              child: Image(
                 image: AssetImage(_mascotAsset),
                 fit: BoxFit.cover,
               ),
             ),
-            Positioned(
-              left: math.max(0, (constraints.maxWidth - 211) / 2),
-              top: 329,
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 329,
+          height: 48,
+          child: Center(
+            child: SizedBox(
               width: 211,
-              height: 48,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
@@ -116,9 +121,14 @@ class _WelcomeComposition extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              left: math.max(0, (constraints.maxWidth - 170) / 2),
-              top: 385,
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 385,
+          child: Center(
+            child: SizedBox(
               width: 170,
               child: Text.rich(
                 TextSpan(
@@ -145,9 +155,15 @@ class _WelcomeComposition extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            Positioned(
-              left: math.max(0, (constraints.maxWidth - 48) / 2),
-              top: 443,
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 443,
+          height: 6,
+          child: Center(
+            child: SizedBox(
               width: 48,
               height: 6,
               child: DecoratedBox(
@@ -157,9 +173,15 @@ class _WelcomeComposition extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              left: (constraints.maxWidth - 470) / 2,
-              top: 425,
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 425,
+          height: 375,
+          child: Center(
+            child: SizedBox(
               width: 470,
               height: 375,
               child: Opacity(
@@ -173,9 +195,15 @@ class _WelcomeComposition extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              left: (constraints.maxWidth - 361) / 2,
-              top: 499,
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 499,
+          height: 209,
+          child: Center(
+            child: SizedBox(
               width: 361,
               height: 209,
               child: ClipRect(
@@ -186,16 +214,22 @@ class _WelcomeComposition extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              left: math.max(0, (constraints.maxWidth - 230) / 2),
-              top: 688,
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 688,
+          height: 58,
+          child: Center(
+            child: SizedBox(
               width: 230,
               height: 58,
               child: _StartButton(onStart: onStart),
             ),
-          ],
-        );
-      },
+          ),
+        ),
+      ],
     );
   }
 }

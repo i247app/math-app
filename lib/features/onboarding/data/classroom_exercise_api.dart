@@ -18,6 +18,7 @@ abstract class ClassroomExerciseService {
     required int profileId,
     String? search,
     String? visibility,
+    String? submissionStatus,
   });
 
   Future<ClassroomExercise?> createExercise({
@@ -67,6 +68,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required int profileId,
     String? search,
     String? visibility,
+    String? submissionStatus,
   }) async {
     try {
       final response = await _networkApi.listClassroomExercises(
@@ -76,6 +78,9 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
           search: search?.trim().isEmpty == true ? null : search?.trim(),
           visibility:
               visibility?.trim().isEmpty == true ? null : visibility?.trim(),
+          submissionStatus: submissionStatus?.trim().isEmpty == true
+              ? null
+              : submissionStatus?.trim(),
         ),
       );
       return response.exercises;

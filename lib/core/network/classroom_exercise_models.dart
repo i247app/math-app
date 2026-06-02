@@ -9,12 +9,14 @@ class ClassroomExerciseListRequest {
     required this.profileId,
     this.search,
     this.visibility,
+    this.submissionStatus,
   });
 
   final int classroomId;
   final int profileId;
   final String? search;
   final String? visibility;
+  final String? submissionStatus;
 
   factory ClassroomExerciseListRequest.fromJson(Map<String, dynamic> json) =>
       _$ClassroomExerciseListRequestFromJson(json);
@@ -331,6 +333,7 @@ class ClassroomExercise {
     this.description,
     this.visibility,
     this.status,
+    this.submissionStatus,
     this.startDate,
     this.endDate,
     this.createDt,
@@ -366,6 +369,8 @@ class ClassroomExercise {
   @JsonKey(fromJson: _stringFromJson)
   final String? status;
   @JsonKey(fromJson: _stringFromJson)
+  final String? submissionStatus;
+  @JsonKey(fromJson: _stringFromJson)
   final String? startDate;
   @JsonKey(fromJson: _stringFromJson)
   final String? endDate;
@@ -396,6 +401,7 @@ class ClassroomExercise {
             json['exercise_description'] ??
             _nestedValue(json['metadata'], 'description'),
         'status': json['status'] ?? json['exercise_status'],
+        'submission_status': json['submission_status'],
         'questions': questionsValue,
       },
     );

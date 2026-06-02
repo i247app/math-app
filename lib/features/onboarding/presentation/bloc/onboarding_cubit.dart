@@ -337,7 +337,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     );
 
     try {
-      final user = await _authService.restoreSession();
+      final userId = await _passcodeService.lastPasscodeUserId();
       if (isClosed) {
         return;
       }
@@ -346,23 +346,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         return;
       }
 
-      var canUsePin = false;
-      if (user != null && user.id > 0) {
-        canUsePin = await _passcodeService.hasPasscode(user.id);
-      }
-      if (isClosed) {
-        return;
-      }
-      if (state.screen != AppScreen.login) {
-        emit(state.copyWith(isCheckingPinLogin: false));
-        return;
-      }
-
+      final canUsePin = userId != null && userId > 0;
       emit(
         state.copyWith(
           isCheckingPinLogin: false,
           canLoginWithPin: canUsePin,
-          pinLoginUser: canUsePin ? user : null,
+          pinLoginUser: canUsePin ? LoginUser(id: userId) : null,
           clearPinLoginUser: !canUsePin,
         ),
       );

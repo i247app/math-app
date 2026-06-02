@@ -10,6 +10,8 @@ class PasscodeException implements Exception {
 }
 
 abstract class PasscodeService {
+  Future<int?> lastPasscodeUserId();
+
   Future<bool> hasPasscode(int userId);
 
   Future<void> setPasscode({
@@ -31,8 +33,24 @@ class SecurePasscodeService implements PasscodeService {
   }) : _storage = storage;
 
   static const _keyPrefix = 'local_passcode_v1_user_';
+  static const _lastUserIdKey = 'local_passcode_v1_last_user_id';
 
   final FlutterSecureStorage _storage;
+
+  @override
+  Future<int?> lastPasscodeUserId() async {
+    final value = await _storage.read(key: _lastUserIdKey);
+    final userId = int.tryParse(value?.trim() ?? '');
+    if (userId != null && userId > 0 && await hasPasscode(userId)) {
+      return userId;
+    }
+
+    if (userId != null) {
+      await _storage.delete(key: _lastUserIdKey);
+    }
+
+    return _findExistingPasscodeUserId();
+  }
 
   @override
   Future<bool> hasPasscode(int userId) async {
@@ -53,6 +71,10 @@ class SecurePasscodeService implements PasscodeService {
     await _storage.write(
       key: _storageKey(userId),
       value: passcode,
+    );
+    await _storage.write(
+      key: _lastUserIdKey,
+      value: '$userId',
     );
   }
 
@@ -75,6 +97,10 @@ class SecurePasscodeService implements PasscodeService {
       return;
     }
     await _storage.delete(key: _storageKey(userId));
+    final lastUserId = await lastPasscodeUserId();
+    if (lastUserId == userId) {
+      await _storage.delete(key: _lastUserIdKey);
+    }
   }
 
   Future<String?> _readPasscode(int userId) async {
@@ -84,6 +110,27 @@ class SecurePasscodeService implements PasscodeService {
       return null;
     }
     return passcode;
+  }
+
+  Future<int?> _findExistingPasscodeUserId() async {
+    final values = await _storage.readAll();
+    for (final entry in values.entries) {
+      if (!entry.key.startsWith(_keyPrefix)) {
+        continue;
+      }
+      final passcode = entry.value.trim();
+      if (!RegExp(r'^\d{4}$').hasMatch(passcode)) {
+        continue;
+      }
+      final userIdText = entry.key.substring(_keyPrefix.length);
+      final userId = int.tryParse(userIdText);
+      if (userId == null || userId <= 0) {
+        continue;
+      }
+      await _storage.write(key: _lastUserIdKey, value: '$userId');
+      return userId;
+    }
+    return null;
   }
 
   static void _validateInput({

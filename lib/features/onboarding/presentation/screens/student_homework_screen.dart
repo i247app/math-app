@@ -71,6 +71,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
     }
     HapticFeedback.selectionClick();
     setState(() => _activeFilter = filter);
+    _loadExercises(search: _searchController.text);
   }
 
   Future<void> _loadExercises({String? search}) async {
@@ -85,6 +86,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
         profileId: widget.profileId,
         search: normalizedSearch.isEmpty ? null : normalizedSearch,
         visibility: 'PUBLIC',
+        submissionStatus: _activeFilter.submissionStatus,
       );
       if (!mounted || _searchController.text.trim() != normalizedSearch) {
         return;
@@ -103,6 +105,21 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
   }
 
   Future<void> _openExercise(ClassroomExercise exercise) async {
+    if (_studentHomeworkIsSubmitted(exercise)) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              context.getText(AppKeys.studentHomeworkAlreadySubmitted),
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(milliseconds: 1400),
+          ),
+        );
+      return;
+    }
+
     final exerciseId = exercise.stableId;
     if (exerciseId == null) {
       ScaffoldMessenger.of(context)
@@ -423,13 +440,14 @@ class _HomeworkFilterTabs extends StatelessWidget {
 }
 
 enum _HomeworkFilter {
-  notSubmitted(AppKeys.studentHomeworkNotSubmitted),
-  submitted(AppKeys.studentHomeworkSubmitted),
-  overdue(AppKeys.studentHomeworkOverdue);
+  notSubmitted(AppKeys.studentHomeworkNotSubmitted, 'NOT_SUBMITTED'),
+  submitted(AppKeys.studentHomeworkSubmitted, 'SUBMITTED'),
+  overdue(AppKeys.studentHomeworkOverdue, 'NOT_SUBMITTED');
 
-  const _HomeworkFilter(this.labelKey);
+  const _HomeworkFilter(this.labelKey, this.submissionStatus);
 
   final String labelKey;
+  final String? submissionStatus;
 }
 
 class _HomeworkFilterChip extends StatelessWidget {
@@ -514,16 +532,24 @@ class _HomeworkAssignmentCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                _studentHomeworkCreatedDate(exercise),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: _studentHomeworkMuted,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  height: 16 / 12,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _studentHomeworkCreatedDate(exercise),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.andika(
+                        color: _studentHomeworkMuted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        height: 16 / 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _HomeworkStatusBadge(exercise: exercise),
+                ],
               ),
               const SizedBox(height: 8),
               Text(
@@ -587,6 +613,49 @@ class _HomeworkAssignmentCard extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeworkStatusBadge extends StatelessWidget {
+  const _HomeworkStatusBadge({required this.exercise});
+
+  final ClassroomExercise exercise;
+
+  @override
+  Widget build(BuildContext context) {
+    final submitted = _studentHomeworkIsSubmitted(exercise);
+    final overdue = _studentHomeworkIsOverdue(exercise);
+    final labelKey = submitted
+        ? AppKeys.studentHomeworkSubmitted
+        : overdue
+            ? AppKeys.studentHomeworkOverdue
+            : AppKeys.studentHomeworkNotSubmitted;
+    final color = submitted
+        ? const Color(0xFF2E7D32)
+        : overdue
+            ? const Color(0xFFC2410C)
+            : _studentHomeworkTeal;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        child: Text(
+          context.getText(labelKey),
+          maxLines: 1,
+          style: GoogleFonts.andika(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            height: 16 / 12,
           ),
         ),
       ),
@@ -662,14 +731,7 @@ List<ClassroomExercise> _filteredExercises(
 }
 
 bool _studentHomeworkIsSubmitted(ClassroomExercise exercise) {
-  final status = exercise.status?.trim().toUpperCase();
-  if (status == null || status.isEmpty) {
-    return false;
-  }
-  return status.contains('SUBMITTED') ||
-      status.contains('COMPLETED') ||
-      status.contains('DONE') ||
-      status.contains('FINISHED');
+  return exercise.submissionStatus?.trim().toUpperCase() == 'SUBMITTED';
 }
 
 bool _studentHomeworkIsOverdue(ClassroomExercise exercise) {
