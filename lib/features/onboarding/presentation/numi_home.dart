@@ -122,8 +122,7 @@ class _NumiHomeState extends State<NumiHome> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          OnboardingCubit(authService: widget.authService)..restoreSession(),
+      create: (_) => OnboardingCubit(authService: widget.authService),
       child: BlocBuilder<OnboardingCubit, OnboardingState>(
         builder: (context, scaffoldState) {
           final usePlainLoginBackground =
@@ -297,6 +296,8 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                         isCheckingAuthPhone: state.isCheckingAuthPhone,
                         canSendOtp: phoneComplete,
                         phoneExists: state.phoneExists,
+                        canLoginWithPin: state.canLoginWithPin,
+                        onLoginWithPin: cubit.openPinLogin,
                         onPhoneChanged: (value) => handlePhoneInputChanged(
                           cubit,
                           state.phoneRegion,

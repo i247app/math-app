@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/localization/app_keys.dart';
@@ -67,6 +69,10 @@ class OnboardingState {
     this.isPasscodeBusy = false,
     this.passcodeError,
     this.passcodeErrorId = 0,
+    this.passcodeRequiresSessionCheck = false,
+    this.isCheckingPinLogin = false,
+    this.canLoginWithPin = false,
+    this.pinLoginUser,
     this.pendingLoginUser,
     this.pendingProfiles = const <StudentProfile>[],
     this.pendingActiveProfile,
@@ -109,6 +115,10 @@ class OnboardingState {
   final bool isPasscodeBusy;
   final String? passcodeError;
   final int passcodeErrorId;
+  final bool passcodeRequiresSessionCheck;
+  final bool isCheckingPinLogin;
+  final bool canLoginWithPin;
+  final LoginUser? pinLoginUser;
   final LoginUser? pendingLoginUser;
   final List<StudentProfile> pendingProfiles;
   final StudentProfile? pendingActiveProfile;
@@ -153,6 +163,10 @@ class OnboardingState {
     bool? isPasscodeBusy,
     String? passcodeError,
     int? passcodeErrorId,
+    bool? passcodeRequiresSessionCheck,
+    bool? isCheckingPinLogin,
+    bool? canLoginWithPin,
+    LoginUser? pinLoginUser,
     LoginUser? pendingLoginUser,
     List<StudentProfile>? pendingProfiles,
     StudentProfile? pendingActiveProfile,
@@ -173,6 +187,8 @@ class OnboardingState {
     bool clearActiveProfile = false,
     bool clearProfileLoadError = false,
     bool clearPasscodeError = false,
+    bool clearPinLogin = false,
+    bool clearPinLoginUser = false,
     bool clearPendingSession = false,
     bool clearPendingActiveProfile = false,
     bool clearPendingProfileLoadError = false,
@@ -228,6 +244,14 @@ class OnboardingState {
       passcodeError:
           clearPasscodeError ? null : passcodeError ?? this.passcodeError,
       passcodeErrorId: passcodeErrorId ?? this.passcodeErrorId,
+      passcodeRequiresSessionCheck:
+          passcodeRequiresSessionCheck ?? this.passcodeRequiresSessionCheck,
+      isCheckingPinLogin: isCheckingPinLogin ?? this.isCheckingPinLogin,
+      canLoginWithPin:
+          clearPinLogin ? false : canLoginWithPin ?? this.canLoginWithPin,
+      pinLoginUser: clearPinLogin || clearPinLoginUser
+          ? null
+          : pinLoginUser ?? this.pinLoginUser,
       pendingLoginUser: clearPendingSession
           ? null
           : pendingLoginUser ?? this.pendingLoginUser,
@@ -267,8 +291,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
-  void openLogin() =>
-      emit(state.copyWith(screen: AppScreen.login, clearOtpError: true));
+  void openLogin() {
+    emit(state.copyWith(screen: AppScreen.login, clearOtpError: true));
+    unawaited(checkPinLoginAvailability());
+  }
 
   void openOtp() =>
       emit(state.copyWith(screen: AppScreen.otp, clearOtpError: true));
@@ -291,8 +317,88 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         clearAuthError: true,
         clearPendingSession: true,
         clearPasscodeError: true,
+        clearPinLogin: true,
+        passcodeRequiresSessionCheck: false,
       ));
     }
+  }
+
+  Future<void> checkPinLoginAvailability() async {
+    if (state.isCheckingPinLogin) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isCheckingPinLogin: true,
+        clearPinLogin: true,
+        clearPasscodeError: true,
+      ),
+    );
+
+    try {
+      final user = await _authService.restoreSession();
+      if (isClosed) {
+        return;
+      }
+      if (state.screen != AppScreen.login) {
+        emit(state.copyWith(isCheckingPinLogin: false));
+        return;
+      }
+
+      var canUsePin = false;
+      if (user != null && user.id > 0) {
+        canUsePin = await _passcodeService.hasPasscode(user.id);
+      }
+      if (isClosed) {
+        return;
+      }
+      if (state.screen != AppScreen.login) {
+        emit(state.copyWith(isCheckingPinLogin: false));
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          isCheckingPinLogin: false,
+          canLoginWithPin: canUsePin,
+          pinLoginUser: canUsePin ? user : null,
+          clearPinLoginUser: !canUsePin,
+        ),
+      );
+    } catch (_) {
+      if (isClosed) {
+        return;
+      }
+      emit(
+        state.copyWith(
+          isCheckingPinLogin: false,
+          clearPinLogin: state.screen == AppScreen.login,
+        ),
+      );
+    }
+  }
+
+  void openPinLogin() {
+    final user = state.pinLoginUser;
+    if (!state.canLoginWithPin || user == null || user.id <= 0) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        screen: AppScreen.passcode,
+        pendingLoginUser: user,
+        pendingProfiles: const <StudentProfile>[],
+        clearPendingActiveProfile: true,
+        clearPendingProfileLoadError: true,
+        passcodeFlow: PasscodeFlow.unlock,
+        passcodeCanSkip: false,
+        passcodeRequiresSessionCheck: true,
+        clearAuthError: true,
+        clearPasscodeError: true,
+      ),
+    );
   }
 
   Future<void> restoreSession() async {
@@ -772,6 +878,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
             );
             return;
           }
+          if (state.passcodeRequiresSessionCheck) {
+            await _completePinLoginAfterLocalPasscode(user);
+            return;
+          }
           _completePendingHome(isPasscodeBusy: false);
       }
     } catch (_) {
@@ -798,7 +908,71 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       return;
     }
 
+    if (state.passcodeRequiresSessionCheck) {
+      emit(
+        state.copyWith(
+          screen: AppScreen.login,
+          isPasscodeBusy: false,
+          clearPendingSession: true,
+          clearPasscodeError: true,
+          passcodeRequiresSessionCheck: false,
+        ),
+      );
+      unawaited(checkPinLoginAvailability());
+      return;
+    }
+
     await logout();
+  }
+
+  Future<void> _completePinLoginAfterLocalPasscode(LoginUser pinUser) async {
+    try {
+      final sessionUser = await _authService.restoreSession();
+      if (sessionUser == null || sessionUser.id != pinUser.id) {
+        emit(
+          state.copyWith(
+            screen: AppScreen.login,
+            isPasscodeBusy: false,
+            authError: AppStrings.current(AppKeys.passcodeSessionExpired),
+            clearPendingSession: true,
+            clearPasscodeError: true,
+            clearPinLogin: true,
+            passcodeRequiresSessionCheck: false,
+          ),
+        );
+        return;
+      }
+
+      final profileResolution = await _profilesForUser(sessionUser);
+      emit(
+        state.copyWith(
+          screen: AppScreen.home,
+          isPasscodeBusy: false,
+          loginUser: sessionUser,
+          profiles: profileResolution.profiles,
+          activeProfile: profileResolution.activeProfile,
+          profileLoadError: profileResolution.errorMessage,
+          clearAuthError: true,
+          clearPendingSession: true,
+          clearPasscodeError: true,
+          passcodeRequiresSessionCheck: false,
+          clearActiveProfile: profileResolution.activeProfile == null,
+          clearProfileLoadError: profileResolution.errorMessage == null,
+        ),
+      );
+    } catch (_) {
+      emit(
+        state.copyWith(
+          screen: AppScreen.login,
+          isPasscodeBusy: false,
+          authError: AppStrings.current(AppKeys.passcodeSessionExpired),
+          clearPendingSession: true,
+          clearPasscodeError: true,
+          clearPinLogin: true,
+          passcodeRequiresSessionCheck: false,
+        ),
+      );
+    }
   }
 
   Future<void> _emitHomeOrPasscodeSetup({
@@ -824,6 +998,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           clearProfileLoadError: profileResolution.errorMessage == null,
           clearPendingSession: true,
           clearPasscodeError: true,
+          passcodeRequiresSessionCheck: false,
         ),
       );
       return;
@@ -840,6 +1015,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         pendingProfileLoadError: profileResolution.errorMessage,
         passcodeFlow: PasscodeFlow.setup,
         passcodeCanSkip: true,
+        passcodeRequiresSessionCheck: false,
         clearAuthError: true,
         clearOtpError: true,
         clearPasscodeError: true,
@@ -866,6 +1042,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         clearProfileLoadError: profileResolution.errorMessage == null,
         clearPendingSession: true,
         clearPasscodeError: true,
+        passcodeRequiresSessionCheck: false,
       ),
     );
   }
@@ -879,6 +1056,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isPasscodeBusy: isPasscodeBusy ?? false,
           clearPendingSession: true,
           clearPasscodeError: true,
+          passcodeRequiresSessionCheck: false,
         ),
       );
       return;
@@ -894,6 +1072,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         profileLoadError: state.pendingProfileLoadError,
         clearPendingSession: true,
         clearPasscodeError: true,
+        passcodeRequiresSessionCheck: false,
         clearActiveProfile: state.pendingActiveProfile == null,
         clearProfileLoadError: state.pendingProfileLoadError == null,
       ),

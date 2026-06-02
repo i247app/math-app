@@ -42,6 +42,7 @@ class AppKeys {
   static const newAccountPrompt = 'new_account_prompt';
   static const signup = 'signup';
   static const login = 'login';
+  static const loginWithPin = 'login_with_pin';
   static const otpWithin30Seconds = 'otp_within_30_seconds';
   static const otpTitle = 'otp_title';
   static const otpSentMessage = 'otp_sent_message';
@@ -244,6 +245,10 @@ class AppKeys {
   static const confirmPasscodeTitle = 'confirm_passcode_title';
   static const unlockPasscodeTitle = 'unlock_passcode_title';
   static const verifyPasscodeTitle = 'verify_passcode_title';
+  static const createPasscodeSubtitle = 'create_passcode_subtitle';
+  static const confirmPasscodeSubtitle = 'confirm_passcode_subtitle';
+  static const unlockPasscodeSubtitle = 'unlock_passcode_subtitle';
+  static const verifyPasscodeSubtitle = 'verify_passcode_subtitle';
   static const changePasscodeTitle = 'change_passcode_title';
   static const enterCurrentPasscodeTitle = 'enter_current_passcode_title';
   static const passcodeContinue = 'passcode_continue';
@@ -255,6 +260,7 @@ class AppKeys {
   static const passcodeMismatch = 'passcode_mismatch';
   static const passcodeIncorrect = 'passcode_incorrect';
   static const passcodeSaveFailed = 'passcode_save_failed';
+  static const passcodeSessionExpired = 'passcode_session_expired';
   static const passcodeRemoveFailed = 'passcode_remove_failed';
   static const passcodeSet = 'passcode_set';
   static const passcodeChanged = 'passcode_changed';

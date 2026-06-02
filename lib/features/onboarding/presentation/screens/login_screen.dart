@@ -20,6 +20,8 @@ class LoginScreen extends StatelessWidget {
     required this.isSendingOtp,
     required this.isCheckingAuthPhone,
     required this.canSendOtp,
+    required this.canLoginWithPin,
+    required this.onLoginWithPin,
     required this.onPhoneChanged,
     this.phoneExists,
     this.phoneErrorText,
@@ -33,6 +35,8 @@ class LoginScreen extends StatelessWidget {
   final bool isSendingOtp;
   final bool isCheckingAuthPhone;
   final bool canSendOtp;
+  final bool canLoginWithPin;
+  final VoidCallback onLoginWithPin;
   final ValueChanged<String> onPhoneChanged;
   final bool? phoneExists;
   final String? phoneErrorText;
@@ -120,6 +124,8 @@ class LoginScreen extends StatelessWidget {
                   isSendingOtp: isSendingOtp,
                   isCheckingAuthPhone: isCheckingAuthPhone,
                   canSendOtp: canSendOtp,
+                  canLoginWithPin: canLoginWithPin,
+                  onLoginWithPin: onLoginWithPin,
                   onPhoneChanged: onPhoneChanged,
                   phoneExists: phoneExists,
                   phoneErrorText: phoneErrorText,
@@ -144,6 +150,8 @@ class LoginCard extends StatelessWidget {
     required this.isSendingOtp,
     required this.isCheckingAuthPhone,
     required this.canSendOtp,
+    required this.canLoginWithPin,
+    required this.onLoginWithPin,
     required this.onPhoneChanged,
     this.phoneExists,
     this.phoneErrorText,
@@ -156,6 +164,8 @@ class LoginCard extends StatelessWidget {
   final bool isSendingOtp;
   final bool isCheckingAuthPhone;
   final bool canSendOtp;
+  final bool canLoginWithPin;
+  final VoidCallback onLoginWithPin;
   final ValueChanged<String> onPhoneChanged;
   final bool? phoneExists;
   final String? phoneErrorText;
@@ -252,6 +262,38 @@ class LoginCard extends StatelessWidget {
                       key: ValueKey('send-otp-placeholder'),
                       height: 56, // same height as button to prevent jumping
                     ),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 180),
+          child: canLoginWithPin
+              ? Padding(
+                  key: const ValueKey('login-with-pin'),
+                  padding: const EdgeInsets.only(top: 18),
+                  child: Center(
+                    child: InkWell(
+                      onTap: onLoginWithPin,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        child: Text(
+                          context.getText(AppKeys.loginWithPin),
+                          style: GoogleFonts.andika(
+                            color: const Color(0xFF001741),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            height: 20 / 16,
+                            decoration: TextDecoration.underline,
+                            decorationColor: const Color(0xFF001741),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(key: ValueKey('no-pin-login')),
         ),
       ],
     );

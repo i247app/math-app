@@ -2,12 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../widgets/common_widgets.dart';
 
 enum PasscodeScreenMode {
   setup,
@@ -53,6 +53,10 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   String? _firstPasscode;
   String? _localError;
   int _lastErrorId = 0;
+
+  static const _mascotAsset = 'assets/images/pin_figma_mascot.png';
+  static const _backIconAsset = 'assets/images/pin_figma_back.svg';
+  static const _arrowIconAsset = 'assets/images/pin_figma_arrow.svg';
 
   bool get _isConfirmingSetup =>
       widget.mode == PasscodeScreenMode.setup && _firstPasscode != null;
@@ -181,10 +185,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
-    final compact = height < 760;
-    final mascotSize = width < 370 ? 150.0 : 178.0;
     final isFull = _controllers.every((controller) => controller.text != '');
     final errorText = _localError ?? widget.errorText;
 
@@ -193,101 +193,177 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: ScreenFrame(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              CircleIconButton(
-                icon: Icons.arrow_back_rounded,
-                onPressed: widget.onBack,
-              ),
-              SizedBox(height: compact ? 34 : 58),
-              Center(
-                child: SizedBox(
-                  width: mascotSize,
-                  height: mascotSize * 0.9,
-                  child: Image.asset(
-                    'assets/images/numi-mascot.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              SizedBox(height: compact ? 10 : 16),
-              Center(
-                child: Text(
-                  context.getText(_titleKey),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.andika(
-                    color: const Color(0xFF001741),
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-              SizedBox(height: compact ? 34 : 44),
-              AnimatedBuilder(
-                animation: _shakeController,
-                builder: (context, child) {
-                  final offset =
-                      math.sin(_shakeController.value * math.pi * 6) *
-                          9 *
-                          (1 - _shakeController.value);
-                  return Transform.translate(
-                    offset: Offset(offset, 0),
-                    child: child,
-                  );
-                },
-                child: _PasscodeInputRow(
-                  controllers: _controllers,
-                  focusNodes: _focusNodes,
-                  hasError: errorText != null,
-                  onChanged: _updateDigit,
-                  onEmptyBackspace: _handleEmptyBackspace,
-                ),
-              ),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 180),
-                child: errorText == null
-                    ? const SizedBox(height: 28)
-                    : Padding(
-                        padding: const EdgeInsets.only(top: 14, bottom: 2),
-                        child: Center(
-                          child: Text(
-                            errorText,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.andika(
-                              color: const Color(0xFFD9534F),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              height: 1.25,
-                              letterSpacing: 0,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              physics: const ClampingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
+                      child: Stack(
+                        clipBehavior: Clip.hardEdge,
+                        children: [
+                          const Positioned.fill(
+                            child: ColoredBox(color: Colors.white),
+                          ),
+                          Positioned(
+                            left: 20,
+                            top: 16,
+                            width: 44,
+                            height: 44,
+                            child: _PasscodeBackButton(
+                              iconAsset: _backIconAsset,
+                              onPressed: widget.onBack,
                             ),
                           ),
-                        ),
+                          Positioned(
+                            left: math.max(0, (constraints.maxWidth - 220) / 2),
+                            top: 90,
+                            width: 220,
+                            height: 198,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.15),
+                                    blurRadius: 25,
+                                    offset: const Offset(0, 25),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRect(
+                                child: Transform.translate(
+                                  offset: const Offset(-21, -16),
+                                  child: Image.asset(
+                                    _mascotAsset,
+                                    width: 241,
+                                    height: 230,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: math.max(0, (constraints.maxWidth - 280) / 2),
+                            top: 279,
+                            width: 280,
+                            child: Text(
+                              context.getText(_titleKey),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.andika(
+                                color: const Color(0xFF001741),
+                                fontSize: 30,
+                                fontWeight: FontWeight.w700,
+                                height: 36 / 30,
+                                letterSpacing: 0,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: math.max(0, (constraints.maxWidth - 294) / 2),
+                            top: 333,
+                            width: 294,
+                            child: Text(
+                              context.getText(_subtitleKey),
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.andika(
+                                color: const Color(0xFF001741),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                                height: 24.75 / 18,
+                                letterSpacing: 0,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            top: 411,
+                            child: AnimatedBuilder(
+                              animation: _shakeController,
+                              builder: (context, child) {
+                                final offset = math.sin(
+                                      _shakeController.value * math.pi * 6,
+                                    ) *
+                                    9 *
+                                    (1 - _shakeController.value);
+                                return Transform.translate(
+                                  offset: Offset(offset, 0),
+                                  child: child,
+                                );
+                              },
+                              child: _PasscodeInputRow(
+                                controllers: _controllers,
+                                focusNodes: _focusNodes,
+                                hasError: errorText != null,
+                                onChanged: _updateDigit,
+                                onEmptyBackspace: _handleEmptyBackspace,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 34,
+                            right: 34,
+                            top: 491,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 180),
+                              child: errorText == null
+                                  ? const SizedBox(height: 24)
+                                  : Text(
+                                      errorText,
+                                      key: ValueKey(errorText),
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.andika(
+                                        color: const Color(0xFFD9534F),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.25,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          Positioned(
+                            left: math.max(0, (constraints.maxWidth - 230) / 2),
+                            top: 542,
+                            width: 230,
+                            height: 58,
+                            child: _PasscodeActionButton(
+                              label: context.getText(_primaryLabelKey),
+                              onPressed: isFull && !widget.isBusy
+                                  ? _handleSubmit
+                                  : null,
+                              isBusy: widget.isBusy,
+                              arrowAsset: _arrowIconAsset,
+                            ),
+                          ),
+                          if (widget.onSkip != null)
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              top: 626,
+                              child: _PasscodeSkipButton(
+                                label: context.getText(AppKeys.passcodeSkip),
+                                onPressed: widget.isBusy ? null : widget.onSkip,
+                              ),
+                            ),
+                        ],
                       ),
-              ),
-              SizedBox(height: compact ? 42 : 58),
-              _PasscodeActionButton(
-                label: context.getText(_primaryLabelKey),
-                onPressed: isFull && !widget.isBusy ? _handleSubmit : null,
-                isBusy: widget.isBusy,
-              ),
-              if (widget.onSkip != null) ...[
-                const SizedBox(height: 22),
-                _PasscodeActionButton(
-                  label: context.getText(AppKeys.passcodeSkip),
-                  onPressed: widget.isBusy ? null : widget.onSkip,
-                  color: const Color(0xFFF8744E),
-                  showArrow: false,
+                    ),
+                  ),
                 ),
-              ],
-              const SizedBox(height: 40),
-            ],
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -318,6 +394,53 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       PasscodeScreenMode.unlock => AppKeys.passcodeUnlock,
       PasscodeScreenMode.verify => AppKeys.passcodeContinue,
     };
+  }
+
+  String get _subtitleKey {
+    if (_isConfirmingSetup) {
+      return AppKeys.confirmPasscodeSubtitle;
+    }
+    return switch (widget.mode) {
+      PasscodeScreenMode.setup => AppKeys.createPasscodeSubtitle,
+      PasscodeScreenMode.unlock => AppKeys.unlockPasscodeSubtitle,
+      PasscodeScreenMode.verify => AppKeys.verifyPasscodeSubtitle,
+    };
+  }
+}
+
+class _PasscodeBackButton extends StatelessWidget {
+  const _PasscodeBackButton({
+    required this.iconAsset,
+    required this.onPressed,
+  });
+
+  final String iconAsset;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.8),
+      shadowColor: Colors.black.withValues(alpha: 0.08),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(999),
+        side: BorderSide(
+          color: const Color(0xFFA2B1A3).withValues(alpha: 0.1),
+        ),
+      ),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(999),
+        child: Center(
+          child: SvgPicture.asset(
+            iconAsset,
+            width: 16,
+            height: 16,
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -461,15 +584,13 @@ class _PasscodeActionButton extends StatelessWidget {
   const _PasscodeActionButton({
     required this.label,
     required this.onPressed,
-    this.color = const Color(0xFF38898D),
-    this.showArrow = true,
+    required this.arrowAsset,
     this.isBusy = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
-  final Color color;
-  final bool showArrow;
+  final String arrowAsset;
   final bool isBusy;
 
   @override
@@ -481,7 +602,7 @@ class _PasscodeActionButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: color,
+            backgroundColor: const Color(0xFF38898D),
             foregroundColor: Colors.white,
             elevation: 0,
             disabledBackgroundColor: const Color(0xFFB5BFC2),
@@ -518,12 +639,52 @@ class _PasscodeActionButton extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (showArrow) ...[
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_rounded, size: 20),
-                    ],
+                    const SizedBox(width: 8),
+                    SvgPicture.asset(
+                      arrowAsset,
+                      width: 13.33,
+                      height: 13.33,
+                    ),
                   ],
                 ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PasscodeSkipButton extends StatelessWidget {
+  const _PasscodeSkipButton({
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Text(
+            label,
+            style: GoogleFonts.andika(
+              color: onPressed == null
+                  ? const Color(0xFF001741).withValues(alpha: 0.45)
+                  : const Color(0xFF001741),
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 20 / 16,
+              decoration: TextDecoration.underline,
+              decorationColor: onPressed == null
+                  ? const Color(0xFF001741).withValues(alpha: 0.45)
+                  : const Color(0xFF001741),
+            ),
+          ),
         ),
       ),
     );
