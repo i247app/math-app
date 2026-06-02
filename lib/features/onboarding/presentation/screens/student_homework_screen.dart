@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -34,10 +36,13 @@ class StudentHomeworkScreen extends StatefulWidget {
 class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
   late final ClassroomExerciseService _exerciseService =
       widget._exerciseService ?? ClassroomExerciseApi();
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
 
   bool _isLoading = false;
   String? _error;
   List<ClassroomExercise> _exercises = const <ClassroomExercise>[];
+  _HomeworkFilter _activeFilter = _HomeworkFilter.notSubmitted;
 
   @override
   void initState() {
@@ -45,7 +50,31 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
     _loadExercises();
   }
 
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {});
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 420), () {
+      _loadExercises(search: value);
+    });
+  }
+
+  void _setFilter(_HomeworkFilter filter) {
+    if (_activeFilter == filter) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() => _activeFilter = filter);
+  }
+
   Future<void> _loadExercises({String? search}) async {
+    final normalizedSearch = search?.trim() ?? _searchController.text.trim();
     setState(() {
       _isLoading = true;
       _error = null;
@@ -54,20 +83,20 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
       final exercises = await _exerciseService.listExercises(
         classroomId: widget.classroomId,
         profileId: widget.profileId,
-        search: search,
+        search: normalizedSearch.isEmpty ? null : normalizedSearch,
         visibility: 'PUBLIC',
       );
-      if (!mounted) {
+      if (!mounted || _searchController.text.trim() != normalizedSearch) {
         return;
       }
       setState(() => _exercises = exercises);
     } on ClassroomExerciseException catch (error) {
-      if (!mounted) {
+      if (!mounted || _searchController.text.trim() != normalizedSearch) {
         return;
       }
       setState(() => _error = error.message);
     } finally {
-      if (mounted) {
+      if (mounted && _searchController.text.trim() == normalizedSearch) {
         setState(() => _isLoading = false);
       }
     }
@@ -100,12 +129,13 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
       ),
     );
     if (submitted == true) {
-      _loadExercises();
+      _loadExercises(search: _searchController.text);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final visibleExercises = _filteredExercises(_exercises, _activeFilter);
     return Scaffold(
       backgroundColor: _studentHomeworkBg,
       body: SafeArea(
@@ -128,9 +158,16 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const _HomeworkSearchField(),
+                    _HomeworkSearchField(
+                      controller: _searchController,
+                      onChanged: _onSearchChanged,
+                      onSubmitted: (value) => _loadExercises(search: value),
+                    ),
                     const SizedBox(height: 17),
-                    const _HomeworkFilterTabs(),
+                    _HomeworkFilterTabs(
+                      activeFilter: _activeFilter,
+                      onFilterSelected: _setFilter,
+                    ),
                     const SizedBox(height: 18),
                     if (_isLoading)
                       const Padding(
@@ -148,15 +185,23 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                         message:
                             context.getText(AppKeys.studentNoHomeworkMessage),
                       )
+                    else if (visibleExercises.isEmpty)
+                      _StudentHomeworkMessage(
+                        message:
+                            context.getText(AppKeys.studentNoHomeworkMessage),
+                      )
                     else
-                      for (var index = 0; index < _exercises.length; index++)
+                      for (var index = 0;
+                          index < visibleExercises.length;
+                          index++)
                         Padding(
                           padding: EdgeInsets.only(
-                            bottom: index == _exercises.length - 1 ? 0 : 14,
+                            bottom:
+                                index == visibleExercises.length - 1 ? 0 : 14,
                           ),
                           child: _HomeworkAssignmentCard(
-                            exercise: _exercises[index],
-                            onTap: () => _openExercise(_exercises[index]),
+                            exercise: visibleExercises[index],
+                            onTap: () => _openExercise(visibleExercises[index]),
                           ),
                         ),
                   ],
@@ -259,47 +304,100 @@ class _StudentHomeworkTopBar extends StatelessWidget {
 }
 
 class _HomeworkSearchField extends StatelessWidget {
-  const _HomeworkSearchField();
+  const _HomeworkSearchField({
+    required this.controller,
+    required this.onChanged,
+    required this.onSubmitted,
+  });
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+  final ValueChanged<String> onSubmitted;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 46,
-      padding: const EdgeInsets.fromLTRB(19, 10, 16, 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEBEEF1),
-        borderRadius: BorderRadius.circular(20),
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      onSubmitted: onSubmitted,
+      textInputAction: TextInputAction.search,
+      style: GoogleFonts.andika(
+        color: _studentHomeworkInk,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        height: 24 / 16,
       ),
-      child: Row(
-        children: [
-          Image.asset(
+      decoration: InputDecoration(
+        hintText: context.getText(AppKeys.studentHomeworkSearchHint),
+        hintStyle: GoogleFonts.andika(
+          color: const Color(0xFF515F54).withValues(alpha: 0.7),
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          height: 24 / 16,
+        ),
+        filled: true,
+        fillColor: const Color(0xFFEBEEF1),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 19,
+          vertical: 12,
+        ),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.only(left: 19, right: 9),
+          child: Image.asset(
             'assets/images/student_homework_search.png',
             width: 19,
             height: 19,
             opacity: const AlwaysStoppedAnimation<double>(0.7),
           ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Text(
-              context.getText(AppKeys.studentHomeworkSearchHint),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.andika(
-                color: const Color(0xFF515F54).withValues(alpha: 0.7),
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                height: 24 / 16,
+        ),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 47,
+          minHeight: 19,
+        ),
+        suffixIcon: controller.text.isEmpty
+            ? null
+            : IconButton(
+                onPressed: () {
+                  controller.clear();
+                  onChanged('');
+                },
+                icon: const Icon(
+                  Icons.close_rounded,
+                  color: _studentHomeworkMuted,
+                  size: 18,
+                ),
               ),
-            ),
+        suffixIconConstraints: const BoxConstraints(
+          minWidth: 44,
+          minHeight: 44,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(
+            color: _studentHomeworkTeal.withValues(alpha: 0.35),
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _HomeworkFilterTabs extends StatelessWidget {
-  const _HomeworkFilterTabs();
+  const _HomeworkFilterTabs({
+    required this.activeFilter,
+    required this.onFilterSelected,
+  });
+
+  final _HomeworkFilter activeFilter;
+  final ValueChanged<_HomeworkFilter> onFilterSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -310,50 +408,67 @@ class _HomeworkFilterTabs extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          _HomeworkFilterChip(
-            label: context.getText(AppKeys.studentHomeworkNotSubmitted),
-            selected: true,
-          ),
-          const SizedBox(width: 8),
-          _HomeworkFilterChip(
-            label: context.getText(AppKeys.studentHomeworkSubmitted),
-          ),
-          const SizedBox(width: 8),
-          _HomeworkFilterChip(
-            label: context.getText(AppKeys.studentHomeworkOverdue),
-          ),
+          for (final filter in _HomeworkFilter.values) ...[
+            _HomeworkFilterChip(
+              label: context.getText(filter.labelKey),
+              selected: filter == activeFilter,
+              onTap: () => onFilterSelected(filter),
+            ),
+            if (filter != _HomeworkFilter.values.last) const SizedBox(width: 8),
+          ],
         ],
       ),
     );
   }
 }
 
+enum _HomeworkFilter {
+  notSubmitted(AppKeys.studentHomeworkNotSubmitted),
+  submitted(AppKeys.studentHomeworkSubmitted),
+  overdue(AppKeys.studentHomeworkOverdue);
+
+  const _HomeworkFilter(this.labelKey);
+
+  final String labelKey;
+}
+
 class _HomeworkFilterChip extends StatelessWidget {
   const _HomeworkFilterChip({
     required this.label,
-    this.selected = false,
+    required this.selected,
+    required this.onTap,
   });
 
   final String label;
   final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-      decoration: BoxDecoration(
-        color: selected ? _studentHomeworkActive : const Color(0xFFE5E8EB),
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(9999),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(9999),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        maxLines: 1,
-        style: GoogleFonts.andika(
-          color: selected ? Colors.white : _studentHomeworkMuted,
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          height: 24 / 16,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? _studentHomeworkActive : const Color(0xFFE5E8EB),
+            borderRadius: BorderRadius.circular(9999),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              maxLines: 1,
+              style: GoogleFonts.andika(
+                color: selected ? Colors.white : _studentHomeworkMuted,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                height: 24 / 16,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -530,3 +645,40 @@ String? _studentHomeworkDateLabel(String? value) {
 }
 
 String _studentHomeworkTwoDigits(int value) => value.toString().padLeft(2, '0');
+
+List<ClassroomExercise> _filteredExercises(
+  List<ClassroomExercise> exercises,
+  _HomeworkFilter filter,
+) {
+  return exercises.where((exercise) {
+    final submitted = _studentHomeworkIsSubmitted(exercise);
+    final overdue = _studentHomeworkIsOverdue(exercise);
+    return switch (filter) {
+      _HomeworkFilter.notSubmitted => !submitted && !overdue,
+      _HomeworkFilter.submitted => submitted,
+      _HomeworkFilter.overdue => overdue,
+    };
+  }).toList(growable: false);
+}
+
+bool _studentHomeworkIsSubmitted(ClassroomExercise exercise) {
+  final status = exercise.status?.trim().toUpperCase();
+  if (status == null || status.isEmpty) {
+    return false;
+  }
+  return status.contains('SUBMITTED') ||
+      status.contains('COMPLETED') ||
+      status.contains('DONE') ||
+      status.contains('FINISHED');
+}
+
+bool _studentHomeworkIsOverdue(ClassroomExercise exercise) {
+  if (_studentHomeworkIsSubmitted(exercise)) {
+    return false;
+  }
+  final parsed = DateTime.tryParse(exercise.endDate?.trim() ?? '');
+  if (parsed == null) {
+    return false;
+  }
+  return parsed.toLocal().isBefore(DateTime.now());
+}
