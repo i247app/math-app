@@ -29,12 +29,35 @@ const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
 const _mintBackground = Color(0xFFEEF9FB);
-const _studentHomeMascot = 'assets/images/student_home_mascot.png';
-const _studentHomeClassIcon = 'assets/images/student_home_class_icon.png';
 const _studentHomeBell = 'assets/images/student_home_bell.svg';
 const _studentHomeInvite = 'assets/images/student_home_invite.svg';
-const _studentHomePracticeIcon = 'assets/images/student_home_practice.svg';
-const _studentHomeAssessmentIcon = 'assets/images/student_home_assessment.svg';
+const _studentParentHomeHeroBg =
+    'assets/images/student_parent_home_hero_bg.png';
+const _studentParentHomeHeroArt =
+    'assets/images/student_parent_home_hero_art.png';
+const _studentParentHomeClassThumb =
+    'assets/images/student_parent_home_class_thumb.png';
+const _studentParentHomePracticeIcon =
+    'assets/images/student_parent_home_practice_icon.svg';
+const _studentParentHomeAssessmentIcon =
+    'assets/images/student_parent_home_assessment_icon.svg';
+const _studentParentHomeEnterIcon =
+    'assets/images/student_parent_home_enter_icon.svg';
+const _studentParentHomeAcceptIcon =
+    'assets/images/student_parent_home_accept.png';
+const _studentParentHomeRejectIcon =
+    'assets/images/student_parent_home_reject.png';
+const _studentParentHomeJoinIcon =
+    'assets/images/student_parent_home_join_icon.svg';
+const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
+
+String _homeRoleLabel(BuildContext context, ProfileRole role) {
+  return switch (role) {
+    ProfileRole.parent => context.getText(AppKeys.roleParent).toUpperCase(),
+    ProfileRole.teacher => context.getText(AppKeys.roleTeacher).toUpperCase(),
+    ProfileRole.student => context.getText(AppKeys.roleStudent).toUpperCase(),
+  };
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -139,7 +162,11 @@ class _HomeScreenState extends State<HomeScreen> {
         final bottomInset = MediaQuery.paddingOf(context).bottom;
         final scale = math.min(
             layoutWidth / _designWidth, viewportHeight / _designHeight);
-        final studentName = _displayProfileName(widget.activeProfile);
+        final studentName = _displayProfileName(
+          context,
+          widget.activeProfile,
+          widget.activeRole,
+        );
 
         double s(double value) => value * scale;
         final navHeight = s(88) + bottomInset;
@@ -235,6 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       horizontalPadding: s(24),
                       name: studentName,
                       profile: widget.activeProfile,
+                      role: widget.activeRole,
                     ),
                   ),
                 Positioned(
@@ -270,12 +298,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _displayProfileName(StudentProfile? profile) {
+  String _displayProfileName(
+    BuildContext context,
+    StudentProfile? profile,
+    ProfileRole role,
+  ) {
     final name = profile?.name?.trim();
     if (name != null && name.isNotEmpty) {
       return name;
     }
-    return 'Student';
+    return switch (role) {
+      ProfileRole.parent => context.getText(AppKeys.roleParent),
+      ProfileRole.teacher => context.getText(AppKeys.roleTeacher),
+      ProfileRole.student => context.getText(AppKeys.roleStudent),
+    };
   }
 
   Future<void> _openTeacherProfileForm() async {
@@ -416,9 +452,12 @@ class _TabContent extends StatelessWidget {
         padding: horizontalPadding,
         scale: scale,
         user: user,
+        profiles: profiles,
         activeProfile: activeProfile,
+        activeRole: activeRole,
         initialGrades: initialGrades,
         gradeService: gradeService,
+        onProfileSaved: onProfileSaved,
       );
     }
 
@@ -488,6 +527,7 @@ class _HeaderBar extends StatelessWidget {
     required this.horizontalPadding,
     required this.name,
     required this.profile,
+    required this.role,
   });
 
   final double height;
@@ -495,6 +535,7 @@ class _HeaderBar extends StatelessWidget {
   final double horizontalPadding;
   final String name;
   final StudentProfile? profile;
+  final ProfileRole role;
 
   @override
   Widget build(BuildContext context) {
@@ -512,7 +553,7 @@ class _HeaderBar extends StatelessWidget {
             contentHeight * 0.21,
           ),
           decoration: BoxDecoration(
-            color: _mintBackground.withValues(alpha: 0.92),
+            color: Colors.white.withValues(alpha: 0.94),
           ),
           child: Row(
             children: [
@@ -528,7 +569,7 @@ class _HeaderBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      context.getText(AppKeys.student),
+                      _homeRoleLabel(context, role),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -545,7 +586,7 @@ class _HeaderBar extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: _teal,
+                        color: const Color(0xFF002B6A),
                         fontSize: contentHeight * 0.18,
                         fontWeight: FontWeight.w900,
                         height: 1,
@@ -654,6 +695,7 @@ class _TestHeroCard extends StatelessWidget {
     required this.user,
     required this.initialGrades,
     required this.gradeService,
+    required this.profileId,
   });
 
   final double height;
@@ -661,6 +703,7 @@ class _TestHeroCard extends StatelessWidget {
   final LoginUser? user;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
+  final int? profileId;
 
   @override
   Widget build(BuildContext context) {
@@ -790,6 +833,7 @@ class _TestHeroCard extends StatelessWidget {
           initialGrades: initialGrades,
           gradeService: gradeService,
           quizPurpose: quizPurpose,
+          profileId: profileId,
         ),
       ),
     );
@@ -1061,17 +1105,23 @@ class _StudentHomeContent extends StatefulWidget {
     required this.padding,
     required this.scale,
     required this.user,
+    required this.profiles,
     required this.activeProfile,
+    required this.activeRole,
     required this.initialGrades,
     required this.gradeService,
+    required this.onProfileSaved,
   });
 
   final EdgeInsets padding;
   final double scale;
   final LoginUser? user;
+  final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
+  final ProfileRole activeRole;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
+  final VoidCallback onProfileSaved;
 
   @override
   State<_StudentHomeContent> createState() => _StudentHomeContentState();
@@ -1218,6 +1268,10 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     ClassroomInvitation invitation, {
     required bool accept,
   }) async {
+    if (!await _allowClassroomActionForActiveRole()) {
+      return;
+    }
+
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
@@ -1296,13 +1350,13 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             onPracticeTap: () => _openGradeSelection(quizPurposePractice),
           ),
           const SizedBox(height: 22),
-          _StudentJoinClassCta(onTap: _openJoinClassroom),
-          const SizedBox(height: 11),
           _StudentInvitationsSection(
             invitations: _invitations,
             isLoading: _isLoadingInvitations,
             error: _invitationError,
             processingClassroomIds: _processingInvitationClassIds,
+            onJoinClassroom: _openJoinClassroom,
+            onViewAll: _openAllInvitations,
             onAccept: (invitation) => _handleInvitation(
               invitation,
               accept: true,
@@ -1319,6 +1373,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             isLoading: _isLoadingClassrooms,
             error: _classroomError,
             onOpenClassroom: _openClassDetail,
+            onViewAll: _openAllClassrooms,
           ),
         ],
       ),
@@ -1349,6 +1404,13 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   }
 
   Future<void> _openJoinClassroom() async {
+    if (!await _allowClassroomActionForActiveRole()) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
@@ -1378,6 +1440,217 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     }
   }
 
+  Future<void> _openAllInvitations() async {
+    if (!await _allowClassroomActionForActiveRole()) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (profileId == null || profileId <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.readText(AppKeys.studentMissingProfileId)),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    final acceptedInvitation = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => _StudentInvitationListScreen(
+          profileId: profileId,
+          classroomService: _classroomService,
+          initialInvitations: _invitations,
+        ),
+      ),
+    );
+    await _loadInvitations();
+    if (acceptedInvitation == true) {
+      _loadedProfileId = null;
+      await _loadClassrooms();
+    }
+  }
+
+  Future<void> _openAllClassrooms() async {
+    if (!await _allowClassroomActionForActiveRole()) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (profileId == null || profileId <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.readText(AppKeys.studentMissingProfileId)),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => _StudentClassroomListScreen(
+          profileId: profileId,
+          classroomService: _classroomService,
+          initialClassrooms: _classrooms,
+        ),
+      ),
+    );
+    _loadedProfileId = null;
+    await _loadClassrooms();
+  }
+
+  Future<bool> _allowClassroomActionForActiveRole() async {
+    if (widget.activeRole != ProfileRole.parent) {
+      return true;
+    }
+
+    if (_studentProfiles.isNotEmpty) {
+      final shouldSwitch = await _showParentSwitchStudentDialog();
+      if (shouldSwitch == true && mounted) {
+        await _openProfileSwitch();
+      }
+      return false;
+    }
+
+    final shouldCreateStudent = await _showParentNoStudentDialog();
+    if (!mounted) {
+      return false;
+    }
+    if (shouldCreateStudent == true) {
+      await _openCreateStudentProfile();
+    }
+    return false;
+  }
+
+  List<StudentProfile> get _studentProfiles {
+    return widget.profiles
+        .where((profile) =>
+            ProfileRole.fromProfile(profile) == ProfileRole.student)
+        .toList();
+  }
+
+  Future<void> _openProfileSwitch() async {
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => Material(
+          color: Colors.white,
+          child: SafeArea(
+            child: SettingTab.page(
+              user: widget.user,
+              profiles: widget.profiles,
+              activeProfile: widget.activeProfile,
+              profileLoadError: null,
+              onLogout: () {},
+              onProfileSaved: widget.onProfileSaved,
+              bottomPadding: 0,
+              scale: widget.scale,
+              initialView: SettingPageView.profile,
+              isPushedPage: true,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openCreateStudentProfile() async {
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => Material(
+          color: Colors.white,
+          child: SafeArea(
+            child: SettingTab.page(
+              user: widget.user,
+              profiles: widget.profiles,
+              activeProfile: widget.activeProfile,
+              profileLoadError: null,
+              onLogout: () {},
+              onProfileSaved: widget.onProfileSaved,
+              bottomPadding: 0,
+              scale: widget.scale,
+              initialView: SettingPageView.addProfile,
+              isPushedPage: true,
+              popAfterProfileSave: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    widget.onProfileSaved();
+  }
+
+  Future<bool?> _showParentSwitchStudentDialog() {
+    HapticFeedback.selectionClick();
+    return showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+          title: Text(
+            context.getText(AppKeys.parentSwitchStudentTitle),
+            style: const TextStyle(
+              color: Color(0xFF001741),
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              height: 1.2,
+            ),
+          ),
+          content: Text(
+            context.getText(AppKeys.parentSwitchStudentMessage),
+            style: const TextStyle(
+              color: Color(0xFF444650),
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(context.getText(AppKeys.cancel)),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF008080),
+              ),
+              child: Text(
+                context.getText(AppKeys.parentSwitchStudentAction),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool?> _showParentNoStudentDialog() {
+    HapticFeedback.selectionClick();
+    return showDialog<bool>(
+      context: context,
+      barrierColor: const Color(0xFF001741).withValues(alpha: 0.40),
+      builder: (_) => const _ParentNoStudentDialog(),
+    );
+  }
+
   void _openGradeSelection(String quizPurpose) {
     HapticFeedback.lightImpact();
     Navigator.of(context).push(
@@ -1387,12 +1660,22 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
           initialGrades: widget.initialGrades,
           gradeService: widget.gradeService,
           quizPurpose: quizPurpose,
+          profileId: ActiveProfileSession.profileStableId(
+            widget.activeProfile,
+          ),
         ),
       ),
     );
   }
 
   Future<void> _openClassDetail(ClassroomModel classroom) async {
+    if (!await _allowClassroomActionForActiveRole()) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
@@ -1427,6 +1710,8 @@ class _StudentInvitationsSection extends StatelessWidget {
     required this.isLoading,
     required this.error,
     required this.processingClassroomIds,
+    required this.onJoinClassroom,
+    required this.onViewAll,
     required this.onAccept,
     required this.onReject,
     required this.onRetry,
@@ -1436,75 +1721,212 @@ class _StudentInvitationsSection extends StatelessWidget {
   final bool isLoading;
   final String? error;
   final Set<int> processingClassroomIds;
+  final VoidCallback onJoinClassroom;
+  final VoidCallback onViewAll;
   final ValueChanged<ClassroomInvitation> onAccept;
   final ValueChanged<ClassroomInvitation> onReject;
   final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    if (!isLoading && error == null && invitations.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    final invitation = invitations.isNotEmpty ? invitations.first : null;
+    final showInvitationPreview =
+        isLoading || error != null || invitation != null;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                context.getText(AppKeys.studentClassInvitations),
-                style: const TextStyle(
-                  color: Color(0xFF181C1E),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  height: 1.2,
-                  letterSpacing: 0,
-                ),
-              ),
-            ),
-            Text(
-              context.formatText(
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.14),
+            blurRadius: 16,
+            offset: const Offset(3, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (showInvitationPreview) ...[
+            _StudentFigmaSectionHeader(
+              title: context.getText(AppKeys.studentClassInvitations),
+              actionLabel: context.formatText(
                 AppKeys.studentViewAllInvitations,
                 {'count': invitations.length},
               ),
-              style: const TextStyle(
-                color: Color(0xFFF87851),
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-                decoration: TextDecoration.underline,
-                height: 1.2,
-                letterSpacing: 0,
-              ),
+              onAction: invitation == null ? null : onViewAll,
             ),
+            const SizedBox(height: 10),
+            if (isLoading && invitation == null)
+              const SizedBox(
+                height: 77,
+                child: Center(
+                  child: CircularProgressIndicator(color: _teal),
+                ),
+              )
+            else if (error != null && invitation == null)
+              _StudentInlineErrorPanel(
+                message: error!,
+                onRetry: onRetry,
+              )
+            else if (invitation != null)
+              _StudentInvitationCard(
+                invitation: invitation,
+                isProcessing: processingClassroomIds.contains(
+                  invitation.stableClassroomId,
+                ),
+                compactActions: true,
+                onAccept: () => onAccept(invitation),
+                onReject: () => onReject(invitation),
+              ),
+            const SizedBox(height: 6),
           ],
+          _StudentJoinClassCta(onTap: onJoinClassroom),
+        ],
+      ),
+    );
+  }
+}
+
+class _ParentNoStudentDialog extends StatelessWidget {
+  const _ParentNoStudentDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 24),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: Container(
+            width: 303,
+            padding: const EdgeInsets.fromLTRB(25, 32, 25, 24),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.4),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 50,
+                  offset: const Offset(0, 25),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 192,
+                      height: 192,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFAA2A6C).withValues(alpha: 0.10),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                const Color(0xFFAA2A6C).withValues(alpha: 0.16),
+                            blurRadius: 30,
+                            spreadRadius: 12,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Image.asset(
+                      _parentNoStudentMascot,
+                      width: 220,
+                      height: 198,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  context.getText(AppKeys.parentNoStudentTitle),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFF001741),
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    height: 1.2,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  context.getText(AppKeys.parentNoStudentMessage),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFF444650),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.5,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: FilledButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFFAA2A6C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      context.getText(AppKeys.parentCreateStudentNow),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFFAA2A6C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      context.getText(AppKeys.parentCreateStudentLater),
+                      style: const TextStyle(
+                        color: Color(0xFFAA2A6C),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        const SizedBox(height: 8),
-        if (isLoading && invitations.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 18),
-            child: Center(
-              child: CircularProgressIndicator(color: _teal),
-            ),
-          )
-        else if (error != null && invitations.isEmpty)
-          _StudentInlineErrorPanel(
-            message: error!,
-            onRetry: onRetry,
-          )
-        else
-          for (var index = 0; index < invitations.length; index++) ...[
-            _StudentInvitationCard(
-              invitation: invitations[index],
-              isProcessing: processingClassroomIds.contains(
-                invitations[index].stableClassroomId,
-              ),
-              onAccept: () => onAccept(invitations[index]),
-              onReject: () => onReject(invitations[index]),
-            ),
-            if (index != invitations.length - 1) const SizedBox(height: 10),
-          ],
-      ],
+      ),
     );
   }
 }
@@ -1553,16 +1975,81 @@ class _StudentInlineErrorPanel extends StatelessWidget {
   }
 }
 
+class _StudentFigmaSectionHeader extends StatelessWidget {
+  const _StudentFigmaSectionHeader({
+    required this.title,
+    required this.actionLabel,
+    required this.onAction,
+  });
+
+  final String title;
+  final String actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final action = Text(
+      actionLabel,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(
+        color: Color(0xFFBC3B14),
+        fontSize: 14,
+        fontWeight: FontWeight.w900,
+        decoration: TextDecoration.underline,
+        height: 1.2,
+        letterSpacing: 0,
+      ),
+    );
+
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF001741),
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              height: 1.25,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        if (onAction == null)
+          action
+        else
+          InkWell(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onAction!();
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: action,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _StudentInvitationCard extends StatelessWidget {
   const _StudentInvitationCard({
     required this.invitation,
     required this.isProcessing,
+    this.compactActions = false,
     required this.onAccept,
     required this.onReject,
   });
 
   final ClassroomInvitation invitation;
   final bool isProcessing;
+  final bool compactActions;
   final VoidCallback onAccept;
   final VoidCallback onReject;
 
@@ -1597,86 +2084,191 @@ class _StudentInvitationCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(
-                _studentHomeInvite,
-                width: 36,
-                height: 32,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: compactActions
+          ? _buildCompact(context, title, subtitle)
+          : Column(
+              children: [
+                Row(
                   children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF181C1E),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
-                        letterSpacing: 0,
-                      ),
+                    SvgPicture.asset(
+                      _studentHomeInvite,
+                      width: 36,
+                      height: 32,
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF444650),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
-                        letterSpacing: 0,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF181C1E),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              height: 1.2,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF444650),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              height: 1.2,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 11),
+                if (isProcessing)
+                  const SizedBox(
+                    height: 27,
+                    child: Center(
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          color: _teal,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _StudentInviteButton(
+                          label: context.getText(AppKeys.accept),
+                          color: const Color(0xFF38898C),
+                          onTap: onAccept,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _StudentInviteButton(
+                          label: context.getText(AppKeys.reject),
+                          color: const Color(0xFFF37850),
+                          onTap: onReject,
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildCompact(
+    BuildContext context,
+    String title,
+    String subtitle,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color(0xFF001741),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  height: 1.35,
+                  letterSpacing: 0,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: const Color(0xFF001741).withValues(alpha: 0.7),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  height: 1.3,
+                  letterSpacing: 0,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 11),
-          if (isProcessing)
-            const SizedBox(
-              height: 27,
-              child: Center(
-                child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    color: _teal,
-                    strokeWidth: 2,
-                  ),
+        ),
+        const SizedBox(width: 12),
+        if (isProcessing)
+          const SizedBox(
+            width: 56,
+            child: Center(
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  color: _teal,
+                  strokeWidth: 2,
                 ),
               ),
-            )
-          else
-            Row(
-              children: [
-                Expanded(
-                  child: _StudentInviteButton(
-                    label: context.getText(AppKeys.accept),
-                    color: const Color(0xFF38898C),
-                    onTap: onAccept,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StudentInviteButton(
-                    label: context.getText(AppKeys.reject),
-                    color: const Color(0xFFF37850),
-                    onTap: onReject,
-                  ),
-                ),
-              ],
             ),
-        ],
+          )
+        else
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _StudentInviteIconButton(
+                asset: _studentParentHomeAcceptIcon,
+                label: context.getText(AppKeys.accept),
+                onTap: onAccept,
+              ),
+              const SizedBox(width: 8),
+              _StudentInviteIconButton(
+                asset: _studentParentHomeRejectIcon,
+                label: context.getText(AppKeys.reject),
+                onTap: onReject,
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+class _StudentInviteIconButton extends StatelessWidget {
+  const _StudentInviteIconButton({
+    required this.asset,
+    required this.label,
+    required this.onTap,
+  });
+
+  final String asset;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(999),
+        child: Image.asset(asset, width: 25, height: 25),
       ),
     );
   }
@@ -1736,171 +2328,110 @@ class _StudentFigmaHeroCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 365,
+      height: 195,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(30),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF78C6B4),
-            Color(0xFFF4B7A3),
+            Color(0xFFE3F1F2),
+            Color(0xFFF47C53),
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.22),
-            blurRadius: 36,
-            offset: const Offset(0, 18),
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 50,
+            offset: const Offset(0, 25),
           ),
         ],
       ),
       child: Stack(
         children: [
           Positioned(
-            right: 22,
+            left: -14,
+            right: -14,
+            bottom: -70,
+            child: Opacity(
+              opacity: 0.70,
+              child: Image.asset(
+                _studentParentHomeHeroBg,
+                height: 240,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 35,
+            right: 35,
             top: 12,
             child: Text(
-              'x²',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.10),
-                fontSize: 72,
+              context.getText(AppKeys.studentHomework).toUpperCase(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF357476),
+                fontSize: 24,
                 fontWeight: FontWeight.w900,
-                height: 1,
-                letterSpacing: 0,
+                height: 1.5,
+                letterSpacing: 1.5,
               ),
             ),
           ),
           Positioned(
-            left: 28,
-            right: 28,
-            top: 24,
+            right: -4,
+            bottom: 0,
+            width: 215,
+            height: 143,
+            child: Image.asset(_studentParentHomeHeroArt, fit: BoxFit.cover),
+          ),
+          Positioned(
+            left: 11,
+            top: 95,
+            width: 134,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  context.getText(AppKeys.assessment),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                    height: 1.15,
-                    letterSpacing: 1.5,
-                  ),
+                _HeroActionButton(
+                  label: context.getText(AppKeys.practice),
+                  color: const Color(0xFF38898C),
+                  icon: _studentParentHomePracticeIcon,
+                  onTap: onPracticeTap,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  context.getText(AppKeys.assessmentDescription),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    height: 1.45,
-                    letterSpacing: 0,
-                  ),
+                const SizedBox(height: 8),
+                _HeroActionButton(
+                  label: context.getText(AppKeys.assessmentAction),
+                  color: const Color(0xFFFB7651),
+                  icon: _studentParentHomeAssessmentIcon,
+                  onTap: onAssessmentTap,
                 ),
               ],
             ),
           ),
           Positioned(
-            left: 60,
-            right: 44,
-            top: 105,
-            bottom: 58,
-            child: Image.asset(_studentHomeMascot, fit: BoxFit.contain),
-          ),
-          const Positioned(
-            right: 12,
-            top: 107,
-            child: _MathBubble(
-              text: '5 + 3 = 8',
-              color: Color(0xFF4A6B5D),
-            ),
-          ),
-          Positioned(
-            left: 20,
-            bottom: 65,
-            child: Transform.rotate(
-              angle: -0.20,
-              child: const _MathBubble(
-                text: '2 × 2 = 4',
-                color: Color(0xFF856404),
-                backgroundColor: Color(0xFFF8D7DA),
+            right: 14,
+            top: 48,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.88),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                '5+3\n=8',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF348285),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  height: 1.0,
+                  letterSpacing: 0,
+                ),
               ),
             ),
           ),
-          Positioned(
-            left: 23,
-            right: 29,
-            bottom: 16,
-            child: Row(
-              children: [
-                Expanded(
-                  child: _HeroActionButton(
-                    label: context.getText(AppKeys.assessmentAction),
-                    color: const Color(0xFFFB7651),
-                    icon: _studentHomeAssessmentIcon,
-                    onTap: onAssessmentTap,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _HeroActionButton(
-                    label: context.getText(AppKeys.practice),
-                    color: const Color(0xFF38898C),
-                    icon: _studentHomePracticeIcon,
-                    onTap: onPracticeTap,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
-      ),
-    );
-  }
-}
-
-class _MathBubble extends StatelessWidget {
-  const _MathBubble({
-    required this.text,
-    required this.color,
-    this.backgroundColor = Colors.white,
-  });
-
-  final String text;
-  final Color color;
-  final Color backgroundColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
-      decoration: BoxDecoration(
-        color: backgroundColor.withValues(alpha: 0.90),
-        borderRadius: BorderRadius.circular(999),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 18,
-          fontWeight: FontWeight.w900,
-          height: 1,
-          letterSpacing: 0,
-        ),
       ),
     );
   }
@@ -1922,12 +2453,12 @@ class _HeroActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44,
+      height: 35,
       child: FilledButton(
         onPressed: onTap,
         style: FilledButton.styleFrom(
           backgroundColor: color,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(999),
           ),
@@ -1944,7 +2475,7 @@ class _HeroActionButton extends StatelessWidget {
                   color: Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
-                  height: 1,
+                  height: 1.1,
                   letterSpacing: 0,
                 ),
               ),
@@ -1970,21 +2501,32 @@ class _StudentJoinClassCta extends StatelessWidget {
       child: FilledButton(
         onPressed: onTap,
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFFFB7651),
+          backgroundColor: const Color(0xFFAA2A6C),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(20),
           ),
           elevation: 0,
         ),
-        child: Text(
-          context.getText(AppKeys.studentJoinClassroomUpper),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            height: 1,
-            letterSpacing: 0,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              _studentParentHomeJoinIcon,
+              width: 20,
+              height: 20,
+            ),
+            const SizedBox(width: 7),
+            Text(
+              context.getText(AppKeys.studentJoinClassroomUpper),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                height: 1,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -1997,12 +2539,14 @@ class _StudentClassGridSection extends StatelessWidget {
     required this.isLoading,
     required this.error,
     required this.onOpenClassroom,
+    required this.onViewAll,
   });
 
   final List<ClassroomModel> classrooms;
   final bool isLoading;
   final String? error;
   final ValueChanged<ClassroomModel> onOpenClassroom;
+  final VoidCallback onViewAll;
 
   @override
   Widget build(BuildContext context) {
@@ -2011,32 +2555,13 @@ class _StudentClassGridSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                context.getText(AppKeys.teacherYourClasses),
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  height: 1.1,
-                  letterSpacing: 0,
-                ),
-              ),
-            ),
-            Text(
-              context.getText(AppKeys.viewAll),
-              style: const TextStyle(
-                color: Color(0xFF161D1F),
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-                decoration: TextDecoration.underline,
-                height: 1,
-                letterSpacing: 0,
-              ),
-            ),
-          ],
+        _StudentFigmaSectionHeader(
+          title: context.getText(AppKeys.teacherYourClasses),
+          actionLabel: context.formatText(
+            AppKeys.studentViewAllClassrooms,
+            {'count': classrooms.length},
+          ),
+          onAction: classrooms.isEmpty ? null : onViewAll,
         ),
         const SizedBox(height: 10),
         if (isLoading && classrooms.isEmpty)
@@ -2060,7 +2585,7 @@ class _StudentClassGridSection extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              mainAxisExtent: 176,
+              mainAxisExtent: 168,
             ),
             itemCount: visibleClassrooms.length,
             itemBuilder: (context, index) {
@@ -2107,7 +2632,11 @@ class _StudentFigmaStateCard extends StatelessWidget {
               color: const Color(0xFFFDF2F8),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Image.asset(_studentHomeClassIcon, fit: BoxFit.contain),
+            clipBehavior: Clip.antiAlias,
+            child: Image.asset(
+              _studentParentHomeClassThumb,
+              fit: BoxFit.cover,
+            ),
           ),
           const SizedBox(height: 12),
           Text(
@@ -2187,7 +2716,11 @@ class _StudentFigmaClassCard extends StatelessWidget {
                   color: const Color(0xFFFDF2F8),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Image.asset(_studentHomeClassIcon, fit: BoxFit.contain),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(
+                  _studentParentHomeClassThumb,
+                  fit: BoxFit.cover,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
@@ -2230,29 +2763,386 @@ class _StudentFigmaClassCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Container(
-                      width: 69,
+                      width: 62,
                       height: 24,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF3F8F92),
-                        borderRadius: BorderRadius.circular(5),
+                        color: const Color(0xFFF8744E),
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.10),
+                            blurRadius: 0,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        context.getText(AppKeys.teacherEnterClass),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          height: 1,
-                          letterSpacing: 0,
-                        ),
+                      child: SvgPicture.asset(
+                        _studentParentHomeEnterIcon,
+                        width: 11,
+                        height: 11,
                       ),
                     ),
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentInvitationListScreen extends StatefulWidget {
+  const _StudentInvitationListScreen({
+    required this.profileId,
+    required this.classroomService,
+    required this.initialInvitations,
+  });
+
+  final int profileId;
+  final ClassroomService classroomService;
+  final List<ClassroomInvitation> initialInvitations;
+
+  @override
+  State<_StudentInvitationListScreen> createState() =>
+      _StudentInvitationListScreenState();
+}
+
+class _StudentInvitationListScreenState
+    extends State<_StudentInvitationListScreen> {
+  List<ClassroomInvitation> _invitations = const <ClassroomInvitation>[];
+  final Set<int> _processingClassroomIds = <int>{};
+  bool _isLoading = false;
+  bool _acceptedInvitation = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _invitations = widget.initialInvitations;
+    _loadInvitations();
+  }
+
+  Future<void> _loadInvitations() async {
+    if (_isLoading) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final invitations = await widget.classroomService
+          .listMyPendingInvitations(profileId: widget.profileId);
+      if (!mounted) {
+        return;
+      }
+      setState(() => _invitations = invitations);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = context.readText(AppKeys.studentInvitationLoadFailed);
+        _invitations = const <ClassroomInvitation>[];
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      } else {
+        _isLoading = false;
+      }
+    }
+  }
+
+  Future<void> _handleInvitation(
+    ClassroomInvitation invitation, {
+    required bool accept,
+  }) async {
+    final classroomId = invitation.stableClassroomId;
+    if (classroomId == null) {
+      return;
+    }
+
+    final inviterProfileId = invitation.inviterProfileId ?? widget.profileId;
+    setState(() => _processingClassroomIds.add(classroomId));
+    try {
+      if (accept) {
+        await widget.classroomService.acceptInvitation(
+          inviteeProfileId: widget.profileId,
+          inviterProfileId: inviterProfileId,
+          classroomId: classroomId,
+        );
+        _acceptedInvitation = true;
+      } else {
+        await widget.classroomService.rejectInvitation(
+          inviteeProfileId: widget.profileId,
+          inviterProfileId: inviterProfileId,
+          classroomId: classroomId,
+        );
+      }
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              context.readText(
+                accept
+                    ? AppKeys.studentInvitationAcceptSuccess
+                    : AppKeys.studentInvitationRejectSuccess,
+              ),
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      await _loadInvitations();
+    } on ClassroomException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _processingClassroomIds.remove(classroomId));
+      }
+    }
+  }
+
+  void _close() {
+    Navigator.of(context).pop(_acceptedInvitation);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope<bool>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _close();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6FAFB),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          leading: IconButton(
+            onPressed: _close,
+            icon: const Icon(Icons.arrow_back_rounded),
+          ),
+          title: Text(context.getText(AppKeys.studentClassInvitations)),
+        ),
+        body: SafeArea(
+          top: false,
+          child: RefreshIndicator(
+            onRefresh: _loadInvitations,
+            color: _teal,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+              children: [
+                if (_isLoading && _invitations.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 120),
+                    child:
+                        Center(child: CircularProgressIndicator(color: _teal)),
+                  )
+                else if (_error != null && _invitations.isEmpty)
+                  _StudentInlineErrorPanel(
+                    message: _error!,
+                    onRetry: _loadInvitations,
+                  )
+                else if (_invitations.isEmpty)
+                  const _StudentFigmaStateCard(
+                    titleKey: AppKeys.studentNoInvitationsTitle,
+                    messageKey: AppKeys.studentNoInvitationsMessage,
+                  )
+                else
+                  for (var index = 0; index < _invitations.length; index++) ...[
+                    _StudentInvitationCard(
+                      invitation: _invitations[index],
+                      isProcessing: _processingClassroomIds.contains(
+                        _invitations[index].stableClassroomId,
+                      ),
+                      onAccept: () => _handleInvitation(
+                        _invitations[index],
+                        accept: true,
+                      ),
+                      onReject: () => _handleInvitation(
+                        _invitations[index],
+                        accept: false,
+                      ),
+                    ),
+                    if (index != _invitations.length - 1)
+                      const SizedBox(height: 12),
+                  ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentClassroomListScreen extends StatefulWidget {
+  const _StudentClassroomListScreen({
+    required this.profileId,
+    required this.classroomService,
+    required this.initialClassrooms,
+  });
+
+  final int profileId;
+  final ClassroomService classroomService;
+  final List<ClassroomModel> initialClassrooms;
+
+  @override
+  State<_StudentClassroomListScreen> createState() =>
+      _StudentClassroomListScreenState();
+}
+
+class _StudentClassroomListScreenState
+    extends State<_StudentClassroomListScreen> {
+  List<ClassroomModel> _classrooms = const <ClassroomModel>[];
+  bool _isLoading = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _classrooms = widget.initialClassrooms;
+    _loadClassrooms();
+  }
+
+  Future<void> _loadClassrooms() async {
+    if (_isLoading) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final classrooms = await widget.classroomService
+          .listMyJoinedClassrooms(profileId: widget.profileId);
+      if (!mounted) {
+        return;
+      }
+      setState(() => _classrooms = classrooms);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = context.readText(AppKeys.studentClassroomLoadFailed);
+        _classrooms = const <ClassroomModel>[];
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      } else {
+        _isLoading = false;
+      }
+    }
+  }
+
+  Future<void> _openClassDetail(ClassroomModel classroom) async {
+    final classroomId = classroom.stableId;
+    if (classroomId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.readText(AppKeys.teacherClassOpenFailed)),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => StudentClassDetailScreen(
+          classroomId: classroomId,
+          profileId: widget.profileId,
+          initialClassroom: classroom,
+          classroomService: widget.classroomService,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF6FAFB),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        title: Text(context.getText(AppKeys.teacherYourClasses)),
+      ),
+      body: SafeArea(
+        top: false,
+        child: RefreshIndicator(
+          onRefresh: _loadClassrooms,
+          color: _teal,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+            children: [
+              if (_isLoading && _classrooms.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 120),
+                  child: Center(child: CircularProgressIndicator(color: _teal)),
+                )
+              else if (_error != null && _classrooms.isEmpty)
+                _StudentInlineErrorPanel(
+                  message: _error!,
+                  onRetry: _loadClassrooms,
+                )
+              else if (_classrooms.isEmpty)
+                const _StudentFigmaStateCard(
+                  titleKey: AppKeys.studentNoClassroomsTitle,
+                  messageKey: AppKeys.studentNoClassroomsMessage,
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    mainAxisExtent: 168,
+                  ),
+                  itemCount: _classrooms.length,
+                  itemBuilder: (context, index) {
+                    return _StudentFigmaClassCard(
+                      classroom: _classrooms[index],
+                      onTap: () => _openClassDetail(_classrooms[index]),
+                    );
+                  },
+                ),
             ],
           ),
         ),

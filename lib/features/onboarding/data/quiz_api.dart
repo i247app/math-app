@@ -38,6 +38,7 @@ abstract class QuizService {
   Future<GeneratedQuiz> submitQuiz({
     required int quizId,
     required List<SubmitQuizAnswer> answers,
+    int? profileId,
   });
 
   Future<GeneratedQuiz> getQuizDetail(int quizId);
@@ -81,6 +82,7 @@ class FakeQuizApi implements QuizService {
   Future<GeneratedQuiz> submitQuiz({
     required int quizId,
     required List<SubmitQuizAnswer> answers,
+    int? profileId,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 700));
     final response = SubmitQuizResponse.fromJson(
@@ -184,6 +186,7 @@ class QuizApi implements QuizService {
   Future<GeneratedQuiz> submitQuiz({
     required int quizId,
     required List<SubmitQuizAnswer> answers,
+    int? profileId,
   }) async {
     final SubmitQuizResponse response;
     try {
@@ -191,6 +194,7 @@ class QuizApi implements QuizService {
         SubmitQuizRequest(
           quizId: quizId,
           answers: answers,
+          profileId: profileId,
         ),
       );
     } on NetworkException catch (error) {

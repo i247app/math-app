@@ -62,6 +62,7 @@ class _AddProfilePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final error = errorMessage?.trim();
     final isTeacherProfile = role == 'TEACHER';
+    final isParentProfile = role == 'PARENT';
     final idTypeOptions =
         isTeacherProfile ? _teacherIdTypeOptions : _studentIdTypeOptions;
     final selectedIdTypeOption = _firstIdTypeOption(
@@ -88,76 +89,78 @@ class _AddProfilePanel extends StatelessWidget {
               : context.getText(AppKeys.studentNameHint),
           scale: scale,
         ),
-        SizedBox(height: 18 * scale),
-        if (isLoadingOptions)
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 58 * scale),
-            child: Center(
-              child: CircularProgressIndicator(
-                color: _teal,
-                strokeWidth: 3 * scale,
+        if (!isParentProfile) ...[
+          SizedBox(height: 18 * scale),
+          if (isLoadingOptions)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 58 * scale),
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: _teal,
+                  strokeWidth: 3 * scale,
+                ),
               ),
             ),
-          )
-        else ...[
-          _AddProfileDropdown<SchoolModel>(
-            label: context.getText(AppKeys.school),
-            hintText: context.getText(AppKeys.chooseSchool),
-            value: selectedSchool,
-            items: schools,
-            itemLabel: (school) => school.name?.trim().isNotEmpty == true
-                ? school.name!.trim()
-                : context.getText(AppKeys.noSchools),
-            onChanged: onSchoolChanged,
-            scale: scale,
-          ),
-          SizedBox(height: 18 * scale),
-          if (!isTeacherProfile) ...[
-            _AddProfileDropdown<ProgramModel>(
-              label: context.getText(AppKeys.learningProgram),
-              hintText: context.getText(AppKeys.chooseProgram),
-              value: selectedProgram,
-              items: programs,
-              itemLabel: (program) => program.label?.trim().isNotEmpty == true
-                  ? program.label!.trim()
-                  : context.getText(AppKeys.program),
-              onChanged: onProgramChanged,
+          if (!isLoadingOptions) ...[
+            _AddProfileDropdown<SchoolModel>(
+              label: context.getText(AppKeys.school),
+              hintText: context.getText(AppKeys.chooseSchool),
+              value: selectedSchool,
+              items: schools,
+              itemLabel: (school) => school.name?.trim().isNotEmpty == true
+                  ? school.name!.trim()
+                  : context.getText(AppKeys.noSchools),
+              onChanged: onSchoolChanged,
               scale: scale,
             ),
             SizedBox(height: 18 * scale),
-            _AddProfileDropdown<GradeModel>(
-              label: context.getText(AppKeys.grade),
-              hintText: context.getText(AppKeys.chooseGrade),
-              value: selectedGrade,
-              items: grades,
-              itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
-                  ? grade.label!.trim()
-                  : context.getText(AppKeys.grade),
-              onChanged: onGradeChanged,
+            if (!isTeacherProfile) ...[
+              _AddProfileDropdown<ProgramModel>(
+                label: context.getText(AppKeys.learningProgram),
+                hintText: context.getText(AppKeys.chooseProgram),
+                value: selectedProgram,
+                items: programs,
+                itemLabel: (program) => program.label?.trim().isNotEmpty == true
+                    ? program.label!.trim()
+                    : context.getText(AppKeys.program),
+                onChanged: onProgramChanged,
+                scale: scale,
+              ),
+              SizedBox(height: 18 * scale),
+              _AddProfileDropdown<GradeModel>(
+                label: context.getText(AppKeys.grade),
+                hintText: context.getText(AppKeys.chooseGrade),
+                value: selectedGrade,
+                items: grades,
+                itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
+                    ? grade.label!.trim()
+                    : context.getText(AppKeys.grade),
+                onChanged: onGradeChanged,
+                scale: scale,
+              ),
+              SizedBox(height: 18 * scale),
+            ],
+            if (isTeacherProfile) ...[
+              _AddProfileDropdown<_ProfileIdTypeOption>(
+                label: context.getText(AppKeys.profileIdTypeLabel),
+                hintText: context.getText(AppKeys.profileIdTypeHint),
+                value: selectedIdTypeOption,
+                items: idTypeOptions,
+                itemLabel: (option) => context.getText(option.label),
+                onChanged: (option) => onIdTypeChanged(option?.value),
+                scale: scale,
+              ),
+              SizedBox(height: 18 * scale),
+            ],
+            _AddProfileTextField(
+              label: context.getText(AppKeys.profileIdValueLabel),
+              controller: idController,
+              hintText: isTeacherProfile
+                  ? context.getText(AppKeys.profileTeacherIdHint)
+                  : context.getText(AppKeys.profileStudentIdHint),
               scale: scale,
             ),
-            SizedBox(height: 18 * scale),
           ],
-          if (isTeacherProfile) ...[
-            _AddProfileDropdown<_ProfileIdTypeOption>(
-              label: context.getText(AppKeys.profileIdTypeLabel),
-              hintText: context.getText(AppKeys.profileIdTypeHint),
-              value: selectedIdTypeOption,
-              items: idTypeOptions,
-              itemLabel: (option) => context.getText(option.label),
-              onChanged: (option) => onIdTypeChanged(option?.value),
-              scale: scale,
-            ),
-            SizedBox(height: 18 * scale),
-          ],
-          _AddProfileTextField(
-            label: context.getText(AppKeys.profileIdValueLabel),
-            controller: idController,
-            hintText: isTeacherProfile
-                ? context.getText(AppKeys.profileTeacherIdHint)
-                : context.getText(AppKeys.profileStudentIdHint),
-            scale: scale,
-          ),
         ],
         if (error != null && error.isNotEmpty) ...[
           SizedBox(height: 14 * scale),

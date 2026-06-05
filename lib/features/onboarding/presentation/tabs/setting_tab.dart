@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../app/numi_app.dart';
@@ -178,7 +179,9 @@ class _SettingTabState extends State<SettingTab> {
       _editingProfile = initialEditingProfile;
       _profileNameController.text = initialEditingProfile.name?.trim() ?? '';
       _selectedProfileAvatarKey = initialEditingProfile.avatarKey?.trim();
-      _applyProfileIdFields(initialEditingProfile);
+      if (_profileRole(initialEditingProfile) != 'PARENT') {
+        _applyProfileIdFields(initialEditingProfile);
+      }
     }
     if (_view == SettingPageView.profile) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -193,12 +196,14 @@ class _SettingTabState extends State<SettingTab> {
         if (!mounted) {
           return;
         }
-        if (initialEditingProfile != null) {
+        final isEditingParent = initialEditingProfile != null &&
+            _profileRole(initialEditingProfile) == 'PARENT';
+        if (initialEditingProfile != null && !isEditingParent) {
           _selectOptionsForProfile(initialEditingProfile);
-        } else {
+        } else if (initialEditingProfile == null) {
           _resetCreateProfileForm();
         }
-        if (!_hasProfileOptions) {
+        if (!isEditingParent && !_hasProfileOptions) {
           _loadProfileOptions(profileToSelect: initialEditingProfile);
         }
       });
@@ -590,15 +595,18 @@ class _SettingTabState extends State<SettingTab> {
     _resetCreateProfileForm();
     _profileNameController.text = profile.name?.trim() ?? '';
     _editingProfile = profile;
-    _selectOptionsForProfile(profile);
-    _applyProfileIdFields(profile);
+    _selectedProfileAvatarKey = profile.avatarKey?.trim();
+    if (_profileRole(profile) != 'PARENT') {
+      _selectOptionsForProfile(profile);
+      _applyProfileIdFields(profile);
+    }
     setState(() {
       _view = SettingPageView.addProfile;
       _isForwardTransition = true;
       _profileCreateError = null;
     });
     FocusScope.of(context).unfocus();
-    if (!_hasProfileOptions) {
+    if (_profileRole(profile) != 'PARENT' && !_hasProfileOptions) {
       _loadProfileOptions(profileToSelect: profile);
     }
   }
@@ -930,6 +938,7 @@ class _SettingTabState extends State<SettingTab> {
     final editingProfile = _editingProfile;
     final formRole = _profileFormRole(editingProfile);
     final isTeacherProfile = formRole == 'TEACHER';
+    final isParentProfile = formRole == 'PARENT';
     final normalizedIdType = _normalizedProfileIdType(
       _selectedProfileIdType,
       formRole,
@@ -945,14 +954,14 @@ class _SettingTabState extends State<SettingTab> {
           () => _profileCreateError = context.readText(AppKeys.missingAccount));
       return;
     }
-    if (editingProfile == null && name.isEmpty) {
+    if ((editingProfile == null || isParentProfile) && name.isEmpty) {
       setState(
         () =>
             _profileCreateError = context.readText(AppKeys.missingProfileName),
       );
       return;
     }
-    if (school?.schoolId == null) {
+    if (!isParentProfile && school?.schoolId == null) {
       setState(
         () => _profileCreateError =
             context.readText(AppKeys.missingProfileSelections),
@@ -960,6 +969,7 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
     if (!isTeacherProfile &&
+        !isParentProfile &&
         editingProfile == null &&
         (grade?.gradeId == null ||
             program?.programId == null ||
@@ -1002,7 +1012,7 @@ class _SettingTabState extends State<SettingTab> {
           studentId: isTeacherProfile ? null : profileIdValue,
           teacherId: shouldSubmitTeacherId ? profileIdValue : null,
         );
-        if (isCreatingFirstProfile) {
+        if (formRole == 'STUDENT' || isCreatingFirstProfile) {
           final profileId =
               ActiveProfileSession.profileStableId(createdProfile);
           if (profileId != null) {
@@ -1018,21 +1028,29 @@ class _SettingTabState extends State<SettingTab> {
           throw ProfileException(context.readText(AppKeys.missingProfileId));
         }
 
-        await _profileService.updateProfile(
-          profileId: profileId,
-          schoolId: school!.schoolId!,
-          name: _emptyToNull(name),
-          gradeId: isTeacherProfile ? null : grade?.gradeId,
-          programId: isTeacherProfile ? null : program?.programId,
-          semesterId: isTeacherProfile ? null : semester?.semesterId,
-          isDefault: editingProfile.isDefault,
-          role: formRole,
-          dob: _dateOnly(editingProfile.dob),
-          avatarKey: _selectedProfileAvatarKey,
-          idType: isTeacherProfile ? normalizedIdType : _idTypeMoet,
-          studentId: isTeacherProfile ? null : profileIdValue,
-          teacherId: shouldSubmitTeacherId ? profileIdValue : null,
-        );
+        if (isParentProfile) {
+          await _profileService.updateProfile(
+            profileId: profileId,
+            name: name,
+            avatarKey: _selectedProfileAvatarKey,
+          );
+        } else {
+          await _profileService.updateProfile(
+            profileId: profileId,
+            schoolId: school!.schoolId!,
+            name: _emptyToNull(name),
+            gradeId: isTeacherProfile ? null : grade?.gradeId,
+            programId: isTeacherProfile ? null : program?.programId,
+            semesterId: isTeacherProfile ? null : semester?.semesterId,
+            isDefault: editingProfile.isDefault,
+            role: formRole,
+            dob: _dateOnly(editingProfile.dob),
+            avatarKey: _selectedProfileAvatarKey,
+            idType: isTeacherProfile ? normalizedIdType : _idTypeMoet,
+            studentId: isTeacherProfile ? null : profileIdValue,
+            teacherId: shouldSubmitTeacherId ? profileIdValue : null,
+          );
+        }
       }
       if (!mounted) {
         return;
@@ -1352,6 +1370,8 @@ class _SettingTabState extends State<SettingTab> {
                         SettingPageView.profile => _ProfilePlaceholderPanel(
                             key: ValueKey(_viewKey(SettingPageView.profile)),
                             profiles: _profiles,
+                            activeProfile: widget.activeProfile,
+                            user: _effectiveUser,
                             activeProfileId: _activeProfileId,
                             isLoading: _isLoadingProfiles ||
                                 _isDeletingProfile ||

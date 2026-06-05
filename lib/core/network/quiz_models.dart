@@ -27,15 +27,21 @@ class GenerateQuizRequest {
   Map<String, dynamic> toJson() => _$GenerateQuizRequestToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+@JsonSerializable(
+  fieldRename: FieldRename.snake,
+  explicitToJson: true,
+  includeIfNull: false,
+)
 class SubmitQuizRequest {
   const SubmitQuizRequest({
     required this.quizId,
     required this.answers,
+    this.profileId,
   });
 
   final int quizId;
   final List<SubmitQuizAnswer> answers;
+  final int? profileId;
 
   factory SubmitQuizRequest.fromJson(Map<String, dynamic> json) =>
       _$SubmitQuizRequestFromJson(json);

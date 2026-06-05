@@ -277,6 +277,9 @@ class _ReviewTabState extends State<ReviewTab> {
           typeOfQuiz: quizTypeGeneral,
           gradeLabel: assessmentQuizGradeLabel,
           chapters: chapterNames,
+          profileId: ActiveProfileSession.profileStableId(
+            widget.activeProfile,
+          ),
         ),
       ),
     );

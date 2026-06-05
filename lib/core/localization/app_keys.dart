@@ -116,6 +116,16 @@ class AppKeys {
   static const studentClassRelationshipNone = 'student_class_relationship_none';
   static const studentClassInvitations = 'student_class_invitations';
   static const studentViewAllInvitations = 'student_view_all_invitations';
+  static const studentViewAllClassrooms = 'student_view_all_classrooms';
+  static const studentNoInvitationsTitle = 'student_no_invitations_title';
+  static const studentNoInvitationsMessage = 'student_no_invitations_message';
+  static const parentNoStudentTitle = 'parent_no_student_title';
+  static const parentNoStudentMessage = 'parent_no_student_message';
+  static const parentCreateStudentNow = 'parent_create_student_now';
+  static const parentCreateStudentLater = 'parent_create_student_later';
+  static const parentSwitchStudentTitle = 'parent_switch_student_title';
+  static const parentSwitchStudentMessage = 'parent_switch_student_message';
+  static const parentSwitchStudentAction = 'parent_switch_student_action';
   static const studentInviteSubtitle = 'student_invite_subtitle';
   static const studentInviteSubtitleFallback =
       'student_invite_subtitle_fallback';
@@ -300,6 +310,8 @@ class AppKeys {
   static const chooseSemester = 'choose_semester';
   static const noSchools = 'no_schools';
   static const active = 'active';
+  static const parentInfoTitle = 'parent_info_title';
+  static const parentChildrenCount = 'parent_children_count';
   static const profileRole = 'profile_role';
   static const roleStudent = 'role_student';
   static const roleParent = 'role_parent';

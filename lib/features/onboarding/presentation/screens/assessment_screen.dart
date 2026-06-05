@@ -33,6 +33,7 @@ class AiAssessmentScreen extends StatefulWidget {
     this.typeOfQuiz = quizTypeGeneral,
     this.gradeLabel,
     this.chapters,
+    this.profileId,
   });
 
   final QuizService? quizService;
@@ -41,6 +42,7 @@ class AiAssessmentScreen extends StatefulWidget {
   final String typeOfQuiz;
   final String? gradeLabel;
   final List<String>? chapters;
+  final int? profileId;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -201,6 +203,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       final submittedQuiz = await _quizService.submitQuiz(
         quizId: quizId,
         answers: answers,
+        profileId: widget.profileId,
       );
       if (!mounted) {
         return;
@@ -262,6 +265,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           purpose: generatedQuiz.purpose ?? widget.purpose,
           typeOfQuiz: generatedQuiz.typeOfQuiz ?? widget.typeOfQuiz,
           gradeLabel: widget.gradeLabel,
+          profileId: widget.profileId,
         ),
       ),
     );
