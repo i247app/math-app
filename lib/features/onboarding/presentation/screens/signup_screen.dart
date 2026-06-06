@@ -291,6 +291,8 @@ class SignupTextField extends StatelessWidget {
             controller: controller,
             keyboardType: keyboardType,
             textInputAction: textInputAction,
+            autofillHints: null,
+            enableSuggestions: true,
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               hintText: hintText,

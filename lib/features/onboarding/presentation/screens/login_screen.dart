@@ -203,6 +203,13 @@ class LoginCard extends StatelessWidget {
                   key: ValueKey(region),
                   controller: controller,
                   keyboardType: TextInputType.phone,
+                  autofillHints: null,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  enableIMEPersonalizedLearning: false,
+                  enableInlinePrediction: false,
+                  smartDashesType: SmartDashesType.disabled,
+                  smartQuotesType: SmartQuotesType.disabled,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     PhoneInputFormatter(region),
