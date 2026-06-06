@@ -130,6 +130,8 @@ class _SettingTabState extends State<SettingTab> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _profileNameController = TextEditingController();
+  final TextEditingController _profilePhoneController = TextEditingController();
+  final TextEditingController _profileEmailController = TextEditingController();
   final TextEditingController _profileIdController = TextEditingController();
 
   late SettingPageView _view;
@@ -179,7 +181,9 @@ class _SettingTabState extends State<SettingTab> {
       _editingProfile = initialEditingProfile;
       _profileNameController.text = initialEditingProfile.name?.trim() ?? '';
       _selectedProfileAvatarKey = initialEditingProfile.avatarKey?.trim();
-      if (_profileRole(initialEditingProfile) != 'PARENT') {
+      if (_profileRole(initialEditingProfile) == 'PARENT') {
+        _applyParentContactFields();
+      } else {
         _applyProfileIdFields(initialEditingProfile);
       }
     }
@@ -269,6 +273,8 @@ class _SettingTabState extends State<SettingTab> {
     _phoneController.dispose();
     _emailController.dispose();
     _profileNameController.dispose();
+    _profilePhoneController.dispose();
+    _profileEmailController.dispose();
     _profileIdController.dispose();
     super.dispose();
   }
@@ -596,7 +602,9 @@ class _SettingTabState extends State<SettingTab> {
     _profileNameController.text = profile.name?.trim() ?? '';
     _editingProfile = profile;
     _selectedProfileAvatarKey = profile.avatarKey?.trim();
-    if (_profileRole(profile) != 'PARENT') {
+    if (_profileRole(profile) == 'PARENT') {
+      _applyParentContactFields();
+    } else {
       _selectOptionsForProfile(profile);
       _applyProfileIdFields(profile);
     }
@@ -1224,6 +1232,8 @@ class _SettingTabState extends State<SettingTab> {
 
   void _resetCreateProfileForm() {
     _profileNameController.clear();
+    _profilePhoneController.clear();
+    _profileEmailController.clear();
     _profileIdController.clear();
     _selectedProfileAvatarKey = null;
     _editingProfile = null;
@@ -1387,6 +1397,8 @@ class _SettingTabState extends State<SettingTab> {
                         SettingPageView.addProfile => _AddProfilePanel(
                             key: ValueKey(_viewKey(SettingPageView.addProfile)),
                             nameController: _profileNameController,
+                            phoneController: _profilePhoneController,
+                            emailController: _profileEmailController,
                             idController: _profileIdController,
                             role: _profileFormRole(_editingProfile),
                             avatarKey: _selectedProfileAvatarKey,
@@ -1463,6 +1475,16 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     return _formatLocalPhone(digits);
+  }
+
+  void _applyParentContactFields() {
+    final user = _effectiveUser;
+    final phone = user?.phone?.trim() ?? '';
+    final digits = phone.replaceAll(RegExp(r'\D'), '');
+    _profilePhoneController.text = digits.startsWith('84') && digits.length > 2
+        ? _formatLocalPhone('0${digits.substring(2)}')
+        : _formatLocalPhone(digits);
+    _profileEmailController.text = user?.email?.trim() ?? '';
   }
 
   static String? _normalizedPhone(String value) {

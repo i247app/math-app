@@ -4,6 +4,8 @@ class _AddProfilePanel extends StatelessWidget {
   const _AddProfilePanel({
     super.key,
     required this.nameController,
+    required this.phoneController,
+    required this.emailController,
     required this.idController,
     required this.role,
     required this.avatarKey,
@@ -32,6 +34,8 @@ class _AddProfilePanel extends StatelessWidget {
   });
 
   final TextEditingController nameController;
+  final TextEditingController phoneController;
+  final TextEditingController emailController;
   final TextEditingController idController;
   final String role;
   final String? avatarKey;
@@ -86,9 +90,29 @@ class _AddProfilePanel extends StatelessWidget {
           controller: nameController,
           hintText: isTeacherProfile
               ? context.getText(AppKeys.profileTeacherNameHint)
-              : context.getText(AppKeys.studentNameHint),
+              : isParentProfile
+                  ? context.getText(AppKeys.parentProfileNameHint)
+                  : context.getText(AppKeys.studentNameHint),
           scale: scale,
         ),
+        if (isParentProfile) ...[
+          SizedBox(height: 18 * scale),
+          _AddProfileTextField(
+            label: context.getText(AppKeys.email),
+            controller: emailController,
+            hintText: context.getText(AppKeys.parentProfileEmailHint),
+            keyboardType: TextInputType.emailAddress,
+            scale: scale,
+          ),
+          SizedBox(height: 18 * scale),
+          _AddProfileTextField(
+            label: context.getText(AppKeys.phoneNumber),
+            controller: phoneController,
+            hintText: context.getText(AppKeys.parentProfilePhoneHint),
+            keyboardType: TextInputType.phone,
+            scale: scale,
+          ),
+        ],
         if (!isParentProfile) ...[
           SizedBox(height: 18 * scale),
           if (isLoadingOptions)
@@ -466,12 +490,14 @@ class _AddProfileTextField extends StatelessWidget {
     required this.controller,
     required this.hintText,
     required this.scale,
+    this.keyboardType,
   });
 
   final String label;
   final TextEditingController controller;
   final String hintText;
   final double scale;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -480,6 +506,7 @@ class _AddProfileTextField extends StatelessWidget {
       scale: scale,
       child: TextField(
         controller: controller,
+        keyboardType: keyboardType,
         textInputAction: TextInputAction.next,
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         style: GoogleFonts.andika(

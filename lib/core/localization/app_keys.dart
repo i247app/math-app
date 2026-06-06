@@ -298,8 +298,11 @@ class AppKeys {
   static const username = 'username';
   static const fullName = 'full_name';
   static const studentNameHint = 'student_name_hint';
+  static const parentProfileNameHint = 'parent_profile_name_hint';
   static const phoneNumber = 'phone_number';
   static const email = 'email';
+  static const parentProfilePhoneHint = 'parent_profile_phone_hint';
+  static const parentProfileEmailHint = 'parent_profile_email_hint';
   static const grade = 'grade';
   static const program = 'program';
   static const learningProgram = 'learning_program';
