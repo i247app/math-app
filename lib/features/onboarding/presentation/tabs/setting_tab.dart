@@ -77,7 +77,7 @@ class SettingTab extends StatefulWidget {
   })  : _initialView = SettingPageView.settings,
         _initialEditingProfile = null,
         _isPushedPage = false,
-        _popAfterProfileSave = false;
+        _openAddProfileOnStart = false;
 
   const SettingTab.page({
     super.key,
@@ -92,12 +92,12 @@ class SettingTab extends StatefulWidget {
     SettingPageView initialView = SettingPageView.settings,
     StudentProfile? initialEditingProfile,
     bool isPushedPage = false,
-    bool popAfterProfileSave = false,
+    bool openAddProfileOnStart = false,
   })  : openAddProfileRequestId = 0,
         _initialView = initialView,
         _initialEditingProfile = initialEditingProfile,
         _isPushedPage = isPushedPage,
-        _popAfterProfileSave = popAfterProfileSave;
+        _openAddProfileOnStart = openAddProfileOnStart;
 
   final LoginUser? user;
   final List<StudentProfile> profiles;
@@ -111,7 +111,7 @@ class SettingTab extends StatefulWidget {
   final SettingPageView _initialView;
   final StudentProfile? _initialEditingProfile;
   final bool _isPushedPage;
-  final bool _popAfterProfileSave;
+  final bool _openAddProfileOnStart;
 
   @override
   State<SettingTab> createState() => _SettingTabState();
@@ -194,6 +194,9 @@ class _SettingTabState extends State<SettingTab> {
         }
         _loadProfiles();
         _preloadProfileOptions();
+        if (widget._openAddProfileOnStart) {
+          _openAddProfile();
+        }
       });
     } else if (_view == SettingPageView.addProfile) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -493,6 +496,7 @@ class _SettingTabState extends State<SettingTab> {
   Future<void> _pushView(
     SettingPageView view, {
     StudentProfile? editingProfile,
+    bool openAddProfileOnStart = false,
   }) async {
     HapticFeedback.selectionClick();
     if (_isEditing) {
@@ -503,22 +507,30 @@ class _SettingTabState extends State<SettingTab> {
     _draftAvatarPath = null;
     FocusScope.of(context).unfocus();
 
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => _settingScreenForView(view, editingProfile),
+    final didSave = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => _settingScreenForView(
+          view,
+          editingProfile,
+          openAddProfileOnStart: openAddProfileOnStart,
+        ),
       ),
     );
 
     if (!mounted) {
       return;
     }
-    _loadProfiles();
+    await _loadProfiles();
+    if (didSave == true) {
+      widget.onProfileSaved?.call();
+    }
   }
 
   Widget _settingScreenForView(
     SettingPageView view,
-    StudentProfile? editingProfile,
-  ) {
+    StudentProfile? editingProfile, {
+    bool openAddProfileOnStart = false,
+  }) {
     final args = _SettingScreenArgs(
       user: widget.user,
       profiles: _profiles,
@@ -531,7 +543,10 @@ class _SettingTabState extends State<SettingTab> {
 
     return switch (view) {
       SettingPageView.account => _SettingAccountScreen(args: args),
-      SettingPageView.profile => _SettingProfileListScreen(args: args),
+      SettingPageView.profile => _SettingProfileListScreen(
+          args: args,
+          openAddProfileOnStart: openAddProfileOnStart,
+        ),
       SettingPageView.addProfile => _SettingProfileFormScreen(
           args: args,
           editingProfile: editingProfile,
@@ -573,7 +588,14 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   void _openAddProfile() {
-    if (!widget._isPushedPage || _view == SettingPageView.profile) {
+    if (!widget._isPushedPage) {
+      _pushView(
+        SettingPageView.profile,
+        openAddProfileOnStart: true,
+      );
+      return;
+    }
+    if (_view == SettingPageView.profile) {
       _pushView(SettingPageView.addProfile);
       return;
     }
@@ -593,7 +615,10 @@ class _SettingTabState extends State<SettingTab> {
 
   void _openUpdateProfile(StudentProfile profile) {
     if (!widget._isPushedPage || _view == SettingPageView.profile) {
-      _pushView(SettingPageView.addProfile, editingProfile: profile);
+      _pushView(
+        SettingPageView.addProfile,
+        editingProfile: profile,
+      );
       return;
     }
 
@@ -1064,6 +1089,12 @@ class _SettingTabState extends State<SettingTab> {
         return;
       }
 
+      if (widget._isPushedPage && _view == SettingPageView.addProfile) {
+        setState(() => _isSavingProfile = false);
+        widget.onProfileSaved?.call();
+        return;
+      }
+
       _resetCreateProfileForm();
       setState(() {
         _isSavingProfile = false;
@@ -1072,10 +1103,6 @@ class _SettingTabState extends State<SettingTab> {
       });
       await _loadProfiles();
       widget.onProfileSaved?.call();
-      if (widget._popAfterProfileSave && mounted) {
-        Navigator.of(context).maybePop();
-        return;
-      }
       if (isCreatingFirstProfile && mounted) {
         NumiApp.restart(context);
       }

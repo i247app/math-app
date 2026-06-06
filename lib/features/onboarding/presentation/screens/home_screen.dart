@@ -325,9 +325,9 @@ class _HomeScreenState extends State<HomeScreen> {
       size.height / _designHeight,
     );
 
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => Material(
+    final didSave = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (routeContext) => Material(
           color: Colors.white,
           child: SafeArea(
             child: SettingTab.page(
@@ -336,22 +336,21 @@ class _HomeScreenState extends State<HomeScreen> {
               activeProfile: widget.activeProfile,
               profileLoadError: widget.profileLoadError,
               onLogout: widget.onLogout,
-              onProfileSaved: () {
-                widget.onRefreshProfiles();
-              },
+              onProfileSaved: () => Navigator.of(routeContext).pop(true),
               bottomPadding: 0,
               scale: scale,
               initialView: SettingPageView.addProfile,
               initialEditingProfile: profile,
               isPushedPage: true,
-              popAfterProfileSave: true,
             ),
           ),
         ),
       ),
     );
 
-    await widget.onRefreshProfiles();
+    if (didSave == true) {
+      await widget.onRefreshProfiles();
+    }
   }
 }
 
@@ -457,6 +456,7 @@ class _TabContent extends StatelessWidget {
         activeRole: activeRole,
         initialGrades: initialGrades,
         gradeService: gradeService,
+        onRefreshProfiles: onRefreshProfiles,
         onProfileSaved: onProfileSaved,
       );
     }
@@ -1110,6 +1110,7 @@ class _StudentHomeContent extends StatefulWidget {
     required this.activeRole,
     required this.initialGrades,
     required this.gradeService,
+    required this.onRefreshProfiles,
     required this.onProfileSaved,
   });
 
@@ -1121,6 +1122,7 @@ class _StudentHomeContent extends StatefulWidget {
   final ProfileRole activeRole;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
+  final Future<void> Function() onRefreshProfiles;
   final VoidCallback onProfileSaved;
 
   @override
@@ -1518,6 +1520,17 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       return true;
     }
 
+    if (_studentProfiles.isEmpty) {
+      await widget.onRefreshProfiles();
+      if (!mounted) {
+        return false;
+      }
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) {
+        return false;
+      }
+    }
+
     if (_studentProfiles.isNotEmpty) {
       final shouldSwitch = await _showParentSwitchStudentDialog();
       if (shouldSwitch == true && mounted) {
@@ -1584,15 +1597,15 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
               onProfileSaved: widget.onProfileSaved,
               bottomPadding: 0,
               scale: widget.scale,
-              initialView: SettingPageView.addProfile,
+              initialView: SettingPageView.profile,
               isPushedPage: true,
-              popAfterProfileSave: true,
+              openAddProfileOnStart: true,
             ),
           ),
         ),
       ),
     );
-    widget.onProfileSaved();
+    await widget.onRefreshProfiles();
   }
 
   Future<bool?> _showParentSwitchStudentDialog() {

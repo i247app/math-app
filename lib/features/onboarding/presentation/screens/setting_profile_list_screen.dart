@@ -1,9 +1,13 @@
 part of '../tabs/setting_tab.dart';
 
 class _SettingProfileListScreen extends StatelessWidget {
-  const _SettingProfileListScreen({required this.args});
+  const _SettingProfileListScreen({
+    required this.args,
+    this.openAddProfileOnStart = false,
+  });
 
   final _SettingScreenArgs args;
+  final bool openAddProfileOnStart;
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +23,7 @@ class _SettingProfileListScreen extends StatelessWidget {
         scale: args.scale,
         initialView: SettingPageView.profile,
         isPushedPage: true,
+        openAddProfileOnStart: openAddProfileOnStart,
       ),
     );
   }
