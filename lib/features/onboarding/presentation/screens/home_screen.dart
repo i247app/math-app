@@ -68,6 +68,7 @@ class HomeScreen extends StatefulWidget {
     required this.activeRole,
     required this.profileLoadError,
     required this.onRefreshProfiles,
+    required this.onActivateProfile,
     required this.onBack,
     required this.onLogout,
   });
@@ -78,6 +79,7 @@ class HomeScreen extends StatefulWidget {
   final ProfileRole activeRole;
   final String? profileLoadError;
   final Future<void> Function() onRefreshProfiles;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onBack;
   final VoidCallback onLogout;
 
@@ -212,7 +214,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                     child: _TabContent(
-                      key: ValueKey(_activeTab),
+                      key: ValueKey(
+                        '$_activeTab-${ActiveProfileSession.profileStableId(widget.activeProfile)}',
+                      ),
                       activeTab: _activeTab,
                       user: widget.user,
                       profiles: widget.profiles,
@@ -220,6 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       activeRole: widget.activeRole,
                       profileLoadError: widget.profileLoadError,
                       onRefreshProfiles: widget.onRefreshProfiles,
+                      onActivateProfile: widget.onActivateProfile,
                       initialGrades: _prefetchedGrades,
                       gradeService: _gradeService,
                       onLogout: widget.onLogout,
@@ -336,6 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
               activeProfile: widget.activeProfile,
               profileLoadError: widget.profileLoadError,
               onLogout: widget.onLogout,
+              onActivateProfile: widget.onActivateProfile,
               onProfileSaved: () => Navigator.of(routeContext).pop(true),
               bottomPadding: 0,
               scale: scale,
@@ -364,6 +370,7 @@ class _TabContent extends StatelessWidget {
     required this.activeRole,
     required this.profileLoadError,
     required this.onRefreshProfiles,
+    required this.onActivateProfile,
     required this.initialGrades,
     required this.gradeService,
     required this.onLogout,
@@ -383,6 +390,7 @@ class _TabContent extends StatelessWidget {
   final ProfileRole activeRole;
   final String? profileLoadError;
   final Future<void> Function() onRefreshProfiles;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final VoidCallback onLogout;
@@ -435,6 +443,7 @@ class _TabContent extends StatelessWidget {
         activeProfile: activeProfile,
         profileLoadError: profileLoadError,
         onLogout: onLogout,
+        onActivateProfile: onActivateProfile,
         onProfileSaved: onProfileSaved,
         openAddProfileRequestId: openAddProfileRequestId,
         bottomPadding: bottomPadding,
@@ -457,6 +466,7 @@ class _TabContent extends StatelessWidget {
         initialGrades: initialGrades,
         gradeService: gradeService,
         onRefreshProfiles: onRefreshProfiles,
+        onActivateProfile: onActivateProfile,
         onProfileSaved: onProfileSaved,
       );
     }
@@ -468,6 +478,7 @@ class _TabContent extends StatelessWidget {
         activeProfile: activeProfile,
         profileLoadError: profileLoadError,
         onLogout: onLogout,
+        onActivateProfile: onActivateProfile,
         onProfileSaved: onProfileSaved,
         openAddProfileRequestId: openAddProfileRequestId,
         bottomPadding: bottomPadding,
@@ -1111,6 +1122,7 @@ class _StudentHomeContent extends StatefulWidget {
     required this.initialGrades,
     required this.gradeService,
     required this.onRefreshProfiles,
+    required this.onActivateProfile,
     required this.onProfileSaved,
   });
 
@@ -1123,6 +1135,7 @@ class _StudentHomeContent extends StatefulWidget {
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final Future<void> Function() onRefreshProfiles;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
 
   @override
@@ -1569,6 +1582,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
               activeProfile: widget.activeProfile,
               profileLoadError: null,
               onLogout: () {},
+              onActivateProfile: widget.onActivateProfile,
               onProfileSaved: widget.onProfileSaved,
               bottomPadding: 0,
               scale: widget.scale,
@@ -1594,6 +1608,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
               activeProfile: widget.activeProfile,
               profileLoadError: null,
               onLogout: () {},
+              onActivateProfile: widget.onActivateProfile,
               onProfileSaved: widget.onProfileSaved,
               bottomPadding: 0,
               scale: widget.scale,

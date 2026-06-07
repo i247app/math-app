@@ -1131,6 +1131,37 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     );
   }
 
+  Future<void> activateProfile(StudentProfile profile) async {
+    final user = state.loginUser;
+    final profileId = ActiveProfileSession.profileStableId(profile);
+    if (user == null || user.id <= 0 || profileId == null) {
+      return;
+    }
+
+    await _activeProfileSession.writeActiveProfileId(
+      userId: user.id,
+      profileId: profileId,
+    );
+    if (isClosed) {
+      return;
+    }
+
+    final profiles = <StudentProfile>[
+      for (final existingProfile in state.profiles)
+        if (ActiveProfileSession.profileStableId(existingProfile) != profileId)
+          existingProfile,
+      profile,
+    ];
+
+    emit(
+      state.copyWith(
+        profiles: profiles,
+        activeProfile: profile,
+        clearProfileLoadError: true,
+      ),
+    );
+  }
+
   Future<void> pickAvatar() async {
     if (state.isPickingAvatar) {
       return;

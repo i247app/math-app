@@ -362,6 +362,7 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                         activeRole: state.activeProfileRole,
                         profileLoadError: state.profileLoadError,
                         onRefreshProfiles: cubit.refreshProfiles,
+                        onActivateProfile: cubit.activateProfile,
                         onBack: cubit.openLogin,
                         onLogout: cubit.logout,
                       ),

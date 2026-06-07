@@ -23,6 +23,7 @@ import '../../data/profile_api.dart';
 import '../../data/school_api.dart';
 import '../../domain/profile_avatar.dart';
 import '../screens/passcode_screen.dart';
+import '../widgets/common_widgets.dart';
 import '../widgets/profile_avatar_image.dart';
 import '../../../../core/localization/app_language.dart';
 import '../../../../core/localization/lingo_scope.dart';
@@ -43,6 +44,7 @@ const _deepInk = Color(0xFF253228);
 const _orange = Color(0xFFDE5E31);
 const _idTypeMoet = 'MOET';
 const _idTypePublicId = 'PUBLIC_ID';
+const _profileSwitchMinimumDuration = Duration(milliseconds: 1500);
 
 class _ProfileIdTypeOption {
   const _ProfileIdTypeOption(this.value, this.label);
@@ -70,6 +72,7 @@ class SettingTab extends StatefulWidget {
     required this.activeProfile,
     required this.profileLoadError,
     required this.onLogout,
+    required this.onActivateProfile,
     this.onProfileSaved,
     this.openAddProfileRequestId = 0,
     required this.bottomPadding,
@@ -86,6 +89,7 @@ class SettingTab extends StatefulWidget {
     required this.activeProfile,
     required this.profileLoadError,
     required this.onLogout,
+    required this.onActivateProfile,
     this.onProfileSaved,
     required this.bottomPadding,
     required this.scale,
@@ -104,6 +108,7 @@ class SettingTab extends StatefulWidget {
   final StudentProfile? activeProfile;
   final String? profileLoadError;
   final VoidCallback onLogout;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback? onProfileSaved;
   final int openAddProfileRequestId;
   final double bottomPadding;
@@ -144,6 +149,7 @@ class _SettingTabState extends State<SettingTab> {
   bool _isSavingProfile = false;
   bool _isDeletingProfile = false;
   bool _isSettingDefaultProfile = false;
+  bool _isSwitchingProfile = false;
   bool _isLoadingPasscode = false;
   bool _hasPasscode = false;
   String? _profileLoadError;
@@ -168,6 +174,7 @@ class _SettingTabState extends State<SettingTab> {
   ProgramModel? _selectedProgram;
   SemesterModel? _selectedSemester;
   String? _selectedProfileIdType;
+  int? _localActiveProfileId;
 
   @override
   void initState() {
@@ -175,6 +182,8 @@ class _SettingTabState extends State<SettingTab> {
     _view = widget._initialView;
     _applyUser(widget.user);
     _profiles = widget.profiles;
+    _localActiveProfileId =
+        ActiveProfileSession.profileStableId(widget.activeProfile);
     _profileLoadError = widget.profileLoadError;
     final initialEditingProfile = widget._initialEditingProfile;
     if (initialEditingProfile != null) {
@@ -259,6 +268,11 @@ class _SettingTabState extends State<SettingTab> {
 
     if (oldWidget.profiles != widget.profiles) {
       _profiles = widget.profiles;
+    }
+
+    if (oldWidget.activeProfile != widget.activeProfile) {
+      _localActiveProfileId =
+          ActiveProfileSession.profileStableId(widget.activeProfile);
     }
 
     if (oldWidget.profileLoadError != widget.profileLoadError) {
@@ -537,6 +551,7 @@ class _SettingTabState extends State<SettingTab> {
       activeProfile: widget.activeProfile,
       profileLoadError: _profileLoadError,
       onLogout: widget.onLogout,
+      onActivateProfile: widget.onActivateProfile,
       onProfileSaved: widget.onProfileSaved,
       scale: widget.scale,
     );
@@ -814,12 +829,15 @@ class _SettingTabState extends State<SettingTab> {
 
     try {
       final profiles = await _profileService.listProfiles(userId: userId);
+      final activeProfileId =
+          await _activeProfileSession.readActiveProfileId(userId);
       if (!mounted) {
         return;
       }
 
       setState(() {
         _profiles = profiles;
+        _localActiveProfileId = activeProfileId;
         _isLoadingProfiles = false;
       });
     } on ProfileException catch (error) {
@@ -981,7 +999,7 @@ class _SettingTabState extends State<SettingTab> {
         normalizedIdType != null &&
         profileIdValue.isNotEmpty;
     final isCreatingFirstProfile = editingProfile == null && _profiles.isEmpty;
-    var shouldRestartAfterCreate = false;
+    StudentProfile? createdActiveProfile;
 
     if (userId == null || userId <= 0) {
       setState(
@@ -1050,11 +1068,7 @@ class _SettingTabState extends State<SettingTab> {
           final profileId =
               ActiveProfileSession.profileStableId(createdProfile);
           if (profileId != null) {
-            await _activeProfileSession.writeActiveProfileId(
-              userId: userId,
-              profileId: profileId,
-            );
-            shouldRestartAfterCreate = true;
+            createdActiveProfile = createdProfile;
           }
         }
       } else {
@@ -1091,9 +1105,19 @@ class _SettingTabState extends State<SettingTab> {
         return;
       }
 
-      if (shouldRestartAfterCreate) {
-        NumiApp.restart(context);
-        return;
+      if (createdActiveProfile != null) {
+        setState(() => _isSwitchingProfile = true);
+        await Future.wait<void>([
+          widget.onActivateProfile(createdActiveProfile),
+          Future<void>.delayed(_profileSwitchMinimumDuration),
+        ]);
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _localActiveProfileId =
+              ActiveProfileSession.profileStableId(createdActiveProfile);
+        });
       }
 
       if (widget._isPushedPage && _view == SettingPageView.addProfile) {
@@ -1109,6 +1133,9 @@ class _SettingTabState extends State<SettingTab> {
         _isForwardTransition = false;
       });
       await _loadProfiles();
+      if (mounted && _isSwitchingProfile) {
+        setState(() => _isSwitchingProfile = false);
+      }
       widget.onProfileSaved?.call();
     } on ProfileException catch (error) {
       if (!mounted) {
@@ -1118,6 +1145,7 @@ class _SettingTabState extends State<SettingTab> {
       setState(() {
         _profileCreateError = error.message;
         _isSavingProfile = false;
+        _isSwitchingProfile = false;
       });
     } catch (_) {
       if (!mounted) {
@@ -1129,6 +1157,7 @@ class _SettingTabState extends State<SettingTab> {
             ? context.readText(AppKeys.profileCreateFailed)
             : context.readText(AppKeys.profileUpdateFailed);
         _isSavingProfile = false;
+        _isSwitchingProfile = false;
       });
     }
   }
@@ -1190,17 +1219,20 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     HapticFeedback.selectionClick();
-    setState(() => _isSettingDefaultProfile = true);
+    setState(() {
+      _isSettingDefaultProfile = true;
+      _isSwitchingProfile = true;
+    });
 
     try {
-      await _activeProfileSession.writeActiveProfileId(
-        userId: userId,
-        profileId: profileId,
-      );
+      await Future.wait<void>([
+        widget.onActivateProfile(selectedProfile),
+        Future<void>.delayed(_profileSwitchMinimumDuration),
+      ]);
       if (!mounted) {
         return;
       }
-      NumiApp.restart(context);
+      setState(() => _localActiveProfileId = profileId);
     } catch (_) {
       if (!mounted) {
         return;
@@ -1210,7 +1242,10 @@ class _SettingTabState extends State<SettingTab> {
       );
     } finally {
       if (mounted) {
-        setState(() => _isSettingDefaultProfile = false);
+        setState(() {
+          _isSettingDefaultProfile = false;
+          _isSwitchingProfile = false;
+        });
       }
     }
   }
@@ -1308,174 +1343,193 @@ class _SettingTabState extends State<SettingTab> {
     const backgroundColor = Colors.white;
     final lingo = LingoScope.of(context);
 
-    return ColoredBox(
-      color: backgroundColor,
-      child: DefaultTextStyle.merge(
-        style: GoogleFonts.andika(letterSpacing: 0),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: EdgeInsets.only(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: widget.bottomPadding,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _SettingHeader(
-                title: headerTitle,
-                canGoBack: canGoBack,
-                onBack: _view == SettingPageView.addProfile
-                    ? _returnToProfileList
-                    : _returnToSettings,
-                backgroundColor: backgroundColor,
-                scale: scale,
-                topInset: topInset,
-              ),
-              SizedBox(height: _topGapForView(_view) * scale),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24 * scale),
+    return PopScope(
+      canPop: !_isSwitchingProfile,
+      child: Stack(
+        children: [
+          ColoredBox(
+            color: backgroundColor,
+            child: DefaultTextStyle.merge(
+              style: GoogleFonts.andika(letterSpacing: 0),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: EdgeInsets.only(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: widget.bottomPadding,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      layoutBuilder: (currentChild, previousChildren) {
-                        return Stack(
-                          alignment: Alignment.topCenter,
-                          children: [
-                            for (final child in previousChildren) child,
-                            if (currentChild != null) currentChild,
-                          ],
-                        );
-                      },
-                      transitionBuilder: (child, animation) {
-                        final isIncoming =
-                            child.key == ValueKey(_viewKey(_view));
-                        final forward = _isForwardTransition;
-                        final beginX = isIncoming
-                            ? (forward ? 0.10 : -0.10)
-                            : (forward ? -0.08 : 0.08);
-                        final offset = Tween<Offset>(
-                          begin: Offset(beginX, 0),
-                          end: Offset.zero,
-                        ).animate(animation);
+                    _SettingHeader(
+                      title: headerTitle,
+                      canGoBack: canGoBack,
+                      onBack: _view == SettingPageView.addProfile
+                          ? _returnToProfileList
+                          : _returnToSettings,
+                      backgroundColor: backgroundColor,
+                      scale: scale,
+                      topInset: topInset,
+                    ),
+                    SizedBox(height: _topGapForView(_view) * scale),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24 * scale),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            switchInCurve: Curves.easeOutCubic,
+                            switchOutCurve: Curves.easeInCubic,
+                            layoutBuilder: (currentChild, previousChildren) {
+                              return Stack(
+                                alignment: Alignment.topCenter,
+                                children: [
+                                  for (final child in previousChildren) child,
+                                  if (currentChild != null) currentChild,
+                                ],
+                              );
+                            },
+                            transitionBuilder: (child, animation) {
+                              final isIncoming =
+                                  child.key == ValueKey(_viewKey(_view));
+                              final forward = _isForwardTransition;
+                              final beginX = isIncoming
+                                  ? (forward ? 0.10 : -0.10)
+                                  : (forward ? -0.08 : 0.08);
+                              final offset = Tween<Offset>(
+                                begin: Offset(beginX, 0),
+                                end: Offset.zero,
+                              ).animate(animation);
 
-                        return FadeTransition(
-                          opacity: animation,
-                          child:
-                              SlideTransition(position: offset, child: child),
-                        );
-                      },
-                      child: switch (_view) {
-                        SettingPageView.settings => _SettingsMenuPanel(
-                            key: ValueKey(_viewKey(SettingPageView.settings)),
-                            activeProfile: widget.activeProfile,
-                            fallbackAvatarUrl: _effectiveUser?.avatarUrl,
-                            fallbackAvatarPath: _localAvatarPath,
-                            username: _fallbackUsername(_effectiveUser),
-                            scale: scale,
-                            currentLanguage: lingo.language,
-                            hasPasscode: _hasPasscode,
-                            isLoadingPasscode: _isLoadingPasscode,
-                            onAccountTap: () =>
-                                _pushView(SettingPageView.account),
-                            onProfileTap: () =>
-                                _pushView(SettingPageView.profile),
-                            onPasscodeTap: _openPasscodeSettings,
-                            onLanguageChanged: _changeLanguage,
-                            onLogoutTap: widget.onLogout,
-                          ),
-                        SettingPageView.account => _AccountDetailsPanel(
-                            key: ValueKey(_viewKey(SettingPageView.account)),
-                            avatarUrl: _effectiveUser?.avatarUrl,
-                            avatarPath: _isEditing
-                                ? _draftAvatarPath
-                                : _localAvatarPath,
-                            usernameController: _usernameController,
-                            phoneController: _phoneController,
-                            emailController: _emailController,
-                            isEditing: _isEditing,
-                            isSaving: _isSavingAccount,
-                            isPickingAvatar: _isPickingAccountAvatar,
-                            onEdit: _startEditing,
-                            onSave: _saveEditing,
-                            onCancel: _cancelEditing,
-                            onAvatarTap: _pickAccountAvatar,
-                            scale: scale,
-                          ),
-                        SettingPageView.profile => _ProfilePlaceholderPanel(
-                            key: ValueKey(_viewKey(SettingPageView.profile)),
-                            profiles: _profiles,
-                            activeProfile: widget.activeProfile,
-                            user: _effectiveUser,
-                            activeProfileId: _activeProfileId,
-                            isLoading: _isLoadingProfiles ||
-                                _isDeletingProfile ||
-                                _isSettingDefaultProfile,
-                            errorMessage: _profileLoadError,
-                            onRetry: _loadProfiles,
-                            onAdd: _openAddProfile,
-                            onSelect: _selectActiveProfile,
-                            onEdit: _openUpdateProfile,
-                            onDelete: _confirmDeleteProfile,
-                            scale: scale,
-                          ),
-                        SettingPageView.addProfile => _AddProfilePanel(
-                            key: ValueKey(_viewKey(SettingPageView.addProfile)),
-                            nameController: _profileNameController,
-                            phoneController: _profilePhoneController,
-                            emailController: _profileEmailController,
-                            idController: _profileIdController,
-                            role: _profileFormRole(_editingProfile),
-                            avatarKey: _selectedProfileAvatarKey,
-                            avatarUrl: _editingProfile?.avatarUrl,
-                            schools: _schoolOptions,
-                            grades: _gradeOptions,
-                            programs: _programOptions,
-                            selectedSchool: _selectedSchool,
-                            selectedGrade: _selectedGrade,
-                            selectedProgram: _selectedProgram,
-                            selectedIdType: _selectedProfileIdType,
-                            isLoadingOptions: _isLoadingProfileOptions,
-                            isSaving: _isSavingProfile,
-                            errorMessage:
-                                _profileOptionsError ?? _profileCreateError,
-                            canRetryOptions: _profileOptionsError != null,
-                            onAvatarChanged: _selectProfileAvatar,
-                            onClearAvatar: _clearProfileAvatar,
-                            onSchoolChanged: (school) {
-                              setState(() => _selectedSchool = school);
+                              return FadeTransition(
+                                opacity: animation,
+                                child: SlideTransition(
+                                    position: offset, child: child),
+                              );
                             },
-                            onGradeChanged: (grade) {
-                              setState(() => _selectedGrade = grade);
+                            child: switch (_view) {
+                              SettingPageView.settings => _SettingsMenuPanel(
+                                  key: ValueKey(
+                                      _viewKey(SettingPageView.settings)),
+                                  activeProfile: widget.activeProfile,
+                                  fallbackAvatarUrl: _effectiveUser?.avatarUrl,
+                                  fallbackAvatarPath: _localAvatarPath,
+                                  username: _fallbackUsername(_effectiveUser),
+                                  scale: scale,
+                                  currentLanguage: lingo.language,
+                                  hasPasscode: _hasPasscode,
+                                  isLoadingPasscode: _isLoadingPasscode,
+                                  onAccountTap: () =>
+                                      _pushView(SettingPageView.account),
+                                  onProfileTap: () =>
+                                      _pushView(SettingPageView.profile),
+                                  onPasscodeTap: _openPasscodeSettings,
+                                  onLanguageChanged: _changeLanguage,
+                                  onLogoutTap: widget.onLogout,
+                                ),
+                              SettingPageView.account => _AccountDetailsPanel(
+                                  key: ValueKey(
+                                      _viewKey(SettingPageView.account)),
+                                  avatarUrl: _effectiveUser?.avatarUrl,
+                                  avatarPath: _isEditing
+                                      ? _draftAvatarPath
+                                      : _localAvatarPath,
+                                  usernameController: _usernameController,
+                                  phoneController: _phoneController,
+                                  emailController: _emailController,
+                                  isEditing: _isEditing,
+                                  isSaving: _isSavingAccount,
+                                  isPickingAvatar: _isPickingAccountAvatar,
+                                  onEdit: _startEditing,
+                                  onSave: _saveEditing,
+                                  onCancel: _cancelEditing,
+                                  onAvatarTap: _pickAccountAvatar,
+                                  scale: scale,
+                                ),
+                              SettingPageView.profile =>
+                                _ProfilePlaceholderPanel(
+                                  key: ValueKey(
+                                      _viewKey(SettingPageView.profile)),
+                                  profiles: _profiles,
+                                  activeProfile: widget.activeProfile,
+                                  user: _effectiveUser,
+                                  activeProfileId: _activeProfileId,
+                                  isLoading: _isLoadingProfiles ||
+                                      _isDeletingProfile ||
+                                      _isSettingDefaultProfile,
+                                  errorMessage: _profileLoadError,
+                                  onRetry: _loadProfiles,
+                                  onAdd: _openAddProfile,
+                                  onSelect: _selectActiveProfile,
+                                  onEdit: _openUpdateProfile,
+                                  onDelete: _confirmDeleteProfile,
+                                  scale: scale,
+                                ),
+                              SettingPageView.addProfile => _AddProfilePanel(
+                                  key: ValueKey(
+                                      _viewKey(SettingPageView.addProfile)),
+                                  nameController: _profileNameController,
+                                  phoneController: _profilePhoneController,
+                                  emailController: _profileEmailController,
+                                  idController: _profileIdController,
+                                  role: _profileFormRole(_editingProfile),
+                                  avatarKey: _selectedProfileAvatarKey,
+                                  avatarUrl: _editingProfile?.avatarUrl,
+                                  schools: _schoolOptions,
+                                  grades: _gradeOptions,
+                                  programs: _programOptions,
+                                  selectedSchool: _selectedSchool,
+                                  selectedGrade: _selectedGrade,
+                                  selectedProgram: _selectedProgram,
+                                  selectedIdType: _selectedProfileIdType,
+                                  isLoadingOptions: _isLoadingProfileOptions,
+                                  isSaving: _isSavingProfile,
+                                  errorMessage: _profileOptionsError ??
+                                      _profileCreateError,
+                                  canRetryOptions: _profileOptionsError != null,
+                                  onAvatarChanged: _selectProfileAvatar,
+                                  onClearAvatar: _clearProfileAvatar,
+                                  onSchoolChanged: (school) {
+                                    setState(() => _selectedSchool = school);
+                                  },
+                                  onGradeChanged: (grade) {
+                                    setState(() => _selectedGrade = grade);
+                                  },
+                                  onProgramChanged: (program) {
+                                    setState(() => _selectedProgram = program);
+                                  },
+                                  onIdTypeChanged: (idType) {
+                                    setState(() {
+                                      _selectedProfileIdType = idType;
+                                      _profileIdController.clear();
+                                    });
+                                  },
+                                  onRetryOptions: _loadProfileOptions,
+                                  onCancel: _cancelAddProfile,
+                                  onSave: _saveProfileForm,
+                                  scale: scale,
+                                ),
                             },
-                            onProgramChanged: (program) {
-                              setState(() => _selectedProgram = program);
-                            },
-                            onIdTypeChanged: (idType) {
-                              setState(() {
-                                _selectedProfileIdType = idType;
-                                _profileIdController.clear();
-                              });
-                            },
-                            onRetryOptions: _loadProfileOptions,
-                            onCancel: _cancelAddProfile,
-                            onSave: _saveProfileForm,
-                            scale: scale,
                           ),
-                      },
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+          if (_isSwitchingProfile)
+            Positioned.fill(
+              child: LoadingScreen(
+                message: context.getText(AppKeys.switchingProfile),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -1632,6 +1686,6 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   int? get _activeProfileId {
-    return ActiveProfileSession.profileStableId(widget.activeProfile);
+    return _localActiveProfileId;
   }
 }

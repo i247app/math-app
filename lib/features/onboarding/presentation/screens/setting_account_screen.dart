@@ -7,6 +7,7 @@ class _SettingScreenArgs {
     required this.activeProfile,
     required this.profileLoadError,
     required this.onLogout,
+    required this.onActivateProfile,
     required this.onProfileSaved,
     required this.scale,
   });
@@ -16,6 +17,7 @@ class _SettingScreenArgs {
   final StudentProfile? activeProfile;
   final String? profileLoadError;
   final VoidCallback onLogout;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback? onProfileSaved;
   final double scale;
 }
@@ -34,6 +36,7 @@ class _SettingAccountScreen extends StatelessWidget {
         activeProfile: args.activeProfile,
         profileLoadError: args.profileLoadError,
         onLogout: args.onLogout,
+        onActivateProfile: args.onActivateProfile,
         onProfileSaved: args.onProfileSaved,
         bottomPadding: 0,
         scale: args.scale,

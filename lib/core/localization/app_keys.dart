@@ -313,6 +313,7 @@ class AppKeys {
   static const chooseSemester = 'choose_semester';
   static const noSchools = 'no_schools';
   static const active = 'active';
+  static const switchingProfile = 'switching_profile';
   static const parentInfoTitle = 'parent_info_title';
   static const parentChildrenCount = 'parent_children_count';
   static const profileRole = 'profile_role';
