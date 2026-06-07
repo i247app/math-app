@@ -981,6 +981,7 @@ class _SettingTabState extends State<SettingTab> {
         normalizedIdType != null &&
         profileIdValue.isNotEmpty;
     final isCreatingFirstProfile = editingProfile == null && _profiles.isEmpty;
+    var shouldRestartAfterCreate = false;
 
     if (userId == null || userId <= 0) {
       setState(
@@ -1053,6 +1054,7 @@ class _SettingTabState extends State<SettingTab> {
               userId: userId,
               profileId: profileId,
             );
+            shouldRestartAfterCreate = true;
           }
         }
       } else {
@@ -1089,6 +1091,11 @@ class _SettingTabState extends State<SettingTab> {
         return;
       }
 
+      if (shouldRestartAfterCreate) {
+        NumiApp.restart(context);
+        return;
+      }
+
       if (widget._isPushedPage && _view == SettingPageView.addProfile) {
         setState(() => _isSavingProfile = false);
         widget.onProfileSaved?.call();
@@ -1103,9 +1110,6 @@ class _SettingTabState extends State<SettingTab> {
       });
       await _loadProfiles();
       widget.onProfileSaved?.call();
-      if (isCreatingFirstProfile && mounted) {
-        NumiApp.restart(context);
-      }
     } on ProfileException catch (error) {
       if (!mounted) {
         return;
