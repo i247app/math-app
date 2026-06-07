@@ -207,7 +207,6 @@ class LoginCard extends StatelessWidget {
                   autocorrect: false,
                   enableSuggestions: false,
                   enableIMEPersonalizedLearning: false,
-                  enableInlinePrediction: false,
                   smartDashesType: SmartDashesType.disabled,
                   smartQuotesType: SmartQuotesType.disabled,
                   inputFormatters: [
