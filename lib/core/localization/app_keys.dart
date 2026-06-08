@@ -354,6 +354,7 @@ class AppKeys {
   static const teacherProgramFallback = 'teacher_program_fallback';
   static const teacherDescriptionFallback = 'teacher_description_fallback';
   static const teacherClassInfoFallback = 'teacher_class_info_fallback';
+  static const teacherClassHideLess = 'teacher_class_hide_less';
   static const teacherCopiedClassLink = 'teacher_copied_class_link';
   static const teacherCopiedClassCode = 'teacher_copied_class_code';
   static const profileIdCopied = 'profile_id_copied';

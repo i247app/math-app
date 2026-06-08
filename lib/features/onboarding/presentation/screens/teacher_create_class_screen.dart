@@ -159,7 +159,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      await _classroomService.createClassroom(
+      final classroom = await _classroomService.createClassroom(
         profileId: profileId,
         name: name,
         gradeId: gradeId,
@@ -171,7 +171,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       if (!mounted) {
         return;
       }
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop(_CreateClassResult(classroom: classroom));
     } on ClassroomException catch (error) {
       _showSnack(error.message);
     } finally {
@@ -318,4 +318,10 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       ),
     );
   }
+}
+
+class _CreateClassResult {
+  const _CreateClassResult({this.classroom});
+
+  final ClassroomModel? classroom;
 }

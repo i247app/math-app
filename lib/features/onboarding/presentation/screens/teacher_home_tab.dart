@@ -87,7 +87,11 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
 
   Future<void> _openCreateClass() async {
     HapticFeedback.lightImpact();
-    final created = await Navigator.of(context).push<bool>(
+    final previousClassroomIds = _classrooms
+        .map((classroom) => classroom.stableId)
+        .whereType<int>()
+        .toSet();
+    final result = await Navigator.of(context).push<_CreateClassResult>(
       MaterialPageRoute(
         builder: (_) => TeacherCreateClassScreen(
           user: widget.user,
@@ -95,8 +99,15 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         ),
       ),
     );
-    if (created == true) {
+    if (result != null) {
       await _loadClassrooms();
+      if (!mounted) {
+        return;
+      }
+      final classroom = _findCreatedClassroom(result, previousClassroomIds);
+      if (classroom != null) {
+        await _openClassDetail(classroom, initiallyExpanded: true);
+      }
     }
   }
 
@@ -110,7 +121,33 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     await _openCreateClass();
   }
 
-  Future<void> _openClassDetail(ClassroomModel classroom) async {
+  ClassroomModel? _findCreatedClassroom(
+    _CreateClassResult result,
+    Set<int> previousClassroomIds,
+  ) {
+    final createdId = result.classroom?.stableId;
+    if (createdId != null) {
+      for (final classroom in _classrooms) {
+        if (classroom.stableId == createdId) {
+          return classroom;
+        }
+      }
+      return result.classroom;
+    }
+
+    for (final classroom in _classrooms) {
+      final id = classroom.stableId;
+      if (id != null && !previousClassroomIds.contains(id)) {
+        return classroom;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _openClassDetail(
+    ClassroomModel classroom, {
+    bool initiallyExpanded = false,
+  }) async {
     final classroomId = classroom.stableId;
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
@@ -127,6 +164,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
           profileId: profileId,
           userId: widget.user?.id,
           initialClassroom: classroom,
+          initiallyExpanded: initiallyExpanded,
         ),
       ),
     );
