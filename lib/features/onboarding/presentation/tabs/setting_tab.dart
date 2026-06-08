@@ -150,6 +150,7 @@ class _SettingTabState extends State<SettingTab> {
   bool _isDeletingProfile = false;
   bool _isSettingDefaultProfile = false;
   bool _isSwitchingProfile = false;
+  bool _isChangingLanguage = false;
   bool _isLoadingPasscode = false;
   bool _hasPasscode = false;
   String? _profileLoadError;
@@ -572,14 +573,52 @@ class _SettingTabState extends State<SettingTab> {
 
   Future<void> _changeLanguage(AppLanguage language) async {
     HapticFeedback.selectionClick();
+    if (_isChangingLanguage) {
+      return;
+    }
+
     final lingo = LingoScope.read(context);
     if (lingo.language == language) {
       return;
     }
-    await lingo.setLanguage(language);
-    if (mounted) {
-      NumiApp.restart(context);
+
+    setState(() => _isChangingLanguage = true);
+    _showFullScreenLoading(context.getText(AppKeys.switchingLanguage));
+    try {
+      await Future.wait<void>([
+        lingo.setLanguage(language),
+        Future<void>.delayed(_profileSwitchMinimumDuration),
+      ]);
+      if (mounted) {
+        _hideFullScreenLoading();
+        setState(() => _isChangingLanguage = false);
+      }
+    } catch (_) {
+      if (mounted) {
+        _hideFullScreenLoading();
+        setState(() => _isChangingLanguage = false);
+      }
     }
+  }
+
+  void _showFullScreenLoading(String message) {
+    showGeneralDialog<void>(
+      context: context,
+      useRootNavigator: true,
+      barrierDismissible: false,
+      barrierColor: Colors.white,
+      transitionDuration: Duration.zero,
+      pageBuilder: (dialogContext, _, __) {
+        return PopScope(
+          canPop: false,
+          child: LoadingScreen(message: message),
+        );
+      },
+    );
+  }
+
+  void _hideFullScreenLoading() {
+    Navigator.of(context, rootNavigator: true).pop();
   }
 
   void _returnToSettings() {

@@ -201,7 +201,7 @@ class LoadingScreen extends StatelessWidget {
         final loadingSpacing = height * 0.085;
         final indicatorSize = shortSide * 0.14;
 
-        return ColoredBox(
+        return Material(
           color: Colors.white,
           child: SizedBox(
             width: width,
@@ -231,6 +231,7 @@ class LoadingScreen extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         height: 0.62,
                         letterSpacing: 0,
+                        decoration: TextDecoration.none,
                       ),
                     ),
                   ),
@@ -279,6 +280,7 @@ class _SessionLoadingStatus extends StatelessWidget {
               fontWeight: FontWeight.w800,
               height: 1.25,
               letterSpacing: 0,
+              decoration: TextDecoration.none,
             ),
           ),
         ),
