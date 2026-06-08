@@ -250,10 +250,14 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
             layoutBuilder: (currentChild, previousChildren) {
+              final isEnteringLogin = currentChild?.key ==
+                  const ValueKey(
+                    'login',
+                  );
               return Stack(
                 alignment: Alignment.topCenter,
                 children: [
-                  ...previousChildren,
+                  if (!isEnteringLogin) ...previousChildren,
                   if (currentChild != null) currentChild,
                 ],
               );

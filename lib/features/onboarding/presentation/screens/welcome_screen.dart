@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({
     super.key,
     required this.onStart,
@@ -19,11 +19,32 @@ class WelcomeScreen extends StatelessWidget {
   static const _background = Color(0xFFFAFCFC);
 
   @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool _didPrecacheNextScreenAssets = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didPrecacheNextScreenAssets) {
+      return;
+    }
+
+    _didPrecacheNextScreenAssets = true;
+    precacheImage(
+      const AssetImage('assets/images/numi-mascot.png'),
+      context,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: ColoredBox(
-        color: _background,
+        color: WelcomeScreen._background,
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -37,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
                       child: SizedBox(
                         width: constraints.maxWidth,
                         height: constraints.maxHeight,
-                        child: _WelcomeComposition(onStart: onStart),
+                        child: _WelcomeComposition(onStart: widget.onStart),
                       ),
                     ),
                   ),
