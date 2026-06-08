@@ -7,6 +7,7 @@ class TeacherCreateHomeworkScreen extends StatefulWidget {
     required this.profileId,
     this.userId,
     this.initialClassroom,
+    this.purpose = classroomExercisePurposeHomework,
     ClassroomExerciseService? exerciseService,
     ClassroomService? classroomService,
     GradeService? gradeService,
@@ -22,6 +23,7 @@ class TeacherCreateHomeworkScreen extends StatefulWidget {
   final int profileId;
   final int? userId;
   final ClassroomModel? initialClassroom;
+  final String purpose;
   final ClassroomExerciseService? _exerciseService;
   final ClassroomService? _classroomService;
   final GradeService? _gradeService;
@@ -105,6 +107,7 @@ class _TeacherCreateHomeworkScreenState
         visibility: _visibility,
         startDate: _exerciseApiDate(_startDate!),
         endDate: _exerciseApiDate(_endDate!),
+        purpose: widget.purpose,
       );
       if (!mounted) {
         return;
@@ -113,7 +116,11 @@ class _TeacherCreateHomeworkScreenState
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(context.getText(AppKeys.teacherAssignmentCreated)),
+            content: Text(
+              context.getText(
+                _teacherExerciseCopy(widget.purpose).createdMessageKey,
+              ),
+            ),
             behavior: SnackBarBehavior.floating,
             duration: const Duration(milliseconds: 1400),
           ),
@@ -125,7 +132,9 @@ class _TeacherCreateHomeworkScreenState
       }
       _showSnack(
         error.message.trim().isEmpty
-            ? context.readText(AppKeys.teacherAssignmentCreateFailed)
+            ? context.readText(
+                _teacherExerciseCopy(widget.purpose).createFailedKey,
+              )
             : error.message,
       );
     } finally {
@@ -414,7 +423,9 @@ class _TeacherCreateHomeworkScreenState
         child: Column(
           children: [
             _TeacherScreenAppBar(
-              title: context.getText(AppKeys.teacherCreateAssignmentTitle),
+              title: context.getText(
+                _teacherExerciseCopy(widget.purpose).createTitleKey,
+              ),
               scale: 1,
               onBack: () => Navigator.of(context).maybePop(),
             ),
@@ -451,7 +462,8 @@ class _TeacherCreateHomeworkScreenState
                         const SizedBox(height: 22),
                         _CreateHomeworkInput(
                           controller: _titleController,
-                          hintKey: AppKeys.teacherAssignmentTitleHint,
+                          hintKey:
+                              _teacherExerciseCopy(widget.purpose).titleHintKey,
                           height: 62,
                           radius: 10,
                         ),
@@ -525,7 +537,8 @@ class _TeacherCreateHomeworkScreenState
                         const SizedBox(height: 17),
                         _CreateHomeworkInput(
                           controller: _descriptionController,
-                          hintKey: AppKeys.teacherAssignmentDescriptionHint,
+                          hintKey: _teacherExerciseCopy(widget.purpose)
+                              .descriptionHintKey,
                           height: 167,
                           maxLines: 6,
                           textAlignVertical: TextAlignVertical.top,

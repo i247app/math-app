@@ -383,18 +383,27 @@ class AppStrings {
       AppKeys.teacherFiveMinutesAgo: '5 phút trước',
       AppKeys.teacherClassFunctions: 'Chức Năng Lớp Học',
       AppKeys.teacherAssignments: 'Bài Tập',
+      AppKeys.teacherAssessments: 'Đánh Giá',
       AppKeys.teacherCreatedAssignments: 'Bài tập đã tạo',
+      AppKeys.teacherCreatedAssessments: 'Đánh giá đã tạo',
       AppKeys.teacherAssignmentSearchHint: 'Tìm kiếm ...',
       AppKeys.teacherAssignmentNewest: 'Mới nhất',
       AppKeys.teacherAssignmentListLoadFailed:
           'Tải danh sách bài tập thất bại.',
+      AppKeys.teacherAssessmentListLoadFailed:
+          'Tải danh sách đánh giá thất bại.',
       AppKeys.teacherAssignmentDetailLoadFailed:
           'Tải chi tiết bài tập thất bại.',
+      AppKeys.teacherAssessmentDetailLoadFailed:
+          'Tải chi tiết đánh giá thất bại.',
       AppKeys.teacherAssignmentCreateFailed:
           'Không thể tạo bài tập. Vui lòng thử lại.',
+      AppKeys.teacherAssessmentCreateFailed:
+          'Không thể tạo đánh giá. Vui lòng thử lại.',
       AppKeys.teacherAssignmentPickerSoon:
           'Lựa chọn này sẽ sớm có. Bạn vẫn có thể tạo bài tập.',
       AppKeys.teacherNoAssignments: 'Chưa có bài tập nào.',
+      AppKeys.teacherNoAssessments: 'Chưa có đánh giá nào.',
       AppKeys.teacherAssignmentGeometryTitle: 'Bài tập về nhà: Hình học cơ bản',
       AppKeys.teacherAssignmentId: 'ID: {id}',
       AppKeys.teacherCreateAssignmentSoon: 'Tính năng tạo bài tập sẽ sớm có.',
@@ -411,6 +420,7 @@ class AppStrings {
       AppKeys.teacherAssignmentEquationPrompt:
           'Giải phương trình x² - 5x + 6 = 0.',
       AppKeys.teacherCreateAssignmentTitle: 'Tạo Bài Tập',
+      AppKeys.teacherCreateAssessmentTitle: 'Tạo Đánh Giá',
       AppKeys.teacherAssignmentClassOption: 'Lớp 2A1',
       AppKeys.teacherAssignmentSelectClass: 'Chọn lớp học',
       AppKeys.teacherAssignmentClassSummaryName: 'Toán A1',
@@ -422,6 +432,7 @@ class AppStrings {
       AppKeys.teacherAssignmentVolumeOne: 'Tập 1',
       AppKeys.teacherAssignmentVolumeTwo: 'Tập 2',
       AppKeys.teacherAssignmentTitleHint: 'Tiêu Đề',
+      AppKeys.teacherAssessmentTitleHint: 'Tiêu Đề Đánh Giá',
       AppKeys.teacherAssignmentProgramLabel: 'Chương Trình',
       AppKeys.teacherAssignmentProgramValue: 'Cánh Diều 1',
       AppKeys.teacherAssignmentProgramRequired: 'Vui lòng chọn chương trình.',
@@ -441,7 +452,9 @@ class AppStrings {
       AppKeys.teacherAssignmentLessonLabel: 'Bài Học',
       AppKeys.teacherAssignmentDescriptionLabel: 'Mô tả',
       AppKeys.teacherAssignmentDescriptionHint: 'Mô tả thêm',
+      AppKeys.teacherAssessmentDescriptionHint: 'Mô tả đánh giá',
       AppKeys.teacherAssignmentCreated: 'Đã tạo bài tập.',
+      AppKeys.teacherAssessmentCreated: 'Đã tạo đánh giá.',
       AppKeys.teacherJoinedStudents: 'Học sinh đã tham gia ({count})',
       AppKeys.teacherNoJoinedStudents: 'Chưa có học sinh tham gia.',
       AppKeys.teacherStudentFallback: 'Học sinh',
@@ -895,17 +908,25 @@ class AppStrings {
       AppKeys.teacherFiveMinutesAgo: '5 minutes ago',
       AppKeys.teacherClassFunctions: 'Class Functions',
       AppKeys.teacherAssignments: 'Assignments',
+      AppKeys.teacherAssessments: 'Assessment',
       AppKeys.teacherCreatedAssignments: 'Created assignments',
+      AppKeys.teacherCreatedAssessments: 'Created assessments',
       AppKeys.teacherAssignmentSearchHint: 'Search ...',
       AppKeys.teacherAssignmentNewest: 'Newest',
       AppKeys.teacherAssignmentListLoadFailed: 'Failed to load assignments.',
+      AppKeys.teacherAssessmentListLoadFailed: 'Failed to load assessments.',
       AppKeys.teacherAssignmentDetailLoadFailed:
           'Failed to load assignment details.',
+      AppKeys.teacherAssessmentDetailLoadFailed:
+          'Failed to load assessment details.',
       AppKeys.teacherAssignmentCreateFailed:
           'Could not create assignment. Please try again.',
+      AppKeys.teacherAssessmentCreateFailed:
+          'Could not create assessment. Please try again.',
       AppKeys.teacherAssignmentPickerSoon:
           'This selector is coming soon. You can still create the assignment.',
       AppKeys.teacherNoAssignments: 'No assignments yet.',
+      AppKeys.teacherNoAssessments: 'No assessments yet.',
       AppKeys.teacherAssignmentGeometryTitle: 'Homework: Basic geometry',
       AppKeys.teacherAssignmentId: 'ID: {id}',
       AppKeys.teacherCreateAssignmentSoon:
@@ -923,6 +944,7 @@ class AppStrings {
       AppKeys.teacherAssignmentEquationPrompt:
           'Solve the equation x² - 5x + 6 = 0.',
       AppKeys.teacherCreateAssignmentTitle: 'Create Assignment',
+      AppKeys.teacherCreateAssessmentTitle: 'Create Assessment',
       AppKeys.teacherAssignmentClassOption: 'Class 2A1',
       AppKeys.teacherAssignmentSelectClass: 'Select classroom',
       AppKeys.teacherAssignmentClassSummaryName: 'Math A1',
@@ -934,6 +956,7 @@ class AppStrings {
       AppKeys.teacherAssignmentVolumeOne: 'Book 1',
       AppKeys.teacherAssignmentVolumeTwo: 'Book 2',
       AppKeys.teacherAssignmentTitleHint: 'Title',
+      AppKeys.teacherAssessmentTitleHint: 'Assessment title',
       AppKeys.teacherAssignmentProgramLabel: 'Program',
       AppKeys.teacherAssignmentProgramValue: 'Canh Dieu 1',
       AppKeys.teacherAssignmentProgramRequired: 'Please select a program.',
@@ -953,7 +976,9 @@ class AppStrings {
       AppKeys.teacherAssignmentLessonLabel: 'Lesson',
       AppKeys.teacherAssignmentDescriptionLabel: 'Description',
       AppKeys.teacherAssignmentDescriptionHint: 'Additional description',
+      AppKeys.teacherAssessmentDescriptionHint: 'Assessment description',
       AppKeys.teacherAssignmentCreated: 'Assignment created.',
+      AppKeys.teacherAssessmentCreated: 'Assessment created.',
       AppKeys.teacherJoinedStudents: 'Joined students ({count})',
       AppKeys.teacherNoJoinedStudents: 'No students have joined yet.',
       AppKeys.teacherStudentFallback: 'Student',

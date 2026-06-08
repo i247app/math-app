@@ -2,6 +2,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classroom_exercise_models.g.dart';
 
+const classroomExercisePurposeHomework = 'HOMEWORK';
+const classroomExercisePurposeQuiz = 'QUIZ';
+const classroomExercisePurposeExam = 'EXAM';
+
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class ClassroomExerciseListRequest {
   const ClassroomExerciseListRequest({
@@ -10,6 +14,7 @@ class ClassroomExerciseListRequest {
     this.search,
     this.visibility,
     this.submissionStatus,
+    this.purpose,
   });
 
   final int classroomId;
@@ -17,6 +22,7 @@ class ClassroomExerciseListRequest {
   final String? search;
   final String? visibility;
   final String? submissionStatus;
+  final String? purpose;
 
   factory ClassroomExerciseListRequest.fromJson(Map<String, dynamic> json) =>
       _$ClassroomExerciseListRequestFromJson(json);
@@ -30,11 +36,13 @@ class UpdateClassroomExerciseRequest {
     required this.profileId,
     required this.classroomExerciseId,
     required this.visibility,
+    this.purpose = classroomExercisePurposeHomework,
   });
 
   final int profileId;
   final int classroomExerciseId;
   final String visibility;
+  final String purpose;
 
   factory UpdateClassroomExerciseRequest.fromJson(
     Map<String, dynamic> json,
@@ -96,6 +104,7 @@ class CreateClassroomExerciseRequest {
     required this.visibility,
     required this.startDate,
     required this.endDate,
+    this.purpose = classroomExercisePurposeHomework,
     this.metadata,
   });
 
@@ -111,6 +120,7 @@ class CreateClassroomExerciseRequest {
   final String visibility;
   final String startDate;
   final String endDate;
+  final String purpose;
 
   factory CreateClassroomExerciseRequest.fromJson(
     Map<String, dynamic> json,
@@ -332,6 +342,7 @@ class ClassroomExercise {
     this.lessonName,
     this.description,
     this.visibility,
+    this.purpose,
     this.status,
     this.submissionStatus,
     this.startDate,
@@ -367,6 +378,8 @@ class ClassroomExercise {
   @JsonKey(fromJson: _stringFromJson)
   final String? visibility;
   @JsonKey(fromJson: _stringFromJson)
+  final String? purpose;
+  @JsonKey(fromJson: _stringFromJson)
   final String? status;
   @JsonKey(fromJson: _stringFromJson)
   final String? submissionStatus;
@@ -401,6 +414,7 @@ class ClassroomExercise {
             json['exercise_description'] ??
             _nestedValue(json['metadata'], 'description'),
         'status': json['status'] ?? json['exercise_status'],
+        'purpose': json['purpose'] ?? json['type'],
         'submission_status': json['submission_status'],
         'questions': questionsValue,
       },

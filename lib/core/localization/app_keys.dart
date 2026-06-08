@@ -380,17 +380,26 @@ class AppKeys {
   static const teacherFiveMinutesAgo = 'teacher_five_minutes_ago';
   static const teacherClassFunctions = 'teacher_class_functions';
   static const teacherAssignments = 'teacher_assignments';
+  static const teacherAssessments = 'teacher_assessments';
   static const teacherCreatedAssignments = 'teacher_created_assignments';
+  static const teacherCreatedAssessments = 'teacher_created_assessments';
   static const teacherAssignmentSearchHint = 'teacher_assignment_search_hint';
   static const teacherAssignmentNewest = 'teacher_assignment_newest';
   static const teacherAssignmentListLoadFailed =
       'teacher_assignment_list_load_failed';
+  static const teacherAssessmentListLoadFailed =
+      'teacher_assessment_list_load_failed';
   static const teacherAssignmentDetailLoadFailed =
       'teacher_assignment_detail_load_failed';
+  static const teacherAssessmentDetailLoadFailed =
+      'teacher_assessment_detail_load_failed';
   static const teacherAssignmentCreateFailed =
       'teacher_assignment_create_failed';
+  static const teacherAssessmentCreateFailed =
+      'teacher_assessment_create_failed';
   static const teacherAssignmentPickerSoon = 'teacher_assignment_picker_soon';
   static const teacherNoAssignments = 'teacher_no_assignments';
+  static const teacherNoAssessments = 'teacher_no_assessments';
   static const teacherAssignmentGeometryTitle =
       'teacher_assignment_geometry_title';
   static const teacherAssignmentId = 'teacher_assignment_id';
@@ -414,6 +423,7 @@ class AppKeys {
   static const teacherAssignmentEquationPrompt =
       'teacher_assignment_equation_prompt';
   static const teacherCreateAssignmentTitle = 'teacher_create_assignment_title';
+  static const teacherCreateAssessmentTitle = 'teacher_create_assessment_title';
   static const teacherAssignmentClassOption = 'teacher_assignment_class_option';
   static const teacherAssignmentSelectClass = 'teacher_assignment_select_class';
   static const teacherAssignmentClassSummaryName =
@@ -430,6 +440,7 @@ class AppKeys {
   static const teacherAssignmentVolumeOne = 'teacher_assignment_volume_one';
   static const teacherAssignmentVolumeTwo = 'teacher_assignment_volume_two';
   static const teacherAssignmentTitleHint = 'teacher_assignment_title_hint';
+  static const teacherAssessmentTitleHint = 'teacher_assessment_title_hint';
   static const teacherAssignmentProgramLabel =
       'teacher_assignment_program_label';
   static const teacherAssignmentProgramValue =
@@ -463,6 +474,9 @@ class AppKeys {
   static const teacherAssignmentDescriptionHint =
       'teacher_assignment_description_hint';
   static const teacherAssignmentCreated = 'teacher_assignment_created';
+  static const teacherAssessmentDescriptionHint =
+      'teacher_assessment_description_hint';
+  static const teacherAssessmentCreated = 'teacher_assessment_created';
   static const teacherJoinedStudents = 'teacher_joined_students';
   static const teacherNoJoinedStudents = 'teacher_no_joined_students';
   static const teacherStudentFallback = 'teacher_student_fallback';

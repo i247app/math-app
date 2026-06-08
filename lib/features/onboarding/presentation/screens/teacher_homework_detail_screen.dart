@@ -6,12 +6,14 @@ class TeacherHomeworkDetailScreen extends StatefulWidget {
     required this.exerciseId,
     required this.profileId,
     this.initialExercise,
+    this.purpose = classroomExercisePurposeHomework,
     ClassroomExerciseService? exerciseService,
   }) : _exerciseService = exerciseService;
 
   final int exerciseId;
   final int profileId;
   final ClassroomExercise? initialExercise;
+  final String purpose;
   final ClassroomExerciseService? _exerciseService;
 
   @override
@@ -30,6 +32,13 @@ class _TeacherHomeworkDetailScreenState
   ClassroomExercise? _exercise;
   String? _savedVisibility;
   String? _editingVisibility;
+
+  String get _effectivePurpose =>
+      _exercise?.purpose?.trim().isNotEmpty == true
+          ? _exercise!.purpose!.trim()
+          : widget.initialExercise?.purpose?.trim().isNotEmpty == true
+              ? widget.initialExercise!.purpose!.trim()
+              : widget.purpose;
 
   @override
   void initState() {
@@ -63,7 +72,9 @@ class _TeacherHomeworkDetailScreenState
       }
       setState(() {
         _error = error.message.trim().isEmpty
-            ? context.readText(AppKeys.teacherAssignmentDetailLoadFailed)
+            ? context.readText(
+                _teacherExerciseCopy(_effectivePurpose).detailLoadFailedKey,
+              )
             : error.message;
       });
     } finally {
@@ -92,6 +103,7 @@ class _TeacherHomeworkDetailScreenState
         profileId: widget.profileId,
         classroomExerciseId: exerciseId,
         visibility: visibility,
+        purpose: _effectivePurpose,
       );
       if (!mounted) {
         return;
@@ -112,7 +124,9 @@ class _TeacherHomeworkDetailScreenState
           SnackBar(
             content: Text(
               error.message.trim().isEmpty
-                  ? context.readText(AppKeys.teacherAssignmentCreateFailed)
+                  ? context.readText(
+                      _teacherExerciseCopy(_effectivePurpose).createFailedKey,
+                    )
                   : error.message,
             ),
             behavior: SnackBarBehavior.floating,
@@ -138,7 +152,9 @@ class _TeacherHomeworkDetailScreenState
         child: Column(
           children: [
             _TeacherScreenAppBar(
-              title: context.getText(AppKeys.teacherAssignments),
+              title: context.getText(
+                _teacherExerciseCopy(_effectivePurpose).titleKey,
+              ),
               scale: 1,
               onBack: () => Navigator.of(context).maybePop(),
               action: _hasVisibilityChange

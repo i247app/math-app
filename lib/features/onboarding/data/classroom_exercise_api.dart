@@ -19,6 +19,7 @@ abstract class ClassroomExerciseService {
     String? search,
     String? visibility,
     String? submissionStatus,
+    String? purpose,
   });
 
   Future<ClassroomExercise?> createExercise({
@@ -33,6 +34,7 @@ abstract class ClassroomExerciseService {
     required String visibility,
     required String startDate,
     required String endDate,
+    String purpose = classroomExercisePurposeHomework,
   });
 
   Future<ClassroomExercise?> getExerciseDetail({
@@ -44,6 +46,7 @@ abstract class ClassroomExerciseService {
     required int profileId,
     required int classroomExerciseId,
     required String visibility,
+    String purpose = classroomExercisePurposeHomework,
   });
 
   Future<ClassroomExerciseSubmissionResponse> submitExercise({
@@ -69,6 +72,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     String? search,
     String? visibility,
     String? submissionStatus,
+    String? purpose,
   }) async {
     try {
       final response = await _networkApi.listClassroomExercises(
@@ -81,6 +85,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
           submissionStatus: submissionStatus?.trim().isEmpty == true
               ? null
               : submissionStatus?.trim(),
+          purpose: purpose?.trim().isEmpty == true ? null : purpose?.trim(),
         ),
       );
       return response.exercises;
@@ -102,6 +107,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required String visibility,
     required String startDate,
     required String endDate,
+    String purpose = classroomExercisePurposeHomework,
   }) async {
     try {
       final response = await _networkApi.createClassroomExercise(
@@ -117,6 +123,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
           visibility: visibility,
           startDate: startDate,
           endDate: endDate,
+          purpose: purpose,
         ),
       );
       return response.exercise;
@@ -146,6 +153,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required int profileId,
     required int classroomExerciseId,
     required String visibility,
+    String purpose = classroomExercisePurposeHomework,
   }) async {
     try {
       final response = await _networkApi.updateClassroomExercise(
@@ -153,6 +161,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
           profileId: profileId,
           classroomExerciseId: classroomExerciseId,
           visibility: visibility,
+          purpose: purpose,
         ),
       );
       return response.exercise;

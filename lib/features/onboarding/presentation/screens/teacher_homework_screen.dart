@@ -7,6 +7,7 @@ class TeacherHomeworkScreen extends StatefulWidget {
     required this.profileId,
     this.userId,
     this.initialClassroom,
+    this.purpose = classroomExercisePurposeHomework,
     ClassroomExerciseService? exerciseService,
   }) : _exerciseService = exerciseService;
 
@@ -14,6 +15,7 @@ class TeacherHomeworkScreen extends StatefulWidget {
   final int profileId;
   final int? userId;
   final ClassroomModel? initialClassroom;
+  final String purpose;
   final ClassroomExerciseService? _exerciseService;
 
   @override
@@ -44,6 +46,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
       final exercises = await _exerciseService.listExercises(
         classroomId: widget.classroomId,
         profileId: widget.profileId,
+        purpose: widget.purpose,
       );
       if (!mounted) {
         return;
@@ -55,7 +58,9 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
       }
       setState(() {
         _error = error.message.trim().isEmpty
-            ? context.readText(AppKeys.teacherAssignmentListLoadFailed)
+            ? context.readText(
+                _teacherExerciseCopy(widget.purpose).listLoadFailedKey,
+              )
             : error.message;
       });
     } finally {
@@ -73,6 +78,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
           profileId: widget.profileId,
           userId: widget.userId,
           initialClassroom: widget.initialClassroom,
+          purpose: widget.purpose,
           exerciseService: _exerciseService,
           classroomService: ClassroomApi(),
         ),
@@ -96,6 +102,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
           exerciseId: exerciseId,
           profileId: widget.profileId,
           initialExercise: exercise,
+          purpose: widget.purpose,
           exerciseService: _exerciseService,
         ),
       ),
@@ -111,7 +118,9 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
         child: Column(
           children: [
             _TeacherScreenAppBar(
-              title: context.getText(AppKeys.teacherAssignments),
+              title: context.getText(
+                _teacherExerciseCopy(widget.purpose).titleKey,
+              ),
               scale: 1,
               onBack: () => Navigator.of(context).maybePop(),
             ),
@@ -141,7 +150,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                       const SizedBox(height: 33),
                       const _TeacherHomeworkSearchField(),
                       const SizedBox(height: 24),
-                      const _TeacherHomeworkSectionHeader(),
+                      _TeacherHomeworkSectionHeader(purpose: widget.purpose),
                       const SizedBox(height: 17),
                       if (_isLoading && _exercises.isEmpty)
                         const Padding(
@@ -160,8 +169,9 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                         )
                       else if (_exercises.isEmpty)
                         _TeacherEmptyAssignmentsPanel(
-                          message:
-                              context.getText(AppKeys.teacherNoAssignments),
+                          message: context.getText(
+                            _teacherExerciseCopy(widget.purpose).emptyKey,
+                          ),
                         )
                       else
                         for (var index = 0;
@@ -307,15 +317,18 @@ class _TeacherHomeworkSearchField extends StatelessWidget {
 }
 
 class _TeacherHomeworkSectionHeader extends StatelessWidget {
-  const _TeacherHomeworkSectionHeader();
+  const _TeacherHomeworkSectionHeader({required this.purpose});
+
+  final String purpose;
 
   @override
   Widget build(BuildContext context) {
+    final copy = _teacherExerciseCopy(purpose);
     return Row(
       children: [
         Expanded(
           child: Text(
-            context.getText(AppKeys.teacherCreatedAssignments),
+            context.getText(copy.createdTitleKey),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
@@ -344,6 +357,62 @@ class _TeacherHomeworkSectionHeader extends StatelessWidget {
       ],
     );
   }
+}
+
+class _TeacherExerciseCopy {
+  const _TeacherExerciseCopy({
+    required this.titleKey,
+    required this.createdTitleKey,
+    required this.listLoadFailedKey,
+    required this.detailLoadFailedKey,
+    required this.createFailedKey,
+    required this.emptyKey,
+    required this.createTitleKey,
+    required this.createdMessageKey,
+    required this.titleHintKey,
+    required this.descriptionHintKey,
+  });
+
+  final String titleKey;
+  final String createdTitleKey;
+  final String listLoadFailedKey;
+  final String detailLoadFailedKey;
+  final String createFailedKey;
+  final String emptyKey;
+  final String createTitleKey;
+  final String createdMessageKey;
+  final String titleHintKey;
+  final String descriptionHintKey;
+}
+
+_TeacherExerciseCopy _teacherExerciseCopy(String purpose) {
+  if (purpose.trim().toUpperCase() == classroomExercisePurposeExam) {
+    return const _TeacherExerciseCopy(
+      titleKey: AppKeys.teacherAssessments,
+      createdTitleKey: AppKeys.teacherCreatedAssessments,
+      listLoadFailedKey: AppKeys.teacherAssessmentListLoadFailed,
+      detailLoadFailedKey: AppKeys.teacherAssessmentDetailLoadFailed,
+      createFailedKey: AppKeys.teacherAssessmentCreateFailed,
+      emptyKey: AppKeys.teacherNoAssessments,
+      createTitleKey: AppKeys.teacherCreateAssessmentTitle,
+      createdMessageKey: AppKeys.teacherAssessmentCreated,
+      titleHintKey: AppKeys.teacherAssessmentTitleHint,
+      descriptionHintKey: AppKeys.teacherAssessmentDescriptionHint,
+    );
+  }
+
+  return const _TeacherExerciseCopy(
+    titleKey: AppKeys.teacherAssignments,
+    createdTitleKey: AppKeys.teacherCreatedAssignments,
+    listLoadFailedKey: AppKeys.teacherAssignmentListLoadFailed,
+    detailLoadFailedKey: AppKeys.teacherAssignmentDetailLoadFailed,
+    createFailedKey: AppKeys.teacherAssignmentCreateFailed,
+    emptyKey: AppKeys.teacherNoAssignments,
+    createTitleKey: AppKeys.teacherCreateAssignmentTitle,
+    createdMessageKey: AppKeys.teacherAssignmentCreated,
+    titleHintKey: AppKeys.teacherAssignmentTitleHint,
+    descriptionHintKey: AppKeys.teacherAssignmentDescriptionHint,
+  );
 }
 
 class _TeacherAssignmentCard extends StatelessWidget {

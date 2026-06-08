@@ -191,6 +191,21 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                                       profileId: widget.profileId,
                                       userId: widget.userId,
                                       initialClassroom: classroom,
+                                      purpose:
+                                          classroomExercisePurposeHomework,
+                                    ),
+                                  ),
+                                );
+                              },
+                              onOpenAssessments: () {
+                                Navigator.of(context).push<void>(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => TeacherHomeworkScreen(
+                                      classroomId: widget.classroomId,
+                                      profileId: widget.profileId,
+                                      userId: widget.userId,
+                                      initialClassroom: classroom,
+                                      purpose: classroomExercisePurposeExam,
                                     ),
                                   ),
                                 );
@@ -629,6 +644,7 @@ class _ClassDetailLowerContent extends StatelessWidget {
     required this.memberCount,
     required this.requestCount,
     required this.onOpenAssignments,
+    required this.onOpenAssessments,
     required this.onOpenMembers,
   });
 
@@ -636,6 +652,7 @@ class _ClassDetailLowerContent extends StatelessWidget {
   final int memberCount;
   final int requestCount;
   final VoidCallback onOpenAssignments;
+  final VoidCallback onOpenAssessments;
   final VoidCallback onOpenMembers;
 
   @override
@@ -667,6 +684,7 @@ class _ClassDetailLowerContent extends StatelessWidget {
           _ClassFunctionGrid(
             scale: scale,
             onOpenAssignments: onOpenAssignments,
+            onOpenAssessments: onOpenAssessments,
           ),
         ],
       ),
@@ -778,10 +796,12 @@ class _ClassFunctionGrid extends StatelessWidget {
   const _ClassFunctionGrid({
     required this.scale,
     required this.onOpenAssignments,
+    required this.onOpenAssessments,
   });
 
   final double scale;
   final VoidCallback onOpenAssignments;
+  final VoidCallback onOpenAssessments;
 
   @override
   Widget build(BuildContext context) {
@@ -796,11 +816,16 @@ class _ClassFunctionGrid extends StatelessWidget {
       children: [
         _ClassFunctionTile(
           scale: scale,
-          iconAsset: 'assets/images/teacher_class_assignment.png',
+          iconAsset: 'assets/images/classroom_homework.png',
           label: context.getText(AppKeys.teacherAssignments),
           onTap: onOpenAssignments,
         ),
-        _ClassFunctionTile(scale: scale),
+        _ClassFunctionTile(
+          scale: scale,
+          iconAsset: 'assets/images/teacher_class_assignment.png',
+          label: context.getText(AppKeys.teacherAssessments),
+          onTap: onOpenAssessments,
+        ),
         _ClassFunctionTile(scale: scale),
         _ClassFunctionTile(scale: scale),
       ],
