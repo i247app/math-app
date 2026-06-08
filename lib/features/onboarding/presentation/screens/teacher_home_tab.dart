@@ -35,6 +35,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   bool _isLoadingAssignments = false;
   String? _error;
   int? _loadedProfileId;
+  int _assignmentLoadRequestId = 0;
   List<ClassroomModel> _classrooms = const <ClassroomModel>[];
   List<ClassroomExercise> _recentAssignments = const <ClassroomExercise>[];
 
@@ -57,6 +58,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   Future<void> _loadClassrooms() async {
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
+    final assignmentRequestId = ++_assignmentLoadRequestId;
     if (profileId == null) {
       setState(() {
         _loadedProfileId = profileId;
@@ -71,7 +73,8 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
 
     setState(() {
       _isLoading = true;
-      _isLoadingAssignments = false;
+      _isLoadingAssignments = true;
+      _recentAssignments = const <ClassroomExercise>[];
       _error = null;
       _loadedProfileId = profileId;
     });
@@ -85,11 +88,15 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       setState(() {
         _classrooms = classrooms;
         _recentAssignments = const <ClassroomExercise>[];
+        _isLoading = false;
         _isLoadingAssignments = classrooms.isNotEmpty;
       });
-      await _loadRecentAssignments(
-        profileId: profileId,
-        classrooms: classrooms,
+      unawaited(
+        _loadRecentAssignments(
+          profileId: profileId,
+          classrooms: classrooms,
+          requestId: assignmentRequestId,
+        ),
       );
     } on ClassroomException catch (error) {
       if (!mounted || _loadedProfileId != profileId) {
@@ -98,6 +105,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       setState(() {
         _error = error.message;
         _recentAssignments = const <ClassroomExercise>[];
+        _isLoading = false;
         _isLoadingAssignments = false;
       });
     } finally {
@@ -110,13 +118,16 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   Future<void> _loadRecentAssignments({
     required int profileId,
     required List<ClassroomModel> classrooms,
+    required int requestId,
   }) async {
     final classroomIds = classrooms
         .map((classroom) => classroom.stableId)
         .whereType<int>()
         .toList(growable: false);
     if (classroomIds.isEmpty) {
-      if (mounted && _loadedProfileId == profileId) {
+      if (mounted &&
+          _loadedProfileId == profileId &&
+          _assignmentLoadRequestId == requestId) {
         setState(() {
           _recentAssignments = const <ClassroomExercise>[];
           _isLoadingAssignments = false;
@@ -138,7 +149,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         }
       }),
     );
-    if (!mounted || _loadedProfileId != profileId) {
+    if (!mounted ||
+        _loadedProfileId != profileId ||
+        _assignmentLoadRequestId != requestId) {
       return;
     }
 
@@ -662,8 +675,8 @@ class _TeacherHomeSectionHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: _teacherBlue,
-              fontSize: 20 * scale,
+              color: Colors.black,
+              fontSize: 18 * scale,
               fontWeight: FontWeight.w800,
               height: 1.25,
             ),
@@ -672,7 +685,7 @@ class _TeacherHomeSectionHeader extends StatelessWidget {
         Text(
           context.getText(AppKeys.viewAllUpper),
           style: GoogleFonts.andika(
-            color: _teacherBlue,
+            color: _teacherInk,
             fontSize: 14 * scale,
             fontWeight: FontWeight.w800,
             decoration: TextDecoration.underline,
@@ -729,11 +742,12 @@ class _TeacherAssignmentsLoadingPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 132 * scale,
-      child: const Center(
-        child: CircularProgressIndicator(color: _teacherTeal),
-      ),
+    return _TeacherSkeletonCarousel(
+      scale: scale,
+      itemWidth: 178 * scale,
+      itemHeight: 164 * scale,
+      itemCount: 2,
+      builder: (context) => _TeacherAssignmentSkeletonCard(scale: scale),
     );
   }
 }
@@ -987,6 +1001,183 @@ class _TeacherClassCard extends StatelessWidget {
   }
 }
 
+class _TeacherSkeletonCarousel extends StatelessWidget {
+  const _TeacherSkeletonCarousel({
+    required this.scale,
+    required this.itemWidth,
+    required this.itemHeight,
+    required this.itemCount,
+    required this.builder,
+  });
+
+  final double scale;
+  final double itemWidth;
+  final double itemHeight;
+  final int itemCount;
+  final WidgetBuilder builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: itemHeight,
+      child: ListView.separated(
+        clipBehavior: Clip.none,
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: itemCount,
+        separatorBuilder: (_, __) => SizedBox(width: 16 * scale),
+        itemBuilder: (context, index) {
+          return SizedBox(
+            width: itemWidth,
+            child: builder(context),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TeacherClassSkeletonCard extends StatelessWidget {
+  const _TeacherClassSkeletonCard({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return _TeacherSkeletonCard(
+      scale: scale,
+      padding: EdgeInsets.all(12 * scale),
+      child: Column(
+        children: [
+          _TeacherSkeletonBlock(
+            width: 84 * scale,
+            height: 56 * scale,
+            radius: 16 * scale,
+          ),
+          SizedBox(height: 8 * scale),
+          _TeacherSkeletonBlock(
+            width: 72 * scale,
+            height: 16 * scale,
+            radius: 8 * scale,
+          ),
+          SizedBox(height: 8 * scale),
+          Divider(color: const Color(0x1AC4C6D2), height: 4 * scale),
+          _TeacherSkeletonBlock(
+            width: 88 * scale,
+            height: 12 * scale,
+            radius: 8 * scale,
+          ),
+          SizedBox(height: 5 * scale),
+          _TeacherSkeletonBlock(
+            width: 69 * scale,
+            height: 14 * scale,
+            radius: 5 * scale,
+            color: _teacherTeal.withValues(alpha: 0.20),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TeacherAssignmentSkeletonCard extends StatelessWidget {
+  const _TeacherAssignmentSkeletonCard({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return _TeacherSkeletonCard(
+      scale: scale,
+      padding: EdgeInsets.all(18 * scale),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _TeacherSkeletonBlock(
+            width: 58 * scale,
+            height: 42 * scale,
+            radius: 12 * scale,
+          ),
+          const Spacer(),
+          _TeacherSkeletonBlock(
+            width: 94 * scale,
+            height: 18 * scale,
+            radius: 8 * scale,
+          ),
+          SizedBox(height: 8 * scale),
+          _TeacherSkeletonBlock(
+            width: 126 * scale,
+            height: 13 * scale,
+            radius: 8 * scale,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TeacherSkeletonCard extends StatelessWidget {
+  const _TeacherSkeletonCard({
+    required this.scale,
+    required this.padding,
+    required this.child,
+  });
+
+  final double scale;
+  final EdgeInsetsGeometry padding;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24 * scale),
+        border: Border.all(color: const Color(0x33C4C6D2)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0x1A002B6A),
+            blurRadius: 20 * scale,
+            spreadRadius: -4 * scale,
+            offset: Offset(0, 4 * scale),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: padding,
+        child: child,
+      ),
+    );
+  }
+}
+
+class _TeacherSkeletonBlock extends StatelessWidget {
+  const _TeacherSkeletonBlock({
+    required this.width,
+    required this.height,
+    required this.radius,
+    this.color = const Color(0xFFF3F7FA),
+  });
+
+  final double width;
+  final double height;
+  final double radius;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
+}
+
 class _ClassThumb extends StatelessWidget {
   const _ClassThumb({
     required this.classroom,
@@ -1040,11 +1231,12 @@ class _TeacherLoadingPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 220 * scale,
-      child: const Center(
-        child: CircularProgressIndicator(color: _teacherTeal),
-      ),
+    return _TeacherSkeletonCarousel(
+      scale: scale,
+      itemWidth: 166 * scale,
+      itemHeight: 164 * scale,
+      itemCount: 2,
+      builder: (context) => _TeacherClassSkeletonCard(scale: scale),
     );
   }
 }
