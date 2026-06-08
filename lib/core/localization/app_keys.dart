@@ -330,6 +330,7 @@ class AppKeys {
   static const teacherHeroTitle = 'teacher_hero_title';
   static const teacherHeroSubtitle = 'teacher_hero_subtitle';
   static const teacherYourClasses = 'teacher_your_classes';
+  static const teacherRecentlyAssigned = 'teacher_recently_assigned';
   static const teacherCreateNewClass = 'teacher_create_new_class';
   static const teacherCompleteProfile = 'teacher_complete_profile';
   static const teacherClassFallback = 'teacher_class_fallback';

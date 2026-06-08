@@ -9,7 +9,9 @@ class TeacherHomeTab extends StatefulWidget {
     required this.scale,
     required this.onCompleteProfile,
     ClassroomService? classroomService,
-  }) : _classroomService = classroomService;
+    ClassroomExerciseService? exerciseService,
+  })  : _classroomService = classroomService,
+        _exerciseService = exerciseService;
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
@@ -17,6 +19,7 @@ class TeacherHomeTab extends StatefulWidget {
   final double scale;
   final Future<void> Function() onCompleteProfile;
   final ClassroomService? _classroomService;
+  final ClassroomExerciseService? _exerciseService;
 
   @override
   State<TeacherHomeTab> createState() => _TeacherHomeTabState();
@@ -25,11 +28,15 @@ class TeacherHomeTab extends StatefulWidget {
 class _TeacherHomeTabState extends State<TeacherHomeTab> {
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
+  late final ClassroomExerciseService _exerciseService =
+      widget._exerciseService ?? ClassroomExerciseApi();
 
   bool _isLoading = false;
+  bool _isLoadingAssignments = false;
   String? _error;
   int? _loadedProfileId;
   List<ClassroomModel> _classrooms = const <ClassroomModel>[];
+  List<ClassroomExercise> _recentAssignments = const <ClassroomExercise>[];
 
   @override
   void initState() {
@@ -54,14 +61,17 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       setState(() {
         _loadedProfileId = profileId;
         _classrooms = const <ClassroomModel>[];
+        _recentAssignments = const <ClassroomExercise>[];
         _error = context.readText(AppKeys.teacherMissingProfileId);
         _isLoading = false;
+        _isLoadingAssignments = false;
       });
       return;
     }
 
     setState(() {
       _isLoading = true;
+      _isLoadingAssignments = false;
       _error = null;
       _loadedProfileId = profileId;
     });
@@ -72,17 +82,75 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       if (!mounted || _loadedProfileId != profileId) {
         return;
       }
-      setState(() => _classrooms = classrooms);
+      setState(() {
+        _classrooms = classrooms;
+        _recentAssignments = const <ClassroomExercise>[];
+        _isLoadingAssignments = classrooms.isNotEmpty;
+      });
+      await _loadRecentAssignments(
+        profileId: profileId,
+        classrooms: classrooms,
+      );
     } on ClassroomException catch (error) {
       if (!mounted || _loadedProfileId != profileId) {
         return;
       }
-      setState(() => _error = error.message);
+      setState(() {
+        _error = error.message;
+        _recentAssignments = const <ClassroomExercise>[];
+        _isLoadingAssignments = false;
+      });
     } finally {
       if (mounted && _loadedProfileId == profileId) {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  Future<void> _loadRecentAssignments({
+    required int profileId,
+    required List<ClassroomModel> classrooms,
+  }) async {
+    final classroomIds = classrooms
+        .map((classroom) => classroom.stableId)
+        .whereType<int>()
+        .toList(growable: false);
+    if (classroomIds.isEmpty) {
+      if (mounted && _loadedProfileId == profileId) {
+        setState(() {
+          _recentAssignments = const <ClassroomExercise>[];
+          _isLoadingAssignments = false;
+        });
+      }
+      return;
+    }
+
+    final exerciseGroups = await Future.wait(
+      classroomIds.map((classroomId) async {
+        try {
+          return await _exerciseService.listExercises(
+            classroomId: classroomId,
+            profileId: profileId,
+            purpose: classroomExercisePurposeHomework,
+          );
+        } catch (_) {
+          return const <ClassroomExercise>[];
+        }
+      }),
+    );
+    if (!mounted || _loadedProfileId != profileId) {
+      return;
+    }
+
+    final assignments = exerciseGroups
+        .expand((exercises) => exercises)
+        .toList(growable: false)
+      ..sort(_compareRecentAssignments);
+
+    setState(() {
+      _recentAssignments = assignments;
+      _isLoadingAssignments = false;
+    });
   }
 
   Future<void> _openCreateClass() async {
@@ -170,6 +238,29 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     );
   }
 
+  void _openAssignmentDetail(ClassroomExercise exercise) {
+    final exerciseId = exercise.stableId;
+    final profileId =
+        ActiveProfileSession.profileStableId(widget.activeProfile);
+    if (exerciseId == null || profileId == null) {
+      _showTeacherHomeworkSoon(context);
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => TeacherHomeworkDetailScreen(
+          exerciseId: exerciseId,
+          profileId: profileId,
+          initialExercise: exercise,
+          purpose: classroomExercisePurposeHomework,
+          exerciseService: _exerciseService,
+        ),
+      ),
+    );
+  }
+
   void _showSnack(String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -188,12 +279,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: EdgeInsets.fromLTRB(
-          18 * scale,
-          0,
-          18 * scale,
-          widget.bottomPadding,
-        ),
+        padding: EdgeInsets.only(bottom: widget.bottomPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -202,35 +288,61 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
               topPadding: MediaQuery.paddingOf(context).top,
               scale: scale,
             ),
-            SizedBox(height: 22 * scale),
-            _TeacherHeroCard(scale: scale),
-            SizedBox(height: 28 * scale),
-            _TeacherClassSectionHeader(
-              scale: scale,
-              hasClasses: _classrooms.isNotEmpty,
-              onAdd: _handleClassCreateAction,
-            ),
-            SizedBox(height: (_classrooms.isNotEmpty ? 5 : 12) * scale),
-            if (_isLoading && _classrooms.isEmpty)
-              _TeacherLoadingPanel(scale: scale)
-            else if (_error != null && _classrooms.isEmpty)
-              _TeacherErrorPanel(
-                scale: scale,
-                message: _error!,
-                onRetry: _loadClassrooms,
-              )
-            else if (_classrooms.isEmpty)
-              _TeacherNoClassPanel(
-                scale: scale,
-                isProfileComplete: isProfileComplete,
-                onCreate: _handleClassCreateAction,
-              )
-            else
-              _TeacherClassGrid(
-                scale: scale,
-                classrooms: _classrooms,
-                onOpen: _openClassDetail,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 18 * scale),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 22 * scale),
+                  _TeacherHeroCard(scale: scale),
+                  SizedBox(height: 28 * scale),
+                  _TeacherClassSectionHeader(
+                    scale: scale,
+                    hasClasses: _classrooms.isNotEmpty,
+                    onAdd: _handleClassCreateAction,
+                  ),
+                  SizedBox(height: 12 * scale),
+                  if (_isLoading && _classrooms.isEmpty)
+                    _TeacherLoadingPanel(scale: scale)
+                  else if (_error != null && _classrooms.isEmpty)
+                    _TeacherErrorPanel(
+                      scale: scale,
+                      message: _error!,
+                      onRetry: _loadClassrooms,
+                    )
+                  else if (_classrooms.isEmpty)
+                    _TeacherNoClassPanel(
+                      scale: scale,
+                      isProfileComplete: isProfileComplete,
+                      onCreate: _handleClassCreateAction,
+                    )
+                  else
+                    _TeacherClassCarousel(
+                      scale: scale,
+                      classrooms: _classrooms,
+                      onOpen: _openClassDetail,
+                    ),
+                  SizedBox(height: 30 * scale),
+                  _TeacherHomeSectionHeader(
+                    scale: scale,
+                    title: context.getText(AppKeys.teacherRecentlyAssigned),
+                  ),
+                  SizedBox(height: 12 * scale),
+                  if (_isLoadingAssignments)
+                    _TeacherAssignmentsLoadingPanel(scale: scale)
+                  else if (_recentAssignments.isEmpty)
+                    _TeacherEmptyAssignmentsPanel(
+                      message: context.getText(AppKeys.teacherNoAssignments),
+                    )
+                  else
+                    _TeacherRecentAssignmentCarousel(
+                      scale: scale,
+                      assignments: _recentAssignments,
+                      onOpen: _openAssignmentDetail,
+                    ),
+                ],
               ),
+            ),
           ],
         ),
       ),
@@ -240,6 +352,37 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
 
 bool _isTeacherProfileComplete(StudentProfile? profile) {
   return profile?.profileStatus?.trim().toUpperCase() == 'OFFICIAL';
+}
+
+int _compareRecentAssignments(
+  ClassroomExercise first,
+  ClassroomExercise second,
+) {
+  final firstDate = _recentAssignmentSortDate(first);
+  final secondDate = _recentAssignmentSortDate(second);
+  final firstMs = firstDate?.millisecondsSinceEpoch ?? -1;
+  final secondMs = secondDate?.millisecondsSinceEpoch ?? -1;
+  final dateCompare = secondMs.compareTo(firstMs);
+  if (dateCompare != 0) {
+    return dateCompare;
+  }
+  return (second.stableId ?? -1).compareTo(first.stableId ?? -1);
+}
+
+DateTime? _recentAssignmentSortDate(ClassroomExercise exercise) {
+  final values = <String?>[
+    exercise.createDt,
+    exercise.modifyDt,
+    exercise.startDate,
+    exercise.endDate,
+  ];
+  for (final value in values) {
+    final parsed = DateTime.tryParse(value?.trim() ?? '');
+    if (parsed != null) {
+      return parsed;
+    }
+  }
+  return null;
 }
 
 class _TeacherTopBar extends StatelessWidget {
@@ -258,9 +401,9 @@ class _TeacherTopBar extends StatelessWidget {
     final name = _displayTeacherName(profile);
     return Container(
       padding: EdgeInsets.fromLTRB(
-        20 * scale,
+        18 * scale,
         topPadding + 16 * scale,
-        20 * scale,
+        18 * scale,
         14 * scale,
       ),
       decoration: const BoxDecoration(color: _teacherMint),
@@ -500,8 +643,49 @@ class _TeacherNoClassPanel extends StatelessWidget {
   }
 }
 
-class _TeacherClassGrid extends StatelessWidget {
-  const _TeacherClassGrid({
+class _TeacherHomeSectionHeader extends StatelessWidget {
+  const _TeacherHomeSectionHeader({
+    required this.scale,
+    required this.title,
+  });
+
+  final double scale;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.andika(
+              color: _teacherBlue,
+              fontSize: 20 * scale,
+              fontWeight: FontWeight.w800,
+              height: 1.25,
+            ),
+          ),
+        ),
+        Text(
+          context.getText(AppKeys.viewAllUpper),
+          style: GoogleFonts.andika(
+            color: _teacherBlue,
+            fontSize: 14 * scale,
+            fontWeight: FontWeight.w800,
+            decoration: TextDecoration.underline,
+            height: 1.25,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TeacherClassCarousel extends StatelessWidget {
+  const _TeacherClassCarousel({
     required this.scale,
     required this.classrooms,
     required this.onOpen,
@@ -513,26 +697,191 @@ class _TeacherClassGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      clipBehavior: Clip.none,
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: classrooms.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16 * scale,
-        mainAxisSpacing: 16 * scale,
-        mainAxisExtent: 180 * scale,
+    return SizedBox(
+      height: 164 * scale,
+      child: ListView.separated(
+        clipBehavior: Clip.none,
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: classrooms.length,
+        separatorBuilder: (_, __) => SizedBox(width: 16 * scale),
+        itemBuilder: (context, index) {
+          final classroom = classrooms[index];
+          return SizedBox(
+            width: 166 * scale,
+            child: _TeacherClassCard(
+              scale: scale,
+              classroom: classroom,
+              onTap: () => onOpen(classroom),
+            ),
+          );
+        },
       ),
-      itemBuilder: (context, index) {
-        final classroom = classrooms[index];
-        return _TeacherClassCard(
-          scale: scale,
-          classroom: classroom,
-          onTap: () => onOpen(classroom),
-        );
-      },
+    );
+  }
+}
+
+class _TeacherAssignmentsLoadingPanel extends StatelessWidget {
+  const _TeacherAssignmentsLoadingPanel({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 132 * scale,
+      child: const Center(
+        child: CircularProgressIndicator(color: _teacherTeal),
+      ),
+    );
+  }
+}
+
+class _TeacherRecentAssignmentCarousel extends StatelessWidget {
+  const _TeacherRecentAssignmentCarousel({
+    required this.scale,
+    required this.assignments,
+    required this.onOpen,
+  });
+
+  final double scale;
+  final List<ClassroomExercise> assignments;
+  final ValueChanged<ClassroomExercise> onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 164 * scale,
+      child: ListView.separated(
+        clipBehavior: Clip.none,
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: assignments.length,
+        separatorBuilder: (_, __) => SizedBox(width: 14 * scale),
+        itemBuilder: (context, index) {
+          final assignment = assignments[index];
+          return SizedBox(
+            width: 178 * scale,
+            child: _TeacherRecentAssignmentCard(
+              scale: scale,
+              assignment: assignment,
+              onTap: () => onOpen(assignment),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TeacherRecentAssignmentCard extends StatelessWidget {
+  const _TeacherRecentAssignmentCard({
+    required this.scale,
+    required this.assignment,
+    required this.onTap,
+  });
+
+  final double scale;
+  final ClassroomExercise assignment;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final dateParts = _teacherExerciseDateParts(
+      assignment.createDt ?? assignment.startDate ?? assignment.endDate,
+    );
+    final timeLabel = _teacherExerciseDateTimeLabel(
+      assignment.createDt ?? assignment.startDate ?? assignment.endDate,
+    );
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24 * scale),
+        border: Border.all(color: const Color(0x33C4C6D2)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0x1A002B6A),
+            blurRadius: 20 * scale,
+            spreadRadius: -4 * scale,
+            offset: Offset(0, 4 * scale),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(24 * scale),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: EdgeInsets.all(18 * scale),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 58 * scale,
+                  height: 42 * scale,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FBFF),
+                    borderRadius: BorderRadius.circular(12 * scale),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        dateParts.day,
+                        style: GoogleFonts.andika(
+                          color: _teacherBlue,
+                          fontSize: 18 * scale,
+                          fontWeight: FontWeight.w900,
+                          height: 0.95,
+                        ),
+                      ),
+                      Text(
+                        dateParts.month,
+                        style: GoogleFonts.andika(
+                          color: _teacherMuted,
+                          fontSize: 9 * scale,
+                          fontWeight: FontWeight.w800,
+                          height: 1.15,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  _teacherExerciseTitle(context, assignment),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.andika(
+                    color: _teacherInk,
+                    fontSize: 17 * scale,
+                    fontWeight: FontWeight.w800,
+                    height: 1.25,
+                  ),
+                ),
+                SizedBox(height: 8 * scale),
+                Text(
+                  timeLabel ??
+                      _teacherExerciseQuestionCount(context, assignment),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.andika(
+                    color: _teacherMuted,
+                    fontSize: 12 * scale,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -574,11 +923,11 @@ class _TeacherClassCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: EdgeInsets.all(16 * scale),
+            padding: EdgeInsets.all(14 * scale),
             child: Column(
               children: [
                 _ClassThumb(classroom: classroom, scale: scale),
-                SizedBox(height: 10 * scale),
+                SizedBox(height: 8 * scale),
                 Text(
                   title,
                   maxLines: 1,
@@ -591,8 +940,8 @@ class _TeacherClassCard extends StatelessWidget {
                     height: 1.15,
                   ),
                 ),
-                const Spacer(),
-                Divider(color: const Color(0x1AC4C6D2), height: 8 * scale),
+                SizedBox(height: 8 * scale),
+                Divider(color: const Color(0x1AC4C6D2), height: 4 * scale),
                 Text(
                   _teacherMemberSummaryText(
                     context,
@@ -609,7 +958,7 @@ class _TeacherClassCard extends StatelessWidget {
                     height: 1.2,
                   ),
                 ),
-                SizedBox(height: 5 * scale),
+                SizedBox(height: 4 * scale),
                 Container(
                   height: 16 * scale,
                   width: 69 * scale,
