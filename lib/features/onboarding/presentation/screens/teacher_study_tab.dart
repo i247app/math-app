@@ -38,6 +38,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   String _selectedPurpose = classroomExercisePurposeHomework;
   bool _isLoadingClassrooms = false;
   bool _isLoadingExercises = false;
+  bool _hasCompletedInitialLoad = false;
   String? _error;
   List<ClassroomModel> _classrooms = const <ClassroomModel>[];
   List<ClassroomExercise> _exercises = const <ClassroomExercise>[];
@@ -71,6 +72,8 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
         ActiveProfileSession.profileStableId(widget.activeProfile);
     final requestId = ++_classroomRequestId;
     _exerciseRequestId++;
+    final isInitialProfileLoad =
+        !_hasCompletedInitialLoad || profileId != _loadedProfileId;
     if (profileId == null) {
       setState(() {
         _loadedProfileId = null;
@@ -79,6 +82,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
         _error = context.readText(AppKeys.teacherMissingProfileId);
         _isLoadingClassrooms = false;
         _isLoadingExercises = false;
+        _hasCompletedInitialLoad = true;
       });
       return;
     }
@@ -87,6 +91,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       _loadedProfileId = profileId;
       _isLoadingClassrooms = true;
       _isLoadingExercises = true;
+      if (isInitialProfileLoad) {
+        _hasCompletedInitialLoad = false;
+      }
       _error = null;
     });
 
@@ -125,6 +132,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
             : error.message;
         _isLoadingClassrooms = false;
         _isLoadingExercises = false;
+        _hasCompletedInitialLoad = true;
       });
     } catch (_) {
       if (!mounted ||
@@ -138,6 +146,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
         _error = context.readText(AppKeys.teacherStudyLoadFailed);
         _isLoadingClassrooms = false;
         _isLoadingExercises = false;
+        _hasCompletedInitialLoad = true;
       });
     }
   }
@@ -145,7 +154,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   Future<void> _loadExercises() async {
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
-    if (profileId == null) {
+    if (profileId == null || _isLoadingClassrooms) {
       return;
     }
 
@@ -166,6 +175,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
         _exercises = const <ClassroomExercise>[];
         _error = null;
         _isLoadingExercises = false;
+        _hasCompletedInitialLoad = true;
       });
       return;
     }
@@ -204,6 +214,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       _exercises = _deduplicateTeacherStudyExercises(exercises);
       _error = exercises.isEmpty ? firstError : null;
       _isLoadingExercises = false;
+      _hasCompletedInitialLoad = true;
     });
   }
 
@@ -343,8 +354,6 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
-    final isInitialLoading =
-        (_isLoadingClassrooms || _isLoadingExercises) && _exercises.isEmpty;
     return ColoredBox(
       color: const Color(0xFFF9FFFF),
       child: Column(
@@ -384,70 +393,83 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                       onChanged: _onSearchChanged,
                     ),
                     SizedBox(height: 14 * scale),
-                    _TeacherStudyClassFilters(
-                      classrooms: _classrooms,
-                      selectedClassroomId: _selectedClassroomId,
-                      scale: scale,
-                      onSelected: _selectClassroom,
-                    ),
-                    SizedBox(height: 14 * scale),
-                    _TeacherStudyPurposeFilters(
-                      selectedPurpose: _selectedPurpose,
-                      scale: scale,
-                      onSelected: _selectPurpose,
-                    ),
-                    SizedBox(height: 24 * scale),
-                    if (isInitialLoading)
-                      Padding(
-                        padding: EdgeInsets.only(top: 32 * scale),
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: _teacherTeal,
-                          ),
-                        ),
-                      )
-                    else if (_error != null && _exercises.isEmpty)
-                      _TeacherErrorPanel(
+                    if (!_hasCompletedInitialLoad)
+                      _TeacherStudyLoadingIndicator(scale: scale)
+                    else ...[
+                      _TeacherStudyClassFilters(
+                        classrooms: _classrooms,
+                        selectedClassroomId: _selectedClassroomId,
                         scale: scale,
-                        message: _error!,
-                        onRetry: _loadClassrooms,
-                      )
-                    else if (_classrooms.isEmpty)
-                      _TeacherEmptyAssignmentsPanel(
-                        message: context.getText(
-                          AppKeys.teacherEmptyClassroomList,
-                        ),
-                      )
-                    else if (_exercises.isEmpty)
-                      _TeacherEmptyAssignmentsPanel(
-                        message: _searchController.text.trim().isNotEmpty
-                            ? context.getText(AppKeys.teacherStudyNoResults)
-                            : context.getText(
-                                _teacherExerciseCopy(
-                                  _selectedPurpose,
-                                ).emptyKey,
-                              ),
-                      )
-                    else
-                      for (var index = 0;
-                          index < _exercises.length;
-                          index++) ...[
-                        _TeacherStudyExerciseCard(
-                          exercise: _exercises[index],
+                        onSelected: _selectClassroom,
+                      ),
+                      SizedBox(height: 14 * scale),
+                      _TeacherStudyPurposeFilters(
+                        selectedPurpose: _selectedPurpose,
+                        scale: scale,
+                        onSelected: _selectPurpose,
+                      ),
+                      SizedBox(height: 24 * scale),
+                      if (_isLoadingExercises)
+                        _TeacherStudyLoadingIndicator(scale: scale)
+                      else if (_error != null && _exercises.isEmpty)
+                        _TeacherErrorPanel(
                           scale: scale,
-                          onTap: () => _openExerciseDetail(
-                            _exercises[index],
+                          message: _error!,
+                          onRetry: _loadClassrooms,
+                        )
+                      else if (_classrooms.isEmpty)
+                        _TeacherEmptyAssignmentsPanel(
+                          message: context.getText(
+                            AppKeys.teacherEmptyClassroomList,
                           ),
-                        ),
-                        if (index != _exercises.length - 1)
-                          SizedBox(height: 14 * scale),
-                      ],
+                        )
+                      else if (_exercises.isEmpty)
+                        _TeacherEmptyAssignmentsPanel(
+                          message: _searchController.text.trim().isNotEmpty
+                              ? context.getText(AppKeys.teacherStudyNoResults)
+                              : context.getText(
+                                  _teacherExerciseCopy(
+                                    _selectedPurpose,
+                                  ).emptyKey,
+                                ),
+                        )
+                      else
+                        for (var index = 0;
+                            index < _exercises.length;
+                            index++) ...[
+                          _TeacherStudyExerciseCard(
+                            exercise: _exercises[index],
+                            scale: scale,
+                            onTap: () => _openExerciseDetail(
+                              _exercises[index],
+                            ),
+                          ),
+                          if (index != _exercises.length - 1)
+                            SizedBox(height: 14 * scale),
+                        ],
+                    ],
                   ],
                 ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _TeacherStudyLoadingIndicator extends StatelessWidget {
+  const _TeacherStudyLoadingIndicator({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 36 * scale),
+      child: const Center(
+        child: CircularProgressIndicator(color: _teacherTeal),
       ),
     );
   }
