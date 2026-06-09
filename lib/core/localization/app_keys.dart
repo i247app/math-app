@@ -64,6 +64,9 @@ class AppKeys {
   static const signingUp = 'signing_up';
 
   static const navHome = 'nav_home';
+  static const navClassroom = 'nav_classroom';
+  static const navHomework = 'nav_homework';
+  static const navMembers = 'nav_members';
   static const navReview = 'nav_review';
   static const navHistory = 'nav_history';
   static const navReport = 'nav_report';
@@ -366,6 +369,8 @@ class AppKeys {
   static const teacherMemberSummaryNoRequests =
       'teacher_member_summary_no_requests';
   static const teacherMembersTitle = 'teacher_members_title';
+  static const teacherSearchClassroomHint = 'teacher_search_classroom_hint';
+  static const teacherEmptyClassroomList = 'teacher_empty_classroom_list';
   static const teacherJoinRequests = 'teacher_join_requests';
   static const teacherNoJoinRequests = 'teacher_no_join_requests';
   static const teacherPendingApproval = 'teacher_pending_approval';

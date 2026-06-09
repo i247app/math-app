@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     if (oldWidget.activeRole != widget.activeRole &&
         widget.activeRole == ProfileRole.teacher &&
-        _activeTab > 2) {
+        _activeTab > 4) {
       _previousActiveTab = _activeTab;
       _activeTab = 0;
     }
@@ -250,6 +250,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       openAddProfileRequestId: _openAddProfileRequestId,
                       onCompleteTeacherProfile: _openTeacherProfileForm,
+                      onOpenClassroomTab: () {
+                        setState(() {
+                          _previousActiveTab = _activeTab;
+                          _activeTab = 1;
+                        });
+                      },
                       bottomPadding: navHeight + s(14),
                       headerHeight: showHeader ? headerHeight : 0,
                       scale: scale,
@@ -378,6 +384,7 @@ class _TabContent extends StatelessWidget {
     required this.onProfileSaved,
     required this.openAddProfileRequestId,
     required this.onCompleteTeacherProfile,
+    required this.onOpenClassroomTab,
     required this.bottomPadding,
     required this.headerHeight,
     required this.scale,
@@ -398,6 +405,7 @@ class _TabContent extends StatelessWidget {
   final VoidCallback onProfileSaved;
   final int openAddProfileRequestId;
   final Future<void> Function() onCompleteTeacherProfile;
+  final VoidCallback onOpenClassroomTab;
   final double bottomPadding;
   final double headerHeight;
   final double scale;
@@ -426,17 +434,28 @@ class _TabContent extends StatelessWidget {
         bottomPadding: bottomPadding,
         scale: scale,
         onCompleteProfile: onCompleteTeacherProfile,
+        onOpenClassroomTab: onOpenClassroomTab,
       );
     }
 
     if (activeTab == 1) {
-      return TeacherReportTab(
+      return TeacherClassroomTab(
+        user: user,
+        activeProfile: activeProfile,
         bottomPadding: bottomPadding,
         scale: scale,
       );
     }
 
     if (activeTab == 2) {
+      return const SizedBox.shrink();
+    }
+
+    if (activeTab == 3) {
+      return const SizedBox.shrink();
+    }
+
+    if (activeTab == 4) {
       return SettingTab(
         user: user,
         profiles: profiles,
@@ -3882,7 +3901,17 @@ class _BottomNavigation extends StatelessWidget {
             ),
             _NavItemData(
               Icons.bar_chart_rounded,
-              context.getText(AppKeys.navReport),
+              context.getText(AppKeys.navClassroom),
+              null,
+            ),
+            _NavItemData(
+              Icons.menu_book_rounded,
+              context.getText(AppKeys.navHomework),
+              null,
+            ),
+            _NavItemData(
+              Icons.chat_bubble_outline_rounded,
+              context.getText(AppKeys.navMembers),
               null,
             ),
             _NavItemData(null, context.getText(AppKeys.navSettings), user),

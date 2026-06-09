@@ -8,6 +8,7 @@ class TeacherHomeTab extends StatefulWidget {
     required this.bottomPadding,
     required this.scale,
     required this.onCompleteProfile,
+    this.onOpenClassroomTab,
     ClassroomService? classroomService,
     ClassroomExerciseService? exerciseService,
   })  : _classroomService = classroomService,
@@ -18,6 +19,7 @@ class TeacherHomeTab extends StatefulWidget {
   final double bottomPadding;
   final double scale;
   final Future<void> Function() onCompleteProfile;
+  final VoidCallback? onOpenClassroomTab;
   final ClassroomService? _classroomService;
   final ClassroomExerciseService? _exerciseService;
 
@@ -313,6 +315,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                     scale: scale,
                     hasClasses: _classrooms.isNotEmpty,
                     onAdd: _handleClassCreateAction,
+                    onViewAll: widget.onOpenClassroomTab,
                   ),
                   SizedBox(height: 12 * scale),
                   if (_isLoading && _classrooms.isEmpty)
@@ -561,11 +564,13 @@ class _TeacherClassSectionHeader extends StatelessWidget {
     required this.scale,
     required this.hasClasses,
     required this.onAdd,
+    this.onViewAll,
   });
 
   final double scale;
   final bool hasClasses;
   final VoidCallback onAdd;
+  final VoidCallback? onViewAll;
 
   @override
   Widget build(BuildContext context) {
@@ -585,14 +590,17 @@ class _TeacherClassSectionHeader extends StatelessWidget {
                 ),
               ),
             ),
-            Text(
-              context.getText(AppKeys.viewAllUpper),
-              style: GoogleFonts.andika(
-                color: _teacherInk,
-                fontSize: 14 * scale,
-                fontWeight: FontWeight.w800,
-                decoration: TextDecoration.underline,
-                height: 1.25,
+            GestureDetector(
+              onTap: onViewAll,
+              child: Text(
+                context.getText(AppKeys.viewAllUpper),
+                style: GoogleFonts.andika(
+                  color: _teacherInk,
+                  fontSize: 14 * scale,
+                  fontWeight: FontWeight.w800,
+                  decoration: TextDecoration.underline,
+                  height: 1.25,
+                ),
               ),
             ),
           ],
