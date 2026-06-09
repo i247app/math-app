@@ -151,8 +151,8 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
     if (classroomId == null || profileId == null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(
-            SnackBar(content: Text(context.readText(AppKeys.teacherClassOpenFailed))));
+        ..showSnackBar(SnackBar(
+            content: Text(context.readText(AppKeys.teacherClassOpenFailed))));
       return;
     }
 
@@ -173,7 +173,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
-    
+
     // Filter logic can be added later, for now just show all
     final displayedClassrooms = _classrooms;
 
@@ -219,11 +219,12 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
             ],
           ),
         ),
-        
+
         // Scrollable content
         Expanded(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: EdgeInsets.fromLTRB(
               22 * scale,
               28 * scale,
@@ -233,132 +234,136 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-          SizedBox(height: 16 * scale),
+                SizedBox(height: 16 * scale),
 
-          // Add button
-          Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onTap: _openCreateClass,
-              child: Container(
-                width: 90 * scale,
-                height: 36 * scale,
-                decoration: BoxDecoration(
-                  color: _teacherCoral,
-                  borderRadius: BorderRadius.circular(12 * scale),
-                ),
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 24 * scale,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 16 * scale),
-
-          // Search bar
-          Container(
-            height: 48 * scale,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24 * scale),
-              border: Border.all(color: const Color(0xFFE2E9EC)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x05000000),
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                SizedBox(width: 16 * scale),
-                Icon(Icons.search, color: _teacherBlue, size: 24 * scale),
-                SizedBox(width: 12 * scale),
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    style: GoogleFonts.andika(
-                      color: _teacherInk,
-                      fontSize: 16 * scale,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: context.getText(AppKeys.teacherSearchClassroomHint),
-                      hintStyle: GoogleFonts.andika(
-                        color: _teacherMuted.withValues(alpha: 0.6),
-                        fontSize: 16 * scale,
-                        fontWeight: FontWeight.w500,
+                // Add button
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: _openCreateClass,
+                    child: Container(
+                      width: 90 * scale,
+                      height: 36 * scale,
+                      decoration: BoxDecoration(
+                        color: _teacherCoral,
+                        borderRadius: BorderRadius.circular(12 * scale),
                       ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 24 * scale,
+                      ),
                     ),
                   ),
                 ),
-                Icon(Icons.tune, color: _teacherBlue, size: 24 * scale),
-                SizedBox(width: 16 * scale),
+                SizedBox(height: 16 * scale),
+
+                // Search bar
+                Container(
+                  height: 48 * scale,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24 * scale),
+                    border: Border.all(color: const Color(0xFFE2E9EC)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x05000000),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(width: 16 * scale),
+                      Icon(Icons.search, color: _teacherBlue, size: 24 * scale),
+                      SizedBox(width: 12 * scale),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          onTapOutside: (_) =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
+                          style: GoogleFonts.andika(
+                            color: _teacherInk,
+                            fontSize: 16 * scale,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: context
+                                .getText(AppKeys.teacherSearchClassroomHint),
+                            hintStyle: GoogleFonts.andika(
+                              color: _teacherMuted.withValues(alpha: 0.6),
+                              fontSize: 16 * scale,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      Icon(Icons.tune, color: _teacherBlue, size: 24 * scale),
+                      SizedBox(width: 16 * scale),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 24 * scale),
+
+                if (_isLoading && _classrooms.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24 * scale),
+                      child:
+                          const CircularProgressIndicator(color: _teacherTeal),
+                    ),
+                  )
+                else if (_error != null && _classrooms.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24 * scale),
+                      child: Text(
+                        _error!,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.andika(
+                          color: _teacherMuted,
+                          fontSize: 14 * scale,
+                        ),
+                      ),
+                    ),
+                  )
+                else if (_classrooms.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24 * scale),
+                      child: Text(
+                        context.getText(AppKeys.teacherEmptyClassroomList),
+                        style: GoogleFonts.andika(
+                          color: _teacherMuted,
+                          fontSize: 16 * scale,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: displayedClassrooms.length,
+                    separatorBuilder: (_, __) => SizedBox(height: 16 * scale),
+                    itemBuilder: (context, index) {
+                      final classroom = displayedClassrooms[index];
+                      return _ClassroomListCard(
+                        scale: scale,
+                        classroom: classroom,
+                        onTap: () => _openClassDetail(classroom),
+                      );
+                    },
+                  ),
               ],
             ),
           ),
-          SizedBox(height: 24 * scale),
-
-          if (_isLoading && _classrooms.isEmpty)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.all(24 * scale),
-                child: const CircularProgressIndicator(color: _teacherTeal),
-              ),
-            )
-          else if (_error != null && _classrooms.isEmpty)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.all(24 * scale),
-                child: Text(
-                  _error!,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.andika(
-                    color: _teacherMuted,
-                    fontSize: 14 * scale,
-                  ),
-                ),
-              ),
-            )
-          else if (_classrooms.isEmpty)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.all(24 * scale),
-                child: Text(
-                  context.getText(AppKeys.teacherEmptyClassroomList),
-                  style: GoogleFonts.andika(
-                    color: _teacherMuted,
-                    fontSize: 16 * scale,
-                  ),
-                ),
-              ),
-            )
-          else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.zero,
-              itemCount: displayedClassrooms.length,
-              separatorBuilder: (_, __) => SizedBox(height: 16 * scale),
-              itemBuilder: (context, index) {
-                final classroom = displayedClassrooms[index];
-                return _ClassroomListCard(
-                  scale: scale,
-                  classroom: classroom,
-                  onTap: () => _openClassDetail(classroom),
-                );
-              },
-            ),
-        ],
-      ),
-    ),
-    ),
+        ),
       ],
     );
   }
@@ -377,13 +382,14 @@ class _ClassroomListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = classroom.name ?? context.getText(AppKeys.teacherClassFallback);
+    final title =
+        classroom.name ?? context.getText(AppKeys.teacherClassFallback);
     final code = classroom.classroomCode ?? classroom.id?.toString() ?? '--';
     final memberCount = classroom.displayStudentCount;
-    
+
     // For the image, we try to use avatarKey/Url or just a placeholder box
     // To match the image, we use a dark container with _HeroMathGlyph if nothing is provided
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(

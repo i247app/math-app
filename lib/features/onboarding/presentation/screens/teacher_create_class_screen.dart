@@ -217,6 +217,8 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                             )
                           : SingleChildScrollView(
                               physics: const BouncingScrollPhysics(),
+                              keyboardDismissBehavior:
+                                  ScrollViewKeyboardDismissBehavior.onDrag,
                               padding: EdgeInsets.fromLTRB(
                                 28 * scale,
                                 24 * scale,

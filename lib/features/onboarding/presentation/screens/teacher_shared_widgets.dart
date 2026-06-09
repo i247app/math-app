@@ -372,6 +372,7 @@ class _TeacherTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
+        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         style: GoogleFonts.andika(
           color: _teacherInk,
           fontSize: 16 * scale,
