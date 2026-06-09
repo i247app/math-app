@@ -66,6 +66,7 @@ class AppKeys {
   static const navHome = 'nav_home';
   static const navClassroom = 'nav_classroom';
   static const navHomework = 'nav_homework';
+  static const navStudy = 'nav_study';
   static const navMembers = 'nav_members';
   static const navReview = 'nav_review';
   static const navHistory = 'nav_history';
@@ -385,6 +386,12 @@ class AppKeys {
   static const teacherTwoMinutesAgo = 'teacher_two_minutes_ago';
   static const teacherFiveMinutesAgo = 'teacher_five_minutes_ago';
   static const teacherClassFunctions = 'teacher_class_functions';
+  static const teacherStudyTitle = 'teacher_study_title';
+  static const teacherStudyAllClasses = 'teacher_study_all_classes';
+  static const teacherStudyLoadFailed = 'teacher_study_load_failed';
+  static const teacherStudyNoResults = 'teacher_study_no_results';
+  static const teacherStudyDueDate = 'teacher_study_due_date';
+  static const teacherStudyMonth = 'teacher_study_month';
   static const teacherAssignments = 'teacher_assignments';
   static const teacherAssessments = 'teacher_assessments';
   static const teacherCreatedAssignments = 'teacher_created_assignments';

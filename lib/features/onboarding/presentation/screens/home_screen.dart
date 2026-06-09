@@ -448,7 +448,12 @@ class _TabContent extends StatelessWidget {
     }
 
     if (activeTab == 2) {
-      return const SizedBox.shrink();
+      return TeacherStudyTab(
+        user: user,
+        activeProfile: activeProfile,
+        bottomPadding: bottomPadding,
+        scale: scale,
+      );
     }
 
     if (activeTab == 3) {
@@ -3906,7 +3911,7 @@ class _BottomNavigation extends StatelessWidget {
             ),
             _NavItemData(
               Icons.menu_book_rounded,
-              context.getText(AppKeys.navHomework),
+              context.getText(AppKeys.navStudy),
               null,
             ),
             _NavItemData(

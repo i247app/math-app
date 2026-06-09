@@ -30,6 +30,7 @@ import '../widgets/profile_avatar_image.dart';
 part 'teacher_home_tab.dart';
 part 'teacher_report_tab.dart';
 part 'teacher_classroom_tab.dart';
+part 'teacher_study_tab.dart';
 part 'teacher_create_class_screen.dart';
 part 'teacher_class_detail_screen.dart';
 part 'teacher_homework_screen.dart';
