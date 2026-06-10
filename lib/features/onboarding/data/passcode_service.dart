@@ -9,10 +9,27 @@ class PasscodeException implements Exception {
   String toString() => message;
 }
 
+class PasscodeLoginAccount {
+  const PasscodeLoginAccount({
+    required this.userId,
+    required this.phone,
+  });
+
+  final int userId;
+  final String phone;
+}
+
 abstract class PasscodeService {
   Future<int?> lastPasscodeUserId();
 
+  Future<PasscodeLoginAccount?> lastPasscodeAccount();
+
   Future<bool> hasPasscode(int userId);
+
+  Future<void> rememberLoginAccount({
+    required int userId,
+    required String phone,
+  });
 
   Future<void> setPasscode({
     required int userId,
@@ -33,6 +50,7 @@ class SecurePasscodeService implements PasscodeService {
   }) : _storage = storage;
 
   static const _keyPrefix = 'local_passcode_v1_user_';
+  static const _phoneKeyPrefix = 'local_passcode_v1_phone_user_';
   static const _lastUserIdKey = 'local_passcode_v1_last_user_id';
 
   final FlutterSecureStorage _storage;
@@ -53,6 +71,22 @@ class SecurePasscodeService implements PasscodeService {
   }
 
   @override
+  Future<PasscodeLoginAccount?> lastPasscodeAccount() async {
+    final value = await _storage.read(key: _lastUserIdKey);
+    final userId = int.tryParse(value?.trim() ?? '');
+    if (userId == null || userId <= 0 || !await hasPasscode(userId)) {
+      return null;
+    }
+
+    final phone = (await _storage.read(key: _phoneStorageKey(userId)))?.trim();
+    if (phone == null || phone.isEmpty) {
+      return null;
+    }
+
+    return PasscodeLoginAccount(userId: userId, phone: phone);
+  }
+
+  @override
   Future<bool> hasPasscode(int userId) async {
     if (userId <= 0) {
       return false;
@@ -60,6 +94,23 @@ class SecurePasscodeService implements PasscodeService {
 
     final passcode = await _readPasscode(userId);
     return passcode != null;
+  }
+
+  @override
+  Future<void> rememberLoginAccount({
+    required int userId,
+    required String phone,
+  }) async {
+    final normalizedPhone = phone.trim();
+    if (userId <= 0 || normalizedPhone.isEmpty) {
+      throw const PasscodeException('Missing login account information.');
+    }
+
+    await _storage.write(
+      key: _phoneStorageKey(userId),
+      value: normalizedPhone,
+    );
+    await _storage.write(key: _lastUserIdKey, value: '$userId');
   }
 
   @override
@@ -146,4 +197,6 @@ class SecurePasscodeService implements PasscodeService {
   }
 
   static String _storageKey(int userId) => '$_keyPrefix$userId';
+
+  static String _phoneStorageKey(int userId) => '$_phoneKeyPrefix$userId';
 }

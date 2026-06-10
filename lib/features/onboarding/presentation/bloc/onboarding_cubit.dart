@@ -69,7 +69,7 @@ class OnboardingState {
     this.isPasscodeBusy = false,
     this.passcodeError,
     this.passcodeErrorId = 0,
-    this.passcodeRequiresSessionCheck = false,
+    this.passcodeLoginRequiresOtp = false,
     this.isCheckingPinLogin = false,
     this.canLoginWithPin = false,
     this.pinLoginUser,
@@ -115,7 +115,7 @@ class OnboardingState {
   final bool isPasscodeBusy;
   final String? passcodeError;
   final int passcodeErrorId;
-  final bool passcodeRequiresSessionCheck;
+  final bool passcodeLoginRequiresOtp;
   final bool isCheckingPinLogin;
   final bool canLoginWithPin;
   final LoginUser? pinLoginUser;
@@ -163,7 +163,7 @@ class OnboardingState {
     bool? isPasscodeBusy,
     String? passcodeError,
     int? passcodeErrorId,
-    bool? passcodeRequiresSessionCheck,
+    bool? passcodeLoginRequiresOtp,
     bool? isCheckingPinLogin,
     bool? canLoginWithPin,
     LoginUser? pinLoginUser,
@@ -244,8 +244,8 @@ class OnboardingState {
       passcodeError:
           clearPasscodeError ? null : passcodeError ?? this.passcodeError,
       passcodeErrorId: passcodeErrorId ?? this.passcodeErrorId,
-      passcodeRequiresSessionCheck:
-          passcodeRequiresSessionCheck ?? this.passcodeRequiresSessionCheck,
+      passcodeLoginRequiresOtp:
+          passcodeLoginRequiresOtp ?? this.passcodeLoginRequiresOtp,
       isCheckingPinLogin: isCheckingPinLogin ?? this.isCheckingPinLogin,
       canLoginWithPin:
           clearPinLogin ? false : canLoginWithPin ?? this.canLoginWithPin,
@@ -318,7 +318,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         clearPendingSession: true,
         clearPasscodeError: true,
         clearPinLogin: true,
-        passcodeRequiresSessionCheck: false,
+        passcodeLoginRequiresOtp: false,
       ));
     }
   }
@@ -337,7 +337,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     );
 
     try {
-      final userId = await _passcodeService.lastPasscodeUserId();
+      final rememberedAccount = await _passcodeService.lastPasscodeAccount();
+      final canUsePin = rememberedAccount != null;
       if (isClosed) {
         return;
       }
@@ -346,12 +347,16 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         return;
       }
 
-      final canUsePin = userId != null && userId > 0;
       emit(
         state.copyWith(
           isCheckingPinLogin: false,
           canLoginWithPin: canUsePin,
-          pinLoginUser: canUsePin ? LoginUser(id: userId) : null,
+          pinLoginUser: canUsePin
+              ? LoginUser(
+                  id: rememberedAccount.userId,
+                  phone: rememberedAccount.phone,
+                )
+              : null,
           clearPinLoginUser: !canUsePin,
         ),
       );
@@ -383,7 +388,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         clearPendingProfileLoadError: true,
         passcodeFlow: PasscodeFlow.unlock,
         passcodeCanSkip: false,
-        passcodeRequiresSessionCheck: true,
+        passcodeLoginRequiresOtp: true,
         clearAuthError: true,
         clearPasscodeError: true,
       ),
@@ -441,7 +446,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         return;
       }
 
-      _emitAuthenticatedHome(user, profileResolution);
+      await _emitAuthenticatedHome(user, profileResolution);
     } catch (_) {
       if (!isClosed) {
         emit(state.copyWith(isRestoringSession: false));
@@ -853,6 +858,21 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           );
           _completePendingHome(isPasscodeBusy: false);
         case PasscodeFlow.unlock:
+          if (!await _passcodeService.hasPasscode(user.id)) {
+            emit(
+              state.copyWith(
+                screen: AppScreen.login,
+                isPasscodeBusy: false,
+                clearPendingSession: true,
+                clearPasscodeError: true,
+                clearPinLogin: true,
+                passcodeLoginRequiresOtp: false,
+              ),
+            );
+            unawaited(checkPinLoginAvailability());
+            return;
+          }
+
           final isValid = await _passcodeService.verifyPasscode(
             userId: user.id,
             passcode: passcode,
@@ -867,8 +887,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
             );
             return;
           }
-          if (state.passcodeRequiresSessionCheck) {
-            await _completePinLoginAfterLocalPasscode(user);
+
+          if (state.passcodeLoginRequiresOtp) {
+            await _sendPinLoginOtp(user);
             return;
           }
           _completePendingHome(isPasscodeBusy: false);
@@ -897,14 +918,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       return;
     }
 
-    if (state.passcodeRequiresSessionCheck) {
+    if (state.passcodeLoginRequiresOtp) {
       emit(
         state.copyWith(
           screen: AppScreen.login,
           isPasscodeBusy: false,
           clearPendingSession: true,
           clearPasscodeError: true,
-          passcodeRequiresSessionCheck: false,
+          passcodeLoginRequiresOtp: false,
         ),
       );
       unawaited(checkPinLoginAvailability());
@@ -914,53 +935,69 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     await logout();
   }
 
-  Future<void> _completePinLoginAfterLocalPasscode(LoginUser pinUser) async {
-    try {
-      final sessionUser = await _authService.restoreSession();
-      if (sessionUser == null || sessionUser.id != pinUser.id) {
-        emit(
-          state.copyWith(
-            screen: AppScreen.login,
-            isPasscodeBusy: false,
-            authError: AppStrings.current(AppKeys.passcodeSessionExpired),
-            clearPendingSession: true,
-            clearPasscodeError: true,
-            clearPinLogin: true,
-            passcodeRequiresSessionCheck: false,
-          ),
-        );
-        return;
-      }
-
-      final profileResolution = await _profilesForUser(sessionUser);
+  Future<void> _sendPinLoginOtp(LoginUser pinUser) async {
+    final phone = pinUser.phone?.trim();
+    if (phone == null || phone.isEmpty) {
       emit(
         state.copyWith(
-          screen: AppScreen.home,
+          screen: AppScreen.login,
           isPasscodeBusy: false,
-          loginUser: sessionUser,
-          profiles: profileResolution.profiles,
-          activeProfile: profileResolution.activeProfile,
-          profileLoadError: profileResolution.errorMessage,
-          clearAuthError: true,
           clearPendingSession: true,
           clearPasscodeError: true,
-          passcodeRequiresSessionCheck: false,
-          clearActiveProfile: profileResolution.activeProfile == null,
-          clearProfileLoadError: profileResolution.errorMessage == null,
+          clearPinLogin: true,
+          passcodeLoginRequiresOtp: false,
         ),
       );
+      unawaited(checkPinLoginAvailability());
+      return;
+    }
+
+    try {
+      final otp = await _authService.sendLoginOtp(phone);
+      emit(
+        state.copyWith(
+          screen: AppScreen.otp,
+          isPasscodeBusy: false,
+          phoneNumber: phone,
+          otpExpiresAt: otp.expiresAt,
+          otpExpiresIn: otp.expiresIn,
+          devOtpCode: otp.otpCode,
+          devOtpPurpose: otp.purpose,
+          otpPreviewId: state.otpPreviewId + 1,
+          otpFlow: OtpFlow.login,
+          clearAuthError: true,
+          clearDevOtp: otp.otpCode == null,
+          clearOtpExpiry: otp.expiresAt == null,
+          clearOtpError: true,
+          clearPendingSession: true,
+          clearPasscodeError: true,
+          passcodeLoginRequiresOtp: false,
+        ),
+      );
+    } on OtpAuthException catch (error) {
+      emit(
+        state.copyWith(
+          screen: AppScreen.login,
+          isPasscodeBusy: false,
+          authError: error.message,
+          clearPendingSession: true,
+          clearPasscodeError: true,
+          passcodeLoginRequiresOtp: false,
+        ),
+      );
+      unawaited(checkPinLoginAvailability());
     } catch (_) {
       emit(
         state.copyWith(
           screen: AppScreen.login,
           isPasscodeBusy: false,
-          authError: AppStrings.current(AppKeys.passcodeSessionExpired),
+          authError: AppStrings.current(AppKeys.loginOtpFailed),
           clearPendingSession: true,
           clearPasscodeError: true,
-          clearPinLogin: true,
-          passcodeRequiresSessionCheck: false,
+          passcodeLoginRequiresOtp: false,
         ),
       );
+      unawaited(checkPinLoginAvailability());
     }
   }
 
@@ -970,6 +1007,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     bool? isVerifyingOtp,
     bool? isSigningUp,
   }) async {
+    await _rememberAuthenticatedAccount(user);
     final hasPasscode = await _passcodeService.hasPasscode(user.id);
     if (hasPasscode) {
       emit(
@@ -987,7 +1025,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           clearProfileLoadError: profileResolution.errorMessage == null,
           clearPendingSession: true,
           clearPasscodeError: true,
-          passcodeRequiresSessionCheck: false,
+          passcodeLoginRequiresOtp: false,
         ),
       );
       return;
@@ -1004,7 +1042,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         pendingProfileLoadError: profileResolution.errorMessage,
         passcodeFlow: PasscodeFlow.setup,
         passcodeCanSkip: true,
-        passcodeRequiresSessionCheck: false,
+        passcodeLoginRequiresOtp: false,
         clearAuthError: true,
         clearOtpError: true,
         clearPasscodeError: true,
@@ -1014,10 +1052,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     );
   }
 
-  void _emitAuthenticatedHome(
+  Future<void> _emitAuthenticatedHome(
     LoginUser user,
     _ResolvedProfiles profileResolution,
-  ) {
+  ) async {
+    await _rememberAuthenticatedAccount(user);
     emit(
       state.copyWith(
         screen: AppScreen.home,
@@ -1031,7 +1070,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         clearProfileLoadError: profileResolution.errorMessage == null,
         clearPendingSession: true,
         clearPasscodeError: true,
-        passcodeRequiresSessionCheck: false,
+        passcodeLoginRequiresOtp: false,
       ),
     );
   }
@@ -1045,7 +1084,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           isPasscodeBusy: isPasscodeBusy ?? false,
           clearPendingSession: true,
           clearPasscodeError: true,
-          passcodeRequiresSessionCheck: false,
+          passcodeLoginRequiresOtp: false,
         ),
       );
       return;
@@ -1061,7 +1100,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         profileLoadError: state.pendingProfileLoadError,
         clearPendingSession: true,
         clearPasscodeError: true,
-        passcodeRequiresSessionCheck: false,
+        passcodeLoginRequiresOtp: false,
         clearActiveProfile: state.pendingActiveProfile == null,
         clearProfileLoadError: state.pendingProfileLoadError == null,
       ),
@@ -1106,6 +1145,25 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         activeProfile: null,
         errorMessage: AppStrings.current(AppKeys.profileLoadFailed),
       );
+    }
+  }
+
+  Future<void> _rememberAuthenticatedAccount(LoginUser user) async {
+    final userPhone = user.phone?.trim();
+    final phone = userPhone != null && userPhone.isNotEmpty
+        ? userPhone
+        : state.phoneNumber?.trim();
+    if (user.id <= 0 || phone == null || phone.isEmpty) {
+      return;
+    }
+
+    try {
+      await _passcodeService.rememberLoginAccount(
+        userId: user.id,
+        phone: phone,
+      );
+    } catch (_) {
+      // Remembered PIN login is optional and must not block authentication.
     }
   }
 
