@@ -19,6 +19,7 @@ class _SettingProfileFormScreen extends StatelessWidget {
         profileLoadError: args.profileLoadError,
         onLogout: args.onLogout,
         onActivateProfile: args.onActivateProfile,
+        onRefreshProfiles: args.onRefreshProfiles,
         onProfileSaved: () => Navigator.of(context).pop(true),
         bottomPadding: 0,
         scale: args.scale,

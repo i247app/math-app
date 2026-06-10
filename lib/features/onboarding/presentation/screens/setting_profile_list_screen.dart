@@ -19,6 +19,7 @@ class _SettingProfileListScreen extends StatelessWidget {
         profileLoadError: args.profileLoadError,
         onLogout: args.onLogout,
         onActivateProfile: args.onActivateProfile,
+        onRefreshProfiles: args.onRefreshProfiles,
         onProfileSaved: args.onProfileSaved,
         bottomPadding: 0,
         scale: args.scale,

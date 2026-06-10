@@ -73,6 +73,7 @@ class SettingTab extends StatefulWidget {
     required this.profileLoadError,
     required this.onLogout,
     required this.onActivateProfile,
+    this.onRefreshProfiles,
     this.onProfileSaved,
     this.openAddProfileRequestId = 0,
     required this.bottomPadding,
@@ -90,6 +91,7 @@ class SettingTab extends StatefulWidget {
     required this.profileLoadError,
     required this.onLogout,
     required this.onActivateProfile,
+    this.onRefreshProfiles,
     this.onProfileSaved,
     required this.bottomPadding,
     required this.scale,
@@ -109,6 +111,7 @@ class SettingTab extends StatefulWidget {
   final String? profileLoadError;
   final VoidCallback onLogout;
   final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final Future<void> Function()? onRefreshProfiles;
   final VoidCallback? onProfileSaved;
   final int openAddProfileRequestId;
   final double bottomPadding;
@@ -147,6 +150,7 @@ class _SettingTabState extends State<SettingTab> {
   bool _isLoadingProfiles = false;
   bool _isLoadingProfileOptions = false;
   bool _isSavingProfile = false;
+  bool _isUpdatingProfile = false;
   bool _isDeletingProfile = false;
   bool _isSettingDefaultProfile = false;
   bool _isSwitchingProfile = false;
@@ -553,6 +557,7 @@ class _SettingTabState extends State<SettingTab> {
       profileLoadError: _profileLoadError,
       onLogout: widget.onLogout,
       onActivateProfile: widget.onActivateProfile,
+      onRefreshProfiles: widget.onRefreshProfiles,
       onProfileSaved: widget.onProfileSaved,
       scale: widget.scale,
     );
@@ -1038,6 +1043,7 @@ class _SettingTabState extends State<SettingTab> {
         normalizedIdType != null &&
         profileIdValue.isNotEmpty;
     final isCreatingFirstProfile = editingProfile == null && _profiles.isEmpty;
+    final isUpdatingProfile = editingProfile != null;
     StudentProfile? createdActiveProfile;
 
     if (userId == null || userId <= 0) {
@@ -1084,6 +1090,7 @@ class _SettingTabState extends State<SettingTab> {
     HapticFeedback.mediumImpact();
     setState(() {
       _isSavingProfile = true;
+      _isUpdatingProfile = isUpdatingProfile;
       _profileCreateError = null;
     });
 
@@ -1144,6 +1151,16 @@ class _SettingTabState extends State<SettingTab> {
         return;
       }
 
+      if (isUpdatingProfile) {
+        await Future.wait<void>([
+          widget.onRefreshProfiles?.call() ?? Future<void>.value(),
+          Future<void>.delayed(_profileSwitchMinimumDuration),
+        ]);
+        if (!mounted) {
+          return;
+        }
+      }
+
       if (createdActiveProfile != null) {
         setState(() => _isSwitchingProfile = true);
         await Future.wait<void>([
@@ -1160,7 +1177,10 @@ class _SettingTabState extends State<SettingTab> {
       }
 
       if (widget._isPushedPage && _view == SettingPageView.addProfile) {
-        setState(() => _isSavingProfile = false);
+        setState(() {
+          _isSavingProfile = false;
+          _isUpdatingProfile = false;
+        });
         widget.onProfileSaved?.call();
         return;
       }
@@ -1168,6 +1188,7 @@ class _SettingTabState extends State<SettingTab> {
       _resetCreateProfileForm();
       setState(() {
         _isSavingProfile = false;
+        _isUpdatingProfile = false;
         _view = SettingPageView.profile;
         _isForwardTransition = false;
       });
@@ -1184,6 +1205,7 @@ class _SettingTabState extends State<SettingTab> {
       setState(() {
         _profileCreateError = error.message;
         _isSavingProfile = false;
+        _isUpdatingProfile = false;
         _isSwitchingProfile = false;
       });
     } catch (_) {
@@ -1196,6 +1218,7 @@ class _SettingTabState extends State<SettingTab> {
             ? context.readText(AppKeys.profileCreateFailed)
             : context.readText(AppKeys.profileUpdateFailed);
         _isSavingProfile = false;
+        _isUpdatingProfile = false;
         _isSwitchingProfile = false;
       });
     }
@@ -1383,7 +1406,7 @@ class _SettingTabState extends State<SettingTab> {
     final lingo = LingoScope.of(context);
 
     return PopScope(
-      canPop: !_isSwitchingProfile,
+      canPop: !_isSwitchingProfile && !_isUpdatingProfile,
       child: Stack(
         children: [
           ColoredBox(
@@ -1562,10 +1585,14 @@ class _SettingTabState extends State<SettingTab> {
               ),
             ),
           ),
-          if (_isSwitchingProfile)
+          if (_isSwitchingProfile || _isUpdatingProfile)
             Positioned.fill(
               child: LoadingScreen(
-                message: context.getText(AppKeys.switchingProfile),
+                message: context.getText(
+                  _isUpdatingProfile
+                      ? AppKeys.updatingProfile
+                      : AppKeys.switchingProfile,
+                ),
               ),
             ),
         ],

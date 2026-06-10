@@ -252,6 +252,7 @@ class AppKeys {
   static const profileTitle = 'profile_title';
   static const addProfileTitle = 'add_profile_title';
   static const updateProfileTitle = 'update_profile_title';
+  static const updatingProfile = 'updating_profile';
   static const school = 'school';
   static const accountMenuTitle = 'account_menu_title';
   static const accountMenuSubtitle = 'account_menu_subtitle';
