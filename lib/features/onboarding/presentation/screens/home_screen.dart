@@ -185,6 +185,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ActiveProfileSession.profileStableId(widget.activeProfile),
             )
             .toList(growable: false);
+        final profileMenuWidth = _profileMenuWidth(
+          context,
+          switchableProfiles,
+          scale,
+          layoutWidth - s(40),
+        );
 
         return Center(
           child: SizedBox(
@@ -309,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Positioned(
                     left: s(20),
                     top: headerHeight - s(29),
-                    width: s(178),
+                    width: profileMenuWidth,
                     child: _HomeProfileMenu(
                       profiles: switchableProfiles,
                       scale: scale,
@@ -385,6 +391,36 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => _isSwitchingProfile = false);
       }
     }
+  }
+
+  double _profileMenuWidth(
+    BuildContext context,
+    List<StudentProfile> profiles,
+    double scale,
+    double maxWidth,
+  ) {
+    final textStyle = TextStyle(
+      fontSize: 15 * scale,
+      fontWeight: FontWeight.w900,
+    );
+    var longestTextWidth = 0.0;
+
+    for (final profile in profiles) {
+      final name = _compactHomeProfileName(
+        _profileDisplayName(context, profile),
+      );
+      final painter = TextPainter(
+        text: TextSpan(text: name, style: textStyle),
+        maxLines: 1,
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      longestTextWidth = math.max(longestTextWidth, painter.width);
+    }
+
+    final contentWidth =
+        (14 * 2 + 42 + 12) * scale + longestTextWidth + 8 * scale;
+    return contentWidth.clamp(150 * scale, maxWidth);
   }
 
   String _displayProfileName(
@@ -789,11 +825,9 @@ class _HomeProfileMenu extends StatelessWidget {
           separatorBuilder: (_, __) => SizedBox(height: 2 * scale),
           itemBuilder: (context, index) {
             final profile = profiles[index];
-            final name = profile.name?.trim().isNotEmpty == true
-                ? profile.name!.trim()
-                : profile.profileCode?.trim().isNotEmpty == true
-                    ? profile.profileCode!.trim()
-                    : context.getText(AppKeys.student);
+            final name = _compactHomeProfileName(
+              _profileDisplayName(context, profile),
+            );
 
             return InkWell(
               onTap: () => onSelect(profile),
@@ -810,16 +844,20 @@ class _HomeProfileMenu extends StatelessWidget {
                       avatarUrl: profile.avatarUrl,
                     ),
                     SizedBox(width: 12 * scale),
-                    Expanded(
-                      child: Text(
-                        name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: const Color(0xFF002B6A),
-                          fontSize: 15 * scale,
-                          fontWeight: FontWeight.w900,
-                          height: 1.1,
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: TextStyle(
+                            color: const Color(0xFF002B6A),
+                            fontSize: 15 * scale,
+                            fontWeight: FontWeight.w900,
+                            height: 1.1,
+                          ),
                         ),
                       ),
                     ),
@@ -832,6 +870,28 @@ class _HomeProfileMenu extends StatelessWidget {
       ),
     );
   }
+}
+
+String _profileDisplayName(BuildContext context, StudentProfile profile) {
+  if (profile.name?.trim().isNotEmpty == true) {
+    return profile.name!.trim();
+  }
+  if (profile.profileCode?.trim().isNotEmpty == true) {
+    return profile.profileCode!.trim();
+  }
+  return context.getText(AppKeys.student);
+}
+
+String _compactHomeProfileName(String name) {
+  final parts = name
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((part) => part.isNotEmpty)
+      .toList(growable: false);
+  if (parts.length <= 2) {
+    return parts.join(' ');
+  }
+  return '${parts.first} ${parts.last}';
 }
 
 class _StudentAvatar extends StatelessWidget {
