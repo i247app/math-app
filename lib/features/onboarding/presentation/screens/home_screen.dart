@@ -47,6 +47,8 @@ const _studentParentHomeRejectIcon =
 const _studentParentHomeJoinIcon =
     'assets/images/student_parent_home_join_icon.svg';
 const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
+const _homeTeacherAvatarOne = 'assets/images/student_home_avatar.png';
+const _homeTeacherAvatarTwo = 'assets/images/student_class_teacher.png';
 const _homeProfileSwitchMinimumDuration = Duration(milliseconds: 1500);
 
 String _homeRoleLabel(BuildContext context, ProfileRole role) {
@@ -1667,6 +1669,8 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             onOpenClassroom: _openClassDetail,
             onViewAll: _openAllClassrooms,
           ),
+          const SizedBox(height: 20),
+          const _HomeTeacherMessages(),
         ],
       ),
     );
@@ -3064,6 +3068,219 @@ class _StudentFigmaClassCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _HomeTeacherMessages extends StatelessWidget {
+  const _HomeTeacherMessages();
+
+  @override
+  Widget build(BuildContext context) {
+    const messages = <_HomeTeacherMessageData>[
+      _HomeTeacherMessageData(
+        avatarAsset: _homeTeacherAvatarOne,
+        teacherKey: AppKeys.homeMessageTeacherOne,
+        classKey: AppKeys.homeMessageClassOne,
+        timeKey: AppKeys.homeMessageTimeOne,
+        studentKey: AppKeys.homeMessageStudentOne,
+        bodyKey: AppKeys.homeMessageBodyOne,
+        accentColor: Color(0xFFB52B70),
+        badgeColor: Color(0xFFF1C6DB),
+      ),
+      _HomeTeacherMessageData(
+        avatarAsset: _homeTeacherAvatarTwo,
+        teacherKey: AppKeys.homeMessageTeacherTwo,
+        classKey: AppKeys.homeMessageClassTwo,
+        timeKey: AppKeys.homeMessageTimeTwo,
+        studentKey: AppKeys.homeMessageStudentTwo,
+        bodyKey: AppKeys.homeMessageBodyTwo,
+        accentColor: Color(0xFF002B6A),
+        badgeColor: Color(0xFFC8D6F2),
+      ),
+    ];
+
+    return Column(
+      children: [
+        for (var index = 0; index < messages.length; index++) ...[
+          _HomeTeacherMessageCard(data: messages[index]),
+          if (index != messages.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}
+
+class _HomeTeacherMessageData {
+  const _HomeTeacherMessageData({
+    required this.avatarAsset,
+    required this.teacherKey,
+    required this.classKey,
+    required this.timeKey,
+    required this.studentKey,
+    required this.bodyKey,
+    required this.accentColor,
+    required this.badgeColor,
+  });
+
+  final String avatarAsset;
+  final String teacherKey;
+  final String classKey;
+  final String timeKey;
+  final String studentKey;
+  final String bodyKey;
+  final Color accentColor;
+  final Color badgeColor;
+}
+
+class _HomeTeacherMessageCard extends StatelessWidget {
+  const _HomeTeacherMessageCard({required this.data});
+
+  final _HomeTeacherMessageData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFDDE1E8)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF002B6A).withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.asset(
+                      data.avatarAsset,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
+                    right: -4,
+                    bottom: -4,
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: data.badgeColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: Icon(
+                        Icons.school_outlined,
+                        size: 11,
+                        color: data.accentColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.getText(data.teacherKey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF001741),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      context.getText(data.classKey),
+                      style: const TextStyle(
+                        color: Color(0xFF515F6F),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                context.getText(data.timeKey),
+                style: const TextStyle(
+                  color: Color(0xFF6B7280),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  height: 1.1,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 11),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FB),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFFB9C0CE),
+                style: BorderStyle.solid,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: data.accentColor,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    context.getText(data.studentKey),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.getText(data.bodyKey),
+                  style: const TextStyle(
+                    color: Color(0xFF30333A),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    height: 1.45,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

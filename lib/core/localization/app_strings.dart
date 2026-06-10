@@ -90,6 +90,18 @@ class AppStrings {
       AppKeys.yourAchievement: 'Thành tích của bạn',
       AppKeys.studentHomework: 'Bài tập',
       AppKeys.studentClassroom: 'Lớp học',
+      AppKeys.homeMessageTeacherOne: 'Cô Nguyễn Anh',
+      AppKeys.homeMessageTeacherTwo: 'Thầy Minh Hoàng',
+      AppKeys.homeMessageClassOne: 'Toán 2A1',
+      AppKeys.homeMessageClassTwo: 'Toán 3A1',
+      AppKeys.homeMessageTimeOne: '10:45 AM',
+      AppKeys.homeMessageTimeTwo: 'Hôm qua',
+      AppKeys.homeMessageStudentOne: 'UYENVO',
+      AppKeys.homeMessageStudentTwo: 'HENRY',
+      AppKeys.homeMessageBodyOne:
+          'Chào chị Jenny, em gửi nhận xét tuần này của bé uyenvo. Bé đã hoàn thành',
+      AppKeys.homeMessageBodyTwo:
+          'Nhắc nhở: Ngày mai henry có buổi dã ngoại, phụ huynh nhớ chuẩn bị thêm...',
       AppKeys.studentNoHomeworkTitle: 'Chưa có bài tập',
       AppKeys.studentNoHomeworkMessage:
           'Bài tập được giao sẽ hiển thị tại đây.',
@@ -631,6 +643,18 @@ class AppStrings {
       AppKeys.yourAchievement: 'Your achievements',
       AppKeys.studentHomework: 'Homework',
       AppKeys.studentClassroom: 'Classroom',
+      AppKeys.homeMessageTeacherOne: 'Ms. Nguyen Anh',
+      AppKeys.homeMessageTeacherTwo: 'Mr. Minh Hoang',
+      AppKeys.homeMessageClassOne: 'Math 2A1',
+      AppKeys.homeMessageClassTwo: 'Math 3A1',
+      AppKeys.homeMessageTimeOne: '10:45 AM',
+      AppKeys.homeMessageTimeTwo: 'Yesterday',
+      AppKeys.homeMessageStudentOne: 'UYENVO',
+      AppKeys.homeMessageStudentTwo: 'HENRY',
+      AppKeys.homeMessageBodyOne:
+          "Hi Jenny, here is uyenvo's feedback for this week. They have completed",
+      AppKeys.homeMessageBodyTwo:
+          'Reminder: Henry has a field trip tomorrow. Please remember to prepare...',
       AppKeys.studentNoHomeworkTitle: 'No homework yet',
       AppKeys.studentNoHomeworkMessage: 'Assigned homework will appear here.',
       AppKeys.studentNoClassroomsTitle: 'No joined classrooms',

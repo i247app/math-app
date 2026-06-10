@@ -86,6 +86,16 @@ class AppKeys {
   static const yourAchievement = 'your_achievement';
   static const studentHomework = 'student_homework';
   static const studentClassroom = 'student_classroom';
+  static const homeMessageTeacherOne = 'home_message_teacher_one';
+  static const homeMessageTeacherTwo = 'home_message_teacher_two';
+  static const homeMessageClassOne = 'home_message_class_one';
+  static const homeMessageClassTwo = 'home_message_class_two';
+  static const homeMessageTimeOne = 'home_message_time_one';
+  static const homeMessageTimeTwo = 'home_message_time_two';
+  static const homeMessageStudentOne = 'home_message_student_one';
+  static const homeMessageStudentTwo = 'home_message_student_two';
+  static const homeMessageBodyOne = 'home_message_body_one';
+  static const homeMessageBodyTwo = 'home_message_body_two';
   static const studentNoHomeworkTitle = 'student_no_homework_title';
   static const studentNoHomeworkMessage = 'student_no_homework_message';
   static const studentNoClassroomsTitle = 'student_no_classrooms_title';
