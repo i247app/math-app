@@ -78,6 +78,11 @@ class AppKeys {
   static const assessmentDescription = 'assessment_description';
   static const startNow = 'start_now';
   static const practice = 'practice';
+  static const homeHeroTitle = 'home_hero_title';
+  static const homeHeroSubtitle = 'home_hero_subtitle';
+  static const homeHeroTextbookLabel = 'home_hero_textbook_label';
+  static const homeHeroPrompt = 'home_hero_prompt';
+  static const homeHeroAssessment = 'home_hero_assessment';
   static const yourAchievement = 'your_achievement';
   static const studentHomework = 'student_homework';
   static const studentClassroom = 'student_classroom';

@@ -37,8 +37,6 @@ const _studentParentHomeHeroArt =
     'assets/images/student_parent_home_hero_art.png';
 const _studentParentHomeClassThumb =
     'assets/images/student_parent_home_class_thumb.png';
-const _studentParentHomePracticeIcon =
-    'assets/images/student_parent_home_practice_icon.svg';
 const _studentParentHomeAssessmentIcon =
     'assets/images/student_parent_home_assessment_icon.svg';
 const _studentParentHomeEnterIcon =
@@ -1386,7 +1384,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
         children: [
           _StudentFigmaHeroCard(
             onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
-            onPracticeTap: () => _openGradeSelection(quizPurposePractice),
           ),
           const SizedBox(height: 22),
           _StudentInvitationsSection(
@@ -2369,34 +2366,30 @@ class _StudentInviteButton extends StatelessWidget {
 }
 
 class _StudentFigmaHeroCard extends StatelessWidget {
-  const _StudentFigmaHeroCard({
-    required this.onAssessmentTap,
-    required this.onPracticeTap,
-  });
+  const _StudentFigmaHeroCard({required this.onAssessmentTap});
 
   final VoidCallback onAssessmentTap;
-  final VoidCallback onPracticeTap;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 195,
+      height: 225,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          end: Alignment.topRight,
           colors: [
-            Color(0xFFE3F1F2),
-            Color(0xFFF47C53),
+            Color(0xFFEDF7F6),
+            Color(0xFFF7CFC3),
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 50,
-            offset: const Offset(0, 25),
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -2405,12 +2398,12 @@ class _StudentFigmaHeroCard extends StatelessWidget {
           Positioned(
             left: -14,
             right: -14,
-            bottom: -70,
+            bottom: -48,
             child: Opacity(
               opacity: 0.70,
               child: Image.asset(
                 _studentParentHomeHeroBg,
-                height: 240,
+                height: 250,
                 fit: BoxFit.cover,
               ),
             ),
@@ -2418,9 +2411,9 @@ class _StudentFigmaHeroCard extends StatelessWidget {
           Positioned(
             left: 35,
             right: 35,
-            top: 12,
+            top: 23,
             child: Text(
-              context.getText(AppKeys.studentHomework).toUpperCase(),
+              context.getText(AppKeys.homeHeroTitle),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xFF357476),
@@ -2432,55 +2425,76 @@ class _StudentFigmaHeroCard extends StatelessWidget {
             ),
           ),
           Positioned(
-            right: -4,
-            bottom: 0,
-            width: 215,
-            height: 143,
-            child: Image.asset(_studentParentHomeHeroArt, fit: BoxFit.cover),
+            left: 35,
+            right: 35,
+            top: 65,
+            child: Text(
+              context.getText(AppKeys.homeHeroSubtitle),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF001741),
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+                letterSpacing: 0,
+              ),
+            ),
           ),
           Positioned(
-            left: 11,
-            top: 95,
-            width: 134,
+            right: -10,
+            top: 18,
+            width: 80,
+            child: Transform.rotate(
+              angle: 0.785398,
+              child: Text(
+                context.getText(AppKeys.homeHeroTextbookLabel),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFFD95F42),
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  height: 1.05,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            right: -13,
+            bottom: 0,
+            width: 202,
+            height: 135,
+            child: Image.asset(_studentParentHomeHeroArt, fit: BoxFit.contain),
+          ),
+          Positioned(
+            left: 9,
+            bottom: 37,
+            width: 150,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _HeroActionButton(
-                  label: context.getText(AppKeys.practice),
-                  color: const Color(0xFF38898C),
-                  icon: _studentParentHomePracticeIcon,
-                  onTap: onPracticeTap,
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Text(
+                    context.getText(AppKeys.homeHeroPrompt),
+                    style: const TextStyle(
+                      color: Color(0xFF001741),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      fontStyle: FontStyle.italic,
+                      height: 1.15,
+                      letterSpacing: 0,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 _HeroActionButton(
-                  label: context.getText(AppKeys.assessmentAction),
+                  label: context.getText(AppKeys.homeHeroAssessment),
                   color: const Color(0xFFFB7651),
                   icon: _studentParentHomeAssessmentIcon,
                   onTap: onAssessmentTap,
                 ),
               ],
-            ),
-          ),
-          Positioned(
-            right: 14,
-            top: 48,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.88),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                '5+3\n=8',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFF348285),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  height: 1.0,
-                  letterSpacing: 0,
-                ),
-              ),
             ),
           ),
         ],
@@ -2510,7 +2524,7 @@ class _HeroActionButton extends StatelessWidget {
         onPressed: onTap,
         style: FilledButton.styleFrom(
           backgroundColor: color,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(999),
           ),
@@ -2525,14 +2539,14 @@ class _HeroActionButton extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
                   height: 1.1,
                   letterSpacing: 0,
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             SvgPicture.asset(icon, width: 16, height: 16),
           ],
         ),
@@ -2637,7 +2651,7 @@ class _StudentClassGridSection extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              mainAxisExtent: 168,
+              mainAxisExtent: 180,
             ),
             itemCount: visibleClassrooms.length,
             itemBuilder: (context, index) {
@@ -3185,7 +3199,7 @@ class _StudentClassroomListScreenState
                     crossAxisCount: 2,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
-                    mainAxisExtent: 168,
+                    mainAxisExtent: 180,
                   ),
                   itemCount: _classrooms.length,
                   itemBuilder: (context, index) {
