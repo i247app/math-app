@@ -213,38 +213,43 @@ class _StudentClassTopBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Material(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              onTap: onBack,
-              borderRadius: BorderRadius.circular(12),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/images/student_join_back.svg',
-                    width: 16,
-                    height: 16,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 52),
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 52),
             child: Text(
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
               style: GoogleFonts.andika(
                 color: _studentClassTeal,
                 fontSize: 25,
                 fontWeight: FontWeight.w700,
                 height: 34 / 25,
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              child: InkWell(
+                onTap: onBack,
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/images/student_join_back.svg',
+                      width: 16,
+                      height: 16,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -566,7 +571,7 @@ class _CategoryTile extends StatelessWidget {
         onTap: onTap ?? () => _showComingSoon(context),
         borderRadius: BorderRadius.circular(16),
         child: Ink(
-          padding: const EdgeInsets.all(21),
+          padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),

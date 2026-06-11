@@ -1966,6 +1966,8 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
           profileId: ActiveProfileSession.profileStableId(
             widget.activeProfile,
           ),
+          initialGradeId: _profileGradeId(widget.activeProfile),
+          initialGradeLabel: widget.activeProfile?.grade?.label,
         ),
       ),
     );
@@ -2006,6 +2008,9 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     );
   }
 }
+
+int? _profileGradeId(StudentProfile? profile) =>
+    profile?.grade?.gradeId ?? profile?.grade?.id ?? profile?.gradeId;
 
 class _StudentInvitationsSection extends StatelessWidget {
   const _StudentInvitationsSection({

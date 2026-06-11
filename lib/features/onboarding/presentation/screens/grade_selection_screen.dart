@@ -28,6 +28,8 @@ class GradeSelectionScreen extends StatefulWidget {
     this.gradeService,
     this.quizPurpose = quizPurposeAssessment,
     this.profileId,
+    this.initialGradeId,
+    this.initialGradeLabel,
   });
 
   final LoginUser? user;
@@ -35,6 +37,8 @@ class GradeSelectionScreen extends StatefulWidget {
   final GradeService? gradeService;
   final String quizPurpose;
   final int? profileId;
+  final int? initialGradeId;
+  final String? initialGradeLabel;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
@@ -56,7 +60,11 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     super.initState();
     _gradeService = widget.gradeService ?? GradeApi();
     grades = widget.initialGrades;
-    selectedGradeLabel = _defaultGradeLabel(grades);
+    selectedGradeLabel = _defaultGradeLabel(
+      grades,
+      preferredGradeId: widget.initialGradeId,
+      preferredGradeLabel: widget.initialGradeLabel,
+    );
     if (grades.isEmpty) {
       loadGrades();
     }
@@ -90,7 +98,11 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
         if (!loadedGrades.any(
           (grade) => grade.label?.trim() == selectedGradeLabel,
         )) {
-          selectedGradeLabel = _defaultGradeLabel(loadedGrades);
+          selectedGradeLabel = _defaultGradeLabel(
+            loadedGrades,
+            preferredGradeId: widget.initialGradeId,
+            preferredGradeLabel: widget.initialGradeLabel,
+          );
         }
       });
     } on GradeException catch (error) {
@@ -142,7 +154,11 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
 
     setState(() {
       showGenerationFailed = false;
-      selectedGradeLabel = _defaultGradeLabel(grades);
+      selectedGradeLabel = _defaultGradeLabel(
+        grades,
+        preferredGradeId: widget.initialGradeId,
+        preferredGradeLabel: widget.initialGradeLabel,
+      );
     });
   }
 
@@ -861,7 +877,11 @@ String? _gradeNumberFromLabel(String label) {
   return match?.group(0);
 }
 
-String? _defaultGradeLabel(List<GradeModel> grades) {
+String? _defaultGradeLabel(
+  List<GradeModel> grades, {
+  int? preferredGradeId,
+  String? preferredGradeLabel,
+}) {
   final sortedGrades = grades
       .where((grade) => grade.label?.trim().isNotEmpty == true)
       .toList()
@@ -869,5 +889,24 @@ String? _defaultGradeLabel(List<GradeModel> grades) {
   if (sortedGrades.isEmpty) {
     return null;
   }
+
+  if (preferredGradeId != null) {
+    for (final grade in sortedGrades) {
+      if ((grade.gradeId ?? grade.id) == preferredGradeId) {
+        return grade.label?.trim();
+      }
+    }
+  }
+
+  final cleanPreferredLabel = preferredGradeLabel?.trim();
+  if (cleanPreferredLabel?.isNotEmpty == true) {
+    for (final grade in sortedGrades) {
+      final label = grade.label?.trim();
+      if (label?.toLowerCase() == cleanPreferredLabel!.toLowerCase()) {
+        return label;
+      }
+    }
+  }
+
   return sortedGrades.first.label?.trim();
 }
