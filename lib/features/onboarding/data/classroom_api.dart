@@ -148,7 +148,18 @@ class ClassroomApi implements ClassroomService {
           schoolIds: schoolIds?.isEmpty == true ? null : schoolIds,
         ),
       );
-      return response.classrooms;
+      final selectedGradeIds = gradeIds?.toSet() ?? const <int>{};
+      final selectedSchoolIds = schoolIds?.toSet() ?? const <int>{};
+
+      return response.classrooms.where((classroom) {
+        final matchesGrade = selectedGradeIds.isEmpty ||
+            (classroom.gradeId != null &&
+                selectedGradeIds.contains(classroom.gradeId));
+        final matchesSchool = selectedSchoolIds.isEmpty ||
+            (classroom.schoolId != null &&
+                selectedSchoolIds.contains(classroom.schoolId));
+        return matchesGrade && matchesSchool;
+      }).toList(growable: false);
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }
