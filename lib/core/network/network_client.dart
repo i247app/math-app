@@ -143,6 +143,10 @@ class NetworkClient {
 
   Future<void> clearAuthToken() => _authTokenStore.clearToken();
 
+  Future<void> writeAuthToken(String token) {
+    return _authTokenStore.writeToken(token);
+  }
+
   Future<bool> hasAuthToken() async {
     final token = (await _authTokenStore.readToken())?.trim();
     return token != null && token.isNotEmpty;
@@ -293,6 +297,10 @@ class NetworkApi {
     return _post('/auth/otp', request.toJson());
   }
 
+  Future<AuthResponse> loginResume() {
+    return _post('/auth/login-resume', const <String, dynamic>{});
+  }
+
   Future<SendOtpResponse> sendOtp(SendOtpRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/otps/send',
@@ -328,6 +336,7 @@ class NetworkApi {
       );
     }
 
+    await _storeAccessToken(verifyResponse.accessToken);
     return verifyResponse;
   }
 
@@ -1017,7 +1026,17 @@ class NetworkApi {
       );
     }
 
+    await _storeAccessToken(authResponse.accessToken);
     return authResponse;
+  }
+
+  Future<void> _storeAccessToken(String? accessToken) async {
+    final token = accessToken?.trim();
+    if (token == null || token.isEmpty) {
+      return;
+    }
+
+    await _networkClient.writeAuthToken(token);
   }
 
   static Map<String, dynamic> _currentUserJson(Map<String, dynamic> json) {

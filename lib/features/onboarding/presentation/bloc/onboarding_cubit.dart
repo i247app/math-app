@@ -425,27 +425,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         return;
       }
 
-      if (await _passcodeService.hasPasscode(user.id)) {
-        emit(
-          state.copyWith(
-            screen: AppScreen.passcode,
-            isRestoringSession: false,
-            pendingLoginUser: user,
-            pendingProfiles: profileResolution.profiles,
-            pendingActiveProfile: profileResolution.activeProfile,
-            pendingProfileLoadError: profileResolution.errorMessage,
-            passcodeFlow: PasscodeFlow.unlock,
-            passcodeCanSkip: false,
-            clearAuthError: true,
-            clearPasscodeError: true,
-            clearPendingActiveProfile: profileResolution.activeProfile == null,
-            clearPendingProfileLoadError:
-                profileResolution.errorMessage == null,
-          ),
-        );
-        return;
-      }
-
       await _emitAuthenticatedHome(user, profileResolution);
     } catch (_) {
       if (!isClosed) {

@@ -72,7 +72,37 @@ class NetworkLogInterceptor extends Interceptor {
       return _formatFormData(data);
     }
 
-    return _jsonOrString(data);
+    return _jsonOrString(_redactSensitiveData(data));
+  }
+
+  static Object? _redactSensitiveData(Object? value) {
+    if (value is Map) {
+      return <String, Object?>{
+        for (final entry in value.entries)
+          entry.key.toString(): _isSensitiveKey(entry.key.toString())
+              ? '<redacted>'
+              : _redactSensitiveData(entry.value),
+      };
+    }
+
+    if (value is List) {
+      return value.map(_redactSensitiveData).toList();
+    }
+
+    return value;
+  }
+
+  static bool _isSensitiveKey(String key) {
+    return switch (key.toLowerCase()) {
+      'authorization' ||
+      'x-auth-token' ||
+      'access_token' ||
+      'accesstoken' ||
+      'refresh_token' ||
+      'refreshtoken' =>
+        true,
+      _ => false,
+    };
   }
 
   static String _formatFormData(FormData formData) {

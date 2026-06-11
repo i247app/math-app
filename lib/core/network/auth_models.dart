@@ -96,6 +96,7 @@ class AuthResponse {
     this.status,
     this.mmessage,
     this.debug,
+    this.accessToken,
     this.expiresAt,
     this.otpCode,
     this.user,
@@ -106,6 +107,8 @@ class AuthResponse {
   final String? status;
   final String? mmessage;
   final String? debug;
+  @JsonKey(name: 'access_token')
+  final String? accessToken;
   @JsonKey(name: 'expires_at')
   final String? expiresAt;
   @JsonKey(name: 'otp_code')
@@ -153,6 +156,7 @@ class VerifyOtpResponse {
     this.status,
     this.mmessage,
     this.debug,
+    this.accessToken,
     this.user,
     this.verified = false,
   });
@@ -162,6 +166,7 @@ class VerifyOtpResponse {
   final String? status;
   final String? mmessage;
   final String? debug;
+  final String? accessToken;
   final AuthUser? user;
   @JsonKey(defaultValue: false)
   final bool verified;

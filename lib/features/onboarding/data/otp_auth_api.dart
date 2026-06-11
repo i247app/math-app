@@ -175,7 +175,12 @@ class OtpAuthApi implements OtpAuthService {
     }
 
     try {
-      final user = (await _networkApi.getCurrentUser()).toLoginUser();
+      final response = await _networkApi.loginResume();
+      final user = response.user?.toLoginUser();
+      if (user == null) {
+        await _networkApi.clearAuthToken();
+        return null;
+      }
       if (user.id <= 0) {
         await _networkApi.clearAuthToken();
         return null;
@@ -185,7 +190,6 @@ class OtpAuthApi implements OtpAuthService {
       if (_isUnauthorized(error.status)) {
         await _networkApi.clearAuthToken();
       }
-
       return null;
     }
   }

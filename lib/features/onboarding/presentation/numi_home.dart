@@ -122,7 +122,8 @@ class _NumiHomeState extends State<NumiHome> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => OnboardingCubit(authService: widget.authService),
+      create: (_) =>
+          OnboardingCubit(authService: widget.authService)..restoreSession(),
       child: BlocBuilder<OnboardingCubit, OnboardingState>(
         builder: (context, scaffoldState) {
           final usePlainLoginBackground =
