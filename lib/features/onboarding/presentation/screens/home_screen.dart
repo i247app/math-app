@@ -37,6 +37,7 @@ const _studentParentHomeHeroBg =
     'assets/images/student_parent_home_hero_bg.png';
 const _studentParentHomeHeroArt =
     'assets/images/student_parent_home_hero_art.png';
+const _parentHomeWelcomeMap = 'assets/images/map_welcome_new.png';
 const _studentParentHomeClassThumb =
     'assets/images/student_parent_home_class_thumb.png';
 const _studentParentHomeAssessmentIcon =
@@ -93,8 +94,10 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late final GradeService _gradeService = GradeApi();
+  late final AnimationController _parentHomeEntranceController;
   int _activeTab = 0;
   int _previousActiveTab = 0;
   int _openAddProfileRequestId = 0;
@@ -111,6 +114,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _parentHomeEntranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    if (widget.activeRole == ProfileRole.parent) {
+      _parentHomeEntranceController.forward();
+    }
     _prefetchGrades();
   }
 
@@ -127,9 +137,25 @@ class _HomeScreenState extends State<HomeScreen> {
       _previousActiveTab = _activeTab;
       _activeTab = 0;
     }
+    if (oldWidget.activeRole != widget.activeRole &&
+        widget.activeRole == ProfileRole.parent) {
+      _playParentHomeEntrance();
+    }
     if (oldWidget.activeProfile != widget.activeProfile) {
       _isProfileMenuOpen = false;
     }
+  }
+
+  void _playParentHomeEntrance() {
+    _parentHomeEntranceController
+      ..reset()
+      ..forward();
+  }
+
+  @override
+  void dispose() {
+    _parentHomeEntranceController.dispose();
+    super.dispose();
   }
 
   Future<void> _prefetchGrades() async {
@@ -281,6 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           _activeTab = 1;
                         });
                       },
+                      parentHomeEntrance: _parentHomeEntranceController,
                       bottomPadding: navHeight + s(14),
                       headerHeight: showHeader ? headerHeight : 0,
                       scale: scale,
@@ -349,6 +376,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
 
                       HapticFeedback.lightImpact();
+                      if (widget.activeRole == ProfileRole.parent &&
+                          index == 0) {
+                        _playParentHomeEntrance();
+                      }
                       setState(() {
                         _previousActiveTab = _activeTab;
                         _activeTab = index;
@@ -513,6 +544,7 @@ class _TabContent extends StatelessWidget {
     required this.openAddProfileRequestId,
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
+    required this.parentHomeEntrance,
     required this.bottomPadding,
     required this.headerHeight,
     required this.scale,
@@ -534,6 +566,7 @@ class _TabContent extends StatelessWidget {
   final int openAddProfileRequestId;
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
+  final Animation<double> parentHomeEntrance;
   final double bottomPadding;
   final double headerHeight;
   final double scale;
@@ -622,6 +655,7 @@ class _TabContent extends StatelessWidget {
         onRefreshProfiles: onRefreshProfiles,
         onActivateProfile: onActivateProfile,
         onProfileSaved: onProfileSaved,
+        parentHomeEntrance: parentHomeEntrance,
       );
     }
 
@@ -1430,6 +1464,7 @@ class _StudentHomeContent extends StatefulWidget {
     required this.onRefreshProfiles,
     required this.onActivateProfile,
     required this.onProfileSaved,
+    required this.parentHomeEntrance,
   });
 
   final EdgeInsets padding;
@@ -1444,6 +1479,7 @@ class _StudentHomeContent extends StatefulWidget {
   final Future<void> Function() onRefreshProfiles;
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
+  final Animation<double> parentHomeEntrance;
 
   @override
   State<_StudentHomeContent> createState() => _StudentHomeContentState();
@@ -1689,11 +1725,33 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _StudentFigmaHeroCard(
-            onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
-          ),
+          if (widget.activeRole == ProfileRole.parent)
+            _HomePopIn(
+              animation: widget.parentHomeEntrance,
+              interval: const Interval(0, 0.62),
+              beginOffset: const Offset(-18, 14),
+              beginRotation: -0.024,
+              beginScale: 0.92,
+              child: _StudentFigmaHeroCard(
+                onAssessmentTap: () =>
+                    _openGradeSelection(quizPurposeAssessment),
+              ),
+            )
+          else
+            _StudentFigmaHeroCard(
+              onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
+            ),
           const SizedBox(height: 22),
-          if (isLoadingHomeSections)
+          if (widget.activeRole == ProfileRole.parent)
+            _HomePopIn(
+              animation: widget.parentHomeEntrance,
+              interval: const Interval(0.3, 1),
+              beginOffset: const Offset(18, 16),
+              beginRotation: 0.024,
+              beginScale: 0.9,
+              child: const _ParentWelcomeMapCard(),
+            )
+          else if (isLoadingHomeSections)
             const _StudentHomeSectionsLoading()
           else ...[
             _StudentInvitationsSection(
@@ -1701,7 +1759,8 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
               isLoading: _isLoadingInvitations,
               error: _invitationError,
               processingClassroomIds: _processingInvitationClassIds,
-              showJoinClassroom: _classrooms.isEmpty,
+              showJoinClassroom: widget.activeRole == ProfileRole.student &&
+                  _classrooms.isEmpty,
               onJoinClassroom: widget.activeRole == ProfileRole.student
                   ? widget.onOpenClassroomTab
                   : _handleParentClassroomEntry,
@@ -2802,6 +2861,80 @@ class _StudentFigmaHeroCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ParentWelcomeMapCard extends StatelessWidget {
+  const _ParentWelcomeMapCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 250,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Image.asset(
+        _parentHomeWelcomeMap,
+        fit: BoxFit.cover,
+        alignment: Alignment.bottomCenter,
+      ),
+    );
+  }
+}
+
+class _HomePopIn extends StatelessWidget {
+  const _HomePopIn({
+    required this.child,
+    required this.animation,
+    required this.interval,
+    required this.beginOffset,
+    required this.beginRotation,
+    this.beginScale = 0.92,
+  });
+
+  final Widget child;
+  final Animation<double> animation;
+  final Interval interval;
+  final Offset beginOffset;
+  final double beginRotation;
+  final double beginScale;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      child: RepaintBoundary(child: child),
+      builder: (context, child) {
+        final intervalValue = interval.transform(animation.value);
+        final fadeValue = Curves.easeOut.transform(intervalValue);
+        final moveValue = Curves.easeOutCubic.transform(intervalValue);
+        final scaleValue = Curves.easeOutBack.transform(intervalValue);
+
+        return Opacity(
+          opacity: fadeValue,
+          child: Transform.translate(
+            offset: Offset.lerp(beginOffset, Offset.zero, moveValue)!,
+            child: Transform.rotate(
+              angle: beginRotation * (1 - moveValue),
+              child: Transform.scale(
+                scale: beginScale + ((1 - beginScale) * scaleValue),
+                child: child,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
