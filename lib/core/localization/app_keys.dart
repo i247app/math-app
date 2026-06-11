@@ -101,10 +101,10 @@ class AppKeys {
   static const studentNoClassroomsTitle = 'student_no_classrooms_title';
   static const studentNoClassroomsMessage = 'student_no_classrooms_message';
   static const studentJoinNewClassroom = 'student_join_new_classroom';
+  static const studentJoinAnotherClassroom = 'student_join_another_classroom';
   static const studentJoinClassroomSoon = 'student_join_classroom_soon';
   static const studentClassroomLoadFailed = 'student_classroom_load_failed';
   static const studentMissingProfileId = 'student_missing_profile_id';
-  static const studentFindClassTitle = 'student_find_class_title';
   static const studentClassCodeHint = 'student_class_code_hint';
   static const studentSearchClass = 'student_search_class';
   static const studentSearchResults = 'student_search_results';

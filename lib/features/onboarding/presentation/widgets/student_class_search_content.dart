@@ -20,7 +20,6 @@ const _joinBlue = Color(0xFF001741);
 const _joinInk = Color(0xFF161D1F);
 const _joinMuted = Color(0xFF444650);
 const _joinCoral = Color(0xFFF97316);
-const _studentJoinBackIcon = 'assets/images/student_join_back.svg';
 const _studentJoinSearchIcon = 'assets/images/student_join_search.png';
 const _studentJoinScanIcon = 'assets/images/student_join_scan.png';
 const _studentJoinFilterIcon = 'assets/images/student_join_filter.svg';
@@ -30,11 +29,13 @@ const _studentJoinEnterIcon = 'assets/images/student_join_enter.svg';
 const _studentJoinPendingIcon = 'assets/images/student_home_bell.svg';
 const _studentJoinJoinedIcon = 'assets/images/teacher_class_graduation.svg';
 
-class StudentJoinClassScreen extends StatefulWidget {
-  const StudentJoinClassScreen({
+class StudentClassSearchContent extends StatefulWidget {
+  const StudentClassSearchContent({
     super.key,
     required this.profileId,
     this.userId,
+    this.onJoinRequested,
+    this.onInitialLoadingChanged,
     ClassroomService? classroomService,
     GradeService? gradeService,
     SchoolService? schoolService,
@@ -44,15 +45,18 @@ class StudentJoinClassScreen extends StatefulWidget {
 
   final int profileId;
   final int? userId;
+  final VoidCallback? onJoinRequested;
+  final ValueChanged<bool>? onInitialLoadingChanged;
   final ClassroomService? _classroomService;
   final GradeService? _gradeService;
   final SchoolService? _schoolService;
 
   @override
-  State<StudentJoinClassScreen> createState() => _StudentJoinClassScreenState();
+  State<StudentClassSearchContent> createState() =>
+      _StudentClassSearchContentState();
 }
 
-class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
+class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
   late final GradeService _gradeService = widget._gradeService ?? GradeApi();
@@ -65,7 +69,7 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
   List<SchoolModel> _schools = const <SchoolModel>[];
   bool _isSearching = false;
   bool _hasSearched = false;
-  bool _isLoadingFilters = false;
+  bool _isLoadingFilters = true;
   int? _joiningClassroomId;
   final Set<int> _selectedGradeIds = <int>{};
   final Set<int> _selectedSchoolIds = <int>{};
@@ -186,6 +190,7 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
     } finally {
       if (mounted) {
         setState(() => _isLoadingFilters = false);
+        widget.onInitialLoadingChanged?.call(false);
       }
     }
   }
@@ -300,7 +305,8 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      Navigator.of(context).pop(true);
+      widget.onJoinRequested?.call();
+      await _search();
     } catch (error) {
       if (!mounted) {
         return;
@@ -324,59 +330,42 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _JoinClassHeader(onBack: () => Navigator.of(context).pop(false)),
-            Expanded(
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.fromLTRB(18, 22, 18, 24 + bottomInset),
-                children: [
-                  _JoinSearchField(
-                    controller: _searchController,
-                    isSearching: _isSearching,
-                    onChanged: _onSearchChanged,
-                    onSubmitted: _search,
-                  ),
-                  const SizedBox(height: 26),
-                  const _SearchSectionTitle(),
-                  const SizedBox(height: 10),
-                  _JoinFilterPanel(
-                    grades: _grades,
-                    schools: _schools,
-                    selectedGradeIds: _selectedGradeIds,
-                    selectedSchoolIds: _selectedSchoolIds,
-                    isLoading: _isLoadingFilters,
-                    error: _filterError,
-                    onGradeTap: _selectGrade,
-                    onGradeRemove: _removeGrade,
-                    onSchoolTap: _openSchoolPicker,
-                    onSchoolRemove: _removeSchool,
-                  ),
-                  const SizedBox(height: 17),
-                  Text(
-                    context.getText(AppKeys.studentSearchResults),
-                    style: const TextStyle(
-                      color: _joinBlue,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      height: 2,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildResults(),
-                ],
-              ),
-            ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _JoinSearchField(
+          controller: _searchController,
+          isSearching: _isSearching,
+          onChanged: _onSearchChanged,
+          onSubmitted: _search,
         ),
-      ),
+        const SizedBox(height: 14),
+        _JoinFilterPanel(
+          grades: _grades,
+          schools: _schools,
+          selectedGradeIds: _selectedGradeIds,
+          selectedSchoolIds: _selectedSchoolIds,
+          isLoading: _isLoadingFilters,
+          error: _filterError,
+          onGradeTap: _selectGrade,
+          onGradeRemove: _removeGrade,
+          onSchoolTap: _openSchoolPicker,
+          onSchoolRemove: _removeSchool,
+        ),
+        const SizedBox(height: 17),
+        Text(
+          context.getText(AppKeys.studentSearchResults),
+          style: const TextStyle(
+            color: _joinBlue,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+            height: 2,
+            letterSpacing: 0,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildResults(),
+      ],
     );
   }
 
@@ -426,61 +415,6 @@ class _StudentJoinClassScreenState extends State<StudentJoinClassScreen> {
           if (index != _results.length - 1) const SizedBox(height: 16),
         ],
       ],
-    );
-  }
-}
-
-class _JoinClassHeader extends StatelessWidget {
-  const _JoinClassHeader({required this.onBack});
-
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 0,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: onBack,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints.tightFor(
-              width: 40,
-              height: 40,
-            ),
-            icon: SvgPicture.asset(
-              _studentJoinBackIcon,
-              width: 16,
-              height: 16,
-            ),
-            tooltip: context.getText(AppKeys.back),
-          ),
-          const Spacer(),
-          Text(
-            context.getText(AppKeys.studentFindClassTitle),
-            style: const TextStyle(
-              color: _joinTeal,
-              fontSize: 25,
-              fontWeight: FontWeight.w900,
-              height: 1.2,
-              letterSpacing: 0,
-            ),
-          ),
-          const Spacer(),
-          const SizedBox(width: 48),
-        ],
-      ),
     );
   }
 }
@@ -568,34 +502,6 @@ class _JoinSearchField extends StatelessWidget {
           borderSide: BorderSide(color: _joinTeal.withValues(alpha: 0.3)),
         ),
       ),
-    );
-  }
-}
-
-class _SearchSectionTitle extends StatelessWidget {
-  const _SearchSectionTitle();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SvgPicture.asset(
-          _studentJoinFilterIcon,
-          width: 18,
-          height: 12,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          context.getText(AppKeys.studentSearchClass),
-          style: const TextStyle(
-            color: _joinBlue,
-            fontSize: 16,
-            fontWeight: FontWeight.w900,
-            height: 2,
-            letterSpacing: 0,
-          ),
-        ),
-      ],
     );
   }
 }

@@ -109,10 +109,10 @@ class AppStrings {
       AppKeys.studentNoClassroomsMessage:
           'Tham gia lớp để nhận bài tập và theo dõi tiến độ.',
       AppKeys.studentJoinNewClassroom: 'Tham gia lớp mới',
+      AppKeys.studentJoinAnotherClassroom: 'Tham gia lớp khác',
       AppKeys.studentJoinClassroomSoon: 'Tính năng tham gia lớp sẽ sớm có mặt.',
       AppKeys.studentClassroomLoadFailed: 'Tải danh sách lớp học thất bại.',
       AppKeys.studentMissingProfileId: 'Hồ sơ học sinh thiếu profile_id.',
-      AppKeys.studentFindClassTitle: 'Tìm Lớp Học',
       AppKeys.studentClassCodeHint: 'Nhập mã lớp',
       AppKeys.studentSearchClass: 'Tìm kiếm lớp học',
       AppKeys.studentSearchResults: 'Kết quả tìm kiếm',
@@ -661,10 +661,10 @@ class AppStrings {
       AppKeys.studentNoClassroomsMessage:
           'Join a classroom to receive homework and track progress.',
       AppKeys.studentJoinNewClassroom: 'Join new classroom',
+      AppKeys.studentJoinAnotherClassroom: 'Join another classroom',
       AppKeys.studentJoinClassroomSoon: 'Classroom joining is coming soon.',
       AppKeys.studentClassroomLoadFailed: 'Failed to load classrooms.',
       AppKeys.studentMissingProfileId: 'Student profile is missing profile_id.',
-      AppKeys.studentFindClassTitle: 'Find Classroom',
       AppKeys.studentClassCodeHint: 'Enter class code',
       AppKeys.studentSearchClass: 'Search classrooms',
       AppKeys.studentSearchResults: 'Search results',

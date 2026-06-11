@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
@@ -21,9 +22,9 @@ import '../tabs/review_tab.dart';
 import '../tabs/setting_tab.dart';
 import '../widgets/common_widgets.dart';
 import '../widgets/profile_avatar_image.dart';
+import '../widgets/student_class_search_content.dart';
 import 'grade_selection_screen.dart';
 import 'student_class_detail_screen.dart';
-import 'student_join_class_screen.dart';
 import 'teacher_classroom_screens.dart';
 
 const _teal = Color(0xFF006762);
@@ -46,6 +47,11 @@ const _studentParentHomeRejectIcon =
     'assets/images/student_parent_home_reject.png';
 const _studentParentHomeJoinIcon =
     'assets/images/student_parent_home_join_icon.svg';
+const _studentHomeNavHome = 'assets/images/student_home_nav_home.svg';
+const _studentHomeNavClass = 'assets/images/student_home_nav_class.svg';
+const _studentHomeNavReport = 'assets/images/student_home_nav_report.svg';
+const _studentHomeNavMessage = 'assets/images/student_home_nav_message.svg';
+const _studentHomeNavSettings = 'assets/images/student_home_nav_settings.svg';
 const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
 const _homeTeacherAvatarOne = 'assets/images/student_home_avatar.png';
 const _homeTeacherAvatarTwo = 'assets/images/student_class_teacher.png';
@@ -117,8 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _prefetchGrades();
     }
     if (oldWidget.activeRole != widget.activeRole &&
-        widget.activeRole == ProfileRole.teacher &&
-        _activeTab > 4) {
+        _activeTab > _lastTabIndex(widget.activeRole)) {
       _previousActiveTab = _activeTab;
       _activeTab = 0;
     }
@@ -250,7 +255,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         HapticFeedback.selectionClick();
                         setState(() {
                           _previousActiveTab = _activeTab;
-                          _activeTab = 3;
+                          _activeTab =
+                              widget.activeRole == ProfileRole.student ? 4 : 3;
                           _returnToReviewAfterProfileSave = true;
                           _openAddProfileRequestId++;
                         });
@@ -262,7 +268,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         setState(() {
                           _previousActiveTab = _activeTab;
-                          _activeTab = 1;
+                          _activeTab =
+                              widget.activeRole == ProfileRole.student ? 2 : 1;
                           _returnToReviewAfterProfileSave = false;
                         });
                       },
@@ -361,6 +368,10 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+  }
+
+  int _lastTabIndex(ProfileRole role) {
+    return role == ProfileRole.parent ? 3 : 4;
   }
 
   Future<void> _switchProfile(StudentProfile profile) async {
@@ -607,13 +618,27 @@ class _TabContent extends StatelessWidget {
         activeRole: activeRole,
         initialGrades: initialGrades,
         gradeService: gradeService,
+        onOpenClassroomTab: onOpenClassroomTab,
         onRefreshProfiles: onRefreshProfiles,
         onActivateProfile: onActivateProfile,
         onProfileSaved: onProfileSaved,
       );
     }
 
-    if (activeTab == 3) {
+    if (activeRole == ProfileRole.student && activeTab == 1) {
+      return _StudentClassroomTab(
+        bottomPadding: bottomPadding,
+        scale: scale,
+        user: user,
+        activeProfile: activeProfile,
+      );
+    }
+
+    final settingsTab = activeRole == ProfileRole.student ? 4 : 3;
+    final reviewTab = activeRole == ProfileRole.student ? 2 : 1;
+    final historyTab = activeRole == ProfileRole.student ? 3 : 2;
+
+    if (activeTab == settingsTab) {
       return SettingTab(
         user: user,
         profiles: profiles,
@@ -629,7 +654,7 @@ class _TabContent extends StatelessWidget {
       );
     }
 
-    if (activeTab == 1) {
+    if (activeTab == reviewTab) {
       return ReviewTab(
         user: user,
         activeProfile: activeProfile,
@@ -641,7 +666,7 @@ class _TabContent extends StatelessWidget {
       );
     }
 
-    if (activeTab == 2) {
+    if (activeTab == historyTab) {
       return HistoryTab(
         user: user,
         activeProfile: activeProfile,
@@ -1401,6 +1426,7 @@ class _StudentHomeContent extends StatefulWidget {
     required this.activeRole,
     required this.initialGrades,
     required this.gradeService,
+    required this.onOpenClassroomTab,
     required this.onRefreshProfiles,
     required this.onActivateProfile,
     required this.onProfileSaved,
@@ -1414,6 +1440,7 @@ class _StudentHomeContent extends StatefulWidget {
   final ProfileRole activeRole;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
+  final VoidCallback onOpenClassroomTab;
   final Future<void> Function() onRefreshProfiles;
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
@@ -1428,6 +1455,8 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   int? _loadedProfileId;
   bool _isLoadingClassrooms = false;
   bool _isLoadingInvitations = false;
+  bool _hasLoadedClassrooms = false;
+  bool _hasLoadedInvitations = false;
   String? _classroomError;
   String? _invitationError;
   List<ClassroomModel> _classrooms = const <ClassroomModel>[];
@@ -1437,7 +1466,9 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   @override
   void initState() {
     super.initState();
-    _loadClassrooms();
+    if (widget.activeRole == ProfileRole.student) {
+      _loadClassrooms();
+    }
     _loadInvitations();
   }
 
@@ -1450,13 +1481,18 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
-    if (oldProfileId != profileId) {
+    final roleChanged = oldWidget.activeRole != widget.activeRole;
+    if (oldProfileId != profileId || roleChanged) {
       _loadedProfileId = null;
       _classrooms = const <ClassroomModel>[];
       _invitations = const <ClassroomInvitation>[];
+      _hasLoadedClassrooms = false;
+      _hasLoadedInvitations = false;
       _classroomError = null;
       _invitationError = null;
-      _loadClassrooms();
+      if (widget.activeRole == ProfileRole.student) {
+        _loadClassrooms();
+      }
       _loadInvitations();
     }
   }
@@ -1489,6 +1525,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
       setState(() {
         _loadedProfileId = profileId;
+        _hasLoadedClassrooms = true;
         _classrooms = classrooms;
       });
     } catch (_) {
@@ -1500,6 +1537,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
       setState(() {
         _loadedProfileId = profileId;
+        _hasLoadedClassrooms = true;
         _classroomError = context.readText(AppKeys.studentClassroomLoadFailed);
         _classrooms = const <ClassroomModel>[];
       });
@@ -1536,6 +1574,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       }
 
       setState(() {
+        _hasLoadedInvitations = true;
         _invitations = invitations;
       });
     } catch (_) {
@@ -1546,6 +1585,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       }
 
       setState(() {
+        _hasLoadedInvitations = true;
         _invitationError =
             context.readText(AppKeys.studentInvitationLoadFailed);
         _invitations = const <ClassroomInvitation>[];
@@ -1634,6 +1674,15 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
   @override
   Widget build(BuildContext context) {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    final isLoadingHomeSections = profileId != null &&
+        profileId > 0 &&
+        (!_hasLoadedInvitations ||
+            (widget.activeRole == ProfileRole.student &&
+                !_hasLoadedClassrooms));
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: widget.padding,
@@ -1644,33 +1693,42 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
           ),
           const SizedBox(height: 22),
-          _StudentInvitationsSection(
-            invitations: _invitations,
-            isLoading: _isLoadingInvitations,
-            error: _invitationError,
-            processingClassroomIds: _processingInvitationClassIds,
-            onJoinClassroom: _openJoinClassroom,
-            onViewAll: _openAllInvitations,
-            onAccept: (invitation) => _handleInvitation(
-              invitation,
-              accept: true,
+          if (isLoadingHomeSections)
+            const _StudentHomeSectionsLoading()
+          else ...[
+            _StudentInvitationsSection(
+              invitations: _invitations,
+              isLoading: _isLoadingInvitations,
+              error: _invitationError,
+              processingClassroomIds: _processingInvitationClassIds,
+              showJoinClassroom: _classrooms.isEmpty,
+              onJoinClassroom: widget.activeRole == ProfileRole.student
+                  ? widget.onOpenClassroomTab
+                  : _handleParentClassroomEntry,
+              onViewAll: _openAllInvitations,
+              onAccept: (invitation) => _handleInvitation(
+                invitation,
+                accept: true,
+              ),
+              onReject: (invitation) => _handleInvitation(
+                invitation,
+                accept: false,
+              ),
+              onRetry: _loadInvitations,
             ),
-            onReject: (invitation) => _handleInvitation(
-              invitation,
-              accept: false,
-            ),
-            onRetry: _loadInvitations,
-          ),
-          const SizedBox(height: 11),
-          _StudentClassGridSection(
-            classrooms: _classrooms,
-            isLoading: _isLoadingClassrooms,
-            error: _classroomError,
-            onOpenClassroom: _openClassDetail,
-            onViewAll: _openAllClassrooms,
-          ),
-          const SizedBox(height: 20),
-          const _HomeTeacherMessages(),
+            if (widget.activeRole == ProfileRole.student) ...[
+              const SizedBox(height: 11),
+              _StudentClassGridSection(
+                classrooms: _classrooms,
+                isLoading: _isLoadingClassrooms,
+                error: _classroomError,
+                onOpenClassroom: _openClassDetail,
+                onViewAll: widget.onOpenClassroomTab,
+              ),
+            ],
+            const SizedBox(height: 20),
+            const _HomeTeacherMessages(),
+          ],
         ],
       ),
     );
@@ -1690,7 +1748,9 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
           isLoading: _isLoadingClassrooms,
           error: _classroomError,
           onRetry: _loadClassrooms,
-          onJoinClassroom: _openJoinClassroom,
+          onJoinClassroom: widget.activeRole == ProfileRole.student
+              ? widget.onOpenClassroomTab
+              : _handleParentClassroomEntry,
         ),
       _StudentHomePanel.achievement => _AchievementPanel(
           key: const ValueKey(_StudentHomePanel.achievement),
@@ -1699,41 +1759,8 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     };
   }
 
-  Future<void> _openJoinClassroom() async {
-    if (!await _allowClassroomActionForActiveRole()) {
-      return;
-    }
-    if (!mounted) {
-      return;
-    }
-
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
-    if (profileId == null || profileId <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.readText(AppKeys.studentMissingProfileId)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
-    HapticFeedback.lightImpact();
-    final joined = await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (_) => StudentJoinClassScreen(
-          profileId: profileId,
-          userId: widget.user?.id,
-          classroomService: _classroomService,
-        ),
-      ),
-    );
-    if (joined == true) {
-      _loadedProfileId = null;
-      await _loadClassrooms();
-    }
+  Future<void> _handleParentClassroomEntry() async {
+    await _allowClassroomActionForActiveRole();
   }
 
   Future<void> _openAllInvitations() async {
@@ -1772,41 +1799,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       _loadedProfileId = null;
       await _loadClassrooms();
     }
-  }
-
-  Future<void> _openAllClassrooms() async {
-    if (!await _allowClassroomActionForActiveRole()) {
-      return;
-    }
-    if (!mounted) {
-      return;
-    }
-
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
-    if (profileId == null || profileId <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.readText(AppKeys.studentMissingProfileId)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => _StudentClassroomListScreen(
-          profileId: profileId,
-          classroomService: _classroomService,
-          initialClassrooms: _classrooms,
-        ),
-      ),
-    );
-    _loadedProfileId = null;
-    await _loadClassrooms();
   }
 
   Future<bool> _allowClassroomActionForActiveRole() async {
@@ -2021,6 +2013,7 @@ class _StudentInvitationsSection extends StatelessWidget {
     required this.isLoading,
     required this.error,
     required this.processingClassroomIds,
+    required this.showJoinClassroom,
     required this.onJoinClassroom,
     required this.onViewAll,
     required this.onAccept,
@@ -2032,6 +2025,7 @@ class _StudentInvitationsSection extends StatelessWidget {
   final bool isLoading;
   final String? error;
   final Set<int> processingClassroomIds;
+  final bool showJoinClassroom;
   final VoidCallback onJoinClassroom;
   final VoidCallback onViewAll;
   final ValueChanged<ClassroomInvitation> onAccept;
@@ -2043,6 +2037,9 @@ class _StudentInvitationsSection extends StatelessWidget {
     final invitation = invitations.isNotEmpty ? invitations.first : null;
     final showInvitationPreview =
         isLoading || error != null || invitation != null;
+    if (!showInvitationPreview && !showJoinClassroom) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       padding: const EdgeInsets.all(15),
@@ -2094,8 +2091,47 @@ class _StudentInvitationsSection extends StatelessWidget {
               ),
             const SizedBox(height: 6),
           ],
-          _StudentJoinClassCta(onTap: onJoinClassroom),
+          if (showJoinClassroom) _StudentJoinClassCta(onTap: onJoinClassroom),
         ],
+      ),
+    );
+  }
+}
+
+class _StudentHomeSectionsLoading extends StatelessWidget {
+  const _StudentHomeSectionsLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 300),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(3, 3),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(color: _teal),
+            const SizedBox(height: 14),
+            Text(
+              context.getText(AppKeys.loading),
+              style: const TextStyle(
+                color: Color(0xFF30333A),
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -3286,6 +3322,451 @@ class _HomeTeacherMessageCard extends StatelessWidget {
   }
 }
 
+class _StudentClassroomTab extends StatefulWidget {
+  const _StudentClassroomTab({
+    required this.bottomPadding,
+    required this.scale,
+    required this.user,
+    required this.activeProfile,
+  });
+
+  final double bottomPadding;
+  final double scale;
+  final LoginUser? user;
+  final StudentProfile? activeProfile;
+
+  @override
+  State<_StudentClassroomTab> createState() => _StudentClassroomTabState();
+}
+
+class _StudentClassroomTabState extends State<_StudentClassroomTab> {
+  final ClassroomService _classroomService = ClassroomApi();
+  List<ClassroomModel> _classrooms = const <ClassroomModel>[];
+  bool _isLoading = false;
+  bool _isSearchContentLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadClassrooms();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StudentClassroomTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldProfileId = ActiveProfileSession.profileStableId(
+      oldWidget.activeProfile,
+    );
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (oldProfileId != profileId) {
+      _classrooms = const <ClassroomModel>[];
+      _isSearchContentLoading = true;
+      _error = null;
+      _loadClassrooms();
+    }
+  }
+
+  Future<void> _loadClassrooms() async {
+    if (_isLoading) {
+      return;
+    }
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (profileId == null || profileId <= 0) {
+      setState(() {
+        _error = context.readText(AppKeys.studentMissingProfileId);
+        _classrooms = const <ClassroomModel>[];
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final classrooms = await _classroomService.listMyJoinedClassrooms(
+        profileId: profileId,
+      );
+      if (!mounted ||
+          ActiveProfileSession.profileStableId(widget.activeProfile) !=
+              profileId) {
+        return;
+      }
+      setState(() => _classrooms = classrooms);
+    } catch (_) {
+      if (!mounted ||
+          ActiveProfileSession.profileStableId(widget.activeProfile) !=
+              profileId) {
+        return;
+      }
+      setState(() {
+        _error = context.readText(AppKeys.studentClassroomLoadFailed);
+        _classrooms = const <ClassroomModel>[];
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      } else {
+        _isLoading = false;
+      }
+    }
+  }
+
+  Future<void> _openClassDetail(ClassroomModel classroom) async {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    final classroomId = classroom.stableId;
+    if (profileId == null || profileId <= 0 || classroomId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.readText(AppKeys.teacherClassOpenFailed)),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => StudentClassDetailScreen(
+          classroomId: classroomId,
+          profileId: profileId,
+          initialClassroom: classroom,
+          classroomService: _classroomService,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    final canLoadContent = profileId != null && profileId > 0;
+    final isInitialLoading =
+        canLoadContent && (_isLoading || _isSearchContentLoading);
+    final scale = widget.scale;
+    final topInset = MediaQuery.paddingOf(context).top;
+
+    return ColoredBox(
+      color: Colors.white,
+      child: Column(
+        children: [
+          _StudentClassroomHeader(scale: scale, topInset: topInset),
+          Expanded(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: Visibility(
+                    visible: !isInitialLoading,
+                    maintainState: true,
+                    child: RefreshIndicator(
+                      onRefresh: _loadClassrooms,
+                      color: _teal,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        padding: EdgeInsets.fromLTRB(
+                          20 * scale,
+                          20 * scale,
+                          20 * scale,
+                          widget.bottomPadding,
+                        ),
+                        children: [
+                          if (_error != null && _classrooms.isEmpty)
+                            _StudentInlineErrorPanel(
+                              message: _error!,
+                              onRetry: _loadClassrooms,
+                            )
+                          else if (_classrooms.isEmpty)
+                            const _StudentFigmaStateCard(
+                              titleKey: AppKeys.studentNoClassroomsTitle,
+                              messageKey: AppKeys.studentNoClassroomsMessage,
+                            )
+                          else
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final cardWidth =
+                                    (constraints.maxWidth - 10 * scale) / 2;
+                                return Wrap(
+                                  spacing: 10 * scale,
+                                  runSpacing: 12 * scale,
+                                  children: [
+                                    for (final classroom in _classrooms)
+                                      SizedBox(
+                                        width: cardWidth,
+                                        child: _StudentClassroomTabCard(
+                                          classroom: classroom,
+                                          onTap: () =>
+                                              _openClassDetail(classroom),
+                                        ),
+                                      ),
+                                  ],
+                                );
+                              },
+                            ),
+                          SizedBox(height: 30 * scale),
+                          const _StudentJoinAnotherClassroomTitle(),
+                          SizedBox(height: 14 * scale),
+                          if (canLoadContent)
+                            StudentClassSearchContent(
+                              profileId: profileId,
+                              userId: widget.user?.id,
+                              classroomService: _classroomService,
+                              onJoinRequested: _loadClassrooms,
+                              onInitialLoadingChanged: (isLoading) {
+                                if (mounted &&
+                                    _isSearchContentLoading != isLoading) {
+                                  setState(
+                                    () => _isSearchContentLoading = isLoading,
+                                  );
+                                }
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                if (isInitialLoading)
+                  const Positioned.fill(
+                    child: _StudentClassroomLoadingRegion(),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudentClassroomHeader extends StatelessWidget {
+  const _StudentClassroomHeader({
+    required this.scale,
+    required this.topInset,
+  });
+
+  final double scale;
+  final double topInset;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: topInset + 60 * scale,
+      padding: EdgeInsets.only(top: topInset),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: const Color(0xFFF2F2F2),
+            width: 4 * scale,
+          ),
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        context.getText(AppKeys.studentClassroom),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: GoogleFonts.andika(
+          color: const Color(0xFF339395),
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0,
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentClassroomLoadingRegion extends StatelessWidget {
+  const _StudentClassroomLoadingRegion();
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: Colors.white,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(color: _teal),
+            const SizedBox(height: 14),
+            Text(
+              context.getText(AppKeys.loading),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF30333A),
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentClassroomTabCard extends StatelessWidget {
+  const _StudentClassroomTabCard({
+    required this.classroom,
+    required this.onTap,
+  });
+
+  final ClassroomModel classroom;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = classroom.name?.trim().isNotEmpty == true
+        ? classroom.name!.trim()
+        : context.getText(AppKeys.teacherClassFallback);
+    final teacher = classroom.teacherName?.trim().isNotEmpty == true
+        ? classroom.teacherName!.trim()
+        : context.getText(AppKeys.teacherFallback);
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Ink(
+          padding: const EdgeInsets.fromLTRB(16, 22, 12, 18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: const Color(0xFFD4D8E3)),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF002B6A).withValues(alpha: 0.10),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color(0xFF002B6A),
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _StudentClassroomMetaRow(
+                icon: Icons.person_rounded,
+                label: teacher,
+              ),
+              const SizedBox(height: 7),
+              _StudentClassroomMetaRow(
+                icon: Icons.groups_rounded,
+                label: context.formatText(
+                  AppKeys.teacherStudentCount,
+                  {'count': classroom.displayStudentCount},
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentClassroomMetaRow extends StatelessWidget {
+  const _StudentClassroomMetaRow({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: const Color(0xFF747781)),
+        const SizedBox(width: 7),
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF747781),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              height: 1.1,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StudentJoinAnotherClassroomTitle extends StatelessWidget {
+  const _StudentJoinAnotherClassroomTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              color: Color(0xFFF1EBFA),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.person_add_alt_1_rounded,
+              color: Color(0xFF6647E8),
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              context.getText(AppKeys.studentJoinAnotherClassroom),
+              style: const TextStyle(
+                color: Color(0xFF002B6A),
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
+                height: 1.1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _StudentInvitationListScreen extends StatefulWidget {
   const _StudentInvitationListScreen({
     required this.profileId,
@@ -3486,156 +3967,6 @@ class _StudentInvitationListScreenState
                   ],
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StudentClassroomListScreen extends StatefulWidget {
-  const _StudentClassroomListScreen({
-    required this.profileId,
-    required this.classroomService,
-    required this.initialClassrooms,
-  });
-
-  final int profileId;
-  final ClassroomService classroomService;
-  final List<ClassroomModel> initialClassrooms;
-
-  @override
-  State<_StudentClassroomListScreen> createState() =>
-      _StudentClassroomListScreenState();
-}
-
-class _StudentClassroomListScreenState
-    extends State<_StudentClassroomListScreen> {
-  List<ClassroomModel> _classrooms = const <ClassroomModel>[];
-  bool _isLoading = false;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _classrooms = widget.initialClassrooms;
-    _loadClassrooms();
-  }
-
-  Future<void> _loadClassrooms() async {
-    if (_isLoading) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final classrooms = await widget.classroomService
-          .listMyJoinedClassrooms(profileId: widget.profileId);
-      if (!mounted) {
-        return;
-      }
-      setState(() => _classrooms = classrooms);
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _error = context.readText(AppKeys.studentClassroomLoadFailed);
-        _classrooms = const <ClassroomModel>[];
-      });
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      } else {
-        _isLoading = false;
-      }
-    }
-  }
-
-  Future<void> _openClassDetail(ClassroomModel classroom) async {
-    final classroomId = classroom.stableId;
-    if (classroomId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.readText(AppKeys.teacherClassOpenFailed)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => StudentClassDetailScreen(
-          classroomId: classroomId,
-          profileId: widget.profileId,
-          initialClassroom: classroom,
-          classroomService: widget.classroomService,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6FAFB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        title: Text(context.getText(AppKeys.teacherYourClasses)),
-      ),
-      body: SafeArea(
-        top: false,
-        child: RefreshIndicator(
-          onRefresh: _loadClassrooms,
-          color: _teal,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-            children: [
-              if (_isLoading && _classrooms.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.only(top: 120),
-                  child: Center(child: CircularProgressIndicator(color: _teal)),
-                )
-              else if (_error != null && _classrooms.isEmpty)
-                _StudentInlineErrorPanel(
-                  message: _error!,
-                  onRetry: _loadClassrooms,
-                )
-              else if (_classrooms.isEmpty)
-                const _StudentFigmaStateCard(
-                  titleKey: AppKeys.studentNoClassroomsTitle,
-                  messageKey: AppKeys.studentNoClassroomsMessage,
-                )
-              else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    mainAxisExtent: 78,
-                  ),
-                  itemCount: _classrooms.length,
-                  itemBuilder: (context, index) {
-                    return _StudentFigmaClassCard(
-                      classroom: _classrooms[index],
-                      onTap: () => _openClassDetail(_classrooms[index]),
-                    );
-                  },
-                ),
-            ],
           ),
         ),
       ),
@@ -4337,48 +4668,81 @@ class _BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = activeRole == ProfileRole.teacher
-        ? [
-            _NavItemData(
-              Icons.home_filled,
-              context.getText(AppKeys.navHome),
-              null,
-            ),
-            _NavItemData(
-              Icons.bar_chart_rounded,
-              context.getText(AppKeys.navClassroom),
-              null,
-            ),
-            _NavItemData(
-              Icons.menu_book_rounded,
-              context.getText(AppKeys.navStudy),
-              null,
-            ),
-            _NavItemData(
-              Icons.chat_bubble_outline_rounded,
-              context.getText(AppKeys.navMembers),
-              null,
-            ),
-            _NavItemData(null, context.getText(AppKeys.navSettings), user),
-          ]
-        : [
-            _NavItemData(
-              Icons.home_filled,
-              context.getText(AppKeys.navHome),
-              null,
-            ),
-            _NavItemData(
-              Icons.explore_outlined,
-              context.getText(AppKeys.navReview),
-              null,
-            ),
-            _NavItemData(
-              Icons.history,
-              context.getText(AppKeys.navHistory),
-              null,
-            ),
-            _NavItemData(null, context.getText(AppKeys.navSettings), user),
-          ];
+    final items = switch (activeRole) {
+      ProfileRole.teacher => [
+          _NavItemData(
+            Icons.home_filled,
+            context.getText(AppKeys.navHome),
+            null,
+          ),
+          _NavItemData(
+            Icons.bar_chart_rounded,
+            context.getText(AppKeys.navClassroom),
+            null,
+          ),
+          _NavItemData(
+            Icons.menu_book_rounded,
+            context.getText(AppKeys.navStudy),
+            null,
+          ),
+          _NavItemData(
+            Icons.chat_bubble_outline_rounded,
+            context.getText(AppKeys.navMembers),
+            null,
+          ),
+          _NavItemData(null, context.getText(AppKeys.navSettings), user),
+        ],
+      ProfileRole.student => [
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navHome),
+            null,
+            assetPath: _studentHomeNavHome,
+          ),
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navClassroom),
+            null,
+            assetPath: _studentHomeNavClass,
+          ),
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navReview),
+            null,
+            assetPath: _studentHomeNavReport,
+          ),
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navHistory),
+            null,
+            assetPath: _studentHomeNavMessage,
+          ),
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navSettings),
+            null,
+            assetPath: _studentHomeNavSettings,
+          ),
+        ],
+      ProfileRole.parent => [
+          _NavItemData(
+            Icons.home_filled,
+            context.getText(AppKeys.navHome),
+            null,
+          ),
+          _NavItemData(
+            Icons.explore_outlined,
+            context.getText(AppKeys.navReview),
+            null,
+          ),
+          _NavItemData(
+            Icons.history,
+            context.getText(AppKeys.navHistory),
+            null,
+          ),
+          _NavItemData(null, context.getText(AppKeys.navSettings), user),
+        ],
+    };
 
     final radius = BorderRadius.vertical(
       top: Radius.circular(48 * scale),
@@ -4502,11 +4866,21 @@ class _AnimatedNavItem extends StatelessWidget {
                               size: (active ? 18 : 18) * scale,
                               color: color,
                             )
-                          : Icon(
-                              data.icon,
-                              color: color,
-                              size: (active ? 18 : 18) * scale,
-                            ),
+                          : data.assetPath != null
+                              ? SvgPicture.asset(
+                                  data.assetPath!,
+                                  width: 18 * scale,
+                                  height: 18 * scale,
+                                  colorFilter: ColorFilter.mode(
+                                    color,
+                                    BlendMode.srcIn,
+                                  ),
+                                )
+                              : Icon(
+                                  data.icon,
+                                  color: color,
+                                  size: (active ? 18 : 18) * scale,
+                                ),
                     ),
                     SizedBox(height: 4 * scale),
                     FittedBox(
@@ -4559,11 +4933,17 @@ class _UserAvatarWidget extends StatelessWidget {
 }
 
 class _NavItemData {
-  const _NavItemData(this.icon, this.label, this.user);
+  const _NavItemData(
+    this.icon,
+    this.label,
+    this.user, {
+    this.assetPath,
+  });
 
   final IconData? icon;
   final String label;
   final LoginUser? user;
+  final String? assetPath;
 }
 
 class _HeroMathGlyph extends StatelessWidget {
