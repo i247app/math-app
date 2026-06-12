@@ -1729,8 +1729,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             _HomePopIn(
               animation: widget.parentHomeEntrance,
               interval: const Interval(0, 0.62),
-              beginOffset: const Offset(-18, 14),
-              beginRotation: -0.024,
+              beginOffset: const Offset(0, 22),
               beginScale: 0.92,
               child: _StudentFigmaHeroCard(
                 onAssessmentTap: () =>
@@ -1746,8 +1745,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             _HomePopIn(
               animation: widget.parentHomeEntrance,
               interval: const Interval(0.3, 1),
-              beginOffset: const Offset(18, 16),
-              beginRotation: 0.024,
+              beginOffset: const Offset(0, 26),
               beginScale: 0.9,
               child: const _ParentWelcomeMapCard(),
             )
@@ -2899,7 +2897,6 @@ class _HomePopIn extends StatelessWidget {
     required this.animation,
     required this.interval,
     required this.beginOffset,
-    required this.beginRotation,
     this.beginScale = 0.92,
   });
 
@@ -2907,7 +2904,6 @@ class _HomePopIn extends StatelessWidget {
   final Animation<double> animation;
   final Interval interval;
   final Offset beginOffset;
-  final double beginRotation;
   final double beginScale;
 
   @override
@@ -2925,12 +2921,9 @@ class _HomePopIn extends StatelessWidget {
           opacity: fadeValue,
           child: Transform.translate(
             offset: Offset.lerp(beginOffset, Offset.zero, moveValue)!,
-            child: Transform.rotate(
-              angle: beginRotation * (1 - moveValue),
-              child: Transform.scale(
-                scale: beginScale + ((1 - beginScale) * scaleValue),
-                child: child,
-              ),
+            child: Transform.scale(
+              scale: beginScale + ((1 - beginScale) * scaleValue),
+              child: child,
             ),
           ),
         );
