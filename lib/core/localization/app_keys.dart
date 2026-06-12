@@ -225,6 +225,19 @@ class AppKeys {
   static const lessons = 'lessons';
   static const chapterNumber = 'chapter_number';
   static const lockedLessonMessage = 'locked_lesson_message';
+  static const learningPathChapterLesson = 'learning_path_chapter_lesson';
+  static const improveMathTypePrompt = 'improve_math_type_prompt';
+  static const reviewLessonAction = 'review_lesson_action';
+  static const practiceLesson18Title = 'practice_lesson_18_title';
+  static const practiceLesson19Title = 'practice_lesson_19_title';
+  static const practiceLesson20Title = 'practice_lesson_20_title';
+  static const practiceLesson21Title = 'practice_lesson_21_title';
+  static const practiceLesson22Title = 'practice_lesson_22_title';
+  static const practiceLesson23Title = 'practice_lesson_23_title';
+  static const practiceLesson24Title = 'practice_lesson_24_title';
+  static const practiceLesson25Title = 'practice_lesson_25_title';
+  static const practiceLesson26Title = 'practice_lesson_26_title';
+  static const practiceLesson27Title = 'practice_lesson_27_title';
 
   static const historyTitle = 'history_title';
   static const searchHint = 'search_hint';

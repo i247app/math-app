@@ -307,6 +307,13 @@ class _HomeScreenState extends State<HomeScreen>
                           _activeTab = 1;
                         });
                       },
+                      onOpenReviewTab: () {
+                        HapticFeedback.lightImpact();
+                        setState(() {
+                          _previousActiveTab = _activeTab;
+                          _activeTab = 1;
+                        });
+                      },
                       parentHomeEntrance: _parentHomeEntranceController,
                       bottomPadding: navHeight + s(14),
                       headerHeight: showHeader ? headerHeight : 0,
@@ -544,6 +551,7 @@ class _TabContent extends StatelessWidget {
     required this.openAddProfileRequestId,
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
+    required this.onOpenReviewTab,
     required this.parentHomeEntrance,
     required this.bottomPadding,
     required this.headerHeight,
@@ -566,6 +574,7 @@ class _TabContent extends StatelessWidget {
   final int openAddProfileRequestId;
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
+  final VoidCallback onOpenReviewTab;
   final Animation<double> parentHomeEntrance;
   final double bottomPadding;
   final double headerHeight;
@@ -652,6 +661,7 @@ class _TabContent extends StatelessWidget {
         initialGrades: initialGrades,
         gradeService: gradeService,
         onOpenClassroomTab: onOpenClassroomTab,
+        onOpenReviewTab: onOpenReviewTab,
         onRefreshProfiles: onRefreshProfiles,
         onActivateProfile: onActivateProfile,
         onProfileSaved: onProfileSaved,
@@ -692,6 +702,7 @@ class _TabContent extends StatelessWidget {
       return ReviewTab(
         user: user,
         activeProfile: activeProfile,
+        isParentMode: activeRole == ProfileRole.parent,
         profileLoadError: profileLoadError,
         onRefreshProfiles: onRefreshProfiles,
         onAddProfile: onAddProfileFromReview,
@@ -1461,6 +1472,7 @@ class _StudentHomeContent extends StatefulWidget {
     required this.initialGrades,
     required this.gradeService,
     required this.onOpenClassroomTab,
+    required this.onOpenReviewTab,
     required this.onRefreshProfiles,
     required this.onActivateProfile,
     required this.onProfileSaved,
@@ -1476,6 +1488,7 @@ class _StudentHomeContent extends StatefulWidget {
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final VoidCallback onOpenClassroomTab;
+  final VoidCallback onOpenReviewTab;
   final Future<void> Function() onRefreshProfiles;
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
@@ -1747,7 +1760,9 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
               interval: const Interval(0.3, 1),
               beginOffset: const Offset(0, 26),
               beginScale: 0.9,
-              child: const _ParentWelcomeMapCard(),
+              child: _ParentWelcomeMapCard(
+                onTap: widget.onOpenReviewTab,
+              ),
             )
           else if (isLoadingHomeSections)
             const _StudentHomeSectionsLoading()
@@ -2864,16 +2879,17 @@ class _StudentFigmaHeroCard extends StatelessWidget {
 }
 
 class _ParentWelcomeMapCard extends StatelessWidget {
-  const _ParentWelcomeMapCard();
+  const _ParentWelcomeMapCard({required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 250,
-      clipBehavior: Clip.antiAlias,
+    final borderRadius = BorderRadius.circular(30);
+
+    return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: borderRadius,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.12),
@@ -2882,10 +2898,22 @@ class _ParentWelcomeMapCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Image.asset(
-        _parentHomeWelcomeMap,
-        fit: BoxFit.cover,
-        alignment: Alignment.bottomCenter,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: borderRadius,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            width: double.infinity,
+            height: 250,
+            child: Ink.image(
+              image: const AssetImage(_parentHomeWelcomeMap),
+              fit: BoxFit.cover,
+              alignment: Alignment.bottomCenter,
+            ),
+          ),
+        ),
       ),
     );
   }

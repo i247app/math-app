@@ -2,16 +2,22 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
 import '../../data/practice_catalog.dart';
 
-const _pathBackground = Color(0xFFF0E4FF);
-const _pathPurple = Color(0xFFA64DF3);
-const _pathInk = Color(0xFF14213D);
+const _pathBackground = Color(0xFFFBFDFE);
+const _pathBlue = Color(0xFF1CB0F6);
+const _pathBlueShadow = Color(0xFF168AC0);
+const _headerTeal = Color(0xFF38898B);
+const _headerTealShadow = Color(0xFF286E70);
+const _completedGold = Color(0xFFF5B400);
+const _completedGoldShadow = Color(0xFFC78300);
+const _reviewGreen = Color(0xFF58CC02);
+const _reviewGreenShadow = Color(0xFF46A302);
 const _pathMuted = Color(0xFF8A94A5);
-const _coinYellow = Color(0xFFFFC928);
 const _headerNavy = Color(0xFF063A7B);
 const _headerLine = Color(0xFFDE8C4B);
 
@@ -19,9 +25,13 @@ class PracticeChapterScreen extends StatefulWidget {
   const PracticeChapterScreen({
     super.key,
     required this.chapter,
+    this.embedded = false,
+    this.bottomPadding = 0,
   });
 
   final PracticeChapter chapter;
+  final bool embedded;
+  final double bottomPadding;
 
   static const _designWidth = 390.0;
 
@@ -84,39 +94,173 @@ class _PracticeChapterScreenState extends State<PracticeChapterScreen>
     });
   }
 
+  Future<void> _showCompletedLessonReview(PracticeLesson lesson) async {
+    HapticFeedback.lightImpact();
+    await showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.32),
+      builder: (context) => _CompletedLessonDialog(lesson: lesson),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final content = LayoutBuilder(
+      builder: (context, constraints) {
+        final width = math.min(constraints.maxWidth, 430.0);
+        final scale = width / PracticeChapterScreen._designWidth;
+
+        return Center(
+          child: SizedBox(
+            width: width,
+            child: Column(
+              children: [
+                if (widget.embedded)
+                  _LearningPathHeader(
+                    chapter: widget.chapter,
+                    lesson: widget.chapter.lessons[_currentIndex],
+                    scale: scale,
+                  )
+                else
+                  _ChapterHeader(chapter: widget.chapter, scale: scale),
+                Expanded(
+                  child: _LessonPath(
+                    chapter: widget.chapter,
+                    lessonKeys: _lessonKeys,
+                    scrollController: _scrollController,
+                    mascotAnimation: _mascotController,
+                    currentIndex: _currentIndex,
+                    onLayoutReady: _scheduleScrollToCurrent,
+                    onCompletedLessonTap: _showCompletedLessonReview,
+                    bottomPadding: widget.bottomPadding,
+                    scale: scale,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (widget.embedded) {
+      return ColoredBox(
+        color: _pathBackground,
+        child: SafeArea(
+          bottom: false,
+          child: content,
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: _pathBackground,
       body: SafeArea(
         bottom: false,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = math.min(constraints.maxWidth, 430.0);
-            final scale = width / PracticeChapterScreen._designWidth;
+        child: content,
+      ),
+    );
+  }
+}
 
-            return Center(
-              child: SizedBox(
-                width: width,
+class _LearningPathHeader extends StatelessWidget {
+  const _LearningPathHeader({
+    required this.chapter,
+    required this.lesson,
+    required this.scale,
+  });
+
+  final PracticeChapter chapter;
+  final PracticeLesson lesson;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        18 * scale,
+        12 * scale,
+        18 * scale,
+        10 * scale,
+      ),
+      child: Container(
+        constraints: BoxConstraints(minHeight: 104 * scale),
+        decoration: BoxDecoration(
+          color: _headerTeal,
+          borderRadius: BorderRadius.circular(20 * scale),
+          boxShadow: [
+            BoxShadow(
+              color: _headerTealShadow,
+              offset: Offset(0, 6 * scale),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  22 * scale,
+                  16 * scale,
+                  14 * scale,
+                  16 * scale,
+                ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _ChapterHeader(chapter: widget.chapter, scale: scale),
-                    Expanded(
-                      child: _LessonPath(
-                        chapter: widget.chapter,
-                        lessonKeys: _lessonKeys,
-                        scrollController: _scrollController,
-                        mascotAnimation: _mascotController,
-                        currentIndex: _currentIndex,
-                        onLayoutReady: _scheduleScrollToCurrent,
-                        scale: scale,
+                    Text(
+                      context.formatText(
+                        AppKeys.learningPathChapterLesson,
+                        {
+                          'chapter': chapter.number,
+                          'lesson': lesson.number,
+                        },
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.andika(
+                        color: Colors.white.withValues(alpha: 0.78),
+                        fontSize: 14 * scale,
+                        fontWeight: FontWeight.w700,
+                        height: 1.1,
+                      ),
+                    ),
+                    SizedBox(height: 6 * scale),
+                    Text(
+                      lesson.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.andika(
+                        color: Colors.white,
+                        fontSize: 20 * scale,
+                        fontWeight: FontWeight.w700,
+                        height: 1.12,
                       ),
                     ),
                   ],
                 ),
               ),
-            );
-          },
+            ),
+            Container(
+              width: 72 * scale,
+              constraints: BoxConstraints(minHeight: 104 * scale),
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: _headerTealShadow.withValues(alpha: 0.7),
+                    width: 2 * scale,
+                  ),
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.format_list_numbered_rounded,
+                color: Colors.white,
+                size: 32 * scale,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -235,6 +379,8 @@ class _LessonPath extends StatelessWidget {
     required this.mascotAnimation,
     required this.currentIndex,
     required this.onLayoutReady,
+    required this.onCompletedLessonTap,
+    required this.bottomPadding,
     required this.scale,
   });
 
@@ -244,18 +390,20 @@ class _LessonPath extends StatelessWidget {
   final Animation<double> mascotAnimation;
   final int currentIndex;
   final VoidCallback onLayoutReady;
+  final ValueChanged<PracticeLesson> onCompletedLessonTap;
+  final double bottomPadding;
   final double scale;
 
   @override
   Widget build(BuildContext context) {
     final contentHeight =
-        math.max(720.0 * scale, (chapter.lessons.length * 150 + 220) * scale);
+        math.max(720.0 * scale, (chapter.lessons.length * 138 + 190) * scale);
 
     return SingleChildScrollView(
       controller: scrollController,
       physics: const BouncingScrollPhysics(),
       reverse: true,
-      padding: EdgeInsets.only(bottom: 34 * scale),
+      padding: EdgeInsets.only(bottom: bottomPadding + 34 * scale),
       child: SizedBox(
         height: contentHeight,
         child: LayoutBuilder(
@@ -263,41 +411,21 @@ class _LessonPath extends StatelessWidget {
             final width = constraints.maxWidth;
             final points =
                 _nodePoints(width, contentHeight, chapter.lessons.length);
-            final mascotPoint =
-                points[currentIndex.clamp(0, points.length - 1)];
+            final mascotIndex = math.min(
+              currentIndex + 2,
+              chapter.lessons.length - 1,
+            );
+            final mascotPoint = points[mascotIndex];
             final mascotOnLeft = mascotPoint.dx > width * 0.55;
             final mascotLeft = mascotOnLeft
-                ? mascotPoint.dx - 132 * scale
-                : mascotPoint.dx + 28 * scale;
-            final mascotTop = mascotPoint.dy - 78 * scale;
+                ? mascotPoint.dx - 142 * scale
+                : mascotPoint.dx + 38 * scale;
+            final mascotTop = mascotPoint.dy - 48 * scale;
             onLayoutReady();
 
             return Stack(
               clipBehavior: Clip.none,
               children: [
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _DottedPathPainter(points: points, scale: scale),
-                  ),
-                ),
-                Positioned(
-                  right: 35 * scale,
-                  top: 104 * scale,
-                  child: _FloatingGlyph(
-                    icon: Icons.star_rounded,
-                    color: const Color(0xFFFFD000),
-                    scale: scale,
-                  ),
-                ),
-                Positioned(
-                  left: 48 * scale,
-                  top: 250 * scale,
-                  child: _FloatingGlyph(
-                    icon: Icons.music_note_rounded,
-                    color: const Color(0xFF52646D),
-                    scale: scale,
-                  ),
-                ),
                 Positioned(
                   left: mascotLeft.clamp(8 * scale, width - 100 * scale),
                   top: mascotTop.clamp(24 * scale, contentHeight - 130 * scale),
@@ -308,13 +436,14 @@ class _LessonPath extends StatelessWidget {
                 ),
                 for (var index = 0; index < chapter.lessons.length; index++)
                   Positioned(
-                    left: points[index].dx - 66 * scale,
-                    top: points[index].dy - 48 * scale,
+                    left: points[index].dx - 110 * scale,
+                    top: points[index].dy - 103 * scale,
                     child: _LessonNode(
                       key: lessonKeys[index],
                       lesson: chapter.lessons[index],
                       index: index,
                       chapter: chapter,
+                      onCompletedTap: onCompletedLessonTap,
                       scale: scale,
                     ),
                   ),
@@ -387,12 +516,14 @@ class _LessonNode extends StatelessWidget {
     required this.lesson,
     required this.index,
     required this.chapter,
+    required this.onCompletedTap,
     required this.scale,
   });
 
   final PracticeLesson lesson;
   final int index;
   final PracticeChapter chapter;
+  final ValueChanged<PracticeLesson> onCompletedTap;
   final double scale;
 
   bool get _completed => index < chapter.completedLessons;
@@ -419,195 +550,286 @@ class _LessonNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nodeColor = _completed
-        ? const Color(0xFF88C87A)
-        : _current
-            ? _pathPurple
-            : const Color(0xFFE5E9EE);
-    final foreground = _locked ? _pathMuted : Colors.white;
-    final showGo = _current;
-    return GestureDetector(
-      onTap: () {
-        if (_locked) {
-          HapticFeedback.selectionClick();
-          return;
-        }
-
-        HapticFeedback.lightImpact();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.formatText(AppKeys.lockedLessonMessage, {
-                'number': lesson.number,
-                'title': lesson.title,
-              }),
+    return SizedBox(
+      width: 220 * scale,
+      height: 150 * scale,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        clipBehavior: Clip.none,
+        children: [
+          if (_current)
+            Positioned(
+              top: 0,
+              left: 5 * scale,
+              right: 5 * scale,
+              child: _CurrentLessonBubble(
+                title: lesson.title,
+                scale: scale,
+              ),
+            ),
+          Positioned(
+            top: 64 * scale,
+            child: GestureDetector(
+              onTap: () {
+                if (_completed) {
+                  onCompletedTap(lesson);
+                  return;
+                }
+                HapticFeedback.selectionClick();
+              },
+              child: _LevelButton(
+                completed: _completed,
+                current: _current,
+                locked: _locked,
+                scale: scale,
+              ),
             ),
           ),
-        );
-      },
-      child: SizedBox(
-        width: 132 * scale,
-        child: Column(
-          children: [
-            if (showGo)
-              Container(
-                margin: EdgeInsets.only(bottom: 6 * scale),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16 * scale,
-                  vertical: 5 * scale,
-                ),
-                decoration: BoxDecoration(
-                  color: _coinYellow,
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: Colors.white, width: 2 * scale),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 8 * scale,
-                      offset: Offset(0, 4 * scale),
-                    ),
-                  ],
-                ),
-                child: Text(
-                  'GO!',
-                  style: TextStyle(
-                    color: _pathInk,
-                    fontSize: 12 * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-            Container(
-              width: 72 * scale,
-              height: 72 * scale,
-              decoration: BoxDecoration(
-                color: nodeColor,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 5 * scale),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.18),
-                    blurRadius: 0,
-                    offset: Offset(0, 8 * scale),
-                  ),
-                  BoxShadow(
-                    color: nodeColor.withValues(alpha: 0.24),
-                    blurRadius: 26 * scale,
-                    offset: Offset(0, 14 * scale),
-                  ),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: _locked
-                  ? Icon(Icons.lock_rounded,
-                      color: foreground, size: 22 * scale)
-                  : Text(
-                      '${lesson.number}',
-                      maxLines: 1,
-                      style: TextStyle(
-                        color: foreground,
-                        fontSize: 22 * scale,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                        letterSpacing: 0,
-                      ),
-                    ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CurrentLessonBubble extends StatelessWidget {
+  const _CurrentLessonBubble({
+    required this.title,
+    required this.scale,
+  });
+
+  final String title;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: double.infinity,
+          constraints: BoxConstraints(minHeight: 48 * scale),
+          padding: EdgeInsets.symmetric(
+            horizontal: 14 * scale,
+            vertical: 8 * scale,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(13 * scale),
+            border: Border.all(
+              color: const Color(0xFFE2E6E9),
+              width: 2 * scale,
             ),
-            SizedBox(height: 8 * scale),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 8 * scale,
+                offset: Offset(0, 4 * scale),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.andika(
+              color: _pathBlue,
+              fontSize: 14 * scale,
+              fontWeight: FontWeight.w700,
+              height: 1.08,
+            ),
+          ),
+        ),
+        CustomPaint(
+          size: Size(16 * scale, 9 * scale),
+          painter: const _BubbleArrowPainter(),
+        ),
+      ],
+    );
+  }
+}
+
+class _BubbleArrowPainter extends CustomPainter {
+  const _BubbleArrowPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..close();
+    canvas.drawPath(path, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BubbleArrowPainter oldDelegate) => false;
+}
+
+class _LevelButton extends StatelessWidget {
+  const _LevelButton({
+    required this.completed,
+    required this.current,
+    required this.locked,
+    required this.scale,
+  });
+
+  final bool completed;
+  final bool current;
+  final bool locked;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = completed
+        ? _completedGold
+        : current
+            ? _pathBlue
+            : const Color(0xFFE5E8EB);
+    final shadow = completed
+        ? _completedGoldShadow
+        : current
+            ? _pathBlueShadow
+            : const Color(0xFFBEC3C7);
+
+    return Container(
+      width: 82 * scale,
+      height: 82 * scale,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: shadow,
+            offset: Offset(0, 8 * scale),
+          ),
+        ],
+      ),
+      alignment: Alignment.center,
+      child: completed
+          ? _BoldCheckIcon(size: 42 * scale)
+          : Icon(
+              current ? Icons.star_rounded : Icons.lock_rounded,
+              color: locked ? _pathMuted : Colors.white,
+              size: 34 * scale,
+              weight: 900,
+            ),
+    );
+  }
+}
+
+class _BoldCheckIcon extends StatelessWidget {
+  const _BoldCheckIcon({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size.square(size),
+      painter: _BoldCheckPainter(),
+    );
+  }
+}
+
+class _BoldCheckPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.width * 0.16
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final path = Path()
+      ..moveTo(size.width * 0.18, size.height * 0.52)
+      ..lineTo(size.width * 0.42, size.height * 0.76)
+      ..lineTo(size.width * 0.84, size.height * 0.28);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BoldCheckPainter oldDelegate) => false;
+}
+
+class _CompletedLessonDialog extends StatelessWidget {
+  const _CompletedLessonDialog({required this.lesson});
+
+  final PracticeLesson lesson;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = math.min(MediaQuery.sizeOf(context).width - 40, 390.0);
+    final scale = width / PracticeChapterScreen._designWidth;
+
+    return Dialog(
+      insetPadding: EdgeInsets.symmetric(horizontal: 20 * scale),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        padding: EdgeInsets.all(22 * scale),
+        decoration: BoxDecoration(
+          color: _reviewGreen,
+          borderRadius: BorderRadius.circular(24 * scale),
+          boxShadow: [
+            BoxShadow(
+              color: _reviewGreenShadow,
+              offset: Offset(0, 7 * scale),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             Text(
               lesson.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: _locked ? _pathMuted : const Color(0xFF6B1FC8),
-                fontSize: 14 * scale,
-                fontWeight: FontWeight.w900,
-                height: 1.08,
-                letterSpacing: 0,
+              style: GoogleFonts.andika(
+                color: Colors.white,
+                fontSize: 22 * scale,
+                fontWeight: FontWeight.w700,
+                height: 1.15,
+              ),
+            ),
+            SizedBox(height: 10 * scale),
+            Text(
+              context.getText(AppKeys.improveMathTypePrompt),
+              style: GoogleFonts.andika(
+                color: Colors.white.withValues(alpha: 0.88),
+                fontSize: 16 * scale,
+                fontWeight: FontWeight.w500,
+                height: 1.3,
+              ),
+            ),
+            SizedBox(height: 22 * scale),
+            Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14 * scale),
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  Navigator.of(context).pop();
+                },
+                borderRadius: BorderRadius.circular(14 * scale),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15 * scale),
+                  child: Text(
+                    context.getText(AppKeys.reviewLessonAction).toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.andika(
+                      color: _reviewGreen,
+                      fontSize: 16 * scale,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
-  }
-}
-
-class _FloatingGlyph extends StatelessWidget {
-  const _FloatingGlyph({
-    required this.icon,
-    required this.color,
-    required this.scale,
-  });
-
-  final IconData icon;
-  final Color color;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Icon(icon, color: color, size: 28 * scale);
-  }
-}
-
-class _DottedPathPainter extends CustomPainter {
-  const _DottedPathPainter({
-    required this.points,
-    required this.scale,
-  });
-
-  final List<Offset> points;
-  final double scale;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (points.length < 2) {
-      return;
-    }
-
-    final paint = Paint()
-      ..color = const Color(0xFFC993F4).withValues(alpha: 0.78)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 14 * scale
-      ..strokeCap = StrokeCap.round;
-
-    for (var index = 0; index < points.length - 1; index++) {
-      final start = points[index];
-      final end = points[index + 1];
-      final yDirection = end.dy >= start.dy ? 1.0 : -1.0;
-      final controlA = Offset(start.dx, start.dy + 48 * scale * yDirection);
-      final controlB = Offset(end.dx, end.dy - 48 * scale * yDirection);
-      final path = Path()
-        ..moveTo(start.dx, start.dy)
-        ..cubicTo(
-            controlA.dx, controlA.dy, controlB.dx, controlB.dy, end.dx, end.dy);
-      _drawDashedPath(canvas, path, paint, 22 * scale, 17 * scale);
-    }
-  }
-
-  void _drawDashedPath(
-    Canvas canvas,
-    Path path,
-    Paint paint,
-    double dashLength,
-    double gapLength,
-  ) {
-    for (final metric in path.computeMetrics()) {
-      var distance = 0.0;
-      while (distance < metric.length) {
-        final next = math.min(distance + dashLength, metric.length);
-        canvas.drawPath(metric.extractPath(distance, next), paint);
-        distance = next + gapLength;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DottedPathPainter oldDelegate) {
-    return oldDelegate.points != points || oldDelegate.scale != scale;
   }
 }
 

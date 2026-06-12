@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extension/localization_extension.dart';
 import '../../../../core/localization/app_keys.dart';
@@ -11,23 +12,54 @@ import '../../data/practice_catalog.dart';
 import '../../data/otp_auth_api.dart';
 import '../../data/quiz_api.dart';
 import '../screens/assessment_screen.dart';
+import '../screens/practice_chapter_screen.dart';
 
 const _reviewInk = Color(0xFF14213D);
 const _reviewMuted = Color(0xFF77859A);
 const _reviewBackground = Color(0xFFEEF9FB);
 const _headerNavy = Color(0xFF063A7B);
-const _headerLine = Color(0xFFDE8C4B);
 const _selectPink = Color(0xFFB72A7F);
 const _checkPink = Color(0xFFFF4081);
 const _uncheckedCircle = Color(0xFF8B5CF6);
 const _testYellow = Color(0xFFFFC400);
 const _testShadow = Color(0xFFD18400);
 
+PracticeChapter _parentPreviewChapter(BuildContext context) {
+  const titleKeys = <String>[
+    AppKeys.practiceLesson18Title,
+    AppKeys.practiceLesson19Title,
+    AppKeys.practiceLesson20Title,
+    AppKeys.practiceLesson21Title,
+    AppKeys.practiceLesson22Title,
+    AppKeys.practiceLesson23Title,
+    AppKeys.practiceLesson24Title,
+    AppKeys.practiceLesson25Title,
+    AppKeys.practiceLesson26Title,
+    AppKeys.practiceLesson27Title,
+  ];
+  final source = gradeOnePracticeChapters[1];
+
+  return PracticeChapter(
+    number: source.number,
+    title: source.title,
+    completedLessons: 2,
+    icon: source.icon,
+    lessons: List.generate(
+      titleKeys.length,
+      (index) => PracticeLesson(
+        number: source.lessons[index].number,
+        title: context.getText(titleKeys[index]),
+      ),
+    ),
+  );
+}
+
 class ReviewTab extends StatefulWidget {
   const ReviewTab({
     super.key,
     required this.user,
     required this.activeProfile,
+    required this.isParentMode,
     required this.profileLoadError,
     required this.onRefreshProfiles,
     required this.onAddProfile,
@@ -37,6 +69,7 @@ class ReviewTab extends StatefulWidget {
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
+  final bool isParentMode;
   final String? profileLoadError;
   final Future<void> Function() onRefreshProfiles;
   final VoidCallback onAddProfile;
@@ -61,7 +94,9 @@ class _ReviewTabState extends State<ReviewTab> {
   @override
   void initState() {
     super.initState();
-    _loadChaptersForActiveProfile();
+    if (!widget.isParentMode) {
+      _loadChaptersForActiveProfile();
+    }
   }
 
   @override
@@ -73,7 +108,10 @@ class _ReviewTabState extends State<ReviewTab> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
-    if (oldWidget.user?.id != widget.user?.id || oldProfileId != profileId) {
+    if (!widget.isParentMode &&
+        (oldWidget.isParentMode ||
+            oldWidget.user?.id != widget.user?.id ||
+            oldProfileId != profileId)) {
       _loadChaptersForActiveProfile();
     }
   }
@@ -163,6 +201,18 @@ class _ReviewTabState extends State<ReviewTab> {
   Widget build(BuildContext context) {
     final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
+
+    if (widget.isParentMode) {
+      return ColoredBox(
+        color: _reviewBackground,
+        child: PracticeChapterScreen(
+          chapter: _parentPreviewChapter(context),
+          embedded: true,
+          bottomPadding: widget.bottomPadding,
+        ),
+      );
+    }
+
     final totalLessons = _chapters.fold<int>(
       0,
       (sum, chapter) => sum + chapter.lessonCount,
@@ -417,72 +467,31 @@ class _ReviewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: topInset + 70 * scale,
-      child: CustomPaint(
-        painter: _ReviewHeaderCurvePainter(scale: scale),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            20 * scale,
-            topInset + 8 * scale,
-            20 * scale,
-            12 * scale,
-          ),
-          child: Row(
-            children: [
-              SizedBox(width: 44 * scale),
-              Expanded(
-                child: Text(
-                  context.getText(AppKeys.reviewTitle),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _headerNavy,
-                    fontSize: 18 * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-              SizedBox(width: 44 * scale),
-            ],
+    return Container(
+      height: topInset + 60 * scale,
+      padding: EdgeInsets.only(top: topInset),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: const Color(0xFFF2F2F2),
+            width: 4 * scale,
           ),
         ),
       ),
+      alignment: Alignment.center,
+      child: Text(
+        context.getText(AppKeys.reviewTitle),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: GoogleFonts.andika(
+          color: const Color(0xFF339395),
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0,
+        ),
+      ),
     );
-  }
-}
-
-class _ReviewHeaderCurvePainter extends CustomPainter {
-  const _ReviewHeaderCurvePainter({required this.scale});
-
-  final double scale;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final background = Paint()..color = _reviewBackground;
-    canvas.drawRect(Offset.zero & size, background);
-
-    final line = Paint()
-      ..color = _headerLine.withValues(alpha: 0.72)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.1 * scale;
-    final path = Path()
-      ..moveTo(0, size.height - 6 * scale)
-      ..quadraticBezierTo(
-        size.width * 0.5,
-        size.height + 6 * scale,
-        size.width,
-        size.height - 6 * scale,
-      );
-    canvas.drawPath(path, line);
-  }
-
-  @override
-  bool shouldRepaint(covariant _ReviewHeaderCurvePainter oldDelegate) {
-    return oldDelegate.scale != scale;
   }
 }
 
