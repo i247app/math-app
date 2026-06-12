@@ -77,17 +77,18 @@ class _PracticeChapterScreenState extends State<PracticeChapterScreen>
       return;
     }
     _didScrollToCurrent = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future<void>.delayed(const Duration(milliseconds: 180));
       if (!mounted) {
         return;
       }
       final context = _lessonKeys[_currentIndex].currentContext;
-      if (context == null) {
+      if (context == null || !context.mounted) {
         return;
       }
-      Scrollable.ensureVisible(
+      await Scrollable.ensureVisible(
         context,
-        duration: const Duration(milliseconds: 520),
+        duration: const Duration(milliseconds: 480),
         curve: Curves.easeOutCubic,
         alignment: 0.50,
       );
