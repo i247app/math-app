@@ -1,4 +1,4 @@
-import '../../features/onboarding/domain/phone_region.dart';
+import 'package:numi_flutter/features/auth/phone_region.dart';
 import '../localization/app_keys.dart';
 
 class PhoneValidationResult {

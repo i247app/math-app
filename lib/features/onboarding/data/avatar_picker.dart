@@ -1,12 +1,2 @@
-import 'package:flutter/services.dart';
-
-class AvatarPickerService {
-  const AvatarPickerService({MethodChannel? channel})
-      : _channel = channel ?? const MethodChannel('numi/avatar_picker');
-
-  final MethodChannel _channel;
-
-  Future<String?> pickAvatarPath() {
-    return _channel.invokeMethod<String>('pickAvatar');
-  }
-}
+// Compatibility export for older imports.
+export 'package:numi_flutter/features/profile/avatar_picker.dart';

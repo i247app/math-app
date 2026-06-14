@@ -1,0 +1,1333 @@
+import 'dart:math' as math;
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/network/grade_models.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/classroom/classroom_api.dart';
+import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
+import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
+import 'package:numi_flutter/features/homework/homework_api.dart';
+import 'package:numi_flutter/features/home/home_tab_cubit.dart';
+import 'package:numi_flutter/features/home/parent/parent_home_cubit.dart';
+import 'package:numi_flutter/features/home/student/student_home_cubit.dart';
+import 'package:numi_flutter/features/home/teacher/teacher_home_cubit.dart';
+import 'package:numi_flutter/features/profile/grade_api.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/quiz/quiz_api.dart';
+import 'package:numi_flutter/features/quiz/presentation/grade_selection_screen.dart';
+import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
+import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi_flutter/features/quiz/history_tab.dart';
+import 'package:numi_flutter/features/quiz/review_tab.dart';
+import 'package:numi_flutter/features/settings/setting_tab.dart';
+import 'package:numi_flutter/shared/widgets/common_widgets.dart';
+import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
+
+part 'parent/parent_dashboard.dart';
+part 'student/student_dashboard.dart';
+part 'teacher/teacher_dashboard.dart';
+
+const _teal = Color(0xFF006762);
+const _muted = Color(0xFF515F54);
+const _deepInk = Color(0xFF253228);
+const _mintBackground = Color(0xFFEEF9FB);
+const _studentHomeBell = 'assets/images/student_home_bell.svg';
+const _studentHomeInvite = 'assets/images/student_home_invite.svg';
+const _studentParentHomeHeroBg =
+    'assets/images/student_parent_home_hero_bg.png';
+const _studentParentHomeHeroArt =
+    'assets/images/student_parent_home_hero_art.png';
+const _parentHomeWelcomeMap = 'assets/images/map_welcome_new.png';
+const _studentParentHomeClassThumb =
+    'assets/images/student_parent_home_class_thumb.png';
+const _studentParentHomeAssessmentIcon =
+    'assets/images/student_parent_home_assessment_icon.svg';
+const _studentParentHomeAcceptIcon =
+    'assets/images/student_parent_home_accept.png';
+const _studentParentHomeRejectIcon =
+    'assets/images/student_parent_home_reject.png';
+const _studentParentHomeJoinIcon =
+    'assets/images/student_parent_home_join_icon.svg';
+const _studentHomeNavHome = 'assets/images/student_home_nav_home.svg';
+const _studentHomeNavClass = 'assets/images/student_home_nav_class.svg';
+const _studentHomeNavReport = 'assets/images/student_home_nav_report.svg';
+const _studentHomeNavMessage = 'assets/images/student_home_nav_message.svg';
+const _studentHomeNavSettings = 'assets/images/student_home_nav_settings.svg';
+const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
+const _homeTeacherAvatarOne = 'assets/images/student_home_avatar.png';
+const _homeTeacherAvatarTwo = 'assets/images/student_class_teacher.png';
+const _homeProfileSwitchMinimumDuration = Duration(milliseconds: 1500);
+
+String _homeRoleLabel(BuildContext context, ProfileRole role) {
+  return switch (role) {
+    ProfileRole.parent => context.getText(AppKeys.roleParent).toUpperCase(),
+    ProfileRole.teacher => context.getText(AppKeys.roleTeacher).toUpperCase(),
+    ProfileRole.student => context.getText(AppKeys.roleStudent).toUpperCase(),
+  };
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({
+    super.key,
+    required this.user,
+    required this.profiles,
+    required this.activeProfile,
+    required this.activeRole,
+    required this.profileLoadError,
+    required this.onRefreshProfiles,
+    required this.onActivateProfile,
+    required this.onBack,
+    required this.onLogout,
+    GradeService? gradeService,
+    ClassroomService? classroomService,
+    ClassroomExerciseService? assignmentService,
+  })  : _gradeService = gradeService,
+        _classroomService = classroomService,
+        _assignmentService = assignmentService;
+
+  final LoginUser? user;
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final ProfileRole activeRole;
+  final String? profileLoadError;
+  final Future<void> Function() onRefreshProfiles;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final VoidCallback onBack;
+  final VoidCallback onLogout;
+  final GradeService? _gradeService;
+  final ClassroomService? _classroomService;
+  final ClassroomExerciseService? _assignmentService;
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late final GradeService _gradeService = widget._gradeService ?? GradeApi();
+  late final ClassroomService _classroomService =
+      widget._classroomService ?? ClassroomApi();
+  late final ClassroomExerciseService _assignmentService =
+      widget._assignmentService ?? ClassroomExerciseApi();
+  final ParentHomeCubit _parentHomeCubit = ParentHomeCubit();
+  final StudentHomeCubit _studentHomeCubit = StudentHomeCubit();
+  final TeacherHomeCubit _teacherHomeCubit = TeacherHomeCubit();
+  late final AnimationController _parentHomeEntranceController;
+  int _openAddProfileRequestId = 0;
+  bool _returnToReviewAfterProfileSave = false;
+  int? _prefetchedGradeUserId;
+  bool _isPrefetchingGrades = false;
+  bool _isProfileMenuOpen = false;
+  bool _isSwitchingProfile = false;
+  List<GradeModel> _prefetchedGrades = const <GradeModel>[];
+
+  static const _designWidth = 390.0;
+  static const _designHeight = 844.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _parentHomeEntranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    if (widget.activeRole == ProfileRole.parent) {
+      _parentHomeEntranceController.forward();
+    }
+    _prefetchGrades();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.user?.id != widget.user?.id) {
+      _prefetchedGrades = const <GradeModel>[];
+      _prefetchedGradeUserId = null;
+      _prefetchGrades();
+    }
+    if (oldWidget.activeRole != widget.activeRole) {
+      final oldTab = _homeCubitFor(oldWidget.activeRole).state.activeTab;
+      final targetCubit = _homeCubitFor(widget.activeRole);
+      targetCubit.selectTab(
+        oldTab <= targetCubit.maxTabIndex ? oldTab : 0,
+      );
+    }
+    if (oldWidget.activeRole != widget.activeRole &&
+        widget.activeRole == ProfileRole.parent) {
+      _playParentHomeEntrance();
+    }
+    if (oldWidget.activeProfile != widget.activeProfile) {
+      _isProfileMenuOpen = false;
+    }
+  }
+
+  void _playParentHomeEntrance() {
+    _parentHomeEntranceController
+      ..reset()
+      ..forward();
+  }
+
+  @override
+  void dispose() {
+    _parentHomeEntranceController.dispose();
+    _parentHomeCubit.close();
+    _studentHomeCubit.close();
+    _teacherHomeCubit.close();
+    super.dispose();
+  }
+
+  Future<void> _prefetchGrades() async {
+    final userId = widget.user?.id;
+    if (userId == null ||
+        userId <= 0 ||
+        _isPrefetchingGrades ||
+        (_prefetchedGradeUserId == userId && _prefetchedGrades.isNotEmpty)) {
+      return;
+    }
+
+    _isPrefetchingGrades = true;
+    _prefetchedGradeUserId = userId;
+
+    try {
+      final grades = await _gradeService.listGrades(userId: userId);
+      if (!mounted || widget.user?.id != userId) {
+        return;
+      }
+
+      setState(() => _prefetchedGrades = grades);
+    } catch (_) {
+      if (!mounted || widget.user?.id != userId) {
+        return;
+      }
+
+      setState(() => _prefetchedGrades = const <GradeModel>[]);
+    } finally {
+      _isPrefetchingGrades = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final homeCubit = _homeCubitFor(widget.activeRole);
+    return BlocBuilder<HomeTabCubit, HomeTabState>(
+      bloc: homeCubit,
+      builder: (context, navigation) => LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final layoutWidth = math.min(width, 430.0);
+          final height = constraints.maxHeight;
+          final viewportHeight = MediaQuery.sizeOf(context).height;
+          final topInset = MediaQuery.paddingOf(context).top;
+          final bottomInset = MediaQuery.paddingOf(context).bottom;
+          final scale = math.min(
+              layoutWidth / _designWidth, viewportHeight / _designHeight);
+          final studentName = _displayProfileName(
+            context,
+            widget.activeProfile,
+            widget.activeRole,
+          );
+
+          double s(double value) => value * scale;
+          final navHeight = s(88) + bottomInset;
+          final headerHeight = s(98) + topInset;
+          final showHeader = widget.activeRole != ProfileRole.teacher &&
+              navigation.activeTab == 0;
+          final switchableProfiles = widget.profiles
+              .where(
+                (profile) =>
+                    ActiveProfileSession.profileStableId(profile) !=
+                    ActiveProfileSession.profileStableId(widget.activeProfile),
+              )
+              .toList(growable: false);
+          final profileMenuWidth = _profileMenuWidth(
+            context,
+            switchableProfiles,
+            scale,
+            layoutWidth - s(40),
+          );
+
+          return Center(
+            child: SizedBox(
+              width: width,
+              height: height,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Positioned.fill(child: _HomeBackground()),
+                  Positioned.fill(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 280),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            for (final child in previousChildren)
+                              Positioned.fill(child: child),
+                            if (currentChild != null)
+                              Positioned.fill(child: currentChild),
+                          ],
+                        );
+                      },
+                      transitionBuilder: (child, animation) {
+                        final isMovingRight =
+                            navigation.activeTab > navigation.previousTab;
+                        final beginX = isMovingRight ? 0.035 : -0.035;
+                        final offset = Tween<Offset>(
+                          begin: Offset(beginX, 0),
+                          end: Offset.zero,
+                        ).animate(animation);
+
+                        return FadeTransition(
+                          opacity: animation,
+                          child:
+                              SlideTransition(position: offset, child: child),
+                        );
+                      },
+                      child: _RoleDashboard(
+                        key: ValueKey(
+                          '${navigation.activeTab}-${ActiveProfileSession.profileStableId(widget.activeProfile)}',
+                        ),
+                        activeTab: navigation.activeTab,
+                        user: widget.user,
+                        profiles: widget.profiles,
+                        activeProfile: widget.activeProfile,
+                        activeRole: widget.activeRole,
+                        profileLoadError: widget.profileLoadError,
+                        onRefreshProfiles: widget.onRefreshProfiles,
+                        onActivateProfile: widget.onActivateProfile,
+                        initialGrades: _prefetchedGrades,
+                        gradeService: _gradeService,
+                        classroomService: _classroomService,
+                        assignmentService: _assignmentService,
+                        onLogout: widget.onLogout,
+                        onAddProfileFromReview: () {
+                          HapticFeedback.selectionClick();
+                          setState(() {
+                            _returnToReviewAfterProfileSave = true;
+                            _openAddProfileRequestId++;
+                          });
+                          homeCubit.selectTab(
+                            widget.activeRole == ProfileRole.student ? 4 : 3,
+                          );
+                        },
+                        onProfileSaved: () {
+                          if (!_returnToReviewAfterProfileSave) {
+                            return;
+                          }
+
+                          setState(() {
+                            _returnToReviewAfterProfileSave = false;
+                          });
+                          homeCubit.selectTab(
+                            widget.activeRole == ProfileRole.student ? 2 : 1,
+                          );
+                        },
+                        openAddProfileRequestId: _openAddProfileRequestId,
+                        onCompleteTeacherProfile: _openTeacherProfileForm,
+                        onOpenClassroomTab: () => homeCubit.selectTab(1),
+                        onOpenReviewTab: () {
+                          HapticFeedback.lightImpact();
+                          homeCubit.selectTab(1);
+                        },
+                        parentHomeEntrance: _parentHomeEntranceController,
+                        bottomPadding: navHeight + s(14),
+                        headerHeight: showHeader ? headerHeight : 0,
+                        scale: scale,
+                      ),
+                    ),
+                  ),
+                  if (_isProfileMenuOpen)
+                    Positioned.fill(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () => setState(() => _isProfileMenuOpen = false),
+                      ),
+                    ),
+                  if (showHeader)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      child: _HeaderBar(
+                        height: headerHeight,
+                        topInset: topInset,
+                        horizontalPadding: s(24),
+                        name: studentName,
+                        profile: widget.activeProfile,
+                        role: widget.activeRole,
+                        canSwitchProfile: switchableProfiles.isNotEmpty,
+                        isProfileMenuOpen: _isProfileMenuOpen,
+                        onProfileTap: switchableProfiles.isEmpty
+                            ? null
+                            : () {
+                                HapticFeedback.selectionClick();
+                                setState(
+                                  () =>
+                                      _isProfileMenuOpen = !_isProfileMenuOpen,
+                                );
+                              },
+                      ),
+                    ),
+                  if (showHeader &&
+                      _isProfileMenuOpen &&
+                      switchableProfiles.isNotEmpty)
+                    Positioned(
+                      left: s(20),
+                      top: headerHeight - s(29),
+                      width: profileMenuWidth,
+                      child: _HomeProfileMenu(
+                        profiles: switchableProfiles,
+                        scale: scale,
+                        onSelect: _switchProfile,
+                      ),
+                    ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: _BottomNavigation(
+                      height: navHeight,
+                      bottomInset: bottomInset,
+                      scale: scale,
+                      activeIndex: navigation.activeTab,
+                      activeRole: widget.activeRole,
+                      user: widget.user,
+                      onTabSelected: (index) {
+                        if (index == navigation.activeTab) {
+                          HapticFeedback.selectionClick();
+                          return;
+                        }
+
+                        HapticFeedback.lightImpact();
+                        if (widget.activeRole == ProfileRole.parent &&
+                            index == 0) {
+                          _playParentHomeEntrance();
+                        }
+                        homeCubit.selectTab(index);
+                      },
+                    ),
+                  ),
+                  if (_isSwitchingProfile)
+                    Positioned.fill(
+                      child: LoadingScreen(
+                        message: context.getText(AppKeys.switchingProfile),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  HomeTabCubit _homeCubitFor(ProfileRole role) {
+    return switch (role) {
+      ProfileRole.parent => _parentHomeCubit,
+      ProfileRole.student => _studentHomeCubit,
+      ProfileRole.teacher => _teacherHomeCubit,
+    };
+  }
+
+  Future<void> _switchProfile(StudentProfile profile) async {
+    if (_isSwitchingProfile ||
+        ActiveProfileSession.profileStableId(profile) ==
+            ActiveProfileSession.profileStableId(widget.activeProfile)) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    setState(() {
+      _isProfileMenuOpen = false;
+      _isSwitchingProfile = true;
+    });
+
+    try {
+      await Future.wait<void>([
+        widget.onActivateProfile(profile),
+        Future<void>.delayed(_homeProfileSwitchMinimumDuration),
+      ]);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.readText(AppKeys.profileUpdateFailed))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSwitchingProfile = false);
+      }
+    }
+  }
+
+  double _profileMenuWidth(
+    BuildContext context,
+    List<StudentProfile> profiles,
+    double scale,
+    double maxWidth,
+  ) {
+    final textStyle = TextStyle(
+      fontSize: 15 * scale,
+      fontWeight: FontWeight.w900,
+    );
+    var longestTextWidth = 0.0;
+
+    for (final profile in profiles) {
+      final name = _compactHomeProfileName(
+        _profileDisplayName(context, profile),
+      );
+      final painter = TextPainter(
+        text: TextSpan(text: name, style: textStyle),
+        maxLines: 1,
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      longestTextWidth = math.max(longestTextWidth, painter.width);
+    }
+
+    final contentWidth =
+        (14 * 2 + 42 + 12) * scale + longestTextWidth + 8 * scale;
+    return contentWidth.clamp(150 * scale, maxWidth);
+  }
+
+  String _displayProfileName(
+    BuildContext context,
+    StudentProfile? profile,
+    ProfileRole role,
+  ) {
+    final name = profile?.name?.trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+    return switch (role) {
+      ProfileRole.parent => context.getText(AppKeys.roleParent),
+      ProfileRole.teacher => context.getText(AppKeys.roleTeacher),
+      ProfileRole.student => context.getText(AppKeys.roleStudent),
+    };
+  }
+
+  Future<void> _openTeacherProfileForm() async {
+    final profile = widget.activeProfile;
+    if (profile == null) {
+      return;
+    }
+    final size = MediaQuery.sizeOf(context);
+    final scale = math.min(
+      math.min(size.width, 430.0) / _designWidth,
+      size.height / _designHeight,
+    );
+
+    final didSave = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (routeContext) => Material(
+          color: Colors.white,
+          child: SafeArea(
+            child: SettingTab.page(
+              user: widget.user,
+              profiles: widget.profiles,
+              activeProfile: widget.activeProfile,
+              profileLoadError: widget.profileLoadError,
+              onLogout: widget.onLogout,
+              onActivateProfile: widget.onActivateProfile,
+              onRefreshProfiles: widget.onRefreshProfiles,
+              onProfileSaved: () => Navigator.of(routeContext).pop(true),
+              bottomPadding: 0,
+              scale: scale,
+              initialView: SettingPageView.addProfile,
+              initialEditingProfile: profile,
+              isPushedPage: true,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (didSave == true) {
+      await widget.onRefreshProfiles();
+    }
+  }
+}
+
+class HomeDashboardArgs {
+  const HomeDashboardArgs({
+    required this.activeTab,
+    required this.user,
+    required this.profiles,
+    required this.activeProfile,
+    required this.profileLoadError,
+    required this.onRefreshProfiles,
+    required this.onActivateProfile,
+    required this.initialGrades,
+    required this.gradeService,
+    required this.classroomService,
+    required this.assignmentService,
+    required this.onLogout,
+    required this.onAddProfileFromReview,
+    required this.onProfileSaved,
+    required this.openAddProfileRequestId,
+    required this.onCompleteTeacherProfile,
+    required this.onOpenClassroomTab,
+    required this.onOpenReviewTab,
+    required this.parentHomeEntrance,
+    required this.bottomPadding,
+    required this.headerHeight,
+    required this.scale,
+  });
+
+  final int activeTab;
+  final LoginUser? user;
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final String? profileLoadError;
+  final Future<void> Function() onRefreshProfiles;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final List<GradeModel> initialGrades;
+  final GradeService gradeService;
+  final ClassroomService classroomService;
+  final ClassroomExerciseService assignmentService;
+  final VoidCallback onLogout;
+  final VoidCallback onAddProfileFromReview;
+  final VoidCallback onProfileSaved;
+  final int openAddProfileRequestId;
+  final Future<void> Function() onCompleteTeacherProfile;
+  final VoidCallback onOpenClassroomTab;
+  final VoidCallback onOpenReviewTab;
+  final Animation<double> parentHomeEntrance;
+  final double bottomPadding;
+  final double headerHeight;
+  final double scale;
+
+  EdgeInsets get contentPadding => EdgeInsets.only(
+        left: 24 * scale,
+        right: 24 * scale,
+        top: headerHeight + (activeTab == 0 ? 0 : 24 * scale),
+        bottom: bottomPadding,
+      );
+}
+
+class _RoleDashboard extends StatelessWidget {
+  const _RoleDashboard({
+    super.key,
+    required this.activeTab,
+    required this.user,
+    required this.profiles,
+    required this.activeProfile,
+    required this.activeRole,
+    required this.profileLoadError,
+    required this.onRefreshProfiles,
+    required this.onActivateProfile,
+    required this.initialGrades,
+    required this.gradeService,
+    required this.classroomService,
+    required this.assignmentService,
+    required this.onLogout,
+    required this.onAddProfileFromReview,
+    required this.onProfileSaved,
+    required this.openAddProfileRequestId,
+    required this.onCompleteTeacherProfile,
+    required this.onOpenClassroomTab,
+    required this.onOpenReviewTab,
+    required this.parentHomeEntrance,
+    required this.bottomPadding,
+    required this.headerHeight,
+    required this.scale,
+  });
+
+  final int activeTab;
+  final LoginUser? user;
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final ProfileRole activeRole;
+  final String? profileLoadError;
+  final Future<void> Function() onRefreshProfiles;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final List<GradeModel> initialGrades;
+  final GradeService gradeService;
+  final ClassroomService classroomService;
+  final ClassroomExerciseService assignmentService;
+  final VoidCallback onLogout;
+  final VoidCallback onAddProfileFromReview;
+  final VoidCallback onProfileSaved;
+  final int openAddProfileRequestId;
+  final Future<void> Function() onCompleteTeacherProfile;
+  final VoidCallback onOpenClassroomTab;
+  final VoidCallback onOpenReviewTab;
+  final Animation<double> parentHomeEntrance;
+  final double bottomPadding;
+  final double headerHeight;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final args = HomeDashboardArgs(
+      activeTab: activeTab,
+      user: user,
+      profiles: profiles,
+      activeProfile: activeProfile,
+      profileLoadError: profileLoadError,
+      onRefreshProfiles: onRefreshProfiles,
+      onActivateProfile: onActivateProfile,
+      initialGrades: initialGrades,
+      gradeService: gradeService,
+      classroomService: classroomService,
+      assignmentService: assignmentService,
+      onLogout: onLogout,
+      onAddProfileFromReview: onAddProfileFromReview,
+      onProfileSaved: onProfileSaved,
+      openAddProfileRequestId: openAddProfileRequestId,
+      onCompleteTeacherProfile: onCompleteTeacherProfile,
+      onOpenClassroomTab: onOpenClassroomTab,
+      onOpenReviewTab: onOpenReviewTab,
+      parentHomeEntrance: parentHomeEntrance,
+      bottomPadding: bottomPadding,
+      headerHeight: headerHeight,
+      scale: scale,
+    );
+
+    return switch (activeRole) {
+      ProfileRole.parent => ParentDashboard(args: args),
+      ProfileRole.student => StudentDashboard(args: args),
+      ProfileRole.teacher => TeacherDashboard(args: args),
+    };
+  }
+}
+
+class _HomeBackground extends StatelessWidget {
+  const _HomeBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x3300504B),
+            blurRadius: 44,
+            offset: Offset(0, 28),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderBar extends StatelessWidget {
+  const _HeaderBar({
+    required this.height,
+    required this.topInset,
+    required this.horizontalPadding,
+    required this.name,
+    required this.profile,
+    required this.role,
+    required this.canSwitchProfile,
+    required this.isProfileMenuOpen,
+    required this.onProfileTap,
+  });
+
+  final double height;
+  final double topInset;
+  final double horizontalPadding;
+  final String name;
+  final StudentProfile? profile;
+  final ProfileRole role;
+  final bool canSwitchProfile;
+  final bool isProfileMenuOpen;
+  final VoidCallback? onProfileTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final contentHeight = height - topInset;
+
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          height: height,
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            topInset + contentHeight * 0.20,
+            horizontalPadding,
+            contentHeight * 0.21,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.94),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Semantics(
+                  button: canSwitchProfile,
+                  child: InkWell(
+                    onTap: onProfileTap,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _StudentAvatar(
+                          size: contentHeight * 0.45,
+                          avatarKey: profile?.avatarKey,
+                          avatarUrl: profile?.avatarUrl,
+                        ),
+                        SizedBox(width: contentHeight * 0.14),
+                        Flexible(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _homeRoleLabel(context, role),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: _muted.withValues(alpha: 0.6),
+                                  fontSize: contentHeight * 0.10,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.8,
+                                  height: 1,
+                                ),
+                              ),
+                              SizedBox(height: contentHeight * 0.06),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      '$name👋',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: const Color(0xFF002B6A),
+                                        fontSize: contentHeight * 0.18,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                  ),
+                                  if (canSwitchProfile) ...[
+                                    SizedBox(width: contentHeight * 0.06),
+                                    AnimatedRotation(
+                                      turns: isProfileMenuOpen ? 0.5 : 0,
+                                      duration:
+                                          const Duration(milliseconds: 180),
+                                      child: Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        size: contentHeight * 0.18,
+                                        color: const Color(0xFF8294B0),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              _NotificationButton(size: contentHeight * 0.45),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeProfileMenu extends StatelessWidget {
+  const _HomeProfileMenu({
+    required this.profiles,
+    required this.scale,
+    required this.onSelect,
+  });
+
+  final List<StudentProfile> profiles;
+  final double scale;
+  final ValueChanged<StudentProfile> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      elevation: 8,
+      shadowColor: Colors.black.withValues(alpha: 0.22),
+      borderRadius: BorderRadius.circular(10 * scale),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: 240 * scale),
+        child: ListView.separated(
+          shrinkWrap: true,
+          padding: EdgeInsets.symmetric(vertical: 8 * scale),
+          itemCount: profiles.length,
+          separatorBuilder: (_, __) => SizedBox(height: 2 * scale),
+          itemBuilder: (context, index) {
+            final profile = profiles[index];
+            final name = _compactHomeProfileName(
+              _profileDisplayName(context, profile),
+            );
+
+            return InkWell(
+              onTap: () => onSelect(profile),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 14 * scale,
+                  vertical: 7 * scale,
+                ),
+                child: Row(
+                  children: [
+                    ProfileAvatarImage(
+                      size: 42 * scale,
+                      avatarKey: profile.avatarKey,
+                      avatarUrl: profile.avatarUrl,
+                    ),
+                    SizedBox(width: 12 * scale),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: TextStyle(
+                            color: const Color(0xFF002B6A),
+                            fontSize: 15 * scale,
+                            fontWeight: FontWeight.w900,
+                            height: 1.1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+String _profileDisplayName(BuildContext context, StudentProfile profile) {
+  if (profile.name?.trim().isNotEmpty == true) {
+    return profile.name!.trim();
+  }
+  if (profile.profileCode?.trim().isNotEmpty == true) {
+    return profile.profileCode!.trim();
+  }
+  return context.getText(AppKeys.student);
+}
+
+String _compactHomeProfileName(String name) {
+  final parts = name
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((part) => part.isNotEmpty)
+      .toList(growable: false);
+  if (parts.length <= 2) {
+    return parts.join(' ');
+  }
+  return '${parts.first} ${parts.last}';
+}
+
+class _StudentAvatar extends StatelessWidget {
+  const _StudentAvatar({required this.size, this.avatarKey, this.avatarUrl});
+
+  final double size;
+  final String? avatarKey;
+  final String? avatarUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: _teal.withValues(alpha: 0.05),
+                spreadRadius: size * 0.08,
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.11),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ProfileAvatarImage(
+            size: size,
+            avatarKey: avatarKey,
+            avatarUrl: avatarUrl,
+          ),
+        ),
+        Positioned(
+          right: -size * 0.05,
+          bottom: -size * 0.05,
+          child: Container(
+            width: size * 0.32,
+            height: size * 0.32,
+            decoration: BoxDecoration(
+              color: const Color(0xFF22C55E),
+              shape: BoxShape.circle,
+              border: Border.all(color: _mintBackground, width: size * 0.05),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _NotificationButton extends StatelessWidget {
+  const _NotificationButton({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      shadowColor: Colors.black.withValues(alpha: 0.08),
+      elevation: 2,
+      borderRadius: BorderRadius.circular(size * 0.36),
+      child: InkWell(
+        onTap: HapticFeedback.selectionClick,
+        borderRadius: BorderRadius.circular(size * 0.36),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Center(
+            child: SvgPicture.asset(
+              _studentHomeBell,
+              width: size * 0.40,
+              height: size * 0.50,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ignore: unused_element
+class _BottomNavigation extends StatelessWidget {
+  const _BottomNavigation({
+    required this.height,
+    required this.bottomInset,
+    required this.scale,
+    required this.activeIndex,
+    required this.activeRole,
+    required this.user,
+    required this.onTabSelected,
+  });
+
+  final double height;
+  final double bottomInset;
+  final double scale;
+  final int activeIndex;
+  final ProfileRole activeRole;
+  final LoginUser? user;
+  final ValueChanged<int> onTabSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = switch (activeRole) {
+      ProfileRole.teacher => [
+          _NavItemData(
+            Icons.home_filled,
+            context.getText(AppKeys.navHome),
+            null,
+          ),
+          _NavItemData(
+            Icons.bar_chart_rounded,
+            context.getText(AppKeys.navClassroom),
+            null,
+          ),
+          _NavItemData(
+            Icons.menu_book_rounded,
+            context.getText(AppKeys.navStudy),
+            null,
+          ),
+          _NavItemData(
+            Icons.chat_bubble_outline_rounded,
+            context.getText(AppKeys.navMembers),
+            null,
+          ),
+          _NavItemData(null, context.getText(AppKeys.navSettings), user),
+        ],
+      ProfileRole.student => [
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navHome),
+            null,
+            assetPath: _studentHomeNavHome,
+          ),
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navClassroom),
+            null,
+            assetPath: _studentHomeNavClass,
+          ),
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navReview),
+            null,
+            assetPath: _studentHomeNavReport,
+          ),
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navHistory),
+            null,
+            assetPath: _studentHomeNavMessage,
+          ),
+          _NavItemData(
+            null,
+            context.getText(AppKeys.navSettings),
+            null,
+            assetPath: _studentHomeNavSettings,
+          ),
+        ],
+      ProfileRole.parent => [
+          _NavItemData(
+            Icons.home_filled,
+            context.getText(AppKeys.navHome),
+            null,
+          ),
+          _NavItemData(
+            Icons.explore_outlined,
+            context.getText(AppKeys.navReview),
+            null,
+          ),
+          _NavItemData(
+            Icons.history,
+            context.getText(AppKeys.navHistory),
+            null,
+          ),
+          _NavItemData(null, context.getText(AppKeys.navSettings), user),
+        ],
+    };
+
+    final radius = BorderRadius.vertical(
+      top: Radius.circular(48 * scale),
+    );
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 30 * scale,
+            offset: Offset(0, -8 * scale),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            height: height,
+            padding: EdgeInsets.fromLTRB(
+              20 * scale,
+              12 * scale,
+              20 * scale,
+              bottomInset + 12 * scale,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.92),
+              borderRadius: radius,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(items.length, (index) {
+                return _AnimatedNavItem(
+                  data: items[index],
+                  active: activeIndex == index,
+                  teacherStyle: activeRole == ProfileRole.teacher,
+                  scale: scale,
+                  onTap: () => onTabSelected(index),
+                );
+              }),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedNavItem extends StatelessWidget {
+  const _AnimatedNavItem({
+    required this.data,
+    required this.active,
+    required this.teacherStyle,
+    required this.scale,
+    required this.onTap,
+  });
+
+  final _NavItemData data;
+  final bool active;
+  final bool teacherStyle;
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const activeColor = Color(0xFF38898B);
+    final inactiveColor = const Color(0xFF515F54).withValues(alpha: 0.68);
+
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 360),
+      curve: Curves.easeOutBack,
+      tween: Tween<double>(end: active ? 1 : 0),
+      builder: (context, value, child) {
+        final color = Color.lerp(inactiveColor, Colors.white, value)!;
+        return Semantics(
+          selected: active,
+          button: true,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(48 * scale),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                width: active ? 72 * scale : 58 * scale,
+                height: active ? 64 * scale : 56 * scale,
+                padding: EdgeInsets.symmetric(
+                  horizontal: active ? 10 * scale : 8 * scale,
+                  vertical: active ? 10 * scale : 8 * scale,
+                ),
+                decoration: BoxDecoration(
+                  color: Color.lerp(Colors.transparent, activeColor, value),
+                  borderRadius: BorderRadius.circular(48 * scale),
+                  boxShadow: active && !teacherStyle
+                      ? [
+                          BoxShadow(
+                            color: _teal.withValues(alpha: 0.20),
+                            blurRadius: 15 * scale,
+                            offset: Offset(0, 10 * scale),
+                          ),
+                          BoxShadow(
+                            color: _teal.withValues(alpha: 0.20),
+                            blurRadius: 6 * scale,
+                            offset: Offset(0, 4 * scale),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Transform.scale(
+                      scale: 1 + (0.10 * value),
+                      child: data.user != null
+                          ? _UserAvatarWidget(
+                              user: data.user!,
+                              size: (active ? 18 : 18) * scale,
+                              color: color,
+                            )
+                          : data.assetPath != null
+                              ? SvgPicture.asset(
+                                  data.assetPath!,
+                                  width: 18 * scale,
+                                  height: 18 * scale,
+                                  colorFilter: ColorFilter.mode(
+                                    color,
+                                    BlendMode.srcIn,
+                                  ),
+                                )
+                              : Icon(
+                                  data.icon,
+                                  color: color,
+                                  size: (active ? 18 : 18) * scale,
+                                ),
+                    ),
+                    SizedBox(height: 4 * scale),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        data.label,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 10 * scale,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _UserAvatarWidget extends StatelessWidget {
+  const _UserAvatarWidget({
+    required this.user,
+    required this.size,
+    required this.color,
+  });
+
+  final LoginUser user;
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return ProfileAvatarImage(
+      size: size,
+      avatarUrl: user.avatarUrl,
+      foregroundColor: color,
+      borderColor: color,
+      borderWidth: 1.5,
+      iconScale: 0.58,
+    );
+  }
+}
+
+class _NavItemData {
+  const _NavItemData(
+    this.icon,
+    this.label,
+    this.user, {
+    this.assetPath,
+  });
+
+  final IconData? icon;
+  final String label;
+  final LoginUser? user;
+  final String? assetPath;
+}

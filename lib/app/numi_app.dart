@@ -6,8 +6,8 @@ import '../core/localization/app_keys.dart';
 import '../core/localization/lingo_provider.dart';
 import '../core/localization/lingo_scope.dart';
 import '../core/theme/app_colors.dart';
-import '../features/onboarding/data/otp_auth_api.dart';
-import '../features/onboarding/presentation/numi_home.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/auth/auth_flow.dart';
 
 class NumiApp extends StatefulWidget {
   const NumiApp({super.key, this.authService});

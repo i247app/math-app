@@ -33,26 +33,66 @@ The app is currently Android-focused in the checked-in platform files. The READM
 - `env.example`: committed template for local API configuration.
 - `lib/core/theme/app_colors.dart`: shared color tokens for the app.
 - `lib/core/utils/phone_input_formatter.dart`: region-aware phone number formatting.
-- `lib/features/onboarding/presentation/numi_home.dart`: main onboarding coordinator, `BlocProvider`, animated screen switching, OTP preview dialog, snackbar errors.
-- `lib/features/onboarding/presentation/bloc/onboarding_cubit.dart`: onboarding state and state transitions.
-- `lib/features/onboarding/data/otp_auth_api.dart`: auth service interface and temporary local OTP verification. It calls the shared `NetworkApi` rather than defining endpoint calls locally.
-- `lib/features/onboarding/data/avatar_picker.dart`: avatar picker abstraction.
-- `lib/features/onboarding/domain/phone_region.dart`: supported phone regions and formatting limits.
-- `lib/features/onboarding/presentation/screens/`: screen-level widgets for each onboarding step.
-- `lib/features/onboarding/presentation/widgets/`: reusable visual widgets and app background.
+- `lib/features/auth/auth_flow.dart`: auth coordinator, providers, animated screen switching, OTP preview dialog, and snackbar errors.
+- `lib/features/auth/auth_cubit.dart`: authentication flow actions and state transitions.
+- `lib/features/auth/auth_state.dart`: immutable auth flow state.
+- `lib/features/auth/otp_auth_api.dart`: auth service interface and temporary local OTP verification.
+- `lib/features/home/home_screen.dart`: shared home shell, profile switcher, role routing, and bottom navigation.
+- `lib/features/home/{parent,student,teacher}/`: role dashboards and role-specific home cubits.
+- `lib/features/classroom/`: classroom API, shared classroom cache, presentation, and widgets.
+- `lib/features/homework/`: homework API and student/teacher homework presentation.
+- `lib/features/quiz/`: quiz APIs, assessment/practice presentation, review, and history.
+- `lib/features/profile/`: profile APIs, active-profile session, avatar handling, grade, and school data.
+- `lib/features/settings/`: settings screen, panels, and settings-specific widgets.
+- `lib/shared/widgets/common_widgets.dart`: reusable visual primitives shared across features.
 - `test/auth_models_test.dart`: serialization tests for auth request and response models.
 - `test/auth_api_client_test.dart`: Dio client tests using a fake HTTP adapter.
 - `test/widget_test.dart`: widget tests with fake OTP and avatar services.
 
 ## Architecture Notes
 
-- The code follows a light feature-first layout under `lib/features/onboarding`.
+- The code follows a light feature-first layout under `lib/features`.
+- Put new code in the feature that owns the behavior: `auth`, `home`, `classroom`, `homework`, `quiz`, `profile`, or `settings`.
+- `lib/features/onboarding` contains compatibility exports only. Do not add new implementation there.
 - `NumiApp` accepts an optional `OtpAuthService`; keep this injection path intact because widget tests rely on it.
-- `OnboardingCubit` owns the flow state. UI widgets should call cubit methods instead of duplicating navigation or API logic.
+- `AuthCubit` owns the authentication flow. UI widgets should call cubit methods instead of duplicating navigation or API logic.
+- `ParentHomeCubit`, `StudentHomeCubit`, and `TeacherHomeCubit` own role dashboard tab navigation.
+- `ClassroomCubit` owns cached owned/joined classroom lists keyed by profile ID. Presentation widgets should request and refresh those lists through the cubit.
 - `OtpAuthService` is an abstraction. Preserve this interface when changing API behavior so tests and future mock services stay simple.
-- UI state is represented by immutable `OnboardingState` plus `copyWith`. When adding nullable fields, add explicit `clear...` flags if callers need to reset them to `null`.
-- Most reusable UI primitives live in `common_widgets.dart`. Prefer reusing them before creating new button/card variants.
+- Auth UI state is represented by immutable `AuthState` plus `copyWith`. When adding nullable fields, add explicit `clear...` flags if callers need to reset them to `null`.
+- Most reusable UI primitives live in `lib/shared/widgets/common_widgets.dart`. Prefer reusing them before creating new button/card variants.
 - `requestLoginOtp` now calls `OtpAuthService.sendLoginOtp` directly. The service delegates login to `NetworkApi`, then returns a local fake OTP until the real OTP API is available.
+
+Current feature layout:
+
+```text
+lib/features/
+  auth/
+    auth_cubit.dart
+    auth_state.dart
+    otp_auth_api.dart
+    presentation/
+  home/
+    home_screen.dart
+    home_tab_cubit.dart
+    parent/
+    student/
+    teacher/
+  classroom/
+    classroom_api.dart
+    presentation/
+      bloc/
+    widgets/
+  homework/
+    homework_api.dart
+    presentation/
+  quiz/
+    quiz_api.dart
+    presentation/
+  profile/
+  settings/
+  session/
+```
 
 ## API Behavior
 
@@ -136,7 +176,8 @@ flutter create --platforms=ios,android .
 - Keep non-secret defaults in `env.example`; keep machine-specific values in `.env`.
 - Do not remove `NumiApp.authService` unless tests are updated with an equivalent injection path.
 - Keep phone formatting logic in `PhoneInputFormatter` and region metadata in `PhoneRegion`.
-- Keep onboarding business logic in `OnboardingCubit`; screens should remain mostly presentational.
+- Keep authentication business logic in `AuthCubit`; screens should remain mostly presentational.
+- Keep role-specific home behavior inside the matching `parent`, `student`, or `teacher` folder.
 - Keep request and response wire shapes in `lib/core/network/auth_models.dart`, not as ad hoc maps in UI code.
 - Keep Dio transport details and endpoint methods inside `NetworkApi` / `NetworkClient` in `lib/core/network/network_client.dart`.
 - UI and cubits should call feature services such as `OtpAuthService`, not `NetworkApi` directly.
