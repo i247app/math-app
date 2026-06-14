@@ -83,6 +83,15 @@ class AppKeys {
   static const homeHeroTextbookLabel = 'home_hero_textbook_label';
   static const homeHeroPrompt = 'home_hero_prompt';
   static const homeHeroAssessment = 'home_hero_assessment';
+  static const parentLearningStreak = 'parent_learning_streak';
+  static const parentAssessmentTitle = 'parent_assessment_title';
+  static const parentAssessmentSubtitle = 'parent_assessment_subtitle';
+  static const parentRoadmapTitle = 'parent_roadmap_title';
+  static const parentRoadmapSubtitle = 'parent_roadmap_subtitle';
+  static const parentJoinRoomTitle = 'parent_join_room_title';
+  static const parentJoinRoomSubtitle = 'parent_join_room_subtitle';
+  static const parentQuizLoadFailed = 'parent_quiz_load_failed';
+  static const parentTryAgain = 'parent_try_again';
   static const yourAchievement = 'your_achievement';
   static const studentHomework = 'student_homework';
   static const studentClassroom = 'student_classroom';

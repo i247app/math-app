@@ -370,7 +370,7 @@ class _HomeworkReviewCard extends StatelessWidget {
                   child: Transform.scale(
                     scale: 1.18,
                     child: Image.asset(
-                      'assets/images/home_test_mascot.png',
+                      'assets/images/onboarding_splash_mascot.png',
                       fit: BoxFit.cover,
                       alignment: Alignment.topCenter,
                     ),

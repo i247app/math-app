@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
@@ -154,78 +155,52 @@ class _ReviewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 70,
-      child: CustomPaint(
-        painter: const _ReviewHeaderPainter(),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-          child: Row(
-            children: [
-              Material(
-                color: Colors.white,
-                elevation: 2,
-                shadowColor: Colors.black.withValues(alpha: 0.08),
-                shape: const CircleBorder(),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: onBack,
-                  child: const SizedBox(
-                    width: 44,
-                    height: 44,
-                    child: Icon(
-                      Icons.arrow_back_rounded,
-                      color: _navy,
-                      size: 26,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  context.getText(AppKeys.quizDetailTitle),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: _navy,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 44),
-            ],
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: Color(0xFFF2F2F2),
+            width: 4,
           ),
         ),
       ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              onPressed: onBack,
+              icon: const Icon(
+                Icons.arrow_back_rounded,
+                color: Color(0xFF339395),
+                size: 28,
+              ),
+              tooltip: context.getText(AppKeys.back),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 52),
+            child: Text(
+              context.getText(AppKeys.quizDetailTitle),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.andika(
+                color: const Color(0xFF339395),
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
-}
-
-class _ReviewHeaderPainter extends CustomPainter {
-  const _ReviewHeaderPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final background = Paint()..color = _reviewBackground;
-    canvas.drawRect(Offset.zero & size, background);
-
-    final line = Paint()
-      ..color = _orange.withValues(alpha: 0.72)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.1;
-    final path = Path()
-      ..moveTo(0, size.height - 6)
-      ..quadraticBezierTo(
-          size.width * 0.5, size.height + 6, size.width, size.height - 6);
-    canvas.drawPath(path, line);
-  }
-
-  @override
-  bool shouldRepaint(covariant _ReviewHeaderPainter oldDelegate) => false;
 }
 
 class _ReviewContent extends StatelessWidget {

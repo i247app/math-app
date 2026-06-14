@@ -12,6 +12,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
@@ -26,6 +27,7 @@ import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/grade_selection_screen.dart';
+import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
 import 'package:numi_flutter/features/quiz/history_tab.dart';
@@ -50,6 +52,11 @@ const _studentParentHomeHeroBg =
 const _studentParentHomeHeroArt =
     'assets/images/student_parent_home_hero_art.png';
 const _parentHomeWelcomeMap = 'assets/images/map_welcome_new.png';
+const _parentHomeAfterReviewBanner =
+    'assets/images/parent_banner_after_review.jpg';
+const _parentHomeClassroom = 'assets/images/parent_home_classroom.png';
+const _parentHomeRace = 'assets/images/parent_home_race.png';
+const _parentHomeShop = 'assets/images/parent_home_shop.png';
 const _studentParentHomeClassThumb =
     'assets/images/student_parent_home_class_thumb.png';
 const _studentParentHomeAssessmentIcon =
@@ -93,9 +100,11 @@ class HomeScreen extends StatefulWidget {
     GradeService? gradeService,
     ClassroomService? classroomService,
     ClassroomExerciseService? assignmentService,
+    QuizService? quizService,
   })  : _gradeService = gradeService,
         _classroomService = classroomService,
-        _assignmentService = assignmentService;
+        _assignmentService = assignmentService,
+        _quizService = quizService;
 
   final LoginUser? user;
   final List<StudentProfile> profiles;
@@ -109,6 +118,7 @@ class HomeScreen extends StatefulWidget {
   final GradeService? _gradeService;
   final ClassroomService? _classroomService;
   final ClassroomExerciseService? _assignmentService;
+  final QuizService? _quizService;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -121,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen>
       widget._classroomService ?? ClassroomApi();
   late final ClassroomExerciseService _assignmentService =
       widget._assignmentService ?? ClassroomExerciseApi();
+  late final QuizService _quizService = widget._quizService ?? QuizApi();
   final ParentHomeCubit _parentHomeCubit = ParentHomeCubit();
   final StudentHomeCubit _studentHomeCubit = StudentHomeCubit();
   final TeacherHomeCubit _teacherHomeCubit = TeacherHomeCubit();
@@ -131,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isPrefetchingGrades = false;
   bool _isProfileMenuOpen = false;
   bool _isSwitchingProfile = false;
+  int _parentStreakCount = 1;
   List<GradeModel> _prefetchedGrades = const <GradeModel>[];
 
   static const _designWidth = 390.0;
@@ -241,7 +253,10 @@ class _HomeScreenState extends State<HomeScreen>
 
           double s(double value) => value * scale;
           final navHeight = s(88) + bottomInset;
-          final headerHeight = s(98) + topInset;
+          final headerHeight = s(
+                widget.activeRole == ProfileRole.parent ? 64 : 98,
+              ) +
+              topInset;
           final showHeader = widget.activeRole != ProfileRole.teacher &&
               navigation.activeTab == 0;
           final switchableProfiles = widget.profiles
@@ -313,6 +328,7 @@ class _HomeScreenState extends State<HomeScreen>
                         gradeService: _gradeService,
                         classroomService: _classroomService,
                         assignmentService: _assignmentService,
+                        quizService: _quizService,
                         onLogout: widget.onLogout,
                         onAddProfileFromReview: () {
                           HapticFeedback.selectionClick();
@@ -343,6 +359,13 @@ class _HomeScreenState extends State<HomeScreen>
                           HapticFeedback.lightImpact();
                           homeCubit.selectTab(1);
                         },
+                        onParentAssessmentStateChanged: (hasAssessment) {
+                          final nextCount = hasAssessment ? 4 : 1;
+                          if (_parentStreakCount == nextCount || !mounted) {
+                            return;
+                          }
+                          setState(() => _parentStreakCount = nextCount);
+                        },
                         parentHomeEntrance: _parentHomeEntranceController,
                         bottomPadding: navHeight + s(14),
                         headerHeight: showHeader ? headerHeight : 0,
@@ -371,6 +394,7 @@ class _HomeScreenState extends State<HomeScreen>
                         role: widget.activeRole,
                         canSwitchProfile: switchableProfiles.isNotEmpty,
                         isProfileMenuOpen: _isProfileMenuOpen,
+                        parentStreakCount: _parentStreakCount,
                         onProfileTap: switchableProfiles.isEmpty
                             ? null
                             : () {
@@ -577,6 +601,7 @@ class HomeDashboardArgs {
     required this.gradeService,
     required this.classroomService,
     required this.assignmentService,
+    required this.quizService,
     required this.onLogout,
     required this.onAddProfileFromReview,
     required this.onProfileSaved,
@@ -584,6 +609,7 @@ class HomeDashboardArgs {
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
     required this.onOpenReviewTab,
+    required this.onParentAssessmentStateChanged,
     required this.parentHomeEntrance,
     required this.bottomPadding,
     required this.headerHeight,
@@ -601,6 +627,7 @@ class HomeDashboardArgs {
   final GradeService gradeService;
   final ClassroomService classroomService;
   final ClassroomExerciseService assignmentService;
+  final QuizService quizService;
   final VoidCallback onLogout;
   final VoidCallback onAddProfileFromReview;
   final VoidCallback onProfileSaved;
@@ -608,6 +635,7 @@ class HomeDashboardArgs {
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenReviewTab;
+  final ValueChanged<bool> onParentAssessmentStateChanged;
   final Animation<double> parentHomeEntrance;
   final double bottomPadding;
   final double headerHeight;
@@ -636,6 +664,7 @@ class _RoleDashboard extends StatelessWidget {
     required this.gradeService,
     required this.classroomService,
     required this.assignmentService,
+    required this.quizService,
     required this.onLogout,
     required this.onAddProfileFromReview,
     required this.onProfileSaved,
@@ -643,6 +672,7 @@ class _RoleDashboard extends StatelessWidget {
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
     required this.onOpenReviewTab,
+    required this.onParentAssessmentStateChanged,
     required this.parentHomeEntrance,
     required this.bottomPadding,
     required this.headerHeight,
@@ -661,6 +691,7 @@ class _RoleDashboard extends StatelessWidget {
   final GradeService gradeService;
   final ClassroomService classroomService;
   final ClassroomExerciseService assignmentService;
+  final QuizService quizService;
   final VoidCallback onLogout;
   final VoidCallback onAddProfileFromReview;
   final VoidCallback onProfileSaved;
@@ -668,6 +699,7 @@ class _RoleDashboard extends StatelessWidget {
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenReviewTab;
+  final ValueChanged<bool> onParentAssessmentStateChanged;
   final Animation<double> parentHomeEntrance;
   final double bottomPadding;
   final double headerHeight;
@@ -687,6 +719,7 @@ class _RoleDashboard extends StatelessWidget {
       gradeService: gradeService,
       classroomService: classroomService,
       assignmentService: assignmentService,
+      quizService: quizService,
       onLogout: onLogout,
       onAddProfileFromReview: onAddProfileFromReview,
       onProfileSaved: onProfileSaved,
@@ -694,6 +727,7 @@ class _RoleDashboard extends StatelessWidget {
       onCompleteTeacherProfile: onCompleteTeacherProfile,
       onOpenClassroomTab: onOpenClassroomTab,
       onOpenReviewTab: onOpenReviewTab,
+      onParentAssessmentStateChanged: onParentAssessmentStateChanged,
       parentHomeEntrance: parentHomeEntrance,
       bottomPadding: bottomPadding,
       headerHeight: headerHeight,
@@ -738,6 +772,7 @@ class _HeaderBar extends StatelessWidget {
     required this.role,
     required this.canSwitchProfile,
     required this.isProfileMenuOpen,
+    required this.parentStreakCount,
     required this.onProfileTap,
   });
 
@@ -749,11 +784,113 @@ class _HeaderBar extends StatelessWidget {
   final ProfileRole role;
   final bool canSwitchProfile;
   final bool isProfileMenuOpen;
+  final int parentStreakCount;
   final VoidCallback? onProfileTap;
 
   @override
   Widget build(BuildContext context) {
     final contentHeight = height - topInset;
+    if (role == ProfileRole.parent) {
+      return ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            height: height,
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding * 0.82,
+              topInset + contentHeight * 0.10,
+              horizontalPadding * 0.72,
+              contentHeight * 0.10,
+            ),
+            color: Colors.white.withValues(alpha: 0.96),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Semantics(
+                    button: canSwitchProfile,
+                    child: InkWell(
+                      onTap: onProfileTap,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Row(
+                        children: [
+                          ProfileAvatarImage(
+                            size: contentHeight * 0.74,
+                            avatarKey: profile?.avatarKey,
+                            avatarUrl: profile?.avatarUrl,
+                            borderColor:
+                                const Color(0xFFE7DAC8).withValues(alpha: 0.9),
+                            borderWidth: 1.5,
+                          ),
+                          SizedBox(width: contentHeight * 0.16),
+                          Flexible(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _homeRoleLabel(context, role),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: const Color(0xFF6782AA),
+                                    fontSize: contentHeight * 0.19,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.8,
+                                    height: 1,
+                                  ),
+                                ),
+                                SizedBox(height: contentHeight * 0.06),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: const Color(0xFF002B6A),
+                                          fontSize: contentHeight * 0.29,
+                                          fontWeight: FontWeight.w900,
+                                          height: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    if (canSwitchProfile) ...[
+                                      SizedBox(width: contentHeight * 0.04),
+                                      AnimatedRotation(
+                                        turns: isProfileMenuOpen ? 0.5 : 0,
+                                        duration:
+                                            const Duration(milliseconds: 180),
+                                        child: Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          size: contentHeight * 0.26,
+                                          color: const Color(0xFF8294B0),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                _ParentFireBadge(
+                  count: parentStreakCount,
+                  height: contentHeight * 0.48,
+                ),
+                SizedBox(width: contentHeight * 0.12),
+                _NotificationButton(size: contentHeight * 0.58),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return ClipRect(
       child: BackdropFilter(
@@ -848,6 +985,49 @@ class _HeaderBar extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ParentFireBadge extends StatelessWidget {
+  const _ParentFireBadge({
+    required this.count,
+    required this.height,
+  });
+
+  final int count;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      constraints: BoxConstraints(minWidth: height * 1.5),
+      padding: EdgeInsets.symmetric(horizontal: height * 0.30),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF4EC),
+        borderRadius: BorderRadius.circular(height),
+        border: Border.all(color: const Color(0xFFFFCBAF)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.local_fire_department_rounded,
+            color: const Color(0xFFFF650B),
+            size: height * 0.66,
+          ),
+          Text(
+            '$count',
+            style: TextStyle(
+              color: const Color(0xFFFF650B),
+              fontSize: height * 0.44,
+              fontWeight: FontWeight.w900,
+              height: 1,
+            ),
+          ),
+        ],
       ),
     );
   }

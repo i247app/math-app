@@ -217,6 +217,8 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                               Text(
                                 context.getText(AppKeys.gradeQuestionTitle),
                                 textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: _gradeInk,
                                   fontSize: s(31),
