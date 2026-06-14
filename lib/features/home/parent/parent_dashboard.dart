@@ -57,11 +57,13 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   bool _isLoading = true;
   String? _errorMessage;
   List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
+  List<_ParentChildSummary> _childSummaries = const <_ParentChildSummary>[];
+  int _childLoadRequestId = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadAssessments();
+    _loadHome();
   }
 
   @override
@@ -73,13 +75,87 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
     );
+    final oldChildIds = _studentProfiles(oldWidget.args.profiles)
+        .map(ActiveProfileSession.profileStableId)
+        .join(',');
+    final childIds = _studentProfiles(widget.args.profiles)
+        .map(ActiveProfileSession.profileStableId)
+        .join(',');
     if (oldProfileId != profileId ||
-        oldWidget.args.user?.id != widget.args.user?.id) {
-      _loadAssessments();
+        oldWidget.args.user?.id != widget.args.user?.id ||
+        oldChildIds != childIds) {
+      _loadHome();
     }
   }
 
+  List<StudentProfile> get _children => _studentProfiles(widget.args.profiles);
+
+  Future<void> _loadHome() {
+    return _children.isNotEmpty ? _loadChildDashboard() : _loadAssessments();
+  }
+
+  Future<void> _loadChildDashboard() async {
+    final requestId = ++_childLoadRequestId;
+    final children = _children;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _completedAssessments = const <GeneratedQuiz>[];
+      _childSummaries = const <_ParentChildSummary>[];
+    });
+    widget.args.onParentAssessmentStateChanged(false);
+
+    var hadError = false;
+    final summaries = await Future.wait(
+      children.map((profile) async {
+        final profileId = ActiveProfileSession.profileStableId(profile);
+        if (profileId == null || profileId <= 0) {
+          hadError = true;
+          return _ParentChildSummary(profile: profile);
+        }
+
+        List<ClassroomModel> classrooms = const <ClassroomModel>[];
+        List<GeneratedQuiz> assessments = const <GeneratedQuiz>[];
+        try {
+          classrooms = await widget.args.classroomService
+              .listMyJoinedClassrooms(profileId: profileId);
+        } catch (_) {
+          hadError = true;
+        }
+        try {
+          final quizzes = await widget.args.quizService.listQuizzes(
+            profileId: profileId,
+          );
+          assessments = quizzes
+              .where(_isCompletedAssessment)
+              .toList(growable: false)
+            ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+        } catch (_) {
+          hadError = true;
+        }
+
+        return _ParentChildSummary(
+          profile: profile,
+          classroom: classrooms.isEmpty ? null : classrooms.first,
+          assessments: assessments,
+        );
+      }),
+    );
+
+    if (!mounted || requestId != _childLoadRequestId) {
+      return;
+    }
+    setState(() {
+      _isLoading = false;
+      _childSummaries = summaries;
+      _errorMessage = hadError
+          ? context.readText(AppKeys.parentChildDashboardLoadFailed)
+          : null;
+    });
+  }
+
   Future<void> _loadAssessments() async {
+    _childSummaries = const <_ParentChildSummary>[];
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
     );
@@ -147,6 +223,10 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
   @override
   Widget build(BuildContext context) {
+    if (_children.isNotEmpty) {
+      return _buildChildDashboard();
+    }
+
     final hasCompletedAssessment = _completedAssessments.isNotEmpty;
     final padding = EdgeInsets.fromLTRB(
       14 * widget.args.scale,
@@ -157,7 +237,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
     return RefreshIndicator(
       color: const Color(0xFF159A86),
-      onRefresh: _loadAssessments,
+      onRefresh: _loadHome,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
@@ -181,6 +261,66 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
               _ParentHomeErrorCard(
                 message: _errorMessage!,
                 onRetry: _loadAssessments,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChildDashboard() {
+    final summaries = _childSummaries;
+    final assessments = <_ParentChildAssessment>[
+      for (final summary in summaries)
+        for (final quiz in summary.assessments)
+          _ParentChildAssessment(summary: summary, quiz: quiz),
+    ]..sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
+    final padding = EdgeInsets.fromLTRB(
+      20 * widget.args.scale,
+      widget.args.headerHeight + 8 * widget.args.scale,
+      20 * widget.args.scale,
+      widget.args.bottomPadding,
+    );
+
+    return RefreshIndicator(
+      color: const Color(0xFF159A86),
+      onRefresh: _loadHome,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (_isLoading)
+              const _ParentChildDashboardLoading()
+            else ...[
+              _ParentChildrenGrid(summaries: summaries),
+              const SizedBox(height: 14),
+              for (final item in assessments.take(2)) ...[
+                _ParentAssessmentResultCard(
+                  quiz: item.quiz,
+                  profileName: _profileDisplayName(
+                    context,
+                    item.summary.profile,
+                  ),
+                  classroomName: _parentClassroomName(
+                    context,
+                    item.summary,
+                  ),
+                  onTap: () => _openQuizReview(item.quiz),
+                ),
+                const SizedBox(height: 10),
+              ],
+              _ParentTeacherMessages(summaries: summaries.take(2).toList()),
+            ],
+            if (!_isLoading && _errorMessage != null) ...[
+              const SizedBox(height: 10),
+              _ParentHomeErrorCard(
+                message: _errorMessage!,
+                onRetry: _loadHome,
               ),
             ],
           ],
@@ -330,6 +470,528 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+  }
+}
+
+class _ParentChildSummary {
+  const _ParentChildSummary({
+    required this.profile,
+    this.classroom,
+    this.assessments = const <GeneratedQuiz>[],
+  });
+
+  final StudentProfile profile;
+  final ClassroomModel? classroom;
+  final List<GeneratedQuiz> assessments;
+}
+
+class _ParentChildAssessment {
+  const _ParentChildAssessment({
+    required this.summary,
+    required this.quiz,
+  });
+
+  final _ParentChildSummary summary;
+  final GeneratedQuiz quiz;
+}
+
+class _ParentChildrenGrid extends StatelessWidget {
+  const _ParentChildrenGrid({required this.summaries});
+
+  final List<_ParentChildSummary> summaries;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        mainAxisExtent: 121,
+      ),
+      itemCount: summaries.length,
+      itemBuilder: (context, index) {
+        final summary = summaries[index];
+        final classroomName = _parentClassroomName(context, summary);
+        final teacherName = summary.classroom?.teacherName?.trim();
+        return Container(
+          padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+          decoration: BoxDecoration(
+            color: index.isEven
+                ? const Color(0xFFE9F8F6)
+                : const Color(0xFFEEF6FD),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: index.isEven
+                  ? const Color(0xFFC8E4DF)
+                  : const Color(0xFFD4E0EC),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                _profileDisplayName(context, summary.profile),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: index.isEven
+                      ? const Color(0xFF14635E)
+                      : const Color(0xFF126696),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                classroomName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: index.isEven
+                      ? const Color(0xFF14635E)
+                      : const Color(0xFF126696),
+                  fontSize: 31,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                teacherName?.isNotEmpty == true
+                    ? teacherName!
+                    : context.getText(AppKeys.parentNoTeacher),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF32625F),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ParentTeacherMessages extends StatelessWidget {
+  const _ParentTeacherMessages({required this.summaries});
+
+  final List<_ParentChildSummary> summaries;
+
+  @override
+  Widget build(BuildContext context) {
+    if (summaries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        for (var index = 0; index < summaries.length; index++) ...[
+          _ParentTeacherMessageCard(
+            summary: summaries[index],
+            index: index,
+          ),
+          if (index != summaries.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}
+
+class _ParentTeacherMessageCard extends StatelessWidget {
+  const _ParentTeacherMessageCard({
+    required this.summary,
+    required this.index,
+  });
+
+  final _ParentChildSummary summary;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final isFirst = index.isEven;
+    final accent = isFirst ? const Color(0xFF17999C) : const Color(0xFFFF701E);
+    final surface = isFirst ? const Color(0xFFEFF9F9) : const Color(0xFFFFF2EA);
+    final studentName = _profileDisplayName(context, summary.profile);
+    final classroomName = _parentClassroomName(context, summary);
+    final teacherName = summary.classroom?.teacherName?.trim();
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFE0E0E0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(13),
+                child: Image.asset(
+                  isFirst ? _homeTeacherAvatarOne : _homeTeacherAvatarTwo,
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      teacherName?.isNotEmpty == true
+                          ? teacherName!
+                          : context.getText(AppKeys.parentNoTeacher),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF001741),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      classroomName,
+                      style: const TextStyle(
+                        color: Color(0xFF515F6F),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Text(
+                '10:45 AM',
+                style: TextStyle(
+                  color: Color(0xFF6B7280),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 11),
+          Container(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(
+                color: accent.withValues(alpha: 0.70),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: accent,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    studentName.toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.formatText(
+                    isFirst
+                        ? AppKeys.parentTeacherFeedback
+                        : AppKeys.parentTeacherReminder,
+                    {'student': studentName},
+                  ),
+                  style: const TextStyle(
+                    color: Color(0xFF30333A),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    height: 1.42,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ParentChildDashboardLoading extends StatefulWidget {
+  const _ParentChildDashboardLoading();
+
+  @override
+  State<_ParentChildDashboardLoading> createState() =>
+      _ParentChildDashboardLoadingState();
+}
+
+class _ParentChildDashboardLoadingState
+    extends State<_ParentChildDashboardLoading>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final color = Color.lerp(
+          const Color(0xFFF1F3F3),
+          const Color(0xFFE1E8E7),
+          _controller.value,
+        )!;
+        return Column(
+          children: [
+            Row(
+              children: [
+                for (var index = 0; index < 2; index++) ...[
+                  Expanded(
+                    child: _ParentSkeletonBlock(
+                      height: 121,
+                      radius: 18,
+                      color: color,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 22,
+                        ),
+                        child: Column(
+                          children: [
+                            _ParentSkeletonLine(
+                              width: 70,
+                              height: 12,
+                              color: color,
+                            ),
+                            const SizedBox(height: 12),
+                            _ParentSkeletonLine(
+                              width: 88,
+                              height: 28,
+                              color: color,
+                            ),
+                            const SizedBox(height: 12),
+                            _ParentSkeletonLine(
+                              width: 96,
+                              height: 10,
+                              color: color,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (index == 0) const SizedBox(width: 12),
+                ],
+              ],
+            ),
+            const SizedBox(height: 14),
+            for (var index = 0; index < 2; index++) ...[
+              _ParentSkeletonBlock(
+                height: 98,
+                radius: 18,
+                color: color,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  child: Row(
+                    children: [
+                      _ParentSkeletonBlock(
+                        width: 50,
+                        height: 50,
+                        radius: 25,
+                        color: color,
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _ParentSkeletonLine(
+                              width: 94,
+                              height: 10,
+                              color: color,
+                            ),
+                            const SizedBox(height: 10),
+                            _ParentSkeletonLine(
+                              width: double.infinity,
+                              height: 16,
+                              color: color,
+                            ),
+                            const SizedBox(height: 8),
+                            _ParentSkeletonLine(
+                              width: 120,
+                              height: 10,
+                              color: color,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+            for (var index = 0; index < 2; index++) ...[
+              _ParentSkeletonBlock(
+                height: 190,
+                radius: 22,
+                color: color,
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          _ParentSkeletonBlock(
+                            width: 48,
+                            height: 48,
+                            radius: 13,
+                            color: color,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _ParentSkeletonLine(
+                                  width: 135,
+                                  height: 15,
+                                  color: color,
+                                ),
+                                const SizedBox(height: 8),
+                                _ParentSkeletonLine(
+                                  width: 70,
+                                  height: 9,
+                                  color: color,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: _ParentSkeletonBlock(
+                          radius: 13,
+                          color: color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (index == 0) const SizedBox(height: 12),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ParentSkeletonBlock extends StatelessWidget {
+  const _ParentSkeletonBlock({
+    this.width,
+    this.height,
+    required this.radius,
+    required this.color,
+    this.child,
+  });
+
+  final double? width;
+  final double? height;
+  final double radius;
+  final Color color;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: const Color(0xFFE8ECEB)),
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.58),
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _ParentSkeletonLine extends StatelessWidget {
+  const _ParentSkeletonLine({
+    required this.width,
+    required this.height,
+    required this.color,
+  });
+
+  final double width;
+  final double height;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(height),
+        ),
+      ),
+    );
   }
 }
 
@@ -657,10 +1319,14 @@ class _ParentAssessmentResultCard extends StatelessWidget {
   const _ParentAssessmentResultCard({
     required this.quiz,
     required this.onTap,
+    this.profileName,
+    this.classroomName,
   });
 
   final GeneratedQuiz quiz;
   final VoidCallback onTap;
+  final String? profileName;
+  final String? classroomName;
 
   @override
   Widget build(BuildContext context) {
@@ -753,6 +1419,19 @@ class _ParentAssessmentResultCard extends StatelessWidget {
                         height: 1.1,
                       ),
                     ),
+                    if (profileName != null || classroomName != null) ...[
+                      const SizedBox(height: 7),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          if (profileName != null)
+                            _ParentResultTag(label: profileName!),
+                          if (classroomName != null)
+                            _ParentResultTag(label: classroomName!),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -763,6 +1442,34 @@ class _ParentAssessmentResultCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentResultTag extends StatelessWidget {
+  const _ParentResultTag({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF4F0EE),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          color: Color(0xFF6D5C58),
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          height: 1,
         ),
       ),
     );
@@ -859,4 +1566,27 @@ String _parentQuizTitle(BuildContext context, GeneratedQuiz quiz) {
     return '${context.getText(AppKeys.mathAssessment)} $grade';
   }
   return context.getText(AppKeys.mathAssessment);
+}
+
+List<StudentProfile> _studentProfiles(List<StudentProfile> profiles) {
+  return profiles
+      .where(
+        (profile) => ProfileRole.fromProfile(profile) == ProfileRole.student,
+      )
+      .toList(growable: false);
+}
+
+String _parentClassroomName(
+  BuildContext context,
+  _ParentChildSummary summary,
+) {
+  final name = summary.classroom?.name?.trim();
+  if (name != null && name.isNotEmpty) {
+    return name;
+  }
+  final grade = summary.profile.grade?.label?.trim();
+  if (grade != null && grade.isNotEmpty) {
+    return grade;
+  }
+  return context.getText(AppKeys.parentNoClassroom);
 }

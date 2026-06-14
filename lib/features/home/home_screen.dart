@@ -54,7 +54,7 @@ const _studentParentHomeHeroArt =
 const _parentHomeWelcomeMap = 'assets/images/map_welcome_new.png';
 const _parentHomeAfterReviewBanner =
     'assets/images/parent_banner_after_review.jpg';
-const _parentHomeClassroom = 'assets/images/parent_home_classroom.png';
+const _parentHomeClassroom = 'assets/images/join_classroom.jpg';
 const _parentHomeRace = 'assets/images/parent_home_race.png';
 const _parentHomeShop = 'assets/images/parent_home_shop.png';
 const _studentParentHomeClassThumb =

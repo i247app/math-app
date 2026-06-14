@@ -97,6 +97,14 @@ class AppStrings {
       AppKeys.parentJoinRoomSubtitle: 'Tương tác và học cùng giáo viên',
       AppKeys.parentQuizLoadFailed: 'Chưa tải được lịch sử đánh giá.',
       AppKeys.parentTryAgain: 'Thử lại',
+      AppKeys.parentNoClassroom: 'Chưa tham gia lớp',
+      AppKeys.parentNoTeacher: 'Chưa có giáo viên',
+      AppKeys.parentChildDashboardLoadFailed:
+          'Chưa tải được đầy đủ thông tin học tập của các bé.',
+      AppKeys.parentTeacherFeedback:
+          'Chào phụ huynh, em gửi nhận xét tuần này của bé {student}. Bé đã có tiến bộ và hoàn thành tốt các hoạt động trên lớp.',
+      AppKeys.parentTeacherReminder:
+          'Bé {student} còn một số hoạt động cần hoàn thành. Nhờ gia đình nhắc bé ôn tập và làm bài đúng hạn.',
       AppKeys.yourAchievement: 'Thành tích của bạn',
       AppKeys.studentHomework: 'Bài tập',
       AppKeys.studentClassroom: 'Lớp học',
@@ -673,6 +681,14 @@ class AppStrings {
       AppKeys.parentJoinRoomSubtitle: 'Interact and learn with a teacher',
       AppKeys.parentQuizLoadFailed: 'Could not load assessment history.',
       AppKeys.parentTryAgain: 'Try again',
+      AppKeys.parentNoClassroom: 'Not in a classroom',
+      AppKeys.parentNoTeacher: 'No teacher yet',
+      AppKeys.parentChildDashboardLoadFailed:
+          'Some learning information could not be loaded.',
+      AppKeys.parentTeacherFeedback:
+          'Hello, here is this week\'s feedback for {student}. Your child has made progress and completed the classroom activities well.',
+      AppKeys.parentTeacherReminder:
+          '{student} still has a few activities to complete. Please remind your child to review and finish them on time.',
       AppKeys.yourAchievement: 'Your achievements',
       AppKeys.studentHomework: 'Homework',
       AppKeys.studentClassroom: 'Classroom',

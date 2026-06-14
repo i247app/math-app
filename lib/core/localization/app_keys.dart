@@ -92,6 +92,12 @@ class AppKeys {
   static const parentJoinRoomSubtitle = 'parent_join_room_subtitle';
   static const parentQuizLoadFailed = 'parent_quiz_load_failed';
   static const parentTryAgain = 'parent_try_again';
+  static const parentNoClassroom = 'parent_no_classroom';
+  static const parentNoTeacher = 'parent_no_teacher';
+  static const parentChildDashboardLoadFailed =
+      'parent_child_dashboard_load_failed';
+  static const parentTeacherFeedback = 'parent_teacher_feedback';
+  static const parentTeacherReminder = 'parent_teacher_reminder';
   static const yourAchievement = 'your_achievement';
   static const studentHomework = 'student_homework';
   static const studentClassroom = 'student_classroom';
