@@ -200,7 +200,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: _teacherTeal,
-                    fontSize: 24,
+                    fontSize: FontSize.title,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0,
                   ),
@@ -276,7 +276,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                               FocusManager.instance.primaryFocus?.unfocus(),
                           style: GoogleFonts.andika(
                             color: _teacherInk,
-                            fontSize: 16 * scale,
+                            fontSize: FontSize.normal * scale,
                             fontWeight: FontWeight.w500,
                           ),
                           decoration: InputDecoration(
@@ -284,7 +284,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                                 .getText(AppKeys.teacherSearchClassroomHint),
                             hintStyle: GoogleFonts.andika(
                               color: _teacherMuted.withValues(alpha: 0.6),
-                              fontSize: 16 * scale,
+                              fontSize: FontSize.normal * scale,
                               fontWeight: FontWeight.w500,
                             ),
                             border: InputBorder.none,
@@ -317,7 +317,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.andika(
                           color: _teacherMuted,
-                          fontSize: 14 * scale,
+                          fontSize: FontSize.small * scale,
                         ),
                       ),
                     ),
@@ -330,7 +330,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                         context.getText(AppKeys.teacherEmptyClassroomList),
                         style: GoogleFonts.andika(
                           color: _teacherMuted,
-                          fontSize: 16 * scale,
+                          fontSize: FontSize.normal * scale,
                         ),
                       ),
                     ),
@@ -431,7 +431,7 @@ class _ClassroomListCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.andika(
                       color: _teacherBlue,
-                      fontSize: 18 * scale,
+                      fontSize: FontSize.large * scale,
                       fontWeight: FontWeight.w800,
                       height: 1.2,
                     ),
@@ -443,7 +443,7 @@ class _ClassroomListCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.andika(
                       color: _teacherMuted,
-                      fontSize: 14 * scale,
+                      fontSize: FontSize.small * scale,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
                     ),
@@ -464,7 +464,7 @@ class _ClassroomListCard extends StatelessWidget {
                         ),
                         style: GoogleFonts.andika(
                           color: _teacherMuted,
-                          fontSize: 13 * scale,
+                          fontSize: FontSize.caption * scale,
                           fontWeight: FontWeight.w700,
                         ),
                       ),

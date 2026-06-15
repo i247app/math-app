@@ -5,6 +5,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
@@ -240,7 +241,7 @@ class _HistoryHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontSize: 24,
+          fontSize: FontSize.title,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
@@ -280,7 +281,7 @@ class _HistorySearchField extends StatelessWidget {
         textInputAction: TextInputAction.search,
         style: TextStyle(
           color: _deepInk,
-          fontSize: 15 * scale,
+          fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w800,
           letterSpacing: 0,
         ),
@@ -288,7 +289,7 @@ class _HistorySearchField extends StatelessWidget {
           hintText: context.getText(AppKeys.searchHint),
           hintStyle: TextStyle(
             color: const Color(0xFFD8C5CC),
-            fontSize: 16 * scale,
+            fontSize: FontSize.normal * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
           ),
@@ -399,7 +400,7 @@ class _HistoryTypeTabButton extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: selected ? Colors.white : _muted,
-              fontSize: 13 * scale,
+              fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w500,
               height: 1,
               letterSpacing: 0,
@@ -558,7 +559,7 @@ class _HistoryQuizCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: _deepInk,
-                        fontSize: 14 * scale,
+                        fontSize: FontSize.small * scale,
                         fontWeight: FontWeight.w900,
                         height: 1.28,
                         letterSpacing: 0,
@@ -634,7 +635,7 @@ class _HistoryMetaItem extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: _muted,
-            fontSize: 10 * scale,
+            fontSize: FontSize.caption * 0.77 * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
           ),
@@ -682,7 +683,7 @@ class _HistoryScoreBadge extends StatelessWidget {
                   maxLines: 1,
                   style: TextStyle(
                     color: colors.foreground,
-                    fontSize: 13 * scale,
+                    fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -699,7 +700,7 @@ class _HistoryScoreBadge extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: colors.foreground,
-              fontSize: 10 * scale,
+              fontSize: FontSize.caption * 0.77 * scale,
               fontWeight: FontWeight.w900,
               height: 1.05,
               letterSpacing: 0,
@@ -727,7 +728,7 @@ class _HistoryIncompleteBadge extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           color: _orange,
-          fontSize: 10 * scale,
+          fontSize: FontSize.caption * 0.77 * scale,
           fontWeight: FontWeight.w900,
           height: 1.1,
           letterSpacing: 0,
@@ -800,7 +801,7 @@ class _HistoryMessageState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _deepInk,
-              fontSize: 18 * scale,
+              fontSize: FontSize.large * scale,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
@@ -811,7 +812,7 @@ class _HistoryMessageState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _muted,
-              fontSize: 13 * scale,
+              fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w700,
               height: 1.35,
               letterSpacing: 0,
@@ -825,7 +826,7 @@ class _HistoryMessageState extends StatelessWidget {
                 actionLabel!,
                 style: TextStyle(
                   color: _teal,
-                  fontSize: 13 * scale,
+                  fontSize: FontSize.caption * scale,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0,
                 ),

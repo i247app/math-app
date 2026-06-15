@@ -350,7 +350,7 @@ class _AccountPhoneField extends StatelessWidget {
             '+84',
             style: GoogleFonts.andika(
               color: _deepInk,
-              fontSize: 17 * scale,
+              fontSize: FontSize.large * scale,
               fontWeight: FontWeight.w900,
               height: 1,
               letterSpacing: 0,
@@ -370,7 +370,7 @@ class _AccountPhoneField extends StatelessWidget {
               scale: scale,
               textStyle: GoogleFonts.andika(
                 color: Colors.black,
-                fontSize: 21 * scale,
+                fontSize: FontSize.title * scale,
                 fontWeight: FontWeight.w900,
                 height: 1,
                 letterSpacing: 0,
@@ -410,7 +410,7 @@ class _AccountFieldShell extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
                   color: const Color(0xFF604950),
-                  fontSize: 15 * scale,
+                  fontSize: FontSize.normal * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
@@ -460,7 +460,7 @@ class _PlainAccountTextField extends StatelessWidget {
     final style = textStyle ??
         GoogleFonts.andika(
           color: _deepInk,
-          fontSize: 17 * scale,
+          fontSize: FontSize.large * scale,
           fontWeight: FontWeight.w700,
           height: 1,
           letterSpacing: 0,
@@ -515,7 +515,7 @@ class _SaveButton extends StatelessWidget {
                 context.getText(AppKeys.save),
                 style: GoogleFonts.andika(
                   color: Colors.white,
-                  fontSize: 18 * scale,
+                  fontSize: FontSize.large * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
@@ -569,7 +569,7 @@ class _CancelButton extends StatelessWidget {
                 context.getText(AppKeys.cancel).toUpperCase(),
                 style: GoogleFonts.andika(
                   color: const Color(0xFFB74419),
-                  fontSize: 16 * scale,
+                  fontSize: FontSize.normal * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,

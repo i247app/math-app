@@ -193,7 +193,7 @@ class _AddProfilePanel extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
               color: _orange,
-              fontSize: 13 * scale,
+              fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w800,
               height: 1.25,
               letterSpacing: 0,
@@ -208,7 +208,7 @@ class _AddProfilePanel extends StatelessWidget {
                   context.getText(AppKeys.reloadOptions),
                   style: GoogleFonts.andika(
                     color: _teal,
-                    fontSize: 13 * scale,
+                    fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0,
                   ),
@@ -417,7 +417,7 @@ class _AddProfileAvatar extends StatelessWidget {
                     context.getText(AppKeys.chooseAvatar),
                     style: GoogleFonts.andika(
                       color: _teal,
-                      fontSize: 22 * scale,
+                      fontSize: FontSize.title * scale,
                       fontWeight: FontWeight.w900,
                       height: 1.15,
                       letterSpacing: 0,
@@ -511,7 +511,7 @@ class _AddProfileTextField extends StatelessWidget {
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         style: GoogleFonts.andika(
           color: _deepInk,
-          fontSize: 15 * scale,
+          fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w800,
           height: 1,
           letterSpacing: 0,
@@ -520,7 +520,7 @@ class _AddProfileTextField extends StatelessWidget {
           hintText: hintText,
           hintStyle: GoogleFonts.andika(
             color: const Color(0xFFA8B1B2),
-            fontSize: 14 * scale,
+            fontSize: FontSize.small * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
           ),
@@ -585,7 +585,7 @@ class _AddProfileDropdown<T> extends StatelessWidget {
                     color: selectedLabel == null
                         ? const Color(0xFFA8B1B2)
                         : _deepInk,
-                    fontSize: 15 * scale,
+                    fontSize: FontSize.normal * scale,
                     fontWeight: selectedLabel == null
                         ? FontWeight.w800
                         : FontWeight.w900,
@@ -652,7 +652,7 @@ class _AddProfileDropdown<T> extends StatelessWidget {
                   label,
                   style: GoogleFonts.andika(
                     color: _teal,
-                    fontSize: 22 * scale,
+                    fontSize: FontSize.title * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.15,
                   ),
@@ -692,7 +692,7 @@ class _AddProfileDropdown<T> extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.andika(
                               color: _deepInk,
-                              fontSize: 16 * scale,
+                              fontSize: FontSize.normal * scale,
                               fontWeight: isSelected
                                   ? FontWeight.w900
                                   : FontWeight.w700,
@@ -755,7 +755,7 @@ class _AddProfileFieldShell extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.andika(
             color: const Color(0xFF604950),
-            fontSize: 14 * scale,
+            fontSize: FontSize.small * scale,
             fontWeight: FontWeight.w900,
             height: 1,
             letterSpacing: 0,

@@ -14,6 +14,7 @@ import 'package:numi_flutter/core/network/school_models.dart';
 import 'package:numi_flutter/core/network/program_models.dart';
 import 'package:numi_flutter/core/network/semester_models.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/avatar_picker.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
@@ -1243,7 +1244,7 @@ class _SettingTabState extends State<SettingTab> {
             context.readText(AppKeys.deleteProfileMessage),
             style: GoogleFonts.andika(
               color: const Color(0xFF1B1B1B),
-              fontSize: 16,
+              fontSize: FontSize.normal,
               fontWeight: FontWeight.w700,
               letterSpacing: 0,
             ),

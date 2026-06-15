@@ -6,6 +6,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/chapter_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/quiz/chapter_api.dart';
 import 'package:numi_flutter/features/quiz/practice_catalog.dart';
@@ -486,7 +487,7 @@ class _ReviewHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontSize: 24,
+          fontSize: FontSize.title,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
@@ -546,7 +547,7 @@ class _ReviewProfileStatePanel extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: const Color(0xFF253228),
-              fontSize: 28 * scale,
+              fontSize: FontSize.title * scale,
               fontWeight: FontWeight.w900,
               height: 1,
               letterSpacing: 0,
@@ -560,7 +561,7 @@ class _ReviewProfileStatePanel extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: const Color(0xFF515F54),
-              fontSize: 17 * scale,
+              fontSize: FontSize.large * scale,
               fontWeight: FontWeight.w800,
               height: 1.25,
               letterSpacing: 0,
@@ -589,7 +590,7 @@ class _ReviewProfileStatePanel extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18 * scale,
+                    fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -647,7 +648,7 @@ class _StatTile extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               icon,
-              style: TextStyle(fontSize: 26 * scale, height: 1),
+              style: TextStyle(fontSize: FontSize.title * scale, height: 1),
             ),
           ),
           SizedBox(width: 14 * scale),
@@ -662,7 +663,7 @@ class _StatTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _reviewInk,
-                    fontSize: 24 * scale,
+                    fontSize: FontSize.title * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -675,7 +676,7 @@ class _StatTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _reviewMuted,
-                    fontSize: 15 * scale,
+                    fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w800,
                     height: 1,
                     letterSpacing: 0,
@@ -763,7 +764,7 @@ class _ChapterCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: _reviewMuted,
-                              fontSize: 16 * scale,
+                              fontSize: FontSize.normal * scale,
                               fontWeight: FontWeight.w900,
                               height: 1,
                               letterSpacing: 0,
@@ -776,7 +777,7 @@ class _ChapterCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: _reviewInk,
-                              fontSize: 22 * scale,
+                              fontSize: FontSize.title * scale,
                               fontWeight: FontWeight.w900,
                               height: 1.08,
                               letterSpacing: 0,
@@ -838,7 +839,7 @@ class _Badge extends StatelessWidget {
       child: Text(
         icon,
         style: TextStyle(
-          fontSize: 28 * scale,
+          fontSize: FontSize.title * scale,
           height: 1,
           color: Colors.black,
         ),
@@ -922,7 +923,7 @@ class _TestButton extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: const Color(0xFF3B0031),
-                      fontSize: 20 * scale,
+                      fontSize: FontSize.large * scale,
                       fontWeight: FontWeight.w900,
                       height: 1,
                       letterSpacing: 0,
@@ -976,7 +977,7 @@ class _StartSelectedButton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: const Color(0xFF3B0031),
-                    fontSize: 18 * scale,
+                    fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -1033,7 +1034,7 @@ class _ClearSelectionButton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _selectPink,
-                    fontSize: 14 * scale,
+                    fontSize: FontSize.small * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,

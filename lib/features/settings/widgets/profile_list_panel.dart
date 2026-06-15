@@ -186,7 +186,7 @@ class _ParentProfileManagePanel extends StatelessWidget {
           context.getText(AppKeys.parentInfoTitle),
           style: GoogleFonts.andika(
             color: _deepInk,
-            fontSize: 18 * scale,
+            fontSize: FontSize.large * scale,
             fontWeight: FontWeight.w900,
             height: 1,
           ),
@@ -212,7 +212,7 @@ class _ParentProfileManagePanel extends StatelessWidget {
                 ),
                 style: GoogleFonts.andika(
                   color: _deepInk,
-                  fontSize: 18 * scale,
+                  fontSize: FontSize.large * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
                 ),
@@ -325,7 +325,7 @@ class _ParentInfoCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.andika(
                                 color: _deepInk,
-                                fontSize: 18 * scale,
+                                fontSize: FontSize.large * scale,
                                 fontWeight: FontWeight.w900,
                                 height: 1.1,
                               ),
@@ -367,7 +367,7 @@ class _ParentInfoCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: const Color(0xFF6B7280),
-                            fontSize: 13 * scale,
+                            fontSize: FontSize.caption * scale,
                             fontWeight: FontWeight.w700,
                             height: 1.1,
                           ),
@@ -457,7 +457,7 @@ class _ManagedProfileRolePill extends StatelessWidget {
         _localizedRole(context, role),
         style: GoogleFonts.andika(
           color: const Color(0xFF008080),
-          fontSize: 13 * scale,
+          fontSize: FontSize.caption * scale,
           fontWeight: FontWeight.w900,
           height: 1,
         ),
@@ -544,7 +544,7 @@ class _ParentChildProfileCard extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.andika(
                                   color: textColor,
-                                  fontSize: 18 * scale,
+                                  fontSize: FontSize.large * scale,
                                   fontWeight: FontWeight.w900,
                                   height: 1.1,
                                 ),
@@ -649,7 +649,7 @@ class _ParentProfileCodeLine extends StatelessWidget {
             style: GoogleFonts.andika(
               color:
                   isActive ? const Color(0xFF604950) : const Color(0xFF6B7280),
-              fontSize: 13 * scale,
+              fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w700,
               height: 1,
             ),
@@ -749,7 +749,7 @@ class _ParentProfileInfoLine extends StatelessWidget {
           '$label : ',
           style: GoogleFonts.andika(
             color: color,
-            fontSize: 14 * scale,
+            fontSize: FontSize.small * scale,
             fontWeight: FontWeight.w800,
             height: 1,
           ),
@@ -761,7 +761,7 @@ class _ParentProfileInfoLine extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: color,
-              fontSize: 14 * scale,
+              fontSize: FontSize.small * scale,
               fontWeight: FontWeight.w700,
               height: 1,
             ),
@@ -917,7 +917,7 @@ class _ProfileCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: _deepInk,
-                            fontSize: 18 * scale,
+                            fontSize: FontSize.large * scale,
                             fontWeight: FontWeight.w900,
                             height: 1,
                             letterSpacing: 0,
@@ -1138,7 +1138,7 @@ class _ProfileIdLine extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: color,
-              fontSize: 14 * scale,
+              fontSize: FontSize.small * scale,
               fontWeight: FontWeight.w700,
               height: 1,
               letterSpacing: 0,
@@ -1206,7 +1206,7 @@ class _ProfileInfoLine extends StatelessWidget {
           '$label : ',
           style: GoogleFonts.andika(
             color: iconColor,
-            fontSize: 14 * scale,
+            fontSize: FontSize.small * scale,
             fontWeight: FontWeight.w700,
             height: 1,
             letterSpacing: 0,
@@ -1219,7 +1219,7 @@ class _ProfileInfoLine extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: iconColor,
-              fontSize: 14 * scale,
+              fontSize: FontSize.small * scale,
               fontWeight: FontWeight.w700,
               height: 1,
               letterSpacing: 0,
@@ -1303,7 +1303,7 @@ class _ProfileStatePanel extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
               color: _deepInk,
-              fontSize: 22 * scale,
+              fontSize: FontSize.title * scale,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
@@ -1314,7 +1314,7 @@ class _ProfileStatePanel extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
               color: _muted,
-              fontSize: 14 * scale,
+              fontSize: FontSize.small * scale,
               fontWeight: FontWeight.w700,
               height: 1.35,
               letterSpacing: 0,
@@ -1336,7 +1336,7 @@ class _ProfileStatePanel extends StatelessWidget {
                   buttonLabel,
                   style: GoogleFonts.andika(
                     color: Colors.white,
-                    fontSize: 14 * scale,
+                    fontSize: FontSize.small * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,

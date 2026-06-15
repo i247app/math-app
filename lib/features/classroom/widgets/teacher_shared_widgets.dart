@@ -27,7 +27,7 @@ class _TeacherErrorPanel extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
               color: _teacherMuted,
-              fontSize: 13 * scale,
+              fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -104,7 +104,7 @@ class _CoralCreateButton extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.andika(
                       color: Colors.white,
-                      fontSize: 20 * scale,
+                      fontSize: FontSize.large * scale,
                       fontWeight: FontWeight.w900,
                       height: 1,
                     ),
@@ -238,7 +238,7 @@ class _TeacherScreenAppBar extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: _teacherTeal,
-              fontSize: 25 * scale,
+              fontSize: FontSize.title * scale,
               fontWeight: FontWeight.w700,
               height: 1,
             ),
@@ -339,7 +339,7 @@ class _ClassAvatarPicker extends StatelessWidget {
           context.getText(AppKeys.teacherClassImageLabel),
           style: GoogleFonts.andika(
             color: const Color(0xFF444650),
-            fontSize: 16 * scale,
+            fontSize: FontSize.normal * scale,
             fontWeight: FontWeight.w400,
             height: 1.3,
           ),
@@ -375,7 +375,7 @@ class _TeacherTextField extends StatelessWidget {
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         style: GoogleFonts.andika(
           color: _teacherInk,
-          fontSize: 16 * scale,
+          fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w400,
         ),
         decoration: _teacherInputDecoration(
@@ -444,7 +444,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                       color: selectedLabel == null
                           ? const Color(0x806B7280)
                           : _teacherInk,
-                      fontSize: 16 * scale,
+                      fontSize: FontSize.normal * scale,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
                     ),
@@ -512,7 +512,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                   label,
                   style: GoogleFonts.andika(
                     color: _teacherTeal,
-                    fontSize: 22 * scale,
+                    fontSize: FontSize.title * scale,
                     fontWeight: FontWeight.w700,
                     height: 1.15,
                   ),
@@ -541,7 +541,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.andika(
                               color: _teacherInk,
-                              fontSize: 16 * scale,
+                              fontSize: FontSize.normal * scale,
                               fontWeight: isSelected
                                   ? FontWeight.w800
                                   : FontWeight.w500,
@@ -636,7 +636,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                           color: values.isEmpty
                               ? const Color(0x806B7280)
                               : _teacherInk,
-                          fontSize: 16 * scale,
+                          fontSize: FontSize.normal * scale,
                           fontWeight: FontWeight.w600,
                           height: 1.2,
                         ),
@@ -741,7 +741,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                       label,
                       style: GoogleFonts.andika(
                         color: _teacherTeal,
-                        fontSize: 22 * scale,
+                        fontSize: FontSize.title * scale,
                         fontWeight: FontWeight.w700,
                         height: 1.15,
                       ),
@@ -773,7 +773,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.andika(
                                   color: _teacherInk,
-                                  fontSize: 16 * scale,
+                                  fontSize: FontSize.normal * scale,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -862,7 +862,7 @@ class _TeacherSelectedChip extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
                 color: _teacherInk,
-                fontSize: 13 * scale,
+                fontSize: FontSize.caption * scale,
                 fontWeight: FontWeight.w400,
                 height: 1.2,
               ),
@@ -909,7 +909,7 @@ class _TeacherFieldShell extends StatelessWidget {
             label,
             style: GoogleFonts.andika(
               color: const Color(0xFF564148),
-              fontSize: 14 * scale,
+              fontSize: FontSize.small * scale,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.7,
               height: 1.2,
@@ -934,7 +934,7 @@ InputDecoration _teacherInputDecoration({
     hintText: hintText,
     hintStyle: GoogleFonts.andika(
       color: const Color(0x806B7280),
-      fontSize: 16 * scale,
+      fontSize: FontSize.normal * scale,
       fontWeight: FontWeight.w400,
     ),
     filled: true,
@@ -1010,7 +1010,7 @@ class _TeacherPrimaryButton extends StatelessWidget {
                     label,
                     style: GoogleFonts.andika(
                       color: Colors.white,
-                      fontSize: 18 * scale,
+                      fontSize: FontSize.large * scale,
                       fontWeight: FontWeight.w700,
                       height: 1,
                     ),

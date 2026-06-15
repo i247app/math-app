@@ -52,7 +52,7 @@ class _SettingsMenuPanel extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.andika(
             color: _deepInk,
-            fontSize: 24 * scale,
+            fontSize: FontSize.title * scale,
             fontWeight: FontWeight.w700,
             height: 1.05,
             letterSpacing: 0,
@@ -351,7 +351,7 @@ class _SettingsLanguageCard extends StatelessWidget {
                   context.getText(AppKeys.language),
                   style: GoogleFonts.andika(
                     color: _deepInk,
-                    fontSize: 15 * scale,
+                    fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w700,
                     height: 1,
                     letterSpacing: 0,
@@ -406,13 +406,13 @@ class _LanguagePill extends StatelessWidget {
         children: [
           Text(
             _flagFor(currentLanguage),
-            style: TextStyle(fontSize: 14 * scale),
+            style: TextStyle(fontSize: FontSize.small * scale),
           ),
           SizedBox(width: 5 * scale),
           Text(
             currentLanguage.displayName,
             style: GoogleFonts.andika(
-              fontSize: 13 * scale,
+              fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF006762),
               letterSpacing: 0,
@@ -488,7 +488,7 @@ class _LanguageBottomSheet extends StatelessWidget {
                   context.getText(AppKeys.languageTitle),
                   style: GoogleFonts.andika(
                     color: _deepInk,
-                    fontSize: 20 * scale,
+                    fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -560,7 +560,7 @@ class _LanguageSheetOption extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Text(flag, style: TextStyle(fontSize: 24 * scale)),
+              Text(flag, style: TextStyle(fontSize: FontSize.title * scale)),
               SizedBox(width: 12 * scale),
               Expanded(
                 child: Text(
@@ -569,7 +569,7 @@ class _LanguageSheetOption extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: _deepInk,
-                    fontSize: 16 * scale,
+                    fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w800,
                     height: 1,
                     letterSpacing: 0,
@@ -672,7 +672,7 @@ class _SettingsActionCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
                         color: isDestructive ? _orange : _deepInk,
-                        fontSize: 15 * scale,
+                        fontSize: FontSize.normal * scale,
                         fontWeight: FontWeight.w700,
                         height: 1,
                         letterSpacing: 0,
@@ -685,7 +685,7 @@ class _SettingsActionCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
                         color: const Color(0xFF8A9BA8),
-                        fontSize: 12 * scale,
+                        fontSize: FontSize.caption * scale,
                         fontWeight: FontWeight.w400,
                         height: 1,
                         letterSpacing: 0,

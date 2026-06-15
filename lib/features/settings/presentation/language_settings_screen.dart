@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_language.dart';
@@ -149,7 +150,7 @@ class _LanguageHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _languageNavy,
-                    fontSize: 18 * scale,
+                    fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -258,7 +259,7 @@ class _LanguageOptionCard extends StatelessWidget {
                 ),
                 child: Text(
                   flag,
-                  style: TextStyle(fontSize: 25 * scale, height: 1),
+                  style: TextStyle(fontSize: FontSize.title * scale, height: 1),
                 ),
               ),
               SizedBox(width: 16 * scale),
@@ -269,7 +270,7 @@ class _LanguageOptionCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _languageInk,
-                    fontSize: 18 * scale,
+                    fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,

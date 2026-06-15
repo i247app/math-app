@@ -1308,14 +1308,15 @@ class _BottomNavigation extends StatelessWidget {
               borderRadius: radius,
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(items.length, (index) {
-                return _AnimatedNavItem(
-                  data: items[index],
-                  active: activeIndex == index,
-                  teacherStyle: activeRole == ProfileRole.teacher,
-                  scale: scale,
-                  onTap: () => onTabSelected(index),
+                return Expanded(
+                  child: _AnimatedNavItem(
+                    data: items[index],
+                    active: activeIndex == index,
+                    teacherStyle: activeRole == ProfileRole.teacher,
+                    scale: scale,
+                    onTap: () => onTabSelected(index),
+                  ),
                 );
               }),
             ),
@@ -1363,10 +1364,10 @@ class _AnimatedNavItem extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOutCubic,
-                width: active ? 72 * scale : 58 * scale,
                 height: active ? 64 * scale : 56 * scale,
+                margin: EdgeInsets.symmetric(horizontal: 2 * scale),
                 padding: EdgeInsets.symmetric(
-                  horizontal: active ? 10 * scale : 8 * scale,
+                  horizontal: active ? 4 * scale : 3 * scale,
                   vertical: active ? 10 * scale : 8 * scale,
                 ),
                 decoration: BoxDecoration(
@@ -1390,42 +1391,47 @@ class _AnimatedNavItem extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Transform.scale(
-                      scale: 1 + (0.10 * value),
-                      child: data.user != null
-                          ? _UserAvatarWidget(
-                              user: data.user!,
-                              size: (active ? 18 : 18) * scale,
-                              color: color,
-                            )
-                          : data.assetPath != null
-                              ? SvgPicture.asset(
-                                  data.assetPath!,
-                                  width: 18 * scale,
-                                  height: 18 * scale,
-                                  colorFilter: ColorFilter.mode(
-                                    color,
-                                    BlendMode.srcIn,
+                    SizedBox.square(
+                      dimension: 22 * scale,
+                      child: Center(
+                        child: data.user != null
+                            ? _UserAvatarWidget(
+                                user: data.user!,
+                                size: 20 * scale,
+                                color: color,
+                              )
+                            : data.assetPath != null
+                                ? SvgPicture.asset(
+                                    data.assetPath!,
+                                    width: 20 * scale,
+                                    height: 20 * scale,
+                                    colorFilter: ColorFilter.mode(
+                                      color,
+                                      BlendMode.srcIn,
+                                    ),
+                                  )
+                                : Icon(
+                                    data.icon,
+                                    color: color,
+                                    size: 20 * scale,
                                   ),
-                                )
-                              : Icon(
-                                  data.icon,
-                                  color: color,
-                                  size: (active ? 18 : 18) * scale,
-                                ),
+                      ),
                     ),
                     SizedBox(height: 4 * scale),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        data.label,
-                        maxLines: 1,
-                        style: TextStyle(
-                          color: color,
-                          fontSize: FontSize.caption * 0.77 * scale,
-                          fontWeight: FontWeight.w900,
-                          height: 1,
-                          letterSpacing: 0.5,
+                    SizedBox(
+                      width: double.infinity,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          data.label,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: color,
+                            fontSize: FontSize.caption * 0.77 * scale,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
                     ),
