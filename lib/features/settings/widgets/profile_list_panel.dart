@@ -316,16 +316,26 @@ class _ParentInfoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Text(
-                          _displayParentName(context, profile, user),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.andika(
-                            color: _deepInk,
-                            fontSize: 18 * scale,
-                            fontWeight: FontWeight.w900,
-                            height: 1.1,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _displayParentName(context, profile, user),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.andika(
+                                color: _deepInk,
+                                fontSize: 18 * scale,
+                                fontWeight: FontWeight.w900,
+                                height: 1.1,
+                              ),
+                            ),
+                            SizedBox(height: 4 * scale),
+                            _ManagedProfileRolePill(
+                              role: ProfileRole.parent,
+                              scale: scale,
+                            ),
+                          ],
                         ),
                       ),
                       SizedBox(width: 8 * scale),
@@ -341,9 +351,7 @@ class _ParentInfoCard extends StatelessWidget {
                       _ProfileRadio(isActive: isActive, scale: scale),
                     ],
                   ),
-                  SizedBox(height: 8 * scale),
-                  _ParentRolePill(scale: scale),
-                  SizedBox(height: 12 * scale),
+                  SizedBox(height: 10 * scale),
                   Row(
                     children: [
                       SvgPicture.asset(
@@ -427,9 +435,13 @@ class _ParentProfileAvatar extends StatelessWidget {
   }
 }
 
-class _ParentRolePill extends StatelessWidget {
-  const _ParentRolePill({required this.scale});
+class _ManagedProfileRolePill extends StatelessWidget {
+  const _ManagedProfileRolePill({
+    required this.role,
+    required this.scale,
+  });
 
+  final ProfileRole role;
   final double scale;
 
   @override
@@ -442,7 +454,7 @@ class _ParentRolePill extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        context.getText(AppKeys.roleParent),
+        _localizedRole(context, role),
         style: GoogleFonts.andika(
           color: const Color(0xFF008080),
           fontSize: 13 * scale,
@@ -537,7 +549,12 @@ class _ParentChildProfileCard extends StatelessWidget {
                                   height: 1.1,
                                 ),
                               ),
-                              SizedBox(height: 10 * scale),
+                              SizedBox(height: 4 * scale),
+                              _ManagedProfileRolePill(
+                                role: ProfileRole.student,
+                                scale: scale,
+                              ),
+                              SizedBox(height: 8 * scale),
                               _ParentProfileCodeLine(
                                 profile: profile,
                                 isActive: isActive,

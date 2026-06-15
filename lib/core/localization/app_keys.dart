@@ -70,6 +70,8 @@ class AppKeys {
   static const navMembers = 'nav_members';
   static const navReview = 'nav_review';
   static const navAssessment = 'nav_assessment';
+  static const navProgram = 'nav_program';
+  static const parentAssessmentTabTitle = 'parent_assessment_tab_title';
   static const navHistory = 'nav_history';
   static const navReport = 'nav_report';
   static const navSettings = 'nav_settings';

@@ -1257,7 +1257,7 @@ class _BottomNavigation extends StatelessWidget {
           ),
           _NavItemData(
             Icons.explore_outlined,
-            context.getText(AppKeys.navReview),
+            context.getText(AppKeys.navProgram),
             null,
           ),
           _NavItemData(

@@ -282,7 +282,7 @@ class _ParentAssessmentHeader extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        context.getText(AppKeys.assessmentAction),
+        context.getText(AppKeys.parentAssessmentTabTitle),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
