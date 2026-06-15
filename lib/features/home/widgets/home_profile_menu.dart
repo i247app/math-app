@@ -28,53 +28,65 @@ class HomeProfileMenu extends StatelessWidget {
 
     return SizedBox(
       width: width,
-      child: Material(
-        color: Colors.white,
-        elevation: 8,
-        shadowColor: Colors.black.withValues(alpha: 0.22),
-        borderRadius: BorderRadius.circular(12 * scale),
-        clipBehavior: Clip.antiAlias,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: 240 * scale),
-          child: ListView.separated(
-            shrinkWrap: true,
-            padding: EdgeInsets.symmetric(vertical: 6 * scale),
-            itemCount: profiles.length,
-            separatorBuilder: (_, __) => SizedBox(height: scale),
-            itemBuilder: (context, index) {
-              final profile = profiles[index];
-              final name = compactHomeProfileName(
-                homeProfileDisplayName(context, profile),
-              );
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12 * scale),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.18),
+              blurRadius: 16 * scale,
+              spreadRadius: 1 * scale,
+              offset: Offset.zero,
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.white,
+          elevation: 0,
+          borderRadius: BorderRadius.circular(12 * scale),
+          clipBehavior: Clip.antiAlias,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 240 * scale),
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.symmetric(vertical: 6 * scale),
+              itemCount: profiles.length,
+              separatorBuilder: (_, __) => SizedBox(height: scale),
+              itemBuilder: (context, index) {
+                final profile = profiles[index];
+                final name = compactHomeProfileName(
+                  homeProfileDisplayName(context, profile),
+                );
 
-              return InkWell(
-                onTap: () => onSelect(profile),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 13 * scale,
-                    vertical: 5 * scale,
-                  ),
-                  child: Row(
-                    children: [
-                      ProfileAvatarImage(
-                        size: 42 * scale,
-                        avatarKey: profile.avatarKey,
-                        avatarUrl: profile.avatarUrl,
-                      ),
-                      SizedBox(width: 11 * scale),
-                      Flexible(
-                        child: Text(
-                          name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: _nameStyle,
+                return InkWell(
+                  onTap: () => onSelect(profile),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 13 * scale,
+                      vertical: 5 * scale,
+                    ),
+                    child: Row(
+                      children: [
+                        ProfileAvatarImage(
+                          size: 42 * scale,
+                          avatarKey: profile.avatarKey,
+                          avatarUrl: profile.avatarUrl,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 11 * scale),
+                        Flexible(
+                          child: Text(
+                            name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: _nameStyle,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
