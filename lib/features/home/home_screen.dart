@@ -23,6 +23,7 @@ import 'package:numi_flutter/features/home/home_tab_cubit.dart';
 import 'package:numi_flutter/features/home/parent/parent_home_cubit.dart';
 import 'package:numi_flutter/features/home/student/student_home_cubit.dart';
 import 'package:numi_flutter/features/home/teacher/teacher_home_cubit.dart';
+import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
@@ -76,6 +77,16 @@ const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
 const _homeTeacherAvatarOne = 'assets/images/student_home_avatar.png';
 const _homeTeacherAvatarTwo = 'assets/images/student_class_teacher.png';
 const _homeProfileSwitchMinimumDuration = Duration(milliseconds: 1500);
+
+enum _HomeTabDestination {
+  home,
+  classroom,
+  review,
+  history,
+  study,
+  members,
+  settings,
+}
 
 String _homeRoleLabel(BuildContext context, ProfileRole role) {
   return switch (role) {
@@ -173,7 +184,11 @@ class _HomeScreenState extends State<HomeScreen>
       final oldTab = _homeCubitFor(oldWidget.activeRole).state.activeTab;
       final targetCubit = _homeCubitFor(widget.activeRole);
       targetCubit.selectTab(
-        oldTab <= targetCubit.maxTabIndex ? oldTab : 0,
+        _tabIndexAfterRoleChange(
+          fromRole: oldWidget.activeRole,
+          toRole: widget.activeRole,
+          currentIndex: oldTab,
+        ),
       );
     }
     if (oldWidget.activeRole != widget.activeRole &&
@@ -189,6 +204,58 @@ class _HomeScreenState extends State<HomeScreen>
     _parentHomeEntranceController
       ..reset()
       ..forward();
+  }
+
+  int _tabIndexAfterRoleChange({
+    required ProfileRole fromRole,
+    required ProfileRole toRole,
+    required int currentIndex,
+  }) {
+    final destination = switch (fromRole) {
+      ProfileRole.parent => switch (currentIndex) {
+          1 => _HomeTabDestination.review,
+          2 => _HomeTabDestination.history,
+          3 => _HomeTabDestination.settings,
+          _ => _HomeTabDestination.home,
+        },
+      ProfileRole.student => switch (currentIndex) {
+          1 => _HomeTabDestination.classroom,
+          2 => _HomeTabDestination.review,
+          3 => _HomeTabDestination.history,
+          4 => _HomeTabDestination.settings,
+          _ => _HomeTabDestination.home,
+        },
+      ProfileRole.teacher => switch (currentIndex) {
+          1 => _HomeTabDestination.classroom,
+          2 => _HomeTabDestination.study,
+          3 => _HomeTabDestination.members,
+          4 => _HomeTabDestination.settings,
+          _ => _HomeTabDestination.home,
+        },
+    };
+
+    return switch (toRole) {
+      ProfileRole.parent => switch (destination) {
+          _HomeTabDestination.review => 1,
+          _HomeTabDestination.history => 2,
+          _HomeTabDestination.settings => 3,
+          _ => 0,
+        },
+      ProfileRole.student => switch (destination) {
+          _HomeTabDestination.classroom => 1,
+          _HomeTabDestination.review => 2,
+          _HomeTabDestination.history => 3,
+          _HomeTabDestination.settings => 4,
+          _ => 0,
+        },
+      ProfileRole.teacher => switch (destination) {
+          _HomeTabDestination.classroom => 1,
+          _HomeTabDestination.study => 2,
+          _HomeTabDestination.members => 3,
+          _HomeTabDestination.settings => 4,
+          _ => 0,
+        },
+    };
   }
 
   @override
@@ -245,10 +312,12 @@ class _HomeScreenState extends State<HomeScreen>
           final bottomInset = MediaQuery.paddingOf(context).bottom;
           final scale = math.min(
               layoutWidth / _designWidth, viewportHeight / _designHeight);
-          final studentName = _displayProfileName(
-            context,
-            widget.activeProfile,
-            widget.activeRole,
+          final studentName = compactHomeProfileName(
+            _displayProfileName(
+              context,
+              widget.activeProfile,
+              widget.activeRole,
+            ),
           );
 
           double s(double value) => value * scale;
@@ -266,13 +335,6 @@ class _HomeScreenState extends State<HomeScreen>
                     ActiveProfileSession.profileStableId(widget.activeProfile),
               )
               .toList(growable: false);
-          final profileMenuWidth = _profileMenuWidth(
-            context,
-            switchableProfiles,
-            scale,
-            layoutWidth - s(40),
-          );
-
           return Center(
             child: SizedBox(
               width: width,
@@ -359,6 +421,14 @@ class _HomeScreenState extends State<HomeScreen>
                           HapticFeedback.lightImpact();
                           homeCubit.selectTab(1);
                         },
+                        onOpenProfileMenu: () {
+                          if (switchableProfiles.isEmpty ||
+                              _isProfileMenuOpen) {
+                            return;
+                          }
+                          HapticFeedback.selectionClick();
+                          setState(() => _isProfileMenuOpen = true);
+                        },
                         onParentAssessmentStateChanged: (hasAssessment) {
                           final nextCount = hasAssessment ? 4 : 1;
                           if (_parentStreakCount == nextCount || !mounted) {
@@ -410,12 +480,14 @@ class _HomeScreenState extends State<HomeScreen>
                       _isProfileMenuOpen &&
                       switchableProfiles.isNotEmpty)
                     Positioned(
-                      left: s(20),
-                      top: headerHeight - s(29),
-                      width: profileMenuWidth,
-                      child: _HomeProfileMenu(
+                      left: s(28),
+                      top: widget.activeRole == ProfileRole.parent
+                          ? headerHeight - s(6)
+                          : headerHeight - s(22),
+                      child: HomeProfileMenu(
                         profiles: switchableProfiles,
                         scale: scale,
+                        maxWidth: layoutWidth - s(56),
                         onSelect: _switchProfile,
                       ),
                     ),
@@ -500,36 +572,6 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  double _profileMenuWidth(
-    BuildContext context,
-    List<StudentProfile> profiles,
-    double scale,
-    double maxWidth,
-  ) {
-    final textStyle = TextStyle(
-      fontSize: 15 * scale,
-      fontWeight: FontWeight.w900,
-    );
-    var longestTextWidth = 0.0;
-
-    for (final profile in profiles) {
-      final name = _compactHomeProfileName(
-        _profileDisplayName(context, profile),
-      );
-      final painter = TextPainter(
-        text: TextSpan(text: name, style: textStyle),
-        maxLines: 1,
-        textDirection: Directionality.of(context),
-        textScaler: MediaQuery.textScalerOf(context),
-      )..layout();
-      longestTextWidth = math.max(longestTextWidth, painter.width);
-    }
-
-    final contentWidth =
-        (14 * 2 + 42 + 12) * scale + longestTextWidth + 8 * scale;
-    return contentWidth.clamp(150 * scale, maxWidth);
-  }
-
   String _displayProfileName(
     BuildContext context,
     StudentProfile? profile,
@@ -609,6 +651,7 @@ class HomeDashboardArgs {
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
     required this.onOpenReviewTab,
+    required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
     required this.parentHomeEntrance,
     required this.bottomPadding,
@@ -635,6 +678,7 @@ class HomeDashboardArgs {
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenReviewTab;
+  final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final Animation<double> parentHomeEntrance;
   final double bottomPadding;
@@ -672,6 +716,7 @@ class _RoleDashboard extends StatelessWidget {
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
     required this.onOpenReviewTab,
+    required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
     required this.parentHomeEntrance,
     required this.bottomPadding,
@@ -699,6 +744,7 @@ class _RoleDashboard extends StatelessWidget {
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenReviewTab;
+  final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final Animation<double> parentHomeEntrance;
   final double bottomPadding;
@@ -727,6 +773,7 @@ class _RoleDashboard extends StatelessWidget {
       onCompleteTeacherProfile: onCompleteTeacherProfile,
       onOpenClassroomTab: onOpenClassroomTab,
       onOpenReviewTab: onOpenReviewTab,
+      onOpenProfileMenu: onOpenProfileMenu,
       onParentAssessmentStateChanged: onParentAssessmentStateChanged,
       parentHomeEntrance: parentHomeEntrance,
       bottomPadding: bottomPadding,
@@ -1031,103 +1078,6 @@ class _ParentFireBadge extends StatelessWidget {
       ),
     );
   }
-}
-
-class _HomeProfileMenu extends StatelessWidget {
-  const _HomeProfileMenu({
-    required this.profiles,
-    required this.scale,
-    required this.onSelect,
-  });
-
-  final List<StudentProfile> profiles;
-  final double scale;
-  final ValueChanged<StudentProfile> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      elevation: 8,
-      shadowColor: Colors.black.withValues(alpha: 0.22),
-      borderRadius: BorderRadius.circular(10 * scale),
-      clipBehavior: Clip.antiAlias,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: 240 * scale),
-        child: ListView.separated(
-          shrinkWrap: true,
-          padding: EdgeInsets.symmetric(vertical: 8 * scale),
-          itemCount: profiles.length,
-          separatorBuilder: (_, __) => SizedBox(height: 2 * scale),
-          itemBuilder: (context, index) {
-            final profile = profiles[index];
-            final name = _compactHomeProfileName(
-              _profileDisplayName(context, profile),
-            );
-
-            return InkWell(
-              onTap: () => onSelect(profile),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 14 * scale,
-                  vertical: 7 * scale,
-                ),
-                child: Row(
-                  children: [
-                    ProfileAvatarImage(
-                      size: 42 * scale,
-                      avatarKey: profile.avatarKey,
-                      avatarUrl: profile.avatarUrl,
-                    ),
-                    SizedBox(width: 12 * scale),
-                    Flexible(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          name,
-                          maxLines: 1,
-                          softWrap: false,
-                          style: TextStyle(
-                            color: const Color(0xFF002B6A),
-                            fontSize: 15 * scale,
-                            fontWeight: FontWeight.w900,
-                            height: 1.1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-String _profileDisplayName(BuildContext context, StudentProfile profile) {
-  if (profile.name?.trim().isNotEmpty == true) {
-    return profile.name!.trim();
-  }
-  if (profile.profileCode?.trim().isNotEmpty == true) {
-    return profile.profileCode!.trim();
-  }
-  return context.getText(AppKeys.student);
-}
-
-String _compactHomeProfileName(String name) {
-  final parts = name
-      .trim()
-      .split(RegExp(r'\s+'))
-      .where((part) => part.isNotEmpty)
-      .toList(growable: false);
-  if (parts.length <= 2) {
-    return parts.join(' ');
-  }
-  return '${parts.first} ${parts.last}';
 }
 
 class _StudentAvatar extends StatelessWidget {

@@ -1332,6 +1332,7 @@ class _SettingTabState extends State<SettingTab> {
         }
       }
       await _loadProfiles();
+      await widget.onRefreshProfiles?.call();
       if (deletedActiveProfile && mounted) {
         NumiApp.restart(context);
       }

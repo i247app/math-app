@@ -162,15 +162,18 @@ class AppStrings {
       AppKeys.studentNoInvitationsTitle: 'Chưa có lời mời',
       AppKeys.studentNoInvitationsMessage:
           'Lời mời lớp học mới sẽ xuất hiện tại đây.',
-      AppKeys.parentNoStudentTitle: 'Chưa có hồ sơ con',
+      AppKeys.parentNoStudentTitle: 'Chưa có hồ sơ',
       AppKeys.parentNoStudentMessage:
-          'Bạn cần tạo hồ sơ cho con trước khi tham gia lớp học.',
+          'Quý phụ huynh cần tạo hồ sơ cho con để tham gia vào các lớp phù hợp.',
       AppKeys.parentCreateStudentNow: 'Tạo hồ sơ ngay',
       AppKeys.parentCreateStudentLater: 'Để sau',
+      AppKeys.parentSelectStudentMessage:
+          'Quý phụ huynh cần chọn hồ sơ hoặc tạo hồ sơ cho bé để tham gia vào các lớp phù hợp.',
+      AppKeys.parentCreateStudent: 'Tạo hồ sơ',
       AppKeys.parentSwitchStudentTitle: 'Chuyển sang hồ sơ học sinh',
       AppKeys.parentSwitchStudentMessage:
           'Tính năng lớp học chỉ dùng được với hồ sơ học sinh. Vui lòng chuyển sang hồ sơ học sinh để tiếp tục.',
-      AppKeys.parentSwitchStudentAction: 'Chọn hồ sơ học sinh',
+      AppKeys.parentSwitchStudentAction: 'Chọn hồ sơ',
       AppKeys.studentInviteSubtitle: '{name} mời bạn',
       AppKeys.studentInviteSubtitleFallback: 'Giáo viên mời bạn',
       AppKeys.studentInvitationLoadFailed: 'Không thể tải lời mời lớp học.',
@@ -745,15 +748,18 @@ class AppStrings {
       AppKeys.studentNoInvitationsTitle: 'No invitations yet',
       AppKeys.studentNoInvitationsMessage:
           'New class invitations will appear here.',
-      AppKeys.parentNoStudentTitle: 'No child profile yet',
+      AppKeys.parentNoStudentTitle: 'No profile selected',
       AppKeys.parentNoStudentMessage:
-          'Create a child profile before joining a classroom.',
+          'Create a child profile to join suitable classrooms.',
       AppKeys.parentCreateStudentNow: 'Create profile now',
       AppKeys.parentCreateStudentLater: 'Later',
+      AppKeys.parentSelectStudentMessage:
+          'Choose a child profile or create one to join suitable classrooms.',
+      AppKeys.parentCreateStudent: 'Create profile',
       AppKeys.parentSwitchStudentTitle: 'Switch to a student profile',
       AppKeys.parentSwitchStudentMessage:
           'Classroom features are only available for student profiles. Please switch to a student profile to continue.',
-      AppKeys.parentSwitchStudentAction: 'Choose student profile',
+      AppKeys.parentSwitchStudentAction: 'Choose profile',
       AppKeys.studentInviteSubtitle: '{name} invited you',
       AppKeys.studentInviteSubtitleFallback: 'Your teacher invited you',
       AppKeys.studentInvitationLoadFailed: 'Could not load class invitations.',

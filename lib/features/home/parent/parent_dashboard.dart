@@ -106,7 +106,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     widget.args.onParentAssessmentStateChanged(false);
 
     var hadError = false;
-    final summaries = await Future.wait(
+    final summariesFuture = Future.wait(
       children.map((profile) async {
         final profileId = ActiveProfileSession.profileStableId(profile);
         if (profileId == null || profileId <= 0) {
@@ -141,6 +141,11 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         );
       }),
     );
+    final parentAssessmentsFuture = _loadParentAssessments(
+      onError: () => hadError = true,
+    );
+    final summaries = await summariesFuture;
+    final parentAssessments = await parentAssessmentsFuture;
 
     if (!mounted || requestId != _childLoadRequestId) {
       return;
@@ -148,10 +153,39 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     setState(() {
       _isLoading = false;
       _childSummaries = summaries;
+      _completedAssessments = parentAssessments;
       _errorMessage = hadError
           ? context.readText(AppKeys.parentChildDashboardLoadFailed)
           : null;
     });
+    widget.args.onParentAssessmentStateChanged(
+      parentAssessments.isNotEmpty,
+    );
+  }
+
+  Future<List<GeneratedQuiz>> _loadParentAssessments({
+    required VoidCallback onError,
+  }) async {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.args.activeProfile,
+    );
+    final userId = widget.args.user?.id;
+    if ((profileId == null || profileId <= 0) &&
+        (userId == null || userId <= 0)) {
+      return const <GeneratedQuiz>[];
+    }
+
+    try {
+      final quizzes = await widget.args.quizService.listQuizzes(
+        profileId: profileId != null && profileId > 0 ? profileId : null,
+        userId: profileId == null || profileId <= 0 ? userId : null,
+      );
+      return quizzes.where(_isCompletedAssessment).toList(growable: false)
+        ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+    } catch (_) {
+      onError();
+      return const <GeneratedQuiz>[];
+    }
   }
 
   Future<void> _loadAssessments() async {
@@ -223,7 +257,10 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
   @override
   Widget build(BuildContext context) {
-    if (_children.isNotEmpty) {
+    final hasJoinedClassroom = _childSummaries.any(
+      (summary) => summary.classroom != null,
+    );
+    if (_children.isNotEmpty && (_isLoading || hasJoinedClassroom)) {
       return _buildChildDashboard();
     }
 
@@ -260,7 +297,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
               const SizedBox(height: 10),
               _ParentHomeErrorCard(
                 message: _errorMessage!,
-                onRetry: _loadAssessments,
+                onRetry: _loadHome,
               ),
             ],
           ],
@@ -302,7 +339,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
               for (final item in assessments.take(2)) ...[
                 _ParentAssessmentResultCard(
                   quiz: item.quiz,
-                  profileName: _profileDisplayName(
+                  profileName: homeProfileDisplayName(
                     context,
                     item.summary.profile,
                   ),
@@ -458,18 +495,208 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     );
   }
 
-  void _showClassroomMessage() {
+  Future<void> _showClassroomMessage() async {
     HapticFeedback.selectionClick();
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            context.readText(AppKeys.studentJoinClassroomSoon),
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
+    if (_children.isEmpty) {
+      final shouldCreate = await showDialog<bool>(
+        context: context,
+        barrierColor: const Color(0xFF001741).withValues(alpha: 0.48),
+        builder: (_) => const _ParentNoStudentDialog(),
       );
+      if (shouldCreate == true && mounted) {
+        await _openCreateStudentProfile();
+      }
+      return;
+    }
+
+    final action = await showDialog<_ParentProfileDialogAction>(
+      context: context,
+      barrierColor: const Color(0xFF001741).withValues(alpha: 0.48),
+      builder: (_) => const _ParentSelectStudentDialog(),
+    );
+    if (!mounted) {
+      return;
+    }
+    switch (action) {
+      case _ParentProfileDialogAction.choose:
+        widget.args.onOpenProfileMenu();
+        return;
+      case _ParentProfileDialogAction.create:
+        await _openCreateStudentProfile();
+        return;
+      case null:
+        return;
+    }
+  }
+
+  Future<void> _openCreateStudentProfile() async {
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => Material(
+          color: Colors.white,
+          child: SafeArea(
+            child: SettingTab.page(
+              user: widget.args.user,
+              profiles: widget.args.profiles,
+              activeProfile: widget.args.activeProfile,
+              profileLoadError: null,
+              onLogout: () {},
+              onActivateProfile: widget.args.onActivateProfile,
+              onRefreshProfiles: widget.args.onRefreshProfiles,
+              onProfileSaved: widget.args.onProfileSaved,
+              bottomPadding: 0,
+              scale: widget.args.scale,
+              initialView: SettingPageView.profile,
+              isPushedPage: true,
+              openAddProfileOnStart: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await widget.args.onRefreshProfiles();
+  }
+}
+
+enum _ParentProfileDialogAction { choose, create }
+
+class _ParentSelectStudentDialog extends StatelessWidget {
+  const _ParentSelectStudentDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 24),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: Container(
+            width: 303,
+            padding: const EdgeInsets.fromLTRB(25, 30, 25, 24),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.94),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.42),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 50,
+                  offset: const Offset(0, 25),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 155,
+                      height: 155,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFAA2A6C).withValues(alpha: 0.08),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                const Color(0xFFAA2A6C).withValues(alpha: 0.14),
+                            blurRadius: 26,
+                            spreadRadius: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Image.asset(
+                      _parentNoStudentMascot,
+                      width: 176,
+                      height: 158,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  context.getText(AppKeys.parentNoStudentTitle),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFF001741),
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  context.getText(AppKeys.parentSelectStudentMessage),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFF444650),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.45,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: FilledButton(
+                    onPressed: () => Navigator.of(context).pop(
+                      _ParentProfileDialogAction.choose,
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFFAA2A6C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      context.getText(AppKeys.parentSwitchStudentAction),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(
+                      _ParentProfileDialogAction.create,
+                    ),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFFAA2A6C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      context.getText(AppKeys.parentCreateStudent),
+                      style: const TextStyle(
+                        color: Color(0xFFAA2A6C),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -534,7 +761,7 @@ class _ParentChildrenGrid extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _profileDisplayName(context, summary.profile),
+                homeProfileDisplayName(context, summary.profile),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
@@ -624,7 +851,7 @@ class _ParentTeacherMessageCard extends StatelessWidget {
     final isFirst = index.isEven;
     final accent = isFirst ? const Color(0xFF17999C) : const Color(0xFFFF701E);
     final surface = isFirst ? const Color(0xFFEFF9F9) : const Color(0xFFFFF2EA);
-    final studentName = _profileDisplayName(context, summary.profile);
+    final studentName = homeProfileDisplayName(context, summary.profile);
     final classroomName = _parentClassroomName(context, summary);
     final teacherName = summary.classroom?.teacherName?.trim();
 

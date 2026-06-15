@@ -157,6 +157,8 @@ class AppKeys {
   static const parentNoStudentMessage = 'parent_no_student_message';
   static const parentCreateStudentNow = 'parent_create_student_now';
   static const parentCreateStudentLater = 'parent_create_student_later';
+  static const parentSelectStudentMessage = 'parent_select_student_message';
+  static const parentCreateStudent = 'parent_create_student';
   static const parentSwitchStudentTitle = 'parent_switch_student_title';
   static const parentSwitchStudentMessage = 'parent_switch_student_message';
   static const parentSwitchStudentAction = 'parent_switch_student_action';

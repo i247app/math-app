@@ -132,7 +132,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   final _StudentHomePanel _activePanel = _StudentHomePanel.homework;
   bool _isLoadingInvitations = false;
   bool _hasLoadedInvitations = false;
-  String? _invitationError;
   List<ClassroomInvitation> _invitations = const <ClassroomInvitation>[];
   final Set<int> _processingInvitationClassIds = <int>{};
 
@@ -178,7 +177,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     if (oldProfileId != profileId || roleChanged) {
       _invitations = const <ClassroomInvitation>[];
       _hasLoadedInvitations = false;
-      _invitationError = null;
       if (widget.activeRole == ProfileRole.student) {
         _loadClassrooms();
       }
@@ -213,7 +211,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
     setState(() {
       _isLoadingInvitations = true;
-      _invitationError = null;
     });
 
     try {
@@ -239,8 +236,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
       setState(() {
         _hasLoadedInvitations = true;
-        _invitationError =
-            context.readText(AppKeys.studentInvitationLoadFailed);
         _invitations = const <ClassroomInvitation>[];
       });
     } finally {
@@ -377,8 +372,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
           else ...[
             _StudentInvitationsSection(
               invitations: _invitations,
-              isLoading: _isLoadingInvitations,
-              error: _invitationError,
               processingClassroomIds: _processingInvitationClassIds,
               showJoinClassroom: widget.activeRole == ProfileRole.student &&
                   _classrooms.isEmpty,
@@ -394,7 +387,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
                 invitation,
                 accept: false,
               ),
-              onRetry: _loadInvitations,
             ),
             if (widget.activeRole == ProfileRole.student) ...[
               const SizedBox(height: 11),
@@ -694,33 +686,26 @@ int? _profileGradeId(StudentProfile? profile) =>
 class _StudentInvitationsSection extends StatelessWidget {
   const _StudentInvitationsSection({
     required this.invitations,
-    required this.isLoading,
-    required this.error,
     required this.processingClassroomIds,
     required this.showJoinClassroom,
     required this.onJoinClassroom,
     required this.onViewAll,
     required this.onAccept,
     required this.onReject,
-    required this.onRetry,
   });
 
   final List<ClassroomInvitation> invitations;
-  final bool isLoading;
-  final String? error;
   final Set<int> processingClassroomIds;
   final bool showJoinClassroom;
   final VoidCallback onJoinClassroom;
   final VoidCallback onViewAll;
   final ValueChanged<ClassroomInvitation> onAccept;
   final ValueChanged<ClassroomInvitation> onReject;
-  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
     final invitation = invitations.isNotEmpty ? invitations.first : null;
-    final showInvitationPreview =
-        isLoading || error != null || invitation != null;
+    final showInvitationPreview = invitation != null;
     if (!showInvitationPreview && !showJoinClassroom) {
       return const SizedBox.shrink();
     }
@@ -748,31 +733,18 @@ class _StudentInvitationsSection extends StatelessWidget {
                 AppKeys.studentViewAllInvitations,
                 {'count': invitations.length},
               ),
-              onAction: invitation == null ? null : onViewAll,
+              onAction: onViewAll,
             ),
             const SizedBox(height: 10),
-            if (isLoading && invitation == null)
-              const SizedBox(
-                height: 77,
-                child: Center(
-                  child: CircularProgressIndicator(color: _teal),
-                ),
-              )
-            else if (error != null && invitation == null)
-              _StudentInlineErrorPanel(
-                message: error!,
-                onRetry: onRetry,
-              )
-            else if (invitation != null)
-              _StudentInvitationCard(
-                invitation: invitation,
-                isProcessing: processingClassroomIds.contains(
-                  invitation.stableClassroomId,
-                ),
-                compactActions: true,
-                onAccept: () => onAccept(invitation),
-                onReject: () => onReject(invitation),
+            _StudentInvitationCard(
+              invitation: invitation,
+              isProcessing: processingClassroomIds.contains(
+                invitation.stableClassroomId,
               ),
+              compactActions: true,
+              onAccept: () => onAccept(invitation),
+              onReject: () => onReject(invitation),
+            ),
             const SizedBox(height: 6),
           ],
           if (showJoinClassroom) _StudentJoinClassCta(onTap: onJoinClassroom),
