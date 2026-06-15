@@ -582,7 +582,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             context.getText(AppKeys.parentSwitchStudentTitle),
             style: const TextStyle(
               color: Color(0xFF001741),
-              fontSize: 20,
+              fontSize: FontSize.large,
               fontWeight: FontWeight.w900,
               height: 1.2,
             ),
@@ -591,7 +591,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             context.getText(AppKeys.parentSwitchStudentMessage),
             style: const TextStyle(
               color: Color(0xFF444650),
-              fontSize: 15,
+              fontSize: FontSize.normal,
               fontWeight: FontWeight.w700,
               height: 1.35,
             ),
@@ -782,7 +782,7 @@ class _StudentHomeSectionsLoading extends StatelessWidget {
               context.getText(AppKeys.loading),
               style: const TextStyle(
                 color: Color(0xFF30333A),
-                fontSize: 14,
+                fontSize: FontSize.small,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -858,7 +858,7 @@ class _ParentNoStudentDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFF001741),
-                    fontSize: 28,
+                    fontSize: FontSize.title,
                     fontWeight: FontWeight.w900,
                     height: 1.2,
                     letterSpacing: 0,
@@ -870,7 +870,7 @@ class _ParentNoStudentDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFF444650),
-                    fontSize: 16,
+                    fontSize: FontSize.normal,
                     fontWeight: FontWeight.w400,
                     height: 1.5,
                     letterSpacing: 0,
@@ -893,7 +893,7 @@ class _ParentNoStudentDialog extends StatelessWidget {
                       context.getText(AppKeys.parentCreateStudentNow),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: FontSize.large,
                         fontWeight: FontWeight.w400,
                         height: 1,
                         letterSpacing: 0,
@@ -917,7 +917,7 @@ class _ParentNoStudentDialog extends StatelessWidget {
                       context.getText(AppKeys.parentCreateStudentLater),
                       style: const TextStyle(
                         color: Color(0xFFAA2A6C),
-                        fontSize: 18,
+                        fontSize: FontSize.large,
                         fontWeight: FontWeight.w400,
                         height: 1,
                         letterSpacing: 0,
@@ -962,7 +962,7 @@ class _StudentInlineErrorPanel extends StatelessWidget {
               message,
               style: const TextStyle(
                 color: Color(0xFF444650),
-                fontSize: 13,
+                fontSize: FontSize.caption,
                 fontWeight: FontWeight.w700,
                 height: 1.25,
               ),
@@ -997,7 +997,7 @@ class _StudentFigmaSectionHeader extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       style: const TextStyle(
         color: Color(0xFFBC3B14),
-        fontSize: 14,
+        fontSize: FontSize.small,
         fontWeight: FontWeight.w900,
         decoration: TextDecoration.underline,
         height: 1.2,
@@ -1014,7 +1014,7 @@ class _StudentFigmaSectionHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Color(0xFF001741),
-              fontSize: 16,
+              fontSize: FontSize.normal,
               fontWeight: FontWeight.w900,
               height: 1.25,
               letterSpacing: 0,
@@ -1109,7 +1109,7 @@ class _StudentInvitationCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Color(0xFF181C1E),
-                              fontSize: 16,
+                              fontSize: FontSize.normal,
                               fontWeight: FontWeight.w700,
                               height: 1.2,
                               letterSpacing: 0,
@@ -1122,7 +1122,7 @@ class _StudentInvitationCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Color(0xFF444650),
-                              fontSize: 12,
+                              fontSize: FontSize.caption,
                               fontWeight: FontWeight.w700,
                               height: 1.2,
                               letterSpacing: 0,
@@ -1190,7 +1190,7 @@ class _StudentInvitationCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Color(0xFF001741),
-                  fontSize: 16,
+                  fontSize: FontSize.normal,
                   fontWeight: FontWeight.w700,
                   height: 1.35,
                   letterSpacing: 0,
@@ -1203,7 +1203,7 @@ class _StudentInvitationCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: const Color(0xFF001741).withValues(alpha: 0.7),
-                  fontSize: 12,
+                  fontSize: FontSize.caption,
                   fontWeight: FontWeight.w400,
                   height: 1.3,
                   letterSpacing: 0,
@@ -1308,7 +1308,7 @@ class _StudentInviteButton extends StatelessWidget {
           label,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 12,
+            fontSize: FontSize.caption,
             fontWeight: FontWeight.w900,
             height: 1,
             letterSpacing: 0,
@@ -1371,7 +1371,7 @@ class _StudentFigmaHeroCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xFF357476),
-                fontSize: 24,
+                fontSize: FontSize.title,
                 fontWeight: FontWeight.w900,
                 height: 1.5,
                 letterSpacing: 1.5,
@@ -1387,7 +1387,7 @@ class _StudentFigmaHeroCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xFF001741),
-                fontSize: 17,
+                fontSize: FontSize.large,
                 fontWeight: FontWeight.w800,
                 height: 1.2,
                 letterSpacing: 0,
@@ -1405,7 +1405,7 @@ class _StudentFigmaHeroCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Color(0xFFD95F42),
-                  fontSize: 9,
+                  fontSize: FontSize.caption * 0.7,
                   fontWeight: FontWeight.w800,
                   height: 1.05,
                   letterSpacing: 0,
@@ -1433,7 +1433,7 @@ class _StudentFigmaHeroCard extends StatelessWidget {
                     context.getText(AppKeys.homeHeroPrompt),
                     style: const TextStyle(
                       color: Color(0xFF001741),
-                      fontSize: 12,
+                      fontSize: FontSize.caption,
                       fontWeight: FontWeight.w800,
                       fontStyle: FontStyle.italic,
                       height: 1.15,
@@ -1575,7 +1575,7 @@ class _HeroActionButton extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 13,
+                  fontSize: FontSize.caption,
                   fontWeight: FontWeight.w800,
                   height: 1.1,
                   letterSpacing: 0,
@@ -1622,7 +1622,7 @@ class _StudentJoinClassCta extends StatelessWidget {
               context.getText(AppKeys.studentJoinClassroomUpper),
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 14,
+                fontSize: FontSize.small,
                 fontWeight: FontWeight.w400,
                 height: 1,
                 letterSpacing: 0,
@@ -1746,7 +1746,7 @@ class _StudentFigmaStateCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.black,
-              fontSize: 16,
+              fontSize: FontSize.normal,
               fontWeight: FontWeight.w900,
               height: 1.1,
               letterSpacing: 0,
@@ -1758,7 +1758,7 @@ class _StudentFigmaStateCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: const Color(0xFF002B6A).withValues(alpha: 0.6),
-              fontSize: 11,
+              fontSize: FontSize.caption * 0.85,
               fontWeight: FontWeight.w900,
               height: 1.2,
               letterSpacing: 0,
@@ -1820,7 +1820,7 @@ class _StudentFigmaClassCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Color(0xFF073E45),
-                  fontSize: 24,
+                  fontSize: FontSize.title,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
@@ -1834,7 +1834,7 @@ class _StudentFigmaClassCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: const Color(0xFF357476).withValues(alpha: 0.72),
-                  fontSize: 10,
+                  fontSize: FontSize.caption * 0.77,
                   fontWeight: FontWeight.w800,
                   height: 1,
                 ),
@@ -1979,7 +1979,7 @@ class _HomeTeacherMessageCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Color(0xFF001741),
-                        fontSize: 17,
+                        fontSize: FontSize.large,
                         fontWeight: FontWeight.w900,
                         height: 1.1,
                       ),
@@ -1989,7 +1989,7 @@ class _HomeTeacherMessageCard extends StatelessWidget {
                       context.getText(data.classKey),
                       style: const TextStyle(
                         color: Color(0xFF515F6F),
-                        fontSize: 11,
+                        fontSize: FontSize.caption * 0.85,
                         fontWeight: FontWeight.w500,
                         height: 1.1,
                       ),
@@ -2002,7 +2002,7 @@ class _HomeTeacherMessageCard extends StatelessWidget {
                 context.getText(data.timeKey),
                 style: const TextStyle(
                   color: Color(0xFF6B7280),
-                  fontSize: 11,
+                  fontSize: FontSize.caption * 0.85,
                   fontWeight: FontWeight.w500,
                   height: 1.1,
                 ),
@@ -2034,7 +2034,7 @@ class _HomeTeacherMessageCard extends StatelessWidget {
                     context.getText(data.studentKey),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 9,
+                      fontSize: FontSize.caption * 0.7,
                       fontWeight: FontWeight.w900,
                       height: 1,
                       letterSpacing: 0.5,
@@ -2046,7 +2046,7 @@ class _HomeTeacherMessageCard extends StatelessWidget {
                   context.getText(data.bodyKey),
                   style: const TextStyle(
                     color: Color(0xFF30333A),
-                    fontSize: 14,
+                    fontSize: FontSize.small,
                     fontWeight: FontWeight.w400,
                     height: 1.45,
                   ),
@@ -2312,7 +2312,7 @@ class _StudentClassroomHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontSize: 24,
+          fontSize: FontSize.title,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
@@ -2340,7 +2340,7 @@ class _StudentClassroomLoadingRegion extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Color(0xFF30333A),
-                fontSize: 14,
+                fontSize: FontSize.small,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -2398,7 +2398,7 @@ class _StudentClassroomTabCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Color(0xFF002B6A),
-                  fontSize: 24,
+                  fontSize: FontSize.title,
                   fontWeight: FontWeight.w900,
                   height: 1,
                 ),
@@ -2446,7 +2446,7 @@ class _StudentClassroomMetaRow extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Color(0xFF747781),
-              fontSize: 13,
+              fontSize: FontSize.caption,
               fontWeight: FontWeight.w500,
               height: 1.1,
             ),
@@ -2485,7 +2485,7 @@ class _StudentJoinAnotherClassroomTitle extends StatelessWidget {
               context.getText(AppKeys.studentJoinAnotherClassroom),
               style: const TextStyle(
                 color: Color(0xFF002B6A),
-                fontSize: 17,
+                fontSize: FontSize.large,
                 fontWeight: FontWeight.w900,
                 height: 1.1,
               ),
@@ -2822,7 +2822,7 @@ class _StudentHomeTabButton extends StatelessWidget {
                 maxLines: 1,
                 style: TextStyle(
                   color: selected ? Colors.white : _muted,
-                  fontSize: 12 * scale,
+                  fontSize: FontSize.caption * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
@@ -2948,7 +2948,7 @@ class _JoinClassroomButton extends StatelessWidget {
                 context.getText(AppKeys.studentJoinNewClassroom),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 12 * scale,
+                  fontSize: FontSize.caption * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
@@ -3021,7 +3021,7 @@ class _StudentClassroomCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _deepInk,
-                    fontSize: 16 * scale,
+                    fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.1,
                     letterSpacing: 0,
@@ -3039,7 +3039,7 @@ class _StudentClassroomCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.grayText,
-                    fontSize: 12 * scale,
+                    fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w700,
                     height: 1.1,
                     letterSpacing: 0,
@@ -3198,7 +3198,7 @@ class _StudentMessagePanel extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _deepInk,
-              fontSize: 16 * scale,
+              fontSize: FontSize.normal * scale,
               fontWeight: FontWeight.w900,
               height: 1.15,
               letterSpacing: 0,
@@ -3210,7 +3210,7 @@ class _StudentMessagePanel extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.grayText,
-              fontSize: 13 * scale,
+              fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w700,
               height: 1.25,
               letterSpacing: 0,
@@ -3249,7 +3249,7 @@ class _AchievementsHeader extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: _deepInk,
-                  fontSize: 20 * scale,
+                  fontSize: FontSize.large * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
@@ -3273,7 +3273,7 @@ class _AchievementsHeader extends StatelessWidget {
             context.getText(AppKeys.viewAllUpper),
             style: TextStyle(
               color: _teal,
-              fontSize: 11 * scale,
+              fontSize: FontSize.caption * 0.85 * scale,
               fontWeight: FontWeight.w900,
               height: 1,
               letterSpacing: 0,
@@ -3335,7 +3335,7 @@ class _AchievementCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _deepInk,
-                    fontSize: 16 * scale,
+                    fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.12,
                     letterSpacing: 0,
@@ -3348,7 +3348,7 @@ class _AchievementCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.grayText,
-                    fontSize: 13 * scale,
+                    fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w700,
                     height: 1,
                     letterSpacing: 0,

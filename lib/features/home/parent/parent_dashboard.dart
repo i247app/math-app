@@ -626,7 +626,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFF001741),
-                    fontSize: 28,
+                    fontSize: FontSize.title,
                     fontWeight: FontWeight.w900,
                     height: 1.2,
                   ),
@@ -637,7 +637,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFF444650),
-                    fontSize: 16,
+                    fontSize: FontSize.normal,
                     fontWeight: FontWeight.w400,
                     height: 1.45,
                   ),
@@ -661,7 +661,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                       context.getText(AppKeys.parentSwitchStudentAction),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: FontSize.large,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -685,7 +685,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                       context.getText(AppKeys.parentCreateStudent),
                       style: const TextStyle(
                         color: Color(0xFFAA2A6C),
-                        fontSize: 18,
+                        fontSize: FontSize.large,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -769,7 +769,7 @@ class _ParentChildrenGrid extends StatelessWidget {
                   color: index.isEven
                       ? const Color(0xFF14635E)
                       : const Color(0xFF126696),
-                  fontSize: 15,
+                  fontSize: FontSize.normal,
                   fontWeight: FontWeight.w900,
                   height: 1,
                 ),
@@ -784,7 +784,7 @@ class _ParentChildrenGrid extends StatelessWidget {
                   color: index.isEven
                       ? const Color(0xFF14635E)
                       : const Color(0xFF126696),
-                  fontSize: 31,
+                  fontSize: FontSize.title,
                   fontWeight: FontWeight.w900,
                   height: 1,
                 ),
@@ -799,7 +799,7 @@ class _ParentChildrenGrid extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Color(0xFF32625F),
-                  fontSize: 12,
+                  fontSize: FontSize.caption,
                   fontWeight: FontWeight.w700,
                   height: 1,
                 ),
@@ -897,7 +897,7 @@ class _ParentTeacherMessageCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Color(0xFF001741),
-                        fontSize: 17,
+                        fontSize: FontSize.large,
                         fontWeight: FontWeight.w900,
                         height: 1.1,
                       ),
@@ -907,7 +907,7 @@ class _ParentTeacherMessageCard extends StatelessWidget {
                       classroomName,
                       style: const TextStyle(
                         color: Color(0xFF515F6F),
-                        fontSize: 11,
+                        fontSize: FontSize.caption * 0.85,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -918,7 +918,7 @@ class _ParentTeacherMessageCard extends StatelessWidget {
                 '10:45 AM',
                 style: TextStyle(
                   color: Color(0xFF6B7280),
-                  fontSize: 10,
+                  fontSize: FontSize.caption * 0.77,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -948,7 +948,7 @@ class _ParentTeacherMessageCard extends StatelessWidget {
                     studentName.toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 9,
+                      fontSize: FontSize.caption * 0.7,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.5,
                     ),
@@ -964,7 +964,7 @@ class _ParentTeacherMessageCard extends StatelessWidget {
                   ),
                   style: const TextStyle(
                     color: Color(0xFF30333A),
-                    fontSize: 14,
+                    fontSize: FontSize.small,
                     fontWeight: FontWeight.w400,
                     height: 1.42,
                   ),
@@ -1273,7 +1273,7 @@ class _ParentLearningStreakCard extends StatelessWidget {
             context.getText(AppKeys.parentLearningStreak),
             style: const TextStyle(
               color: Color(0xFF282828),
-              fontSize: 14,
+              fontSize: FontSize.small,
               fontWeight: FontWeight.w900,
               height: 1,
             ),
@@ -1314,7 +1314,7 @@ class _ParentStreakDay extends StatelessWidget {
           label,
           style: const TextStyle(
             color: Color(0xFF9A6B61),
-            fontSize: 10,
+            fontSize: FontSize.caption * 0.77,
             fontWeight: FontWeight.w700,
             height: 1,
           ),
@@ -1353,7 +1353,7 @@ class _ParentStreakDay extends StatelessWidget {
                     '5',
                     style: TextStyle(
                       color: Color(0xFFC98E7E),
-                      fontSize: 12,
+                      fontSize: FontSize.caption,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1518,7 +1518,7 @@ class _ParentGuideItem extends StatelessWidget {
                   title,
                   style: TextStyle(
                     color: color,
-                    fontSize: 17,
+                    fontSize: FontSize.large,
                     fontWeight: FontWeight.w900,
                     height: 1.05,
                   ),
@@ -1528,7 +1528,7 @@ class _ParentGuideItem extends StatelessWidget {
                   subtitle,
                   style: const TextStyle(
                     color: Color(0xFF6D5C5C),
-                    fontSize: 13,
+                    fontSize: FontSize.caption,
                     fontWeight: FontWeight.w600,
                     height: 1.15,
                   ),
@@ -1602,7 +1602,7 @@ class _ParentAssessmentResultCard extends StatelessWidget {
                         '$score',
                         style: TextStyle(
                           color: scoreColor,
-                          fontSize: 26,
+                          fontSize: FontSize.title,
                           fontWeight: FontWeight.w900,
                           height: 1,
                         ),
@@ -1628,7 +1628,7 @@ class _ParentAssessmentResultCard extends StatelessWidget {
                           _parentQuizDateLabel(quiz),
                           style: const TextStyle(
                             color: Color(0xFF595959),
-                            fontSize: 13,
+                            fontSize: FontSize.caption,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -1641,7 +1641,7 @@ class _ParentAssessmentResultCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Color(0xFF222222),
-                        fontSize: 16,
+                        fontSize: FontSize.normal,
                         fontWeight: FontWeight.w900,
                         height: 1.1,
                       ),
@@ -1694,7 +1694,7 @@ class _ParentResultTag extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(
           color: Color(0xFF6D5C58),
-          fontSize: 10,
+          fontSize: FontSize.caption * 0.77,
           fontWeight: FontWeight.w700,
           height: 1,
         ),
@@ -1747,7 +1747,7 @@ class _ParentHomeErrorCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Color(0xFF8A4433),
-                fontSize: 12,
+                fontSize: FontSize.caption,
                 fontWeight: FontWeight.w700,
               ),
             ),

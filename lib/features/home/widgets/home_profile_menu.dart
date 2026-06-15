@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 
 class HomeProfileMenu extends StatelessWidget {
@@ -82,7 +83,7 @@ class HomeProfileMenu extends StatelessWidget {
 
   TextStyle get _nameStyle => TextStyle(
         color: const Color(0xFF002B6A),
-        fontSize: 16 * scale,
+        fontSize: FontSize.avatarName * scale,
         fontWeight: FontWeight.w900,
         height: 1.1,
       );

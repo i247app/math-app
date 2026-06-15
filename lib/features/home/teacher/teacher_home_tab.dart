@@ -446,7 +446,7 @@ class _TeacherTopBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: _teacherBlue.withValues(alpha: 0.60),
-                    fontSize: 12 * scale,
+                    fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.6,
                     height: 1.25,
@@ -458,7 +458,7 @@ class _TeacherTopBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: _teacherBlue,
-                    fontSize: 18 * scale,
+                    fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.1,
                   ),
@@ -543,7 +543,7 @@ class _TeacherHeroCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
                   color: Colors.white,
-                  fontSize: 18 * scale,
+                  fontSize: FontSize.large * scale,
                   fontWeight: FontWeight.w900,
                   height: 1.25,
                 ),
@@ -555,7 +555,7 @@ class _TeacherHeroCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
                   color: Colors.white,
-                  fontSize: 14 * scale,
+                  fontSize: FontSize.small * scale,
                   fontWeight: FontWeight.w700,
                   height: 1.25,
                 ),
@@ -593,7 +593,7 @@ class _TeacherClassSectionHeader extends StatelessWidget {
                 context.getText(AppKeys.teacherYourClasses),
                 style: GoogleFonts.andika(
                   color: Colors.black,
-                  fontSize: 18 * scale,
+                  fontSize: FontSize.large * scale,
                   fontWeight: FontWeight.w800,
                   height: 1.25,
                 ),
@@ -605,7 +605,7 @@ class _TeacherClassSectionHeader extends StatelessWidget {
                 context.getText(AppKeys.viewAllUpper),
                 style: GoogleFonts.andika(
                   color: _teacherInk,
-                  fontSize: 14 * scale,
+                  fontSize: FontSize.small * scale,
                   fontWeight: FontWeight.w800,
                   decoration: TextDecoration.underline,
                   height: 1.25,
@@ -693,7 +693,7 @@ class _TeacherHomeSectionHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: Colors.black,
-              fontSize: 18 * scale,
+              fontSize: FontSize.large * scale,
               fontWeight: FontWeight.w800,
               height: 1.25,
             ),
@@ -703,7 +703,7 @@ class _TeacherHomeSectionHeader extends StatelessWidget {
           context.getText(AppKeys.viewAllUpper),
           style: GoogleFonts.andika(
             color: _teacherInk,
-            fontSize: 14 * scale,
+            fontSize: FontSize.small * scale,
             fontWeight: FontWeight.w800,
             decoration: TextDecoration.underline,
             height: 1.25,
@@ -866,7 +866,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                         dateParts.day,
                         style: GoogleFonts.andika(
                           color: _teacherBlue,
-                          fontSize: 18 * scale,
+                          fontSize: FontSize.large * scale,
                           fontWeight: FontWeight.w900,
                           height: 0.95,
                         ),
@@ -875,7 +875,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                         dateParts.month,
                         style: GoogleFonts.andika(
                           color: _teacherMuted,
-                          fontSize: 9 * scale,
+                          fontSize: FontSize.caption * 0.7 * scale,
                           fontWeight: FontWeight.w800,
                           height: 1.15,
                         ),
@@ -890,7 +890,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: _teacherInk,
-                    fontSize: 17 * scale,
+                    fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.25,
                   ),
@@ -903,7 +903,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: _teacherMuted,
-                    fontSize: 12 * scale,
+                    fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
                   ),
@@ -966,7 +966,7 @@ class _TeacherClassCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.andika(
                     color: Colors.black,
-                    fontSize: 16 * scale,
+                    fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.15,
                   ),
@@ -984,7 +984,7 @@ class _TeacherClassCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.andika(
                     color: _teacherBlue.withValues(alpha: 0.60),
-                    fontSize: 11 * scale,
+                    fontSize: FontSize.caption * 0.85 * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.2,
                   ),
@@ -1003,7 +1003,7 @@ class _TeacherClassCard extends StatelessWidget {
                     maxLines: 1,
                     style: GoogleFonts.andika(
                       color: Colors.white,
-                      fontSize: 11 * scale,
+                      fontSize: FontSize.caption * 0.85 * scale,
                       fontWeight: FontWeight.w800,
                       height: 1,
                     ),

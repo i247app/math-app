@@ -194,7 +194,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                     context.getText(AppKeys.parentLearningProgress),
                     style: TextStyle(
                       color: const Color(0xFF17252B),
-                      fontSize: 17 * scale,
+                      fontSize: FontSize.large * scale,
                       fontWeight: FontWeight.w900,
                       height: 1.1,
                     ),
@@ -287,7 +287,7 @@ class _ParentAssessmentHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontSize: 24,
+          fontSize: FontSize.title,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
@@ -360,14 +360,14 @@ class _ParentAssessmentSearchField extends StatelessWidget {
         textInputAction: TextInputAction.search,
         style: TextStyle(
           color: const Color(0xFF17252B),
-          fontSize: 15 * scale,
+          fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w700,
         ),
         decoration: InputDecoration(
           hintText: context.getText(AppKeys.searchHint),
           hintStyle: TextStyle(
             color: const Color(0xFFD8C5CC),
-            fontSize: 15 * scale,
+            fontSize: FontSize.normal * scale,
             fontWeight: FontWeight.w700,
           ),
           prefixIcon: Icon(
@@ -456,7 +456,7 @@ class _ParentAssessmentChartPainter extends CustomPainter {
         '${10 - index * 2}',
         Offset(2 * scale, y - 5 * scale),
         color: const Color(0xFF5A676A),
-        fontSize: 7 * scale,
+        fontSize: FontSize.caption * 0.54 * scale,
       );
     }
 
@@ -517,7 +517,7 @@ class _ParentAssessmentChartPainter extends CustomPainter {
         score.toStringAsFixed(1),
         Offset(point.dx - 6 * scale, point.dy - 12 * scale),
         color: const Color(0xFF007E79),
-        fontSize: 6.5 * scale,
+        fontSize: FontSize.caption * 0.5 * scale,
         fontWeight: FontWeight.w800,
       );
       final date = _quizDate(entries[index].quiz).toLocal();
@@ -530,7 +530,7 @@ class _ParentAssessmentChartPainter extends CustomPainter {
         label,
         Offset(point.dx - 9 * scale, bottom + 5 * scale),
         color: const Color(0xFF5A676A),
-        fontSize: 6.5 * scale,
+        fontSize: FontSize.caption * 0.5 * scale,
       );
     }
   }
@@ -627,7 +627,7 @@ class _ParentAssessmentTabCard extends StatelessWidget {
                         '$score',
                         style: TextStyle(
                           color: scoreColor,
-                          fontSize: 24 * scale,
+                          fontSize: FontSize.title * scale,
                           fontWeight: FontWeight.w900,
                           height: 1,
                         ),
@@ -654,7 +654,7 @@ class _ParentAssessmentTabCard extends StatelessWidget {
                           _parentQuizDateLabel(entry.quiz),
                           style: TextStyle(
                             color: const Color(0xFF575757),
-                            fontSize: 12 * scale,
+                            fontSize: FontSize.caption * scale,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -667,7 +667,7 @@ class _ParentAssessmentTabCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: const Color(0xFF17252B),
-                        fontSize: 15 * scale,
+                        fontSize: FontSize.normal * scale,
                         fontWeight: FontWeight.w900,
                         height: 1.1,
                       ),
@@ -721,7 +721,7 @@ class _ParentAssessmentStateCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: const Color(0xFF17252B),
-              fontSize: 15 * scale,
+              fontSize: FontSize.normal * scale,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -731,7 +731,7 @@ class _ParentAssessmentStateCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: const Color(0xFF77859A),
-              fontSize: 12 * scale,
+              fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w600,
             ),
           ),

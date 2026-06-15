@@ -27,7 +27,7 @@ class TeacherReportTab extends StatelessWidget {
             context.getText(AppKeys.teacherReportTitle),
             style: GoogleFonts.andika(
               color: _teacherTeal,
-              fontSize: 28 * scale,
+              fontSize: FontSize.title * scale,
               fontWeight: FontWeight.w700,
               height: 1.15,
             ),
@@ -75,7 +75,7 @@ class TeacherReportTab extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
                       color: _teacherInk,
-                      fontSize: 18 * scale,
+                      fontSize: FontSize.large * scale,
                       fontWeight: FontWeight.w800,
                       height: 1.25,
                     ),
@@ -86,7 +86,7 @@ class TeacherReportTab extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
                       color: _teacherMuted,
-                      fontSize: 13 * scale,
+                      fontSize: FontSize.caption * scale,
                       fontWeight: FontWeight.w500,
                       height: 1.45,
                     ),

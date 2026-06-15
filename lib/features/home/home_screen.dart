@@ -14,6 +14,7 @@ import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
@@ -841,6 +842,8 @@ class _HeaderBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final contentHeight = height - topInset;
+    final typographyScale =
+        contentHeight / (role == ProfileRole.parent ? 64 : 98);
     if (role == ProfileRole.parent) {
       return ClipRect(
         child: BackdropFilter(
@@ -884,7 +887,8 @@ class _HeaderBar extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: const Color(0xFF6782AA),
-                                    fontSize: contentHeight * 0.19,
+                                    fontSize:
+                                        FontSize.avatarMini * typographyScale,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.8,
                                     height: 1,
@@ -901,7 +905,8 @@ class _HeaderBar extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           color: const Color(0xFF002B6A),
-                                          fontSize: contentHeight * 0.29,
+                                          fontSize: FontSize.avatarName *
+                                              typographyScale,
                                           fontWeight: FontWeight.w900,
                                           height: 1,
                                         ),
@@ -985,7 +990,8 @@ class _HeaderBar extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: _muted.withValues(alpha: 0.6),
-                                  fontSize: contentHeight * 0.10,
+                                  fontSize:
+                                      FontSize.avatarMini * typographyScale,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 1.8,
                                   height: 1,
@@ -1002,7 +1008,8 @@ class _HeaderBar extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: const Color(0xFF002B6A),
-                                        fontSize: contentHeight * 0.18,
+                                        fontSize: FontSize.avatarName *
+                                            typographyScale,
                                         fontWeight: FontWeight.w900,
                                         height: 1,
                                         letterSpacing: 0,
@@ -1073,7 +1080,7 @@ class _ParentFireBadge extends StatelessWidget {
             '$count',
             style: TextStyle(
               color: const Color(0xFFFF650B),
-              fontSize: height * 0.44,
+              fontSize: FontSize.caption * (height / 30),
               fontWeight: FontWeight.w900,
               height: 1,
             ),
@@ -1415,7 +1422,7 @@ class _AnimatedNavItem extends StatelessWidget {
                         maxLines: 1,
                         style: TextStyle(
                           color: color,
-                          fontSize: 10 * scale,
+                          fontSize: FontSize.caption * 0.77 * scale,
                           fontWeight: FontWeight.w900,
                           height: 1,
                           letterSpacing: 0.5,

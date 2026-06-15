@@ -507,7 +507,7 @@ class _TeacherStudyHeader extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
                 color: const Color(0xFF339395),
-                fontSize: 24,
+                fontSize: FontSize.title,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0,
               ),
@@ -568,14 +568,14 @@ class _TeacherStudySearchField extends StatelessWidget {
               textInputAction: TextInputAction.search,
               style: GoogleFonts.andika(
                 color: _teacherInk,
-                fontSize: 16 * scale,
+                fontSize: FontSize.normal * scale,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
                 hintText: context.getText(AppKeys.teacherAssignmentSearchHint),
                 hintStyle: GoogleFonts.andika(
                   color: const Color(0xFFDCBFC8),
-                  fontSize: 16 * scale,
+                  fontSize: FontSize.normal * scale,
                   fontWeight: FontWeight.w500,
                 ),
                 border: InputBorder.none,
@@ -725,7 +725,7 @@ class _TeacherStudyFilterChip extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: selected ? Colors.white : const Color(0xFF737373),
-              fontSize: 14 * scale,
+              fontSize: FontSize.small * scale,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
@@ -794,7 +794,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                           dateParts?.day ?? '--',
                           style: GoogleFonts.andika(
                             color: _teacherBlue,
-                            fontSize: 20 * scale,
+                            fontSize: FontSize.large * scale,
                             fontWeight: FontWeight.w800,
                             height: 1,
                           ),
@@ -808,7 +808,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                             ),
                             style: GoogleFonts.andika(
                               color: const Color(0xFF6B7280),
-                              fontSize: 10 * scale,
+                              fontSize: FontSize.caption * 0.77 * scale,
                               fontWeight: FontWeight.w700,
                               height: 1,
                             ),
@@ -828,7 +828,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: _teacherBlue,
-                            fontSize: 15 * scale,
+                            fontSize: FontSize.normal * scale,
                             fontWeight: FontWeight.w700,
                             height: 1.25,
                           ),
@@ -843,7 +843,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: const Color(0xFF7B8494),
-                            fontSize: 12 * scale,
+                            fontSize: FontSize.caption * scale,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -879,7 +879,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: const Color(0xFF4B5563),
-                          fontSize: 12 * scale,
+                          fontSize: FontSize.caption * scale,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
