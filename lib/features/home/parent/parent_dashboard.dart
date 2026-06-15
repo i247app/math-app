@@ -15,6 +15,10 @@ class ParentDashboard extends StatelessWidget {
     }
 
     if (args.activeTab == 1) {
+      return ParentAssessmentTab(args: args);
+    }
+
+    if (args.activeTab == 2) {
       return ReviewTab(
         user: args.user,
         activeProfile: args.activeProfile,
@@ -27,7 +31,7 @@ class ParentDashboard extends StatelessWidget {
       );
     }
 
-    if (args.activeTab == 2) {
+    if (args.activeTab == 3) {
       return HistoryTab(
         user: args.user,
         activeProfile: args.activeProfile,
@@ -36,7 +40,7 @@ class ParentDashboard extends StatelessWidget {
       );
     }
 
-    if (args.activeTab == 3) {
+    if (args.activeTab == 4) {
       return _dashboardSettings(args);
     }
 
@@ -176,12 +180,11 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     }
 
     try {
-      final quizzes = await widget.args.quizService.listQuizzes(
-        profileId: profileId != null && profileId > 0 ? profileId : null,
-        userId: profileId == null || profileId <= 0 ? userId : null,
+      return await _loadCompletedParentAssessments(
+        quizService: widget.args.quizService,
+        profileId: profileId,
+        userId: userId,
       );
-      return quizzes.where(_isCompletedAssessment).toList(growable: false)
-        ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
     } catch (_) {
       onError();
       return const <GeneratedQuiz>[];
@@ -214,18 +217,15 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     });
 
     try {
-      final quizzes = await widget.args.quizService.listQuizzes(
-        profileId: profileId != null && profileId > 0 ? profileId : null,
-        userId: profileId == null || profileId <= 0 ? userId : null,
+      final completed = await _loadCompletedParentAssessments(
+        quizService: widget.args.quizService,
+        profileId: profileId,
+        userId: userId,
       );
       if (!mounted) {
         return;
       }
 
-      final completed = quizzes
-          .where(_isCompletedAssessment)
-          .toList(growable: false)
-        ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
       setState(() {
         _isLoading = false;
         _errorMessage = null;
@@ -1767,6 +1767,49 @@ bool _isCompletedAssessment(GeneratedQuiz quiz) {
   final status = quiz.quizStatus?.trim().toUpperCase();
   return purpose == quizPurposeAssessment &&
       (status == 'SUBMITTED' || quiz.grading?.scorePercentage != null);
+}
+
+Future<List<GeneratedQuiz>> _loadCompletedParentAssessments({
+  required QuizService quizService,
+  required int? profileId,
+  required int? userId,
+}) async {
+  List<GeneratedQuiz> completed(List<GeneratedQuiz> quizzes) {
+    return quizzes.where(_isCompletedAssessment).toList(growable: false)
+      ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+  }
+
+  Object? profileError;
+  if (profileId != null && profileId > 0) {
+    try {
+      final profileQuizzes = await quizService.listQuizzes(
+        profileId: profileId,
+      );
+      final profileAssessments = completed(profileQuizzes);
+      if (profileAssessments.isNotEmpty) {
+        return profileAssessments;
+      }
+    } catch (error) {
+      profileError = error;
+    }
+  }
+
+  if (userId != null && userId > 0) {
+    try {
+      final userQuizzes = await quizService.listQuizzes(userId: userId);
+      return completed(userQuizzes);
+    } catch (_) {
+      if (profileError != null) {
+        Error.throwWithStackTrace(profileError, StackTrace.current);
+      }
+      rethrow;
+    }
+  }
+
+  if (profileError != null) {
+    Error.throwWithStackTrace(profileError, StackTrace.current);
+  }
+  return const <GeneratedQuiz>[];
 }
 
 DateTime _quizDate(GeneratedQuiz quiz) {

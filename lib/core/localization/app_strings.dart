@@ -73,6 +73,7 @@ class AppStrings {
       AppKeys.navStudy: 'HỌC',
       AppKeys.navMembers: 'THÀNH VIÊN',
       AppKeys.navReview: 'ÔN TẬP',
+      AppKeys.navAssessment: 'ĐÁNH GIÁ',
       AppKeys.navHistory: 'LỊCH SỬ',
       AppKeys.navReport: 'BÁO CÁO',
       AppKeys.navSettings: 'CÀI ĐẶT',
@@ -91,6 +92,7 @@ class AppStrings {
       AppKeys.parentAssessmentTitle: 'Đánh Giá',
       AppKeys.parentAssessmentSubtitle:
           'Xác định năng lực và trình độ hiện tại',
+      AppKeys.parentLearningProgress: 'Tiến trình học tập',
       AppKeys.parentRoadmapTitle: 'Game road map',
       AppKeys.parentRoadmapSubtitle: 'Phiêu lưu học tập qua từng cấp độ',
       AppKeys.parentJoinRoomTitle: 'Tham gia phòng học',
@@ -660,6 +662,7 @@ class AppStrings {
       AppKeys.navStudy: 'STUDY',
       AppKeys.navMembers: 'MEMBERS',
       AppKeys.navReview: 'REVIEW',
+      AppKeys.navAssessment: 'ASSESSMENT',
       AppKeys.navHistory: 'HISTORY',
       AppKeys.navReport: 'REPORT',
       AppKeys.navSettings: 'SETTINGS',
@@ -678,6 +681,7 @@ class AppStrings {
       AppKeys.parentAssessmentTitle: 'Assessment',
       AppKeys.parentAssessmentSubtitle:
           'Identify the current ability and learning level',
+      AppKeys.parentLearningProgress: 'Learning progress',
       AppKeys.parentRoadmapTitle: 'Game road map',
       AppKeys.parentRoadmapSubtitle: 'Learn through an adventure of levels',
       AppKeys.parentJoinRoomTitle: 'Join a classroom',

@@ -69,6 +69,7 @@ class AppKeys {
   static const navStudy = 'nav_study';
   static const navMembers = 'nav_members';
   static const navReview = 'nav_review';
+  static const navAssessment = 'nav_assessment';
   static const navHistory = 'nav_history';
   static const navReport = 'nav_report';
   static const navSettings = 'nav_settings';
@@ -86,6 +87,7 @@ class AppKeys {
   static const parentLearningStreak = 'parent_learning_streak';
   static const parentAssessmentTitle = 'parent_assessment_title';
   static const parentAssessmentSubtitle = 'parent_assessment_subtitle';
+  static const parentLearningProgress = 'parent_learning_progress';
   static const parentRoadmapTitle = 'parent_roadmap_title';
   static const parentRoadmapSubtitle = 'parent_roadmap_subtitle';
   static const parentJoinRoomTitle = 'parent_join_room_title';

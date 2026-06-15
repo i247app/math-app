@@ -39,6 +39,7 @@ import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart'
 import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
 
 part 'parent/parent_dashboard.dart';
+part 'parent/parent_assessment_tab.dart';
 part 'student/student_dashboard.dart';
 part 'teacher/teacher_dashboard.dart';
 
@@ -81,6 +82,7 @@ const _homeProfileSwitchMinimumDuration = Duration(milliseconds: 1500);
 enum _HomeTabDestination {
   home,
   classroom,
+  assessment,
   review,
   history,
   study,
@@ -213,9 +215,10 @@ class _HomeScreenState extends State<HomeScreen>
   }) {
     final destination = switch (fromRole) {
       ProfileRole.parent => switch (currentIndex) {
-          1 => _HomeTabDestination.review,
-          2 => _HomeTabDestination.history,
-          3 => _HomeTabDestination.settings,
+          1 => _HomeTabDestination.assessment,
+          2 => _HomeTabDestination.review,
+          3 => _HomeTabDestination.history,
+          4 => _HomeTabDestination.settings,
           _ => _HomeTabDestination.home,
         },
       ProfileRole.student => switch (currentIndex) {
@@ -236,9 +239,10 @@ class _HomeScreenState extends State<HomeScreen>
 
     return switch (toRole) {
       ProfileRole.parent => switch (destination) {
-          _HomeTabDestination.review => 1,
-          _HomeTabDestination.history => 2,
-          _HomeTabDestination.settings => 3,
+          _HomeTabDestination.assessment => 1,
+          _HomeTabDestination.review => 2,
+          _HomeTabDestination.history => 3,
+          _HomeTabDestination.settings => 4,
           _ => 0,
         },
       ProfileRole.student => switch (destination) {
@@ -399,7 +403,7 @@ class _HomeScreenState extends State<HomeScreen>
                             _openAddProfileRequestId++;
                           });
                           homeCubit.selectTab(
-                            widget.activeRole == ProfileRole.student ? 4 : 3,
+                            4,
                           );
                         },
                         onProfileSaved: () {
@@ -411,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen>
                             _returnToReviewAfterProfileSave = false;
                           });
                           homeCubit.selectTab(
-                            widget.activeRole == ProfileRole.student ? 2 : 1,
+                            2,
                           );
                         },
                         openAddProfileRequestId: _openAddProfileRequestId,
@@ -419,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen>
                         onOpenClassroomTab: () => homeCubit.selectTab(1),
                         onOpenReviewTab: () {
                           HapticFeedback.lightImpact();
-                          homeCubit.selectTab(1);
+                          homeCubit.selectTab(2);
                         },
                         onOpenProfileMenu: () {
                           if (switchableProfiles.isEmpty ||
@@ -1244,6 +1248,11 @@ class _BottomNavigation extends StatelessWidget {
           _NavItemData(
             Icons.home_filled,
             context.getText(AppKeys.navHome),
+            null,
+          ),
+          _NavItemData(
+            Icons.assignment_turned_in_outlined,
+            context.getText(AppKeys.navAssessment),
             null,
           ),
           _NavItemData(
