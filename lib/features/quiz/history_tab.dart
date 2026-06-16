@@ -553,16 +553,20 @@ class _HistoryQuizCard extends StatelessWidget {
                   children: [
                     _HistoryMetaRow(parts: dateParts, scale: scale),
                     SizedBox(height: 7 * scale),
-                    Text(
-                      _quizTitle(context, quiz),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: _deepInk,
-                        fontSize: FontSize.small * scale,
-                        fontWeight: FontWeight.w900,
-                        height: 1.28,
-                        letterSpacing: 0,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        _quizTitle(context, quiz),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _deepInk,
+                          fontSize: FontSize.small * scale,
+                          fontWeight: FontWeight.w900,
+                          height: 1.28,
+                          letterSpacing: 0,
+                        ),
                       ),
                     ),
                   ],
@@ -629,15 +633,19 @@ class _HistoryMetaItem extends StatelessWidget {
       children: [
         Icon(icon, color: _muted, size: 18 * scale),
         SizedBox(width: 5 * scale),
-        Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: _muted,
-            fontSize: FontSize.caption * 0.77 * scale,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: _muted,
+              fontSize: FontSize.caption * scale,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0,
+            ),
           ),
         ),
       ],
