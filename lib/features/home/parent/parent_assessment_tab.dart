@@ -32,6 +32,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     super.didUpdateWidget(oldWidget);
     if (_profileSourceKey(oldWidget.args) != _profileSourceKey(widget.args)) {
       _loadAssessments();
+    } else if (oldWidget.args.activeRefreshTick !=
+        widget.args.activeRefreshTick) {
+      _loadAssessments();
     }
   }
 
@@ -89,9 +92,11 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       (a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)),
     );
     setState(() {
-      _entries = entries;
+      if (!failed || entries.isNotEmpty || _entries.isEmpty) {
+        _entries = entries;
+      }
       _isLoading = false;
-      _errorMessage = failed && entries.isEmpty
+      _errorMessage = failed && _entries.isEmpty
           ? context.readText(AppKeys.parentQuizLoadFailed)
           : null;
     });

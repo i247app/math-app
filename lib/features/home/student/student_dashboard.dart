@@ -27,6 +27,7 @@ class StudentDashboard extends StatelessWidget {
         onActivateProfile: args.onActivateProfile,
         onProfileSaved: args.onProfileSaved,
         parentHomeEntrance: args.parentHomeEntrance,
+        activeRefreshTick: args.activeRefreshTick,
       );
     }
 
@@ -37,6 +38,7 @@ class StudentDashboard extends StatelessWidget {
         user: args.user,
         activeProfile: args.activeProfile,
         classroomService: args.classroomService,
+        activeRefreshTick: args.activeRefreshTick,
       );
     }
 
@@ -105,6 +107,7 @@ class _StudentHomeContent extends StatefulWidget {
     required this.onActivateProfile,
     required this.onProfileSaved,
     required this.parentHomeEntrance,
+    this.activeRefreshTick = 0,
   });
 
   final EdgeInsets padding;
@@ -122,6 +125,7 @@ class _StudentHomeContent extends StatefulWidget {
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
   final Animation<double> parentHomeEntrance;
+  final int activeRefreshTick;
 
   @override
   State<_StudentHomeContent> createState() => _StudentHomeContentState();
@@ -179,6 +183,11 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       _hasLoadedInvitations = false;
       if (widget.activeRole == ProfileRole.student) {
         _loadClassrooms();
+      }
+      _loadInvitations();
+    } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
+      if (widget.activeRole == ProfileRole.student) {
+        _loadClassrooms(forceRefresh: true);
       }
       _loadInvitations();
     }
@@ -2067,6 +2076,7 @@ class _StudentClassroomTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.classroomService,
+    this.activeRefreshTick = 0,
   });
 
   final double bottomPadding;
@@ -2074,6 +2084,7 @@ class _StudentClassroomTab extends StatefulWidget {
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final ClassroomService classroomService;
+  final int activeRefreshTick;
 
   @override
   State<_StudentClassroomTab> createState() => _StudentClassroomTabState();
@@ -2098,6 +2109,8 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
   List<ClassroomModel> get _classrooms => _classroomCollection.classrooms;
 
   bool get _isLoading => _classroomCollection.isLoading;
+
+  bool get _hasLoadedClassrooms => _classroomCollection.hasLoaded;
 
   String? get _error {
     final profileId = _profileId;
@@ -2127,6 +2140,8 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
     if (oldProfileId != profileId) {
       setState(() => _isSearchContentLoading = true);
       _loadClassrooms();
+    } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
+      _loadClassrooms(forceRefresh: true);
     }
   }
 
@@ -2182,8 +2197,9 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
       );
     }
     final canLoadContent = profileId != null && profileId > 0;
-    final isInitialLoading =
-        canLoadContent && (_isLoading || _isSearchContentLoading);
+    final isInitialLoading = canLoadContent &&
+        ((_isLoading && _classrooms.isEmpty) ||
+            (_isSearchContentLoading && !_hasLoadedClassrooms));
     final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
 
@@ -2245,6 +2261,19 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                                   ],
                                 );
                               },
+                            ),
+                          if (_isLoading && _classrooms.isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(top: 12 * scale),
+                              child: Text(
+                                context.getText(AppKeys.loading),
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.andika(
+                                  color: _muted,
+                                  fontSize: FontSize.caption * scale,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           SizedBox(height: 30 * scale),
                           const _StudentJoinAnotherClassroomTitle(),

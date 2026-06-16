@@ -59,6 +59,7 @@ class _ParentHomeContent extends StatefulWidget {
 
 class _ParentHomeContentState extends State<_ParentHomeContent> {
   bool _isLoading = true;
+  bool _hasLoadedHome = false;
   String? _errorMessage;
   List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
   List<_ParentChildSummary> _childSummaries = const <_ParentChildSummary>[];
@@ -88,6 +89,10 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     if (oldProfileId != profileId ||
         oldWidget.args.user?.id != widget.args.user?.id ||
         oldChildIds != childIds) {
+      _hasLoadedHome = false;
+      _loadHome();
+    } else if (oldWidget.args.activeRefreshTick !=
+        widget.args.activeRefreshTick) {
       _loadHome();
     }
   }
@@ -104,8 +109,9 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
-      _completedAssessments = const <GeneratedQuiz>[];
-      _childSummaries = const <_ParentChildSummary>[];
+      if (_childSummaries.isEmpty) {
+        _completedAssessments = const <GeneratedQuiz>[];
+      }
     });
     widget.args.onParentAssessmentStateChanged(false);
 
@@ -156,6 +162,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     }
     setState(() {
       _isLoading = false;
+      _hasLoadedHome = true;
       _childSummaries = summaries;
       _completedAssessments = parentAssessments;
       _errorMessage = hadError
@@ -192,7 +199,9 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   }
 
   Future<void> _loadAssessments() async {
-    _childSummaries = const <_ParentChildSummary>[];
+    if (_childSummaries.isNotEmpty) {
+      _childSummaries = const <_ParentChildSummary>[];
+    }
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
     );
@@ -204,6 +213,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       }
       setState(() {
         _isLoading = false;
+        _hasLoadedHome = true;
         _errorMessage = null;
         _completedAssessments = const <GeneratedQuiz>[];
       });
@@ -228,6 +238,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
       setState(() {
         _isLoading = false;
+        _hasLoadedHome = true;
         _errorMessage = null;
         _completedAssessments = completed;
       });
@@ -238,8 +249,11 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       }
       setState(() {
         _isLoading = false;
+        _hasLoadedHome = true;
         _errorMessage = error.message;
-        _completedAssessments = const <GeneratedQuiz>[];
+        if (_completedAssessments.isEmpty) {
+          _completedAssessments = const <GeneratedQuiz>[];
+        }
       });
       widget.args.onParentAssessmentStateChanged(false);
     } catch (_) {
@@ -248,8 +262,11 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       }
       setState(() {
         _isLoading = false;
+        _hasLoadedHome = true;
         _errorMessage = context.readText(AppKeys.parentQuizLoadFailed);
-        _completedAssessments = const <GeneratedQuiz>[];
+        if (_completedAssessments.isEmpty) {
+          _completedAssessments = const <GeneratedQuiz>[];
+        }
       });
       widget.args.onParentAssessmentStateChanged(false);
     }
@@ -260,7 +277,10 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     final hasJoinedClassroom = _childSummaries.any(
       (summary) => summary.classroom != null,
     );
-    if (_children.isNotEmpty && (_isLoading || hasJoinedClassroom)) {
+    final isInitialChildDashboardLoad =
+        _children.isNotEmpty && !_hasLoadedHome && _isLoading;
+    if (_children.isNotEmpty &&
+        (hasJoinedClassroom || isInitialChildDashboardLoad)) {
       return _buildChildDashboard();
     }
 
@@ -287,12 +307,16 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
               hasCompletedAssessment: hasCompletedAssessment,
             ),
             const SizedBox(height: 12),
-            if (_isLoading)
+            if (_isLoading && !_hasLoadedHome)
               const _ParentHomeLoadingCard()
             else if (hasCompletedAssessment)
               _buildCompletedState()
             else
               _buildFirstAssessmentState(),
+            if (_isLoading && _hasLoadedHome) ...[
+              const SizedBox(height: 8),
+              const _ParentHomeRefreshLabel(),
+            ],
             if (_errorMessage != null) ...[
               const SizedBox(height: 10),
               _ParentHomeErrorCard(
@@ -331,7 +355,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (_isLoading)
+            if (_isLoading && summaries.isEmpty && !_hasLoadedHome)
               const _ParentChildDashboardLoading()
             else ...[
               _ParentChildrenGrid(summaries: summaries),
@@ -352,6 +376,10 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
                 const SizedBox(height: 10),
               ],
               _ParentTeacherMessages(summaries: summaries.take(2).toList()),
+            ],
+            if (_isLoading && summaries.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              const _ParentHomeRefreshLabel(),
             ],
             if (!_isLoading && _errorMessage != null) ...[
               const SizedBox(height: 10),
@@ -556,6 +584,23 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       ),
     );
     await widget.args.onRefreshProfiles();
+  }
+}
+
+class _ParentHomeRefreshLabel extends StatelessWidget {
+  const _ParentHomeRefreshLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      context.getText(AppKeys.loading),
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        color: Color(0xFF6D5C5C),
+        fontSize: FontSize.caption,
+        fontWeight: FontWeight.w700,
+      ),
+    );
   }
 }
 

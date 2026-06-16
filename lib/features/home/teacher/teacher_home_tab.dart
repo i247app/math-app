@@ -10,6 +10,7 @@ class TeacherHomeTab extends StatefulWidget {
     required this.onCompleteProfile,
     this.onOpenClassroomTab,
     ClassroomExerciseService? exerciseService,
+    this.activeRefreshTick = 0,
   }) : _exerciseService = exerciseService;
 
   final LoginUser? user;
@@ -18,6 +19,7 @@ class TeacherHomeTab extends StatefulWidget {
   final double scale;
   final Future<void> Function() onCompleteProfile;
   final VoidCallback? onOpenClassroomTab;
+  final int activeRefreshTick;
   final ClassroomExerciseService? _exerciseService;
 
   @override
@@ -29,6 +31,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       widget._exerciseService ?? ClassroomExerciseApi();
 
   bool _isLoadingAssignments = false;
+  bool _hasLoadedAssignments = false;
   int? _loadedProfileId;
   int _assignmentLoadRequestId = 0;
   List<ClassroomExercise> _recentAssignments = const <ClassroomExercise>[];
@@ -45,6 +48,8 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   List<ClassroomModel> get _classrooms => _classroomCollection.classrooms;
 
   bool get _isLoading => _classroomCollection.isLoading;
+
+  bool get _hasLoadedClassrooms => _classroomCollection.hasLoaded;
 
   String? get _error {
     final profileId =
@@ -68,6 +73,8 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         ActiveProfileSession.profileStableId(widget.activeProfile);
     if (profileId != _loadedProfileId) {
       _loadClassrooms();
+    } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
+      _loadClassrooms(forceRefresh: true);
     }
   }
 
@@ -80,6 +87,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         _loadedProfileId = profileId;
         _recentAssignments = const <ClassroomExercise>[];
         _isLoadingAssignments = false;
+        _hasLoadedAssignments = true;
       });
       return;
     }
@@ -88,6 +96,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       _isLoadingAssignments = true;
       if (_loadedProfileId != profileId) {
         _recentAssignments = const <ClassroomExercise>[];
+        _hasLoadedAssignments = false;
       }
       _loadedProfileId = profileId;
     });
@@ -106,6 +115,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       }
       _isLoadingAssignments =
           collection.errorMessage == null && classrooms.isNotEmpty;
+      if (collection.errorMessage != null || classrooms.isEmpty) {
+        _hasLoadedAssignments = true;
+      }
     });
     if (collection.errorMessage != null || classrooms.isEmpty) {
       return;
@@ -139,6 +151,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         setState(() {
           _recentAssignments = const <ClassroomExercise>[];
           _isLoadingAssignments = false;
+          _hasLoadedAssignments = true;
         });
       }
       return;
@@ -171,6 +184,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     setState(() {
       _recentAssignments = assignments;
       _isLoadingAssignments = false;
+      _hasLoadedAssignments = true;
     });
   }
 
@@ -331,7 +345,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                     onViewAll: widget.onOpenClassroomTab,
                   ),
                   SizedBox(height: 12 * scale),
-                  if (_isLoading && _classrooms.isEmpty)
+                  if (_isLoading &&
+                      _classrooms.isEmpty &&
+                      !_hasLoadedClassrooms)
                     _TeacherLoadingPanel(scale: scale)
                   else if (_error != null && _classrooms.isEmpty)
                     _TeacherErrorPanel(
@@ -346,10 +362,16 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                       onCreate: _handleClassCreateAction,
                     )
                   else
-                    _TeacherClassCarousel(
-                      scale: scale,
-                      classrooms: _classrooms,
-                      onOpen: _openClassDetail,
+                    Column(
+                      children: [
+                        _TeacherClassCarousel(
+                          scale: scale,
+                          classrooms: _classrooms,
+                          onOpen: _openClassDetail,
+                        ),
+                        if (_isLoading)
+                          _TeacherBackgroundRefreshLabel(scale: scale),
+                      ],
                     ),
                   SizedBox(height: 30 * scale),
                   _TeacherHomeSectionHeader(
@@ -357,7 +379,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                     title: context.getText(AppKeys.teacherRecentlyAssigned),
                   ),
                   SizedBox(height: 12 * scale),
-                  if (_isLoadingAssignments && _recentAssignments.isEmpty)
+                  if (_isLoadingAssignments &&
+                      _recentAssignments.isEmpty &&
+                      !_hasLoadedAssignments)
                     _TeacherAssignmentsLoadingPanel(scale: scale)
                   else if (_recentAssignments.isEmpty)
                     _TeacherEmptyAssignmentsPanel(

@@ -349,103 +349,67 @@ class _HomeScreenState extends State<HomeScreen>
                 children: [
                   const Positioned.fill(child: _HomeBackground()),
                   Positioned.fill(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 280),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      layoutBuilder: (currentChild, previousChildren) {
-                        return Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            for (final child in previousChildren)
-                              Positioned.fill(child: child),
-                            if (currentChild != null)
-                              Positioned.fill(child: currentChild),
-                          ],
-                        );
-                      },
-                      transitionBuilder: (child, animation) {
-                        final isMovingRight =
-                            navigation.activeTab > navigation.previousTab;
-                        final beginX = isMovingRight ? 0.035 : -0.035;
-                        final offset = Tween<Offset>(
-                          begin: Offset(beginX, 0),
-                          end: Offset.zero,
-                        ).animate(animation);
-
-                        return FadeTransition(
-                          opacity: animation,
-                          child:
-                              SlideTransition(position: offset, child: child),
-                        );
-                      },
-                      child: _RoleDashboard(
-                        key: ValueKey(
-                          '${navigation.activeTab}-${ActiveProfileSession.profileStableId(widget.activeProfile)}',
-                        ),
-                        activeTab: navigation.activeTab,
-                        user: widget.user,
-                        profiles: widget.profiles,
-                        activeProfile: widget.activeProfile,
-                        activeRole: widget.activeRole,
-                        profileLoadError: widget.profileLoadError,
-                        onRefreshProfiles: widget.onRefreshProfiles,
-                        onActivateProfile: widget.onActivateProfile,
-                        initialGrades: _prefetchedGrades,
-                        gradeService: _gradeService,
-                        classroomService: _classroomService,
-                        assignmentService: _assignmentService,
-                        quizService: _quizService,
-                        onLogout: widget.onLogout,
-                        onAddProfileFromReview: () {
-                          HapticFeedback.selectionClick();
-                          setState(() {
-                            _returnToReviewAfterProfileSave = true;
-                            _openAddProfileRequestId++;
-                          });
-                          homeCubit.selectTab(
-                            4,
-                          );
-                        },
-                        onProfileSaved: () {
-                          if (!_returnToReviewAfterProfileSave) {
-                            return;
-                          }
-
-                          setState(() {
-                            _returnToReviewAfterProfileSave = false;
-                          });
-                          homeCubit.selectTab(
-                            2,
-                          );
-                        },
-                        openAddProfileRequestId: _openAddProfileRequestId,
-                        onCompleteTeacherProfile: _openTeacherProfileForm,
-                        onOpenClassroomTab: () => homeCubit.selectTab(1),
-                        onOpenReviewTab: () {
-                          HapticFeedback.lightImpact();
-                          homeCubit.selectTab(2);
-                        },
-                        onOpenProfileMenu: () {
-                          if (switchableProfiles.isEmpty ||
-                              _isProfileMenuOpen) {
-                            return;
-                          }
-                          HapticFeedback.selectionClick();
-                          setState(() => _isProfileMenuOpen = true);
-                        },
-                        onParentAssessmentStateChanged: (hasAssessment) {
-                          final nextCount = hasAssessment ? 4 : 1;
-                          if (_parentStreakCount == nextCount || !mounted) {
-                            return;
-                          }
-                          setState(() => _parentStreakCount = nextCount);
-                        },
-                        parentHomeEntrance: _parentHomeEntranceController,
-                        bottomPadding: navHeight + s(14),
-                        headerHeight: showHeader ? headerHeight : 0,
-                        scale: scale,
+                    child: _RoleDashboard(
+                      key: ValueKey(
+                        '${widget.activeRole}-${ActiveProfileSession.profileStableId(widget.activeProfile)}',
                       ),
+                      activeTab: navigation.activeTab,
+                      user: widget.user,
+                      profiles: widget.profiles,
+                      activeProfile: widget.activeProfile,
+                      activeRole: widget.activeRole,
+                      profileLoadError: widget.profileLoadError,
+                      onRefreshProfiles: widget.onRefreshProfiles,
+                      onActivateProfile: widget.onActivateProfile,
+                      initialGrades: _prefetchedGrades,
+                      gradeService: _gradeService,
+                      classroomService: _classroomService,
+                      assignmentService: _assignmentService,
+                      quizService: _quizService,
+                      onLogout: widget.onLogout,
+                      onAddProfileFromReview: () {
+                        HapticFeedback.selectionClick();
+                        setState(() {
+                          _returnToReviewAfterProfileSave = true;
+                          _openAddProfileRequestId++;
+                        });
+                        homeCubit.selectTab(
+                          4,
+                        );
+                      },
+                      onProfileSaved: () {
+                        if (!_returnToReviewAfterProfileSave) {
+                          return;
+                        }
+
+                        setState(() {
+                          _returnToReviewAfterProfileSave = false;
+                        });
+                        homeCubit.selectTab(
+                          2,
+                        );
+                      },
+                      openAddProfileRequestId: _openAddProfileRequestId,
+                      onCompleteTeacherProfile: _openTeacherProfileForm,
+                      onOpenClassroomTab: () => homeCubit.selectTab(1),
+                      onOpenReviewTab: () {
+                        HapticFeedback.lightImpact();
+                        homeCubit.selectTab(2);
+                      },
+                      onOpenProfileMenu: () {
+                        if (switchableProfiles.isEmpty || _isProfileMenuOpen) {
+                          return;
+                        }
+                        HapticFeedback.selectionClick();
+                        setState(() => _isProfileMenuOpen = true);
+                      },
+                      onParentAssessmentStateChanged: (hasAssessment) {
+                        _updateParentStreak(hasAssessment ? 4 : 1);
+                      },
+                      parentHomeEntrance: _parentHomeEntranceController,
+                      bottomPadding: navHeight + s(14),
+                      headerHeight: showHeader ? headerHeight : 0,
+                      scale: scale,
                     ),
                   ),
                   if (_isProfileMenuOpen)
@@ -543,6 +507,19 @@ class _HomeScreenState extends State<HomeScreen>
       ProfileRole.student => _studentHomeCubit,
       ProfileRole.teacher => _teacherHomeCubit,
     };
+  }
+
+  void _updateParentStreak(int nextCount) {
+    if (_parentStreakCount == nextCount || !mounted) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _parentStreakCount == nextCount) {
+        return;
+      }
+      setState(() => _parentStreakCount = nextCount);
+    });
   }
 
   Future<void> _switchProfile(StudentProfile profile) async {
@@ -659,6 +636,7 @@ class HomeDashboardArgs {
     required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
     required this.parentHomeEntrance,
+    required this.activeRefreshTick,
     required this.bottomPadding,
     required this.headerHeight,
     required this.scale,
@@ -686,6 +664,7 @@ class HomeDashboardArgs {
   final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final Animation<double> parentHomeEntrance;
+  final int activeRefreshTick;
   final double bottomPadding;
   final double headerHeight;
   final double scale;
@@ -698,7 +677,7 @@ class HomeDashboardArgs {
       );
 }
 
-class _RoleDashboard extends StatelessWidget {
+class _RoleDashboard extends StatefulWidget {
   const _RoleDashboard({
     super.key,
     required this.activeTab,
@@ -757,36 +736,80 @@ class _RoleDashboard extends StatelessWidget {
   final double scale;
 
   @override
+  State<_RoleDashboard> createState() => _RoleDashboardState();
+}
+
+class _RoleDashboardState extends State<_RoleDashboard> {
+  late final Set<int> _visitedTabs = <int>{widget.activeTab};
+  final Map<int, int> _activationTicks = <int, int>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _activationTicks[widget.activeTab] = 1;
+  }
+
+  @override
+  void didUpdateWidget(covariant _RoleDashboard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.activeTab != widget.activeTab) {
+      _visitedTabs.add(widget.activeTab);
+      _activationTicks[widget.activeTab] =
+          (_activationTicks[widget.activeTab] ?? 0) + 1;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    const maxTabIndex = 4;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        for (var tab = 0; tab <= maxTabIndex; tab++)
+          if (_visitedTabs.contains(tab))
+            Offstage(
+              key: ValueKey('home-tab-$tab'),
+              offstage: tab != widget.activeTab,
+              child: TickerMode(
+                enabled: tab == widget.activeTab,
+                child: _buildTab(context, tab),
+              ),
+            ),
+      ],
+    );
+  }
+
+  Widget _buildTab(BuildContext context, int tab) {
     final args = HomeDashboardArgs(
-      activeTab: activeTab,
-      user: user,
-      profiles: profiles,
-      activeProfile: activeProfile,
-      profileLoadError: profileLoadError,
-      onRefreshProfiles: onRefreshProfiles,
-      onActivateProfile: onActivateProfile,
-      initialGrades: initialGrades,
-      gradeService: gradeService,
-      classroomService: classroomService,
-      assignmentService: assignmentService,
-      quizService: quizService,
-      onLogout: onLogout,
-      onAddProfileFromReview: onAddProfileFromReview,
-      onProfileSaved: onProfileSaved,
-      openAddProfileRequestId: openAddProfileRequestId,
-      onCompleteTeacherProfile: onCompleteTeacherProfile,
-      onOpenClassroomTab: onOpenClassroomTab,
-      onOpenReviewTab: onOpenReviewTab,
-      onOpenProfileMenu: onOpenProfileMenu,
-      onParentAssessmentStateChanged: onParentAssessmentStateChanged,
-      parentHomeEntrance: parentHomeEntrance,
-      bottomPadding: bottomPadding,
-      headerHeight: headerHeight,
-      scale: scale,
+      activeTab: tab,
+      user: widget.user,
+      profiles: widget.profiles,
+      activeProfile: widget.activeProfile,
+      profileLoadError: widget.profileLoadError,
+      onRefreshProfiles: widget.onRefreshProfiles,
+      onActivateProfile: widget.onActivateProfile,
+      initialGrades: widget.initialGrades,
+      gradeService: widget.gradeService,
+      classroomService: widget.classroomService,
+      assignmentService: widget.assignmentService,
+      quizService: widget.quizService,
+      onLogout: widget.onLogout,
+      onAddProfileFromReview: widget.onAddProfileFromReview,
+      onProfileSaved: widget.onProfileSaved,
+      openAddProfileRequestId: widget.openAddProfileRequestId,
+      onCompleteTeacherProfile: widget.onCompleteTeacherProfile,
+      onOpenClassroomTab: widget.onOpenClassroomTab,
+      onOpenReviewTab: widget.onOpenReviewTab,
+      onOpenProfileMenu: widget.onOpenProfileMenu,
+      onParentAssessmentStateChanged: widget.onParentAssessmentStateChanged,
+      parentHomeEntrance: widget.parentHomeEntrance,
+      activeRefreshTick: _activationTicks[tab] ?? 0,
+      bottomPadding: widget.bottomPadding,
+      headerHeight: tab == 0 ? widget.headerHeight : 0,
+      scale: widget.scale,
     );
 
-    return switch (activeRole) {
+    return switch (widget.activeRole) {
       ProfileRole.parent => ParentDashboard(args: args),
       ProfileRole.student => StudentDashboard(args: args),
       ProfileRole.teacher => TeacherDashboard(args: args),

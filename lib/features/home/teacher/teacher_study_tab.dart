@@ -9,6 +9,7 @@ class TeacherStudyTab extends StatefulWidget {
     required this.scale,
     ClassroomService? classroomService,
     ClassroomExerciseService? exerciseService,
+    this.activeRefreshTick = 0,
   })  : _classroomService = classroomService,
         _exerciseService = exerciseService;
 
@@ -16,6 +17,7 @@ class TeacherStudyTab extends StatefulWidget {
   final StudentProfile? activeProfile;
   final double bottomPadding;
   final double scale;
+  final int activeRefreshTick;
   final ClassroomService? _classroomService;
   final ClassroomExerciseService? _exerciseService;
 
@@ -69,6 +71,8 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     if (profileId != _loadedProfileId) {
       _selectedClassroomId = null;
       _loadClassrooms();
+    } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
+      _loadClassrooms(forceRefresh: true);
     }
   }
 

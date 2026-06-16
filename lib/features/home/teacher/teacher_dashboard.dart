@@ -19,6 +19,7 @@ class TeacherDashboard extends StatelessWidget {
         onCompleteProfile: args.onCompleteTeacherProfile,
         onOpenClassroomTab: args.onOpenClassroomTab,
         exerciseService: args.assignmentService,
+        activeRefreshTick: args.activeRefreshTick,
       );
     }
 
@@ -28,6 +29,7 @@ class TeacherDashboard extends StatelessWidget {
         activeProfile: args.activeProfile,
         bottomPadding: args.bottomPadding,
         scale: args.scale,
+        activeRefreshTick: args.activeRefreshTick,
       );
     }
 
@@ -39,6 +41,7 @@ class TeacherDashboard extends StatelessWidget {
         scale: args.scale,
         classroomService: args.classroomService,
         exerciseService: args.assignmentService,
+        activeRefreshTick: args.activeRefreshTick,
       );
     }
 

@@ -7,12 +7,14 @@ class TeacherClassroomTab extends StatefulWidget {
     required this.activeProfile,
     required this.bottomPadding,
     required this.scale,
+    this.activeRefreshTick = 0,
   });
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final double bottomPadding;
   final double scale;
+  final int activeRefreshTick;
   @override
   State<TeacherClassroomTab> createState() => _TeacherClassroomTabState();
 }
@@ -57,6 +59,8 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
         ActiveProfileSession.profileStableId(oldWidget.activeProfile);
     if (_profileId != oldProfileId) {
       _loadClassrooms();
+    } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
+      _loadClassrooms(forceRefresh: true);
     }
   }
 
@@ -336,20 +340,27 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                     ),
                   )
                 else
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    itemCount: displayedClassrooms.length,
-                    separatorBuilder: (_, __) => SizedBox(height: 16 * scale),
-                    itemBuilder: (context, index) {
-                      final classroom = displayedClassrooms[index];
-                      return _ClassroomListCard(
-                        scale: scale,
-                        classroom: classroom,
-                        onTap: () => _openClassDetail(classroom),
-                      );
-                    },
+                  Column(
+                    children: [
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        itemCount: displayedClassrooms.length,
+                        separatorBuilder: (_, __) =>
+                            SizedBox(height: 16 * scale),
+                        itemBuilder: (context, index) {
+                          final classroom = displayedClassrooms[index];
+                          return _ClassroomListCard(
+                            scale: scale,
+                            classroom: classroom,
+                            onTap: () => _openClassDetail(classroom),
+                          );
+                        },
+                      ),
+                      if (_isLoading)
+                        _TeacherBackgroundRefreshLabel(scale: scale),
+                    ],
                   ),
               ],
             ),
