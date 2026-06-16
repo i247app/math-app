@@ -559,7 +559,7 @@ class _HistoryQuizCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: _deepInk,
-                        fontSize: FontSize.normal * scale,
+                        fontSize: FontSize.small * scale,
                         fontWeight: FontWeight.w500,
                         height: 1.28,
                         letterSpacing: 0,
