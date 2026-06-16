@@ -560,7 +560,7 @@ class _HistoryQuizCard extends StatelessWidget {
                       style: TextStyle(
                         color: _deepInk,
                         fontSize: FontSize.normal * scale,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w500,
                         height: 1.28,
                         letterSpacing: 0,
                       ),
