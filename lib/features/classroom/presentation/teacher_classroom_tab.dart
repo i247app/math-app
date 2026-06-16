@@ -38,6 +38,8 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
 
   bool get _isLoading => _classroomCollection.isLoading;
 
+  bool get _hasLoadedClassrooms => _classroomCollection.hasLoaded;
+
   String? get _error {
     final profileId = _profileId;
     if (profileId == null || profileId <= 0) {
@@ -304,7 +306,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                 ),
                 SizedBox(height: 24 * scale),
 
-                if (_isLoading && _classrooms.isEmpty)
+                if (_isLoading && _classrooms.isEmpty && !_hasLoadedClassrooms)
                   Center(
                     child: Padding(
                       padding: EdgeInsets.all(24 * scale),
@@ -327,17 +329,23 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                     ),
                   )
                 else if (_classrooms.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24 * scale),
-                      child: Text(
-                        context.getText(AppKeys.teacherEmptyClassroomList),
-                        style: GoogleFonts.andika(
-                          color: _teacherMuted,
-                          fontSize: FontSize.normal * scale,
+                  Column(
+                    children: [
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(24 * scale),
+                          child: Text(
+                            context.getText(AppKeys.teacherEmptyClassroomList),
+                            style: GoogleFonts.andika(
+                              color: _teacherMuted,
+                              fontSize: FontSize.normal * scale,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      if (_isLoading)
+                        _TeacherBackgroundRefreshLabel(scale: scale),
+                    ],
                   )
                 else
                   Column(

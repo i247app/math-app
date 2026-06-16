@@ -356,10 +356,16 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                       onRetry: _refreshClassrooms,
                     )
                   else if (_classrooms.isEmpty)
-                    _TeacherNoClassPanel(
-                      scale: scale,
-                      isProfileComplete: isProfileComplete,
-                      onCreate: _handleClassCreateAction,
+                    Column(
+                      children: [
+                        _TeacherNoClassPanel(
+                          scale: scale,
+                          isProfileComplete: isProfileComplete,
+                          onCreate: _handleClassCreateAction,
+                        ),
+                        if (_isLoading)
+                          _TeacherBackgroundRefreshLabel(scale: scale),
+                      ],
                     )
                   else
                     Column(
@@ -384,8 +390,16 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                       !_hasLoadedAssignments)
                     _TeacherAssignmentsLoadingPanel(scale: scale)
                   else if (_recentAssignments.isEmpty)
-                    _TeacherEmptyAssignmentsPanel(
-                      message: context.getText(AppKeys.teacherNoAssignments),
+                    Column(
+                      children: [
+                        _TeacherEmptyAssignmentsPanel(
+                          message: context.getText(
+                            AppKeys.teacherNoAssignments,
+                          ),
+                        ),
+                        if (_isLoadingAssignments)
+                          _TeacherBackgroundRefreshLabel(scale: scale),
+                      ],
                     )
                   else ...[
                     _TeacherRecentAssignmentCarousel(

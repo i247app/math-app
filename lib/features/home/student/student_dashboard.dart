@@ -398,14 +398,19 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
               ),
             ),
             if (widget.activeRole == ProfileRole.student) ...[
-              const SizedBox(height: 11),
-              _StudentClassGridSection(
-                classrooms: _classrooms,
-                isLoading: _isLoadingClassrooms,
-                error: _classroomError,
-                onOpenClassroom: _openClassDetail,
-                onViewAll: widget.onOpenClassroomTab,
-              ),
+              if (_classrooms.isNotEmpty ||
+                  !_hasLoadedClassrooms ||
+                  _classroomError != null) ...[
+                const SizedBox(height: 11),
+                _StudentClassGridSection(
+                  classrooms: _classrooms,
+                  isLoading: _isLoadingClassrooms && !_hasLoadedClassrooms,
+                  isRefreshing: _isLoadingClassrooms && _classrooms.isNotEmpty,
+                  error: _classroomError,
+                  onOpenClassroom: _openClassDetail,
+                  onViewAll: widget.onOpenClassroomTab,
+                ),
+              ],
             ],
             const SizedBox(height: 20),
             const _HomeTeacherMessages(),
@@ -1648,6 +1653,7 @@ class _StudentClassGridSection extends StatelessWidget {
   const _StudentClassGridSection({
     required this.classrooms,
     required this.isLoading,
+    required this.isRefreshing,
     required this.error,
     required this.onOpenClassroom,
     required this.onViewAll,
@@ -1655,6 +1661,7 @@ class _StudentClassGridSection extends StatelessWidget {
 
   final List<ClassroomModel> classrooms;
   final bool isLoading;
+  final bool isRefreshing;
   final String? error;
   final ValueChanged<ClassroomModel> onOpenClassroom;
   final VoidCallback onViewAll;
@@ -1706,7 +1713,28 @@ class _StudentClassGridSection extends StatelessWidget {
               );
             },
           ),
+        if (isRefreshing) const _StudentHomeRefreshLabel(),
       ],
+    );
+  }
+}
+
+class _StudentHomeRefreshLabel extends StatelessWidget {
+  const _StudentHomeRefreshLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Text(
+        context.getText(AppKeys.loading),
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: _muted,
+          fontSize: FontSize.caption,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 }
@@ -2198,7 +2226,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
     }
     final canLoadContent = profileId != null && profileId > 0;
     final isInitialLoading = canLoadContent &&
-        ((_isLoading && _classrooms.isEmpty) ||
+        ((_isLoading && _classrooms.isEmpty && !_hasLoadedClassrooms) ||
             (_isSearchContentLoading && !_hasLoadedClassrooms));
     final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;

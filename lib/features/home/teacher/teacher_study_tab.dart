@@ -408,7 +408,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                         onSelected: _selectPurpose,
                       ),
                       SizedBox(height: 24 * scale),
-                      if (_isLoadingExercises && _exercises.isEmpty)
+                      if (_isLoadingExercises &&
+                          _exercises.isEmpty &&
+                          !_hasCompletedInitialLoad)
                         _TeacherStudyLoadingIndicator(scale: scale)
                       else if (_displayError != null && _exercises.isEmpty)
                         _TeacherErrorPanel(
@@ -417,20 +419,34 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                           onRetry: _refreshClassrooms,
                         )
                       else if (_classrooms.isEmpty)
-                        _TeacherEmptyAssignmentsPanel(
-                          message: context.getText(
-                            AppKeys.teacherEmptyClassroomList,
-                          ),
+                        Column(
+                          children: [
+                            _TeacherEmptyAssignmentsPanel(
+                              message: context.getText(
+                                AppKeys.teacherEmptyClassroomList,
+                              ),
+                            ),
+                            if (_isLoadingExercises)
+                              _TeacherBackgroundRefreshLabel(scale: scale),
+                          ],
                         )
                       else if (_exercises.isEmpty)
-                        _TeacherEmptyAssignmentsPanel(
-                          message: _searchController.text.trim().isNotEmpty
-                              ? context.getText(AppKeys.teacherStudyNoResults)
-                              : context.getText(
-                                  _teacherExerciseCopy(
-                                    _selectedPurpose,
-                                  ).emptyKey,
-                                ),
+                        Column(
+                          children: [
+                            _TeacherEmptyAssignmentsPanel(
+                              message: _searchController.text.trim().isNotEmpty
+                                  ? context.getText(
+                                      AppKeys.teacherStudyNoResults,
+                                    )
+                                  : context.getText(
+                                      _teacherExerciseCopy(
+                                        _selectedPurpose,
+                                      ).emptyKey,
+                                    ),
+                            ),
+                            if (_isLoadingExercises)
+                              _TeacherBackgroundRefreshLabel(scale: scale),
+                          ],
                         )
                       else ...[
                         for (var index = 0;

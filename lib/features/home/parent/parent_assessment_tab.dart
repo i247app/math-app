@@ -605,6 +605,7 @@ class _ParentAssessmentTabCard extends StatelessWidget {
     final score = (percent / 10).round();
     final scoreColor =
         score >= 8 ? const Color(0xFF087D47) : const Color(0xFFFF6B17);
+    final shortText = _parentQuizShortText(entry.quiz);
 
     return Material(
       color: Colors.white,
@@ -696,6 +697,20 @@ class _ParentAssessmentTabCard extends StatelessWidget {
                         height: 1.1,
                       ),
                     ),
+                    if (shortText != null) ...[
+                      SizedBox(height: 3 * scale),
+                      Text(
+                        shortText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: const Color(0xFF6D5C58),
+                          fontSize: FontSize.small * scale,
+                          fontWeight: FontWeight.w500,
+                          height: 1.15,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

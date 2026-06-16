@@ -1606,6 +1606,7 @@ class _ParentAssessmentResultCard extends StatelessWidget {
     final score = (percent / 10).round();
     final scoreColor =
         score >= 8 ? const Color(0xFF087D47) : const Color(0xFFFF6B17);
+    final shortText = _parentQuizShortText(quiz);
 
     return Material(
       color: Colors.white,
@@ -1691,6 +1692,20 @@ class _ParentAssessmentResultCard extends StatelessWidget {
                         height: 1.1,
                       ),
                     ),
+                    if (shortText != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        shortText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF6D5C58),
+                          fontSize: FontSize.small,
+                          fontWeight: FontWeight.w500,
+                          height: 1.15,
+                        ),
+                      ),
+                    ],
                     if (profileName != null || classroomName != null) ...[
                       const SizedBox(height: 7),
                       Wrap(
@@ -1881,6 +1896,14 @@ String _parentQuizTitle(BuildContext context, GeneratedQuiz quiz) {
     return '${context.getText(AppKeys.mathAssessment)} $grade';
   }
   return context.getText(AppKeys.mathAssessment);
+}
+
+String? _parentQuizShortText(GeneratedQuiz quiz) {
+  final shortText = quiz.shortText?.trim();
+  if (shortText == null || shortText.isEmpty) {
+    return null;
+  }
+  return shortText;
 }
 
 List<StudentProfile> _studentProfiles(List<StudentProfile> profiles) {
