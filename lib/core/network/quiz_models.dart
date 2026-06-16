@@ -209,11 +209,13 @@ class GeneratedQuiz {
     this.id,
     this.quizId,
     this.previousQuizId,
+    this.profileId,
     this.quizStatus,
     this.purpose,
     this.typeOfQuiz,
     this.type,
     this.title,
+    this.shortText,
     this.userId,
     this.createDt,
     this.modifyDt,
@@ -228,12 +230,15 @@ class GeneratedQuiz {
   final int? quizId;
   @JsonKey(fromJson: _intFromJson)
   final int? previousQuizId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? profileId;
   final String? quizStatus;
   final String? purpose;
   @JsonKey(name: 'type_of_quiz')
   final String? typeOfQuiz;
   final String? type;
   final String? title;
+  final String? shortText;
   @JsonKey(fromJson: _intFromJson)
   final int? userId;
   final String? createDt;
@@ -279,6 +284,9 @@ class QuizQuestion {
     required this.questionNumber,
     required this.answers,
     this.rightAnswer,
+    this.correctAnswer,
+    this.difficulty,
+    this.topic,
   });
 
   final String questionName;
@@ -286,6 +294,10 @@ class QuizQuestion {
   @JsonKey(defaultValue: <QuizAnswer>[])
   final List<QuizAnswer> answers;
   final String? rightAnswer;
+  final String? correctAnswer;
+  @JsonKey(fromJson: _intFromJson)
+  final int? difficulty;
+  final String? topic;
 
   factory QuizQuestion.fromJson(Map<String, dynamic> json) =>
       _$QuizQuestionFromJson(json);

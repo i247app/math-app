@@ -298,6 +298,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
     'create_dt': '2026-05-21T09:24:04Z',
     'id': 2,
     'modify_dt': '2026-05-21T09:24:04Z',
+    'profile_id': 1,
     'questions': <Object?>[
       <String, Object?>{
         'answers': <Object?>[
@@ -357,6 +358,7 @@ Map<String, Object?> _fakeGeneratedQuiz({
     ],
     'quiz_id': previousQuizId ?? 310,
     'quiz_status': 'GENERATED',
+    'short_text': 'Addition, subtraction, and mixed operations practice.',
     'purpose': purpose,
     'type': purpose,
     'type_of_quiz': typeOfQuiz,

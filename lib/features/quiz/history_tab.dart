@@ -144,6 +144,7 @@ class _HistoryTabState extends State<HistoryTab> {
 
       final searchable = <String>[
         _quizTitle(context, quiz),
+        quiz.shortText ?? '',
         quiz.purpose ?? '',
         quiz.typeOfQuiz ?? '',
         quiz.type ?? '',
@@ -515,7 +516,7 @@ class _HistoryQuizCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: Container(
-          constraints: BoxConstraints(minHeight: 100 * scale),
+          constraints: BoxConstraints(minHeight: 116 * scale),
           padding: EdgeInsets.fromLTRB(
             16 * scale,
             14 * scale,
@@ -559,12 +560,27 @@ class _HistoryQuizCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: _deepInk,
-                        fontSize: FontSize.small * scale,
-                        fontWeight: FontWeight.w500,
+                        fontSize: FontSize.normal * scale,
+                        fontWeight: FontWeight.w800,
                         height: 1.28,
                         letterSpacing: 0,
                       ),
                     ),
+                    if (_quizShortText(quiz) case final shortText?) ...[
+                      SizedBox(height: 4 * scale),
+                      Text(
+                        shortText,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _muted,
+                          fontSize: FontSize.small * scale,
+                          fontWeight: FontWeight.w500,
+                          height: 1.22,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -879,6 +895,14 @@ String _quizTitle(BuildContext context, GeneratedQuiz quiz) {
     return '${context.getText(AppKeys.mathPractice)}$suffix';
   }
   return '${context.getText(AppKeys.mathReview)}$suffix';
+}
+
+String? _quizShortText(GeneratedQuiz quiz) {
+  final shortText = quiz.shortText?.trim();
+  if (shortText == null || shortText.isEmpty) {
+    return null;
+  }
+  return shortText;
 }
 
 _ScoreBadgeColors _scoreColors(BuildContext context, int? percent) {

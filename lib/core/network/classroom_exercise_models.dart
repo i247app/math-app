@@ -341,6 +341,7 @@ class ClassroomExercise {
     this.chapterName,
     this.lessonName,
     this.description,
+    this.shortText,
     this.visibility,
     this.purpose,
     this.status,
@@ -375,6 +376,8 @@ class ClassroomExercise {
   final String? lessonName;
   @JsonKey(fromJson: _stringFromJson)
   final String? description;
+  @JsonKey(fromJson: _stringFromJson)
+  final String? shortText;
   @JsonKey(fromJson: _stringFromJson)
   final String? visibility;
   @JsonKey(fromJson: _stringFromJson)
@@ -412,7 +415,12 @@ class ClassroomExercise {
         'description': json['description'] ??
             json['assignment_description'] ??
             json['exercise_description'] ??
+            json['short_text'] ??
             _nestedValue(json['metadata'], 'description'),
+        'short_text': json['short_text'] ??
+            json['short_description'] ??
+            _nestedValue(json['metadata'], 'short_text') ??
+            _nestedValue(json['metadata'], 'short_description'),
         'status': json['status'] ?? json['exercise_status'],
         'purpose': json['purpose'] ?? json['type'],
         'submission_status': json['submission_status'],
