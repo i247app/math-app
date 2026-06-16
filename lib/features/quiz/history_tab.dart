@@ -553,20 +553,16 @@ class _HistoryQuizCard extends StatelessWidget {
                   children: [
                     _HistoryMetaRow(parts: dateParts, scale: scale),
                     SizedBox(height: 7 * scale),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        _quizTitle(context, quiz),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: _deepInk,
-                          fontSize: FontSize.small * scale,
-                          fontWeight: FontWeight.w900,
-                          height: 1.28,
-                          letterSpacing: 0,
-                        ),
+                    Text(
+                      _quizTitle(context, quiz),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: _deepInk,
+                        fontSize: FontSize.normal * scale,
+                        fontWeight: FontWeight.w900,
+                        height: 1.28,
+                        letterSpacing: 0,
                       ),
                     ),
                   ],
