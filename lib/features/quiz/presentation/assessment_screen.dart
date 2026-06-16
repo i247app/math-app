@@ -89,6 +89,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         typeOfQuiz: widget.typeOfQuiz,
         gradeLabel: widget.gradeLabel,
         chapters: widget.chapters,
+        profileId: widget.profileId,
       );
       if (!mounted) {
         return;
@@ -214,6 +215,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           builder: (_) => AssessmentResultScreen(
             quiz: submittedQuiz,
             quizService: _quizService,
+            profileId: widget.profileId,
             onTestAgainGenerated: openGeneratedQuiz,
           ),
         ),

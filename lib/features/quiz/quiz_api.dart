@@ -28,6 +28,7 @@ abstract class QuizService {
     String? gradeLabel,
     int? previousQuizId,
     List<String>? chapters,
+    int? profileId,
   });
 
   Future<List<GeneratedQuiz>> listQuizzes({
@@ -54,6 +55,7 @@ class FakeQuizApi implements QuizService {
     String? gradeLabel,
     int? previousQuizId,
     List<String>? chapters,
+    int? profileId,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 900));
     final response = GenerateQuizResponse.fromJson(
@@ -153,6 +155,7 @@ class QuizApi implements QuizService {
     String? gradeLabel,
     int? previousQuizId,
     List<String>? chapters,
+    int? profileId,
   }) async {
     final GenerateQuizResponse response;
     final cleanGradeLabel = gradeLabel?.trim();
@@ -168,6 +171,7 @@ class QuizApi implements QuizService {
               : null,
           previousQuizId: previousQuizId,
           chapters: _cleanChapters(chapters),
+          profileId: profileId,
         ),
       );
     } on NetworkException catch (error) {

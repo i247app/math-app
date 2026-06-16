@@ -26,11 +26,13 @@ class AssessmentResultScreen extends StatefulWidget {
     super.key,
     this.quiz,
     this.quizService,
+    this.profileId,
     this.onTestAgainGenerated,
   });
 
   final GeneratedQuiz? quiz;
   final QuizService? quizService;
+  final int? profileId;
   final ValueChanged<GeneratedQuiz>? onTestAgainGenerated;
 
   @override
@@ -90,6 +92,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
         typeOfQuiz: typeOfQuiz,
         gradeLabel: gradeLabel,
         previousQuizId: previousQuizId,
+        profileId: widget.profileId,
       );
       if (!mounted) {
         return;
