@@ -52,7 +52,7 @@ class AuthCubit extends Cubit<AuthState> {
     await _authService.logout();
     if (!isClosed) {
       emit(state.copyWith(
-        screen: AppScreen.welcome,
+        screen: AppScreen.login,
         clearLoginUser: true,
         phoneNumber: null,
         checkedPhone: null,
@@ -65,6 +65,7 @@ class AuthCubit extends Cubit<AuthState> {
         clearPinLogin: true,
         passcodeLoginRequiresOtp: false,
       ));
+      unawaited(checkPinLoginAvailability());
     }
   }
 
