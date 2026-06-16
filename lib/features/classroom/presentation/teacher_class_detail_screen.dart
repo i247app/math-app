@@ -168,8 +168,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                               grades: _grades,
                               programs: _programs,
                               schools: _schools,
-                              isLoading: (_isLoading && classroom == null) ||
-                                  _isLoadingLookups,
+                              isLoading: _isLoading && classroom == null,
                               isExpanded: _isInfoExpanded,
                               onToggleExpanded: () {
                                 HapticFeedback.selectionClick();
@@ -178,6 +177,9 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                                 );
                               },
                             ),
+                          if (classroom != null &&
+                              (_isLoading || _isLoadingLookups))
+                            _TeacherBackgroundRefreshLabel(scale: scale),
                           if (_error == null || classroom != null)
                             _ClassDetailLowerContent(
                               scale: scale,

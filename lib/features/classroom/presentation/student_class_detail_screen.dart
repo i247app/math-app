@@ -167,7 +167,8 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                           classroomId: widget.classroomId,
                           profileId: widget.profileId,
                           homeworkCount: _homeworkExercises.length,
-                          isLoadingHomework: _isLoadingHomework,
+                          isLoadingHomework:
+                              _isLoadingHomework && _homeworkExercises.isEmpty,
                         ),
                         const SizedBox(height: 23),
                         _UpcomingDeadlineSection(
@@ -486,7 +487,7 @@ class _LearningCategorySection extends StatelessWidget {
               backgroundColor: const Color(0xFFFDF0F5),
               iconAsset: 'assets/images/student_class_assignment.svg',
               title: context.getText(AppKeys.studentClassAssignments),
-              subtitle: isLoadingHomework
+              subtitle: isLoadingHomework && homeworkCount == 0
                   ? ''
                   : context.formatText(
                       AppKeys.studentClassAssignmentsCountFormat,
@@ -672,7 +673,7 @@ class _UpcomingDeadlineSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        if (isLoading)
+        if (isLoading && upcomingExercises.isEmpty)
           const SizedBox(
             height: 72,
             child: Center(
@@ -738,7 +739,29 @@ class _UpcomingDeadlineSection extends StatelessWidget {
                 },
               ),
             ),
+        if (isLoading && upcomingExercises.isNotEmpty)
+          const _StudentClassRefreshLabel(),
       ],
+    );
+  }
+}
+
+class _StudentClassRefreshLabel extends StatelessWidget {
+  const _StudentClassRefreshLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Text(
+        context.getText(AppKeys.loading),
+        textAlign: TextAlign.center,
+        style: GoogleFonts.andika(
+          color: _studentClassMuted,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

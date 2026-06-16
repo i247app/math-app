@@ -101,6 +101,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       _isLoadingExercises = true;
       if (isInitialProfileLoad) {
         _hasCompletedInitialLoad = false;
+        _exercises = const <ClassroomExercise>[];
       }
       _error = null;
     });
@@ -403,7 +404,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                         onSelected: _selectPurpose,
                       ),
                       SizedBox(height: 24 * scale),
-                      if (_isLoadingExercises)
+                      if (_isLoadingExercises && _exercises.isEmpty)
                         _TeacherStudyLoadingIndicator(scale: scale)
                       else if (_displayError != null && _exercises.isEmpty)
                         _TeacherErrorPanel(
@@ -427,7 +428,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                                   ).emptyKey,
                                 ),
                         )
-                      else
+                      else ...[
                         for (var index = 0;
                             index < _exercises.length;
                             index++) ...[
@@ -441,6 +442,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                           if (index != _exercises.length - 1)
                             SizedBox(height: 14 * scale),
                         ],
+                        if (_isLoadingExercises)
+                          _TeacherBackgroundRefreshLabel(scale: scale),
+                      ],
                     ],
                   ],
                 ),

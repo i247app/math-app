@@ -205,16 +205,22 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                     scale: scale,
                   ),
                   SizedBox(height: 16 * scale),
-                  if (_isLoading)
+                  if (_isLoading && _entries.isEmpty)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 48 * scale),
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF339395),
+                      child: Center(
+                        child: Text(
+                          context.getText(AppKeys.loading),
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.andika(
+                            color: const Color(0xFF77859A),
+                            fontSize: FontSize.small * scale,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     )
-                  else if (_errorMessage != null)
+                  else if (_errorMessage != null && _entries.isEmpty)
                     _ParentAssessmentStateCard(
                       icon: Icons.cloud_off_rounded,
                       title: context.getText(AppKeys.historyLoadErrorTitle),
@@ -239,6 +245,19 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                       ),
                       SizedBox(height: 8 * scale),
                     ],
+                  if (_isLoading && _entries.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: 8 * scale),
+                      child: Text(
+                        context.getText(AppKeys.loading),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.andika(
+                          color: const Color(0xFF77859A),
+                          fontSize: FontSize.caption * scale,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                 ]),
               ),
             ),

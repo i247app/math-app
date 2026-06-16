@@ -42,6 +42,10 @@ class _TeacherHomeworkDetailScreenState
   @override
   void initState() {
     super.initState();
+    _exercise = widget.initialExercise;
+    final visibility = _normalizeExerciseVisibility(_exercise?.visibility);
+    _savedVisibility = visibility;
+    _editingVisibility = visibility;
     _loadDetail();
   }
 
@@ -196,7 +200,7 @@ class _TeacherHomeworkDetailScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (_isLoading)
+                      if (_isLoading && exercise == null)
                         const Padding(
                           padding: EdgeInsets.only(top: 80),
                           child: Center(
@@ -205,7 +209,7 @@ class _TeacherHomeworkDetailScreenState
                             ),
                           ),
                         )
-                      else if (_error != null)
+                      else if (_error != null && exercise == null)
                         _TeacherErrorPanel(
                           scale: 1,
                           message: _error!,
@@ -246,6 +250,8 @@ class _TeacherHomeworkDetailScreenState
                               question: questions[index],
                             ),
                           ),
+                        if (_isLoading)
+                          const _TeacherBackgroundRefreshLabel(scale: 1),
                       ],
                     ],
                   ),

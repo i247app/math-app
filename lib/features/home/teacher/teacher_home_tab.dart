@@ -86,7 +86,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
 
     setState(() {
       _isLoadingAssignments = true;
-      _recentAssignments = const <ClassroomExercise>[];
+      if (_loadedProfileId != profileId) {
+        _recentAssignments = const <ClassroomExercise>[];
+      }
       _loadedProfileId = profileId;
     });
 
@@ -99,7 +101,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     }
     final classrooms = collection.classrooms;
     setState(() {
-      _recentAssignments = const <ClassroomExercise>[];
+      if (collection.errorMessage == null && classrooms.isEmpty) {
+        _recentAssignments = const <ClassroomExercise>[];
+      }
       _isLoadingAssignments =
           collection.errorMessage == null && classrooms.isNotEmpty;
     });
@@ -353,18 +357,21 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                     title: context.getText(AppKeys.teacherRecentlyAssigned),
                   ),
                   SizedBox(height: 12 * scale),
-                  if (_isLoadingAssignments)
+                  if (_isLoadingAssignments && _recentAssignments.isEmpty)
                     _TeacherAssignmentsLoadingPanel(scale: scale)
                   else if (_recentAssignments.isEmpty)
                     _TeacherEmptyAssignmentsPanel(
                       message: context.getText(AppKeys.teacherNoAssignments),
                     )
-                  else
+                  else ...[
                     _TeacherRecentAssignmentCarousel(
                       scale: scale,
                       assignments: _recentAssignments,
                       onOpen: _openAssignmentDetail,
                     ),
+                    if (_isLoadingAssignments)
+                      _TeacherBackgroundRefreshLabel(scale: scale),
+                  ],
                 ],
               ),
             ),

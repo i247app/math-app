@@ -186,28 +186,27 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                       onFilterSelected: _setFilter,
                     ),
                     const SizedBox(height: 18),
-                    if (_isLoading)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 80),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: _studentHomeworkTeal,
-                          ),
-                        ),
+                    if (_isLoading && _exercises.isEmpty)
+                      _StudentHomeworkMessage(
+                        message: context.getText(AppKeys.loading),
                       )
-                    else if (_error != null)
+                    else if (_error != null && _exercises.isEmpty)
                       _StudentHomeworkMessage(message: _error!)
                     else if (_exercises.isEmpty)
                       _StudentHomeworkMessage(
                         message:
                             context.getText(AppKeys.studentNoHomeworkMessage),
                       )
+                    else if (visibleExercises.isEmpty && _isLoading)
+                      _StudentHomeworkMessage(
+                        message: context.getText(AppKeys.loading),
+                      )
                     else if (visibleExercises.isEmpty)
                       _StudentHomeworkMessage(
                         message:
                             context.getText(AppKeys.studentNoHomeworkMessage),
                       )
-                    else
+                    else ...[
                       for (var index = 0;
                           index < visibleExercises.length;
                           index++)
@@ -221,11 +220,33 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                             onTap: () => _openExercise(visibleExercises[index]),
                           ),
                         ),
+                      if (_isLoading) const _StudentHomeworkRefreshLabel(),
+                    ],
                   ],
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentHomeworkRefreshLabel extends StatelessWidget {
+  const _StudentHomeworkRefreshLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Text(
+        context.getText(AppKeys.loading),
+        textAlign: TextAlign.center,
+        style: GoogleFonts.andika(
+          color: _studentHomeworkMuted,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

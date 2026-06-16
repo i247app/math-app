@@ -173,7 +173,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                             _teacherExerciseCopy(widget.purpose).emptyKey,
                           ),
                         )
-                      else
+                      else ...[
                         for (var index = 0;
                             index < _exercises.length;
                             index++) ...[
@@ -186,6 +186,9 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                           if (index != _exercises.length - 1)
                             const SizedBox(height: 10),
                         ],
+                        if (_isLoading)
+                          const _TeacherBackgroundRefreshLabel(scale: 1),
+                      ],
                     ],
                   ),
                 ),
