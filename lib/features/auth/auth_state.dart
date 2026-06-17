@@ -115,7 +115,12 @@ class AuthState {
   final StudentProfile? pendingActiveProfile;
   final String? pendingProfileLoadError;
 
-  ProfileRole get activeProfileRole => ProfileRole.fromProfile(activeProfile);
+  ProfileRole get activeProfileRole {
+    if (activeProfile != null) {
+      return ProfileRole.fromProfile(activeProfile);
+    }
+    return ProfileRole.fromRole(loginUser?.role);
+  }
 
   AuthState copyWith({
     AppScreen? screen,

@@ -7,13 +7,17 @@ enum ProfileRole {
   parent,
   teacher;
 
-  static ProfileRole fromProfile(StudentProfile? profile) {
-    final role = profile?.role?.trim().toUpperCase();
+  static ProfileRole fromRole(String? value) {
+    final role = value?.trim().toUpperCase();
     return switch (role) {
       'PARENT' => ProfileRole.parent,
       'TEACHER' => ProfileRole.teacher,
       _ => ProfileRole.student,
     };
+  }
+
+  static ProfileRole fromProfile(StudentProfile? profile) {
+    return fromRole(profile?.role);
   }
 }
 

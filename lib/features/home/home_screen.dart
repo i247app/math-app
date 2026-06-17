@@ -1369,8 +1369,8 @@ class _AnimatedNavItem extends StatelessWidget {
     final inactiveColor = const Color(0xFF515F54).withValues(alpha: 0.68);
 
     return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 360),
-      curve: Curves.easeOutBack,
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
       tween: Tween<double>(end: active ? 1 : 0),
       builder: (context, value, child) {
         final color = Color.lerp(inactiveColor, Colors.white, value)!;
@@ -1383,13 +1383,13 @@ class _AnimatedNavItem extends StatelessWidget {
               onTap: onTap,
               borderRadius: BorderRadius.circular(48 * scale),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOutCubic,
-                height: active ? 64 * scale : 56 * scale,
+                height: 60 * scale,
                 margin: EdgeInsets.symmetric(horizontal: 2 * scale),
                 padding: EdgeInsets.symmetric(
-                  horizontal: active ? 4 * scale : 3 * scale,
-                  vertical: active ? 10 * scale : 8 * scale,
+                  horizontal: 4 * scale,
+                  vertical: 9 * scale,
                 ),
                 decoration: BoxDecoration(
                   color: Color.lerp(Colors.transparent, activeColor, value),

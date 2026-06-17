@@ -15,7 +15,12 @@ class AppSessionState {
   final StudentProfile? activeProfile;
   final String? profileLoadError;
 
-  ProfileRole get activeRole => ProfileRole.fromProfile(activeProfile);
+  ProfileRole get activeRole {
+    if (activeProfile != null) {
+      return ProfileRole.fromProfile(activeProfile);
+    }
+    return ProfileRole.fromRole(user?.role);
+  }
 
   bool get isAuthenticated => user != null;
 }
