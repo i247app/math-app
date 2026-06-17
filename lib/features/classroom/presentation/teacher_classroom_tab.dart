@@ -343,8 +343,6 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                           ),
                         ),
                       ),
-                      if (_isLoading)
-                        _TeacherBackgroundRefreshLabel(scale: scale),
                     ],
                   )
                 else
@@ -366,8 +364,6 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                           );
                         },
                       ),
-                      if (_isLoading)
-                        _TeacherBackgroundRefreshLabel(scale: scale),
                     ],
                   ),
               ],

@@ -426,8 +426,6 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                                 AppKeys.teacherEmptyClassroomList,
                               ),
                             ),
-                            if (_isLoadingExercises)
-                              _TeacherBackgroundRefreshLabel(scale: scale),
                           ],
                         )
                       else if (_exercises.isEmpty)
@@ -444,8 +442,6 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                                       ).emptyKey,
                                     ),
                             ),
-                            if (_isLoadingExercises)
-                              _TeacherBackgroundRefreshLabel(scale: scale),
                           ],
                         )
                       else ...[
@@ -462,8 +458,6 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                           if (index != _exercises.length - 1)
                             SizedBox(height: 14 * scale),
                         ],
-                        if (_isLoadingExercises)
-                          _TeacherBackgroundRefreshLabel(scale: scale),
                       ],
                     ],
                   ],

@@ -363,8 +363,6 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                           isProfileComplete: isProfileComplete,
                           onCreate: _handleClassCreateAction,
                         ),
-                        if (_isLoading)
-                          _TeacherBackgroundRefreshLabel(scale: scale),
                       ],
                     )
                   else
@@ -375,8 +373,6 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                           classrooms: _classrooms,
                           onOpen: _openClassDetail,
                         ),
-                        if (_isLoading)
-                          _TeacherBackgroundRefreshLabel(scale: scale),
                       ],
                     ),
                   SizedBox(height: 30 * scale),
@@ -397,8 +393,6 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                             AppKeys.teacherNoAssignments,
                           ),
                         ),
-                        if (_isLoadingAssignments)
-                          _TeacherBackgroundRefreshLabel(scale: scale),
                       ],
                     )
                   else ...[
@@ -407,8 +401,6 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                       assignments: _recentAssignments,
                       onOpen: _openAssignmentDetail,
                     ),
-                    if (_isLoadingAssignments)
-                      _TeacherBackgroundRefreshLabel(scale: scale),
                   ],
                 ],
               ),
