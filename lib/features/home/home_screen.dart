@@ -473,11 +473,9 @@ class _HomeScreenState extends State<HomeScreen>
                       user: widget.user,
                       onTabSelected: (index) {
                         if (index == navigation.activeTab) {
-                          HapticFeedback.selectionClick();
                           return;
                         }
 
-                        HapticFeedback.lightImpact();
                         if (widget.activeRole == ProfileRole.parent &&
                             index == 0) {
                           _playParentHomeEntrance();
