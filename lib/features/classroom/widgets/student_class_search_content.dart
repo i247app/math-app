@@ -35,7 +35,7 @@ class StudentClassSearchContent extends StatefulWidget {
     required this.profileId,
     this.userId,
     this.onJoinRequested,
-    this.onInitialLoadingChanged,
+    this.activeRefreshTick = 0,
     ClassroomService? classroomService,
     GradeService? gradeService,
     SchoolService? schoolService,
@@ -46,7 +46,7 @@ class StudentClassSearchContent extends StatefulWidget {
   final int profileId;
   final int? userId;
   final VoidCallback? onJoinRequested;
-  final ValueChanged<bool>? onInitialLoadingChanged;
+  final int activeRefreshTick;
   final ClassroomService? _classroomService;
   final GradeService? _gradeService;
   final SchoolService? _schoolService;
@@ -57,6 +57,8 @@ class StudentClassSearchContent extends StatefulWidget {
 }
 
 class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
+  static const _requestTimeout = Duration(seconds: 12);
+
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
   late final GradeService _gradeService = widget._gradeService ?? GradeApi();
@@ -70,6 +72,9 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
   bool _isSearching = false;
   bool _hasSearched = false;
   bool _isLoadingFilters = true;
+  bool _hasLoadedFilters = false;
+  int _searchRequestId = 0;
+  int _filterRequestId = 0;
   int? _joiningClassroomId;
   final Set<int> _selectedGradeIds = <int>{};
   final Set<int> _selectedSchoolIds = <int>{};
@@ -83,10 +88,55 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
   }
 
   @override
+  void didUpdateWidget(covariant StudentClassSearchContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.profileId != widget.profileId ||
+        oldWidget.userId != widget.userId) {
+      _resetForProfileChange();
+      _loadFilterOptions();
+      return;
+    }
+
+    if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
+      if (!_hasLoadedFilters || _filterError != null) {
+        _loadFilterOptions();
+      }
+      if (_error != null && _hasSearchCriteria) {
+        _search();
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
+  }
+
+  bool get _hasSearchCriteria =>
+      _searchController.text.trim().isNotEmpty ||
+      _selectedGradeIds.isNotEmpty ||
+      _selectedSchoolIds.isNotEmpty;
+
+  void _resetForProfileChange() {
+    _debounce?.cancel();
+    _searchRequestId++;
+    _filterRequestId++;
+    _searchController.clear();
+    setState(() {
+      _results = const <ClassroomModel>[];
+      _grades = const <GradeModel>[];
+      _schools = const <SchoolModel>[];
+      _selectedGradeIds.clear();
+      _selectedSchoolIds.clear();
+      _isSearching = false;
+      _hasSearched = false;
+      _isLoadingFilters = true;
+      _hasLoadedFilters = false;
+      _error = null;
+      _filterError = null;
+    });
   }
 
   void _onSearchChanged(String value) {
@@ -100,9 +150,11 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     final search = (rawValue ?? _searchController.text).trim();
     final gradeIds = Set<int>.from(_selectedGradeIds);
     final schoolIds = Set<int>.from(_selectedSchoolIds);
+    final requestId = ++_searchRequestId;
     if (search.isEmpty && gradeIds.isEmpty && schoolIds.isEmpty) {
       setState(() {
         _results = const <ClassroomModel>[];
+        _isSearching = false;
         _hasSearched = false;
         _error = null;
       });
@@ -116,13 +168,16 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     });
 
     try {
-      final results = await _classroomService.searchClassrooms(
-        profileId: widget.profileId,
-        search: search.isEmpty ? null : search,
-        gradeIds: gradeIds.toList(growable: false),
-        schoolIds: schoolIds.toList(growable: false),
-      );
+      final results = await _classroomService
+          .searchClassrooms(
+            profileId: widget.profileId,
+            search: search.isEmpty ? null : search,
+            gradeIds: gradeIds.toList(growable: false),
+            schoolIds: schoolIds.toList(growable: false),
+          )
+          .timeout(_requestTimeout);
       if (!mounted ||
+          requestId != _searchRequestId ||
           _searchController.text.trim() != search ||
           !_setEquals(_selectedGradeIds, gradeIds) ||
           !_setEquals(_selectedSchoolIds, schoolIds)) {
@@ -131,19 +186,20 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       setState(() => _results = results);
     } catch (error) {
       if (!mounted ||
+          requestId != _searchRequestId ||
           _searchController.text.trim() != search ||
           !_setEquals(_selectedGradeIds, gradeIds) ||
           !_setEquals(_selectedSchoolIds, schoolIds)) {
         return;
       }
       setState(() {
-        _results = const <ClassroomModel>[];
         _error = error is ClassroomException
             ? error.message
             : context.readText(AppKeys.studentClassSearchFailed);
       });
     } finally {
       if (mounted &&
+          requestId == _searchRequestId &&
           _searchController.text.trim() == search &&
           _setEquals(_selectedGradeIds, gradeIds) &&
           _setEquals(_selectedSchoolIds, schoolIds)) {
@@ -153,45 +209,60 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
   }
 
   Future<void> _loadFilterOptions() async {
+    final requestId = ++_filterRequestId;
     final userId = widget.userId;
     setState(() {
       _isLoadingFilters = true;
       _filterError = null;
     });
 
-    try {
-      final results = await Future.wait<Object>([
-        if (userId != null && userId > 0)
-          _gradeService.listGrades(userId: userId)
-        else
-          Future<List<GradeModel>>.value(const <GradeModel>[]),
-        _schoolService.listSchools(),
-      ]);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _grades = (results[0] as List<GradeModel>)
+    final results = await Future.wait<Object?>([
+      _loadGrades(userId),
+      _loadSchools(),
+    ]);
+    if (!mounted || requestId != _filterRequestId) {
+      return;
+    }
+
+    final grades = results[0] as List<GradeModel>?;
+    final schools = results[1] as List<SchoolModel>?;
+    setState(() {
+      if (grades != null) {
+        _grades = grades
             .where((grade) => _gradeStableId(grade) != null)
             .toList(growable: false);
-        _schools = (results[1] as List<SchoolModel>)
+      }
+      if (schools != null) {
+        _schools = schools
             .where((school) => _schoolStableId(school) != null)
             .toList(growable: false);
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
       }
-      setState(() {
-        _filterError = error is GradeException || error is SchoolException
-            ? error.toString()
-            : context.readText(AppKeys.studentClassSearchFailed);
-      });
-    } finally {
-      if (mounted) {
-        setState(() => _isLoadingFilters = false);
-        widget.onInitialLoadingChanged?.call(false);
-      }
+      _hasLoadedFilters = grades != null && schools != null;
+      _filterError = _hasLoadedFilters
+          ? null
+          : context.readText(AppKeys.studentClassFilterLoadFailed);
+      _isLoadingFilters = false;
+    });
+  }
+
+  Future<List<GradeModel>?> _loadGrades(int? userId) async {
+    if (userId == null || userId <= 0) {
+      return const <GradeModel>[];
+    }
+    try {
+      return await _gradeService
+          .listGrades(userId: userId)
+          .timeout(_requestTimeout);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<List<SchoolModel>?> _loadSchools() async {
+    try {
+      return await _schoolService.listSchools().timeout(_requestTimeout);
+    } catch (_) {
+      return null;
     }
   }
 
@@ -347,6 +418,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
           selectedSchoolIds: _selectedSchoolIds,
           isLoading: _isLoadingFilters,
           error: _filterError,
+          onRetry: _loadFilterOptions,
           onGradeTap: _selectGrade,
           onGradeRemove: _removeGrade,
           onSchoolTap: _openSchoolPicker,
@@ -378,11 +450,13 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       );
     }
 
-    if (_error != null) {
+    if (_error != null && _results.isEmpty) {
       return _JoinStateCard(
         assetPath: _studentJoinSearchIcon,
         title: _error!,
         messageKey: AppKeys.studentClassSearchRetry,
+        actionLabelKey: AppKeys.studentRetry,
+        onAction: _search,
       );
     }
 
@@ -406,6 +480,21 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (_isSearching) ...[
+          const LinearProgressIndicator(
+            minHeight: 3,
+            color: _joinTeal,
+            backgroundColor: Color(0xFFDDEDEA),
+          ),
+          const SizedBox(height: 10),
+        ],
+        if (_error != null) ...[
+          _JoinRetryBanner(
+            message: _error!,
+            onRetry: _search,
+          ),
+          const SizedBox(height: 10),
+        ],
         for (var index = 0; index < _results.length; index++) ...[
           _JoinClassCard(
             classroom: _results[index],
@@ -514,6 +603,7 @@ class _JoinFilterPanel extends StatelessWidget {
     required this.selectedSchoolIds,
     required this.isLoading,
     required this.error,
+    required this.onRetry,
     required this.onGradeTap,
     required this.onGradeRemove,
     required this.onSchoolTap,
@@ -526,6 +616,7 @@ class _JoinFilterPanel extends StatelessWidget {
   final Set<int> selectedSchoolIds;
   final bool isLoading;
   final String? error;
+  final VoidCallback onRetry;
   final ValueChanged<GradeModel> onGradeTap;
   final ValueChanged<int> onGradeRemove;
   final VoidCallback onSchoolTap;
@@ -534,6 +625,8 @@ class _JoinFilterPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedSchools = _selectedSchools(schools, selectedSchoolIds);
+    final showSchoolFilter = error == null || schools.isNotEmpty;
+    final showGradeFilter = error == null || grades.isNotEmpty;
 
     return Container(
       width: double.infinity,
@@ -548,98 +641,99 @@ class _JoinFilterPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _FilterLabel(context.getText(AppKeys.school)),
-          const SizedBox(height: 7),
-          _SchoolFilterField(
-            valueText: selectedSchools.isEmpty
-                ? context.getText(AppKeys.chooseSchool)
-                : selectedSchools
-                    .map((school) => _schoolName(context, school))
-                    .join(', '),
-            selected: selectedSchools.isNotEmpty,
-            isLoading: isLoading,
-            onTap: onSchoolTap,
-          ),
-          if (selectedSchools.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final school in selectedSchools)
-                  _SelectedFilterPill(
-                    label: _schoolName(context, school),
+          if (error != null) ...[
+            _JoinRetryBanner(
+              message: error!,
+              onRetry: onRetry,
+            ),
+            if (showSchoolFilter || showGradeFilter) const SizedBox(height: 13),
+          ],
+          if (showSchoolFilter) ...[
+            _FilterLabel(context.getText(AppKeys.school)),
+            const SizedBox(height: 7),
+            _SchoolFilterField(
+              valueText: selectedSchools.isEmpty
+                  ? context.getText(AppKeys.chooseSchool)
+                  : selectedSchools
+                      .map((school) => _schoolName(context, school))
+                      .join(', '),
+              selected: selectedSchools.isNotEmpty,
+              isLoading: isLoading,
+              onTap: schools.isEmpty ? null : onSchoolTap,
+            ),
+            if (selectedSchools.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final school in selectedSchools)
+                    _SelectedFilterPill(
+                      label: _schoolName(context, school),
+                      onRemove: () {
+                        final schoolId = _schoolStableId(school);
+                        if (schoolId != null) {
+                          onSchoolRemove(schoolId);
+                        }
+                      },
+                    ),
+                ],
+              ),
+            ],
+          ],
+          if (showSchoolFilter && showGradeFilter) const SizedBox(height: 13),
+          if (showGradeFilter) ...[
+            _FilterLabel(context.getText(AppKeys.grade)),
+            const SizedBox(height: 7),
+            if (isLoading && grades.isEmpty)
+              const SizedBox(
+                height: 30,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              )
+            else if (grades.isEmpty)
+              Text(
+                context.getText(AppKeys.noGrades),
+                style: const TextStyle(
+                  color: _joinMuted,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              )
+            else
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemCount: grades.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 10,
+                  mainAxisExtent: 30,
+                ),
+                itemBuilder: (context, index) {
+                  final grade = grades[index];
+                  return _GradeChip(
+                    label: _gradeLabel(context, grade),
+                    selected: selectedGradeIds.contains(_gradeStableId(grade)),
+                    onTap: () => onGradeTap(grade),
                     onRemove: () {
-                      final schoolId = _schoolStableId(school);
-                      if (schoolId != null) {
-                        onSchoolRemove(schoolId);
+                      final gradeId = _gradeStableId(grade);
+                      if (gradeId != null) {
+                        onGradeRemove(gradeId);
                       }
                     },
-                  ),
-              ],
-            ),
+                  );
+                },
+              ),
           ],
-          if (error != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              error!,
-              style: const TextStyle(
-                color: Color(0xFFA03A0F),
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-          const SizedBox(height: 13),
-          _FilterLabel(context.getText(AppKeys.grade)),
-          const SizedBox(height: 7),
-          if (isLoading && grades.isEmpty)
-            const SizedBox(
-              height: 30,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
-            )
-          else if (grades.isEmpty)
-            Text(
-              context.getText(AppKeys.noGrades),
-              style: const TextStyle(
-                color: _joinMuted,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            )
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: grades.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 10,
-                mainAxisExtent: 30,
-              ),
-              itemBuilder: (context, index) {
-                final grade = grades[index];
-                return _GradeChip(
-                  label: _gradeLabel(context, grade),
-                  selected: selectedGradeIds.contains(_gradeStableId(grade)),
-                  onTap: () => onGradeTap(grade),
-                  onRemove: () {
-                    final gradeId = _gradeStableId(grade);
-                    if (gradeId != null) {
-                      onGradeRemove(gradeId);
-                    }
-                  },
-                );
-              },
-            ),
         ],
       ),
     );
@@ -657,7 +751,7 @@ class _SchoolFilterField extends StatelessWidget {
   final String valueText;
   final bool selected;
   final bool isLoading;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1344,6 +1438,8 @@ class _JoinStateCard extends StatelessWidget {
     this.titleKey,
     this.title,
     required this.messageKey,
+    this.actionLabelKey,
+    this.onAction,
   });
 
   final String assetPath;
@@ -1351,6 +1447,8 @@ class _JoinStateCard extends StatelessWidget {
   final String? titleKey;
   final String? title;
   final String messageKey;
+  final String? actionLabelKey;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -1386,6 +1484,74 @@ class _JoinStateCard extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w700,
               height: 1.25,
+            ),
+          ),
+          if (onAction != null && actionLabelKey != null) ...[
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              onPressed: onAction,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: Text(context.getText(actionLabelKey!)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _joinDeepTeal,
+                side: const BorderSide(color: _joinDeepTeal),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _JoinRetryBanner extends StatelessWidget {
+  const _JoinRetryBanner({
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF4ED),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFF4C7AE)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.wifi_off_rounded,
+            color: Color(0xFFA03A0F),
+            size: 20,
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFF7E2F0E),
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                height: 1.3,
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: onRetry,
+            tooltip: context.getText(AppKeys.studentRetry),
+            icon: const Icon(
+              Icons.refresh_rounded,
+              color: _joinDeepTeal,
+              size: 22,
             ),
           ),
         ],

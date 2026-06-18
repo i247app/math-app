@@ -132,6 +132,9 @@ class AppKeys {
   static const studentClassSearchFailed = 'student_class_search_failed';
   static const studentClassSearchLoading = 'student_class_search_loading';
   static const studentClassSearchRetry = 'student_class_search_retry';
+  static const studentClassFilterLoadFailed =
+      'student_class_filter_load_failed';
+  static const studentRetry = 'student_retry';
   static const studentNoClassSearchResults = 'student_no_class_search_results';
   static const studentNoClassSearchResultsMessage =
       'student_no_class_search_results_message';

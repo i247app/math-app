@@ -142,7 +142,11 @@ class AppStrings {
       AppKeys.studentGradeFilter: 'Lớp {grade}',
       AppKeys.studentClassSearchFailed: 'Tìm kiếm lớp học thất bại.',
       AppKeys.studentClassSearchLoading: 'Đang tìm lớp phù hợp...',
-      AppKeys.studentClassSearchRetry: 'Thử lại bằng mã hoặc tên lớp khác.',
+      AppKeys.studentClassSearchRetry:
+          'Không thể hoàn tất tìm kiếm. Kiểm tra kết nối rồi thử lại.',
+      AppKeys.studentClassFilterLoadFailed:
+          'Không thể tải bộ lọc. Bạn vẫn có thể tìm bằng mã hoặc tên lớp.',
+      AppKeys.studentRetry: 'Thử lại',
       AppKeys.studentNoClassSearchResults: 'Không tìm thấy lớp học',
       AppKeys.studentNoClassSearchResultsMessage:
           'Kiểm tra lại mã lớp hoặc tên lớp rồi thử lại.',
@@ -732,7 +736,11 @@ class AppStrings {
       AppKeys.studentGradeFilter: 'Grade {grade}',
       AppKeys.studentClassSearchFailed: 'Failed to search classrooms.',
       AppKeys.studentClassSearchLoading: 'Searching for matching classes...',
-      AppKeys.studentClassSearchRetry: 'Try another code or class name.',
+      AppKeys.studentClassSearchRetry:
+          'The search could not be completed. Check your connection and try again.',
+      AppKeys.studentClassFilterLoadFailed:
+          'Filters could not be loaded. You can still search by code or class name.',
+      AppKeys.studentRetry: 'Try again',
       AppKeys.studentNoClassSearchResults: 'No classrooms found',
       AppKeys.studentNoClassSearchResultsMessage:
           'Check the class code or class name and try again.',

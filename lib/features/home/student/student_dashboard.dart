@@ -982,9 +982,10 @@ class _StudentInlineErrorPanel extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(width: 8),
           TextButton(
             onPressed: onRetry,
-            child: Text(context.getText(AppKeys.studentClassSearchRetry)),
+            child: Text(context.getText(AppKeys.studentRetry)),
           ),
         ],
       ),
@@ -2120,7 +2121,6 @@ class _StudentClassroomTab extends StatefulWidget {
 
 class _StudentClassroomTabState extends State<_StudentClassroomTab> {
   late final ClassroomService _classroomService = widget.classroomService;
-  bool _isSearchContentLoading = true;
 
   int? get _profileId => ActiveProfileSession.profileStableId(
         widget.activeProfile,
@@ -2166,7 +2166,6 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
       widget.activeProfile,
     );
     if (oldProfileId != profileId) {
-      setState(() => _isSearchContentLoading = true);
       _loadClassrooms();
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       _loadClassrooms(forceRefresh: true);
@@ -2226,8 +2225,9 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
     }
     final canLoadContent = profileId != null && profileId > 0;
     final isInitialLoading = canLoadContent &&
-        ((_isLoading && _classrooms.isEmpty && !_hasLoadedClassrooms) ||
-            (_isSearchContentLoading && !_hasLoadedClassrooms));
+        _isLoading &&
+        _classrooms.isEmpty &&
+        !_hasLoadedClassrooms;
     final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
 
@@ -2310,16 +2310,9 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                             StudentClassSearchContent(
                               profileId: profileId,
                               userId: widget.user?.id,
+                              activeRefreshTick: widget.activeRefreshTick,
                               classroomService: _classroomService,
                               onJoinRequested: _refreshClassrooms,
-                              onInitialLoadingChanged: (isLoading) {
-                                if (mounted &&
-                                    _isSearchContentLoading != isLoading) {
-                                  setState(
-                                    () => _isSearchContentLoading = isLoading,
-                                  );
-                                }
-                              },
                             ),
                         ],
                       ),
