@@ -29,12 +29,14 @@ class HistoryTab extends StatefulWidget {
     required this.activeProfile,
     required this.bottomPadding,
     required this.scale,
+    this.activeRefreshTick = 0,
   });
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final double bottomPadding;
   final double scale;
+  final int activeRefreshTick;
 
   @override
   State<HistoryTab> createState() => _HistoryTabState();
@@ -68,6 +70,8 @@ class _HistoryTabState extends State<HistoryTab> {
       widget.activeProfile,
     );
     if (oldWidget.user?.id != widget.user?.id || oldProfileId != profileId) {
+      _loadHistory();
+    } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       _loadHistory();
     }
   }
@@ -430,11 +434,11 @@ class _HistoryBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (isLoading && quizzes.isEmpty) {
       return _HistoryLoadingState(scale: scale);
     }
 
-    if (errorMessage != null) {
+    if (errorMessage != null && quizzes.isEmpty) {
       return _HistoryMessageState(
         icon: Icons.cloud_off_rounded,
         title: context.getText(AppKeys.historyLoadErrorTitle),
@@ -758,29 +762,154 @@ class _HistoryIncompleteBadge extends StatelessWidget {
   }
 }
 
-class _HistoryLoadingState extends StatelessWidget {
+class _HistoryLoadingState extends StatefulWidget {
   const _HistoryLoadingState({required this.scale});
+
+  final double scale;
+
+  @override
+  State<_HistoryLoadingState> createState() => _HistoryLoadingStateState();
+}
+
+class _HistoryLoadingStateState extends State<_HistoryLoadingState>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1250),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return ShaderMask(
+          blendMode: BlendMode.srcATop,
+          shaderCallback: (bounds) {
+            final shimmerWidth = bounds.width * 1.2;
+            final start = -shimmerWidth;
+            final end = bounds.width;
+            final dx = start + (end - start) * _controller.value;
+            return LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0),
+                Colors.white.withValues(alpha: 0.72),
+                Colors.white.withValues(alpha: 0),
+              ],
+              stops: const [0.28, 0.5, 0.72],
+            ).createShader(
+              Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height),
+            );
+          },
+          child: child,
+        );
+      },
+      child: Column(
+        children: [
+          for (var index = 0; index < 3; index++) ...[
+            _HistorySkeletonCard(scale: widget.scale),
+            if (index != 2) SizedBox(height: 14 * widget.scale),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _HistorySkeletonCard extends StatelessWidget {
+  const _HistorySkeletonCard({required this.scale});
 
   final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150 * scale,
+      height: 116 * scale,
+      padding: EdgeInsets.fromLTRB(
+        16 * scale,
+        14 * scale,
+        16 * scale,
+        14 * scale,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: _cardBorder),
+        border: Border.all(color: _cardBorder, width: 1.3 * scale),
       ),
-      child: Center(
-        child: SizedBox(
-          width: 34 * scale,
-          height: 34 * scale,
-          child: const CircularProgressIndicator(
-            color: _teal,
-            strokeWidth: 3,
+      child: Row(
+        children: [
+          _HistorySkeletonBlock(
+            width: 54 * scale,
+            height: 54 * scale,
+            radius: 27 * scale,
           ),
-        ),
+          SizedBox(width: 14 * scale),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _HistorySkeletonBlock(
+                      width: 82 * scale,
+                      height: 12 * scale,
+                      radius: 6 * scale,
+                    ),
+                    SizedBox(width: 12 * scale),
+                    _HistorySkeletonBlock(
+                      width: 54 * scale,
+                      height: 12 * scale,
+                      radius: 6 * scale,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12 * scale),
+                _HistorySkeletonBlock(
+                  width: 150 * scale,
+                  height: 17 * scale,
+                  radius: 8 * scale,
+                ),
+                SizedBox(height: 8 * scale),
+                _HistorySkeletonBlock(
+                  width: 110 * scale,
+                  height: 11 * scale,
+                  radius: 6 * scale,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HistorySkeletonBlock extends StatelessWidget {
+  const _HistorySkeletonBlock({
+    required this.width,
+    required this.height,
+    required this.radius,
+  });
+
+  final double width;
+  final double height;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE3EAEC),
+        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }
