@@ -1369,94 +1369,97 @@ class _AnimatedNavItem extends StatelessWidget {
     final inactiveColor = const Color(0xFF515F54).withValues(alpha: 0.68);
 
     return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 180),
+      duration: const Duration(milliseconds: 120),
       curve: Curves.easeOutCubic,
       tween: Tween<double>(end: active ? 1 : 0),
       builder: (context, value, child) {
         final color = Color.lerp(inactiveColor, Colors.white, value)!;
-        return Semantics(
-          selected: active,
-          button: true,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(48 * scale),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOutCubic,
-                height: 60 * scale,
-                margin: EdgeInsets.symmetric(horizontal: 2 * scale),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 4 * scale,
-                  vertical: 9 * scale,
-                ),
-                decoration: BoxDecoration(
-                  color: Color.lerp(Colors.transparent, activeColor, value),
-                  borderRadius: BorderRadius.circular(48 * scale),
-                  boxShadow: active && !teacherStyle
-                      ? [
-                          BoxShadow(
-                            color: _teal.withValues(alpha: 0.20),
-                            blurRadius: 15 * scale,
-                            offset: Offset(0, 10 * scale),
-                          ),
-                          BoxShadow(
-                            color: _teal.withValues(alpha: 0.20),
-                            blurRadius: 6 * scale,
-                            offset: Offset(0, 4 * scale),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox.square(
-                      dimension: 22 * scale,
-                      child: Center(
-                        child: data.user != null
-                            ? _UserAvatarWidget(
-                                user: data.user!,
-                                size: 20 * scale,
-                                color: color,
-                              )
-                            : data.assetPath != null
-                                ? SvgPicture.asset(
-                                    data.assetPath!,
-                                    width: 20 * scale,
-                                    height: 20 * scale,
-                                    colorFilter: ColorFilter.mode(
-                                      color,
-                                      BlendMode.srcIn,
+        return AnimatedScale(
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOutCubic,
+          scale: active ? 1 : 0.98,
+          child: Semantics(
+            selected: active,
+            button: true,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(48 * scale),
+                child: Container(
+                  height: 60 * scale,
+                  margin: EdgeInsets.symmetric(horizontal: 2 * scale),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 4 * scale,
+                    vertical: 9 * scale,
+                  ),
+                  decoration: BoxDecoration(
+                    color: active ? activeColor : Colors.transparent,
+                    borderRadius: BorderRadius.circular(48 * scale),
+                    boxShadow: active && !teacherStyle
+                        ? [
+                            BoxShadow(
+                              color: _teal.withValues(alpha: 0.20),
+                              blurRadius: 15 * scale,
+                              offset: Offset(0, 10 * scale),
+                            ),
+                            BoxShadow(
+                              color: _teal.withValues(alpha: 0.20),
+                              blurRadius: 6 * scale,
+                              offset: Offset(0, 4 * scale),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox.square(
+                        dimension: 22 * scale,
+                        child: Center(
+                          child: data.user != null
+                              ? _UserAvatarWidget(
+                                  user: data.user!,
+                                  size: 20 * scale,
+                                  color: color,
+                                )
+                              : data.assetPath != null
+                                  ? SvgPicture.asset(
+                                      data.assetPath!,
+                                      width: 20 * scale,
+                                      height: 20 * scale,
+                                      colorFilter: ColorFilter.mode(
+                                        color,
+                                        BlendMode.srcIn,
+                                      ),
+                                    )
+                                  : Icon(
+                                      data.icon,
+                                      color: color,
+                                      size: 20 * scale,
                                     ),
-                                  )
-                                : Icon(
-                                    data.icon,
-                                    color: color,
-                                    size: 20 * scale,
-                                  ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 4 * scale),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          data.label,
-                          maxLines: 1,
-                          style: TextStyle(
-                            color: color,
-                            fontSize: FontSize.caption * 0.77 * scale,
-                            fontWeight: FontWeight.w900,
-                            height: 1,
-                            letterSpacing: 0.5,
+                      SizedBox(height: 4 * scale),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            data.label,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: color,
+                              fontSize: FontSize.caption * 0.77 * scale,
+                              fontWeight: FontWeight.w900,
+                              height: 1,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
