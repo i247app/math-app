@@ -65,6 +65,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   List<_ParentChildSummary> _childSummaries = const <_ParentChildSummary>[];
   int _childLoadRequestId = 0;
   bool _hasPlayedModeOneEntrance = false;
+  bool _hasPlayedModeTwoEntrance = false;
 
   @override
   void initState() {
@@ -307,6 +308,40 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     setState(() => _hasPlayedModeOneEntrance = true);
   }
 
+  Widget _modeTwoFadeIn({required Widget child}) {
+    if (_hasPlayedModeTwoEntrance) {
+      return child;
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 850),
+      curve: Curves.easeOutQuart,
+      onEnd: _markModeTwoEntrancePlayed,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 14 * (1 - value)),
+            child: Transform.scale(
+              scale: 0.985 + 0.015 * value,
+              alignment: Alignment.topCenter,
+              child: animatedChild,
+            ),
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  void _markModeTwoEntrancePlayed() {
+    if (!mounted || _hasPlayedModeTwoEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedModeTwoEntrance = true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasJoinedClassroom = _childSummaries.any(
@@ -340,6 +375,12 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
           children: [
             if (!_isLoading && !hasCompletedAssessment)
               _modeOneFadeIn(
+                child: _ParentLearningStreakCard(
+                  hasCompletedAssessment: hasCompletedAssessment,
+                ),
+              )
+            else if (!_isLoading && hasCompletedAssessment)
+              _modeTwoFadeIn(
                 child: _ParentLearningStreakCard(
                   hasCompletedAssessment: hasCompletedAssessment,
                 ),
@@ -485,47 +526,53 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _ParentImageAction(
-          asset: _parentHomeAfterReviewBanner,
-          height: 214,
-          onTap: widget.args.onOpenReviewTab,
+        _modeTwoFadeIn(
+          child: _ParentImageAction(
+            asset: _parentHomeAfterReviewBanner,
+            height: 214,
+            onTap: widget.args.onOpenReviewTab,
+          ),
         ),
         const SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  _ParentImageAction(
-                    asset: _parentHomeRace,
-                    height: 83,
-                    onTap: widget.args.onOpenReviewTab,
-                  ),
-                  const SizedBox(height: 7),
-                  _ParentImageAction(
-                    asset: _parentHomeShop,
-                    height: 72,
-                    onTap: widget.args.onOpenReviewTab,
-                  ),
-                ],
+        _modeTwoFadeIn(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    _ParentImageAction(
+                      asset: _parentHomeRace,
+                      height: 83,
+                      onTap: widget.args.onOpenReviewTab,
+                    ),
+                    const SizedBox(height: 7),
+                    _ParentImageAction(
+                      asset: _parentHomeShop,
+                      height: 72,
+                      onTap: widget.args.onOpenReviewTab,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _ParentImageAction(
-                asset: _parentHomeClassroom,
-                height: 162,
-                onTap: _showClassroomMessage,
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ParentImageAction(
+                  asset: _parentHomeClassroom,
+                  height: 162,
+                  onTap: _showClassroomMessage,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         for (final quiz in _completedAssessments.take(2)) ...[
-          _ParentAssessmentResultCard(
-            quiz: quiz,
-            onTap: () => _openQuizReview(quiz),
+          _modeTwoFadeIn(
+            child: _ParentAssessmentResultCard(
+              quiz: quiz,
+              onTap: () => _openQuizReview(quiz),
+            ),
           ),
           const SizedBox(height: 8),
         ],
