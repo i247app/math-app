@@ -65,6 +65,83 @@ const _teacherIdTypeOptions = <_ProfileIdTypeOption>[
 
 enum SettingPageView { settings, account, profile, addProfile }
 
+class _SettingsDepthRoute<T> extends PageRouteBuilder<T> {
+  _SettingsDepthRoute({required WidgetBuilder builder})
+      : super(
+          transitionDuration: const Duration(milliseconds: 520),
+          reverseTransitionDuration: const Duration(milliseconds: 480),
+          opaque: false,
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              builder(context),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return AnimatedBuilder(
+              animation: animation,
+              child: child,
+              builder: (context, child) {
+                final isReversing = animation.status == AnimationStatus.reverse;
+                final progress =
+                    (isReversing ? Curves.easeInCubic : Curves.easeOutCubic)
+                        .transform(animation.value);
+                if (isReversing) {
+                  return Opacity(opacity: progress, child: child);
+                }
+
+                final scaleProgress =
+                    Curves.easeInOutCubic.transform(animation.value);
+                return Transform.scale(
+                  scale: 0.72 + (0.28 * scaleProgress),
+                  alignment: Alignment.center,
+                  child: child,
+                );
+              },
+            );
+          },
+        );
+
+  @override
+  DelegatedTransitionBuilder? get delegatedTransition =>
+      _buildDelegatedTransition;
+
+  static Widget? _buildDelegatedTransition(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    bool allowSnapshotting,
+    Widget? child,
+  ) {
+    return AnimatedBuilder(
+      animation: secondaryAnimation,
+      child: child,
+      builder: (context, child) {
+        final isReversing =
+            secondaryAnimation.status == AnimationStatus.reverse;
+        final progress =
+            (isReversing ? Curves.easeInCubic : Curves.easeOutCubic)
+                .transform(secondaryAnimation.value);
+        if (isReversing) {
+          return ColoredBox(
+            color: Colors.white,
+            child: Transform.scale(
+              scale: 1 + (0.14 * progress),
+              alignment: Alignment.center,
+              child: child,
+            ),
+          );
+        }
+
+        return ColoredBox(
+          color: Colors.white,
+          child: Transform.scale(
+            scale: 1 - (0.12 * progress),
+            alignment: Alignment.center,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+}
+
 class SettingTab extends StatefulWidget {
   const SettingTab({
     super.key,
@@ -527,15 +604,15 @@ class _SettingTabState extends State<SettingTab> {
     _draftAvatarPath = null;
     FocusScope.of(context).unfocus();
 
-    final didSave = await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (_) => _settingScreenForView(
-          view,
-          editingProfile,
-          openAddProfileOnStart: openAddProfileOnStart,
-        ),
-      ),
+    final screen = _settingScreenForView(
+      view,
+      editingProfile,
+      openAddProfileOnStart: openAddProfileOnStart,
     );
+    final route = view == SettingPageView.account
+        ? _SettingsDepthRoute<bool>(builder: (_) => screen)
+        : MaterialPageRoute<bool>(builder: (_) => screen);
+    final didSave = await Navigator.of(context).push<bool>(route);
 
     if (!mounted) {
       return;
