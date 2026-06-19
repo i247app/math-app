@@ -46,6 +46,7 @@ const _orange = Color(0xFFDE5E31);
 const _idTypeMoet = 'MOET';
 const _idTypePublicId = 'PUBLIC_ID';
 const _profileSwitchMinimumDuration = Duration(milliseconds: 1500);
+const _settingsMenuFadeInDuration = Duration(milliseconds: 900);
 
 class _ProfileIdTypeOption {
   const _ProfileIdTypeOption(this.value, this.label);
@@ -238,6 +239,7 @@ class _SettingTabState extends State<SettingTab> {
   bool _isChangingLanguage = false;
   bool _isLoadingPasscode = false;
   bool _hasPasscode = false;
+  bool _hasPlayedSettingsMenuEntrance = false;
   String? _profileLoadError;
   String? _profileOptionsError;
   String? _profileCreateError;
@@ -1570,6 +1572,10 @@ class _SettingTabState extends State<SettingTab> {
                                   currentLanguage: lingo.language,
                                   hasPasscode: _hasPasscode,
                                   isLoadingPasscode: _isLoadingPasscode,
+                                  animateActions: widget.isActive &&
+                                      !_hasPlayedSettingsMenuEntrance,
+                                  onActionsAnimationEnd:
+                                      _markSettingsMenuEntrancePlayed,
                                   onAccountTap: () =>
                                       _pushView(SettingPageView.account),
                                   onProfileTap: () =>
@@ -1740,6 +1746,13 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     return digits;
+  }
+
+  void _markSettingsMenuEntrancePlayed() {
+    if (!mounted || _hasPlayedSettingsMenuEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedSettingsMenuEntrance = true);
   }
 
   static String _viewKey(SettingPageView view) {

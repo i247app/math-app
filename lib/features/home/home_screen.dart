@@ -79,7 +79,7 @@ const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
 const _homeTeacherAvatarOne = 'assets/images/student_home_avatar.png';
 const _homeTeacherAvatarTwo = 'assets/images/student_class_teacher.png';
 const _homeProfileSwitchMinimumDuration = Duration(milliseconds: 1500);
-const _homeFadeInDuration = Duration(milliseconds: 1000);
+const _homeFadeInDuration = Duration(milliseconds: 900);
 
 enum _HomeTabDestination {
   home,
@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _parentHomeEntranceController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: _homeFadeInDuration,
     );
     if (widget.activeRole == ProfileRole.parent) {
       _parentHomeEntranceController.forward();

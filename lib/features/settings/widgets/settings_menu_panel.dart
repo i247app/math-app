@@ -11,6 +11,8 @@ class _SettingsMenuPanel extends StatelessWidget {
     required this.currentLanguage,
     required this.hasPasscode,
     required this.isLoadingPasscode,
+    required this.animateActions,
+    required this.onActionsAnimationEnd,
     required this.onAccountTap,
     required this.onProfileTap,
     required this.onPasscodeTap,
@@ -26,6 +28,8 @@ class _SettingsMenuPanel extends StatelessWidget {
   final AppLanguage currentLanguage;
   final bool hasPasscode;
   final bool isLoadingPasscode;
+  final bool animateActions;
+  final VoidCallback onActionsAnimationEnd;
   final VoidCallback onAccountTap;
   final VoidCallback onProfileTap;
   final VoidCallback onPasscodeTap;
@@ -59,62 +63,96 @@ class _SettingsMenuPanel extends StatelessWidget {
           ),
         ),
         SizedBox(height: 32 * scale),
-        _SettingsActionCard(
-          icon: Icons.account_circle_outlined,
-          iconColor: const Color(0xFFC21873),
-          iconBackground: const Color(0xFFFFF0F7),
-          title: context.getText(AppKeys.accountMenuTitle),
-          subtitle: context.getText(AppKeys.accountMenuSubtitle),
-          scale: scale,
-          onTap: onAccountTap,
+        _animatedAction(
+          child: _SettingsActionCard(
+            icon: Icons.account_circle_outlined,
+            iconColor: const Color(0xFFC21873),
+            iconBackground: const Color(0xFFFFF0F7),
+            title: context.getText(AppKeys.accountMenuTitle),
+            subtitle: context.getText(AppKeys.accountMenuSubtitle),
+            scale: scale,
+            onTap: onAccountTap,
+          ),
         ),
         SizedBox(height: 12 * scale),
-        _SettingsActionCard(
-          icon: Icons.person_outline_rounded,
-          iconColor: const Color(0xFF008A52),
-          iconBackground: const Color(0xFFD6FFE3),
-          title: context.getText(AppKeys.profileMenuTitle),
-          subtitle: context.getText(AppKeys.profileMenuSubtitle),
-          scale: scale,
-          onTap: onProfileTap,
+        _animatedAction(
+          child: _SettingsActionCard(
+            icon: Icons.person_outline_rounded,
+            iconColor: const Color(0xFF008A52),
+            iconBackground: const Color(0xFFD6FFE3),
+            title: context.getText(AppKeys.profileMenuTitle),
+            subtitle: context.getText(AppKeys.profileMenuSubtitle),
+            scale: scale,
+            onTap: onProfileTap,
+          ),
         ),
         SizedBox(height: 12 * scale),
-        _SettingsActionCard(
-          icon: Icons.lock_outline_rounded,
-          iconColor: const Color(0xFF327F84),
-          iconBackground: const Color(0xFFE5F7F8),
-          title: context.getText(AppKeys.passcodeMenuTitle),
-          subtitle: isLoadingPasscode
-              ? context.getText(AppKeys.loading)
-              : context.getText(
-                  hasPasscode
-                      ? AppKeys.passcodeMenuSubtitleManage
-                      : AppKeys.passcodeMenuSubtitleSet,
-                ),
-          scale: scale,
-          onTap: onPasscodeTap,
+        _animatedAction(
+          child: _SettingsActionCard(
+            icon: Icons.lock_outline_rounded,
+            iconColor: const Color(0xFF327F84),
+            iconBackground: const Color(0xFFE5F7F8),
+            title: context.getText(AppKeys.passcodeMenuTitle),
+            subtitle: isLoadingPasscode
+                ? context.getText(AppKeys.loading)
+                : context.getText(
+                    hasPasscode
+                        ? AppKeys.passcodeMenuSubtitleManage
+                        : AppKeys.passcodeMenuSubtitleSet,
+                  ),
+            scale: scale,
+            onTap: onPasscodeTap,
+          ),
         ),
         SizedBox(height: 12 * scale),
-        _SettingsLanguageCard(
-          currentLanguage: currentLanguage,
-          scale: scale,
-          onLanguageChanged: onLanguageChanged,
+        _animatedAction(
+          child: _SettingsLanguageCard(
+            currentLanguage: currentLanguage,
+            scale: scale,
+            onLanguageChanged: onLanguageChanged,
+          ),
         ),
         SizedBox(height: 12 * scale),
-        _SettingsActionCard(
-          icon: Icons.logout_rounded,
-          iconColor: _orange,
-          iconBackground: const Color(0xFFFFEAEA),
-          title: context.getText(AppKeys.logout),
-          subtitle: context.getText(AppKeys.logoutSubtitle),
-          isDestructive: true,
-          scale: scale,
-          onTap: () {
-            HapticFeedback.selectionClick();
-            onLogoutTap();
-          },
+        _animatedAction(
+          child: _SettingsActionCard(
+            icon: Icons.logout_rounded,
+            iconColor: _orange,
+            iconBackground: const Color(0xFFFFEAEA),
+            title: context.getText(AppKeys.logout),
+            subtitle: context.getText(AppKeys.logoutSubtitle),
+            isDestructive: true,
+            scale: scale,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onLogoutTap();
+            },
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _animatedAction({required Widget child}) {
+    if (!animateActions) {
+      return child;
+    }
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: _settingsMenuFadeInDuration,
+      curve: Curves.easeOutQuart,
+      onEnd: onActionsAnimationEnd,
+      builder: (context, value, animatedChild) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, 14 * (1 - value)),
+          child: Transform.scale(
+            scale: 0.985 + 0.015 * value,
+            alignment: Alignment.topCenter,
+            child: animatedChild,
+          ),
+        ),
+      ),
+      child: child,
     );
   }
 
