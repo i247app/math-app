@@ -251,19 +251,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                         ],
                       ),
                     ),
-                  if (_isLoading && _entries.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.only(top: 8 * scale),
-                      child: Text(
-                        context.getText(AppKeys.loading),
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.andika(
-                          color: const Color(0xFF77859A),
-                          fontSize: FontSize.caption * scale,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
                 ]),
               ),
             ),

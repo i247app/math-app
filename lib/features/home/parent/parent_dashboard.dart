@@ -503,10 +503,6 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
                   ],
                 ),
               ),
-            if (_isLoading && summaries.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              const _ParentHomeRefreshLabel(),
-            ],
             if (!_isLoading && _errorMessage != null) ...[
               const SizedBox(height: 10),
               _ParentHomeErrorCard(

@@ -740,12 +740,34 @@ class _RoleDashboard extends StatefulWidget {
 
 class _RoleDashboardState extends State<_RoleDashboard> {
   late final Set<int> _visitedTabs = <int>{widget.activeTab};
+  late final Set<int> _activatedTabs = <int>{widget.activeTab};
   final Map<int, int> _activationTicks = <int, int>{};
 
   @override
   void initState() {
     super.initState();
     _activationTicks[widget.activeTab] = 1;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _prewarmTabs());
+  }
+
+  Future<void> _prewarmTabs() async {
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    const tabOrder = <int>[1, 2, 3, 4, 0];
+    for (final tab in tabOrder) {
+      if (!mounted) {
+        return;
+      }
+      if (tab == widget.activeTab || _visitedTabs.contains(tab)) {
+        continue;
+      }
+
+      setState(() {
+        _visitedTabs.add(tab);
+        _activationTicks[tab] = 1;
+      });
+      await WidgetsBinding.instance.endOfFrame;
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
   }
 
   @override
@@ -753,8 +775,13 @@ class _RoleDashboardState extends State<_RoleDashboard> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.activeTab != widget.activeTab) {
       _visitedTabs.add(widget.activeTab);
-      _activationTicks[widget.activeTab] =
-          (_activationTicks[widget.activeTab] ?? 0) + 1;
+      final isFirstActivation = _activatedTabs.add(widget.activeTab);
+      if (isFirstActivation) {
+        _activationTicks[widget.activeTab] ??= 1;
+      } else {
+        _activationTicks[widget.activeTab] =
+            (_activationTicks[widget.activeTab] ?? 0) + 1;
+      }
     }
   }
 
