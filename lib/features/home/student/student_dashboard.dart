@@ -137,6 +137,8 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   final _StudentHomePanel _activePanel = _StudentHomePanel.homework;
   bool _isLoadingInvitations = false;
   bool _hasLoadedInvitations = false;
+  bool _hasPlayedHeroEntrance = false;
+  bool _hasPlayedSectionsEntrance = false;
   List<ClassroomInvitation> _invitations = const <ClassroomInvitation>[];
   final Set<int> _processingInvitationClassIds = <int>{};
 
@@ -329,6 +331,48 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     }
   }
 
+  Widget _studentHomeFadeIn({
+    required bool hasPlayed,
+    required VoidCallback onEnd,
+    required Widget child,
+  }) {
+    if (hasPlayed) {
+      return child;
+    }
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 850),
+      curve: Curves.easeOutQuart,
+      onEnd: onEnd,
+      builder: (context, value, animatedChild) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, 14 * (1 - value)),
+          child: Transform.scale(
+            scale: 0.985 + 0.015 * value,
+            alignment: Alignment.topCenter,
+            child: animatedChild,
+          ),
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  void _markHeroEntrancePlayed() {
+    if (!mounted || _hasPlayedHeroEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedHeroEntrance = true);
+  }
+
+  void _markSectionsEntrancePlayed() {
+    if (!mounted || _hasPlayedSectionsEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedSectionsEntrance = true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileId = ActiveProfileSession.profileStableId(
@@ -363,8 +407,13 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
               ),
             )
           else
-            _StudentFigmaHeroCard(
-              onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
+            _studentHomeFadeIn(
+              hasPlayed: _hasPlayedHeroEntrance,
+              onEnd: _markHeroEntrancePlayed,
+              child: _StudentFigmaHeroCard(
+                onAssessmentTap: () =>
+                    _openGradeSelection(quizPurposeAssessment),
+              ),
             ),
           const SizedBox(height: 22),
           if (widget.activeRole == ProfileRole.parent)
@@ -379,43 +428,52 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             )
           else if (isLoadingHomeSections)
             const _StudentHomeSectionsLoading()
-          else ...[
-            _StudentInvitationsSection(
-              invitations: _invitations,
-              processingClassroomIds: _processingInvitationClassIds,
-              showJoinClassroom: widget.activeRole == ProfileRole.student &&
-                  _classrooms.isEmpty,
-              onJoinClassroom: widget.activeRole == ProfileRole.student
-                  ? widget.onOpenClassroomTab
-                  : _handleParentClassroomEntry,
-              onViewAll: _openAllInvitations,
-              onAccept: (invitation) => _handleInvitation(
-                invitation,
-                accept: true,
-              ),
-              onReject: (invitation) => _handleInvitation(
-                invitation,
-                accept: false,
+          else
+            _studentHomeFadeIn(
+              hasPlayed: _hasPlayedSectionsEntrance,
+              onEnd: _markSectionsEntrancePlayed,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _StudentInvitationsSection(
+                    invitations: _invitations,
+                    processingClassroomIds: _processingInvitationClassIds,
+                    showJoinClassroom:
+                        widget.activeRole == ProfileRole.student &&
+                            _classrooms.isEmpty,
+                    onJoinClassroom: widget.activeRole == ProfileRole.student
+                        ? widget.onOpenClassroomTab
+                        : _handleParentClassroomEntry,
+                    onViewAll: _openAllInvitations,
+                    onAccept: (invitation) => _handleInvitation(
+                      invitation,
+                      accept: true,
+                    ),
+                    onReject: (invitation) => _handleInvitation(
+                      invitation,
+                      accept: false,
+                    ),
+                  ),
+                  if (widget.activeRole == ProfileRole.student &&
+                      (_classrooms.isNotEmpty ||
+                          !_hasLoadedClassrooms ||
+                          _classroomError != null)) ...[
+                    const SizedBox(height: 11),
+                    _StudentClassGridSection(
+                      classrooms: _classrooms,
+                      isLoading: _isLoadingClassrooms && !_hasLoadedClassrooms,
+                      isRefreshing:
+                          _isLoadingClassrooms && _classrooms.isNotEmpty,
+                      error: _classroomError,
+                      onOpenClassroom: _openClassDetail,
+                      onViewAll: widget.onOpenClassroomTab,
+                    ),
+                  ],
+                  const SizedBox(height: 20),
+                  const _HomeTeacherMessages(),
+                ],
               ),
             ),
-            if (widget.activeRole == ProfileRole.student) ...[
-              if (_classrooms.isNotEmpty ||
-                  !_hasLoadedClassrooms ||
-                  _classroomError != null) ...[
-                const SizedBox(height: 11),
-                _StudentClassGridSection(
-                  classrooms: _classrooms,
-                  isLoading: _isLoadingClassrooms && !_hasLoadedClassrooms,
-                  isRefreshing: _isLoadingClassrooms && _classrooms.isNotEmpty,
-                  error: _classroomError,
-                  onOpenClassroom: _openClassDetail,
-                  onViewAll: widget.onOpenClassroomTab,
-                ),
-              ],
-            ],
-            const SizedBox(height: 20),
-            const _HomeTeacherMessages(),
-          ],
         ],
       ),
     );
@@ -769,40 +827,104 @@ class _StudentInvitationsSection extends StatelessWidget {
   }
 }
 
-class _StudentHomeSectionsLoading extends StatelessWidget {
+class _StudentHomeSectionsLoading extends StatefulWidget {
   const _StudentHomeSectionsLoading();
 
   @override
+  State<_StudentHomeSectionsLoading> createState() =>
+      _StudentHomeSectionsLoadingState();
+}
+
+class _StudentHomeSectionsLoadingState
+    extends State<_StudentHomeSectionsLoading>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1250),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 300),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(3, 3),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) => ShaderMask(
+        blendMode: BlendMode.srcATop,
+        shaderCallback: (bounds) {
+          final shimmerWidth = bounds.width * 1.2;
+          final start = -shimmerWidth;
+          final dx = start + (bounds.width - start) * _controller.value;
+          return LinearGradient(
+            colors: [
+              Colors.white.withValues(alpha: 0),
+              Colors.white.withValues(alpha: 0.72),
+              Colors.white.withValues(alpha: 0),
+            ],
+            stops: const [0.28, 0.5, 0.72],
+          ).createShader(
+            Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height),
+          );
+        },
+        child: child,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            height: 116,
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE4EAEC)),
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _StudentClassroomSkeletonBlock(
+                  width: 150,
+                  height: 15,
+                  radius: 7,
+                ),
+                SizedBox(height: 12),
+                _StudentClassroomSkeletonBlock(
+                  height: 56,
+                  radius: 14,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 11),
+          Row(
+            children: [
+              for (var index = 0; index < 2; index++) ...[
+                const Expanded(
+                  child: _StudentClassroomSkeletonBlock(
+                    height: 138,
+                    radius: 18,
+                  ),
+                ),
+                if (index == 0) const SizedBox(width: 10),
+              ],
+            ],
+          ),
+          const SizedBox(height: 20),
+          const _StudentClassroomSkeletonBlock(
+            width: 170,
+            height: 18,
+            radius: 8,
+          ),
+          const SizedBox(height: 10),
+          const _StudentClassroomSkeletonBlock(
+            height: 104,
+            radius: 18,
           ),
         ],
-      ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(color: _teal),
-            const SizedBox(height: 14),
-            Text(
-              context.getText(AppKeys.loading),
-              style: const TextStyle(
-                color: Color(0xFF30333A),
-                fontSize: FontSize.small,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

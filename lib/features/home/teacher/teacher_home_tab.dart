@@ -765,7 +765,7 @@ class _TeacherClassCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 164 * scale,
+      height: 176 * scale,
       child: ListView.separated(
         clipBehavior: Clip.none,
         scrollDirection: Axis.horizontal,
@@ -1010,20 +1010,22 @@ class _TeacherClassCard extends StatelessWidget {
                 ),
                 SizedBox(height: 8 * scale),
                 Divider(color: const Color(0x1AC4C6D2), height: 4 * scale),
-                Text(
-                  _teacherMemberSummaryText(
-                    context,
-                    members: classroom.displayStudentCount,
-                    requests: classroom.displayPendingRequestCount,
-                  ),
-                  maxLines: classroom.displayPendingRequestCount > 0 ? 2 : 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.andika(
-                    color: _teacherBlue.withValues(alpha: 0.60),
-                    fontSize: FontSize.caption * 0.85 * scale,
-                    fontWeight: FontWeight.w800,
-                    height: 1.2,
+                Flexible(
+                  child: Text(
+                    _teacherMemberSummaryText(
+                      context,
+                      members: classroom.displayStudentCount,
+                      requests: classroom.displayPendingRequestCount,
+                    ),
+                    maxLines: classroom.displayPendingRequestCount > 0 ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.andika(
+                      color: _teacherBlue.withValues(alpha: 0.60),
+                      fontSize: FontSize.caption * 0.85 * scale,
+                      fontWeight: FontWeight.w800,
+                      height: 1.2,
+                    ),
                   ),
                 ),
                 SizedBox(height: 4 * scale),
@@ -1332,7 +1334,7 @@ class _TeacherLoadingPanel extends StatelessWidget {
     return _TeacherSkeletonCarousel(
       scale: scale,
       itemWidth: 166 * scale,
-      itemHeight: 164 * scale,
+      itemHeight: 176 * scale,
       itemCount: 2,
       builder: (context) => _TeacherClassSkeletonCard(scale: scale),
     );
