@@ -66,6 +66,7 @@ class ReviewTab extends StatefulWidget {
     required this.onAddProfile,
     required this.bottomPadding,
     required this.scale,
+    this.isActive = true,
   });
 
   final LoginUser? user;
@@ -76,6 +77,7 @@ class ReviewTab extends StatefulWidget {
   final VoidCallback onAddProfile;
   final double bottomPadding;
   final double scale;
+  final bool isActive;
 
   @override
   State<ReviewTab> createState() => _ReviewTabState();
@@ -95,7 +97,7 @@ class _ReviewTabState extends State<ReviewTab> {
   @override
   void initState() {
     super.initState();
-    if (!widget.isParentMode) {
+    if (widget.isActive && !widget.isParentMode) {
       _loadChaptersForActiveProfile();
     }
   }
@@ -103,6 +105,13 @@ class _ReviewTabState extends State<ReviewTab> {
   @override
   void didUpdateWidget(covariant ReviewTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive && !widget.isParentMode) {
+      _loadChaptersForActiveProfile();
+      return;
+    }
+    if (!widget.isActive) {
+      return;
+    }
     final oldProfileId = ActiveProfileSession.profileStableId(
       oldWidget.activeProfile,
     );

@@ -30,6 +30,7 @@ class HistoryTab extends StatefulWidget {
     required this.bottomPadding,
     required this.scale,
     this.activeRefreshTick = 0,
+    this.isActive = true,
   });
 
   final LoginUser? user;
@@ -37,6 +38,7 @@ class HistoryTab extends StatefulWidget {
   final double bottomPadding;
   final double scale;
   final int activeRefreshTick;
+  final bool isActive;
 
   @override
   State<HistoryTab> createState() => _HistoryTabState();
@@ -57,12 +59,21 @@ class _HistoryTabState extends State<HistoryTab> {
   void initState() {
     super.initState();
     _searchController.addListener(_refreshSearch);
-    _loadHistory();
+    if (widget.isActive) {
+      _loadHistory();
+    }
   }
 
   @override
   void didUpdateWidget(covariant HistoryTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      _loadHistory();
+      return;
+    }
+    if (!widget.isActive) {
+      return;
+    }
     final oldProfileId = ActiveProfileSession.profileStableId(
       oldWidget.activeProfile,
     );

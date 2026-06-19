@@ -18,6 +18,7 @@ class StudentDashboard extends StatelessWidget {
         profiles: args.profiles,
         activeProfile: args.activeProfile,
         activeRole: ProfileRole.student,
+        isActive: args.isActive,
         initialGrades: args.initialGrades,
         gradeService: args.gradeService,
         classroomService: args.classroomService,
@@ -38,6 +39,7 @@ class StudentDashboard extends StatelessWidget {
         user: args.user,
         activeProfile: args.activeProfile,
         classroomService: args.classroomService,
+        isActive: args.isActive,
         activeRefreshTick: args.activeRefreshTick,
       );
     }
@@ -52,6 +54,7 @@ class StudentDashboard extends StatelessWidget {
         onAddProfile: args.onAddProfileFromReview,
         bottomPadding: args.bottomPadding,
         scale: args.scale,
+        isActive: args.isActive,
       );
     }
 
@@ -62,6 +65,7 @@ class StudentDashboard extends StatelessWidget {
         bottomPadding: args.bottomPadding,
         scale: args.scale,
         activeRefreshTick: args.activeRefreshTick,
+        isActive: args.isActive,
       );
     }
 
@@ -86,6 +90,7 @@ Widget _dashboardSettings(HomeDashboardArgs args) {
     openAddProfileRequestId: args.openAddProfileRequestId,
     bottomPadding: args.bottomPadding,
     scale: args.scale,
+    isActive: args.isActive,
   );
 }
 
@@ -99,6 +104,7 @@ class _StudentHomeContent extends StatefulWidget {
     required this.profiles,
     required this.activeProfile,
     required this.activeRole,
+    required this.isActive,
     required this.initialGrades,
     required this.gradeService,
     required this.classroomService,
@@ -117,6 +123,7 @@ class _StudentHomeContent extends StatefulWidget {
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
   final ProfileRole activeRole;
+  final bool isActive;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final ClassroomService classroomService;
@@ -165,15 +172,27 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   @override
   void initState() {
     super.initState();
-    if (widget.activeRole == ProfileRole.student) {
-      _loadClassrooms();
+    if (widget.isActive) {
+      if (widget.activeRole == ProfileRole.student) {
+        _loadClassrooms();
+      }
+      _loadInvitations();
     }
-    _loadInvitations();
   }
 
   @override
   void didUpdateWidget(covariant _StudentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      if (widget.activeRole == ProfileRole.student) {
+        _loadClassrooms();
+      }
+      _loadInvitations();
+      return;
+    }
+    if (!widget.isActive) {
+      return;
+    }
     final oldProfileId = ActiveProfileSession.profileStableId(
       oldWidget.activeProfile,
     );
@@ -2228,6 +2247,7 @@ class _StudentClassroomTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.classroomService,
+    required this.isActive,
     this.activeRefreshTick = 0,
   });
 
@@ -2236,6 +2256,7 @@ class _StudentClassroomTab extends StatefulWidget {
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final ClassroomService classroomService;
+  final bool isActive;
   final int activeRefreshTick;
 
   @override
@@ -2276,12 +2297,21 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
   @override
   void initState() {
     super.initState();
-    _loadClassrooms();
+    if (widget.isActive) {
+      _loadClassrooms();
+    }
   }
 
   @override
   void didUpdateWidget(covariant _StudentClassroomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      _loadClassrooms();
+      return;
+    }
+    if (!widget.isActive) {
+      return;
+    }
     final oldProfileId = ActiveProfileSession.profileStableId(
       oldWidget.activeProfile,
     );

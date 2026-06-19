@@ -26,12 +26,21 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
-    _loadAssessments();
+    if (widget.args.isActive) {
+      _loadAssessments();
+    }
   }
 
   @override
   void didUpdateWidget(covariant ParentAssessmentTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.args.isActive && widget.args.isActive) {
+      _loadAssessments();
+      return;
+    }
+    if (!widget.args.isActive) {
+      return;
+    }
     if (_profileSourceKey(oldWidget.args) != _profileSourceKey(widget.args)) {
       _loadAssessments();
     } else if (oldWidget.args.activeRefreshTick !=

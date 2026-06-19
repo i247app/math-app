@@ -8,6 +8,7 @@ class TeacherClassroomTab extends StatefulWidget {
     required this.bottomPadding,
     required this.scale,
     this.activeRefreshTick = 0,
+    this.isActive = true,
   });
 
   final LoginUser? user;
@@ -15,6 +16,7 @@ class TeacherClassroomTab extends StatefulWidget {
   final double bottomPadding;
   final double scale;
   final int activeRefreshTick;
+  final bool isActive;
   @override
   State<TeacherClassroomTab> createState() => _TeacherClassroomTabState();
 }
@@ -51,12 +53,21 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
   @override
   void initState() {
     super.initState();
-    _loadClassrooms();
+    if (widget.isActive) {
+      _loadClassrooms();
+    }
   }
 
   @override
   void didUpdateWidget(covariant TeacherClassroomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      _loadClassrooms();
+      return;
+    }
+    if (!widget.isActive) {
+      return;
+    }
     final oldProfileId =
         ActiveProfileSession.profileStableId(oldWidget.activeProfile);
     if (_profileId != oldProfileId) {

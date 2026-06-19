@@ -156,6 +156,7 @@ class SettingTab extends StatefulWidget {
     this.openAddProfileRequestId = 0,
     required this.bottomPadding,
     required this.scale,
+    this.isActive = true,
   })  : _initialView = SettingPageView.settings,
         _initialEditingProfile = null,
         _isPushedPage = false,
@@ -177,6 +178,7 @@ class SettingTab extends StatefulWidget {
     StudentProfile? initialEditingProfile,
     bool isPushedPage = false,
     bool openAddProfileOnStart = false,
+    this.isActive = true,
   })  : openAddProfileRequestId = 0,
         _initialView = initialView,
         _initialEditingProfile = initialEditingProfile,
@@ -194,6 +196,7 @@ class SettingTab extends StatefulWidget {
   final int openAddProfileRequestId;
   final double bottomPadding;
   final double scale;
+  final bool isActive;
   final SettingPageView _initialView;
   final StudentProfile? _initialEditingProfile;
   final bool _isPushedPage;
@@ -315,7 +318,7 @@ class _SettingTabState extends State<SettingTab> {
       });
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
+      if (mounted && widget.isActive) {
         _loadPasscodeStatus();
       }
     });
@@ -324,6 +327,9 @@ class _SettingTabState extends State<SettingTab> {
   @override
   void didUpdateWidget(covariant SettingTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      _loadPasscodeStatus();
+    }
     if (oldWidget.openAddProfileRequestId != widget.openAddProfileRequestId) {
       _openAddProfile();
       return;

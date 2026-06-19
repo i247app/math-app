@@ -614,6 +614,7 @@ class _HomeScreenState extends State<HomeScreen>
 class HomeDashboardArgs {
   const HomeDashboardArgs({
     required this.activeTab,
+    required this.isActive,
     required this.user,
     required this.profiles,
     required this.activeProfile,
@@ -642,6 +643,7 @@ class HomeDashboardArgs {
   });
 
   final int activeTab;
+  final bool isActive;
   final LoginUser? user;
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
@@ -808,6 +810,7 @@ class _RoleDashboardState extends State<_RoleDashboard> {
   Widget _buildTab(BuildContext context, int tab) {
     final args = HomeDashboardArgs(
       activeTab: tab,
+      isActive: tab == widget.activeTab,
       user: widget.user,
       profiles: widget.profiles,
       activeProfile: widget.activeProfile,

@@ -11,6 +11,7 @@ class TeacherHomeTab extends StatefulWidget {
     this.onOpenClassroomTab,
     ClassroomExerciseService? exerciseService,
     this.activeRefreshTick = 0,
+    this.isActive = true,
   }) : _exerciseService = exerciseService;
 
   final LoginUser? user;
@@ -20,6 +21,7 @@ class TeacherHomeTab extends StatefulWidget {
   final Future<void> Function() onCompleteProfile;
   final VoidCallback? onOpenClassroomTab;
   final int activeRefreshTick;
+  final bool isActive;
   final ClassroomExerciseService? _exerciseService;
 
   @override
@@ -63,12 +65,21 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   @override
   void initState() {
     super.initState();
-    _loadClassrooms();
+    if (widget.isActive) {
+      _loadClassrooms();
+    }
   }
 
   @override
   void didUpdateWidget(covariant TeacherHomeTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      _loadClassrooms();
+      return;
+    }
+    if (!widget.isActive) {
+      return;
+    }
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
     if (profileId != _loadedProfileId) {

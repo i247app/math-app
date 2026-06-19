@@ -28,6 +28,7 @@ class ParentDashboard extends StatelessWidget {
         onAddProfile: args.onAddProfileFromReview,
         bottomPadding: args.bottomPadding,
         scale: args.scale,
+        isActive: args.isActive,
       );
     }
 
@@ -37,6 +38,7 @@ class ParentDashboard extends StatelessWidget {
         activeProfile: args.activeProfile,
         bottomPadding: args.bottomPadding,
         scale: args.scale,
+        isActive: args.isActive,
       );
     }
 
@@ -71,12 +73,21 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   @override
   void initState() {
     super.initState();
-    _loadHome();
+    if (widget.args.isActive) {
+      _loadHome();
+    }
   }
 
   @override
   void didUpdateWidget(covariant _ParentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.args.isActive && widget.args.isActive) {
+      _loadHome();
+      return;
+    }
+    if (!widget.args.isActive) {
+      return;
+    }
     final oldProfileId = ActiveProfileSession.profileStableId(
       oldWidget.args.activeProfile,
     );

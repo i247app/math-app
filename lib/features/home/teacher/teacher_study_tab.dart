@@ -10,6 +10,7 @@ class TeacherStudyTab extends StatefulWidget {
     ClassroomService? classroomService,
     ClassroomExerciseService? exerciseService,
     this.activeRefreshTick = 0,
+    this.isActive = true,
   })  : _classroomService = classroomService,
         _exerciseService = exerciseService;
 
@@ -18,6 +19,7 @@ class TeacherStudyTab extends StatefulWidget {
   final double bottomPadding;
   final double scale;
   final int activeRefreshTick;
+  final bool isActive;
   final ClassroomService? _classroomService;
   final ClassroomExerciseService? _exerciseService;
 
@@ -60,12 +62,21 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   @override
   void initState() {
     super.initState();
-    _loadClassrooms();
+    if (widget.isActive) {
+      _loadClassrooms();
+    }
   }
 
   @override
   void didUpdateWidget(covariant TeacherStudyTab oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      _loadClassrooms();
+      return;
+    }
+    if (!widget.isActive) {
+      return;
+    }
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
     if (profileId != _loadedProfileId) {
