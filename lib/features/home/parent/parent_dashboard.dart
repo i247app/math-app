@@ -64,6 +64,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
   List<_ParentChildSummary> _childSummaries = const <_ParentChildSummary>[];
   int _childLoadRequestId = 0;
+  bool _hasPlayedModeOneEntrance = false;
 
   @override
   void initState() {
@@ -272,6 +273,40 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     }
   }
 
+  Widget _modeOneFadeIn({required Widget child}) {
+    if (_hasPlayedModeOneEntrance) {
+      return child;
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 850),
+      curve: Curves.easeOutQuart,
+      onEnd: _markModeOneEntrancePlayed,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 14 * (1 - value)),
+            child: Transform.scale(
+              scale: 0.985 + 0.015 * value,
+              alignment: Alignment.topCenter,
+              child: animatedChild,
+            ),
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  void _markModeOneEntrancePlayed() {
+    if (!mounted || _hasPlayedModeOneEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedModeOneEntrance = true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasJoinedClassroom = _childSummaries.any(
@@ -303,9 +338,16 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _ParentLearningStreakCard(
-              hasCompletedAssessment: hasCompletedAssessment,
-            ),
+            if (!_isLoading && !hasCompletedAssessment)
+              _modeOneFadeIn(
+                child: _ParentLearningStreakCard(
+                  hasCompletedAssessment: hasCompletedAssessment,
+                ),
+              )
+            else
+              _ParentLearningStreakCard(
+                hasCompletedAssessment: hasCompletedAssessment,
+              ),
             const SizedBox(height: 12),
             if (_isLoading && !_hasLoadedHome)
               const _ParentHomeLoadingCard()
@@ -398,36 +440,42 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _StudentFigmaHeroCard(
-          onAssessmentTap: _openAssessment,
+        _modeOneFadeIn(
+          child: _StudentFigmaHeroCard(
+            onAssessmentTap: _openAssessment,
+          ),
         ),
         const SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _ParentImageAction(
-                asset: _parentHomeAfterReviewBanner,
-                height: 160,
-                alignment: Alignment.centerLeft,
-                onTap: widget.args.onOpenReviewTab,
+        _modeOneFadeIn(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _ParentImageAction(
+                  asset: _parentHomeAfterReviewBanner,
+                  height: 160,
+                  alignment: Alignment.centerLeft,
+                  onTap: widget.args.onOpenReviewTab,
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _ParentImageAction(
-                asset: _parentHomeClassroom,
-                height: 160,
-                onTap: _showClassroomMessage,
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ParentImageAction(
+                  asset: _parentHomeClassroom,
+                  height: 160,
+                  onTap: _showClassroomMessage,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 12),
-        _ParentStartGuideCard(
-          onAssessmentTap: _openAssessment,
-          onRoadmapTap: widget.args.onOpenReviewTab,
-          onClassroomTap: _showClassroomMessage,
+        _modeOneFadeIn(
+          child: _ParentStartGuideCard(
+            onAssessmentTap: _openAssessment,
+            onRoadmapTap: widget.args.onOpenReviewTab,
+            onClassroomTap: _showClassroomMessage,
+          ),
         ),
       ],
     );

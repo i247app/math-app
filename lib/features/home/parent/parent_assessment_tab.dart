@@ -17,6 +17,8 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
 
   List<_ParentAssessmentEntry> _entries = const <_ParentAssessmentEntry>[];
   bool _isLoading = true;
+  bool _hasCompletedInitialLoad = false;
+  bool _hasPlayedInitialEntrance = false;
   String? _errorMessage;
   int _loadRequestId = 0;
 
@@ -96,6 +98,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         _entries = entries;
       }
       _isLoading = false;
+      _hasCompletedInitialLoad = true;
       _errorMessage = failed && _entries.isEmpty
           ? context.readText(AppKeys.parentQuizLoadFailed)
           : null;
@@ -159,6 +162,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     final scale = widget.args.scale;
     final topInset = MediaQuery.paddingOf(context).top;
     final entries = _filteredEntries;
+    final isInitialLoading = _isLoading && !_hasCompletedInitialLoad;
 
     return ColoredBox(
       color: const Color(0xFFF1FBFA),
@@ -210,46 +214,43 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                     scale: scale,
                   ),
                   SizedBox(height: 16 * scale),
-                  if (_isLoading && _entries.isEmpty)
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 48 * scale),
-                      child: Center(
-                        child: Text(
-                          context.getText(AppKeys.loading),
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.andika(
-                            color: const Color(0xFF77859A),
-                            fontSize: FontSize.small * scale,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    )
+                  if (isInitialLoading)
+                    _ParentAssessmentListSkeleton(scale: scale)
                   else if (_errorMessage != null && _entries.isEmpty)
-                    _ParentAssessmentStateCard(
-                      icon: Icons.cloud_off_rounded,
-                      title: context.getText(AppKeys.historyLoadErrorTitle),
-                      message: _errorMessage!,
-                      onTap: _loadAssessments,
-                      scale: scale,
+                    _initialFadeIn(
+                      child: _ParentAssessmentStateCard(
+                        icon: Icons.cloud_off_rounded,
+                        title: context.getText(AppKeys.historyLoadErrorTitle),
+                        message: _errorMessage!,
+                        onTap: _loadAssessments,
+                        scale: scale,
+                      ),
                     )
                   else if (entries.isEmpty)
-                    _ParentAssessmentStateCard(
-                      icon: Icons.assignment_turned_in_outlined,
-                      title: context.getText(AppKeys.noHistoryTitle),
-                      message: context.getText(AppKeys.noHistoryMessage),
-                      onTap: _loadAssessments,
-                      scale: scale,
+                    _initialFadeIn(
+                      child: _ParentAssessmentStateCard(
+                        icon: Icons.assignment_turned_in_outlined,
+                        title: context.getText(AppKeys.noHistoryTitle),
+                        message: context.getText(AppKeys.noHistoryMessage),
+                        onTap: _loadAssessments,
+                        scale: scale,
+                      ),
                     )
                   else
-                    for (final entry in entries) ...[
-                      _ParentAssessmentTabCard(
-                        entry: entry,
-                        scale: scale,
-                        onTap: () => _openQuizReview(entry.quiz),
+                    _initialFadeIn(
+                      child: Column(
+                        children: [
+                          for (final entry in entries) ...[
+                            _ParentAssessmentTabCard(
+                              entry: entry,
+                              scale: scale,
+                              onTap: () => _openQuizReview(entry.quiz),
+                            ),
+                            SizedBox(height: 8 * scale),
+                          ],
+                        ],
                       ),
-                      SizedBox(height: 8 * scale),
-                    ],
+                    ),
                   if (_isLoading && _entries.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.only(top: 8 * scale),
@@ -270,6 +271,36 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         ),
       ),
     );
+  }
+
+  Widget _initialFadeIn({required Widget child}) {
+    if (_hasPlayedInitialEntrance) {
+      return child;
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 240),
+      curve: Curves.easeOut,
+      onEnd: _markInitialEntrancePlayed,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 4 * (1 - value)),
+            child: animatedChild,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  void _markInitialEntrancePlayed() {
+    if (!mounted || _hasPlayedInitialEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedInitialEntrance = true);
   }
 }
 
@@ -341,13 +372,137 @@ class _ParentReviewTabBanner extends StatelessWidget {
         onTap: onTap,
         child: AspectRatio(
           aspectRatio: 3.21,
-          child: Ink.image(
-            image: const AssetImage(
-              'assets/images/review_tab_banner.jpg',
-            ),
+          child: Image.asset(
+            'assets/images/review_tab_banner.jpg',
             fit: BoxFit.cover,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded) {
+                return child;
+              }
+              if (frame == null) {
+                return _ParentAssessmentSkeletonPulse(
+                  builder: (context, color) => _ParentSkeletonBlock(
+                    radius: 10 * scale,
+                    color: color,
+                  ),
+                );
+              }
+              return TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: 1),
+                duration: const Duration(milliseconds: 240),
+                curve: Curves.easeOut,
+                builder: (context, value, animatedChild) => Opacity(
+                  opacity: value,
+                  child: animatedChild,
+                ),
+                child: child,
+              );
+            },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ParentAssessmentListSkeleton extends StatelessWidget {
+  const _ParentAssessmentListSkeleton({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return _ParentAssessmentSkeletonPulse(
+      builder: (context, color) => Column(
+        children: [
+          for (var index = 0; index < 3; index++) ...[
+            _ParentSkeletonBlock(
+              height: 68 * scale,
+              radius: 14 * scale,
+              color: color,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 14 * scale),
+                child: Row(
+                  children: [
+                    _ParentSkeletonBlock(
+                      width: 47 * scale,
+                      height: 47 * scale,
+                      radius: 24 * scale,
+                      color: color,
+                    ),
+                    SizedBox(width: 12 * scale),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _ParentSkeletonLine(
+                            width: 78 * scale,
+                            height: 8 * scale,
+                            color: color,
+                          ),
+                          SizedBox(height: 7 * scale),
+                          _ParentSkeletonLine(
+                            width: 172 * scale,
+                            height: 13 * scale,
+                            color: color,
+                          ),
+                          SizedBox(height: 6 * scale),
+                          _ParentSkeletonLine(
+                            width: 112 * scale,
+                            height: 8 * scale,
+                            color: color,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (index < 2) SizedBox(height: 8 * scale),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ParentAssessmentSkeletonPulse extends StatefulWidget {
+  const _ParentAssessmentSkeletonPulse({required this.builder});
+
+  final Widget Function(BuildContext context, Color color) builder;
+
+  @override
+  State<_ParentAssessmentSkeletonPulse> createState() =>
+      _ParentAssessmentSkeletonPulseState();
+}
+
+class _ParentAssessmentSkeletonPulseState
+    extends State<_ParentAssessmentSkeletonPulse>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) => widget.builder(
+        context,
+        Color.lerp(
+          const Color(0xFFF0F4F3),
+          const Color(0xFFDCE7E5),
+          _controller.value,
+        )!,
       ),
     );
   }
