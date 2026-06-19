@@ -1,4 +1,3 @@
-import 'package:numi_flutter/core/config/api_config.dart';
 import 'package:numi_flutter/core/network/chapter_models.dart';
 import 'package:numi_flutter/core/network/network_client.dart';
 
@@ -24,8 +23,10 @@ class ChapterApi implements ChapterService {
   ChapterApi({
     String? baseUrl,
     NetworkApi? networkApi,
-  }) : _networkApi =
-            networkApi ?? NetworkApi(baseUrl: baseUrl ?? ApiConfig.baseUrl);
+  }) : _networkApi = networkApi ??
+            (baseUrl == null
+                ? NetworkApi.shared
+                : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 

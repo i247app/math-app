@@ -35,7 +35,7 @@ class NetworkClient {
     AppApiMetadataProvider? metadataProvider,
   })  : _baseUrl = _normalizeBaseUrl(baseUrl ?? ApiConfig.baseUrl),
         _dio = dio ?? Dio(),
-        _authTokenStore = authTokenStore ?? const SecureAuthTokenStore(),
+        _authTokenStore = authTokenStore ?? CachedAuthTokenStore.instance,
         _metadataProvider =
             metadataProvider ?? AppApiMetadataProvider.instance {
     _dio.options
@@ -225,6 +225,10 @@ class NetworkClient {
 }
 
 class NetworkApi {
+  static final NetworkApi shared = NetworkApi._shared();
+
+  NetworkApi._shared() : _networkClient = NetworkClient();
+
   NetworkApi({
     String? baseUrl,
     NetworkClient? networkClient,

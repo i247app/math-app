@@ -1,4 +1,3 @@
-import 'package:numi_flutter/core/config/api_config.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/network_client.dart';
 
@@ -60,8 +59,10 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
   ClassroomExerciseApi({
     String? baseUrl,
     NetworkApi? networkApi,
-  }) : _networkApi =
-            networkApi ?? NetworkApi(baseUrl: baseUrl ?? ApiConfig.baseUrl);
+  }) : _networkApi = networkApi ??
+            (baseUrl == null
+                ? NetworkApi.shared
+                : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 

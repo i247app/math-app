@@ -1,4 +1,3 @@
-import 'package:numi_flutter/core/config/api_config.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/network_client.dart';
@@ -22,8 +21,10 @@ class GradeApi implements GradeService {
   GradeApi({
     String? baseUrl,
     NetworkApi? networkApi,
-  }) : _networkApi =
-            networkApi ?? NetworkApi(baseUrl: baseUrl ?? ApiConfig.baseUrl);
+  }) : _networkApi = networkApi ??
+            (baseUrl == null
+                ? NetworkApi.shared
+                : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 

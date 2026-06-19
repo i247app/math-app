@@ -1,4 +1,3 @@
-import 'package:numi_flutter/core/config/api_config.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/auth_models.dart';
@@ -162,8 +161,10 @@ class OtpAuthApi implements OtpAuthService {
   OtpAuthApi({
     String? baseUrl,
     NetworkApi? networkApi,
-  }) : _networkApi =
-            networkApi ?? NetworkApi(baseUrl: baseUrl ?? ApiConfig.baseUrl);
+  }) : _networkApi = networkApi ??
+            (baseUrl == null
+                ? NetworkApi.shared
+                : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
   final Map<String, LoginUser> _loginUsers = {};
