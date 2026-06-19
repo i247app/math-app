@@ -280,7 +280,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
 
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 240),
+      duration: _homeFadeInDuration,
       curve: Curves.easeOut,
       onEnd: _markInitialEntrancePlayed,
       builder: (context, value, animatedChild) {
@@ -389,7 +389,7 @@ class _ParentReviewTabBanner extends StatelessWidget {
               }
               return TweenAnimationBuilder<double>(
                 tween: Tween<double>(begin: 0, end: 1),
-                duration: const Duration(milliseconds: 240),
+                duration: _homeFadeInDuration,
                 curve: Curves.easeOut,
                 builder: (context, value, animatedChild) => Opacity(
                   opacity: value,

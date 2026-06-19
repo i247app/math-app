@@ -341,7 +341,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     }
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 850),
+      duration: _homeFadeInDuration,
       curve: Curves.easeOutQuart,
       onEnd: onEnd,
       builder: (context, value, animatedChild) => Opacity(

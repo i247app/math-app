@@ -66,6 +66,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   int _childLoadRequestId = 0;
   bool _hasPlayedModeOneEntrance = false;
   bool _hasPlayedModeTwoEntrance = false;
+  bool _hasPlayedModeThreeEntrance = false;
 
   @override
   void initState() {
@@ -281,7 +282,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 850),
+      duration: _homeFadeInDuration,
       curve: Curves.easeOutQuart,
       onEnd: _markModeOneEntrancePlayed,
       builder: (context, value, animatedChild) {
@@ -315,7 +316,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 850),
+      duration: _homeFadeInDuration,
       curve: Curves.easeOutQuart,
       onEnd: _markModeTwoEntrancePlayed,
       builder: (context, value, animatedChild) {
@@ -340,6 +341,40 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       return;
     }
     setState(() => _hasPlayedModeTwoEntrance = true);
+  }
+
+  Widget _modeThreeFadeIn({required Widget child}) {
+    if (_hasPlayedModeThreeEntrance) {
+      return child;
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: _homeFadeInDuration,
+      curve: Curves.easeOutQuart,
+      onEnd: _markModeThreeEntrancePlayed,
+      builder: (context, value, animatedChild) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 14 * (1 - value)),
+            child: Transform.scale(
+              scale: 0.985 + 0.015 * value,
+              alignment: Alignment.topCenter,
+              child: animatedChild,
+            ),
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  void _markModeThreeEntrancePlayed() {
+    if (!mounted || _hasPlayedModeThreeEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedModeThreeEntrance = true);
   }
 
   @override
@@ -440,26 +475,34 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
           children: [
             if (_isLoading && summaries.isEmpty && !_hasLoadedHome)
               const _ParentChildDashboardLoading()
-            else ...[
-              _ParentChildrenGrid(summaries: summaries),
-              const SizedBox(height: 14),
-              for (final item in assessments.take(2)) ...[
-                _ParentAssessmentResultCard(
-                  quiz: item.quiz,
-                  profileName: homeProfileDisplayName(
-                    context,
-                    item.summary.profile,
-                  ),
-                  classroomName: _parentClassroomName(
-                    context,
-                    item.summary,
-                  ),
-                  onTap: () => _openQuizReview(item.quiz),
+            else
+              _modeThreeFadeIn(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _ParentChildrenGrid(summaries: summaries),
+                    const SizedBox(height: 14),
+                    for (final item in assessments.take(2)) ...[
+                      _ParentAssessmentResultCard(
+                        quiz: item.quiz,
+                        profileName: homeProfileDisplayName(
+                          context,
+                          item.summary.profile,
+                        ),
+                        classroomName: _parentClassroomName(
+                          context,
+                          item.summary,
+                        ),
+                        onTap: () => _openQuizReview(item.quiz),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                    _ParentTeacherMessages(
+                      summaries: summaries.take(2).toList(),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
-              ],
-              _ParentTeacherMessages(summaries: summaries.take(2).toList()),
-            ],
+              ),
             if (_isLoading && summaries.isNotEmpty) ...[
               const SizedBox(height: 8),
               const _ParentHomeRefreshLabel(),

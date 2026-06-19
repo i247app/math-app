@@ -79,6 +79,7 @@ const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
 const _homeTeacherAvatarOne = 'assets/images/student_home_avatar.png';
 const _homeTeacherAvatarTwo = 'assets/images/student_class_teacher.png';
 const _homeProfileSwitchMinimumDuration = Duration(milliseconds: 1500);
+const _homeFadeInDuration = Duration(milliseconds: 1000);
 
 enum _HomeTabDestination {
   home,
