@@ -255,7 +255,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                               scale: scale,
                               onTap: () => _openQuizReview(entry.quiz),
                             ),
-                            SizedBox(height: 8 * scale),
+                            SizedBox(height: 14 * scale),
                           ],
                         ],
                       ),
@@ -413,17 +413,22 @@ class _ParentAssessmentListSkeleton extends StatelessWidget {
         children: [
           for (var index = 0; index < 3; index++) ...[
             _ParentSkeletonBlock(
-              height: 68 * scale,
-              radius: 14 * scale,
+              height: 116 * scale,
+              radius: 24 * scale,
               color: color,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 14 * scale),
+                padding: EdgeInsets.fromLTRB(
+                  16 * scale,
+                  14 * scale,
+                  16 * scale,
+                  14 * scale,
+                ),
                 child: Row(
                   children: [
                     _ParentSkeletonBlock(
-                      width: 47 * scale,
-                      height: 47 * scale,
-                      radius: 24 * scale,
+                      width: 54 * scale,
+                      height: 54 * scale,
+                      radius: 27 * scale,
                       color: color,
                     ),
                     SizedBox(width: 12 * scale),
@@ -433,13 +438,13 @@ class _ParentAssessmentListSkeleton extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _ParentSkeletonLine(
-                            width: 78 * scale,
+                            width: 136 * scale,
                             height: 8 * scale,
                             color: color,
                           ),
                           SizedBox(height: 7 * scale),
                           _ParentSkeletonLine(
-                            width: 172 * scale,
+                            width: 176 * scale,
                             height: 13 * scale,
                             color: color,
                           ),
@@ -456,7 +461,7 @@ class _ParentAssessmentListSkeleton extends StatelessWidget {
                 ),
               ),
             ),
-            if (index < 2) SizedBox(height: 8 * scale),
+            if (index < 2) SizedBox(height: 14 * scale),
           ],
         ],
       ),
@@ -752,113 +757,95 @@ class _ParentAssessmentTabCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final percent = (entry.quiz.grading?.scorePercentage ?? 0).clamp(0, 100);
-    final score = (percent / 10).round();
-    final scoreColor =
-        score >= 8 ? const Color(0xFF087D47) : const Color(0xFFFF6B17);
+    final percent = entry.quiz.grading?.scorePercentage;
+    final scoreStyle = _parentAssessmentScoreStyle(context, percent);
+    final dateParts = _parentAssessmentDateParts(entry.quiz.createDt);
     final shortText = _parentQuizShortText(entry.quiz);
+    final radius = BorderRadius.circular(24 * scale);
 
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(14 * scale),
-      clipBehavior: Clip.antiAlias,
+      borderRadius: radius,
       child: InkWell(
         onTap: onTap,
+        borderRadius: radius,
         child: Container(
-          constraints: BoxConstraints(minHeight: 68 * scale),
+          constraints: BoxConstraints(minHeight: 116 * scale),
           padding: EdgeInsets.fromLTRB(
+            16 * scale,
             14 * scale,
-            9 * scale,
-            11 * scale,
-            9 * scale,
+            10 * scale,
+            14 * scale,
           ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14 * scale),
-            border: Border.all(color: const Color(0xFFE9E4E4)),
+            color: Colors.white,
+            borderRadius: radius,
+            border: Border.all(
+              color: const Color(0xFFE3DDDF),
+              width: 1.3 * scale,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8 * scale,
-                offset: Offset(0, 3 * scale),
+                color: Colors.black.withValues(alpha: 0.07),
+                blurRadius: 12 * scale,
+                offset: Offset(0, 4 * scale),
               ),
             ],
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 47 * scale,
-                height: 47 * scale,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    CircularProgressIndicator(
-                      value: math.max(percent / 100, 0.08),
-                      strokeWidth: 4.5 * scale,
-                      backgroundColor: scoreColor.withValues(alpha: 0.12),
-                      color: scoreColor,
-                      strokeCap: StrokeCap.round,
-                    ),
-                    Center(
-                      child: Text(
-                        '$score',
-                        style: TextStyle(
-                          color: scoreColor,
-                          fontSize: FontSize.title * scale,
-                          fontWeight: FontWeight.w900,
-                          height: 1,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              _ParentAssessmentScoreBadge(
+                percentage: percent,
+                color: scoreStyle.color,
+                label: scoreStyle.label,
+                scale: scale,
               ),
               SizedBox(width: 12 * scale),
               Expanded(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Row(
+                    Wrap(
+                      spacing: 14 * scale,
+                      runSpacing: 5 * scale,
                       children: [
-                        Icon(
-                          Icons.calendar_month_outlined,
-                          color: const Color(0xFF575757),
-                          size: 14 * scale,
+                        _ParentAssessmentMetaItem(
+                          icon: Icons.calendar_month_outlined,
+                          label: dateParts.date,
+                          scale: scale,
                         ),
-                        SizedBox(width: 5 * scale),
-                        Text(
-                          _parentQuizDateLabel(entry.quiz),
-                          style: TextStyle(
-                            color: const Color(0xFF575757),
-                            fontSize: FontSize.caption * scale,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        _ParentAssessmentMetaItem(
+                          icon: Icons.schedule_rounded,
+                          label: dateParts.time,
+                          scale: scale,
                         ),
                       ],
                     ),
-                    SizedBox(height: 2 * scale),
+                    SizedBox(height: 7 * scale),
                     Text(
                       _parentQuizTitle(context, entry.quiz),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: const Color(0xFF17252B),
                         fontSize: FontSize.normal * scale,
-                        fontWeight: FontWeight.w900,
-                        height: 1.1,
+                        fontWeight: FontWeight.w800,
+                        height: 1.28,
                       ),
                     ),
                     if (shortText != null) ...[
-                      SizedBox(height: 3 * scale),
+                      SizedBox(height: 4 * scale),
                       Text(
                         shortText,
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: const Color(0xFF6D5C58),
+                          color: const Color(0xFF5D4A54),
                           fontSize: FontSize.small * scale,
                           fontWeight: FontWeight.w500,
-                          height: 1.15,
+                          height: 1.22,
                         ),
                       ),
                     ],
@@ -867,8 +854,8 @@ class _ParentAssessmentTabCard extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: const Color(0xFF91A7C2),
-                size: 22 * scale,
+                color: const Color(0xFF083B78),
+                size: 26 * scale,
               ),
             ],
           ),
@@ -876,6 +863,147 @@ class _ParentAssessmentTabCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ParentAssessmentScoreBadge extends StatelessWidget {
+  const _ParentAssessmentScoreBadge({
+    required this.percentage,
+    required this.color,
+    required this.label,
+    required this.scale,
+  });
+
+  final int? percentage;
+  final Color color;
+  final String label;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 56 * scale,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 48 * scale,
+            height: 48 * scale,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              border: Border.all(color: color, width: 5 * scale),
+            ),
+            alignment: Alignment.center,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                percentage == null ? '--' : '${(percentage! / 10).round()}/10',
+                maxLines: 1,
+                style: TextStyle(
+                  color: color,
+                  fontSize: FontSize.caption * scale,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 7 * scale),
+          Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: color,
+              fontSize: FontSize.caption * 0.77 * scale,
+              fontWeight: FontWeight.w900,
+              height: 1.05,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ParentAssessmentMetaItem extends StatelessWidget {
+  const _ParentAssessmentMetaItem({
+    required this.icon,
+    required this.label,
+    required this.scale,
+  });
+
+  final IconData icon;
+  final String label;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: const Color(0xFF5D4A54), size: 18 * scale),
+        SizedBox(width: 5 * scale),
+        Text(
+          label,
+          maxLines: 1,
+          style: TextStyle(
+            color: const Color(0xFF5D4A54),
+            fontSize: FontSize.caption * scale,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+({Color color, String label}) _parentAssessmentScoreStyle(
+  BuildContext context,
+  int? percentage,
+) {
+  if (percentage == null) {
+    return (
+      color: const Color(0xFFDE8C4B),
+      label: context.getText(AppKeys.incomplete),
+    );
+  }
+  final score = (percentage / 10).round();
+  if (score >= 9) {
+    return (
+      color: const Color(0xFF0A8A4D),
+      label: context.getText(AppKeys.excellent),
+    );
+  }
+  if (score >= 7) {
+    return (
+      color: const Color(0xFFF4B62D),
+      label: context.getText(AppKeys.good),
+    );
+  }
+  if (score >= 5) {
+    return (
+      color: const Color.fromARGB(255, 244, 135, 45),
+      label: context.getText(AppKeys.niceTry),
+    );
+  }
+  return (
+    color: const Color(0xFFD71920),
+    label: context.getText(AppKeys.failed),
+  );
+}
+
+({String date, String time}) _parentAssessmentDateParts(String? isoDate) {
+  final parsed = DateTime.tryParse(isoDate ?? '')?.toLocal();
+  if (parsed == null) {
+    return (date: '--/--/----', time: '--:--');
+  }
+  String twoDigits(int value) => value.toString().padLeft(2, '0');
+  return (
+    date: '${twoDigits(parsed.day)}/${twoDigits(parsed.month)}/${parsed.year}',
+    time: '${twoDigits(parsed.hour)}:${twoDigits(parsed.minute)}',
+  );
 }
 
 class _ParentAssessmentStateCard extends StatelessWidget {
