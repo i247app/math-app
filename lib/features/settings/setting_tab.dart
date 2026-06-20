@@ -69,9 +69,10 @@ enum SettingPageView { settings, account, profile, addProfile }
 class _SettingsDepthRoute<T> extends PageRouteBuilder<T> {
   _SettingsDepthRoute({required WidgetBuilder builder})
       : super(
-          transitionDuration: const Duration(milliseconds: 520),
-          reverseTransitionDuration: const Duration(milliseconds: 480),
+          transitionDuration: const Duration(milliseconds: 420),
+          reverseTransitionDuration: const Duration(milliseconds: 380),
           opaque: false,
+          allowSnapshotting: false,
           pageBuilder: (context, animation, secondaryAnimation) =>
               builder(context),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -86,14 +87,7 @@ class _SettingsDepthRoute<T> extends PageRouteBuilder<T> {
                 if (isReversing) {
                   return Opacity(opacity: progress, child: child);
                 }
-
-                final scaleProgress =
-                    Curves.easeInOutCubic.transform(animation.value);
-                return Transform.scale(
-                  scale: 0.72 + (0.28 * scaleProgress),
-                  alignment: Alignment.center,
-                  child: child,
-                );
+                return child ?? const SizedBox.shrink();
               },
             );
           },
@@ -603,7 +597,9 @@ class _SettingTabState extends State<SettingTab> {
     StudentProfile? editingProfile,
     bool openAddProfileOnStart = false,
   }) async {
-    HapticFeedback.selectionClick();
+    if (view != SettingPageView.account) {
+      HapticFeedback.selectionClick();
+    }
     if (_isEditing) {
       _restoreEditSnapshot();
     }

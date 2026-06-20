@@ -24,27 +24,368 @@ class _SettingScreenArgs {
   final double scale;
 }
 
-class _SettingAccountScreen extends StatelessWidget {
+class _SettingAccountScreen extends StatefulWidget {
   const _SettingAccountScreen({required this.args});
 
   final _SettingScreenArgs args;
 
   @override
+  State<_SettingAccountScreen> createState() => _SettingAccountScreenState();
+}
+
+class _SettingAccountScreenState extends State<_SettingAccountScreen>
+    with SingleTickerProviderStateMixin {
+  final AvatarPickerService _avatarPicker = const AvatarPickerService();
+  final OtpAuthService _authService = OtpAuthApi();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+
+  LoginUser? _user;
+  bool _isEditing = false;
+  bool _isSaving = false;
+  bool _isPickingAvatar = false;
+  bool _isLoadingAccount = true;
+  bool _didSave = false;
+  String? _localAvatarPath;
+  String? _draftAvatarPath;
+  String? _snapshotUsername;
+  String? _snapshotPhone;
+  String? _snapshotEmail;
+  String? _snapshotAvatarPath;
+  late final AnimationController _entranceController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+    value: 0,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _user = widget.args.user;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _entranceController.forward();
+        _prepareAccount();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _entranceController.dispose();
+    super.dispose();
+  }
+
+  void _applyUser(LoginUser? user) {
+    _usernameController.text = _SettingTabState._fallbackUsername(user);
+    _phoneController.text = _SettingTabState._displayPhone(user?.phone);
+    _emailController.text = user?.email?.trim() ?? '';
+  }
+
+  Future<void> _prepareAccount() async {
+    final initialUser = widget.args.user;
+    final userFuture = initialUser != null
+        ? Future<LoginUser?>.value(initialUser)
+        : _authService.restoreSession();
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    try {
+      final user = await userFuture;
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _user = user;
+        _applyUser(user);
+        _isLoadingAccount = false;
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isLoadingAccount = false);
+      }
+    }
+  }
+
+  void _startEditing() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _snapshotUsername = _usernameController.text;
+      _snapshotPhone = _phoneController.text;
+      _snapshotEmail = _emailController.text;
+      _snapshotAvatarPath = _localAvatarPath;
+      _draftAvatarPath = _localAvatarPath;
+      _isEditing = true;
+    });
+  }
+
+  void _cancelEditing() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _usernameController.text = _snapshotUsername ?? _usernameController.text;
+      _phoneController.text = _snapshotPhone ?? _phoneController.text;
+      _emailController.text = _snapshotEmail ?? _emailController.text;
+      _localAvatarPath = _snapshotAvatarPath;
+      _draftAvatarPath = null;
+      _isEditing = false;
+      _isSaving = false;
+      _isPickingAvatar = false;
+    });
+    FocusScope.of(context).unfocus();
+  }
+
+  Future<void> _saveEditing() async {
+    final userId = _user?.id;
+    if (userId == null || userId <= 0) {
+      _showMessage(context.readText(AppKeys.missingAccount));
+      return;
+    }
+    final name = _usernameController.text.trim();
+    if (name.isEmpty) {
+      _showMessage(context.readText(AppKeys.accountNameRequired));
+      return;
+    }
+
+    HapticFeedback.mediumImpact();
+    setState(() => _isSaving = true);
+    try {
+      final avatarPath =
+          _draftAvatarPath != _snapshotAvatarPath ? _draftAvatarPath : null;
+      final updatedUser = await _authService.updateUser(
+        userId: userId,
+        name: name,
+        phone: _SettingTabState._normalizedPhone(_phoneController.text),
+        email: _SettingTabState._emptyToNull(_emailController.text),
+        avatarPath: avatarPath,
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _user = updatedUser;
+        _localAvatarPath = _draftAvatarPath;
+        _draftAvatarPath = null;
+        _isEditing = false;
+        _isPickingAvatar = false;
+        _isSaving = false;
+        _didSave = true;
+      });
+      FocusScope.of(context).unfocus();
+      _showMessage(context.readText(AppKeys.accountUpdated));
+    } on OtpAuthException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _isSaving = false);
+      _showMessage(error.message);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _isSaving = false);
+      _showMessage(context.readText(AppKeys.accountUpdateFailed));
+    }
+  }
+
+  Future<void> _pickAvatar() async {
+    if (!_isEditing || _isPickingAvatar) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() => _isPickingAvatar = true);
+    try {
+      final path = await _avatarPicker.pickAvatarPath();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        if (path != null) {
+          _draftAvatarPath = path;
+        }
+        _isPickingAvatar = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _isPickingAvatar = false);
+      _showMessage(context.readText(AppKeys.imagePickFailed));
+    }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void _close() {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).pop(_didSave);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return _SettingSafeScreen(
-      child: SettingTab.page(
-        user: args.user,
-        profiles: args.profiles,
-        activeProfile: args.activeProfile,
-        profileLoadError: args.profileLoadError,
-        onLogout: args.onLogout,
-        onActivateProfile: args.onActivateProfile,
-        onRefreshProfiles: args.onRefreshProfiles,
-        onProfileSaved: args.onProfileSaved,
-        bottomPadding: 0,
-        scale: args.scale,
-        initialView: SettingPageView.account,
-        isPushedPage: true,
+    final scale = widget.args.scale;
+    final screen = PopScope(
+      canPop: !_isSaving,
+      child: _SettingSafeScreen(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _SettingHeader(
+                title: context.getText(AppKeys.accountTitle),
+                canGoBack: true,
+                onBack: _close,
+                backgroundColor: Colors.white,
+                scale: scale,
+                topInset: 0,
+              ),
+              SizedBox(height: 36 * scale),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24 * scale),
+                child: _isLoadingAccount
+                    ? _AccountScreenSkeleton(scale: scale)
+                    : _AccountDetailsPanel(
+                        avatarUrl: _user?.avatarUrl,
+                        avatarPath:
+                            _isEditing ? _draftAvatarPath : _localAvatarPath,
+                        usernameController: _usernameController,
+                        phoneController: _phoneController,
+                        emailController: _emailController,
+                        isEditing: _isEditing,
+                        isSaving: _isSaving,
+                        isPickingAvatar: _isPickingAvatar,
+                        onEdit: _startEditing,
+                        onSave: _saveEditing,
+                        onCancel: _cancelEditing,
+                        onAvatarTap: _pickAvatar,
+                        scale: scale,
+                      ),
+              ),
+              SizedBox(height: 24 * scale),
+            ],
+          ),
+        ),
+      ),
+    );
+    return AnimatedBuilder(
+      animation: _entranceController,
+      child: screen,
+      builder: (context, child) {
+        final scale = Curves.easeOutCubic.transform(
+          _entranceController.value,
+        );
+        return Transform.scale(
+          scale: 0.97 + 0.03 * scale,
+          alignment: Alignment.center,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+class _AccountScreenSkeleton extends StatefulWidget {
+  const _AccountScreenSkeleton({required this.scale});
+
+  final double scale;
+
+  @override
+  State<_AccountScreenSkeleton> createState() => _AccountScreenSkeletonState();
+}
+
+class _AccountScreenSkeletonState extends State<_AccountScreenSkeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = widget.scale;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) => ShaderMask(
+        blendMode: BlendMode.srcATop,
+        shaderCallback: (bounds) {
+          final shimmerWidth = bounds.width * 1.2;
+          final start = -shimmerWidth;
+          final dx = start + (bounds.width - start) * _controller.value;
+          return LinearGradient(
+            colors: [
+              Colors.white.withValues(alpha: 0),
+              Colors.white.withValues(alpha: 0.78),
+              Colors.white.withValues(alpha: 0),
+            ],
+            stops: const [0.28, 0.5, 0.72],
+          ).createShader(
+            Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height),
+          );
+        },
+        child: child,
+      ),
+      child: Column(
+        children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: _AccountSkeletonBlock(
+              width: 36 * scale,
+              height: 36 * scale,
+              radius: 10 * scale,
+            ),
+          ),
+          SizedBox(height: 10 * scale),
+          _AccountSkeletonBlock(
+            width: 126 * scale,
+            height: 126 * scale,
+            radius: 63 * scale,
+          ),
+          SizedBox(height: 24 * scale),
+          for (var index = 0; index < 3; index++) ...[
+            _AccountSkeletonBlock(
+              height: 68 * scale,
+              radius: 16 * scale,
+            ),
+            if (index < 2) SizedBox(height: 20 * scale),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountSkeletonBlock extends StatelessWidget {
+  const _AccountSkeletonBlock({
+    this.width,
+    required this.height,
+    required this.radius,
+  });
+
+  final double? width;
+  final double height;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8EEF0),
+        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }
