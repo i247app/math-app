@@ -5,6 +5,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/games/presentation/numi_farm_stage_screen.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/quiz/practice_catalog.dart';
 import 'package:numi_flutter/features/quiz/presentation/practice_chapter_screen.dart';
@@ -45,6 +46,7 @@ class _GamesTabState extends State<GamesTab> {
   _GamePreview? _selectedGame;
   bool _isLoadingGrades = false;
   String? _gradeError;
+  int _farmCompletedStages = 0;
 
   _GamesStep get _step {
     if (_selectedGrade == null) {
@@ -73,6 +75,7 @@ class _GamesTabState extends State<GamesTab> {
       _grades = widget.initialGrades;
       _selectedGrade = _preferredGrade(_grades);
       _selectedGame = null;
+      _farmCompletedStages = 0;
       if (_grades.isEmpty) {
         _loadGrades();
       }
@@ -154,6 +157,7 @@ class _GamesTabState extends State<GamesTab> {
     setState(() {
       _selectedGrade = grade;
       _selectedGame = null;
+      _farmCompletedStages = 0;
     });
   }
 
@@ -175,8 +179,30 @@ class _GamesTabState extends State<GamesTab> {
     setState(() => _selectedGame = null);
   }
 
-  void _openLevel(PracticeLesson lesson) {
+  Future<void> _openLevel(PracticeLesson lesson) async {
     HapticFeedback.lightImpact();
+    if (_selectedGame?.id == 'journey-1' &&
+        lesson.number >= 1 &&
+        lesson.number <= 5) {
+      final stageScreen = lesson.number <= 2
+          ? NumiFarmHarvestStageScreen(stage: lesson.number)
+          : NumiFarmChoiceStageScreen(stage: lesson.number);
+      final completed = await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => stageScreen,
+        ),
+      );
+      if (completed == true &&
+          mounted &&
+          _farmCompletedStages < lesson.number) {
+        setState(() => _farmCompletedStages = lesson.number);
+      }
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -226,9 +252,13 @@ class _GamesTabState extends State<GamesTab> {
             onSelected: _selectGame,
           ),
         _GamesStep.map => _GamesMap(
-            key: ValueKey('games-map-${_selectedGame!.id}'),
+            key: ValueKey(
+              'games-map-${_selectedGame!.id}-$_farmCompletedStages',
+            ),
             game: _selectedGame!,
             grade: _selectedGrade!,
+            completedStages:
+                _selectedGame!.id == 'journey-1' ? _farmCompletedStages : 0,
             bottomPadding: widget.bottomPadding,
             onBack: _backToGames,
             onLevelTap: _openLevel,
@@ -452,6 +482,7 @@ class _GamesMap extends StatelessWidget {
     super.key,
     required this.game,
     required this.grade,
+    required this.completedStages,
     required this.bottomPadding,
     required this.onBack,
     required this.onLevelTap,
@@ -459,6 +490,7 @@ class _GamesMap extends StatelessWidget {
 
   final _GamePreview game;
   final GradeModel grade;
+  final int completedStages;
   final double bottomPadding;
   final VoidCallback onBack;
   final ValueChanged<PracticeLesson> onLevelTap;
@@ -481,36 +513,17 @@ class _GamesMap extends StatelessWidget {
       title: game.title,
       description: grade.label,
       lessons: lessons,
-      completedLessons: 0,
+      completedLessons: completedStages,
       icon: '🎮',
     );
 
-    return Stack(
-      children: [
-        PracticeChapterScreen(
-          chapter: chapter,
-          embedded: true,
-          bottomPadding: bottomPadding,
-          onLessonTap: onLevelTap,
-        ),
-        SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 12, top: 12),
-            child: Material(
-              color: Colors.white.withValues(alpha: 0.94),
-              shape: const CircleBorder(),
-              elevation: 2,
-              child: IconButton(
-                onPressed: onBack,
-                icon: const Icon(Icons.arrow_back_rounded),
-                color: _gamesTeal,
-                tooltip: context.getText(AppKeys.back),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return PracticeChapterScreen(
+      chapter: chapter,
+      embedded: true,
+      bottomPadding: bottomPadding,
+      onLessonTap: onLevelTap,
+      onEmbeddedBack: onBack,
+      showEmbeddedChapterLabel: false,
     );
   }
 }
@@ -1007,7 +1020,7 @@ List<_GamePreview> _gamePreviews(BuildContext context) => [
       _GamePreview(
         id: 'journey-1',
         title: context.getText(AppKeys.gamesJourneyOne),
-        assetPath: 'assets/images/map_welcome_new.png',
+        assetPath: 'assets/images/game_numi_farm_banner.png',
         background: const Color(0xFFDDF3EE),
         accent: _gamesTeal,
       ),

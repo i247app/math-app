@@ -28,12 +28,16 @@ class PracticeChapterScreen extends StatefulWidget {
     this.embedded = false,
     this.bottomPadding = 0,
     this.onLessonTap,
+    this.onEmbeddedBack,
+    this.showEmbeddedChapterLabel = true,
   });
 
   final PracticeChapter chapter;
   final bool embedded;
   final double bottomPadding;
   final ValueChanged<PracticeLesson>? onLessonTap;
+  final VoidCallback? onEmbeddedBack;
+  final bool showEmbeddedChapterLabel;
 
   static const _designWidth = 390.0;
 
@@ -123,6 +127,8 @@ class _PracticeChapterScreenState extends State<PracticeChapterScreen>
                     chapter: widget.chapter,
                     lesson: widget.chapter.lessons[_currentIndex],
                     scale: scale,
+                    onBack: widget.onEmbeddedBack,
+                    showChapterLabel: widget.showEmbeddedChapterLabel,
                   )
                 else
                   _ChapterHeader(chapter: widget.chapter, scale: scale),
@@ -172,11 +178,15 @@ class _LearningPathHeader extends StatelessWidget {
     required this.chapter,
     required this.lesson,
     required this.scale,
+    this.onBack,
+    this.showChapterLabel = true,
   });
 
   final PracticeChapter chapter;
   final PracticeLesson lesson;
   final double scale;
+  final VoidCallback? onBack;
+  final bool showChapterLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -201,10 +211,34 @@ class _LearningPathHeader extends StatelessWidget {
         ),
         child: Row(
           children: [
+            if (onBack != null)
+              Padding(
+                padding: EdgeInsets.only(left: 12 * scale),
+                child: Material(
+                  color: Colors.white.withValues(alpha: 0.94),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      onBack!();
+                    },
+                    customBorder: const CircleBorder(),
+                    child: SizedBox(
+                      width: 42 * scale,
+                      height: 42 * scale,
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: _headerTeal,
+                        size: 24 * scale,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
-                  22 * scale,
+                  (onBack == null ? 22 : 12) * scale,
                   16 * scale,
                   14 * scale,
                   16 * scale,
@@ -213,24 +247,26 @@ class _LearningPathHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      context.formatText(
-                        AppKeys.learningPathChapterLesson,
-                        {
-                          'chapter': chapter.number,
-                          'lesson': lesson.number,
-                        },
+                    if (showChapterLabel) ...[
+                      Text(
+                        context.formatText(
+                          AppKeys.learningPathChapterLesson,
+                          {
+                            'chapter': chapter.number,
+                            'lesson': lesson.number,
+                          },
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.andika(
+                          color: Colors.white.withValues(alpha: 0.78),
+                          fontSize: 14 * scale,
+                          fontWeight: FontWeight.w700,
+                          height: 1.1,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.andika(
-                        color: Colors.white.withValues(alpha: 0.78),
-                        fontSize: 14 * scale,
-                        fontWeight: FontWeight.w700,
-                        height: 1.1,
-                      ),
-                    ),
-                    SizedBox(height: 6 * scale),
+                      SizedBox(height: 6 * scale),
+                    ],
                     Text(
                       lesson.title,
                       maxLines: 2,
@@ -569,8 +605,6 @@ class _LessonNode extends StatelessWidget {
           if (_current)
             Positioned(
               top: 0,
-              left: 5 * scale,
-              right: 5 * scale,
               child: _CurrentLessonBubble(
                 title: lesson.title,
                 scale: scale,
@@ -619,11 +653,13 @@ class _CurrentLessonBubble extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: double.infinity,
-          constraints: BoxConstraints(minHeight: 48 * scale),
+          constraints: BoxConstraints(
+            minHeight: 48 * scale,
+            maxWidth: 190 * scale,
+          ),
           padding: EdgeInsets.symmetric(
-            horizontal: 14 * scale,
-            vertical: 8 * scale,
+            horizontal: 20 * scale,
+            vertical: 10 * scale,
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -650,7 +686,7 @@ class _CurrentLessonBubble extends StatelessWidget {
               color: _pathBlue,
               fontSize: 14 * scale,
               fontWeight: FontWeight.w700,
-              height: 1.08,
+              height: 1.3,
             ),
           ),
         ),
