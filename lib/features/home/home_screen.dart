@@ -40,6 +40,9 @@ import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart'
 import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
 
 part 'parent/parent_dashboard.dart';
+part 'parent/parent_home_first_assessment.dart';
+part 'parent/parent_home_completed_assessment.dart';
+part 'parent/parent_home_child_dashboard.dart';
 part 'parent/parent_assessment_tab.dart';
 part 'parent/parent_room_tab.dart';
 part 'student/student_dashboard.dart';
