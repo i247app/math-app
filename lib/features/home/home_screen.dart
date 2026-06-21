@@ -41,6 +41,7 @@ import 'package:numi_flutter/features/classroom/widgets/student_class_search_con
 
 part 'parent/parent_dashboard.dart';
 part 'parent/parent_assessment_tab.dart';
+part 'parent/parent_room_tab.dart';
 part 'student/student_dashboard.dart';
 part 'teacher/teacher_dashboard.dart';
 
@@ -84,6 +85,7 @@ const _homeFadeInDuration = Duration(milliseconds: 900);
 enum _HomeTabDestination {
   home,
   classroom,
+  room,
   assessment,
   review,
   history,
@@ -218,8 +220,8 @@ class _HomeScreenState extends State<HomeScreen>
     final destination = switch (fromRole) {
       ProfileRole.parent => switch (currentIndex) {
           1 => _HomeTabDestination.assessment,
-          2 => _HomeTabDestination.review,
-          3 => _HomeTabDestination.history,
+          2 => _HomeTabDestination.room,
+          3 => _HomeTabDestination.review,
           4 => _HomeTabDestination.settings,
           _ => _HomeTabDestination.home,
         },
@@ -242,20 +244,20 @@ class _HomeScreenState extends State<HomeScreen>
     return switch (toRole) {
       ProfileRole.parent => switch (destination) {
           _HomeTabDestination.assessment => 1,
-          _HomeTabDestination.review => 2,
-          _HomeTabDestination.history => 3,
+          _HomeTabDestination.room || _HomeTabDestination.classroom => 2,
+          _HomeTabDestination.review => 3,
           _HomeTabDestination.settings => 4,
           _ => 0,
         },
       ProfileRole.student => switch (destination) {
-          _HomeTabDestination.classroom => 1,
+          _HomeTabDestination.classroom || _HomeTabDestination.room => 1,
           _HomeTabDestination.review => 2,
           _HomeTabDestination.history => 3,
           _HomeTabDestination.settings => 4,
           _ => 0,
         },
       ProfileRole.teacher => switch (destination) {
-          _HomeTabDestination.classroom => 1,
+          _HomeTabDestination.classroom || _HomeTabDestination.room => 1,
           _HomeTabDestination.study => 2,
           _HomeTabDestination.members => 3,
           _HomeTabDestination.settings => 4,
@@ -386,16 +388,18 @@ class _HomeScreenState extends State<HomeScreen>
                         setState(() {
                           _returnToReviewAfterProfileSave = false;
                         });
-                        homeCubit.selectTab(
-                          2,
-                        );
+                        homeCubit.selectTab(3);
                       },
                       openAddProfileRequestId: _openAddProfileRequestId,
                       onCompleteTeacherProfile: _openTeacherProfileForm,
-                      onOpenClassroomTab: () => homeCubit.selectTab(1),
+                      onOpenClassroomTab: () => homeCubit.selectTab(
+                        widget.activeRole == ProfileRole.parent ? 2 : 1,
+                      ),
                       onOpenReviewTab: () {
                         HapticFeedback.lightImpact();
-                        homeCubit.selectTab(2);
+                        homeCubit.selectTab(
+                          widget.activeRole == ProfileRole.parent ? 3 : 2,
+                        );
                       },
                       onOpenProfileMenu: () {
                         if (switchableProfiles.isEmpty || _isProfileMenuOpen) {
@@ -1315,13 +1319,13 @@ class _BottomNavigation extends StatelessWidget {
             null,
           ),
           _NavItemData(
-            Icons.explore_outlined,
-            context.getText(AppKeys.navProgram),
+            Icons.meeting_room_outlined,
+            context.getText(AppKeys.navRoom),
             null,
           ),
           _NavItemData(
-            Icons.history,
-            context.getText(AppKeys.navHistory),
+            Icons.sports_esports_rounded,
+            context.getText(AppKeys.navGames),
             null,
           ),
           _NavItemData(null, context.getText(AppKeys.navSettings), user),
@@ -1474,18 +1478,17 @@ class _AnimatedNavItem extends StatelessWidget {
                       SizedBox(height: 4 * scale),
                       SizedBox(
                         width: double.infinity,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            data.label,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: color,
-                              fontSize: FontSize.caption * 0.77 * scale,
-                              fontWeight: FontWeight.w900,
-                              height: 1,
-                              letterSpacing: 0.5,
-                            ),
+                        child: Text(
+                          data.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.andika(
+                            color: color,
+                            fontSize: FontSize.caption * 0.77 * scale,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),

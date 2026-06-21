@@ -19,6 +19,10 @@ class ParentDashboard extends StatelessWidget {
     }
 
     if (args.activeTab == 2) {
+      return ParentRoomTab(args: args);
+    }
+
+    if (args.activeTab == 3) {
       return ReviewTab(
         user: args.user,
         activeProfile: args.activeProfile,
@@ -26,16 +30,6 @@ class ParentDashboard extends StatelessWidget {
         profileLoadError: args.profileLoadError,
         onRefreshProfiles: args.onRefreshProfiles,
         onAddProfile: args.onAddProfileFromReview,
-        bottomPadding: args.bottomPadding,
-        scale: args.scale,
-        isActive: args.isActive,
-      );
-    }
-
-    if (args.activeTab == 3) {
-      return HistoryTab(
-        user: args.user,
-        activeProfile: args.activeProfile,
         bottomPadding: args.bottomPadding,
         scale: args.scale,
         isActive: args.isActive,
