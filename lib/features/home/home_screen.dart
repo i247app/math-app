@@ -25,6 +25,7 @@ import 'package:numi_flutter/features/home/parent/parent_home_cubit.dart';
 import 'package:numi_flutter/features/home/student/student_home_cubit.dart';
 import 'package:numi_flutter/features/home/teacher/teacher_home_cubit.dart';
 import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
+import 'package:numi_flutter/features/games/presentation/games_tab.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';

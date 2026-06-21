@@ -552,6 +552,21 @@ class AppStrings {
       AppKeys.gradeQuestionTitle: 'Bé đang học lớp\nmấy nhỉ?',
       AppKeys.generateTestFailed: 'Tạo test thất bại. Vui lòng thử lại sau.',
       AppKeys.noGrades: 'Chưa có lớp học nào để hiển thị.',
+      AppKeys.gamesGradeTitle: 'Chọn lớp để bắt đầu',
+      AppKeys.gamesGradeSubtitle:
+          'NUMI sẽ điều chỉnh nội dung và độ khó theo lớp của bé.',
+      AppKeys.gamesSelectGrade: 'Chọn lớp này',
+      AppKeys.gamesChooseTitle: 'Chọn một hành trình',
+      AppKeys.gamesChooseSubtitle:
+          'Chọn game để mở bản đồ cấp độ. Nội dung game sẽ được hoàn thiện sau.',
+      AppKeys.gamesPrototype: 'BẢN MẪU',
+      AppKeys.gamesLevelCount: '{count} cấp độ',
+      AppKeys.gamesLevelLabel: 'Cấp độ {level}',
+      AppKeys.gamesLevelComingSoon:
+          'Cấp độ {level} đã sẵn sàng cho game được chọn sau.',
+      AppKeys.gamesJourneyOne: 'Hành trình Numi 01',
+      AppKeys.gamesJourneyTwo: 'Hành trình Numi 02',
+      AppKeys.gamesJourneyThree: 'Hành trình Numi 03',
       AppKeys.createQuestionFailed: 'Không thể tạo câu hỏi. Vui lòng thử lại.',
       AppKeys.missingQuizToSubmit: 'Không tìm thấy bài test để nộp.',
       AppKeys.submitQuizFailed: 'Nộp bài thất bại. Vui lòng thử lại.',
@@ -1151,6 +1166,21 @@ class AppStrings {
       AppKeys.gradeQuestionTitle: 'Which grade is your\nchild in?',
       AppKeys.generateTestFailed: 'Failed to create test. Please try later.',
       AppKeys.noGrades: 'No grades to show.',
+      AppKeys.gamesGradeTitle: 'Choose a grade to begin',
+      AppKeys.gamesGradeSubtitle:
+          'NUMI will match the content and difficulty to the child\'s grade.',
+      AppKeys.gamesSelectGrade: 'Choose this grade',
+      AppKeys.gamesChooseTitle: 'Choose an adventure',
+      AppKeys.gamesChooseSubtitle:
+          'Choose a game to open its level map. Game content will be decided next.',
+      AppKeys.gamesPrototype: 'PROTOTYPE',
+      AppKeys.gamesLevelCount: '{count} levels',
+      AppKeys.gamesLevelLabel: 'Level {level}',
+      AppKeys.gamesLevelComingSoon:
+          'Level {level} is ready for the game we choose next.',
+      AppKeys.gamesJourneyOne: 'Numi Journey 01',
+      AppKeys.gamesJourneyTwo: 'Numi Journey 02',
+      AppKeys.gamesJourneyThree: 'Numi Journey 03',
       AppKeys.createQuestionFailed:
           'Could not create questions. Please try again.',
       AppKeys.missingQuizToSubmit: 'Could not find a test to submit.',

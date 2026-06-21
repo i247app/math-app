@@ -27,11 +27,13 @@ class PracticeChapterScreen extends StatefulWidget {
     required this.chapter,
     this.embedded = false,
     this.bottomPadding = 0,
+    this.onLessonTap,
   });
 
   final PracticeChapter chapter;
   final bool embedded;
   final double bottomPadding;
+  final ValueChanged<PracticeLesson>? onLessonTap;
 
   static const _designWidth = 390.0;
 
@@ -133,6 +135,7 @@ class _PracticeChapterScreenState extends State<PracticeChapterScreen>
                     currentIndex: _currentIndex,
                     onLayoutReady: _scheduleScrollToCurrent,
                     onCompletedLessonTap: _showCompletedLessonReview,
+                    onLessonTap: widget.onLessonTap,
                     bottomPadding: widget.bottomPadding,
                     scale: scale,
                   ),
@@ -381,6 +384,7 @@ class _LessonPath extends StatelessWidget {
     required this.currentIndex,
     required this.onLayoutReady,
     required this.onCompletedLessonTap,
+    this.onLessonTap,
     required this.bottomPadding,
     required this.scale,
   });
@@ -392,6 +396,7 @@ class _LessonPath extends StatelessWidget {
   final int currentIndex;
   final VoidCallback onLayoutReady;
   final ValueChanged<PracticeLesson> onCompletedLessonTap;
+  final ValueChanged<PracticeLesson>? onLessonTap;
   final double bottomPadding;
   final double scale;
 
@@ -445,6 +450,7 @@ class _LessonPath extends StatelessWidget {
                       index: index,
                       chapter: chapter,
                       onCompletedTap: onCompletedLessonTap,
+                      onLessonTap: onLessonTap,
                       scale: scale,
                     ),
                   ),
@@ -518,6 +524,7 @@ class _LessonNode extends StatelessWidget {
     required this.index,
     required this.chapter,
     required this.onCompletedTap,
+    this.onLessonTap,
     required this.scale,
   });
 
@@ -525,6 +532,7 @@ class _LessonNode extends StatelessWidget {
   final int index;
   final PracticeChapter chapter;
   final ValueChanged<PracticeLesson> onCompletedTap;
+  final ValueChanged<PracticeLesson>? onLessonTap;
   final double scale;
 
   bool get _completed => index < chapter.completedLessons;
@@ -572,6 +580,10 @@ class _LessonNode extends StatelessWidget {
             top: 64 * scale,
             child: GestureDetector(
               onTap: () {
+                if (!_locked && onLessonTap != null) {
+                  onLessonTap!(lesson);
+                  return;
+                }
                 if (_completed) {
                   onCompletedTap(lesson);
                   return;

@@ -23,16 +23,13 @@ class ParentDashboard extends StatelessWidget {
     }
 
     if (args.activeTab == 3) {
-      return ReviewTab(
-        user: args.user,
-        activeProfile: args.activeProfile,
-        isParentMode: true,
-        profileLoadError: args.profileLoadError,
-        onRefreshProfiles: args.onRefreshProfiles,
-        onAddProfile: args.onAddProfileFromReview,
+      return GamesTab(
+        userId: args.user?.id,
+        initialGrades: args.initialGrades,
+        gradeService: args.gradeService,
+        initialGradeId: _profileGradeId(args.activeProfile),
+        initialGradeLabel: args.activeProfile?.grade?.label,
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
-        isActive: args.isActive,
       );
     }
 
