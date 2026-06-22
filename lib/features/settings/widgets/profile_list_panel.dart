@@ -329,8 +329,7 @@ class _ParentInfoCard extends StatelessWidget {
                           children: [
                             Text(
                               _displayParentName(context, profile, user),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
                               style: GoogleFonts.andika(
                                 color: _deepInk,
                                 fontSize: FontSize.large * scale,
@@ -548,8 +547,7 @@ class _ParentChildProfileCard extends StatelessWidget {
                               Text(
                                 _ProfileCard._displayProfileName(
                                     context, profile),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                softWrap: true,
                                 style: GoogleFonts.andika(
                                   color: textColor,
                                   fontSize: FontSize.large * scale,
@@ -921,8 +919,7 @@ class _ProfileCard extends StatelessWidget {
                       children: [
                         Text(
                           _displayProfileName(context, profile),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
                           style: GoogleFonts.andika(
                             color: _deepInk,
                             fontSize: FontSize.large * scale,
