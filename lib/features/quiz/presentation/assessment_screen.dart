@@ -34,6 +34,7 @@ class AiAssessmentScreen extends StatefulWidget {
     this.gradeLabel,
     this.chapters,
     this.profileId,
+    this.onResultBack,
   });
 
   final QuizService? quizService;
@@ -43,6 +44,7 @@ class AiAssessmentScreen extends StatefulWidget {
   final String? gradeLabel;
   final List<String>? chapters;
   final int? profileId;
+  final VoidCallback? onResultBack;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -217,6 +219,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             quizService: _quizService,
             profileId: widget.profileId,
             onTestAgainGenerated: openGeneratedQuiz,
+            onBack: widget.onResultBack,
           ),
         ),
       );
@@ -268,6 +271,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           typeOfQuiz: generatedQuiz.typeOfQuiz ?? widget.typeOfQuiz,
           gradeLabel: widget.gradeLabel,
           profileId: widget.profileId,
+          onResultBack: widget.onResultBack,
         ),
       ),
     );

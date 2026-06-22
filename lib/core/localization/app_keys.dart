@@ -615,6 +615,9 @@ class AppKeys {
   static const testAgainCreateFailed = 'test_again_create_failed';
   static const testAgainDialogTitle = 'test_again_dialog_title';
   static const excellentResultTitle = 'excellent_result_title';
+  static const goodResultTitle = 'good_result_title';
+  static const completedResultTitle = 'completed_result_title';
+  static const incompleteResultTitle = 'incomplete_result_title';
   static const excellentResultMessage = 'excellent_result_message';
   static const generatingNewQuiz = 'generating_new_quiz';
   static const assessmentResultTitle = 'assessment_result_title';

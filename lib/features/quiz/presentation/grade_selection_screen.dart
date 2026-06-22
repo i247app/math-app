@@ -30,6 +30,7 @@ class GradeSelectionScreen extends StatefulWidget {
     this.profileId,
     this.initialGradeId,
     this.initialGradeLabel,
+    this.onResultBack,
   });
 
   final LoginUser? user;
@@ -39,6 +40,7 @@ class GradeSelectionScreen extends StatefulWidget {
   final int? profileId;
   final int? initialGradeId;
   final String? initialGradeLabel;
+  final VoidCallback? onResultBack;
 
   static const _designWidth = 390.0;
   static const _designHeight = 844.0;
@@ -139,6 +141,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
           typeOfQuiz: quizTypeGeneral,
           gradeLabel: gradeLabel,
           profileId: widget.profileId,
+          onResultBack: widget.onResultBack,
         ),
       ),
     );

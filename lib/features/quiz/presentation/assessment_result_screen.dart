@@ -13,6 +13,9 @@ import 'package:numi_flutter/features/quiz/quiz_api.dart';
 const _resultTeal = Color(0xFF006762);
 const _resultHeaderTeal = Color(0xFF38898C);
 const _resultScoreGreen = Color(0xFF006D36);
+const _resultScoreYellow = Color(0xFFD9A400);
+const _resultScoreOrange = Color(0xFFEF6C00);
+const _resultScoreRed = Color(0xFFD32F2F);
 const _resultInk = Color(0xFF253228);
 const _resultMuted = Color(0xFF515F54);
 const _resultCoral = Color(0xFFEC724F);
@@ -28,12 +31,14 @@ class AssessmentResultScreen extends StatefulWidget {
     this.quizService,
     this.profileId,
     this.onTestAgainGenerated,
+    this.onBack,
   });
 
   final GeneratedQuiz? quiz;
   final QuizService? quizService;
   final int? profileId;
   final ValueChanged<GeneratedQuiz>? onTestAgainGenerated;
+  final VoidCallback? onBack;
 
   @override
   State<AssessmentResultScreen> createState() => _AssessmentResultScreenState();
@@ -139,6 +144,16 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
     );
   }
 
+  void exitResult() {
+    HapticFeedback.mediumImpact();
+    final onBack = widget.onBack;
+    if (onBack != null) {
+      onBack();
+      return;
+    }
+    _exitToGradeSelection(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -155,7 +170,9 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
 
               double s(double value) => value * scale;
               final grading = widget.quiz?.grading;
-              final scoreText = _scoreText(grading);
+              final score = _scoreOutOf10(grading);
+              final scoreText = '$score/10';
+              final resultLevel = _resultLevel(score);
               final reviewText = _reviewText(grading);
 
               return Center(
@@ -175,7 +192,10 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               left: 0,
                               right: 0,
                               top: 0,
-                              child: _ResultHeader(scale: scale),
+                              child: _ResultHeader(
+                                scale: scale,
+                                onBack: exitResult,
+                              ),
                             ),
                             Positioned(
                               left: 0,
@@ -184,6 +204,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               child: _ScoreRing(
                                 scale: scale,
                                 scoreText: scoreText,
+                                accentColor: resultLevel.color,
                               ),
                             ),
                             Positioned(
@@ -191,10 +212,10 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               right: 0,
                               top: s(285),
                               child: Text(
-                                context.getText(AppKeys.excellentResultTitle),
+                                context.getText(resultLevel.titleKey),
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.andika(
-                                  color: _resultInk,
+                                  color: resultLevel.color,
                                   fontSize: 24 * scale,
                                   fontWeight: FontWeight.w800,
                                   height: 32 / 24,
@@ -319,9 +340,10 @@ class _TestAgainLoaderState extends State<_TestAgainLoader>
 }
 
 class _ResultHeader extends StatelessWidget {
-  const _ResultHeader({required this.scale});
+  const _ResultHeader({required this.scale, required this.onBack});
 
   final double scale;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -346,7 +368,7 @@ class _ResultHeader extends StatelessWidget {
             child: _HeaderIconButton(
               icon: Icons.arrow_back_rounded,
               scale: scale,
-              onTap: () => _exitToGradeSelection(context),
+              onTap: onBack,
             ),
           ),
           Text(
@@ -405,10 +427,12 @@ class _ScoreRing extends StatelessWidget {
   const _ScoreRing({
     required this.scale,
     required this.scoreText,
+    required this.accentColor,
   });
 
   final double scale;
   final String scoreText;
+  final Color accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -450,7 +474,7 @@ class _ScoreRing extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
-                border: Border.all(color: _resultTeal, width: 9 * scale),
+                border: Border.all(color: accentColor, width: 9 * scale),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -462,7 +486,7 @@ class _ScoreRing extends StatelessWidget {
                         TextSpan(
                           text: scoreValue,
                           style: GoogleFonts.andika(
-                            color: _resultScoreGreen,
+                            color: accentColor,
                             fontSize: 48 * scale,
                             fontWeight: FontWeight.w800,
                             height: 40 / 48,
@@ -779,7 +803,6 @@ class _ResultActionButton extends StatelessWidget {
 }
 
 void _exitToGradeSelection(BuildContext context) {
-  HapticFeedback.mediumImpact();
   final navigator = Navigator.of(context);
   if (navigator.canPop()) {
     navigator.pop();
@@ -789,14 +812,45 @@ void _exitToGradeSelection(BuildContext context) {
   }
 }
 
-String _scoreText(QuizGrading? grading) {
+int _scoreOutOf10(QuizGrading? grading) {
   final scorePercentage = grading?.scorePercentage;
   if (scorePercentage != null) {
-    final scoreOutOf10 = (scorePercentage / 10).round().clamp(0, 10);
-    return '$scoreOutOf10/10';
+    return (scorePercentage / 10).round().clamp(0, 10);
   }
 
-  return '10/10';
+  return 10;
+}
+
+_ResultLevel _resultLevel(int score) {
+  if (score >= 9) {
+    return const _ResultLevel(
+      titleKey: AppKeys.excellentResultTitle,
+      color: _resultScoreGreen,
+    );
+  }
+  if (score >= 7) {
+    return const _ResultLevel(
+      titleKey: AppKeys.goodResultTitle,
+      color: _resultScoreYellow,
+    );
+  }
+  if (score >= 5) {
+    return const _ResultLevel(
+      titleKey: AppKeys.completedResultTitle,
+      color: _resultScoreOrange,
+    );
+  }
+  return const _ResultLevel(
+    titleKey: AppKeys.incompleteResultTitle,
+    color: _resultScoreRed,
+  );
+}
+
+class _ResultLevel {
+  const _ResultLevel({required this.titleKey, required this.color});
+
+  final String titleKey;
+  final Color color;
 }
 
 String _reviewText(QuizGrading? grading) {

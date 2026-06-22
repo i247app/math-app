@@ -146,6 +146,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
 
   Future<void> _openAssessment() async {
     HapticFeedback.lightImpact();
+    final assessmentTabRoute = ModalRoute.of(context);
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => GradeSelectionScreen(
@@ -158,6 +159,17 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           ),
           initialGradeId: _profileGradeId(widget.args.activeProfile),
           initialGradeLabel: widget.args.activeProfile?.grade?.label,
+          onResultBack: () {
+            if (!mounted) {
+              return;
+            }
+            final navigator = Navigator.of(context);
+            if (assessmentTabRoute == null) {
+              navigator.popUntil((route) => route.isFirst);
+              return;
+            }
+            navigator.popUntil((route) => identical(route, assessmentTabRoute));
+          },
         ),
       ),
     );
