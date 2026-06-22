@@ -135,15 +135,25 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
   }
 
   StudentProfile? get _parentProfile {
-    if (activeProfile != null &&
-        ProfileRole.fromProfile(activeProfile) == ProfileRole.parent) {
-      return activeProfile;
+    final activeProfileId = ActiveProfileSession.profileStableId(activeProfile);
+    if (activeProfileId != null) {
+      for (final profile in profiles) {
+        if (ActiveProfileSession.profileStableId(profile) == activeProfileId &&
+            ProfileRole.fromProfile(profile) == ProfileRole.parent) {
+          return profile;
+        }
+      }
     }
 
     for (final profile in profiles) {
       if (ProfileRole.fromProfile(profile) == ProfileRole.parent) {
         return profile;
       }
+    }
+
+    if (activeProfile != null &&
+        ProfileRole.fromProfile(activeProfile) == ProfileRole.parent) {
+      return activeProfile;
     }
 
     return null;
