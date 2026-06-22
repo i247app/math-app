@@ -729,6 +729,9 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   void _openAddProfile() {
+    if (!_canCreateProfile) {
+      return;
+    }
     if (!widget._isPushedPage) {
       _pushView(
         SettingPageView.profile,
@@ -1617,6 +1620,7 @@ class _SettingTabState extends State<SettingTab> {
                                   onEdit: _openUpdateProfile,
                                   onDelete: _confirmDeleteProfile,
                                   scale: scale,
+                                  canAddProfile: _canCreateProfile,
                                 ),
                               SettingPageView.addProfile => _AddProfilePanel(
                                   key: ValueKey(
@@ -1818,6 +1822,23 @@ class _SettingTabState extends State<SettingTab> {
 
     final userRole = widget.user?.role?.trim().toUpperCase();
     return userRole == 'TEACHER' ? 'TEACHER' : 'STUDENT';
+  }
+
+  bool get _canCreateProfile {
+    final userRole = _effectiveUser?.role?.trim().toUpperCase();
+    if (userRole == 'STUDENT' || userRole?.endsWith('_STUDENT') == true) {
+      return false;
+    }
+    if (userRole == 'PARENT' ||
+        userRole == 'TEACHER' ||
+        userRole?.endsWith('_PARENT') == true ||
+        userRole?.endsWith('_TEACHER') == true) {
+      return true;
+    }
+
+    return _profiles.any(
+      (profile) => ProfileRole.fromProfile(profile) != ProfileRole.student,
+    );
   }
 
   void _applyProfileIdFields(StudentProfile profile) {

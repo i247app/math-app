@@ -15,6 +15,7 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.scale,
+    required this.canAddProfile,
   });
 
   final List<StudentProfile> profiles;
@@ -29,6 +30,7 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
   final ValueChanged<StudentProfile> onEdit;
   final ValueChanged<StudentProfile> onDelete;
   final double scale;
+  final bool canAddProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +63,9 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
         icon: Icons.groups_2_outlined,
         title: context.getText(AppKeys.noProfileTitle),
         message: context.getText(AppKeys.noProfileMessage),
-        buttonLabel: context.getText(AppKeys.addProfile),
+        buttonLabel: canAddProfile ? context.getText(AppKeys.addProfile) : null,
         scale: scale,
-        onTap: onAdd,
+        onTap: canAddProfile ? onAdd : null,
       );
     }
 
@@ -77,6 +79,7 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
         activeProfileId: activeProfileId,
         user: user,
         scale: scale,
+        canAddProfile: canAddProfile,
         onAdd: onAdd,
         onSelect: onSelect,
         onEdit: onEdit,
@@ -87,11 +90,13 @@ class _ProfilePlaceholderPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: _ProfileAddButton(scale: scale, onTap: onAdd),
-        ),
-        SizedBox(height: 10 * scale),
+        if (canAddProfile) ...[
+          Align(
+            alignment: Alignment.centerRight,
+            child: _ProfileAddButton(scale: scale, onTap: onAdd),
+          ),
+          SizedBox(height: 10 * scale),
+        ],
         for (var index = 0; index < sortedProfiles.length; index++) ...[
           _ProfileCard(
             profile: sortedProfiles[index],
@@ -163,6 +168,7 @@ class _ParentProfileManagePanel extends StatelessWidget {
     required this.onSelect,
     required this.onEdit,
     required this.onDelete,
+    required this.canAddProfile,
   });
 
   final StudentProfile parentProfile;
@@ -174,6 +180,7 @@ class _ParentProfileManagePanel extends StatelessWidget {
   final ValueChanged<StudentProfile> onSelect;
   final ValueChanged<StudentProfile> onEdit;
   final ValueChanged<StudentProfile> onDelete;
+  final bool canAddProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +225,7 @@ class _ParentProfileManagePanel extends StatelessWidget {
                 ),
               ),
             ),
-            _ProfileAddButton(scale: scale, onTap: onAdd),
+            if (canAddProfile) _ProfileAddButton(scale: scale, onTap: onAdd),
           ],
         ),
         SizedBox(height: 12 * scale),
@@ -227,9 +234,10 @@ class _ParentProfileManagePanel extends StatelessWidget {
             icon: Icons.groups_2_outlined,
             title: context.getText(AppKeys.noProfileTitle),
             message: context.getText(AppKeys.noProfileMessage),
-            buttonLabel: context.getText(AppKeys.addProfile),
+            buttonLabel:
+                canAddProfile ? context.getText(AppKeys.addProfile) : null,
             scale: scale,
-            onTap: onAdd,
+            onTap: canAddProfile ? onAdd : null,
           )
         else
           for (var index = 0; index < sortedChildren.length; index++) ...[
@@ -923,7 +931,12 @@ class _ProfileCard extends StatelessWidget {
                             letterSpacing: 0,
                           ),
                         ),
-                        SizedBox(height: 10 * scale),
+                        SizedBox(height: 5 * scale),
+                        _ManagedProfileRolePill(
+                          role: role,
+                          scale: scale,
+                        ),
+                        SizedBox(height: 9 * scale),
                         _ProfileIdLine(
                           profile: profile,
                           isActive: isActive,
@@ -935,14 +948,6 @@ class _ProfileCard extends StatelessWidget {
                   SizedBox(width: 10 * scale),
                   _ProfileRadio(isActive: isActive, scale: scale),
                 ],
-              ),
-              SizedBox(height: 14 * scale),
-              _ProfileInfoLine(
-                icon: _roleIcon(role),
-                iconColor: accent,
-                label: context.getText(AppKeys.profileRole),
-                value: _localizedRole(context, role),
-                scale: scale,
               ),
               SizedBox(height: 14 * scale),
               _ProfileInfoLine(
@@ -1023,14 +1028,6 @@ class _ProfileCard extends StatelessWidget {
         ? context.getText(AppKeys.notSelected)
         : school;
   }
-}
-
-IconData _roleIcon(ProfileRole role) {
-  return switch (role) {
-    ProfileRole.teacher => Icons.co_present_rounded,
-    ProfileRole.parent => Icons.family_restroom_rounded,
-    ProfileRole.student => Icons.person_rounded,
-  };
 }
 
 String _localizedRole(BuildContext context, ProfileRole role) {
@@ -1277,9 +1274,9 @@ class _ProfileStatePanel extends StatelessWidget {
   final IconData icon;
   final String title;
   final String message;
-  final String buttonLabel;
+  final String? buttonLabel;
   final double scale;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1320,31 +1317,33 @@ class _ProfileStatePanel extends StatelessWidget {
               letterSpacing: 0,
             ),
           ),
-          SizedBox(height: 20 * scale),
-          Material(
-            color: _navy,
-            borderRadius: BorderRadius.circular(999),
-            child: InkWell(
-              onTap: onTap,
+          if (buttonLabel != null && onTap != null) ...[
+            SizedBox(height: 20 * scale),
+            Material(
+              color: _navy,
               borderRadius: BorderRadius.circular(999),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 22 * scale,
-                  vertical: 12 * scale,
-                ),
-                child: Text(
-                  buttonLabel,
-                  style: GoogleFonts.andika(
-                    color: Colors.white,
-                    fontSize: FontSize.small * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 22 * scale,
+                    vertical: 12 * scale,
+                  ),
+                  child: Text(
+                    buttonLabel!,
+                    style: GoogleFonts.andika(
+                      color: Colors.white,
+                      fontSize: FontSize.small * scale,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
