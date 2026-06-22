@@ -558,7 +558,7 @@ class AppStrings {
       AppKeys.gamesSelectGrade: 'Chọn lớp này',
       AppKeys.gamesChooseTitle: 'Chọn một hành trình',
       AppKeys.gamesChooseSubtitle:
-          'Chọn game để mở bản đồ cấp độ. Nội dung game sẽ được hoàn thiện sau.',
+          'Chọn game để mở bản đồ và bắt đầu hành trình thử thách.',
       AppKeys.gamesPrototype: 'BẢN MẪU',
       AppKeys.gamesLevelCount: '{count} màn',
       AppKeys.gamesLevelLabel: 'Màn {level}',
@@ -577,6 +577,7 @@ class AppStrings {
       AppKeys.gamesFarmHarvestPrefix: 'Hãy hái',
       AppKeys.gamesFarmHarvestSuffix: 'củ cà rốt',
       AppKeys.gamesFarmCorrect: 'CHÍNH XÁC!',
+      AppKeys.gamesFarmIncorrect: 'CHƯA ĐÚNG!',
       AppKeys.gamesFarmBasketReady: 'Giỏ cà rốt đã đủ rồi!',
       AppKeys.gamesFarmComparePrompt: 'Chọn dấu đúng giữa hai giỏ',
       AppKeys.gamesFarmAdditionPrompt: 'Hai giỏ có tất cả bao nhiêu?',
@@ -589,6 +590,44 @@ class AppStrings {
       AppKeys.gamesFarmCompleteMessage:
           'Bé đã hoàn thành xuất sắc Màn {stage} của Nông trại Numi.',
       AppKeys.gamesFarmBackToMap: 'VỀ BẢN ĐỒ',
+      AppKeys.gamesFarmTime: 'Thời gian',
+      AppKeys.gamesFarmCorrectCount: 'Đúng',
+      AppKeys.gamesFarmWrongCount: 'Sai',
+      AppKeys.gamesSquadronTitle: 'Phi đội Toán học',
+      AppKeys.gamesSquadronLevelOne: 'Màn 1 · Tuần tra số học',
+      AppKeys.gamesSquadronLevelTwo: 'Màn 2 · Vành đai cửu chương',
+      AppKeys.gamesSquadronLevelThree: 'Màn 3 · BOSS Drone Nhân Chia',
+      AppKeys.gamesSquadronLevelFour: 'Màn 4 · Truy tìm ẩn số',
+      AppKeys.gamesSquadronLevelFive: 'Màn 5 · BOSS Pháo đài 1.000',
+      AppKeys.gamesSquadronLevelSix: 'Màn 6 · Cổng không-thời gian',
+      AppKeys.gamesSquadronLevelSeven: 'Màn 7 · BOSS Vua Thiên Thạch',
+      AppKeys.gamesSquadronBossLevel: 'BOSS · MÀN {level}',
+      AppKeys.gamesSquadronBossEnergy: 'NĂNG LƯỢNG BOSS',
+      AppKeys.gamesSquadronMission: 'CHẠM MỤC TIÊU ĐÚNG',
+      AppKeys.gamesSquadronComplete: 'Nhiệm vụ hoàn thành!',
+      AppKeys.gamesSquadronBossDefeated: 'Đã hạ Boss!',
+      AppKeys.gamesSquadronTryAgain: 'Phi thuyền cần sửa chữa!',
+      AppKeys.gamesSquadronLevelComplete:
+          'Bé đã hoàn thành Màn {level} của Phi đội Toán học.',
+      AppKeys.gamesSquadronNeedAccuracy:
+          'Cần trả lời đúng ít nhất 60% và giữ lại khiên để qua màn.',
+      AppKeys.gamesSquadronExitTitle: 'Rời nhiệm vụ?',
+      AppKeys.gamesSquadronExitMessage:
+          'Tiến độ của lượt chơi này sẽ không được lưu.',
+      AppKeys.gamesSquadronKeepPlaying: 'CHƠI TIẾP',
+      AppKeys.gamesSquadronFlightHint:
+          'Kéo tàu để né • Chọn đạn đáp án • Bắn thiên thạch',
+      AppKeys.gamesSquadronChooseAmmoFirst:
+          'Hãy chọn một viên đạn đáp án trước khi bắn!',
+      AppKeys.gamesSquadronFire: 'BẮN',
+      AppKeys.gamesSquadronSelectTarget:
+          'Chạm vào thiên thạch hoặc bộ phận boss để khóa mục tiêu!',
+      AppKeys.gamesSquadronCurrentAmmo: 'ĐẠN HIỆN TẠI',
+      AppKeys.gamesSquadronTargetLocked: 'Đã khóa mục tiêu • Sẵn sàng bắn',
+      AppKeys.gamesSquadronTapMeteor: 'Chạm vào một mục tiêu để ngắm',
+      AppKeys.gamesSquadronNextAmmo: 'Đạn kế tiếp: {ammo}',
+      AppKeys.gamesSquadronLaserWarning: 'CẢNH BÁO LASER • HÃY NÉ!',
+      AppKeys.gamesSquadronAimShip: 'Di chuyển tàu vào đúng làn rồi bắn thẳng',
       AppKeys.createQuestionFailed: 'Không thể tạo câu hỏi. Vui lòng thử lại.',
       AppKeys.missingQuizToSubmit: 'Không tìm thấy bài test để nộp.',
       AppKeys.submitQuizFailed: 'Nộp bài thất bại. Vui lòng thử lại.',
@@ -1197,7 +1236,7 @@ class AppStrings {
       AppKeys.gamesSelectGrade: 'Choose this grade',
       AppKeys.gamesChooseTitle: 'Choose an adventure',
       AppKeys.gamesChooseSubtitle:
-          'Choose a game to open its level map. Game content will be decided next.',
+          'Choose a game to open its map and begin the challenge.',
       AppKeys.gamesPrototype: 'PROTOTYPE',
       AppKeys.gamesLevelCount: '{count} stages',
       AppKeys.gamesLevelLabel: 'Stage {level}',
@@ -1216,6 +1255,7 @@ class AppStrings {
       AppKeys.gamesFarmHarvestPrefix: 'Pick',
       AppKeys.gamesFarmHarvestSuffix: 'carrots',
       AppKeys.gamesFarmCorrect: 'THAT\'S RIGHT!',
+      AppKeys.gamesFarmIncorrect: 'NOT QUITE!',
       AppKeys.gamesFarmBasketReady: 'The carrot basket is ready!',
       AppKeys.gamesFarmComparePrompt:
           'Choose the correct sign between the baskets',
@@ -1230,6 +1270,45 @@ class AppStrings {
       AppKeys.gamesFarmCompleteMessage:
           'You completed Stage {stage} of Numi Farm.',
       AppKeys.gamesFarmBackToMap: 'BACK TO MAP',
+      AppKeys.gamesFarmTime: 'Time',
+      AppKeys.gamesFarmCorrectCount: 'Correct',
+      AppKeys.gamesFarmWrongCount: 'Wrong',
+      AppKeys.gamesSquadronTitle: 'Math Squadron',
+      AppKeys.gamesSquadronLevelOne: 'Stage 1 · Number Patrol',
+      AppKeys.gamesSquadronLevelTwo: 'Stage 2 · Times-table Belt',
+      AppKeys.gamesSquadronLevelThree: 'Stage 3 · BOSS Multiply Drone',
+      AppKeys.gamesSquadronLevelFour: 'Stage 4 · Find the Unknown',
+      AppKeys.gamesSquadronLevelFive: 'Stage 5 · BOSS Fortress 1,000',
+      AppKeys.gamesSquadronLevelSix: 'Stage 6 · Space-time Gate',
+      AppKeys.gamesSquadronLevelSeven: 'Stage 7 · BOSS Meteor King',
+      AppKeys.gamesSquadronBossLevel: 'BOSS · STAGE {level}',
+      AppKeys.gamesSquadronBossEnergy: 'BOSS ENERGY',
+      AppKeys.gamesSquadronMission: 'TAP THE CORRECT TARGET',
+      AppKeys.gamesSquadronComplete: 'Mission complete!',
+      AppKeys.gamesSquadronBossDefeated: 'Boss defeated!',
+      AppKeys.gamesSquadronTryAgain: 'Ship needs repairs!',
+      AppKeys.gamesSquadronLevelComplete:
+          'You completed Stage {level} of Math Squadron.',
+      AppKeys.gamesSquadronNeedAccuracy:
+          'Answer at least 60% correctly and keep a shield to pass.',
+      AppKeys.gamesSquadronExitTitle: 'Leave mission?',
+      AppKeys.gamesSquadronExitMessage:
+          'Progress from this play session will not be saved.',
+      AppKeys.gamesSquadronKeepPlaying: 'KEEP PLAYING',
+      AppKeys.gamesSquadronFlightHint:
+          'Drag to dodge • Choose answer ammo • Fire',
+      AppKeys.gamesSquadronChooseAmmoFirst:
+          'Choose an answer charge before firing!',
+      AppKeys.gamesSquadronFire: 'FIRE',
+      AppKeys.gamesSquadronSelectTarget:
+          'Tap a meteor or boss part to lock the target!',
+      AppKeys.gamesSquadronCurrentAmmo: 'CURRENT AMMO',
+      AppKeys.gamesSquadronTargetLocked: 'Target locked • Ready to fire',
+      AppKeys.gamesSquadronTapMeteor: 'Tap a target to aim',
+      AppKeys.gamesSquadronNextAmmo: 'Next ammo: {ammo}',
+      AppKeys.gamesSquadronLaserWarning: 'LASER WARNING • DODGE!',
+      AppKeys.gamesSquadronAimShip:
+          'Move the ship into a lane and fire straight ahead',
       AppKeys.createQuestionFailed:
           'Could not create questions. Please try again.',
       AppKeys.missingQuizToSubmit: 'Could not find a test to submit.',

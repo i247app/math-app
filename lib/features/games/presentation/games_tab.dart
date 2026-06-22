@@ -5,6 +5,8 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/games/math_squadron/math_squadron_data.dart';
+import 'package:numi_flutter/features/games/presentation/math_squadron_stage_screen.dart';
 import 'package:numi_flutter/features/games/presentation/numi_farm_stage_screen.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/quiz/practice_catalog.dart';
@@ -47,6 +49,7 @@ class _GamesTabState extends State<GamesTab> {
   bool _isLoadingGrades = false;
   String? _gradeError;
   int _farmCompletedStages = 0;
+  int _squadronCompletedStages = 0;
 
   _GamesStep get _step {
     if (_selectedGrade == null) {
@@ -76,6 +79,7 @@ class _GamesTabState extends State<GamesTab> {
       _selectedGrade = _preferredGrade(_grades);
       _selectedGame = null;
       _farmCompletedStages = 0;
+      _squadronCompletedStages = 0;
       if (_grades.isEmpty) {
         _loadGrades();
       }
@@ -158,6 +162,7 @@ class _GamesTabState extends State<GamesTab> {
       _selectedGrade = grade;
       _selectedGame = null;
       _farmCompletedStages = 0;
+      _squadronCompletedStages = 0;
     });
   }
 
@@ -196,6 +201,22 @@ class _GamesTabState extends State<GamesTab> {
           mounted &&
           _farmCompletedStages < lesson.number) {
         setState(() => _farmCompletedStages = lesson.number);
+      }
+      return;
+    }
+
+    if (_selectedGame?.id == 'math-squadron' &&
+        lesson.number >= 1 &&
+        lesson.number <= mathSquadronLevels.length) {
+      final completed = await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => MathSquadronStageScreen(level: lesson.number),
+        ),
+      );
+      if (completed == true &&
+          mounted &&
+          _squadronCompletedStages < lesson.number) {
+        setState(() => _squadronCompletedStages = lesson.number);
       }
       return;
     }
@@ -253,12 +274,15 @@ class _GamesTabState extends State<GamesTab> {
           ),
         _GamesStep.map => _GamesMap(
             key: ValueKey(
-              'games-map-${_selectedGame!.id}-$_farmCompletedStages',
+              'games-map-${_selectedGame!.id}-$_farmCompletedStages-$_squadronCompletedStages',
             ),
             game: _selectedGame!,
             grade: _selectedGrade!,
-            completedStages:
-                _selectedGame!.id == 'journey-1' ? _farmCompletedStages : 0,
+            completedStages: switch (_selectedGame!.id) {
+              'journey-1' => _farmCompletedStages,
+              'math-squadron' => _squadronCompletedStages,
+              _ => 0,
+            },
             bottomPadding: widget.bottomPadding,
             onBack: _backToGames,
             onLevelTap: _openLevel,
@@ -401,7 +425,7 @@ class _GamesCatalog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final games = _gamePreviews(context);
+    final games = _gamePreviews(context, selectedGrade);
     return ColoredBox(
       color: const Color(0xFFF6FBF7),
       child: SafeArea(
@@ -498,13 +522,15 @@ class _GamesMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lessons = List.generate(
-      5,
+      game.levelCount,
       (index) => PracticeLesson(
         number: index + 1,
-        title: context.formatText(
-          AppKeys.gamesLevelLabel,
-          {'level': index + 1},
-        ),
+        title: game.levelTitleKeys == null
+            ? context.formatText(
+                AppKeys.gamesLevelLabel,
+                {'level': index + 1},
+              )
+            : context.getText(game.levelTitleKeys![index]),
       ),
     );
     final chapter = PracticeChapter(
@@ -514,7 +540,7 @@ class _GamesMap extends StatelessWidget {
       description: grade.label,
       lessons: lessons,
       completedLessons: completedStages,
-      icon: '🎮',
+      icon: game.id == 'math-squadron' ? '🚀' : '🎮',
     );
 
     return PracticeChapterScreen(
@@ -846,7 +872,7 @@ class _GamePreviewCard extends StatelessWidget {
                     Text(
                       context.formatText(
                         AppKeys.gamesLevelCount,
-                        {'count': 5},
+                        {'count': game.levelCount},
                       ),
                       style: const TextStyle(
                         color: _gamesMuted,
@@ -867,7 +893,9 @@ class _GamePreviewCard extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(26),
-                  child: Image.asset(game.assetPath, fit: BoxFit.cover),
+                  child: game.id == 'math-squadron'
+                      ? const _MathSquadronPreviewArtwork()
+                      : Image.asset(game.assetPath, fit: BoxFit.cover),
                 ),
               ),
             ],
@@ -1007,6 +1035,8 @@ class _GamePreview {
     required this.assetPath,
     required this.background,
     required this.accent,
+    this.levelCount = 5,
+    this.levelTitleKeys,
   });
 
   final String id;
@@ -1014,15 +1044,27 @@ class _GamePreview {
   final String assetPath;
   final Color background;
   final Color accent;
+  final int levelCount;
+  final List<String>? levelTitleKeys;
 }
 
-List<_GamePreview> _gamePreviews(BuildContext context) => [
+List<_GamePreview> _gamePreviews(
+  BuildContext context,
+  GradeModel selectedGrade,
+) {
+  final gradeNumber = _selectedGradeNumber(selectedGrade);
+  if (gradeNumber == 3) {
+    return [
       _GamePreview(
-        id: 'journey-1',
-        title: context.getText(AppKeys.gamesJourneyOne),
-        assetPath: 'assets/images/game_numi_farm_banner.png',
-        background: const Color(0xFFDDF3EE),
-        accent: _gamesTeal,
+        id: 'math-squadron',
+        title: context.getText(AppKeys.gamesSquadronTitle),
+        assetPath: '',
+        background: const Color(0xFFDDEBFF),
+        accent: const Color(0xFF335BC5),
+        levelCount: mathSquadronLevels.length,
+        levelTitleKeys: mathSquadronLevels
+            .map((level) => level.titleKey)
+            .toList(growable: false),
       ),
       _GamePreview(
         id: 'journey-2',
@@ -1039,3 +1081,113 @@ List<_GamePreview> _gamePreviews(BuildContext context) => [
         accent: _gamesOrange,
       ),
     ];
+  }
+  return [
+    _GamePreview(
+      id: 'journey-1',
+      title: context.getText(AppKeys.gamesJourneyOne),
+      assetPath: 'assets/images/game_numi_farm_banner.png',
+      background: const Color(0xFFDDF3EE),
+      accent: _gamesTeal,
+    ),
+    _GamePreview(
+      id: 'journey-2',
+      title: context.getText(AppKeys.gamesJourneyTwo),
+      assetPath: 'assets/images/parent_home_race.png',
+      background: _gamesCream,
+      accent: const Color(0xFFA86700),
+    ),
+    _GamePreview(
+      id: 'journey-3',
+      title: context.getText(AppKeys.gamesJourneyThree),
+      assetPath: 'assets/images/parent_home_shop.png',
+      background: const Color(0xFFFFE5DD),
+      accent: _gamesOrange,
+    ),
+  ];
+}
+
+int? _selectedGradeNumber(GradeModel grade) {
+  final match = RegExp(r'\d+').firstMatch(grade.label ?? '');
+  if (match != null) {
+    return int.tryParse(match.group(0)!);
+  }
+  final order = grade.displayOrder;
+  return order != null && order >= 1 && order <= 12 ? order : null;
+}
+
+class _MathSquadronPreviewArtwork extends StatelessWidget {
+  const _MathSquadronPreviewArtwork();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF111C4B), Color(0xFF335BC5)],
+        ),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          const Positioned(
+            top: 10,
+            right: 12,
+            child: Icon(Icons.star_rounded, color: Color(0xFFFFD95A), size: 15),
+          ),
+          const Positioned(
+            top: 28,
+            left: 12,
+            child: Icon(Icons.circle, color: Colors.white24, size: 6),
+          ),
+          Positioned(
+            top: 13,
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF625F),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white54, width: 2),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x99FF625F), blurRadius: 14),
+                ],
+              ),
+              child: const Center(
+                child: Text(
+                  '× 7',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Positioned(
+            bottom: 12,
+            child:
+                Icon(Icons.flight_rounded, color: Color(0xFF61DAFF), size: 45),
+          ),
+          Positioned(
+            bottom: 48,
+            child: Container(
+              width: 3,
+              height: 25,
+              decoration: BoxDecoration(
+                color: const Color(0xFF61DAFF),
+                borderRadius: BorderRadius.circular(99),
+                boxShadow: const [
+                  BoxShadow(color: Color(0xFF61DAFF), blurRadius: 9),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

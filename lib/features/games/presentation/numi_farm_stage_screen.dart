@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,6 +18,73 @@ const _farmInk = Color(0xFF253228);
 const _farmMuted = Color(0xFF68746B);
 const _farmCream = Color(0xFFFFFBEE);
 const _farmSoil = Color(0xFF9B653D);
+const _correctSound = 'sounds/effects/correct.wav';
+const _incorrectSound = 'sounds/effects/incorrect.wav';
+
+mixin _FarmSessionMixin<T extends StatefulWidget> on State<T> {
+  final AudioPlayer _effectPlayer = AudioPlayer();
+  final Stopwatch _stopwatch = Stopwatch();
+  Timer? _clockTimer;
+  Duration _elapsed = Duration.zero;
+
+  Duration get elapsed => _elapsed;
+
+  void startFarmSession() {
+    _stopwatch.start();
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() => _elapsed = _stopwatch.elapsed);
+      }
+    });
+  }
+
+  void stopFarmSession() {
+    _stopwatch.stop();
+    _clockTimer?.cancel();
+    _clockTimer = null;
+    if (mounted) {
+      setState(() => _elapsed = _stopwatch.elapsed);
+    }
+  }
+
+  Future<void> playCorrectSound() => _playEffect(_correctSound);
+
+  Future<void> playIncorrectSound() => _playEffect(_incorrectSound);
+
+  Future<void> _playEffect(String assetPath) async {
+    try {
+      await _effectPlayer.stop();
+      await _effectPlayer.play(AssetSource(assetPath));
+    } catch (_) {
+      // Audio feedback must never block the learning flow.
+    }
+  }
+
+  void disposeFarmSession() {
+    _clockTimer?.cancel();
+    _stopwatch.stop();
+    unawaited(_effectPlayer.dispose());
+  }
+}
+
+String _formatElapsed(Duration duration) {
+  final minutes = duration.inMinutes.remainder(100).toString().padLeft(2, '0');
+  final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+  return '$minutes:$seconds';
+}
+
+int _starsForScore({required int correct, required int total}) {
+  if (correct == total) {
+    return 3;
+  }
+  if (correct * 10 >= total * 6) {
+    return 2;
+  }
+  if (correct > 0) {
+    return 1;
+  }
+  return 0;
+}
 
 class NumiFarmHarvestStageScreen extends StatefulWidget {
   const NumiFarmHarvestStageScreen({
@@ -30,20 +99,34 @@ class NumiFarmHarvestStageScreen extends StatefulWidget {
       _NumiFarmHarvestStageScreenState();
 }
 
-class _NumiFarmHarvestStageScreenState
-    extends State<NumiFarmHarvestStageScreen> {
+class _NumiFarmHarvestStageScreenState extends State<NumiFarmHarvestStageScreen>
+    with _FarmSessionMixin<NumiFarmHarvestStageScreen> {
   late final List<NumiFarmCountRound> _rounds =
       buildHarvestRounds(widget.stage);
   final Set<int> _pickedCarrots = <int>{};
   int _roundIndex = 0;
-  int _mistakes = 0;
+  int _correctAnswers = 0;
+  int _wrongAnswers = 0;
   int _feedbackTick = 0;
   bool _isSolved = false;
+  bool _isWrong = false;
 
   NumiFarmCountRound get _round => _rounds[_roundIndex];
 
+  @override
+  void initState() {
+    super.initState();
+    startFarmSession();
+  }
+
+  @override
+  void dispose() {
+    disposeFarmSession();
+    super.dispose();
+  }
+
   void _toggleCarrot(int index) {
-    if (_isSolved) {
+    if (_isSolved || _isWrong) {
       return;
     }
     HapticFeedback.selectionClick();
@@ -54,7 +137,7 @@ class _NumiFarmHarvestStageScreenState
     });
   }
 
-  void _checkAnswer() {
+  Future<void> _checkAnswer() async {
     if (_pickedCarrots.isEmpty || _isSolved) {
       HapticFeedback.selectionClick();
       return;
@@ -62,34 +145,44 @@ class _NumiFarmHarvestStageScreenState
 
     if (_pickedCarrots.length == _round.target) {
       HapticFeedback.mediumImpact();
-      setState(() => _isSolved = true);
+      setState(() {
+        _isSolved = true;
+        _correctAnswers++;
+      });
+      await playCorrectSound();
+      await Future<void>.delayed(const Duration(milliseconds: 520));
+      if (mounted) {
+        await _advanceAfterAnswer();
+      }
       return;
     }
 
     HapticFeedback.heavyImpact();
     setState(() {
-      _mistakes++;
+      _wrongAnswers++;
+      _isWrong = true;
       _feedbackTick++;
     });
+    await playIncorrectSound();
+    await Future<void>.delayed(const Duration(milliseconds: 650));
+    if (mounted) {
+      await _advanceAfterAnswer();
+    }
   }
 
-  Future<void> _continue() async {
-    if (!_isSolved) {
-      _checkAnswer();
-      return;
-    }
-
+  Future<void> _advanceAfterAnswer() async {
     if (_roundIndex < _rounds.length - 1) {
-      HapticFeedback.lightImpact();
       setState(() {
         _roundIndex++;
         _pickedCarrots.clear();
         _isSolved = false;
+        _isWrong = false;
         _feedbackTick = 0;
       });
       return;
     }
 
+    stopFarmSession();
     final completed = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -97,6 +190,9 @@ class _NumiFarmHarvestStageScreenState
       builder: (_) => _FarmStageCompleteDialog(
         stars: _earnedStars,
         stage: widget.stage,
+        elapsed: elapsed,
+        correctAnswers: _correctAnswers,
+        wrongAnswers: _wrongAnswers,
       ),
     );
     if (completed == true && mounted) {
@@ -105,13 +201,10 @@ class _NumiFarmHarvestStageScreenState
   }
 
   int get _earnedStars {
-    if (_mistakes == 0) {
-      return 3;
-    }
-    if (_mistakes <= 2) {
-      return 2;
-    }
-    return 1;
+    return _starsForScore(
+      correct: _correctAnswers,
+      total: _rounds.length,
+    );
   }
 
   @override
@@ -137,6 +230,7 @@ class _NumiFarmHarvestStageScreenState
                     roundCount: _rounds.length,
                     progress: progress,
                     stageTitleKey: numiFarmStage(widget.stage).titleKey,
+                    elapsed: elapsed,
                     onBack: () => Navigator.of(context).maybePop(),
                   ),
                   SizedBox(height: compact ? 10 : 14),
@@ -144,6 +238,7 @@ class _NumiFarmHarvestStageScreenState
                     target: _round.target,
                     feedbackTick: _feedbackTick,
                     isSolved: _isSolved,
+                    isWrong: _isWrong,
                     compact: compact,
                   ),
                   SizedBox(height: compact ? 10 : 14),
@@ -159,8 +254,8 @@ class _NumiFarmHarvestStageScreenState
                     picked: _pickedCarrots.length,
                     target: _round.target,
                     isSolved: _isSolved,
-                    isLastRound: _roundIndex == _rounds.length - 1,
-                    onPressed: _continue,
+                    isWrong: _isWrong,
+                    onPressed: _checkAnswer,
                   ),
                 ],
               ),
@@ -178,6 +273,7 @@ class _FarmHeader extends StatelessWidget {
     required this.roundCount,
     required this.progress,
     required this.stageTitleKey,
+    required this.elapsed,
     required this.onBack,
   });
 
@@ -185,6 +281,7 @@ class _FarmHeader extends StatelessWidget {
   final int roundCount;
   final double progress;
   final String stageTitleKey;
+  final Duration elapsed;
   final VoidCallback onBack;
 
   @override
@@ -241,6 +338,9 @@ class _FarmHeader extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(width: 7),
+            _FarmTimerChip(elapsed: elapsed),
+            const SizedBox(width: 7),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
               decoration: BoxDecoration(
@@ -273,17 +373,52 @@ class _FarmHeader extends StatelessWidget {
   }
 }
 
+class _FarmTimerChip extends StatelessWidget {
+  const _FarmTimerChip({required this.elapsed});
+
+  final Duration elapsed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: _farmGreen.withValues(alpha: 0.12)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.timer_outlined, color: _farmGreen, size: 16),
+          const SizedBox(width: 4),
+          Text(
+            _formatElapsed(elapsed),
+            style: const TextStyle(
+              color: _farmInk,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _FarmOrderCard extends StatelessWidget {
   const _FarmOrderCard({
     required this.target,
     required this.feedbackTick,
     required this.isSolved,
+    required this.isWrong,
     required this.compact,
   });
 
   final int target;
   final int feedbackTick;
   final bool isSolved;
+  final bool isWrong;
   final bool compact;
 
   @override
@@ -302,12 +437,19 @@ class _FarmOrderCard extends StatelessWidget {
         padding:
             EdgeInsets.fromLTRB(14, compact ? 10 : 14, 18, compact ? 10 : 14),
         decoration: BoxDecoration(
-          color: isSolved ? const Color(0xFFE7F7DF) : Colors.white,
+          color: isSolved
+              ? const Color(0xFFE7F7DF)
+              : isWrong
+                  ? const Color(0xFFFFEEEE)
+                  : Colors.white,
           borderRadius: BorderRadius.circular(26),
           border: Border.all(
             color: isSolved
                 ? _farmLeaf.withValues(alpha: 0.45)
-                : _farmGreen.withValues(alpha: 0.10),
+                : isWrong
+                    ? const Color(0xFFE53935)
+                    : _farmGreen.withValues(alpha: 0.10),
+            width: isWrong ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
@@ -335,7 +477,9 @@ class _FarmOrderCard extends StatelessWidget {
                   Text(
                     isSolved
                         ? context.getText(AppKeys.gamesFarmCorrect)
-                        : context.getText(AppKeys.gamesFarmOrderLabel),
+                        : isWrong
+                            ? context.getText(AppKeys.gamesFarmIncorrect)
+                            : context.getText(AppKeys.gamesFarmOrderLabel),
                     style: TextStyle(
                       color: isSolved ? _farmDeepGreen : _farmMuted,
                       fontSize: 12,
@@ -609,14 +753,14 @@ class _FarmBottomBar extends StatelessWidget {
     required this.picked,
     required this.target,
     required this.isSolved,
-    required this.isLastRound,
+    required this.isWrong,
     required this.onPressed,
   });
 
   final int picked;
   final int target;
   final bool isSolved;
-  final bool isLastRound;
+  final bool isWrong;
   final VoidCallback onPressed;
 
   @override
@@ -629,7 +773,12 @@ class _FarmBottomBar extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: _farmGreen.withValues(alpha: 0.12)),
+            border: Border.all(
+              color: isWrong
+                  ? const Color(0xFFE53935)
+                  : _farmGreen.withValues(alpha: 0.12),
+              width: isWrong ? 2 : 1,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -638,8 +787,8 @@ class _FarmBottomBar extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 '$picked/$target',
-                style: const TextStyle(
-                  color: _farmInk,
+                style: TextStyle(
+                  color: isWrong ? const Color(0xFFD32F2F) : _farmInk,
                   fontSize: 19,
                   fontWeight: FontWeight.w900,
                 ),
@@ -650,11 +799,16 @@ class _FarmBottomBar extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: FilledButton(
-            onPressed: picked == 0 ? null : onPressed,
+            onPressed: picked == 0 || isSolved || isWrong ? null : onPressed,
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(54),
               backgroundColor: isSolved ? _farmLeaf : _farmGreen,
-              disabledBackgroundColor: _farmGreen.withValues(alpha: 0.16),
+              disabledBackgroundColor: isSolved
+                  ? _farmLeaf
+                  : isWrong
+                      ? const Color(0xFFE53935)
+                      : _farmGreen.withValues(alpha: 0.16),
+              disabledForegroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -662,12 +816,10 @@ class _FarmBottomBar extends StatelessWidget {
             ),
             child: Text(
               isSolved
-                  ? context.getText(
-                      isLastRound
-                          ? AppKeys.gamesFarmFinish
-                          : AppKeys.gamesFarmNext,
-                    )
-                  : context.getText(AppKeys.gamesFarmCheck),
+                  ? context.getText(AppKeys.gamesFarmCorrect)
+                  : isWrong
+                      ? context.getText(AppKeys.gamesFarmIncorrect)
+                      : context.getText(AppKeys.gamesFarmCheck),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15,
@@ -694,58 +846,84 @@ class NumiFarmChoiceStageScreen extends StatefulWidget {
       _NumiFarmChoiceStageScreenState();
 }
 
-class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen> {
+class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
+    with _FarmSessionMixin<NumiFarmChoiceStageScreen> {
   late final List<NumiFarmChoiceRound> _rounds =
       buildChoiceRounds(widget.stage);
   int _roundIndex = 0;
-  int _mistakes = 0;
+  int _correctAnswers = 0;
+  int _wrongAnswers = 0;
   int _feedbackTick = 0;
   String? _selectedAnswer;
   bool _isSolved = false;
+  bool _isWrong = false;
 
   NumiFarmChoiceRound get _round => _rounds[_roundIndex];
 
+  @override
+  void initState() {
+    super.initState();
+    startFarmSession();
+  }
+
+  @override
+  void dispose() {
+    disposeFarmSession();
+    super.dispose();
+  }
+
   void _selectAnswer(String answer) {
-    if (_isSolved) {
+    if (_isSolved || _isWrong) {
       return;
     }
     HapticFeedback.selectionClick();
     setState(() => _selectedAnswer = answer);
   }
 
-  void _checkAnswer() {
+  Future<void> _checkAnswer() async {
     if (_selectedAnswer == null || _isSolved) {
       HapticFeedback.selectionClick();
       return;
     }
     if (_selectedAnswer == _round.answer) {
       HapticFeedback.mediumImpact();
-      setState(() => _isSolved = true);
+      setState(() {
+        _isSolved = true;
+        _correctAnswers++;
+      });
+      await playCorrectSound();
+      await Future<void>.delayed(const Duration(milliseconds: 520));
+      if (mounted) {
+        await _advanceAfterAnswer();
+      }
       return;
     }
     HapticFeedback.heavyImpact();
     setState(() {
-      _mistakes++;
+      _wrongAnswers++;
+      _isWrong = true;
       _feedbackTick++;
     });
+    await playIncorrectSound();
+    await Future<void>.delayed(const Duration(milliseconds: 650));
+    if (mounted) {
+      await _advanceAfterAnswer();
+    }
   }
 
-  Future<void> _continue() async {
-    if (!_isSolved) {
-      _checkAnswer();
-      return;
-    }
+  Future<void> _advanceAfterAnswer() async {
     if (_roundIndex < _rounds.length - 1) {
-      HapticFeedback.lightImpact();
       setState(() {
         _roundIndex++;
         _selectedAnswer = null;
         _isSolved = false;
+        _isWrong = false;
         _feedbackTick = 0;
       });
       return;
     }
 
+    stopFarmSession();
     final completed = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -753,6 +931,9 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen> {
       builder: (_) => _FarmStageCompleteDialog(
         stars: _earnedStars,
         stage: widget.stage,
+        elapsed: elapsed,
+        correctAnswers: _correctAnswers,
+        wrongAnswers: _wrongAnswers,
       ),
     );
     if (completed == true && mounted) {
@@ -761,13 +942,10 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen> {
   }
 
   int get _earnedStars {
-    if (_mistakes == 0) {
-      return 3;
-    }
-    if (_mistakes <= 2) {
-      return 2;
-    }
-    return 1;
+    return _starsForScore(
+      correct: _correctAnswers,
+      total: _rounds.length,
+    );
   }
 
   String get _promptKey => switch (_round.kind) {
@@ -794,12 +972,14 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen> {
                     roundCount: _rounds.length,
                     progress: progress,
                     stageTitleKey: numiFarmStage(widget.stage).titleKey,
+                    elapsed: elapsed,
                     onBack: () => Navigator.of(context).maybePop(),
                   ),
                   SizedBox(height: compact ? 12 : 18),
                   _FarmChoicePrompt(
                     promptKey: _promptKey,
                     isSolved: _isSolved,
+                    isWrong: _isWrong,
                   ),
                   SizedBox(height: compact ? 10 : 14),
                   Expanded(
@@ -826,28 +1006,33 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen> {
                     correctAnswer: _round.answer,
                     selectedAnswer: _selectedAnswer,
                     isSolved: _isSolved,
+                    isWrong: _isWrong,
                     onSelected: _selectAnswer,
                   ),
                   const SizedBox(height: 12),
                   FilledButton(
-                    onPressed: _selectedAnswer == null ? null : _continue,
+                    onPressed: _selectedAnswer == null || _isSolved || _isWrong
+                        ? null
+                        : _checkAnswer,
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(54),
                       backgroundColor: _isSolved ? _farmLeaf : _farmGreen,
-                      disabledBackgroundColor:
-                          _farmGreen.withValues(alpha: 0.16),
+                      disabledBackgroundColor: _isSolved
+                          ? _farmLeaf
+                          : _isWrong
+                              ? const Color(0xFFE53935)
+                              : _farmGreen.withValues(alpha: 0.16),
+                      disabledForegroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
                     child: Text(
                       _isSolved
-                          ? context.getText(
-                              _roundIndex == _rounds.length - 1
-                                  ? AppKeys.gamesFarmFinish
-                                  : AppKeys.gamesFarmNext,
-                            )
-                          : context.getText(AppKeys.gamesFarmCheck),
+                          ? context.getText(AppKeys.gamesFarmCorrect)
+                          : _isWrong
+                              ? context.getText(AppKeys.gamesFarmIncorrect)
+                              : context.getText(AppKeys.gamesFarmCheck),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
@@ -869,10 +1054,12 @@ class _FarmChoicePrompt extends StatelessWidget {
   const _FarmChoicePrompt({
     required this.promptKey,
     required this.isSolved,
+    required this.isWrong,
   });
 
   final String promptKey;
   final bool isSolved;
+  final bool isWrong;
 
   @override
   Widget build(BuildContext context) {
@@ -880,12 +1067,19 @@ class _FarmChoicePrompt extends StatelessWidget {
       duration: const Duration(milliseconds: 220),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
       decoration: BoxDecoration(
-        color: isSolved ? const Color(0xFFE7F7DF) : Colors.white,
+        color: isSolved
+            ? const Color(0xFFE7F7DF)
+            : isWrong
+                ? const Color(0xFFFFEEEE)
+                : Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: isSolved
               ? _farmLeaf.withValues(alpha: 0.45)
-              : _farmGreen.withValues(alpha: 0.10),
+              : isWrong
+                  ? const Color(0xFFE53935)
+                  : _farmGreen.withValues(alpha: 0.10),
+          width: isWrong ? 2 : 1,
         ),
       ),
       child: Row(
@@ -902,7 +1096,11 @@ class _FarmChoicePrompt extends StatelessWidget {
           Expanded(
             child: Text(
               context.getText(
-                isSolved ? AppKeys.gamesFarmCorrect : promptKey,
+                isSolved
+                    ? AppKeys.gamesFarmCorrect
+                    : isWrong
+                        ? AppKeys.gamesFarmIncorrect
+                        : promptKey,
               ),
               style: const TextStyle(
                 color: _farmInk,
@@ -1113,6 +1311,7 @@ class _FarmAnswerChoices extends StatelessWidget {
     required this.correctAnswer,
     required this.selectedAnswer,
     required this.isSolved,
+    required this.isWrong,
     required this.onSelected,
   });
 
@@ -1120,6 +1319,7 @@ class _FarmAnswerChoices extends StatelessWidget {
   final String correctAnswer;
   final String? selectedAnswer;
   final bool isSolved;
+  final bool isWrong;
   final ValueChanged<String> onSelected;
 
   @override
@@ -1133,6 +1333,7 @@ class _FarmAnswerChoices extends StatelessWidget {
               answer: choices[index],
               isSelected: selectedAnswer == choices[index],
               isCorrect: isSolved && choices[index] == correctAnswer,
+              isWrong: isWrong && selectedAnswer == choices[index],
               onTap: () => onSelected(choices[index]),
             ),
           ),
@@ -1147,39 +1348,56 @@ class _FarmAnswerButton extends StatelessWidget {
     required this.answer,
     required this.isSelected,
     required this.isCorrect,
+    required this.isWrong,
     required this.onTap,
   });
 
   final String answer;
   final bool isSelected;
   final bool isCorrect;
+  final bool isWrong;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final background = isCorrect
         ? _farmLeaf
-        : isSelected
-            ? _farmGreen
-            : Colors.white;
-    final foreground = isCorrect || isSelected ? Colors.white : _farmInk;
-    return Material(
-      color: background,
-      borderRadius: BorderRadius.circular(20),
-      elevation: isSelected || isCorrect ? 0 : 2,
-      shadowColor: _farmDeepGreen.withValues(alpha: 0.14),
-      child: InkWell(
-        onTap: onTap,
+        : isWrong
+            ? const Color(0xFFFFEEEE)
+            : isSelected
+                ? _farmGreen
+                : Colors.white;
+    final foreground = isWrong
+        ? const Color(0xFFD32F2F)
+        : isCorrect || isSelected
+            ? Colors.white
+            : _farmInk;
+    return DecoratedBox(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        child: SizedBox(
-          height: 64,
-          child: Center(
-            child: Text(
-              answer,
-              style: TextStyle(
-                color: foreground,
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
+        border: Border.all(
+          color: isWrong ? const Color(0xFFE53935) : Colors.transparent,
+          width: isWrong ? 3 : 0,
+        ),
+      ),
+      child: Material(
+        color: background,
+        borderRadius: BorderRadius.circular(20),
+        elevation: isSelected || isCorrect || isWrong ? 0 : 2,
+        shadowColor: _farmDeepGreen.withValues(alpha: 0.14),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: SizedBox(
+            height: 64,
+            child: Center(
+              child: Text(
+                answer,
+                style: TextStyle(
+                  color: foreground,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
           ),
@@ -1193,10 +1411,16 @@ class _FarmStageCompleteDialog extends StatelessWidget {
   const _FarmStageCompleteDialog({
     required this.stars,
     required this.stage,
+    required this.elapsed,
+    required this.correctAnswers,
+    required this.wrongAnswers,
   });
 
   final int stars;
   final int stage;
+  final Duration elapsed;
+  final int correctAnswers;
+  final int wrongAnswers;
 
   @override
   Widget build(BuildContext context) {
@@ -1244,6 +1468,53 @@ class _FarmStageCompleteDialog extends StatelessWidget {
                 height: 1.35,
               ),
             ),
+            const SizedBox(height: 14),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _FarmScoreChip(
+                  icon: Icons.check_circle_rounded,
+                  color: _farmLeaf,
+                  label: context.getText(AppKeys.gamesFarmCorrectCount),
+                  value: correctAnswers,
+                ),
+                const SizedBox(width: 10),
+                _FarmScoreChip(
+                  icon: Icons.cancel_rounded,
+                  color: const Color(0xFFE53935),
+                  label: context.getText(AppKeys.gamesFarmWrongCount),
+                  value: wrongAnswers,
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+              decoration: BoxDecoration(
+                color: _farmGreen.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.timer_outlined,
+                    color: _farmGreen,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 7),
+                  Text(
+                    '${context.getText(AppKeys.gamesFarmTime)} '
+                    '${_formatElapsed(elapsed)}',
+                    style: const TextStyle(
+                      color: _farmInk,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1274,6 +1545,52 @@ class _FarmStageCompleteDialog extends StatelessWidget {
               child: Text(
                 context.getText(AppKeys.gamesFarmBackToMap),
                 style: const TextStyle(fontWeight: FontWeight.w900),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FarmScoreChip extends StatelessWidget {
+  const _FarmScoreChip({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String label;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 19),
+            const SizedBox(width: 5),
+            Flexible(
+              child: Text(
+                '$label $value',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: _farmInk,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
           ],
