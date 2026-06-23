@@ -490,20 +490,25 @@ class _SaveButton extends StatelessWidget {
   const _SaveButton({
     required this.scale,
     required this.onTap,
+    this.enabled = true,
   });
 
   final double scale;
   final VoidCallback onTap;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = enabled ? _teal : const Color(0xFFBFC9CA);
+    final foregroundColor = enabled ? Colors.white : const Color(0xFFF4F6F6);
+
     return Material(
-      color: _teal,
-      elevation: 9,
-      shadowColor: Colors.black.withValues(alpha: 0.30),
+      color: backgroundColor,
+      elevation: enabled ? 9 : 0,
+      shadowColor: Colors.black.withValues(alpha: enabled ? 0.30 : 0),
       borderRadius: BorderRadius.circular(999),
       child: InkWell(
-        onTap: onTap,
+        onTap: enabled ? onTap : null,
         borderRadius: BorderRadius.circular(999),
         child: SizedBox(
           width: 142 * scale,
@@ -514,7 +519,7 @@ class _SaveButton extends StatelessWidget {
               Text(
                 context.getText(AppKeys.save),
                 style: GoogleFonts.andika(
-                  color: Colors.white,
+                  color: foregroundColor,
                   fontSize: FontSize.large * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
@@ -524,7 +529,7 @@ class _SaveButton extends StatelessWidget {
               SizedBox(width: 10 * scale),
               Icon(
                 Icons.arrow_forward_rounded,
-                color: Colors.white,
+                color: foregroundColor,
                 size: 24 * scale,
               ),
             ],

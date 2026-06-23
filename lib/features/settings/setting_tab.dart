@@ -261,6 +261,7 @@ class _SettingTabState extends State<SettingTab> {
   @override
   void initState() {
     super.initState();
+    _profileNameController.addListener(_onProfileNameChanged);
     _view = widget._initialView;
     _applyUser(widget.user);
     _profiles = widget.profiles;
@@ -371,6 +372,7 @@ class _SettingTabState extends State<SettingTab> {
 
   @override
   void dispose() {
+    _profileNameController.removeListener(_onProfileNameChanged);
     _usernameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
@@ -379,6 +381,13 @@ class _SettingTabState extends State<SettingTab> {
     _profileEmailController.dispose();
     _profileIdController.dispose();
     super.dispose();
+  }
+
+  void _onProfileNameChanged() {
+    if (!mounted || _view != SettingPageView.addProfile) {
+      return;
+    }
+    setState(() {});
   }
 
   void _applyUser(LoginUser? user) {
@@ -1049,9 +1058,9 @@ class _SettingTabState extends State<SettingTab> {
         if (profile != null) {
           _selectOptionsForProfile(profile);
         } else {
-          _selectedSchool ??= schools.isEmpty ? null : schools.first;
-          _selectedGrade ??= grades.isEmpty ? null : grades.first;
-          _selectedProgram ??= programs.isEmpty ? null : programs.first;
+          _selectedSchool = null;
+          _selectedGrade = null;
+          _selectedProgram = null;
           _selectedSemester ??= semesters.isEmpty ? null : semesters.first;
         }
         _isLoadingProfileOptions = false;
@@ -1163,8 +1172,8 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
     if (isTeacherProfile &&
-        ((normalizedIdType == null && profileIdValue.isNotEmpty) ||
-            (normalizedIdType != null && profileIdValue.isEmpty))) {
+        normalizedIdType == null &&
+        profileIdValue.isNotEmpty) {
       setState(
         () => _profileCreateError =
             context.readText(AppKeys.missingProfileSelections),
@@ -1453,9 +1462,9 @@ class _SettingTabState extends State<SettingTab> {
     _editingProfile = null;
     _profileCreateError = null;
     _selectedProfileIdType = null;
-    _selectedSchool = _schoolOptions.isEmpty ? null : _schoolOptions.first;
-    _selectedGrade = _gradeOptions.isEmpty ? null : _gradeOptions.first;
-    _selectedProgram = _programOptions.isEmpty ? null : _programOptions.first;
+    _selectedSchool = null;
+    _selectedGrade = null;
+    _selectedProgram = null;
     _selectedSemester =
         _semesterOptions.isEmpty ? null : _semesterOptions.first;
   }
@@ -1641,6 +1650,7 @@ class _SettingTabState extends State<SettingTab> {
                                   selectedIdType: _selectedProfileIdType,
                                   isLoadingOptions: _isLoadingProfileOptions,
                                   isSaving: _isSavingProfile,
+                                  canSave: _canSaveProfileForm,
                                   errorMessage: _profileOptionsError ??
                                       _profileCreateError,
                                   canRetryOptions: _profileOptionsError != null,
@@ -1839,6 +1849,33 @@ class _SettingTabState extends State<SettingTab> {
     return _profiles.any(
       (profile) => ProfileRole.fromProfile(profile) != ProfileRole.student,
     );
+  }
+
+  bool get _canSaveProfileForm {
+    if (_isSavingProfile || _isLoadingProfileOptions) {
+      return false;
+    }
+
+    final name = _profileNameController.text.trim();
+    if (name.isEmpty) {
+      return false;
+    }
+
+    final formRole = _profileFormRole(_editingProfile);
+    if (formRole == 'PARENT') {
+      return true;
+    }
+
+    if (_selectedSchool?.schoolId == null) {
+      return false;
+    }
+
+    if (formRole == 'TEACHER') {
+      return true;
+    }
+
+    return _selectedProgram?.programId != null &&
+        _selectedGrade?.gradeId != null;
   }
 
   void _applyProfileIdFields(StudentProfile profile) {

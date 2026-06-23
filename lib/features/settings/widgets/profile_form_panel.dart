@@ -19,6 +19,7 @@ class _AddProfilePanel extends StatelessWidget {
     required this.selectedIdType,
     required this.isLoadingOptions,
     required this.isSaving,
+    required this.canSave,
     required this.errorMessage,
     required this.canRetryOptions,
     required this.onAvatarChanged,
@@ -49,6 +50,7 @@ class _AddProfilePanel extends StatelessWidget {
   final String? selectedIdType;
   final bool isLoadingOptions;
   final bool isSaving;
+  final bool canSave;
   final String? errorMessage;
   final bool canRetryOptions;
   final ValueChanged<String> onAvatarChanged;
@@ -128,7 +130,7 @@ class _AddProfilePanel extends StatelessWidget {
           if (!isLoadingOptions) ...[
             _AddProfileDropdown<SchoolModel>(
               label: context.getText(AppKeys.school),
-              hintText: context.getText(AppKeys.chooseSchool),
+              hintText: context.getText(AppKeys.notSelected),
               value: selectedSchool,
               items: schools,
               itemLabel: (school) => school.name?.trim().isNotEmpty == true
@@ -141,7 +143,7 @@ class _AddProfilePanel extends StatelessWidget {
             if (!isTeacherProfile) ...[
               _AddProfileDropdown<ProgramModel>(
                 label: context.getText(AppKeys.learningProgram),
-                hintText: context.getText(AppKeys.chooseProgram),
+                hintText: context.getText(AppKeys.notSelected),
                 value: selectedProgram,
                 items: programs,
                 itemLabel: (program) => program.label?.trim().isNotEmpty == true
@@ -153,7 +155,7 @@ class _AddProfilePanel extends StatelessWidget {
               SizedBox(height: 18 * scale),
               _AddProfileDropdown<GradeModel>(
                 label: context.getText(AppKeys.grade),
-                hintText: context.getText(AppKeys.chooseGrade),
+                hintText: context.getText(AppKeys.notSelected),
                 value: selectedGrade,
                 items: grades,
                 itemLabel: (grade) => grade.label?.trim().isNotEmpty == true
@@ -225,8 +227,11 @@ class _AddProfilePanel extends StatelessWidget {
             SizedBox(width: 14 * scale),
             Opacity(
               opacity: isSaving ? 0.72 : 1,
-              child:
-                  _SaveButton(scale: scale, onTap: isSaving ? () {} : onSave),
+              child: _SaveButton(
+                scale: scale,
+                enabled: canSave,
+                onTap: onSave,
+              ),
             ),
           ],
         ),
