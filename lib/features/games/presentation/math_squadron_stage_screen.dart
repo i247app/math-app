@@ -15,7 +15,9 @@ const _spaceCyan = Color(0xFF39D9FF);
 const _spaceGold = Color(0xFFFFD95A);
 const _spaceRed = Color(0xFFFF625F);
 const _spaceGreen = Color(0xFF4DE3A7);
-const _waveSize = 25;
+const _waveSize = 30;
+const _minimumMathKills = 10;
+const _reloadDuration = 0.9;
 
 enum _MissionPhase { wave, boss, ended }
 
@@ -100,7 +102,9 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
   late int _shields;
   late String _currentAmmo;
   String? _nextAmmo;
-  MathSquadronQuestion? _forcedSpawn;
+  final List<String> _ammoQueue = [];
+  bool _nextAmmoGuaranteed = false;
+  double _reloadRemaining = 0;
   double _spawnClock = 0;
   double _worldTime = 0;
   double _bossTime = 0;
@@ -152,8 +156,11 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     _finishing = false;
     _paused = false;
     final first = _config.questions.first;
-    _currentAmmo = first.correctAnswer;
-    _nextAmmo = null;
+    _currentAmmo = _randomAmmo();
+    _nextAmmo = _randomAmmo(excluding: _currentAmmo);
+    _ammoQueue.clear();
+    _nextAmmoGuaranteed = false;
+    _reloadRemaining = 0;
     _spawnMeteor(question: first, startNearTop: true);
     _lastTick = DateTime.now();
     _gameTimer = Timer.periodic(
@@ -174,6 +181,19 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     setState(() {
       _worldTime += dt;
       _damageImmunity = math.max(0, _damageImmunity - dt);
+      if (_reloadRemaining > 0) {
+        _reloadRemaining = math.max(0, _reloadRemaining - dt);
+        if (_reloadRemaining == 0 && _nextAmmo != null) {
+          _currentAmmo = _nextAmmo!;
+          if (_ammoQueue.isNotEmpty) {
+            _nextAmmo = _ammoQueue.removeAt(0);
+            _nextAmmoGuaranteed = true;
+          } else {
+            _nextAmmo = _randomAmmo(excluding: _currentAmmo);
+            _nextAmmoGuaranteed = false;
+          }
+        }
+      }
       if (_phase == _MissionPhase.wave) {
         _updateWave(dt);
         shouldFinishWave = _spawned >= _waveSize && _meteors.isEmpty;
@@ -191,7 +211,7 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     _spawnClock += dt;
     if (_spawned < _waveSize &&
         _spawnClock >= spawnInterval &&
-        _meteors.length < 5) {
+        _meteors.length < 8) {
       _spawnClock = 0;
       final activeQuestions =
           _meteors.where((meteor) => meteor.hasQuestion).length;
@@ -220,7 +240,6 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     }
     if (passedIds.isNotEmpty) {
       _meteors.removeWhere((meteor) => passedIds.contains(meteor.id));
-      _ensureAmmoHasTarget();
     }
   }
 
@@ -234,12 +253,10 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     }
     final selectedQuestion = withQuestion
         ? question ??
-            _forcedSpawn ??
             _config.questions[_random.nextInt(_config.questions.length)]
         : null;
-    if (withQuestion) {
-      _forcedSpawn = null;
-    }
+    final activeQuestionsBefore =
+        _meteors.where((meteor) => meteor.hasQuestion).length;
     final lane = 0.12 + _random.nextDouble() * 0.76;
     _meteors.add(
       _MeteorEntity(
@@ -254,87 +271,54 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     if (selectedQuestion != null) {
       _spawned += 1;
       _plainSpawnedSinceQuestion = 0;
-      if (_nextAmmo == null && selectedQuestion.correctAnswer != _currentAmmo) {
-        _nextAmmo = selectedQuestion.correctAnswer;
-      }
+      _registerMathAmmo(
+        selectedQuestion.correctAnswer,
+        prioritizeNext: activeQuestionsBefore == 0,
+      );
     } else {
       _plainSpawnedSinceQuestion += 1;
     }
   }
 
-  void _ensureAmmoHasTarget() {
-    if (_phase == _MissionPhase.wave &&
-        _meteors.any(
-          (meteor) => meteor.question?.correctAnswer == _currentAmmo,
-        )) {
-      return;
+  String _randomAmmo({String? excluding}) {
+    final answers = _config.questions
+        .map((question) => question.correctAnswer)
+        .toSet()
+        .where((answer) => answer != excluding)
+        .toList(growable: false);
+    if (answers.isEmpty) {
+      return _config.questions.first.correctAnswer;
     }
-    if (_phase == _MissionPhase.boss &&
-        _bossParts.any(
-          (part) => part.alive && part.question.correctAnswer == _currentAmmo,
-        )) {
-      return;
-    }
-
-    if (_phase == _MissionPhase.wave && _meteors.isNotEmpty) {
-      final questionMeteors =
-          _meteors.where((meteor) => meteor.hasQuestion).toList();
-      if (questionMeteors.isNotEmpty) {
-        _currentAmmo = questionMeteors[_random.nextInt(questionMeteors.length)]
-            .question!
-            .correctAnswer;
-        _nextAmmo = null;
-        return;
-      }
-    }
-    if (_phase == _MissionPhase.boss) {
-      final alive = _bossParts.where((part) => part.alive).toList();
-      if (alive.isNotEmpty) {
-        _currentAmmo =
-            alive[_random.nextInt(alive.length)].question.correctAnswer;
-        _nextAmmo = null;
-      }
-      return;
-    }
-    if (_spawned < _waveSize) {
-      final forced =
-          _config.questions[_random.nextInt(_config.questions.length)];
-      _currentAmmo = forced.correctAnswer;
-      _forcedSpawn = forced;
-      _spawnClock = 999;
-    }
+    return answers[_random.nextInt(answers.length)];
   }
 
-  void _chooseNextAmmo() {
-    final candidates = _phase == _MissionPhase.wave
-        ? _meteors
-            .where((meteor) => meteor.hasQuestion)
-            .map((meteor) => meteor.question!.correctAnswer)
-            .toList()
-        : _bossParts
-            .where((part) => part.alive)
-            .map((part) => part.question.correctAnswer)
-            .toList();
-    if (candidates.isNotEmpty) {
-      if (_nextAmmo != null && candidates.contains(_nextAmmo)) {
-        _currentAmmo = _nextAmmo!;
-      } else {
-        _currentAmmo = candidates[_random.nextInt(candidates.length)];
+  void _registerMathAmmo(
+    String answer, {
+    required bool prioritizeNext,
+  }) {
+    if (_currentAmmo == answer) {
+      if (!prioritizeNext) {
+        _ammoQueue.add(answer);
       }
-      final nextCandidates = candidates
-          .where((answer) => answer != _currentAmmo)
-          .toList(growable: false);
-      _nextAmmo = nextCandidates.isEmpty
-          ? null
-          : nextCandidates[_random.nextInt(nextCandidates.length)];
-    } else {
-      _nextAmmo = null;
-      _ensureAmmoHasTarget();
+      return;
     }
+    if (prioritizeNext && _nextAmmo != answer) {
+      _nextAmmo = answer;
+      _nextAmmoGuaranteed = true;
+      return;
+    }
+    if (!_nextAmmoGuaranteed) {
+      _nextAmmo = answer;
+      _nextAmmoGuaranteed = true;
+      return;
+    }
+    _ammoQueue.add(answer);
   }
 
   Future<void> _fire() async {
-    if (_shotFlashing || _phase == _MissionPhase.ended) {
+    if (_shotFlashing ||
+        _reloadRemaining > 0 ||
+        _phase == _MissionPhase.ended) {
       return;
     }
     if (_phase == _MissionPhase.wave) {
@@ -355,7 +339,6 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
               _destroyed += 1;
               _combo += 1;
               _score += 100 + math.min(_combo, 5) * 20;
-              _chooseNextAmmo();
             } else {
               _score += 25;
             }
@@ -383,7 +366,6 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
             _bossPartsDestroyed += 1;
             _combo += 1;
             _score += 180 + math.min(_combo, 5) * 25;
-            _chooseNextAmmo();
           } else {
             target.shieldFlash = 0.45;
             _wrongShots += 1;
@@ -396,6 +378,9 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
               .addPostFrameCallback((_) => _finishMission(true));
         }
       }
+    }
+    if (mounted) {
+      setState(() => _reloadRemaining = _reloadDuration);
     }
     await Future<void>.delayed(const Duration(milliseconds: 190));
     if (mounted) {
@@ -457,6 +442,10 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     if (!mounted || _phase != _MissionPhase.wave || _finishing) {
       return;
     }
+    if (_destroyed < _minimumMathKills) {
+      _finishMission(false);
+      return;
+    }
     if (_config.isBoss) {
       setState(_enterBoss);
     } else {
@@ -469,13 +458,11 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     _bossTime = 0;
     _missileClock = 0;
     _missiles.clear();
-    final bonusArmor = _destroyed < 4
-        ? 3
-        : _destroyed < 8
-            ? 2
-            : _destroyed < 12
-                ? 1
-                : 0;
+    final bonusArmor = _destroyed < 15
+        ? 2
+        : _destroyed < 22
+            ? 1
+            : 0;
     final partCount = 4 + bonusArmor;
     const positions = <Offset>[
       Offset(0.24, 0.25),
@@ -486,21 +473,28 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
       Offset(0.18, 0.57),
       Offset(0.82, 0.57),
     ];
+    _ammoQueue.clear();
+    _currentAmmo = _randomAmmo();
+    _nextAmmo = _randomAmmo(excluding: _currentAmmo);
+    _nextAmmoGuaranteed = false;
     for (var index = 0; index < partCount; index++) {
+      final question = _config.questions[
+          (index + _random.nextInt(_config.questions.length)) %
+              _config.questions.length];
       _bossParts.add(
         _BossPartEntity(
           id: _nextEntityId++,
-          question: _config.questions[
-              (index + _random.nextInt(_config.questions.length)) %
-                  _config.questions.length],
+          question: question,
           position: positions[index],
           isArmor: index >= 4,
         ),
       );
+      _registerMathAmmo(
+        question.correctAnswer,
+        prioritizeNext: index == 0,
+      );
     }
-    _currentAmmo = _bossParts.first.question.correctAnswer;
-    _nextAmmo =
-        _bossParts.length > 1 ? _bossParts[1].question.correctAnswer : null;
+    _reloadRemaining = 0;
   }
 
   void _updateBoss(double dt) {
@@ -733,6 +727,9 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
                     _AmmoPanel(
                       currentAmmo: _currentAmmo,
                       nextAmmo: _nextAmmo,
+                      reloading: _reloadRemaining > 0,
+                      reloadProgress:
+                          1 - (_reloadRemaining / _reloadDuration).clamp(0, 1),
                       compact: compact,
                       onFire: _fire,
                     ),
@@ -1032,12 +1029,16 @@ class _AmmoPanel extends StatelessWidget {
   const _AmmoPanel({
     required this.currentAmmo,
     required this.nextAmmo,
+    required this.reloading,
+    required this.reloadProgress,
     required this.compact,
     required this.onFire,
   });
 
   final String currentAmmo;
   final String? nextAmmo;
+  final bool reloading;
+  final double reloadProgress;
   final bool compact;
   final VoidCallback onFire;
 
@@ -1121,9 +1122,9 @@ class _AmmoPanel extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Material(
-            color: _spaceRed,
+            color: reloading ? Colors.white12 : _spaceRed,
             shape: const CircleBorder(),
-            elevation: 8,
+            elevation: reloading ? 0 : 8,
             shadowColor: _spaceRed,
             child: InkWell(
               onTap: onFire,
@@ -1131,21 +1132,43 @@ class _AmmoPanel extends StatelessWidget {
               child: SizedBox(
                 width: compact ? 64 : 72,
                 height: compact ? 64 : 72,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Icon(
-                      Icons.rocket_launch_rounded,
-                      color: Colors.white,
-                      size: compact ? 25 : 28,
-                    ),
-                    Text(
-                      context.getText(AppKeys.gamesSquadronFire),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
+                    if (reloading)
+                      SizedBox(
+                        width: compact ? 54 : 62,
+                        height: compact ? 54 : 62,
+                        child: CircularProgressIndicator(
+                          value: reloadProgress,
+                          strokeWidth: 4,
+                          color: _spaceCyan,
+                          backgroundColor: Colors.white12,
+                        ),
                       ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          reloading
+                              ? Icons.sync_rounded
+                              : Icons.rocket_launch_rounded,
+                          color: reloading ? _spaceCyan : Colors.white,
+                          size: compact ? 24 : 27,
+                        ),
+                        Text(
+                          context.getText(
+                            reloading
+                                ? AppKeys.gamesSquadronReloading
+                                : AppKeys.gamesSquadronFire,
+                          ),
+                          style: TextStyle(
+                            color: reloading ? _spaceCyan : Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1358,11 +1381,11 @@ class _MissionResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stars = destroyed >= 12
+    final stars = destroyed >= 24
         ? 3
-        : destroyed >= 8
+        : destroyed >= 20
             ? 2
-            : destroyed > 0
+            : destroyed >= _minimumMathKills
                 ? 1
                 : 0;
     final color = won ? _spaceCyan : _spaceRed;

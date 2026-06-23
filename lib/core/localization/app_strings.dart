@@ -610,7 +610,7 @@ class AppStrings {
       AppKeys.gamesSquadronLevelComplete:
           'Bé đã hoàn thành Màn {level} của Phi đội Toán học.',
       AppKeys.gamesSquadronNeedAccuracy:
-          'Cần trả lời đúng ít nhất 60% và giữ lại khiên để qua màn.',
+          'Cần phá ít nhất 10 trong 30 thiên thạch toán và giữ lại khiên để qua màn.',
       AppKeys.gamesSquadronExitTitle: 'Rời nhiệm vụ?',
       AppKeys.gamesSquadronExitMessage:
           'Tiến độ của lượt chơi này sẽ không được lưu.',
@@ -628,6 +628,7 @@ class AppStrings {
       AppKeys.gamesSquadronNextAmmo: 'Đạn kế tiếp: {ammo}',
       AppKeys.gamesSquadronLaserWarning: 'CẢNH BÁO LASER • HÃY NÉ!',
       AppKeys.gamesSquadronAimShip: 'Di chuyển tàu vào đúng làn rồi bắn thẳng',
+      AppKeys.gamesSquadronReloading: 'ĐANG NẠP',
       AppKeys.createQuestionFailed: 'Không thể tạo câu hỏi. Vui lòng thử lại.',
       AppKeys.missingQuizToSubmit: 'Không tìm thấy bài test để nộp.',
       AppKeys.submitQuizFailed: 'Nộp bài thất bại. Vui lòng thử lại.',
@@ -1290,7 +1291,7 @@ class AppStrings {
       AppKeys.gamesSquadronLevelComplete:
           'You completed Stage {level} of Math Squadron.',
       AppKeys.gamesSquadronNeedAccuracy:
-          'Answer at least 60% correctly and keep a shield to pass.',
+          'Destroy at least 10 of 30 math meteors and keep a shield to pass.',
       AppKeys.gamesSquadronExitTitle: 'Leave mission?',
       AppKeys.gamesSquadronExitMessage:
           'Progress from this play session will not be saved.',
@@ -1309,6 +1310,7 @@ class AppStrings {
       AppKeys.gamesSquadronLaserWarning: 'LASER WARNING • DODGE!',
       AppKeys.gamesSquadronAimShip:
           'Move the ship into a lane and fire straight ahead',
+      AppKeys.gamesSquadronReloading: 'RELOAD',
       AppKeys.createQuestionFailed:
           'Could not create questions. Please try again.',
       AppKeys.missingQuizToSubmit: 'Could not find a test to submit.',

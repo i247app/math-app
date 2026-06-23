@@ -632,6 +632,7 @@ class AppKeys {
   static const gamesSquadronNextAmmo = 'games_squadron_next_ammo';
   static const gamesSquadronLaserWarning = 'games_squadron_laser_warning';
   static const gamesSquadronAimShip = 'games_squadron_aim_ship';
+  static const gamesSquadronReloading = 'games_squadron_reloading';
   static const createQuestionFailed = 'create_question_failed';
   static const missingQuizToSubmit = 'missing_quiz_to_submit';
   static const submitQuizFailed = 'submit_quiz_failed';
