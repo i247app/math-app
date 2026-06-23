@@ -28,7 +28,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
-  String selectedRole = 'STUDENT';
+  String? selectedRole;
 
   static bool _isUsernameExistsError(String? message) {
     final normalized = message?.toLowerCase().trim();
@@ -65,7 +65,9 @@ class _SignupScreenState extends State<SignupScreen> {
     final tight = width < 370;
     final mascotSize = tight ? 118.0 : 136.0;
 
-    final isFormValid = usernameController.text.trim().isNotEmpty;
+    final role = selectedRole;
+    final isFormValid =
+        usernameController.text.trim().isNotEmpty && role != null;
 
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (previous, current) =>
@@ -173,7 +175,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 label:
                                     context.getText(AppKeys.signupRoleStudent),
                                 imagePath: 'assets/images/student-icon.png',
-                                isSelected: selectedRole == 'STUDENT',
+                                isSelected: role == 'STUDENT',
                                 onTap: () =>
                                     setState(() => selectedRole = 'STUDENT'),
                               ),
@@ -184,7 +186,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 label:
                                     context.getText(AppKeys.signupRoleParent),
                                 imagePath: 'assets/images/parent-icon.png',
-                                isSelected: selectedRole == 'PARENT',
+                                isSelected: role == 'PARENT',
                                 onTap: () =>
                                     setState(() => selectedRole = 'PARENT'),
                               ),
@@ -195,7 +197,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 label:
                                     context.getText(AppKeys.signupRoleTeacher),
                                 imagePath: 'assets/images/teacher-icon.png',
-                                isSelected: selectedRole == 'TEACHER',
+                                isSelected: role == 'TEACHER',
                                 onTap: () =>
                                     setState(() => selectedRole = 'TEACHER'),
                               ),
@@ -214,7 +216,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   widget.onContinue(
                                     usernameController.text,
                                     emailController.text,
-                                    selectedRole,
+                                    role,
                                   );
                                 },
                         ),

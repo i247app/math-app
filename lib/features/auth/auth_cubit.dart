@@ -532,6 +532,14 @@ class AuthCubit extends Cubit<AuthState> {
       );
       return;
     }
+    if (trimmedRole.isEmpty) {
+      emit(
+        state.copyWith(
+          authError: AppStrings.current(AppKeys.missingProfileSelections),
+        ),
+      );
+      return;
+    }
 
     emit(state.copyWith(isSigningUp: true, clearAuthError: true));
 
