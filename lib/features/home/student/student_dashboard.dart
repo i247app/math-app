@@ -154,11 +154,12 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   late final ClassroomService _classroomService = widget.classroomService;
   late final ClassroomExerciseService _assignmentService =
       widget.assignmentService;
+  late final HomeLayoutService _homeLayoutService = HomeLayoutApi();
   final _StudentHomePanel _activePanel = _StudentHomePanel.homework;
   bool _isLoadingInvitations = false;
-  bool _hasLoadedInvitations = false;
   bool _isLoadingAssessments = false;
-  bool _hasLoadedAssessments = false;
+  bool _isLoadingHomeLayout = false;
+  bool _hasLoadedHomeLayout = false;
   bool _isLoadingModeHomework = false;
   bool _hasPlayedHeroEntrance = false;
   bool _hasPlayedSectionsEntrance = false;
@@ -167,10 +168,12 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   bool _hasPlayedModeThreeEntrance = false;
   List<ClassroomInvitation> _invitations = const <ClassroomInvitation>[];
   List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
+  List<ClassroomModel> _layoutClassrooms = const <ClassroomModel>[];
   List<ClassroomExercise> _modeHomeworkExercises = const <ClassroomExercise>[];
   final Set<int> _processingInvitationClassIds = <int>{};
   int? _modeHomeworkClassroomId;
   int? _modeHomeworkProfileId;
+  int _homeLayoutRequestId = 0;
 
   ClassroomCollectionState get _classroomCollection {
     final profileId = ActiveProfileSession.profileStableId(
@@ -182,10 +185,16 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     return context.read<ClassroomCubit>().joined(profileId);
   }
 
-  List<ClassroomModel> get _classrooms => _classroomCollection.classrooms;
+  List<ClassroomModel> get _classrooms {
+    if (_hasLoadedHomeLayout || _layoutClassrooms.isNotEmpty) {
+      return _layoutClassrooms;
+    }
+    return _classroomCollection.classrooms;
+  }
 
   bool get _isLoadingClassrooms => _classroomCollection.isLoading;
 
+  // ignore: unused_element
   bool get _hasLoadedClassrooms => _classroomCollection.hasLoaded;
 
   String? get _classroomError => _classroomCollection.errorMessage == null
@@ -196,11 +205,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   void initState() {
     super.initState();
     if (widget.isActive) {
-      if (widget.activeRole == ProfileRole.student) {
-        _loadClassrooms();
-      }
-      _loadInvitations();
-      _loadAssessments();
+      _loadHomeLayout();
     }
   }
 
@@ -208,11 +213,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   void didUpdateWidget(covariant _StudentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      if (widget.activeRole == ProfileRole.student) {
-        _loadClassrooms();
-      }
-      _loadInvitations();
-      _loadAssessments();
+      _loadHomeLayout();
       return;
     }
     if (!widget.isActive) {
@@ -227,10 +228,11 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     final roleChanged = oldWidget.activeRole != widget.activeRole;
     if (oldProfileId != profileId || roleChanged) {
       _invitations = const <ClassroomInvitation>[];
-      _hasLoadedInvitations = false;
       _isLoadingAssessments = false;
       _completedAssessments = const <GeneratedQuiz>[];
-      _hasLoadedAssessments = false;
+      _isLoadingHomeLayout = false;
+      _hasLoadedHomeLayout = false;
+      _layoutClassrooms = const <ClassroomModel>[];
       _isLoadingModeHomework = false;
       _modeHomeworkExercises = const <ClassroomExercise>[];
       _modeHomeworkClassroomId = null;
@@ -238,17 +240,82 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       _hasPlayedModeOneEntrance = false;
       _hasPlayedModeTwoEntrance = false;
       _hasPlayedModeThreeEntrance = false;
-      if (widget.activeRole == ProfileRole.student) {
-        _loadClassrooms();
-      }
-      _loadInvitations();
-      _loadAssessments();
+      _loadHomeLayout();
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
-      if (widget.activeRole == ProfileRole.student) {
-        _loadClassrooms(forceRefresh: true);
+      _loadHomeLayout();
+    }
+  }
+
+  Future<void> _loadHomeLayout() async {
+    final requestId = ++_homeLayoutRequestId;
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    if (profileId == null || profileId <= 0) {
+      if (!mounted) {
+        return;
       }
-      _loadInvitations();
-      _loadAssessments();
+      setState(() {
+        _isLoadingHomeLayout = false;
+        _hasLoadedHomeLayout = true;
+        _layoutClassrooms = const <ClassroomModel>[];
+        _modeHomeworkExercises = const <ClassroomExercise>[];
+        _completedAssessments = const <GeneratedQuiz>[];
+        _isLoadingModeHomework = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingHomeLayout = true;
+      if (!_hasLoadedHomeLayout) {
+        _layoutClassrooms = const <ClassroomModel>[];
+        _modeHomeworkExercises = const <ClassroomExercise>[];
+        _completedAssessments = const <GeneratedQuiz>[];
+      }
+    });
+
+    try {
+      final layout = await _homeLayoutService.getLayout(profileId: profileId);
+      if (!mounted ||
+          requestId != _homeLayoutRequestId ||
+          ActiveProfileSession.profileStableId(widget.activeProfile) !=
+              profileId) {
+        return;
+      }
+      final student = layout.student;
+      final classrooms = student?.classrooms
+              .map((classroom) => classroom.classroom)
+              .toList(growable: false) ??
+          const <ClassroomModel>[];
+      final pendingExercises = student?.pendingExercises
+              .map((pending) => pending.exercise)
+              .whereType<ClassroomExercise>()
+              .toList(growable: false) ??
+          const <ClassroomExercise>[];
+      setState(() {
+        _isLoadingHomeLayout = false;
+        _hasLoadedHomeLayout = true;
+        _layoutClassrooms = classrooms;
+        _modeHomeworkExercises = pendingExercises;
+        _modeHomeworkClassroomId =
+            classrooms.isEmpty ? null : classrooms.first.stableId;
+        _modeHomeworkProfileId = profileId;
+        _isLoadingModeHomework = false;
+        _completedAssessments = _quizzesFromLayoutQuizzes(layout.quizzes);
+      });
+    } catch (_) {
+      if (!mounted || requestId != _homeLayoutRequestId) {
+        return;
+      }
+      setState(() {
+        _isLoadingHomeLayout = false;
+        _hasLoadedHomeLayout = true;
+        _layoutClassrooms = const <ClassroomModel>[];
+        _modeHomeworkExercises = const <ClassroomExercise>[];
+        _completedAssessments = const <GeneratedQuiz>[];
+        _isLoadingModeHomework = false;
+      });
     }
   }
 
@@ -292,7 +359,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       }
 
       setState(() {
-        _hasLoadedInvitations = true;
         _invitations = invitations;
       });
     } catch (_) {
@@ -303,7 +369,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       }
 
       setState(() {
-        _hasLoadedInvitations = true;
         _invitations = const <ClassroomInvitation>[];
       });
     } finally {
@@ -315,6 +380,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     }
   }
 
+  // ignore: unused_element
   Future<void> _loadAssessments() async {
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
@@ -347,7 +413,6 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
         ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
       setState(() {
         _completedAssessments = completed;
-        _hasLoadedAssessments = true;
         _isLoadingAssessments = false;
       });
     } catch (_) {
@@ -356,12 +421,12 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       }
       setState(() {
         _completedAssessments = const <GeneratedQuiz>[];
-        _hasLoadedAssessments = true;
         _isLoadingAssessments = false;
       });
     }
   }
 
+  // ignore: unused_element
   Future<void> _loadModeHomework({
     required int classroomId,
     required int profileId,
@@ -557,43 +622,10 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
   @override
   Widget build(BuildContext context) {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
-    if (profileId != null && profileId > 0) {
-      context.select<ClassroomCubit, ClassroomCollectionState>(
-        (cubit) => cubit.joined(profileId),
-      );
-    }
-    final isLoadingHomeSections = profileId != null &&
-        profileId > 0 &&
-        (!_hasLoadedInvitations ||
-            !_hasLoadedAssessments ||
-            (widget.activeRole == ProfileRole.student &&
-                !_hasLoadedClassrooms));
+    final isLoadingHomeSections = !_hasLoadedHomeLayout || _isLoadingHomeLayout;
     final hasClassroom =
         widget.activeRole == ProfileRole.student && _classrooms.isNotEmpty;
     final hasCompletedAssessment = _completedAssessments.isNotEmpty;
-
-    if (hasClassroom) {
-      final classroom = _classrooms.first;
-      final classroomId = classroom.stableId;
-      if (classroomId != null &&
-          profileId != null &&
-          profileId > 0 &&
-          (_modeHomeworkClassroomId != classroomId ||
-              _modeHomeworkProfileId != profileId) &&
-          !_isLoadingModeHomework) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            _loadModeHomework(
-              classroomId: classroomId,
-              profileId: profileId,
-            );
-          }
-        });
-      }
-    }
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),

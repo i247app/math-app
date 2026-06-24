@@ -66,9 +66,8 @@ extension _StudentHomeModeThreeView on _StudentHomeContentState {
       ),
     );
 
-    final classroomId = _classrooms.isEmpty ? null : _classrooms.first.stableId;
-    if (classroomId != null && mounted) {
-      await _loadModeHomework(classroomId: classroomId, profileId: profileId);
+    if (mounted) {
+      await _loadHomeLayout();
     }
   }
 }

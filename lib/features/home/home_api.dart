@@ -86,12 +86,14 @@ class HomeLayout {
     this.role,
     this.profile,
     this.parent,
+    this.student,
     this.quizzes = const <HomeLayoutQuiz>[],
   });
 
   final String? role;
   final StudentProfile? profile;
   final ParentHomeLayout? parent;
+  final StudentHomeLayout? student;
   final List<HomeLayoutQuiz> quizzes;
 
   factory HomeLayout.fromJson(Map<String, dynamic> json) {
@@ -99,6 +101,7 @@ class HomeLayout {
       role: _stringFromJson(json['role']),
       profile: _objectFromJson(json['profile'], StudentProfile.fromJson),
       parent: _objectFromJson(json['parent'], ParentHomeLayout.fromJson),
+      student: _objectFromJson(json['student'], StudentHomeLayout.fromJson),
       quizzes: _listFromJson(json['quizzes'], HomeLayoutQuiz.fromJson),
     );
   }
@@ -163,6 +166,41 @@ class ParentHomeLayout {
   factory ParentHomeLayout.fromJson(Map<String, dynamic> json) {
     return ParentHomeLayout(
       children: _listFromJson(json['children'], StudentProfile.fromJson),
+      classrooms: _listFromJson(
+        json['classrooms'],
+        HomeLayoutClassroom.fromJson,
+      ),
+      pendingExercises: _listFromJson(
+        json['pending_exercises'],
+        HomeLayoutPendingExercise.fromJson,
+      ),
+      expiredExercises: _listFromJson(
+        json['expired_exercises'],
+        HomeLayoutPendingExercise.fromJson,
+      ),
+      recentCompletions: _listFromJson(
+        json['recent_completions'],
+        HomeLayoutRecentCompletion.fromJson,
+      ),
+    );
+  }
+}
+
+class StudentHomeLayout {
+  const StudentHomeLayout({
+    this.classrooms = const <HomeLayoutClassroom>[],
+    this.pendingExercises = const <HomeLayoutPendingExercise>[],
+    this.expiredExercises = const <HomeLayoutPendingExercise>[],
+    this.recentCompletions = const <HomeLayoutRecentCompletion>[],
+  });
+
+  final List<HomeLayoutClassroom> classrooms;
+  final List<HomeLayoutPendingExercise> pendingExercises;
+  final List<HomeLayoutPendingExercise> expiredExercises;
+  final List<HomeLayoutRecentCompletion> recentCompletions;
+
+  factory StudentHomeLayout.fromJson(Map<String, dynamic> json) {
+    return StudentHomeLayout(
       classrooms: _listFromJson(
         json['classrooms'],
         HomeLayoutClassroom.fromJson,
