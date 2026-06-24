@@ -729,16 +729,40 @@ ClassroomModel? _classroomForLayoutChild(
   for (final completion in parent.recentCompletions) {
     if (_layoutChildId(completion.child) == childId &&
         completion.classroom != null) {
+      final classroomId =
+          completion.classroomId ?? completion.exercise?.classroomId;
+      final matchingClassroom = _layoutClassroomById(parent, classroomId);
+      if (matchingClassroom != null) {
+        return matchingClassroom;
+      }
       return completion.classroom;
     }
   }
 
   for (final pending in parent.pendingExercises) {
     if (_layoutChildId(pending.child) == childId && pending.classroom != null) {
+      final classroomId = pending.classroomId ?? pending.exercise?.classroomId;
+      final matchingClassroom = _layoutClassroomById(parent, classroomId);
+      if (matchingClassroom != null) {
+        return matchingClassroom;
+      }
       return pending.classroom;
     }
   }
 
+  return null;
+}
+
+ClassroomModel? _layoutClassroomById(
+    ParentHomeLayout parent, int? classroomId) {
+  if (classroomId == null) {
+    return null;
+  }
+  for (final layoutClassroom in parent.classrooms) {
+    if (layoutClassroom.classroom.stableId == classroomId) {
+      return layoutClassroom.classroom;
+    }
+  }
   return null;
 }
 

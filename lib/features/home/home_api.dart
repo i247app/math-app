@@ -174,7 +174,7 @@ class HomeLayoutPendingExercise {
       classroom: _objectFromJson(json['classroom'], ClassroomModel.fromJson),
       classroomExerciseId: _intFromJson(json['classroom_exercise_id']),
       classroomId: _intFromJson(json['classroom_id']),
-      exercise: _objectFromJson(json['exercise'], ClassroomExercise.fromJson),
+      exercise: _exerciseFromJson(json['exercise']),
     );
   }
 }
@@ -218,7 +218,7 @@ class HomeLayoutRecentCompletion {
       ),
       classroomId: _intFromJson(json['classroom_id']),
       correctNumber: _intFromJson(json['correct_number']),
-      exercise: _objectFromJson(json['exercise'], ClassroomExercise.fromJson),
+      exercise: _exerciseFromJson(json['exercise']),
       gradedDt: _stringFromJson(json['graded_dt']),
       scorePercentage: _intFromJson(json['score_percentage']),
       submissionStatus: _stringFromJson(json['submission_status']),
@@ -236,6 +236,25 @@ Object? _nestedValue(Object? value, String key) {
     return json[key];
   }
   return null;
+}
+
+ClassroomExercise? _exerciseFromJson(Object? value) {
+  if (value case final Map<String, dynamic> json) {
+    return ClassroomExercise.fromJson(_normalizedExerciseJson(json));
+  }
+  if (value case final Map<Object?, Object?> json) {
+    return ClassroomExercise.fromJson(
+      _normalizedExerciseJson(Map<String, dynamic>.from(json)),
+    );
+  }
+  return null;
+}
+
+Map<String, dynamic> _normalizedExerciseJson(Map<String, dynamic> json) {
+  return <String, dynamic>{
+    ...json,
+    'num_questions': json['num_questions'] ?? json['total_questions'],
+  };
 }
 
 T? _objectFromJson<T>(
