@@ -58,8 +58,6 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   HomeLayout? _homeLayout;
   List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
   List<_ParentChildSummary> _childSummaries = const <_ParentChildSummary>[];
-  Map<String, HomeLayoutRecentCompletion> _layoutCompletionByQuizKey =
-      const <String, HomeLayoutRecentCompletion>{};
   int _childLoadRequestId = 0;
   bool _hasPlayedModeOneEntrance = false;
   bool _hasPlayedModeTwoEntrance = false;
@@ -131,8 +129,6 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         _homeLayout = null;
         _childSummaries = const <_ParentChildSummary>[];
         _completedAssessments = const <GeneratedQuiz>[];
-        _layoutCompletionByQuizKey =
-            const <String, HomeLayoutRecentCompletion>{};
       });
       widget.args.onParentAssessmentStateChanged(false);
       return;
@@ -155,13 +151,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       }
       final parent = layout.parent;
       final summaries = _summariesFromLayout(parent);
-      final completedAssessments = _recentCompletionQuizzes(parent);
-      final completionByQuizKey = <String, HomeLayoutRecentCompletion>{
-        for (final completion in parent?.recentCompletions ??
-            const <HomeLayoutRecentCompletion>[])
-          if (_layoutQuizKeyFromCompletion(completion) != null)
-            _layoutQuizKeyFromCompletion(completion)!: completion,
-      };
+      final completedAssessments = _quizzesFromLayoutQuizzes(layout.quizzes);
       setState(() {
         _isLoading = false;
         _hasLoadedHome = true;
@@ -169,7 +159,6 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         _homeLayout = layout;
         _childSummaries = summaries;
         _completedAssessments = completedAssessments;
-        _layoutCompletionByQuizKey = completionByQuizKey;
       });
       widget.args.onParentAssessmentStateChanged(
         completedAssessments.isNotEmpty,
@@ -185,8 +174,6 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         _homeLayout = null;
         _childSummaries = const <_ParentChildSummary>[];
         _completedAssessments = const <GeneratedQuiz>[];
-        _layoutCompletionByQuizKey =
-            const <String, HomeLayoutRecentCompletion>{};
       });
       widget.args.onParentAssessmentStateChanged(false);
     } catch (_) {
@@ -201,8 +188,6 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         _homeLayout = null;
         _childSummaries = const <_ParentChildSummary>[];
         _completedAssessments = const <GeneratedQuiz>[];
-        _layoutCompletionByQuizKey =
-            const <String, HomeLayoutRecentCompletion>{};
       });
       widget.args.onParentAssessmentStateChanged(false);
     }
@@ -373,20 +358,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   }
 
   void _openParentAssessmentResult(GeneratedQuiz quiz) {
-    final completion = _layoutCompletionByQuizKey[_layoutQuizKeyFromQuiz(quiz)];
-    if (completion == null) {
-      _openQuizReview(quiz);
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => StudentHomeworkResultScreen(
-          summary: _homeworkSummaryFromCompletion(context, completion),
-        ),
-      ),
-    );
+    _openQuizReview(quiz);
   }
 
   Future<void> _openPendingExercise(HomeLayoutPendingExercise pending) async {
@@ -699,11 +671,27 @@ List<_ParentChildSummary> _summariesFromLayout(ParentHomeLayout? parent) {
   }).toList(growable: false);
 }
 
-List<GeneratedQuiz> _recentCompletionQuizzes(ParentHomeLayout? parent) {
+List<GeneratedQuiz> _quizzesFromLayoutQuizzes(List<HomeLayoutQuiz> quizzes) {
   return <GeneratedQuiz>[
-    for (final completion
-        in parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[])
-      _quizFromRecentCompletion(completion),
+    for (final quiz in quizzes)
+      GeneratedQuiz(
+        id: quiz.quizId,
+        quizId: quiz.quizId,
+        quizStatus: quiz.quizStatus,
+        purpose: quiz.purpose,
+        type: quiz.purpose,
+        typeOfQuiz: quiz.typeOfQuiz,
+        title: quiz.title,
+        shortText: quiz.shortText,
+        createDt: quiz.createDt,
+        modifyDt: quiz.createDt,
+        grading: QuizGrading(
+          correctNumber: quiz.correctNumber,
+          scorePercentage: quiz.scorePercentage,
+          totalQuestions: quiz.totalQuestions,
+        ),
+        questions: const <QuizQuestion>[],
+      ),
   ]..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
 }
 
@@ -747,6 +735,17 @@ ClassroomModel? _classroomForLayoutChild(
         return matchingClassroom;
       }
       return pending.classroom;
+    }
+  }
+
+  for (final expired in parent.expiredExercises) {
+    if (_layoutChildId(expired.child) == childId && expired.classroom != null) {
+      final classroomId = expired.classroomId ?? expired.exercise?.classroomId;
+      final matchingClassroom = _layoutClassroomById(parent, classroomId);
+      if (matchingClassroom != null) {
+        return matchingClassroom;
+      }
+      return expired.classroom;
     }
   }
 
@@ -821,22 +820,6 @@ StudentHomeworkResultSummary _homeworkSummaryFromCompletion(
     scoreText: '--/10',
     reviewText: context.getText(AppKeys.defaultAiReview),
   );
-}
-
-String? _layoutQuizKeyFromCompletion(HomeLayoutRecentCompletion completion) {
-  final childId = _layoutChildId(completion.child);
-  final exerciseId = completion.classroomExerciseId ??
-      completion.exercise?.classroomExerciseId ??
-      completion.exercise?.exerciseId ??
-      completion.exercise?.id;
-  if (childId == null || exerciseId == null) {
-    return null;
-  }
-  return '$childId:$exerciseId';
-}
-
-String _layoutQuizKeyFromQuiz(GeneratedQuiz quiz) {
-  return '${quiz.profileId}:${quiz.quizId ?? quiz.id}';
 }
 
 int? _layoutChildId(StudentProfile? child) {

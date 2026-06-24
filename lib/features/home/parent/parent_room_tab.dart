@@ -112,6 +112,8 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     final entries = _roomEntries(parent);
     final pendingExercises =
         parent?.pendingExercises ?? const <HomeLayoutPendingExercise>[];
+    final expiredExercises =
+        parent?.expiredExercises ?? const <HomeLayoutPendingExercise>[];
     final completions =
         parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[];
 
@@ -140,6 +142,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                     context,
                     entries: entries,
                     pendingExercises: pendingExercises,
+                    expiredExercises: expiredExercises,
                     completions: completions,
                   ),
                 ),
@@ -155,6 +158,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     BuildContext context, {
     required List<_ParentRoomEntry> entries,
     required List<HomeLayoutPendingExercise> pendingExercises,
+    required List<HomeLayoutPendingExercise> expiredExercises,
     required List<HomeLayoutRecentCompletion> completions,
   }) {
     if (_isLoading && !_hasLoaded) {
@@ -194,6 +198,14 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           _ParentRoomPendingCard(
             pending: pending,
             onTap: () => _openPendingExercise(pending),
+          ),
+          const SizedBox(height: 14),
+        ],
+        for (final expired in expiredExercises.take(3)) ...[
+          _ParentRoomPendingCard(
+            pending: expired,
+            isExpired: true,
+            onTap: () => _openPendingExercise(expired),
           ),
           const SizedBox(height: 14),
         ],
@@ -272,6 +284,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         builder: (_) => _ParentRoomDetailScreen(
           entry: entry,
           pendingExercises: _pendingForRoomEntry(parent, entry),
+          expiredExercises: _expiredForRoomEntry(parent, entry),
           completions: _completionsForRoomEntry(parent, entry),
           exerciseService: widget.args.assignmentService,
           onRefreshLayout: _loadLayout,
@@ -285,6 +298,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
   const _ParentRoomDetailScreen({
     required this.entry,
     required this.pendingExercises,
+    required this.expiredExercises,
     required this.completions,
     required this.exerciseService,
     required this.onRefreshLayout,
@@ -292,6 +306,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
 
   final _ParentRoomEntry entry;
   final List<HomeLayoutPendingExercise> pendingExercises;
+  final List<HomeLayoutPendingExercise> expiredExercises;
   final List<HomeLayoutRecentCompletion> completions;
   final ClassroomExerciseService exerciseService;
   final Future<void> Function() onRefreshLayout;
@@ -326,7 +341,8 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                     _ParentRoomDetailHero(entry: entry),
                     const SizedBox(height: 18),
                     _ParentRoomDetailShortcuts(
-                      pendingCount: pendingExercises.length,
+                      pendingCount:
+                          pendingExercises.length + expiredExercises.length,
                       completedCount: completions.length,
                     ),
                     const SizedBox(height: 26),
@@ -335,6 +351,15 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                         pending: pending,
                         compact: true,
                         onTap: () => _openPendingExercise(context, pending),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+                    for (final expired in expiredExercises) ...[
+                      _ParentRoomPendingCard(
+                        pending: expired,
+                        compact: true,
+                        isExpired: true,
+                        onTap: () => _openPendingExercise(context, expired),
                       ),
                       const SizedBox(height: 14),
                     ],
@@ -357,7 +382,9 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                         const SizedBox(height: 14),
                       ],
                     ],
-                    if (pendingExercises.isEmpty && completions.isEmpty)
+                    if (pendingExercises.isEmpty &&
+                        expiredExercises.isEmpty &&
+                        completions.isEmpty)
                       _ParentRoomStateCard(
                         icon: Icons.assignment_outlined,
                         title: context.getText(AppKeys.studentNoHomeworkTitle),
@@ -634,11 +661,13 @@ class _ParentRoomPendingCard extends StatelessWidget {
     required this.pending,
     required this.onTap,
     this.compact = false,
+    this.isExpired = false,
   });
 
   final HomeLayoutPendingExercise pending;
   final VoidCallback onTap;
   final bool compact;
+  final bool isExpired;
 
   @override
   Widget build(BuildContext context) {
@@ -651,7 +680,11 @@ class _ParentRoomPendingCard extends StatelessWidget {
     final dateLabel = _roomExerciseCreatedDate(exercise);
     final dueLabel = _roomExerciseDueLabel(context, exercise);
     final purpose = _roomPurposeLabel(context, exercise?.purpose);
-    final accent = _roomPurposeAccent(exercise?.purpose);
+    final accent = isExpired
+        ? (color: const Color(0xFFC2410C), badge: const Color(0xFFFFE7D6))
+        : _roomPurposeAccent(exercise?.purpose);
+    final statusLabel =
+        isExpired ? context.getText(AppKeys.studentHomeworkOverdue) : purpose;
 
     return _ParentRoomTaskShell(
       accent: accent.color,
@@ -683,7 +716,7 @@ class _ParentRoomPendingCard extends StatelessWidget {
                 ),
               ),
               _ParentRoomChip(
-                label: purpose,
+                label: statusLabel,
                 color: accent.badge,
                 textColor: accent.color,
               ),
@@ -1448,6 +1481,29 @@ List<_ParentRoomEntry> _roomEntries(ParentHomeLayout? parent) {
     }
   }
 
+  for (final expired in parent.expiredExercises) {
+    final childId = _layoutChildId(expired.child);
+    final classroomId = expired.classroomId ?? expired.exercise?.classroomId;
+    final child = childId == null ? null : childById[childId] ?? expired.child;
+    if (child == null || classroomId == null) {
+      continue;
+    }
+    final layoutClassroom = _layoutClassroomForChildClass(
+      parent: parent,
+      layoutClassroomById: layoutClassroomById,
+      classroomId: classroomId,
+      childId: childId!,
+      fallbackClassroom: expired.classroom,
+    );
+    if (layoutClassroom != null) {
+      addEntry(
+        layoutClassroom: layoutClassroom,
+        child: child,
+        memberProfileId: childId,
+      );
+    }
+  }
+
   for (final completion in parent.recentCompletions) {
     final childId = _layoutChildId(completion.child);
     final classroomId =
@@ -1520,6 +1576,22 @@ List<HomeLayoutPendingExercise> _pendingForRoomEntry(
     return _sameRoom(
       classroomId: pending.classroomId ?? pending.exercise?.classroomId,
       childId: _layoutChildId(pending.child),
+      entry: entry,
+    );
+  }).toList(growable: false);
+}
+
+List<HomeLayoutPendingExercise> _expiredForRoomEntry(
+  ParentHomeLayout? parent,
+  _ParentRoomEntry entry,
+) {
+  if (parent == null) {
+    return const <HomeLayoutPendingExercise>[];
+  }
+  return parent.expiredExercises.where((expired) {
+    return _sameRoom(
+      classroomId: expired.classroomId ?? expired.exercise?.classroomId,
+      childId: _layoutChildId(expired.child),
       entry: entry,
     );
   }).toList(growable: false);

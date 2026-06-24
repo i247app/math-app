@@ -86,17 +86,61 @@ class HomeLayout {
     this.role,
     this.profile,
     this.parent,
+    this.quizzes = const <HomeLayoutQuiz>[],
   });
 
   final String? role;
   final StudentProfile? profile;
   final ParentHomeLayout? parent;
+  final List<HomeLayoutQuiz> quizzes;
 
   factory HomeLayout.fromJson(Map<String, dynamic> json) {
     return HomeLayout(
       role: _stringFromJson(json['role']),
       profile: _objectFromJson(json['profile'], StudentProfile.fromJson),
       parent: _objectFromJson(json['parent'], ParentHomeLayout.fromJson),
+      quizzes: _listFromJson(json['quizzes'], HomeLayoutQuiz.fromJson),
+    );
+  }
+}
+
+class HomeLayoutQuiz {
+  const HomeLayoutQuiz({
+    this.quizId,
+    this.createDt,
+    this.purpose,
+    this.quizStatus,
+    this.scorePercentage,
+    this.shortText,
+    this.title,
+    this.totalQuestions,
+    this.typeOfQuiz,
+    this.correctNumber,
+  });
+
+  final int? quizId;
+  final String? createDt;
+  final String? purpose;
+  final String? quizStatus;
+  final int? scorePercentage;
+  final String? shortText;
+  final String? title;
+  final int? totalQuestions;
+  final String? typeOfQuiz;
+  final int? correctNumber;
+
+  factory HomeLayoutQuiz.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutQuiz(
+      quizId: _intFromJson(json['quiz_id']),
+      createDt: _stringFromJson(json['create_dt']),
+      purpose: _stringFromJson(json['purpose']),
+      quizStatus: _stringFromJson(json['quiz_status']),
+      scorePercentage: _intFromJson(json['score_percentage']),
+      shortText: _stringFromJson(json['short_text']),
+      title: _stringFromJson(json['title']),
+      totalQuestions: _intFromJson(json['total_questions']),
+      typeOfQuiz: _stringFromJson(json['type_of_quiz']),
+      correctNumber: _intFromJson(json['correct_number']),
     );
   }
 }
@@ -106,12 +150,14 @@ class ParentHomeLayout {
     this.children = const <StudentProfile>[],
     this.classrooms = const <HomeLayoutClassroom>[],
     this.pendingExercises = const <HomeLayoutPendingExercise>[],
+    this.expiredExercises = const <HomeLayoutPendingExercise>[],
     this.recentCompletions = const <HomeLayoutRecentCompletion>[],
   });
 
   final List<StudentProfile> children;
   final List<HomeLayoutClassroom> classrooms;
   final List<HomeLayoutPendingExercise> pendingExercises;
+  final List<HomeLayoutPendingExercise> expiredExercises;
   final List<HomeLayoutRecentCompletion> recentCompletions;
 
   factory ParentHomeLayout.fromJson(Map<String, dynamic> json) {
@@ -123,6 +169,10 @@ class ParentHomeLayout {
       ),
       pendingExercises: _listFromJson(
         json['pending_exercises'],
+        HomeLayoutPendingExercise.fromJson,
+      ),
+      expiredExercises: _listFromJson(
+        json['expired_exercises'],
         HomeLayoutPendingExercise.fromJson,
       ),
       recentCompletions: _listFromJson(
