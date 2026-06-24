@@ -649,6 +649,13 @@ class AppStrings {
       AppKeys.goodResultTitle: 'Tốt',
       AppKeys.completedResultTitle: 'Hoàn Thành',
       AppKeys.incompleteResultTitle: 'Chưa Hoàn Thành',
+      AppKeys.noCompletedHomeworkTitle: 'Chưa có bài tập nào hoàn thành',
+      AppKeys.noCompletedHomeworkMessage:
+          'Kết quả bài tập của bé sẽ xuất hiện tại đây.',
+      AppKeys.homeworkExpiredCannotSubmit: 'Bài tập đã quá hạn nộp.',
+      AppKeys.homeworkDueSoon: 'Sắp hết hạn',
+      AppKeys.homeworkFailed: 'Failed',
+      AppKeys.parentRoomAssignmentsTitle: 'Bài tập, kiểm tra',
       AppKeys.excellentResultMessage: '',
       AppKeys.generatingNewQuiz: 'đợi Numi tạo bài mới cho bạn nhé!',
       AppKeys.assessmentResultTitle: 'Kết Quả',
@@ -1333,6 +1340,14 @@ class AppStrings {
       AppKeys.goodResultTitle: 'Good',
       AppKeys.completedResultTitle: 'Completed',
       AppKeys.incompleteResultTitle: 'Not Completed',
+      AppKeys.noCompletedHomeworkTitle: 'No completed homework yet',
+      AppKeys.noCompletedHomeworkMessage:
+          'Your child\'s homework results will appear here.',
+      AppKeys.homeworkExpiredCannotSubmit:
+          'This homework is past the submission deadline.',
+      AppKeys.homeworkDueSoon: 'Due soon',
+      AppKeys.homeworkFailed: 'Failed',
+      AppKeys.parentRoomAssignmentsTitle: 'Assignments, tests',
       AppKeys.excellentResultMessage: '',
       AppKeys.generatingNewQuiz: 'Numi is creating a new test...',
       AppKeys.assessmentResultTitle: 'Result',

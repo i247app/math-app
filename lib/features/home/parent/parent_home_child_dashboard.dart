@@ -2,19 +2,12 @@ part of '../home_screen.dart';
 
 extension _ParentHomeChildDashboardView on _ParentHomeContentState {
   Widget _buildChildDashboard() {
-    final summaries = _childSummaries;
-    final pendingExercises = _homeLayout?.parent?.pendingExercises ??
-        const <HomeLayoutPendingExercise>[];
-    final assessments = <_ParentChildAssessment>[
-      for (final summary in summaries)
-        for (final quiz in summary.assessments)
-          _ParentChildAssessment(summary: summary, quiz: quiz),
-    ]..sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
+    final parent = _homeLayout?.parent;
     final padding = EdgeInsets.fromLTRB(
-      20 * widget.args.scale,
-      widget.args.headerHeight + 8 * widget.args.scale,
-      20 * widget.args.scale,
-      widget.args.bottomPadding,
+      14 * widget.args.scale,
+      widget.args.headerHeight + 10 * widget.args.scale,
+      14 * widget.args.scale,
+      widget.args.bottomPadding + 18 * widget.args.scale,
     );
 
     return RefreshIndicator(
@@ -25,57 +18,24 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
           parent: BouncingScrollPhysics(),
         ),
         padding: padding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (_isLoading && summaries.isEmpty && !_hasLoadedHome)
-              const _ParentChildDashboardLoading()
-            else
-              _modeThreeFadeIn(
-                order: 0,
-                markOnEnd: true,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _ParentChildrenGrid(summaries: summaries),
-                    const SizedBox(height: 14),
-                    for (final pending in pendingExercises.take(2)) ...[
-                      _ParentPendingExerciseCard(
-                        pending: pending,
-                        onTap: () => _openPendingExercise(pending),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                    for (final item in assessments.take(2)) ...[
-                      _ParentAssessmentResultCard(
-                        quiz: item.quiz,
-                        profileName: homeProfileDisplayName(
-                          context,
-                          item.summary.profile,
-                        ),
-                        classroomName: _parentClassroomName(
-                          context,
-                          item.summary,
-                        ),
-                        onTap: () => _openParentAssessmentResult(item.quiz),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                    _ParentTeacherMessages(
-                      summaries: summaries.take(2).toList(),
-                    ),
-                  ],
-                ),
-              ),
-            if (!_isLoading && _errorMessage != null) ...[
-              const SizedBox(height: 10),
-              _ParentHomeErrorCard(
-                message: _errorMessage!,
+        child: _isLoading && !_hasLoadedHome
+            ? const _ParentChildDashboardLoading()
+            : _ParentModeThreeContent(
+                summaries: _childSummaries,
+                pendingExercises: parent?.pendingExercises ??
+                    const <HomeLayoutPendingExercise>[],
+                completions: parent?.recentCompletions ??
+                    const <HomeLayoutRecentCompletion>[],
+                entranceBuilder: _modeThreeFadeIn,
+                onPendingTap: _openPendingExercise,
+                onCompletionTap: _openCompletionResult,
+                onViewTasks: widget.args.onOpenClassroomTab,
+                onViewResults: widget.args.onOpenClassroomTab,
+                onViewMessages: widget.args.onOpenClassroomTab,
+                isRefreshing: _isLoading && _hasLoadedHome,
+                errorMessage: _errorMessage,
                 onRetry: _loadHome,
               ),
-            ],
-          ],
-        ),
       ),
     );
   }

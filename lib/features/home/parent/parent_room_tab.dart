@@ -194,28 +194,49 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           onTap: _openRoomDetail,
         ),
         const SizedBox(height: 24),
-        for (final pending in pendingExercises.take(3)) ...[
-          _ParentRoomPendingCard(
-            pending: pending,
-            onTap: () => _openPendingExercise(pending),
+        _ParentRoomSectionTitle(
+          icon: Icons.assignment_outlined,
+          label: context.getText(AppKeys.parentRoomAssignmentsTitle),
+        ),
+        const SizedBox(height: 14),
+        if (pendingExercises.isEmpty && expiredExercises.isEmpty) ...[
+          _ParentRoomEmptyBox(
+            icon: Icons.assignment_turned_in_outlined,
+            title: context.getText(AppKeys.studentNoHomeworkTitle),
+            message: context.getText(AppKeys.studentNoHomeworkMessage),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 18),
+        ] else ...[
+          for (final pending in pendingExercises.take(3)) ...[
+            _ParentRoomPendingCard(
+              pending: pending,
+              onTap: () => _openPendingExercise(pending),
+            ),
+            const SizedBox(height: 14),
+          ],
+          for (final expired in expiredExercises.take(3)) ...[
+            _ParentRoomPendingCard(
+              pending: expired,
+              isExpired: true,
+              onTap: () => _showExpiredExerciseMessage(context),
+            ),
+            const SizedBox(height: 14),
+          ],
         ],
-        for (final expired in expiredExercises.take(3)) ...[
-          _ParentRoomPendingCard(
-            pending: expired,
-            isExpired: true,
-            onTap: () => _openPendingExercise(expired),
+        const SizedBox(height: 4),
+        _ParentRoomSectionTitle(
+          icon: Icons.inventory_2_rounded,
+          label: context.getText(AppKeys.assessmentResultTitle),
+        ),
+        const SizedBox(height: 14),
+        if (completions.isEmpty) ...[
+          _ParentRoomEmptyBox(
+            icon: Icons.fact_check_outlined,
+            title: context.getText(AppKeys.noCompletedHomeworkTitle),
+            message: context.getText(AppKeys.noCompletedHomeworkMessage),
           ),
           const SizedBox(height: 14),
-        ],
-        if (completions.isNotEmpty) ...[
-          const SizedBox(height: 4),
-          _ParentRoomSectionTitle(
-            icon: Icons.inventory_2_rounded,
-            label: context.getText(AppKeys.assessmentResultTitle),
-          ),
-          const SizedBox(height: 14),
+        ] else ...[
           for (final completion in completions.take(5)) ...[
             _ParentRoomCompletionCard(
               completion: completion,
@@ -224,16 +245,6 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             const SizedBox(height: 14),
           ],
         ],
-        if (_isLoading && _hasLoaded)
-          Text(
-            context.getText(AppKeys.loading),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF6D5C5C),
-              fontSize: FontSize.caption,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
       ],
     );
   }
@@ -314,8 +325,6 @@ class _ParentRoomDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = _roomClassName(context, entry.classroom);
-    final childName = homeProfileDisplayName(context, entry.child);
-
     return Scaffold(
       backgroundColor: const Color(0xFFFBFCFC),
       body: SafeArea(
@@ -346,30 +355,58 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                       completedCount: completions.length,
                     ),
                     const SizedBox(height: 26),
-                    for (final pending in pendingExercises) ...[
-                      _ParentRoomPendingCard(
-                        pending: pending,
-                        compact: true,
-                        onTap: () => _openPendingExercise(context, pending),
+                    _ParentRoomSectionTitle(
+                      icon: Icons.assignment_outlined,
+                      label:
+                          context.getText(AppKeys.parentRoomAssignmentsTitle),
+                    ),
+                    const SizedBox(height: 14),
+                    if (pendingExercises.isEmpty &&
+                        expiredExercises.isEmpty) ...[
+                      _ParentRoomEmptyBox(
+                        icon: Icons.assignment_turned_in_outlined,
+                        title: context.getText(AppKeys.studentNoHomeworkTitle),
+                        message:
+                            context.getText(AppKeys.studentNoHomeworkMessage),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 18),
+                    ] else ...[
+                      for (final pending in pendingExercises) ...[
+                        _ParentRoomPendingCard(
+                          pending: pending,
+                          compact: true,
+                          onTap: () => _openPendingExercise(context, pending),
+                        ),
+                        const SizedBox(height: 14),
+                      ],
+                      for (final expired in expiredExercises) ...[
+                        _ParentRoomPendingCard(
+                          pending: expired,
+                          compact: true,
+                          isExpired: true,
+                          onTap: () => _showExpiredExerciseMessage(context),
+                        ),
+                        const SizedBox(height: 14),
+                      ],
                     ],
-                    for (final expired in expiredExercises) ...[
-                      _ParentRoomPendingCard(
-                        pending: expired,
-                        compact: true,
-                        isExpired: true,
-                        onTap: () => _openPendingExercise(context, expired),
+                    const SizedBox(height: 4),
+                    _ParentRoomSectionTitle(
+                      icon: Icons.inventory_2_rounded,
+                      label: context.getText(AppKeys.assessmentResultTitle),
+                    ),
+                    const SizedBox(height: 14),
+                    if (completions.isEmpty) ...[
+                      _ParentRoomEmptyBox(
+                        icon: Icons.fact_check_outlined,
+                        title: context.getText(
+                          AppKeys.noCompletedHomeworkTitle,
+                        ),
+                        message: context.getText(
+                          AppKeys.noCompletedHomeworkMessage,
+                        ),
                       ),
                       const SizedBox(height: 14),
-                    ],
-                    if (completions.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      _ParentRoomSectionTitle(
-                        icon: Icons.inventory_2_rounded,
-                        label: context.getText(AppKeys.assessmentResultTitle),
-                      ),
-                      const SizedBox(height: 14),
+                    ] else ...[
                       for (final completion in completions) ...[
                         _ParentRoomCompletionCard(
                           completion: completion,
@@ -382,27 +419,6 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                         const SizedBox(height: 14),
                       ],
                     ],
-                    if (pendingExercises.isEmpty &&
-                        expiredExercises.isEmpty &&
-                        completions.isEmpty)
-                      _ParentRoomStateCard(
-                        icon: Icons.assignment_outlined,
-                        title: context.getText(AppKeys.studentNoHomeworkTitle),
-                        message: context.getText(
-                          AppKeys.studentNoHomeworkMessage,
-                        ),
-                        onTap: onRefreshLayout,
-                      ),
-                    const SizedBox(height: 4),
-                    Text(
-                      childName,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFF8A979B),
-                        fontSize: FontSize.caption,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -680,17 +696,31 @@ class _ParentRoomPendingCard extends StatelessWidget {
     final dateLabel = _roomExerciseCreatedDate(exercise);
     final dueLabel = _roomExerciseDueLabel(context, exercise);
     final purpose = _roomPurposeLabel(context, exercise?.purpose);
+    final dueSoon = _roomExerciseDueSoon(exercise);
     final accent = isExpired
-        ? (color: const Color(0xFFC2410C), badge: const Color(0xFFFFE7D6))
-        : _roomPurposeAccent(exercise?.purpose);
-    final statusLabel =
-        isExpired ? context.getText(AppKeys.studentHomeworkOverdue) : purpose;
+        ? (color: const Color(0xFFB91C1C), badge: const Color(0xFFFFE2E2))
+        : dueSoon
+            ? (color: const Color(0xFFFF7A1A), badge: const Color(0xFFFFF0D8))
+            : _roomPurposeAccent(exercise?.purpose);
+    final statusLabel = isExpired
+        ? context.getText(AppKeys.homeworkFailed)
+        : dueSoon
+            ? context.getText(AppKeys.homeworkDueSoon)
+            : purpose;
 
     return _ParentRoomTaskShell(
       accent: accent.color,
       compact: compact,
       onTap: onTap,
-      leading: null,
+      leading: isExpired
+          ? _ParentRoomScoreIcon(score: 0, color: accent.color)
+          : _ParentRoomStatusIcon(
+              icon: dueSoon
+                  ? Icons.notification_important_outlined
+                  : Icons.assignment_outlined,
+              color: accent.color,
+              backgroundColor: accent.badge,
+            ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -783,33 +813,7 @@ class _ParentRoomCompletionCard extends StatelessWidget {
       accent: accent,
       compact: compact,
       onTap: onTap,
-      leading: SizedBox(
-        width: 48,
-        height: 48,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CircularProgressIndicator(
-              value: (completion.scorePercentage ?? 0).clamp(0, 100) / 100,
-              strokeWidth: 5,
-              backgroundColor: accent.withValues(alpha: 0.12),
-              color: accent,
-              strokeCap: StrokeCap.round,
-            ),
-            Center(
-              child: Text(
-                '$score',
-                style: TextStyle(
-                  color: accent,
-                  fontSize: FontSize.title,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      leading: _ParentRoomScoreIcon(score: score, color: accent),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -842,6 +846,72 @@ class _ParentRoomCompletionCard extends StatelessWidget {
   }
 }
 
+class _ParentRoomStatusIcon extends StatelessWidget {
+  const _ParentRoomStatusIcon({
+    required this.icon,
+    required this.color,
+    required this.backgroundColor,
+  });
+
+  final IconData icon;
+  final Color color;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: color, size: 24),
+    );
+  }
+}
+
+class _ParentRoomScoreIcon extends StatelessWidget {
+  const _ParentRoomScoreIcon({
+    required this.score,
+    required this.color,
+  });
+
+  final int score;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CircularProgressIndicator(
+            value: score <= 0 ? 0 : (score / 10).clamp(0.08, 1),
+            strokeWidth: 5,
+            backgroundColor: color.withValues(alpha: 0.12),
+            color: color,
+            strokeCap: StrokeCap.round,
+          ),
+          Center(
+            child: Text(
+              '$score',
+              style: TextStyle(
+                color: color,
+                fontSize: FontSize.title,
+                fontWeight: FontWeight.w900,
+                height: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ParentRoomTaskShell extends StatelessWidget {
   const _ParentRoomTaskShell({
     required this.accent,
@@ -861,6 +931,8 @@ class _ParentRoomTaskShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
+      elevation: compact ? 2.5 : 1.5,
+      shadowColor: Colors.black.withValues(alpha: compact ? 0.16 : 0.10),
       borderRadius: BorderRadius.circular(14),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -870,27 +942,38 @@ class _ParentRoomTaskShell extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 13,
-                offset: const Offset(5, 6),
-              ),
-            ],
           ),
-          child: Row(
+          child: Stack(
             children: [
-              Container(width: 4, color: accent),
-              if (leading != null) ...[
-                const SizedBox(width: 14),
-                leading!,
-                const SizedBox(width: 13),
-              ] else
-                const SizedBox(width: 14),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 12, 12, 12),
-                  child: child,
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 5,
+                  decoration: BoxDecoration(
+                    color: accent,
+                    borderRadius: const BorderRadius.horizontal(
+                      left: Radius.circular(14),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 14),
+                child: Row(
+                  children: [
+                    if (leading != null) ...[
+                      leading!,
+                      const SizedBox(width: 13),
+                    ],
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 12, 12, 12),
+                        child: child,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -1276,12 +1359,47 @@ class _ParentRoomShortcutTile extends StatelessWidget {
   }
 }
 
-class _ParentRoomLoading extends StatelessWidget {
+class _ParentRoomLoading extends StatefulWidget {
   const _ParentRoomLoading({super.key});
+
+  @override
+  State<_ParentRoomLoading> createState() => _ParentRoomLoadingState();
+}
+
+class _ParentRoomLoadingState extends State<_ParentRoomLoading>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return _ParentSkeletonShimmer(
+          progress: _controller.value,
+          child: const _ParentRoomLoadingContent(),
+        );
+      },
+    );
+  }
+}
+
+class _ParentRoomLoadingContent extends StatelessWidget {
+  const _ParentRoomLoadingContent();
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         GridView.count(
           crossAxisCount: 2,
@@ -1297,9 +1415,13 @@ class _ParentRoomLoading extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
+        const _ParentRoomSkeletonLine(width: 128),
+        const SizedBox(height: 14),
         const _ParentRoomSkeletonBlock(height: 104),
         const SizedBox(height: 14),
         const _ParentRoomSkeletonBlock(height: 104),
+        const SizedBox(height: 14),
+        const _ParentRoomSkeletonLine(width: 92),
         const SizedBox(height: 14),
         const _ParentRoomSkeletonBlock(height: 104),
       ],
@@ -1319,6 +1441,103 @@ class _ParentRoomSkeletonBlock extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFE5EFEE),
         borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+}
+
+class _ParentRoomSkeletonLine extends StatelessWidget {
+  const _ParentRoomSkeletonLine({required this.width});
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        width: width,
+        height: 22,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE5EFEE),
+          borderRadius: BorderRadius.circular(11),
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentRoomEmptyBox extends StatelessWidget {
+  const _ParentRoomEmptyBox({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE4E8EA)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEAF3F3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: const Color(0xFF339395), size: 22),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF121B42),
+                    fontSize: FontSize.normal,
+                    fontWeight: FontWeight.w900,
+                    height: 1.1,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  message,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: FontSize.small,
+                    fontWeight: FontWeight.w600,
+                    height: 1.25,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1693,6 +1912,15 @@ String _roomExerciseDueLabel(
   return context.formatText(AppKeys.studentHomeworkDueFormat, {'date': date});
 }
 
+bool _roomExerciseDueSoon(ClassroomExercise? exercise) {
+  final endDate = DateTime.tryParse(exercise?.endDate?.trim() ?? '')?.toLocal();
+  if (endDate == null) {
+    return false;
+  }
+  final remaining = endDate.difference(DateTime.now());
+  return !remaining.isNegative && remaining <= const Duration(days: 2);
+}
+
 String _roomDateLabel(String? value) {
   final parsed = DateTime.tryParse(value?.trim() ?? '')?.toLocal();
   if (parsed == null) {
@@ -1701,6 +1929,19 @@ String _roomDateLabel(String? value) {
   String twoDigits(int value) => value.toString().padLeft(2, '0');
   return '${twoDigits(parsed.hour)}:${twoDigits(parsed.minute)} '
       '${twoDigits(parsed.day)}/${twoDigits(parsed.month)}/${parsed.year}';
+}
+
+void _showExpiredExerciseMessage(BuildContext context) {
+  HapticFeedback.selectionClick();
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(context.getText(AppKeys.homeworkExpiredCannotSubmit)),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(milliseconds: 1600),
+      ),
+    );
 }
 
 void _parentRoomShowComingSoon(BuildContext context) {

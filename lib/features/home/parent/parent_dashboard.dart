@@ -361,6 +361,17 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     _openQuizReview(quiz);
   }
 
+  void _openCompletionResult(HomeLayoutRecentCompletion completion) {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => StudentHomeworkResultScreen(
+          summary: _homeworkSummaryFromCompletion(context, completion),
+        ),
+      ),
+    );
+  }
+
   Future<void> _openPendingExercise(HomeLayoutPendingExercise pending) async {
     final exercise = pending.exercise;
     final exerciseId = pending.classroomExerciseId ?? exercise?.stableId;
@@ -638,14 +649,760 @@ class _ParentChildSummary {
   final List<GeneratedQuiz> assessments;
 }
 
-class _ParentChildAssessment {
-  const _ParentChildAssessment({
+typedef _ParentHomeEntranceBuilder = Widget Function({
+  required Widget child,
+  int order,
+  bool markOnEnd,
+});
+
+class _ParentModeThreeContent extends StatelessWidget {
+  const _ParentModeThreeContent({
+    required this.summaries,
+    required this.pendingExercises,
+    required this.completions,
+    required this.entranceBuilder,
+    required this.onPendingTap,
+    required this.onCompletionTap,
+    required this.onViewTasks,
+    required this.onViewResults,
+    required this.onViewMessages,
+    required this.isRefreshing,
+    required this.errorMessage,
+    required this.onRetry,
+  });
+
+  final List<_ParentChildSummary> summaries;
+  final List<HomeLayoutPendingExercise> pendingExercises;
+  final List<HomeLayoutRecentCompletion> completions;
+  final _ParentHomeEntranceBuilder entranceBuilder;
+  final ValueChanged<HomeLayoutPendingExercise> onPendingTap;
+  final ValueChanged<HomeLayoutRecentCompletion> onCompletionTap;
+  final VoidCallback onViewTasks;
+  final VoidCallback onViewResults;
+  final VoidCallback onViewMessages;
+  final bool isRefreshing;
+  final String? errorMessage;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final primarySummary = _parentPrimarySummary(summaries);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        entranceBuilder(
+          order: 0,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _ParentModeThreeClassCard(summary: primarySummary),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        entranceBuilder(
+          order: 1,
+          child: _ParentModeThreeSection(
+            title: 'Nhiệm vụ',
+            onViewAll: onViewTasks,
+            child: pendingExercises.isEmpty
+                ? _ParentModeThreeEmptyLine(
+                    icon: Icons.assignment_outlined,
+                    text: context.getText(AppKeys.studentNoHomeworkTitle),
+                  )
+                : Column(
+                    children: [
+                      for (final pending in pendingExercises.take(2)) ...[
+                        _ParentModeThreeTaskItem(
+                          pending: pending,
+                          onTap: () => onPendingTap(pending),
+                        ),
+                        if (pending != pendingExercises.take(2).last)
+                          const Divider(
+                            height: 24,
+                            indent: 62,
+                            color: Color(0xFFE9EEF2),
+                          ),
+                      ],
+                    ],
+                  ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        entranceBuilder(
+          order: 2,
+          child: _ParentModeThreeSection(
+            title: context.getText(AppKeys.assessmentResultTitle),
+            onViewAll: onViewResults,
+            child: completions.isEmpty
+                ? _ParentModeThreeEmptyLine(
+                    icon: Icons.fact_check_outlined,
+                    text: context.getText(AppKeys.noCompletedHomeworkTitle),
+                  )
+                : Column(
+                    children: [
+                      for (final completion in completions.take(2)) ...[
+                        _ParentModeThreeResultItem(
+                          completion: completion,
+                          onTap: () => onCompletionTap(completion),
+                        ),
+                        if (completion != completions.take(2).last)
+                          const Divider(
+                            height: 24,
+                            indent: 62,
+                            color: Color(0xFFE9EEF2),
+                          ),
+                      ],
+                    ],
+                  ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        entranceBuilder(
+          order: 3,
+          markOnEnd: true,
+          child: _ParentModeThreeSection(
+            title: 'Tin nhắn',
+            onViewAll: onViewMessages,
+            child: _ParentModeThreeMessages(summaries: summaries),
+          ),
+        ),
+        if (isRefreshing) ...[
+          const SizedBox(height: 8),
+          const _ParentHomeRefreshLabel(),
+        ],
+        if (errorMessage != null) ...[
+          const SizedBox(height: 10),
+          _ParentHomeErrorCard(message: errorMessage!, onRetry: onRetry),
+        ],
+      ],
+    );
+  }
+}
+
+class _ParentModeThreeClassCard extends StatelessWidget {
+  const _ParentModeThreeClassCard({required this.summary});
+
+  final _ParentChildSummary? summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final className = summary == null
+        ? context.getText(AppKeys.parentNoClassroom)
+        : _parentClassroomName(context, summary!);
+    final teacherName = summary?.classroom?.teacherName?.trim();
+
+    return Container(
+      height: 100,
+      padding: const EdgeInsets.fromLTRB(12, 13, 12, 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAF3FA),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFD1DFE9)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            summary == null
+                ? context.getText(AppKeys.parentNoStudentTitle)
+                : homeProfileDisplayName(context, summary!.profile),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFF006CB6),
+              fontSize: FontSize.caption,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            className,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFF006CB6),
+              fontSize: 34,
+              fontWeight: FontWeight.w900,
+              height: 0.95,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            teacherName?.isNotEmpty == true
+                ? teacherName!
+                : context.getText(AppKeys.parentNoTeacher),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFF006CB6),
+              fontSize: FontSize.caption,
+              fontWeight: FontWeight.w800,
+              height: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ParentModeThreeSection extends StatelessWidget {
+  const _ParentModeThreeSection({
+    required this.title,
+    required this.child,
+    required this.onViewAll,
+  });
+
+  final String title;
+  final Widget child;
+  final VoidCallback onViewAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFF0F3F7)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.055),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF1B3D91),
+                    fontSize: FontSize.large,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: onViewAll,
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF2775FF),
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                label: Text(
+                  context.getText(AppKeys.viewAll),
+                  style: const TextStyle(
+                    fontSize: FontSize.caption,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                icon: const Icon(Icons.chevron_right_rounded, size: 18),
+                iconAlignment: IconAlignment.end,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _ParentModeThreeTaskItem extends StatelessWidget {
+  const _ParentModeThreeTaskItem({
+    required this.pending,
+    required this.onTap,
+  });
+
+  final HomeLayoutPendingExercise pending;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final exercise = pending.exercise;
+    final accent = _parentExerciseAccent(exercise?.purpose);
+    final title = _parentExerciseTitle(context, exercise);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          children: [
+            _ParentModeThreeIconBox(
+              icon: accent.icon,
+              color: accent.color,
+              backgroundColor: accent.background,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: _ParentModeThreeExerciseText(
+                title: title,
+                childName: pending.child == null
+                    ? null
+                    : homeProfileDisplayName(context, pending.child!),
+                classroomName: pending.classroom?.name,
+              ),
+            ),
+            const SizedBox(width: 8),
+            _ParentModeThreeDateLabel(
+              date: _parentExerciseDateLabel(exercise?.endDate),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentModeThreeResultItem extends StatelessWidget {
+  const _ParentModeThreeResultItem({
+    required this.completion,
+    required this.onTap,
+  });
+
+  final HomeLayoutRecentCompletion completion;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final exercise = completion.exercise;
+    final score = ((completion.scorePercentage ?? 0) / 10).round().clamp(0, 10);
+    final color =
+        score >= 8 ? const Color(0xFF07824C) : const Color(0xFFFF6B17);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          children: [
+            _ParentModeThreeScore(score: score, color: color),
+            const SizedBox(width: 14),
+            Expanded(
+              child: _ParentModeThreeExerciseText(
+                title: _parentExerciseTitle(context, exercise),
+                childName: completion.child == null
+                    ? null
+                    : homeProfileDisplayName(context, completion.child!),
+                classroomName: completion.classroom?.name,
+              ),
+            ),
+            const SizedBox(width: 8),
+            _ParentModeThreeDateLabel(
+              date: _parentExerciseDateLabel(
+                completion.gradedDt ??
+                    completion.submittedDt ??
+                    completion.exercise?.createDt,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentModeThreeExerciseText extends StatelessWidget {
+  const _ParentModeThreeExerciseText({
+    required this.title,
+    required this.childName,
+    required this.classroomName,
+  });
+
+  final String title;
+  final String? childName;
+  final String? classroomName;
+
+  @override
+  Widget build(BuildContext context) {
+    final cleanChildName = childName?.trim();
+    final cleanClassroom = classroomName?.trim();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 5,
+          runSpacing: 4,
+          children: [
+            if (cleanChildName?.isNotEmpty == true)
+              _ParentModeThreeTag(label: cleanChildName!),
+            if (cleanClassroom?.isNotEmpty == true)
+              _ParentModeThreeTag(label: cleanClassroom!),
+          ],
+        ),
+        const SizedBox(height: 5),
+        Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: Color(0xFF17233F),
+            fontSize: FontSize.normal,
+            fontWeight: FontWeight.w900,
+            height: 1.1,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ParentModeThreeTag extends StatelessWidget {
+  const _ParentModeThreeTag({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 82),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF4FA),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          color: Color(0xFF8C9AB0),
+          fontSize: FontSize.caption * 0.68,
+          fontWeight: FontWeight.w800,
+          height: 1,
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentModeThreeDateLabel extends StatelessWidget {
+  const _ParentModeThreeDateLabel({required this.date});
+
+  final String date;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(
+          Icons.calendar_today_outlined,
+          color: Color(0xFF9AA6B5),
+          size: 12,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          date,
+          style: const TextStyle(
+            color: Color(0xFF90A0B6),
+            fontSize: FontSize.caption * 0.76,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ParentModeThreeIconBox extends StatelessWidget {
+  const _ParentModeThreeIconBox({
+    required this.icon,
+    required this.color,
+    required this.backgroundColor,
+  });
+
+  final IconData icon;
+  final Color color;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(11),
+      ),
+      child: Icon(icon, color: color, size: 24),
+    );
+  }
+}
+
+class _ParentModeThreeScore extends StatelessWidget {
+  const _ParentModeThreeScore({
+    required this.score,
+    required this.color,
+  });
+
+  final int score;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CircularProgressIndicator(
+            value: score <= 0 ? 0 : (score / 10).clamp(0.08, 1),
+            strokeWidth: 5,
+            backgroundColor: color.withValues(alpha: 0.12),
+            color: color,
+            strokeCap: StrokeCap.round,
+          ),
+          Center(
+            child: Text(
+              '$score',
+              style: TextStyle(
+                color: color,
+                fontSize: FontSize.title,
+                fontWeight: FontWeight.w900,
+                height: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ParentModeThreeEmptyLine extends StatelessWidget {
+  const _ParentModeThreeEmptyLine({
+    required this.icon,
+    required this.text,
+  });
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _ParentModeThreeIconBox(
+          icon: icon,
+          color: const Color(0xFF339395),
+          backgroundColor: const Color(0xFFEAF3F3),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF6D778A),
+              fontSize: FontSize.small,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ParentModeThreeMessages extends StatelessWidget {
+  const _ParentModeThreeMessages({required this.summaries});
+
+  final List<_ParentChildSummary> summaries;
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleSummaries = summaries.take(2).toList(growable: false);
+    if (visibleSummaries.isEmpty) {
+      return _ParentModeThreeEmptyLine(
+        icon: Icons.mail_outline_rounded,
+        text: context.getText(AppKeys.homeMessageBodyOne),
+      );
+    }
+
+    return Column(
+      children: [
+        for (var index = 0; index < visibleSummaries.length; index++) ...[
+          _ParentModeThreeMessageItem(
+            summary: visibleSummaries[index],
+            index: index,
+          ),
+          if (index != visibleSummaries.length - 1)
+            const Divider(height: 24, color: Color(0xFFE9EEF2)),
+        ],
+      ],
+    );
+  }
+}
+
+class _ParentModeThreeMessageItem extends StatelessWidget {
+  const _ParentModeThreeMessageItem({
     required this.summary,
-    required this.quiz,
+    required this.index,
   });
 
   final _ParentChildSummary summary;
-  final GeneratedQuiz quiz;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final childName = homeProfileDisplayName(context, summary.profile);
+    final className = _parentClassroomName(context, summary);
+    final teacherName = context.getText(
+      index.isEven
+          ? AppKeys.homeMessageTeacherOne
+          : AppKeys.homeMessageTeacherTwo,
+    );
+    final time = context.getText(
+      index.isEven ? AppKeys.homeMessageTimeOne : AppKeys.homeMessageTimeTwo,
+    );
+    final body = context.getText(
+      index.isEven ? AppKeys.homeMessageBodyOne : AppKeys.homeMessageBodyTwo,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          ClipOval(
+            child: Image.asset(
+              index.isEven ? _homeTeacherAvatarOne : _homeTeacherAvatarTwo,
+              width: 46,
+              height: 46,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        teacherName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF17233F),
+                          fontSize: FontSize.normal,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      time,
+                      style: const TextStyle(
+                        color: Color(0xFF8B9BB1),
+                        fontSize: FontSize.caption * 0.74,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '$className - ${childName.toUpperCase()}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF8390A5),
+                    fontSize: FontSize.caption * 0.76,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  body,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF697895),
+                    fontSize: FontSize.caption,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+_ParentChildSummary? _parentPrimarySummary(
+  List<_ParentChildSummary> summaries,
+) {
+  for (final summary in summaries) {
+    if (summary.classroom != null) {
+      return summary;
+    }
+  }
+  return summaries.isEmpty ? null : summaries.first;
+}
+
+({IconData icon, Color color, Color background}) _parentExerciseAccent(
+  String? purpose,
+) {
+  final normalized = purpose?.trim().toUpperCase();
+  if (normalized == classroomExercisePurposeQuiz ||
+      normalized == classroomExercisePurposeExam) {
+    return (
+      icon: Icons.show_chart_rounded,
+      color: const Color(0xFFCC2228),
+      background: const Color(0xFFFFECEF),
+    );
+  }
+  return (
+    icon: Icons.menu_book_rounded,
+    color: const Color(0xFF147A8F),
+    background: const Color(0xFFEAF6FF),
+  );
+}
+
+String _parentExerciseTitle(
+  BuildContext context,
+  ClassroomExercise? exercise,
+) {
+  final title = exercise?.title?.trim();
+  if (title != null && title.isNotEmpty) {
+    return title;
+  }
+  return context.getText(AppKeys.studentHomework);
+}
+
+String _parentExerciseDateLabel(String? value) {
+  final parsed = DateTime.tryParse(value?.trim() ?? '')?.toLocal();
+  if (parsed == null) {
+    return '--/--/----';
+  }
+  return '${parsed.day.toString().padLeft(2, '0')}/'
+      '${parsed.month.toString().padLeft(2, '0')}/${parsed.year}';
 }
 
 List<_ParentChildSummary> _summariesFromLayout(ParentHomeLayout? parent) {
@@ -824,262 +1581,6 @@ StudentHomeworkResultSummary _homeworkSummaryFromCompletion(
 
 int? _layoutChildId(StudentProfile? child) {
   return child == null ? null : ActiveProfileSession.profileStableId(child);
-}
-
-class _ParentChildrenGrid extends StatelessWidget {
-  const _ParentChildrenGrid({required this.summaries});
-
-  final List<_ParentChildSummary> summaries;
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.zero,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        mainAxisExtent: 121,
-      ),
-      itemCount: summaries.length,
-      itemBuilder: (context, index) {
-        final summary = summaries[index];
-        final classroomName = _parentClassroomName(context, summary);
-        final teacherName = summary.classroom?.teacherName?.trim();
-        return Container(
-          padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
-          decoration: BoxDecoration(
-            color: index.isEven
-                ? const Color(0xFFE9F8F6)
-                : const Color(0xFFEEF6FD),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: index.isEven
-                  ? const Color(0xFFC8E4DF)
-                  : const Color(0xFFD4E0EC),
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                homeProfileDisplayName(context, summary.profile),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: index.isEven
-                      ? const Color(0xFF14635E)
-                      : const Color(0xFF126696),
-                  fontSize: FontSize.normal,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                ),
-              ),
-              const SizedBox(height: 7),
-              Text(
-                classroomName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: index.isEven
-                      ? const Color(0xFF14635E)
-                      : const Color(0xFF126696),
-                  fontSize: FontSize.title,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                ),
-              ),
-              const SizedBox(height: 7),
-              Text(
-                teacherName?.isNotEmpty == true
-                    ? teacherName!
-                    : context.getText(AppKeys.parentNoTeacher),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Color(0xFF32625F),
-                  fontSize: FontSize.caption,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _ParentTeacherMessages extends StatelessWidget {
-  const _ParentTeacherMessages({required this.summaries});
-
-  final List<_ParentChildSummary> summaries;
-
-  @override
-  Widget build(BuildContext context) {
-    if (summaries.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Column(
-      children: [
-        for (var index = 0; index < summaries.length; index++) ...[
-          _ParentTeacherMessageCard(
-            summary: summaries[index],
-            index: index,
-          ),
-          if (index != summaries.length - 1) const SizedBox(height: 12),
-        ],
-      ],
-    );
-  }
-}
-
-class _ParentTeacherMessageCard extends StatelessWidget {
-  const _ParentTeacherMessageCard({
-    required this.summary,
-    required this.index,
-  });
-
-  final _ParentChildSummary summary;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    final isFirst = index.isEven;
-    final accent = isFirst ? const Color(0xFF17999C) : const Color(0xFFFF701E);
-    final surface = isFirst ? const Color(0xFFEFF9F9) : const Color(0xFFFFF2EA);
-    final studentName = homeProfileDisplayName(context, summary.profile);
-    final classroomName = _parentClassroomName(context, summary);
-    final teacherName = summary.classroom?.teacherName?.trim();
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(13),
-                child: Image.asset(
-                  isFirst ? _homeTeacherAvatarOne : _homeTeacherAvatarTwo,
-                  width: 48,
-                  height: 48,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      teacherName?.isNotEmpty == true
-                          ? teacherName!
-                          : context.getText(AppKeys.parentNoTeacher),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF001741),
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w900,
-                        height: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      classroomName,
-                      style: const TextStyle(
-                        color: Color(0xFF515F6F),
-                        fontSize: FontSize.caption * 0.85,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Text(
-                '10:45 AM',
-                style: TextStyle(
-                  color: Color(0xFF6B7280),
-                  fontSize: FontSize.caption * 0.77,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 11),
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(13),
-              border: Border.all(
-                color: accent.withValues(alpha: 0.70),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: accent,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    studentName.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: FontSize.caption * 0.7,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  context.formatText(
-                    isFirst
-                        ? AppKeys.parentTeacherFeedback
-                        : AppKeys.parentTeacherReminder,
-                    {'student': studentName},
-                  ),
-                  style: const TextStyle(
-                    color: Color(0xFF30333A),
-                    fontSize: FontSize.small,
-                    fontWeight: FontWeight.w400,
-                    height: 1.42,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _ParentChildDashboardLoading extends StatefulWidget {
@@ -1767,14 +2268,10 @@ class _ParentAssessmentResultCard extends StatelessWidget {
   const _ParentAssessmentResultCard({
     required this.quiz,
     required this.onTap,
-    this.profileName,
-    this.classroomName,
   });
 
   final GeneratedQuiz quiz;
   final VoidCallback onTap;
-  final String? profileName;
-  final String? classroomName;
 
   @override
   Widget build(BuildContext context) {
@@ -1882,19 +2379,6 @@ class _ParentAssessmentResultCard extends StatelessWidget {
                         ),
                       ),
                     ],
-                    if (profileName != null || classroomName != null) ...[
-                      const SizedBox(height: 7),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          if (profileName != null)
-                            _ParentResultTag(label: profileName!),
-                          if (classroomName != null)
-                            _ParentResultTag(label: classroomName!),
-                        ],
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -1905,171 +2389,6 @@ class _ParentAssessmentResultCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ParentPendingExerciseCard extends StatelessWidget {
-  const _ParentPendingExerciseCard({
-    required this.pending,
-    required this.onTap,
-  });
-
-  final HomeLayoutPendingExercise pending;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final exercise = pending.exercise;
-    final title = exercise?.title?.trim().isNotEmpty == true
-        ? exercise!.title!.trim()
-        : context.getText(AppKeys.studentHomework);
-    final shortText = exercise?.shortText?.trim().isNotEmpty == true
-        ? exercise!.shortText!.trim()
-        : exercise?.description?.trim();
-    final childName = pending.child == null
-        ? null
-        : homeProfileDisplayName(context, pending.child!);
-    final classroomName = pending.classroom?.name?.trim();
-
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(17),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 90),
-          padding: const EdgeInsets.fromLTRB(16, 14, 13, 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(17),
-            border: Border.all(color: const Color(0xFFE9E4E4)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF2EA),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: const Icon(
-                  Icons.assignment_rounded,
-                  color: Color(0xFFFF6B17),
-                  size: 27,
-                ),
-              ),
-              const SizedBox(width: 13),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.schedule_rounded,
-                          color: Color(0xFFFF6B17),
-                          size: 15,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          context.getText(AppKeys.studentHomeworkNotSubmitted),
-                          style: const TextStyle(
-                            color: Color(0xFFFF6B17),
-                            fontSize: FontSize.caption,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF222222),
-                        fontSize: FontSize.normal,
-                        fontWeight: FontWeight.w900,
-                        height: 1.1,
-                      ),
-                    ),
-                    if (shortText != null && shortText.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        shortText,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF6D5C58),
-                          fontSize: FontSize.small,
-                          fontWeight: FontWeight.w500,
-                          height: 1.15,
-                        ),
-                      ),
-                    ],
-                    if (childName != null ||
-                        classroomName?.isNotEmpty == true) ...[
-                      const SizedBox(height: 7),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          if (childName != null)
-                            _ParentResultTag(label: childName),
-                          if (classroomName?.isNotEmpty == true)
-                            _ParentResultTag(label: classroomName!),
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: Color(0xFF8DA4BD),
-                size: 22,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ParentResultTag extends StatelessWidget {
-  const _ParentResultTag({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF4F0EE),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: Color(0xFF6D5C58),
-          fontSize: FontSize.caption * 0.77,
-          fontWeight: FontWeight.w700,
-          height: 1,
         ),
       ),
     );

@@ -653,6 +653,12 @@ class AppKeys {
   static const goodResultTitle = 'good_result_title';
   static const completedResultTitle = 'completed_result_title';
   static const incompleteResultTitle = 'incomplete_result_title';
+  static const noCompletedHomeworkTitle = 'no_completed_homework_title';
+  static const noCompletedHomeworkMessage = 'no_completed_homework_message';
+  static const homeworkExpiredCannotSubmit = 'homework_expired_cannot_submit';
+  static const homeworkDueSoon = 'homework_due_soon';
+  static const homeworkFailed = 'homework_failed';
+  static const parentRoomAssignmentsTitle = 'parent_room_assignments_title';
   static const excellentResultMessage = 'excellent_result_message';
   static const generatingNewQuiz = 'generating_new_quiz';
   static const assessmentResultTitle = 'assessment_result_title';
