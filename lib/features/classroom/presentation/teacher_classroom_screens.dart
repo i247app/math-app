@@ -24,6 +24,7 @@ import 'package:numi_flutter/features/profile/avatar_picker.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';

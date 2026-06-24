@@ -10,9 +10,11 @@ class TeacherHomeTab extends StatefulWidget {
     required this.onCompleteProfile,
     this.onOpenClassroomTab,
     ClassroomExerciseService? exerciseService,
+    HomeLayoutService? homeLayoutService,
     this.activeRefreshTick = 0,
     this.isActive = true,
-  }) : _exerciseService = exerciseService;
+  })  : _exerciseService = exerciseService,
+        _homeLayoutService = homeLayoutService;
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
@@ -23,6 +25,7 @@ class TeacherHomeTab extends StatefulWidget {
   final int activeRefreshTick;
   final bool isActive;
   final ClassroomExerciseService? _exerciseService;
+  final HomeLayoutService? _homeLayoutService;
 
   @override
   State<TeacherHomeTab> createState() => _TeacherHomeTabState();
@@ -31,27 +34,24 @@ class TeacherHomeTab extends StatefulWidget {
 class _TeacherHomeTabState extends State<TeacherHomeTab> {
   late final ClassroomExerciseService _exerciseService =
       widget._exerciseService ?? ClassroomExerciseApi();
+  late final HomeLayoutService _homeLayoutService =
+      widget._homeLayoutService ?? HomeLayoutApi();
 
+  bool _isLoadingHomeLayout = false;
+  bool _hasLoadedHomeLayout = false;
   bool _isLoadingAssignments = false;
   bool _hasLoadedAssignments = false;
   int? _loadedProfileId;
-  int _assignmentLoadRequestId = 0;
+  int _homeLayoutRequestId = 0;
+  String? _homeLayoutError;
+  List<ClassroomModel> _layoutClassrooms = const <ClassroomModel>[];
   List<ClassroomExercise> _recentAssignments = const <ClassroomExercise>[];
 
-  ClassroomCollectionState get _classroomCollection {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
-    if (profileId == null || profileId <= 0) {
-      return const ClassroomCollectionState(profileId: 0);
-    }
-    return context.read<ClassroomCubit>().owned(profileId);
-  }
+  List<ClassroomModel> get _classrooms => _layoutClassrooms;
 
-  List<ClassroomModel> get _classrooms => _classroomCollection.classrooms;
+  bool get _isLoading => _isLoadingHomeLayout;
 
-  bool get _isLoading => _classroomCollection.isLoading;
-
-  bool get _hasLoadedClassrooms => _classroomCollection.hasLoaded;
+  bool get _hasLoadedClassrooms => _hasLoadedHomeLayout;
 
   String? get _error {
     final profileId =
@@ -59,7 +59,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     if (profileId == null || profileId <= 0) {
       return context.readText(AppKeys.teacherMissingProfileId);
     }
-    return _classroomCollection.errorMessage;
+    return _homeLayoutError;
   }
 
   @override
@@ -92,111 +92,82 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   Future<void> _loadClassrooms({bool forceRefresh = false}) async {
     final profileId =
         ActiveProfileSession.profileStableId(widget.activeProfile);
-    final assignmentRequestId = ++_assignmentLoadRequestId;
-    if (profileId == null) {
+    final requestId = ++_homeLayoutRequestId;
+    if (profileId == null || profileId <= 0) {
       setState(() {
         _loadedProfileId = profileId;
+        _layoutClassrooms = const <ClassroomModel>[];
         _recentAssignments = const <ClassroomExercise>[];
+        _isLoadingHomeLayout = false;
+        _hasLoadedHomeLayout = true;
         _isLoadingAssignments = false;
         _hasLoadedAssignments = true;
+        _homeLayoutError = null;
       });
       return;
     }
 
     setState(() {
+      _isLoadingHomeLayout = true;
       _isLoadingAssignments = true;
       if (_loadedProfileId != profileId) {
+        _layoutClassrooms = const <ClassroomModel>[];
         _recentAssignments = const <ClassroomExercise>[];
+        _hasLoadedHomeLayout = false;
         _hasLoadedAssignments = false;
       }
+      _homeLayoutError = null;
       _loadedProfileId = profileId;
     });
 
-    final collection = await context.read<ClassroomCubit>().loadOwned(
-          profileId,
-          forceRefresh: forceRefresh,
-        );
-    if (!mounted || _loadedProfileId != profileId) {
-      return;
-    }
-    final classrooms = collection.classrooms;
-    setState(() {
-      if (collection.errorMessage == null && classrooms.isEmpty) {
-        _recentAssignments = const <ClassroomExercise>[];
+    try {
+      final layout = await _homeLayoutService.getLayout(profileId: profileId);
+      if (!mounted ||
+          _loadedProfileId != profileId ||
+          _homeLayoutRequestId != requestId) {
+        return;
       }
-      _isLoadingAssignments =
-          collection.errorMessage == null && classrooms.isNotEmpty;
-      if (collection.errorMessage != null || classrooms.isEmpty) {
+      final teacher = layout.teacher;
+      final classrooms = teacher?.classrooms
+              .map((classroom) => classroom.classroom)
+              .toList(growable: false) ??
+          const <ClassroomModel>[];
+      final assignments = <ClassroomExercise>[
+        ...?teacher?.assignedExercises,
+      ]..sort(_compareRecentAssignments);
+
+      setState(() {
+        _layoutClassrooms = classrooms;
+        _recentAssignments = assignments;
+        _isLoadingHomeLayout = false;
+        _hasLoadedHomeLayout = true;
+        _isLoadingAssignments = false;
         _hasLoadedAssignments = true;
+        _homeLayoutError = null;
+      });
+    } catch (error) {
+      if (!mounted ||
+          _loadedProfileId != profileId ||
+          _homeLayoutRequestId != requestId) {
+        return;
       }
-    });
-    if (collection.errorMessage != null || classrooms.isEmpty) {
-      return;
+      final message = error is HomeLayoutException
+          ? error.message
+          : context.readText(AppKeys.teacherStudyLoadFailed);
+      setState(() {
+        _layoutClassrooms = const <ClassroomModel>[];
+        _recentAssignments = const <ClassroomExercise>[];
+        _isLoadingHomeLayout = false;
+        _hasLoadedHomeLayout = true;
+        _isLoadingAssignments = false;
+        _hasLoadedAssignments = true;
+        _homeLayoutError = message;
+      });
     }
-    unawaited(
-      _loadRecentAssignments(
-        profileId: profileId,
-        classrooms: classrooms,
-        requestId: assignmentRequestId,
-      ),
-    );
   }
 
   Future<void> _refreshClassrooms() {
     return _loadClassrooms(forceRefresh: true);
-  }
-
-  Future<void> _loadRecentAssignments({
-    required int profileId,
-    required List<ClassroomModel> classrooms,
-    required int requestId,
-  }) async {
-    final classroomIds = classrooms
-        .map((classroom) => classroom.stableId)
-        .whereType<int>()
-        .toList(growable: false);
-    if (classroomIds.isEmpty) {
-      if (mounted &&
-          _loadedProfileId == profileId &&
-          _assignmentLoadRequestId == requestId) {
-        setState(() {
-          _recentAssignments = const <ClassroomExercise>[];
-          _isLoadingAssignments = false;
-          _hasLoadedAssignments = true;
-        });
-      }
-      return;
-    }
-
-    final exerciseGroups = await Future.wait(
-      classroomIds.map((classroomId) async {
-        try {
-          return await _exerciseService.listExercises(
-            classroomId: classroomId,
-            profileId: profileId,
-            purpose: classroomExercisePurposeHomework,
-          );
-        } catch (_) {
-          return const <ClassroomExercise>[];
-        }
-      }),
-    );
-    if (!mounted ||
-        _loadedProfileId != profileId ||
-        _assignmentLoadRequestId != requestId) {
-      return;
-    }
-
-    final assignments = exerciseGroups
-        .expand((exercises) => exercises)
-        .toList(growable: false)
-      ..sort(_compareRecentAssignments);
-
-    setState(() {
-      _recentAssignments = assignments;
-      _isLoadingAssignments = false;
-      _hasLoadedAssignments = true;
-    });
   }
 
   Future<void> _openCreateClass() async {
@@ -300,7 +271,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
           exerciseId: exerciseId,
           profileId: profileId,
           initialExercise: exercise,
-          purpose: classroomExercisePurposeHomework,
+          purpose: _teacherExercisePurpose(exercise),
           exerciseService: _exerciseService,
         ),
       ),
@@ -315,13 +286,6 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
-    if (profileId != null && profileId > 0) {
-      context.select<ClassroomCubit, ClassroomCollectionState>(
-        (cubit) => cubit.owned(profileId),
-      );
-    }
     final scale = widget.scale;
     final isProfileComplete = _isTeacherProfileComplete(widget.activeProfile);
 
@@ -440,6 +404,15 @@ int _compareRecentAssignments(
     return dateCompare;
   }
   return (second.stableId ?? -1).compareTo(first.stableId ?? -1);
+}
+
+String _teacherExercisePurpose(ClassroomExercise exercise) {
+  final purpose = exercise.purpose?.trim().toUpperCase();
+  if (purpose == classroomExercisePurposeExam ||
+      purpose == classroomExercisePurposeQuiz) {
+    return classroomExercisePurposeExam;
+  }
+  return classroomExercisePurposeHomework;
 }
 
 DateTime? _recentAssignmentSortDate(ClassroomExercise exercise) {

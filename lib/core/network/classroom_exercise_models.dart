@@ -411,6 +411,7 @@ class ClassroomExercise {
         'exercise_id': json['exercise_id'] ?? json['assignment_id'],
         'classroom_exercise_id':
             json['classroom_exercise_id'] ?? json['assignment_id'],
+        'num_questions': json['num_questions'] ?? json['total_questions'],
         'profile_id': json['profile_id'] ?? json['creator_profile_id'],
         'description': json['description'] ??
             json['assignment_description'] ??
