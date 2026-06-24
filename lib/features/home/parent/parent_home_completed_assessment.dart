@@ -6,6 +6,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _modeTwoFadeIn(
+          order: 1,
           child: _ParentImageAction(
             asset: _parentHomeAfterReviewBanner,
             height: 214,
@@ -14,6 +15,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
         ),
         const SizedBox(height: 8),
         _modeTwoFadeIn(
+          order: 2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -46,11 +48,14 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
           ),
         ),
         const SizedBox(height: 12),
-        for (final quiz in _completedAssessments.take(2)) ...[
+        for (final entry in _completedAssessments.take(2).indexed) ...[
           _modeTwoFadeIn(
+            order: 3 + entry.$1,
+            markOnEnd: entry.$1 == 1 ||
+                entry.$1 == _completedAssessments.take(2).length - 1,
             child: _ParentAssessmentResultCard(
-              quiz: quiz,
-              onTap: () => _openQuizReview(quiz),
+              quiz: entry.$2,
+              onTap: () => _openQuizReview(entry.$2),
             ),
           ),
           const SizedBox(height: 8),

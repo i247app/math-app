@@ -30,6 +30,8 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
               const _ParentChildDashboardLoading()
             else
               _modeThreeFadeIn(
+                order: 0,
+                markOnEnd: true,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

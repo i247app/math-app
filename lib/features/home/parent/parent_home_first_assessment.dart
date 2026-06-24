@@ -6,10 +6,12 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _modeOneFadeIn(
-          child: _StudentFigmaHeroCard(onAssessmentTap: _openAssessment),
+          order: 1,
+          child: _ParentModeOneAssessmentBanner(onTap: _openAssessment),
         ),
         const SizedBox(height: 8),
         _modeOneFadeIn(
+          order: 2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -34,6 +36,8 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
         ),
         const SizedBox(height: 12),
         _modeOneFadeIn(
+          order: 3,
+          markOnEnd: true,
           child: _ParentStartGuideCard(
             onAssessmentTap: _openAssessment,
             onRoadmapTap: widget.args.onOpenReviewTab,
@@ -41,6 +45,44 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ParentModeOneAssessmentBanner extends StatelessWidget {
+  const _ParentModeOneAssessmentBanner({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final borderRadius = BorderRadius.circular(30);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: borderRadius,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Ink.image(
+            image: const AssetImage(_parentHomeModeOneAssessmentBanner),
+            height: 225,
+            fit: BoxFit.cover,
+            child: const SizedBox(width: double.infinity),
+          ),
+        ),
+      ),
     );
   }
 }

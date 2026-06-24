@@ -277,29 +277,18 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     }
   }
 
-  Widget _modeOneFadeIn({required Widget child}) {
+  Widget _modeOneFadeIn({
+    required Widget child,
+    int order = 0,
+    bool markOnEnd = false,
+  }) {
     if (_hasPlayedModeOneEntrance) {
       return child;
     }
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: _homeFadeInDuration,
-      curve: Curves.easeOutQuart,
-      onEnd: _markModeOneEntrancePlayed,
-      builder: (context, value, animatedChild) {
-        return Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, 14 * (1 - value)),
-            child: Transform.scale(
-              scale: 0.985 + 0.015 * value,
-              alignment: Alignment.topCenter,
-              child: animatedChild,
-            ),
-          ),
-        );
-      },
+    return _ParentHomeEntrance(
+      order: order,
+      onFinished: markOnEnd ? _markModeOneEntrancePlayed : null,
       child: child,
     );
   }
@@ -311,29 +300,18 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     setState(() => _hasPlayedModeOneEntrance = true);
   }
 
-  Widget _modeTwoFadeIn({required Widget child}) {
+  Widget _modeTwoFadeIn({
+    required Widget child,
+    int order = 0,
+    bool markOnEnd = false,
+  }) {
     if (_hasPlayedModeTwoEntrance) {
       return child;
     }
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: _homeFadeInDuration,
-      curve: Curves.easeOutQuart,
-      onEnd: _markModeTwoEntrancePlayed,
-      builder: (context, value, animatedChild) {
-        return Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, 14 * (1 - value)),
-            child: Transform.scale(
-              scale: 0.985 + 0.015 * value,
-              alignment: Alignment.topCenter,
-              child: animatedChild,
-            ),
-          ),
-        );
-      },
+    return _ParentHomeEntrance(
+      order: order,
+      onFinished: markOnEnd ? _markModeTwoEntrancePlayed : null,
       child: child,
     );
   }
@@ -345,29 +323,18 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     setState(() => _hasPlayedModeTwoEntrance = true);
   }
 
-  Widget _modeThreeFadeIn({required Widget child}) {
+  Widget _modeThreeFadeIn({
+    required Widget child,
+    int order = 0,
+    bool markOnEnd = false,
+  }) {
     if (_hasPlayedModeThreeEntrance) {
       return child;
     }
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: _homeFadeInDuration,
-      curve: Curves.easeOutQuart,
-      onEnd: _markModeThreeEntrancePlayed,
-      builder: (context, value, animatedChild) {
-        return Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, 14 * (1 - value)),
-            child: Transform.scale(
-              scale: 0.985 + 0.015 * value,
-              alignment: Alignment.topCenter,
-              child: animatedChild,
-            ),
-          ),
-        );
-      },
+    return _ParentHomeEntrance(
+      order: order,
+      onFinished: markOnEnd ? _markModeThreeEntrancePlayed : null,
       child: child,
     );
   }
@@ -412,12 +379,14 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
           children: [
             if (!_isLoading && !hasCompletedAssessment)
               _modeOneFadeIn(
+                order: 0,
                 child: _ParentLearningStreakCard(
                   hasCompletedAssessment: hasCompletedAssessment,
                 ),
               )
             else if (!_isLoading && hasCompletedAssessment)
               _modeTwoFadeIn(
+                order: 0,
                 child: _ParentLearningStreakCard(
                   hasCompletedAssessment: hasCompletedAssessment,
                 ),
@@ -1232,6 +1201,123 @@ class _ParentSkeletonLine extends StatelessWidget {
   }
 }
 
+class _ParentHomeEntrance extends StatefulWidget {
+  const _ParentHomeEntrance({
+    required this.order,
+    required this.child,
+    this.onFinished,
+  });
+
+  final int order;
+  final Widget child;
+  final VoidCallback? onFinished;
+
+  @override
+  State<_ParentHomeEntrance> createState() => _ParentHomeEntranceState();
+}
+
+class _ParentHomeEntranceState extends State<_ParentHomeEntrance> {
+  bool _isVisible = false;
+  bool _hasNotifiedFinished = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future<void>.delayed(
+        Duration(milliseconds: 55 * widget.order.clamp(0, 8)),
+      );
+      if (mounted) {
+        setState(() => _isVisible = true);
+      }
+    });
+  }
+
+  void _notifyFinished() {
+    if (_hasNotifiedFinished) {
+      return;
+    }
+    _hasNotifiedFinished = true;
+    widget.onFinished?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _notifyFinished());
+      return widget.child;
+    }
+
+    return AnimatedOpacity(
+      opacity: _isVisible ? 1 : 0,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOut,
+      child: AnimatedSlide(
+        offset: _isVisible ? Offset.zero : const Offset(0, 0.055),
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+        child: AnimatedScale(
+          scale: _isVisible ? 1 : 0.94,
+          duration: const Duration(milliseconds: 520),
+          curve: Curves.easeOutBack,
+          onEnd: _isVisible ? _notifyFinished : null,
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentSkeletonShimmer extends StatelessWidget {
+  const _ParentSkeletonShimmer({
+    required this.progress,
+    required this.child,
+  });
+
+  final double progress;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return child;
+    }
+
+    return ShaderMask(
+      blendMode: BlendMode.srcATop,
+      shaderCallback: (bounds) {
+        final width = bounds.width;
+        final shimmerWidth = width * 0.42;
+        final start = -shimmerWidth + (width + shimmerWidth * 2) * progress;
+
+        return LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: const [
+            Colors.transparent,
+            Color(0x99FFFFFF),
+            Colors.transparent,
+          ],
+          stops: const [0.18, 0.50, 0.82],
+          transform: _ParentShimmerTransform(start),
+        ).createShader(bounds);
+      },
+      child: child,
+    );
+  }
+}
+
+class _ParentShimmerTransform extends GradientTransform {
+  const _ParentShimmerTransform(this.dx);
+
+  final double dx;
+
+  @override
+  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
+    return Matrix4.translationValues(dx, 0, 0);
+  }
+}
+
 class _ParentLearningStreakCard extends StatelessWidget {
   const _ParentLearningStreakCard({
     required this.hasCompletedAssessment,
@@ -1728,20 +1814,150 @@ class _ParentResultTag extends StatelessWidget {
   }
 }
 
-class _ParentHomeLoadingCard extends StatelessWidget {
+class _ParentHomeLoadingCard extends StatefulWidget {
   const _ParentHomeLoadingCard();
 
   @override
+  State<_ParentHomeLoadingCard> createState() => _ParentHomeLoadingCardState();
+}
+
+class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 214,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1FAF9),
-        borderRadius: BorderRadius.circular(17),
-      ),
-      child: const Center(
-        child: CircularProgressIndicator(color: Color(0xFF159A86)),
-      ),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final pulseValue =
+            0.5 - 0.5 * math.cos(math.pi * 2 * _controller.value);
+        final color = Color.lerp(
+          const Color(0xFFF1F3F3),
+          const Color(0xFFE1E8E7),
+          pulseValue,
+        )!;
+
+        return _ParentSkeletonShimmer(
+          progress: _controller.value,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ParentSkeletonBlock(
+                height: 225,
+                radius: 30,
+                color: color,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(28, 32, 28, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ParentSkeletonLine(
+                        width: 148,
+                        height: 30,
+                        color: color,
+                      ),
+                      const SizedBox(height: 14),
+                      _ParentSkeletonLine(
+                        width: 210,
+                        height: 34,
+                        color: color,
+                      ),
+                      const Spacer(),
+                      _ParentSkeletonLine(
+                        width: 132,
+                        height: 14,
+                        color: color,
+                      ),
+                      const SizedBox(height: 12),
+                      _ParentSkeletonBlock(
+                        width: 150,
+                        height: 44,
+                        radius: 22,
+                        color: color,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _ParentSkeletonBlock(
+                      height: 160,
+                      radius: 18,
+                      color: color,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _ParentSkeletonBlock(
+                      height: 160,
+                      radius: 18,
+                      color: color,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _ParentSkeletonBlock(
+                height: 178,
+                radius: 17,
+                color: color,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      for (var index = 0; index < 3; index++) ...[
+                        Row(
+                          children: [
+                            _ParentSkeletonBlock(
+                              width: 32,
+                              height: 32,
+                              radius: 10,
+                              color: color,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _ParentSkeletonLine(
+                                    width: index == 0 ? 120 : 150,
+                                    height: 14,
+                                    color: color,
+                                  ),
+                                  const SizedBox(height: 7),
+                                  _ParentSkeletonLine(
+                                    width: double.infinity,
+                                    height: 10,
+                                    color: color,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (index != 2) const SizedBox(height: 14),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
