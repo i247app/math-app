@@ -9,6 +9,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
+import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 
 const _resultTeal = Color(0xFF006762);
 const _resultHeaderTeal = Color(0xFF38898C);
@@ -467,15 +468,11 @@ class _ScoreRing extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              width: 150 * scale,
-              height: 150 * scale,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                border: Border.all(color: accentColor, width: 9 * scale),
-              ),
+            ScoreProgressRing(
+              progress: (_scoreNumber(scoreValue) / 10).clamp(0, 1).toDouble(),
+              color: accentColor,
+              size: 150 * scale,
+              strokeWidth: 9 * scale,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -525,6 +522,10 @@ class _ScoreRing extends StatelessWidget {
       ),
     );
   }
+}
+
+double _scoreNumber(String value) {
+  return double.tryParse(value.trim()) ?? 0;
 }
 
 class _AiReviewCard extends StatelessWidget {

@@ -10,6 +10,7 @@ import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const _teal = Color(0xFF006762);
@@ -699,30 +700,22 @@ class _HistoryScoreBadge extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 48 * scale,
-            height: 48 * scale,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              border: Border.all(
-                color: colors.foreground,
-                width: 5 * scale,
-              ),
-            ),
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  '$scoreOutOf10/10',
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: colors.foreground,
-                    fontSize: FontSize.caption * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
+          ScoreProgressRing(
+            progress: percentage.clamp(0, 100) / 100,
+            color: colors.foreground,
+            size: 48 * scale,
+            strokeWidth: 5 * scale,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                '$scoreOutOf10/10',
+                maxLines: 1,
+                style: TextStyle(
+                  color: colors.foreground,
+                  fontSize: FontSize.caption * scale,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  letterSpacing: 0,
                 ),
               ),
             ),

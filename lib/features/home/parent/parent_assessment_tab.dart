@@ -897,15 +897,12 @@ class _ParentAssessmentScoreBadge extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 48 * scale,
-            height: 48 * scale,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              border: Border.all(color: color, width: 5 * scale),
-            ),
-            alignment: Alignment.center,
+          ScoreProgressRing(
+            progress:
+                percentage == null ? 0.0 : percentage!.clamp(0, 100) / 100,
+            color: color,
+            size: 48 * scale,
+            strokeWidth: 5 * scale,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(

@@ -37,6 +37,7 @@ import 'package:numi_flutter/features/quiz/history_tab.dart';
 import 'package:numi_flutter/features/quiz/review_tab.dart';
 import 'package:numi_flutter/features/settings/setting_tab.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
+import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
 
