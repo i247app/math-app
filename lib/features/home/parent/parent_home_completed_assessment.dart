@@ -30,7 +30,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
                     const SizedBox(height: 7),
                     _ParentImageAction(
                       asset: _parentHomeShop,
-                      height: 72,
+                      height: 83,
                       onTap: widget.args.onOpenReviewTab,
                     ),
                   ],
@@ -40,7 +40,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
               Expanded(
                 child: _ParentImageAction(
                   asset: _parentHomeClassroom,
-                  height: 162,
+                  height: 173,
                   onTap: _showClassroomMessage,
                 ),
               ),
