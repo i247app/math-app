@@ -1018,15 +1018,22 @@ class _HeaderBar extends StatelessWidget {
       );
     }
 
+    final startPadding = role == ProfileRole.student
+        ? horizontalPadding * 0.82
+        : horizontalPadding;
+    final endPadding = role == ProfileRole.student
+        ? horizontalPadding * 0.72
+        : horizontalPadding;
+
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Container(
           height: height,
           padding: EdgeInsets.fromLTRB(
-            horizontalPadding,
+            startPadding,
             topInset + contentHeight * 0.20,
-            horizontalPadding,
+            endPadding,
             contentHeight * 0.21,
           ),
           decoration: BoxDecoration(

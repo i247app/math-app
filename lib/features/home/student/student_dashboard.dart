@@ -12,7 +12,12 @@ class StudentDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     if (args.activeTab == 0) {
       return _StudentHomeContent(
-        padding: args.contentPadding,
+        padding: EdgeInsets.fromLTRB(
+          14 * args.scale,
+          args.headerHeight,
+          14 * args.scale,
+          args.bottomPadding,
+        ),
         scale: args.scale,
         user: args.user,
         profiles: args.profiles,
@@ -406,6 +411,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     }
   }
 
+  // ignore: unused_element
   Future<void> _handleInvitation(
     ClassroomInvitation invitation, {
     required bool accept,
@@ -593,14 +599,14 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       physics: const BouncingScrollPhysics(),
       padding: widget.padding,
       child: widget.activeRole == ProfileRole.parent
-          ? _buildStudentModeOne(isLoadingHomeSections: false)
+          ? _buildStudentModeOne()
           : isLoadingHomeSections
               ? const _StudentHomeSectionsLoading()
               : hasClassroom
                   ? _buildStudentModeThree()
                   : hasCompletedAssessment
                       ? _buildStudentModeTwo()
-                      : _buildStudentModeOne(isLoadingHomeSections: false),
+                      : _buildStudentModeOne(),
     );
   }
 
@@ -633,6 +639,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     await _allowClassroomActionForActiveRole();
   }
 
+  // ignore: unused_element
   Future<void> _openAllInvitations() async {
     if (!await _allowClassroomActionForActiveRole()) {
       return;
@@ -842,6 +849,22 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     );
   }
 
+  void _openStudentAssessmentResult(GeneratedQuiz quiz) {
+    final quizId = quiz.quizId ?? quiz.id;
+    if (quizId == null || quizId <= 0) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => QuizReviewScreen(
+          quizId: quizId,
+          initialQuiz: quiz,
+        ),
+      ),
+    );
+  }
+
   Future<void> _openClassDetail(ClassroomModel classroom) async {
     if (!await _allowClassroomActionForActiveRole()) {
       return;
@@ -881,6 +904,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 int? _profileGradeId(StudentProfile? profile) =>
     profile?.grade?.gradeId ?? profile?.grade?.id ?? profile?.gradeId;
 
+// ignore: unused_element
 class _StudentInvitationsSection extends StatelessWidget {
   const _StudentInvitationsSection({
     required this.invitations,
@@ -2133,6 +2157,7 @@ class _StudentFigmaClassCard extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _HomeTeacherMessages extends StatelessWidget {
   const _HomeTeacherMessages();
 

@@ -1,7 +1,7 @@
 part of '../home_screen.dart';
 
 extension _StudentHomeModeOneView on _StudentHomeContentState {
-  Widget _buildStudentModeOne({required bool isLoadingHomeSections}) {
+  Widget _buildStudentModeOne() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -39,38 +39,15 @@ extension _StudentHomeModeOneView on _StudentHomeContentState {
           ),
         ),
         const SizedBox(height: 12),
-        if (isLoadingHomeSections)
-          const _StudentHomeSectionsLoading()
-        else
-          _studentModeEntrance(
-            order: 2,
-            markOnEnd: true,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _StudentInvitationsSection(
-                  invitations: _invitations,
-                  processingClassroomIds: _processingInvitationClassIds,
-                  showJoinClassroom: widget.activeRole == ProfileRole.student &&
-                      _classrooms.isEmpty,
-                  onJoinClassroom: widget.activeRole == ProfileRole.student
-                      ? widget.onOpenClassroomTab
-                      : _handleParentClassroomEntry,
-                  onViewAll: _openAllInvitations,
-                  onAccept: (invitation) => _handleInvitation(
-                    invitation,
-                    accept: true,
-                  ),
-                  onReject: (invitation) => _handleInvitation(
-                    invitation,
-                    accept: false,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const _HomeTeacherMessages(),
-              ],
-            ),
+        _studentModeEntrance(
+          order: 2,
+          markOnEnd: true,
+          child: _ParentStartGuideCard(
+            onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
+            onRoadmapTap: widget.onOpenReviewTab,
+            onClassroomTap: widget.onOpenClassroomTab,
           ),
+        ),
       ],
     );
   }

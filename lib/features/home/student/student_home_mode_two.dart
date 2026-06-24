@@ -48,33 +48,18 @@ extension _StudentHomeModeTwoView on _StudentHomeContentState {
           ),
         ),
         const SizedBox(height: 12),
-        _studentModeEntrance(
-          order: 2,
-          markOnEnd: true,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _StudentInvitationsSection(
-                invitations: _invitations,
-                processingClassroomIds: _processingInvitationClassIds,
-                showJoinClassroom: widget.activeRole == ProfileRole.student &&
-                    _classrooms.isEmpty,
-                onJoinClassroom: widget.onOpenClassroomTab,
-                onViewAll: _openAllInvitations,
-                onAccept: (invitation) => _handleInvitation(
-                  invitation,
-                  accept: true,
-                ),
-                onReject: (invitation) => _handleInvitation(
-                  invitation,
-                  accept: false,
-                ),
-              ),
-              const SizedBox(height: 20),
-              const _HomeTeacherMessages(),
-            ],
+        for (final entry in _completedAssessments.take(2).indexed) ...[
+          _studentModeEntrance(
+            order: 2 + entry.$1,
+            markOnEnd: entry.$1 == 1 ||
+                entry.$1 == _completedAssessments.take(2).length - 1,
+            child: _ParentAssessmentResultCard(
+              quiz: entry.$2,
+              onTap: () => _openStudentAssessmentResult(entry.$2),
+            ),
           ),
-        ),
+          const SizedBox(height: 8),
+        ],
       ],
     );
   }
