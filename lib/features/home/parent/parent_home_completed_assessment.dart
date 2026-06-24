@@ -55,7 +55,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
                 entry.$1 == _completedAssessments.take(2).length - 1,
             child: _ParentAssessmentResultCard(
               quiz: entry.$2,
-              onTap: () => _openQuizReview(entry.$2),
+              onTap: () => _openParentAssessmentResult(entry.$2),
             ),
           ),
           const SizedBox(height: 8),

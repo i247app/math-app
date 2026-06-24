@@ -51,11 +51,15 @@ class _ParentHomeContent extends StatefulWidget {
 }
 
 class _ParentHomeContentState extends State<_ParentHomeContent> {
+  late final HomeLayoutService _homeLayoutService = HomeLayoutApi();
   bool _isLoading = true;
   bool _hasLoadedHome = false;
   String? _errorMessage;
+  HomeLayout? _homeLayout;
   List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
   List<_ParentChildSummary> _childSummaries = const <_ParentChildSummary>[];
+  Map<String, HomeLayoutRecentCompletion> _layoutCompletionByQuizKey =
+      const <String, HomeLayoutRecentCompletion>{};
   int _childLoadRequestId = 0;
   bool _hasPlayedModeOneEntrance = false;
   bool _hasPlayedModeTwoEntrance = false;
@@ -102,117 +106,21 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     }
   }
 
-  List<StudentProfile> get _children => _studentProfiles(widget.args.profiles);
-
-  Future<void> _loadHome() {
-    return _children.isNotEmpty ? _loadChildDashboard() : _loadAssessments();
+  List<StudentProfile> get _children {
+    final layoutChildren = _homeLayout?.parent?.children;
+    if (layoutChildren != null &&
+        (_hasLoadedHome || layoutChildren.isNotEmpty)) {
+      return layoutChildren;
+    }
+    return _studentProfiles(widget.args.profiles);
   }
 
-  Future<void> _loadChildDashboard() async {
+  Future<void> _loadHome() async {
     final requestId = ++_childLoadRequestId;
-    final children = _children;
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-      if (_childSummaries.isEmpty) {
-        _completedAssessments = const <GeneratedQuiz>[];
-      }
-    });
-    widget.args.onParentAssessmentStateChanged(false);
-
-    var hadError = false;
-    final summariesFuture = Future.wait(
-      children.map((profile) async {
-        final profileId = ActiveProfileSession.profileStableId(profile);
-        if (profileId == null || profileId <= 0) {
-          hadError = true;
-          return _ParentChildSummary(profile: profile);
-        }
-
-        List<ClassroomModel> classrooms = const <ClassroomModel>[];
-        List<GeneratedQuiz> assessments = const <GeneratedQuiz>[];
-        try {
-          classrooms = await widget.args.classroomService
-              .listMyJoinedClassrooms(profileId: profileId);
-        } catch (_) {
-          hadError = true;
-        }
-        try {
-          final quizzes = await widget.args.quizService.listQuizzes(
-            profileId: profileId,
-          );
-          assessments = quizzes
-              .where(_isCompletedAssessment)
-              .toList(growable: false)
-            ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
-        } catch (_) {
-          hadError = true;
-        }
-
-        return _ParentChildSummary(
-          profile: profile,
-          classroom: classrooms.isEmpty ? null : classrooms.first,
-          assessments: assessments,
-        );
-      }),
-    );
-    final parentAssessmentsFuture = _loadParentAssessments(
-      onError: () => hadError = true,
-    );
-    final summaries = await summariesFuture;
-    final parentAssessments = await parentAssessmentsFuture;
-
-    if (!mounted || requestId != _childLoadRequestId) {
-      return;
-    }
-    setState(() {
-      _isLoading = false;
-      _hasLoadedHome = true;
-      _childSummaries = summaries;
-      _completedAssessments = parentAssessments;
-      _errorMessage = hadError
-          ? context.readText(AppKeys.parentChildDashboardLoadFailed)
-          : null;
-    });
-    widget.args.onParentAssessmentStateChanged(
-      parentAssessments.isNotEmpty,
-    );
-  }
-
-  Future<List<GeneratedQuiz>> _loadParentAssessments({
-    required VoidCallback onError,
-  }) async {
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
     );
-    final userId = widget.args.user?.id;
-    if ((profileId == null || profileId <= 0) &&
-        (userId == null || userId <= 0)) {
-      return const <GeneratedQuiz>[];
-    }
-
-    try {
-      return await _loadCompletedParentAssessments(
-        quizService: widget.args.quizService,
-        profileId: profileId,
-        userId: userId,
-      );
-    } catch (_) {
-      onError();
-      return const <GeneratedQuiz>[];
-    }
-  }
-
-  Future<void> _loadAssessments() async {
-    if (_childSummaries.isNotEmpty) {
-      _childSummaries = const <_ParentChildSummary>[];
-    }
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.args.activeProfile,
-    );
-    final userId = widget.args.user?.id;
-    if ((profileId == null || profileId <= 0) &&
-        (userId == null || userId <= 0)) {
+    if (profileId == null || profileId <= 0) {
       if (!mounted) {
         return;
       }
@@ -220,7 +128,11 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         _isLoading = false;
         _hasLoadedHome = true;
         _errorMessage = null;
+        _homeLayout = null;
+        _childSummaries = const <_ParentChildSummary>[];
         _completedAssessments = const <GeneratedQuiz>[];
+        _layoutCompletionByQuizKey =
+            const <String, HomeLayoutRecentCompletion>{};
       });
       widget.args.onParentAssessmentStateChanged(false);
       return;
@@ -229,26 +141,40 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      if (!_hasLoadedHome) {
+        _childSummaries = const <_ParentChildSummary>[];
+        _completedAssessments = const <GeneratedQuiz>[];
+      }
     });
+    widget.args.onParentAssessmentStateChanged(false);
 
     try {
-      final completed = await _loadCompletedParentAssessments(
-        quizService: widget.args.quizService,
-        profileId: profileId,
-        userId: userId,
-      );
-      if (!mounted) {
+      final layout = await _homeLayoutService.getLayout(profileId: profileId);
+      if (!mounted || requestId != _childLoadRequestId) {
         return;
       }
-
+      final parent = layout.parent;
+      final summaries = _summariesFromLayout(parent);
+      final completedAssessments = _recentCompletionQuizzes(parent);
+      final completionByQuizKey = <String, HomeLayoutRecentCompletion>{
+        for (final completion in parent?.recentCompletions ??
+            const <HomeLayoutRecentCompletion>[])
+          if (_layoutQuizKeyFromCompletion(completion) != null)
+            _layoutQuizKeyFromCompletion(completion)!: completion,
+      };
       setState(() {
         _isLoading = false;
         _hasLoadedHome = true;
         _errorMessage = null;
-        _completedAssessments = completed;
+        _homeLayout = layout;
+        _childSummaries = summaries;
+        _completedAssessments = completedAssessments;
+        _layoutCompletionByQuizKey = completionByQuizKey;
       });
-      widget.args.onParentAssessmentStateChanged(completed.isNotEmpty);
-    } on QuizException catch (error) {
+      widget.args.onParentAssessmentStateChanged(
+        completedAssessments.isNotEmpty,
+      );
+    } on HomeLayoutException catch (error) {
       if (!mounted) {
         return;
       }
@@ -256,9 +182,11 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         _isLoading = false;
         _hasLoadedHome = true;
         _errorMessage = error.message;
-        if (_completedAssessments.isEmpty) {
-          _completedAssessments = const <GeneratedQuiz>[];
-        }
+        _homeLayout = null;
+        _childSummaries = const <_ParentChildSummary>[];
+        _completedAssessments = const <GeneratedQuiz>[];
+        _layoutCompletionByQuizKey =
+            const <String, HomeLayoutRecentCompletion>{};
       });
       widget.args.onParentAssessmentStateChanged(false);
     } catch (_) {
@@ -268,10 +196,13 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       setState(() {
         _isLoading = false;
         _hasLoadedHome = true;
-        _errorMessage = context.readText(AppKeys.parentQuizLoadFailed);
-        if (_completedAssessments.isEmpty) {
-          _completedAssessments = const <GeneratedQuiz>[];
-        }
+        _errorMessage =
+            context.readText(AppKeys.parentChildDashboardLoadFailed);
+        _homeLayout = null;
+        _childSummaries = const <_ParentChildSummary>[];
+        _completedAssessments = const <GeneratedQuiz>[];
+        _layoutCompletionByQuizKey =
+            const <String, HomeLayoutRecentCompletion>{};
       });
       widget.args.onParentAssessmentStateChanged(false);
     }
@@ -437,7 +368,51 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       ),
     );
     if (mounted) {
-      await _loadAssessments();
+      await _loadHome();
+    }
+  }
+
+  void _openParentAssessmentResult(GeneratedQuiz quiz) {
+    final completion = _layoutCompletionByQuizKey[_layoutQuizKeyFromQuiz(quiz)];
+    if (completion == null) {
+      _openQuizReview(quiz);
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => StudentHomeworkResultScreen(
+          summary: _homeworkSummaryFromCompletion(context, completion),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openPendingExercise(HomeLayoutPendingExercise pending) async {
+    final exercise = pending.exercise;
+    final exerciseId = pending.classroomExerciseId ?? exercise?.stableId;
+    final profileId = _layoutChildId(pending.child);
+    if (exerciseId == null ||
+        exerciseId <= 0 ||
+        profileId == null ||
+        profileId <= 0) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => StudentHomeworkAttemptScreen(
+          exerciseId: exerciseId,
+          profileId: profileId,
+          initialExercise: exercise,
+          exerciseService: widget.args.assignmentService,
+        ),
+      ),
+    );
+    if (mounted) {
+      await _loadHome();
     }
   }
 
@@ -699,6 +674,149 @@ class _ParentChildAssessment {
 
   final _ParentChildSummary summary;
   final GeneratedQuiz quiz;
+}
+
+List<_ParentChildSummary> _summariesFromLayout(ParentHomeLayout? parent) {
+  final children = parent?.children ?? const <StudentProfile>[];
+  if (children.isEmpty) {
+    return const <_ParentChildSummary>[];
+  }
+
+  return children.map((child) {
+    final childId = ActiveProfileSession.profileStableId(child);
+    final assessments = <GeneratedQuiz>[
+      for (final completion
+          in parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[])
+        if (_layoutChildId(completion.child) == childId)
+          _quizFromRecentCompletion(completion),
+    ]..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+
+    return _ParentChildSummary(
+      profile: child,
+      classroom: _classroomForLayoutChild(parent, child),
+      assessments: assessments,
+    );
+  }).toList(growable: false);
+}
+
+List<GeneratedQuiz> _recentCompletionQuizzes(ParentHomeLayout? parent) {
+  return <GeneratedQuiz>[
+    for (final completion
+        in parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[])
+      _quizFromRecentCompletion(completion),
+  ]..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+}
+
+ClassroomModel? _classroomForLayoutChild(
+  ParentHomeLayout? parent,
+  StudentProfile child,
+) {
+  if (parent == null) {
+    return null;
+  }
+
+  final childId = ActiveProfileSession.profileStableId(child);
+  for (final classroom in parent.classrooms) {
+    if (classroom.memberProfileId == childId) {
+      return classroom.classroom;
+    }
+  }
+
+  if (parent.children.length == 1 && parent.classrooms.length == 1) {
+    return parent.classrooms.first.classroom;
+  }
+
+  for (final completion in parent.recentCompletions) {
+    if (_layoutChildId(completion.child) == childId &&
+        completion.classroom != null) {
+      return completion.classroom;
+    }
+  }
+
+  for (final pending in parent.pendingExercises) {
+    if (_layoutChildId(pending.child) == childId && pending.classroom != null) {
+      return pending.classroom;
+    }
+  }
+
+  return null;
+}
+
+GeneratedQuiz _quizFromRecentCompletion(HomeLayoutRecentCompletion completion) {
+  final exercise = completion.exercise;
+  final exerciseId = completion.classroomExerciseId ??
+      exercise?.classroomExerciseId ??
+      exercise?.exerciseId ??
+      exercise?.id;
+  final totalQuestions = completion.totalQuestions ?? exercise?.numQuestions;
+  return GeneratedQuiz(
+    id: exerciseId,
+    quizId: exerciseId,
+    profileId: _layoutChildId(completion.child),
+    quizStatus: completion.submissionStatus,
+    purpose: exercise?.purpose,
+    type: exercise?.purpose,
+    title: exercise?.title,
+    shortText: exercise?.shortText ?? exercise?.description,
+    createDt: completion.submittedDt ?? exercise?.createDt,
+    modifyDt:
+        completion.gradedDt ?? completion.submittedDt ?? exercise?.modifyDt,
+    grading: QuizGrading(
+      correctNumber: completion.correctNumber,
+      scorePercentage: completion.scorePercentage,
+      totalQuestions: totalQuestions,
+    ),
+    questions: const <QuizQuestion>[],
+  );
+}
+
+StudentHomeworkResultSummary _homeworkSummaryFromCompletion(
+  BuildContext context,
+  HomeLayoutRecentCompletion completion,
+) {
+  final scorePercentage = completion.scorePercentage;
+  if (scorePercentage != null) {
+    final scoreOutOf10 = (scorePercentage / 10).round().clamp(0, 10);
+    return StudentHomeworkResultSummary(
+      scoreText: '$scoreOutOf10/10',
+      reviewText: context.getText(AppKeys.defaultAiReview),
+    );
+  }
+
+  final correctNumber = completion.correctNumber;
+  final totalQuestions = completion.totalQuestions;
+  if (correctNumber != null && totalQuestions != null && totalQuestions > 0) {
+    final scoreOutOf10 = (correctNumber / totalQuestions * 10).round();
+    return StudentHomeworkResultSummary(
+      scoreText: '${scoreOutOf10.clamp(0, 10)}/10',
+      reviewText: context.getText(AppKeys.defaultAiReview),
+    );
+  }
+
+  return StudentHomeworkResultSummary(
+    scoreText: '--/10',
+    reviewText: context.getText(AppKeys.defaultAiReview),
+  );
+}
+
+String? _layoutQuizKeyFromCompletion(HomeLayoutRecentCompletion completion) {
+  final childId = _layoutChildId(completion.child);
+  final exerciseId = completion.classroomExerciseId ??
+      completion.exercise?.classroomExerciseId ??
+      completion.exercise?.exerciseId ??
+      completion.exercise?.id;
+  if (childId == null || exerciseId == null) {
+    return null;
+  }
+  return '$childId:$exerciseId';
+}
+
+String _layoutQuizKeyFromQuiz(GeneratedQuiz quiz) {
+  return '${quiz.profileId}:${quiz.quizId ?? quiz.id}';
+}
+
+int? _layoutChildId(StudentProfile? child) {
+  return child == null ? null : ActiveProfileSession.profileStableId(child);
 }
 
 class _ParentChildrenGrid extends StatelessWidget {
@@ -1766,6 +1884,143 @@ class _ParentAssessmentResultCard extends StatelessWidget {
                           if (profileName != null)
                             _ParentResultTag(label: profileName!),
                           if (classroomName != null)
+                            _ParentResultTag(label: classroomName!),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: Color(0xFF8DA4BD),
+                size: 22,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentPendingExerciseCard extends StatelessWidget {
+  const _ParentPendingExerciseCard({
+    required this.pending,
+    required this.onTap,
+  });
+
+  final HomeLayoutPendingExercise pending;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final exercise = pending.exercise;
+    final title = exercise?.title?.trim().isNotEmpty == true
+        ? exercise!.title!.trim()
+        : context.getText(AppKeys.studentHomework);
+    final shortText = exercise?.shortText?.trim().isNotEmpty == true
+        ? exercise!.shortText!.trim()
+        : exercise?.description?.trim();
+    final childName = pending.child == null
+        ? null
+        : homeProfileDisplayName(context, pending.child!);
+    final classroomName = pending.classroom?.name?.trim();
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(17),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 90),
+          padding: const EdgeInsets.fromLTRB(16, 14, 13, 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(17),
+            border: Border.all(color: const Color(0xFFE9E4E4)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF2EA),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.assignment_rounded,
+                  color: Color(0xFFFF6B17),
+                  size: 27,
+                ),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.schedule_rounded,
+                          color: Color(0xFFFF6B17),
+                          size: 15,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          context.getText(AppKeys.studentHomeworkNotSubmitted),
+                          style: const TextStyle(
+                            color: Color(0xFFFF6B17),
+                            fontSize: FontSize.caption,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF222222),
+                        fontSize: FontSize.normal,
+                        fontWeight: FontWeight.w900,
+                        height: 1.1,
+                      ),
+                    ),
+                    if (shortText != null && shortText.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        shortText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF6D5C58),
+                          fontSize: FontSize.small,
+                          fontWeight: FontWeight.w500,
+                          height: 1.15,
+                        ),
+                      ),
+                    ],
+                    if (childName != null ||
+                        classroomName?.isNotEmpty == true) ...[
+                      const SizedBox(height: 7),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          if (childName != null)
+                            _ParentResultTag(label: childName),
+                          if (classroomName?.isNotEmpty == true)
                             _ParentResultTag(label: classroomName!),
                         ],
                       ),

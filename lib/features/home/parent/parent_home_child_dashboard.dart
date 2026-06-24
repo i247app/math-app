@@ -3,6 +3,8 @@ part of '../home_screen.dart';
 extension _ParentHomeChildDashboardView on _ParentHomeContentState {
   Widget _buildChildDashboard() {
     final summaries = _childSummaries;
+    final pendingExercises = _homeLayout?.parent?.pendingExercises ??
+        const <HomeLayoutPendingExercise>[];
     final assessments = <_ParentChildAssessment>[
       for (final summary in summaries)
         for (final quiz in summary.assessments)
@@ -37,6 +39,13 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
                   children: [
                     _ParentChildrenGrid(summaries: summaries),
                     const SizedBox(height: 14),
+                    for (final pending in pendingExercises.take(2)) ...[
+                      _ParentPendingExerciseCard(
+                        pending: pending,
+                        onTap: () => _openPendingExercise(pending),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                     for (final item in assessments.take(2)) ...[
                       _ParentAssessmentResultCard(
                         quiz: item.quiz,
@@ -48,7 +57,7 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
                           context,
                           item.summary,
                         ),
-                        onTap: () => _openQuizReview(item.quiz),
+                        onTap: () => _openParentAssessmentResult(item.quiz),
                       ),
                       const SizedBox(height: 10),
                     ],
