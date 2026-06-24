@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
@@ -31,6 +32,7 @@ import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/grade_selection_screen.dart';
 import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
 import 'package:numi_flutter/features/quiz/history_tab.dart';
@@ -48,6 +50,9 @@ part 'parent/parent_home_child_dashboard.dart';
 part 'parent/parent_assessment_tab.dart';
 part 'parent/parent_room_tab.dart';
 part 'student/student_dashboard.dart';
+part 'student/student_home_mode_one.dart';
+part 'student/student_home_mode_two.dart';
+part 'student/student_home_mode_three.dart';
 part 'teacher/teacher_dashboard.dart';
 
 const _teal = Color(0xFF006762);

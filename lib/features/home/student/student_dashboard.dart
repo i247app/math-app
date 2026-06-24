@@ -22,6 +22,8 @@ class StudentDashboard extends StatelessWidget {
         initialGrades: args.initialGrades,
         gradeService: args.gradeService,
         classroomService: args.classroomService,
+        assignmentService: args.assignmentService,
+        quizService: args.quizService,
         onOpenClassroomTab: args.onOpenClassroomTab,
         onOpenReviewTab: args.onOpenReviewTab,
         onRefreshProfiles: args.onRefreshProfiles,
@@ -108,6 +110,8 @@ class _StudentHomeContent extends StatefulWidget {
     required this.initialGrades,
     required this.gradeService,
     required this.classroomService,
+    required this.assignmentService,
+    required this.quizService,
     required this.onOpenClassroomTab,
     required this.onOpenReviewTab,
     required this.onRefreshProfiles,
@@ -127,6 +131,8 @@ class _StudentHomeContent extends StatefulWidget {
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final ClassroomService classroomService;
+  final ClassroomExerciseService assignmentService;
+  final QuizService quizService;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenReviewTab;
   final Future<void> Function() onRefreshProfiles;
@@ -141,13 +147,25 @@ class _StudentHomeContent extends StatefulWidget {
 
 class _StudentHomeContentState extends State<_StudentHomeContent> {
   late final ClassroomService _classroomService = widget.classroomService;
+  late final ClassroomExerciseService _assignmentService =
+      widget.assignmentService;
   final _StudentHomePanel _activePanel = _StudentHomePanel.homework;
   bool _isLoadingInvitations = false;
   bool _hasLoadedInvitations = false;
+  bool _isLoadingAssessments = false;
+  bool _hasLoadedAssessments = false;
+  bool _isLoadingModeHomework = false;
   bool _hasPlayedHeroEntrance = false;
   bool _hasPlayedSectionsEntrance = false;
+  bool _hasPlayedModeOneEntrance = false;
+  bool _hasPlayedModeTwoEntrance = false;
+  bool _hasPlayedModeThreeEntrance = false;
   List<ClassroomInvitation> _invitations = const <ClassroomInvitation>[];
+  List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
+  List<ClassroomExercise> _modeHomeworkExercises = const <ClassroomExercise>[];
   final Set<int> _processingInvitationClassIds = <int>{};
+  int? _modeHomeworkClassroomId;
+  int? _modeHomeworkProfileId;
 
   ClassroomCollectionState get _classroomCollection {
     final profileId = ActiveProfileSession.profileStableId(
@@ -177,6 +195,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
         _loadClassrooms();
       }
       _loadInvitations();
+      _loadAssessments();
     }
   }
 
@@ -188,6 +207,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
         _loadClassrooms();
       }
       _loadInvitations();
+      _loadAssessments();
       return;
     }
     if (!widget.isActive) {
@@ -203,15 +223,27 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     if (oldProfileId != profileId || roleChanged) {
       _invitations = const <ClassroomInvitation>[];
       _hasLoadedInvitations = false;
+      _isLoadingAssessments = false;
+      _completedAssessments = const <GeneratedQuiz>[];
+      _hasLoadedAssessments = false;
+      _isLoadingModeHomework = false;
+      _modeHomeworkExercises = const <ClassroomExercise>[];
+      _modeHomeworkClassroomId = null;
+      _modeHomeworkProfileId = null;
+      _hasPlayedModeOneEntrance = false;
+      _hasPlayedModeTwoEntrance = false;
+      _hasPlayedModeThreeEntrance = false;
       if (widget.activeRole == ProfileRole.student) {
         _loadClassrooms();
       }
       _loadInvitations();
+      _loadAssessments();
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       if (widget.activeRole == ProfileRole.student) {
         _loadClassrooms(forceRefresh: true);
       }
       _loadInvitations();
+      _loadAssessments();
     }
   }
 
@@ -275,6 +307,102 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       } else {
         _isLoadingInvitations = false;
       }
+    }
+  }
+
+  Future<void> _loadAssessments() async {
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
+    final userId = widget.user?.id;
+    if (_isLoadingAssessments ||
+        ((profileId == null || profileId <= 0) &&
+            (userId == null || userId <= 0))) {
+      return;
+    }
+
+    setState(() => _isLoadingAssessments = true);
+    try {
+      final quizzes = await widget.quizService.listQuizzes(
+        profileId: profileId,
+        userId: userId,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (ActiveProfileSession.profileStableId(widget.activeProfile) !=
+          profileId) {
+        setState(() => _isLoadingAssessments = false);
+        if (widget.isActive) {
+          await _loadAssessments();
+        }
+        return;
+      }
+      final completed = quizzes.where(_isCompletedAssessment).toList()
+        ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+      setState(() {
+        _completedAssessments = completed;
+        _hasLoadedAssessments = true;
+        _isLoadingAssessments = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _completedAssessments = const <GeneratedQuiz>[];
+        _hasLoadedAssessments = true;
+        _isLoadingAssessments = false;
+      });
+    }
+  }
+
+  Future<void> _loadModeHomework({
+    required int classroomId,
+    required int profileId,
+  }) async {
+    if (_isLoadingModeHomework &&
+        _modeHomeworkClassroomId == classroomId &&
+        _modeHomeworkProfileId == profileId) {
+      return;
+    }
+
+    setState(() {
+      _isLoadingModeHomework = true;
+      _modeHomeworkClassroomId = classroomId;
+      _modeHomeworkProfileId = profileId;
+    });
+
+    try {
+      final exercises = await _assignmentService.listExercises(
+        classroomId: classroomId,
+        profileId: profileId,
+      );
+      if (!mounted ||
+          _modeHomeworkClassroomId != classroomId ||
+          _modeHomeworkProfileId != profileId) {
+        return;
+      }
+      exercises.sort(
+        (a, b) =>
+            _studentModeDate(b.createDt ?? b.startDate ?? b.endDate).compareTo(
+          _studentModeDate(a.createDt ?? a.startDate ?? a.endDate),
+        ),
+      );
+      setState(() {
+        _modeHomeworkExercises = exercises;
+        _isLoadingModeHomework = false;
+      });
+    } catch (_) {
+      if (!mounted ||
+          _modeHomeworkClassroomId != classroomId ||
+          _modeHomeworkProfileId != profileId) {
+        return;
+      }
+      setState(() {
+        _modeHomeworkExercises = const <ClassroomExercise>[];
+        _isLoadingModeHomework = false;
+      });
     }
   }
 
@@ -392,6 +520,35 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     setState(() => _hasPlayedSectionsEntrance = true);
   }
 
+  Widget _studentModeEntrance({
+    required int order,
+    required Widget child,
+    bool markOnEnd = false,
+  }) {
+    if (_hasPlayedModeOneEntrance &&
+        _hasPlayedModeTwoEntrance &&
+        _hasPlayedModeThreeEntrance) {
+      return child;
+    }
+
+    return _ParentHomeEntrance(
+      order: order,
+      onFinished: markOnEnd ? _markStudentModeEntrancePlayed : null,
+      child: child,
+    );
+  }
+
+  void _markStudentModeEntrancePlayed() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _hasPlayedModeOneEntrance = true;
+      _hasPlayedModeTwoEntrance = true;
+      _hasPlayedModeThreeEntrance = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileId = ActiveProfileSession.profileStableId(
@@ -405,96 +562,45 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     final isLoadingHomeSections = profileId != null &&
         profileId > 0 &&
         (!_hasLoadedInvitations ||
+            !_hasLoadedAssessments ||
             (widget.activeRole == ProfileRole.student &&
                 !_hasLoadedClassrooms));
+    final hasClassroom =
+        widget.activeRole == ProfileRole.student && _classrooms.isNotEmpty;
+    final hasCompletedAssessment = _completedAssessments.isNotEmpty;
+
+    if (hasClassroom) {
+      final classroom = _classrooms.first;
+      final classroomId = classroom.stableId;
+      if (classroomId != null &&
+          profileId != null &&
+          profileId > 0 &&
+          (_modeHomeworkClassroomId != classroomId ||
+              _modeHomeworkProfileId != profileId) &&
+          !_isLoadingModeHomework) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _loadModeHomework(
+              classroomId: classroomId,
+              profileId: profileId,
+            );
+          }
+        });
+      }
+    }
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: widget.padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (widget.activeRole == ProfileRole.parent)
-            _HomePopIn(
-              animation: widget.parentHomeEntrance,
-              interval: const Interval(0, 0.62),
-              beginOffset: const Offset(0, 22),
-              beginScale: 0.92,
-              child: _StudentFigmaHeroCard(
-                onAssessmentTap: () =>
-                    _openGradeSelection(quizPurposeAssessment),
-              ),
-            )
-          else
-            _studentHomeFadeIn(
-              hasPlayed: _hasPlayedHeroEntrance,
-              onEnd: _markHeroEntrancePlayed,
-              child: _StudentFigmaHeroCard(
-                onAssessmentTap: () =>
-                    _openGradeSelection(quizPurposeAssessment),
-              ),
-            ),
-          const SizedBox(height: 22),
-          if (widget.activeRole == ProfileRole.parent)
-            _HomePopIn(
-              animation: widget.parentHomeEntrance,
-              interval: const Interval(0.3, 1),
-              beginOffset: const Offset(0, 26),
-              beginScale: 0.9,
-              child: _ParentWelcomeMapCard(
-                onTap: widget.onOpenReviewTab,
-              ),
-            )
-          else if (isLoadingHomeSections)
-            const _StudentHomeSectionsLoading()
-          else
-            _studentHomeFadeIn(
-              hasPlayed: _hasPlayedSectionsEntrance,
-              onEnd: _markSectionsEntrancePlayed,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _StudentInvitationsSection(
-                    invitations: _invitations,
-                    processingClassroomIds: _processingInvitationClassIds,
-                    showJoinClassroom:
-                        widget.activeRole == ProfileRole.student &&
-                            _classrooms.isEmpty,
-                    onJoinClassroom: widget.activeRole == ProfileRole.student
-                        ? widget.onOpenClassroomTab
-                        : _handleParentClassroomEntry,
-                    onViewAll: _openAllInvitations,
-                    onAccept: (invitation) => _handleInvitation(
-                      invitation,
-                      accept: true,
-                    ),
-                    onReject: (invitation) => _handleInvitation(
-                      invitation,
-                      accept: false,
-                    ),
-                  ),
-                  if (widget.activeRole == ProfileRole.student &&
-                      (_classrooms.isNotEmpty ||
-                          !_hasLoadedClassrooms ||
-                          _classroomError != null)) ...[
-                    const SizedBox(height: 11),
-                    _StudentClassGridSection(
-                      classrooms: _classrooms,
-                      isLoading: _isLoadingClassrooms && !_hasLoadedClassrooms,
-                      isRefreshing:
-                          _isLoadingClassrooms && _classrooms.isNotEmpty,
-                      error: _classroomError,
-                      onOpenClassroom: _openClassDetail,
-                      onViewAll: widget.onOpenClassroomTab,
-                    ),
-                  ],
-                  const SizedBox(height: 20),
-                  const _HomeTeacherMessages(),
-                ],
-              ),
-            ),
-        ],
-      ),
+      child: widget.activeRole == ProfileRole.parent
+          ? _buildStudentModeOne(isLoadingHomeSections: false)
+          : isLoadingHomeSections
+              ? const _StudentHomeSectionsLoading()
+              : hasClassroom
+                  ? _buildStudentModeThree()
+                  : hasCompletedAssessment
+                      ? _buildStudentModeTwo()
+                      : _buildStudentModeOne(isLoadingHomeSections: false),
     );
   }
 
