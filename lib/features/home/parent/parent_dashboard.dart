@@ -661,7 +661,6 @@ class _ParentModeThreeContent extends StatelessWidget {
     required this.pendingExercises,
     required this.completions,
     required this.entranceBuilder,
-    required this.onAssessmentTap,
     required this.onPendingTap,
     required this.onCompletionTap,
     required this.onViewTasks,
@@ -676,7 +675,6 @@ class _ParentModeThreeContent extends StatelessWidget {
   final List<HomeLayoutPendingExercise> pendingExercises;
   final List<HomeLayoutRecentCompletion> completions;
   final _ParentHomeEntranceBuilder entranceBuilder;
-  final VoidCallback onAssessmentTap;
   final ValueChanged<HomeLayoutPendingExercise> onPendingTap;
   final ValueChanged<HomeLayoutRecentCompletion> onCompletionTap;
   final VoidCallback onViewTasks;
@@ -689,6 +687,7 @@ class _ParentModeThreeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primarySummary = _parentPrimarySummary(summaries);
+    final showGameSuggestions = pendingExercises.isEmpty || completions.isEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -705,67 +704,75 @@ class _ParentModeThreeContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        entranceBuilder(
-          order: 1,
-          child: pendingExercises.isEmpty
-              ? _ParentModeOneAssessmentBanner(onTap: onAssessmentTap)
-              : _ParentModeThreeSection(
-                  title: 'Nhiệm vụ',
-                  onViewAll: onViewTasks,
-                  child: Column(
-                    children: [
-                      for (final pending in pendingExercises.take(2)) ...[
-                        _ParentModeThreeTaskItem(
-                          pending: pending,
-                          onTap: () => onPendingTap(pending),
-                        ),
-                        if (pending != pendingExercises.take(2).last)
-                          const Divider(
-                            height: 24,
-                            indent: 62,
-                            color: Color(0xFFE9EEF2),
-                          ),
-                      ],
-                    ],
-                  ),
-                ),
-        ),
-        const SizedBox(height: 14),
-        entranceBuilder(
-          order: 2,
-          child: completions.isEmpty
-              ? const _ParentModeThreeGameSuggestions()
-              : _ParentModeThreeSection(
-                  title: context.getText(AppKeys.assessmentResultTitle),
-                  onViewAll: onViewResults,
-                  child: Column(
-                    children: [
-                      for (final completion in completions.take(2)) ...[
-                        _ParentModeThreeResultItem(
-                          completion: completion,
-                          onTap: () => onCompletionTap(completion),
-                        ),
-                        if (completion != completions.take(2).last)
-                          const Divider(
-                            height: 24,
-                            indent: 62,
-                            color: Color(0xFFE9EEF2),
-                          ),
-                      ],
-                    ],
-                  ),
-                ),
-        ),
-        const SizedBox(height: 14),
+        if (pendingExercises.isNotEmpty) ...[
+          entranceBuilder(
+            order: 1,
+            child: _ParentModeThreeSection(
+              title: 'Nhiệm vụ',
+              onViewAll: onViewTasks,
+              child: Column(
+                children: [
+                  for (final pending in pendingExercises.take(2)) ...[
+                    _ParentModeThreeTaskItem(
+                      pending: pending,
+                      onTap: () => onPendingTap(pending),
+                    ),
+                    if (pending != pendingExercises.take(2).last)
+                      const Divider(
+                        height: 24,
+                        indent: 62,
+                        color: Color(0xFFE9EEF2),
+                      ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
+        if (completions.isNotEmpty) ...[
+          entranceBuilder(
+            order: 2,
+            child: _ParentModeThreeSection(
+              title: context.getText(AppKeys.assessmentResultTitle),
+              onViewAll: onViewResults,
+              child: Column(
+                children: [
+                  for (final completion in completions.take(2)) ...[
+                    _ParentModeThreeResultItem(
+                      completion: completion,
+                      onTap: () => onCompletionTap(completion),
+                    ),
+                    if (completion != completions.take(2).last)
+                      const Divider(
+                        height: 24,
+                        indent: 62,
+                        color: Color(0xFFE9EEF2),
+                      ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
         entranceBuilder(
           order: 3,
-          markOnEnd: true,
+          markOnEnd: !showGameSuggestions,
           child: _ParentModeThreeSection(
             title: 'Tin nhắn',
             onViewAll: onViewMessages,
             child: _ParentModeThreeMessages(summaries: summaries),
           ),
         ),
+        if (showGameSuggestions) ...[
+          const SizedBox(height: 14),
+          entranceBuilder(
+            order: 4,
+            markOnEnd: true,
+            child: const _ParentModeThreeGameSuggestions(),
+          ),
+        ],
         if (isRefreshing) ...[
           const SizedBox(height: 8),
           const _ParentHomeRefreshLabel(),
