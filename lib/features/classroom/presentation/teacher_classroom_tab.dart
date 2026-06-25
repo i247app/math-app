@@ -561,38 +561,50 @@ class _TeacherClassroomSkeletonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _TeacherSkeletonCard(
       scale: scale,
-      padding: EdgeInsets.all(16 * scale),
-      child: Row(
+      padding: EdgeInsets.symmetric(
+        horizontal: 18 * scale,
+        vertical: 18 * scale,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _TeacherSkeletonBlock(
-            width: 80 * scale,
-            height: 80 * scale,
-            radius: 16 * scale,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _TeacherSkeletonBlock(
+                width: 76 * scale,
+                height: 76 * scale,
+                radius: 16 * scale,
+              ),
+              SizedBox(width: 16 * scale),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 4 * scale),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _TeacherSkeletonBlock(
+                        width: 128 * scale,
+                        height: 21 * scale,
+                        radius: 10.5 * scale,
+                      ),
+                      SizedBox(height: 16 * scale),
+                      _TeacherSkeletonBlock(
+                        width: 142 * scale,
+                        height: 18 * scale,
+                        radius: 9 * scale,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 16 * scale),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _TeacherSkeletonBlock(
-                  width: 136 * scale,
-                  height: 18 * scale,
-                  radius: 9 * scale,
-                ),
-                SizedBox(height: 8 * scale),
-                _TeacherSkeletonBlock(
-                  width: 90 * scale,
-                  height: 13 * scale,
-                  radius: 7 * scale,
-                ),
-                SizedBox(height: 14 * scale),
-                _TeacherSkeletonBlock(
-                  width: 150 * scale,
-                  height: 13 * scale,
-                  radius: 7 * scale,
-                ),
-              ],
-            ),
+          SizedBox(height: 16 * scale),
+          _TeacherSkeletonBlock(
+            width: 132 * scale,
+            height: 18 * scale,
+            radius: 9 * scale,
           ),
         ],
       ),
@@ -617,105 +629,284 @@ class _ClassroomListCard extends StatelessWidget {
         classroom.name ?? context.getText(AppKeys.teacherClassFallback);
     final code = classroom.classroomCode ?? classroom.id?.toString() ?? '--';
     final memberCount = classroom.displayStudentCount;
-
-    // For the image, we try to use avatarKey/Url or just a placeholder box
-    // To match the image, we use a dark container with _HeroMathGlyph if nothing is provided
+    final classNumber = _teacherClassNumber(classroom);
+    final numberPalette = _teacherClassNumberPalette(classroom);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20 * scale),
-          border: Border.all(color: const Color(0xFFF2F4F7)),
+          borderRadius: BorderRadius.circular(24 * scale),
+          border: Border.all(color: const Color(0xFFE9EEF2)),
           boxShadow: [
             BoxShadow(
-              color: _teacherBlue.withValues(alpha: 0.04),
-              blurRadius: 16 * scale,
-              offset: Offset(0, 4 * scale),
+              color: _teacherBlue.withValues(alpha: 0.035),
+              blurRadius: 18 * scale,
+              offset: Offset(0, 5 * scale),
             ),
           ],
         ),
-        padding: EdgeInsets.all(16 * scale),
-        child: Row(
+        padding: EdgeInsets.symmetric(
+          horizontal: 18 * scale,
+          vertical: 18 * scale,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 80 * scale,
-              height: 80 * scale,
-              decoration: BoxDecoration(
-                color: _teacherBlue,
-                borderRadius: BorderRadius.circular(16 * scale),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF293B4E), Color(0xFF0F1B2A)],
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _TeacherClassNumberBadge(
+                  scale: scale,
+                  number: classNumber,
+                  palette: numberPalette,
                 ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16 * scale),
-                child: ProfileAvatarImage(
-                  size: 80 * scale,
-                  avatarUrl: classroom.avatarUrl ?? classroom.imageUrl,
-                  fallbackAsset: 'assets/images/numi-mascot.png',
+                SizedBox(width: 16 * scale),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 4 * scale),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.andika(
+                            color: _teacherBlue,
+                            fontSize: 21 * scale,
+                            fontWeight: FontWeight.w800,
+                            height: 1.05,
+                          ),
+                        ),
+                        SizedBox(height: 16 * scale),
+                        Text(
+                          'ID: $code',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.andika(
+                            color: const Color(0xFF484B56),
+                            fontSize: 18 * scale,
+                            fontWeight: FontWeight.w600,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-            SizedBox(width: 16 * scale),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
+            SizedBox(height: 16 * scale),
+            Row(
+              children: [
+                Icon(
+                  Icons.person_outline_rounded,
+                  color: const Color(0xFF4B4E5A),
+                  size: 17 * scale,
+                ),
+                SizedBox(width: 7 * scale),
+                Flexible(
+                  child: Text(
+                    context.formatText(
+                      AppKeys.teacherStudentCount,
+                      {'count': memberCount},
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.andika(
-                      color: _teacherBlue,
-                      fontSize: FontSize.large * scale,
+                      color: const Color(0xFF4B4E5A),
+                      fontSize: 18 * scale,
                       fontWeight: FontWeight.w800,
-                      height: 1.2,
+                      height: 1.1,
                     ),
                   ),
-                  SizedBox(height: 6 * scale),
-                  Text(
-                    'ID: $code',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.andika(
-                      color: _teacherMuted,
-                      fontSize: FontSize.small * scale,
-                      fontWeight: FontWeight.w600,
-                      height: 1.2,
-                    ),
-                  ),
-                  SizedBox(height: 12 * scale),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.person_outline_rounded,
-                        color: _teacherMuted,
-                        size: 16 * scale,
-                      ),
-                      SizedBox(width: 4 * scale),
-                      Text(
-                        context.formatText(
-                          AppKeys.teacherStudentCount,
-                          {'count': memberCount},
-                        ),
-                        style: GoogleFonts.andika(
-                          color: _teacherMuted,
-                          fontSize: FontSize.caption * scale,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
+}
+
+class _TeacherClassNumberBadge extends StatelessWidget {
+  const _TeacherClassNumberBadge({
+    required this.scale,
+    required this.number,
+    required this.palette,
+  });
+
+  final double scale;
+  final String number;
+  final _TeacherClassNumberPalette palette;
+
+  TextStyle get _numberStyle => TextStyle(
+        fontSize: 50 * scale,
+        fontWeight: FontWeight.w900,
+        height: 1,
+        letterSpacing: 0,
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = 16 * scale;
+    return Container(
+      width: 76 * scale,
+      height: 76 * scale,
+      decoration: BoxDecoration(
+        color: palette.background,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: palette.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(-0.45, -0.5),
+                  radius: 1.05,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.85),
+                    palette.background,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Transform.translate(
+            offset: Offset(3.5 * scale, 5.5 * scale),
+            child: Text(number,
+                style: _numberStyle.copyWith(color: palette.shadow)),
+          ),
+          Transform.translate(
+            offset: Offset(0, 3 * scale),
+            child: Text(
+              number,
+              style: _numberStyle.copyWith(
+                color: palette.depth,
+                shadows: [
+                  Shadow(
+                    color: palette.shadow,
+                    offset: Offset(2 * scale, 2.6 * scale),
+                    blurRadius: 2 * scale,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          ShaderMask(
+            blendMode: BlendMode.srcIn,
+            shaderCallback: (bounds) => LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [palette.top, palette.bottom],
+              stops: const [0.12, 0.88],
+            ).createShader(bounds),
+            child:
+                Text(number, style: _numberStyle.copyWith(color: Colors.white)),
+          ),
+          Positioned(
+            top: 17 * scale,
+            left: 26 * scale,
+            child: Transform.rotate(
+              angle: -0.5,
+              child: Container(
+                width: 13 * scale,
+                height: 5 * scale,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.42),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TeacherClassNumberPalette {
+  const _TeacherClassNumberPalette({
+    required this.top,
+    required this.bottom,
+    required this.depth,
+    required this.shadow,
+    required this.background,
+    required this.border,
+  });
+
+  final Color top;
+  final Color bottom;
+  final Color depth;
+  final Color shadow;
+  final Color background;
+  final Color border;
+}
+
+const _teacherClassNumberPalettes = <_TeacherClassNumberPalette>[
+  _TeacherClassNumberPalette(
+    top: Color(0xFF76DCCB),
+    bottom: Color(0xFF3DB9A5),
+    depth: Color(0xFF168A7C),
+    shadow: Color(0x55384350),
+    background: Color(0xFFEAF9F7),
+    border: Color(0xFFCDEDEA),
+  ),
+  _TeacherClassNumberPalette(
+    top: Color(0xFF20C8ED),
+    bottom: Color(0xFF0794D3),
+    depth: Color(0xFF075FB3),
+    shadow: Color(0x55384350),
+    background: Color(0xFFEAF7FF),
+    border: Color(0xFFD2ECFA),
+  ),
+  _TeacherClassNumberPalette(
+    top: Color(0xFFFFDA17),
+    bottom: Color(0xFFFFA800),
+    depth: Color(0xFFF06B17),
+    shadow: Color(0x55384350),
+    background: Color(0xFFFFF7DE),
+    border: Color(0xFFFFE8AC),
+  ),
+  _TeacherClassNumberPalette(
+    top: Color(0xFFA9DD35),
+    bottom: Color(0xFF71BD26),
+    depth: Color(0xFF2A8B22),
+    shadow: Color(0x55384350),
+    background: Color(0xFFF1FAE6),
+    border: Color(0xFFDDEFC1),
+  ),
+  _TeacherClassNumberPalette(
+    top: Color(0xFFFF514B),
+    bottom: Color(0xFFF01422),
+    depth: Color(0xFFB8071C),
+    shadow: Color(0x55384350),
+    background: Color(0xFFFFEEEE),
+    border: Color(0xFFFFD5D5),
+  ),
+];
+
+String _teacherClassNumber(ClassroomModel classroom) {
+  final source = [
+    classroom.name,
+    classroom.classroomCode,
+    classroom.id?.toString(),
+  ].whereType<String>().join(' ');
+  final match = RegExp(r'\d+').firstMatch(source);
+  return match?.group(0) ?? '1';
+}
+
+_TeacherClassNumberPalette _teacherClassNumberPalette(
+    ClassroomModel classroom) {
+  final seed =
+      classroom.stableId ?? classroom.id ?? classroom.name?.hashCode ?? 0;
+  return _teacherClassNumberPalettes[
+      seed.abs() % _teacherClassNumberPalettes.length];
 }
