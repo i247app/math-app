@@ -841,9 +841,9 @@ class _ParentModeThreeClassCard extends StatelessWidget {
       height: 100,
       padding: const EdgeInsets.fromLTRB(12, 13, 12, 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF3FA),
+        color: const Color(0xFFE7F6F5),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFD1DFE9)),
+        border: Border.all(color: const Color(0xFFCBE6E4)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -856,7 +856,7 @@ class _ParentModeThreeClassCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Color(0xFF006CB6),
+              color: Color(0xFF276C6B),
               fontSize: FontSize.caption,
               fontWeight: FontWeight.w900,
             ),
@@ -868,7 +868,7 @@ class _ParentModeThreeClassCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Color(0xFF006CB6),
+              color: Color(0xFF276C6B),
               fontSize: 34,
               fontWeight: FontWeight.w900,
               height: 0.95,
@@ -883,7 +883,7 @@ class _ParentModeThreeClassCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Color(0xFF006CB6),
+              color: Color(0xFF276C6B),
               fontSize: FontSize.caption,
               fontWeight: FontWeight.w800,
               height: 1,
