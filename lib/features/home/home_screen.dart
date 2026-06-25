@@ -63,11 +63,6 @@ const _deepInk = Color(0xFF253228);
 const _mintBackground = Color(0xFFEEF9FB);
 const _studentHomeBell = 'assets/images/student_home_bell.svg';
 const _studentHomeInvite = 'assets/images/student_home_invite.svg';
-const _studentParentHomeHeroBg =
-    'assets/images/student_parent_home_hero_bg.png';
-const _studentParentHomeHeroArt =
-    'assets/images/student_parent_home_hero_art.png';
-const _parentHomeWelcomeMap = 'assets/images/map_welcome_new.png';
 const _parentHomeAfterReviewBanner =
     'assets/images/parent_banner_after_review.jpg';
 const _parentHomeModeOneAssessmentBanner =
@@ -77,8 +72,6 @@ const _parentHomeRace = 'assets/images/parent_home_race.png';
 const _parentHomeShop = 'assets/images/parent_home_shop.png';
 const _studentParentHomeClassThumb =
     'assets/images/student_parent_home_class_thumb.png';
-const _studentParentHomeAssessmentIcon =
-    'assets/images/student_parent_home_assessment_icon.svg';
 const _studentParentHomeAcceptIcon =
     'assets/images/student_parent_home_accept.png';
 const _studentParentHomeRejectIcon =
