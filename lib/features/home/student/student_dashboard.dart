@@ -284,15 +284,26 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
         return;
       }
       final student = layout.student;
-      final classrooms = student?.classrooms
+      final classrooms = layout.rooms.isNotEmpty
+          ? layout.rooms
               .map((classroom) => classroom.classroom)
-              .toList(growable: false) ??
-          const <ClassroomModel>[];
-      final pendingExercises = student?.pendingExercises
-              .map((pending) => pending.exercise)
-              .whereType<ClassroomExercise>()
-              .toList(growable: false) ??
-          const <ClassroomExercise>[];
+              .toList(growable: false)
+          : student?.classrooms
+                  .map((classroom) => classroom.classroom)
+                  .toList(growable: false) ??
+              const <ClassroomModel>[];
+      final modernPendingExercises = layout.tasks
+          .where((task) => task.isPending)
+          .map((task) => task.exercise)
+          .whereType<ClassroomExercise>()
+          .toList(growable: false);
+      final pendingExercises = layout.tasks.isNotEmpty
+          ? modernPendingExercises
+          : student?.pendingExercises
+                  .map((pending) => pending.exercise)
+                  .whereType<ClassroomExercise>()
+                  .toList(growable: false) ??
+              const <ClassroomExercise>[];
       setState(() {
         _isLoadingHomeLayout = false;
         _hasLoadedHomeLayout = true;

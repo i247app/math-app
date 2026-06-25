@@ -128,12 +128,24 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         return;
       }
       final teacher = layout.teacher;
-      final classrooms = teacher?.classrooms
+      final classrooms = layout.rooms.isNotEmpty
+          ? layout.rooms
               .map((classroom) => classroom.classroom)
-              .toList(growable: false) ??
-          const <ClassroomModel>[];
+              .toList(growable: false)
+          : teacher?.classrooms
+                  .map((classroom) => classroom.classroom)
+                  .toList(growable: false) ??
+              const <ClassroomModel>[];
+      final layoutAssignments = layout.tasks
+          .where((task) => task.isAssigned)
+          .map((task) => task.exercise)
+          .whereType<ClassroomExercise>()
+          .toList(growable: false);
       final assignments = <ClassroomExercise>[
-        ...?teacher?.assignedExercises,
+        if (layout.tasks.isNotEmpty)
+          ...layoutAssignments
+        else
+          ...?teacher?.assignedExercises,
       ]..sort(_compareRecentAssignments);
 
       setState(() {
