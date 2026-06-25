@@ -370,70 +370,85 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                       completedCount: completions.length,
                     ),
                     const SizedBox(height: 26),
-                    _ParentRoomSectionTitle(
-                      icon: Icons.assignment_outlined,
-                      label:
-                          context.getText(AppKeys.parentRoomAssignmentsTitle),
+                    _ParentRoomListSection(
+                      title:
+                          'Nhiệm vụ(${pendingExercises.length + expiredExercises.length})',
+                      onViewAll: () => _parentRoomShowComingSoon(context),
+                      child: pendingExercises.isEmpty &&
+                              expiredExercises.isEmpty
+                          ? _ParentRoomEmptyLine(
+                              icon: Icons.assignment_turned_in_outlined,
+                              text: context.getText(
+                                AppKeys.studentNoHomeworkTitle,
+                              ),
+                            )
+                          : Column(
+                              children: [
+                                for (final pending in pendingExercises) ...[
+                                  _ParentRoomPendingListItem(
+                                    pending: pending,
+                                    onTap: () => _openPendingExercise(
+                                      context,
+                                      pending,
+                                    ),
+                                  ),
+                                  if (pending != pendingExercises.last ||
+                                      expiredExercises.isNotEmpty)
+                                    const Divider(
+                                      height: 24,
+                                      indent: 62,
+                                      color: Color(0xFFE9EEF2),
+                                    ),
+                                ],
+                                for (final expired in expiredExercises) ...[
+                                  _ParentRoomPendingListItem(
+                                    pending: expired,
+                                    isExpired: true,
+                                    onTap: () =>
+                                        _showExpiredExerciseMessage(context),
+                                  ),
+                                  if (expired != expiredExercises.last)
+                                    const Divider(
+                                      height: 24,
+                                      indent: 62,
+                                      color: Color(0xFFE9EEF2),
+                                    ),
+                                ],
+                              ],
+                            ),
                     ),
                     const SizedBox(height: 14),
-                    if (pendingExercises.isEmpty &&
-                        expiredExercises.isEmpty) ...[
-                      _ParentRoomEmptyBox(
-                        icon: Icons.assignment_turned_in_outlined,
-                        title: context.getText(AppKeys.studentNoHomeworkTitle),
-                        message:
-                            context.getText(AppKeys.studentNoHomeworkMessage),
-                      ),
-                      const SizedBox(height: 18),
-                    ] else ...[
-                      for (final pending in pendingExercises) ...[
-                        _ParentRoomPendingCard(
-                          pending: pending,
-                          compact: true,
-                          onTap: () => _openPendingExercise(context, pending),
-                        ),
-                        const SizedBox(height: 14),
-                      ],
-                      for (final expired in expiredExercises) ...[
-                        _ParentRoomPendingCard(
-                          pending: expired,
-                          compact: true,
-                          isExpired: true,
-                          onTap: () => _showExpiredExerciseMessage(context),
-                        ),
-                        const SizedBox(height: 14),
-                      ],
-                    ],
-                    const SizedBox(height: 4),
-                    _ParentRoomSectionTitle(
-                      icon: Icons.inventory_2_rounded,
-                      label: context.getText(AppKeys.assessmentResultTitle),
+                    _ParentRoomListSection(
+                      title: 'Kết quả',
+                      onViewAll: () => _parentRoomShowComingSoon(context),
+                      child: completions.isEmpty
+                          ? _ParentRoomEmptyLine(
+                              icon: Icons.fact_check_outlined,
+                              text: context.getText(
+                                AppKeys.noCompletedHomeworkTitle,
+                              ),
+                            )
+                          : Column(
+                              children: [
+                                for (final completion in completions) ...[
+                                  _ParentRoomCompletionListItem(
+                                    completion: completion,
+                                    onTap: () => _openCompletionResult(
+                                      context,
+                                      completion,
+                                    ),
+                                  ),
+                                  if (completion != completions.last)
+                                    const Divider(
+                                      height: 24,
+                                      indent: 62,
+                                      color: Color(0xFFE9EEF2),
+                                    ),
+                                ],
+                              ],
+                            ),
                     ),
                     const SizedBox(height: 14),
-                    if (completions.isEmpty) ...[
-                      _ParentRoomEmptyBox(
-                        icon: Icons.fact_check_outlined,
-                        title: context.getText(
-                          AppKeys.noCompletedHomeworkTitle,
-                        ),
-                        message: context.getText(
-                          AppKeys.noCompletedHomeworkMessage,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                    ] else ...[
-                      for (final completion in completions) ...[
-                        _ParentRoomCompletionCard(
-                          completion: completion,
-                          compact: true,
-                          onTap: () => _openCompletionResult(
-                            context,
-                            completion,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                      ],
-                    ],
                   ],
                 ),
               ),
@@ -643,6 +658,7 @@ class _ParentRoomClassCard extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _ParentRoomSectionTitle extends StatelessWidget {
   const _ParentRoomSectionTitle({
     required this.icon,
@@ -1066,11 +1082,14 @@ class _ParentRoomEmptyLine extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _ParentRoomPendingCard extends StatelessWidget {
   const _ParentRoomPendingCard({
     required this.pending,
     required this.onTap,
+    // ignore: unused_element_parameter
     this.compact = false,
+    // ignore: unused_element_parameter
     this.isExpired = false,
   });
 
@@ -1177,10 +1196,12 @@ class _ParentRoomPendingCard extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _ParentRoomCompletionCard extends StatelessWidget {
   const _ParentRoomCompletionCard({
     required this.completion,
     required this.onTap,
+    // ignore: unused_element_parameter
     this.compact = false,
   });
 
@@ -1861,6 +1882,7 @@ class _ParentRoomSkeletonLine extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _ParentRoomEmptyBox extends StatelessWidget {
   const _ParentRoomEmptyBox({
     required this.icon,
