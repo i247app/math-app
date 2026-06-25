@@ -8,7 +8,7 @@ extension _StudentHomeModeThreeView on _StudentHomeContentState {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _studentModeEntrance(
+        _studentModeThreeEntrance(
           order: 0,
           child: _StudentModeThreeClassCard(
             classroom: classroom,
@@ -20,7 +20,7 @@ extension _StudentHomeModeThreeView on _StudentHomeContentState {
           const _StudentHomeSectionsLoading()
         else ...[
           for (var index = 0; index < 2; index++) ...[
-            _studentModeEntrance(
+            _studentModeThreeEntrance(
               order: 1 + index,
               child: _StudentModeThreeHomeworkCard(
                 exercise: index < exercises.length ? exercises[index] : null,
@@ -34,7 +34,7 @@ extension _StudentHomeModeThreeView on _StudentHomeContentState {
             const SizedBox(height: 10),
           ],
         ],
-        _studentModeEntrance(
+        _studentModeThreeEntrance(
           order: 3,
           markOnEnd: true,
           child: _StudentModeThreeGamesSection(
@@ -69,6 +69,74 @@ extension _StudentHomeModeThreeView on _StudentHomeContentState {
     if (mounted) {
       await _loadHomeLayout();
     }
+  }
+}
+
+class _StudentModeThreeEntrance extends StatefulWidget {
+  const _StudentModeThreeEntrance({
+    required this.order,
+    required this.child,
+    this.onFinished,
+  });
+
+  final int order;
+  final Widget child;
+  final VoidCallback? onFinished;
+
+  @override
+  State<_StudentModeThreeEntrance> createState() =>
+      _StudentModeThreeEntranceState();
+}
+
+class _StudentModeThreeEntranceState extends State<_StudentModeThreeEntrance> {
+  bool _isVisible = false;
+  bool _hasNotifiedFinished = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future<void>.delayed(
+        Duration(milliseconds: 55 * widget.order.clamp(0, 8)),
+      );
+      if (mounted) {
+        setState(() => _isVisible = true);
+      }
+    });
+  }
+
+  void _notifyFinished() {
+    if (_hasNotifiedFinished) {
+      return;
+    }
+    _hasNotifiedFinished = true;
+    widget.onFinished?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _notifyFinished());
+      return widget.child;
+    }
+
+    return AnimatedOpacity(
+      opacity: _isVisible ? 1 : 0,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOut,
+      child: AnimatedSlide(
+        offset: _isVisible ? Offset.zero : const Offset(0, 0.055),
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+        child: AnimatedScale(
+          scale: _isVisible ? 1 : 0.94,
+          duration: const Duration(milliseconds: 520),
+          curve: Curves.easeOutBack,
+          onEnd: _isVisible ? _notifyFinished : null,
+          child: widget.child,
+        ),
+      ),
+    );
   }
 }
 

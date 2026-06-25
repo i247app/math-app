@@ -631,6 +631,29 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     });
   }
 
+  Widget _studentModeThreeEntrance({
+    required int order,
+    required Widget child,
+    bool markOnEnd = false,
+  }) {
+    if (_hasPlayedModeThreeEntrance) {
+      return child;
+    }
+
+    return _StudentModeThreeEntrance(
+      order: order,
+      onFinished: markOnEnd ? _markStudentModeThreeEntrancePlayed : null,
+      child: child,
+    );
+  }
+
+  void _markStudentModeThreeEntrancePlayed() {
+    if (!mounted || _hasPlayedModeThreeEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedModeThreeEntrance = true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoadingHomeSections = !_hasLoadedHomeLayout || _isLoadingHomeLayout;
