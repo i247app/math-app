@@ -193,58 +193,73 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           entries: entries,
           onTap: _openRoomDetail,
         ),
-        const SizedBox(height: 24),
-        _ParentRoomSectionTitle(
-          icon: Icons.assignment_outlined,
-          label: context.getText(AppKeys.parentRoomAssignmentsTitle),
+        const SizedBox(height: 18),
+        _ParentRoomListSection(
+          title:
+              'Nhiệm vụ(${pendingExercises.length + expiredExercises.length})',
+          onViewAll: widget.args.onOpenClassroomTab,
+          child: pendingExercises.isEmpty && expiredExercises.isEmpty
+              ? _ParentRoomEmptyLine(
+                  icon: Icons.assignment_turned_in_outlined,
+                  text: context.getText(AppKeys.studentNoHomeworkTitle),
+                )
+              : Column(
+                  children: [
+                    for (final pending in pendingExercises.take(3)) ...[
+                      _ParentRoomPendingListItem(
+                        pending: pending,
+                        onTap: () => _openPendingExercise(pending),
+                      ),
+                      if (pending != pendingExercises.take(3).last ||
+                          expiredExercises.isNotEmpty)
+                        const Divider(
+                          height: 24,
+                          indent: 62,
+                          color: Color(0xFFE9EEF2),
+                        ),
+                    ],
+                    for (final expired in expiredExercises.take(3)) ...[
+                      _ParentRoomPendingListItem(
+                        pending: expired,
+                        isExpired: true,
+                        onTap: () => _showExpiredExerciseMessage(context),
+                      ),
+                      if (expired != expiredExercises.take(3).last)
+                        const Divider(
+                          height: 24,
+                          indent: 62,
+                          color: Color(0xFFE9EEF2),
+                        ),
+                    ],
+                  ],
+                ),
         ),
         const SizedBox(height: 14),
-        if (pendingExercises.isEmpty && expiredExercises.isEmpty) ...[
-          _ParentRoomEmptyBox(
-            icon: Icons.assignment_turned_in_outlined,
-            title: context.getText(AppKeys.studentNoHomeworkTitle),
-            message: context.getText(AppKeys.studentNoHomeworkMessage),
-          ),
-          const SizedBox(height: 18),
-        ] else ...[
-          for (final pending in pendingExercises.take(3)) ...[
-            _ParentRoomPendingCard(
-              pending: pending,
-              onTap: () => _openPendingExercise(pending),
-            ),
-            const SizedBox(height: 14),
-          ],
-          for (final expired in expiredExercises.take(3)) ...[
-            _ParentRoomPendingCard(
-              pending: expired,
-              isExpired: true,
-              onTap: () => _showExpiredExerciseMessage(context),
-            ),
-            const SizedBox(height: 14),
-          ],
-        ],
-        const SizedBox(height: 4),
-        _ParentRoomSectionTitle(
-          icon: Icons.inventory_2_rounded,
-          label: context.getText(AppKeys.assessmentResultTitle),
+        _ParentRoomListSection(
+          title: 'Kết quả',
+          onViewAll: widget.args.onOpenClassroomTab,
+          child: completions.isEmpty
+              ? _ParentRoomEmptyLine(
+                  icon: Icons.fact_check_outlined,
+                  text: context.getText(AppKeys.noCompletedHomeworkTitle),
+                )
+              : Column(
+                  children: [
+                    for (final completion in completions.take(5)) ...[
+                      _ParentRoomCompletionListItem(
+                        completion: completion,
+                        onTap: () => _openCompletionResult(completion),
+                      ),
+                      if (completion != completions.take(5).last)
+                        const Divider(
+                          height: 24,
+                          indent: 62,
+                          color: Color(0xFFE9EEF2),
+                        ),
+                    ],
+                  ],
+                ),
         ),
-        const SizedBox(height: 14),
-        if (completions.isEmpty) ...[
-          _ParentRoomEmptyBox(
-            icon: Icons.fact_check_outlined,
-            title: context.getText(AppKeys.noCompletedHomeworkTitle),
-            message: context.getText(AppKeys.noCompletedHomeworkMessage),
-          ),
-          const SizedBox(height: 14),
-        ] else ...[
-          for (final completion in completions.take(5)) ...[
-            _ParentRoomCompletionCard(
-              completion: completion,
-              onTap: () => _openCompletionResult(completion),
-            ),
-            const SizedBox(height: 14),
-          ],
-        ],
       ],
     );
   }
@@ -672,6 +687,385 @@ class _ParentRoomSectionTitle extends StatelessWidget {
   }
 }
 
+class _ParentRoomListSection extends StatelessWidget {
+  const _ParentRoomListSection({
+    required this.title,
+    required this.child,
+    required this.onViewAll,
+  });
+
+  final String title;
+  final Widget child;
+  final VoidCallback onViewAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFF0F3F7)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.055),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF1B3D91),
+                          fontSize: FontSize.large,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: onViewAll,
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF2775FF),
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                label: Text(
+                  context.getText(AppKeys.viewAll),
+                  style: const TextStyle(
+                    fontSize: FontSize.caption,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                icon: const Icon(Icons.chevron_right_rounded, size: 18),
+                iconAlignment: IconAlignment.end,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _ParentRoomPendingListItem extends StatelessWidget {
+  const _ParentRoomPendingListItem({
+    required this.pending,
+    required this.onTap,
+    this.isExpired = false,
+  });
+
+  final HomeLayoutPendingExercise pending;
+  final VoidCallback onTap;
+  final bool isExpired;
+
+  @override
+  Widget build(BuildContext context) {
+    final exercise = pending.exercise;
+    final title = _roomExerciseTitle(context, exercise);
+    final childName = pending.child == null
+        ? null
+        : homeProfileDisplayName(context, pending.child!);
+    final classroomName = _roomClassName(context, pending.classroom);
+    final accent = isExpired
+        ? (
+            color: const Color(0xFFFF7A1A),
+            background: const Color(0xFFFFF0D8),
+            icon: Icons.warning_amber_rounded,
+            asset: null,
+          )
+        : _roomPurposeListAccent(exercise?.purpose);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          children: [
+            _ParentRoomListIconBox(
+              icon: accent.icon,
+              asset: accent.asset,
+              color: accent.color,
+              backgroundColor: accent.background,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _ParentRoomBadgeRow(
+                          childName: childName,
+                          classroomName: classroomName,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _ParentRoomListDateLabel(
+                        date: _roomDateOnlyLabel(
+                          exercise?.endDate ?? exercise?.createDt,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  _ParentRoomListTitle(title: title),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentRoomCompletionListItem extends StatelessWidget {
+  const _ParentRoomCompletionListItem({
+    required this.completion,
+    required this.onTap,
+  });
+
+  final HomeLayoutRecentCompletion completion;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final exercise = completion.exercise;
+    final score = ((completion.scorePercentage ?? 0) / 10).round().clamp(0, 10);
+    final color =
+        score >= 8 ? const Color(0xFF07824C) : const Color(0xFFFF6B17);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          children: [
+            _ParentRoomScoreIcon(score: score, color: color),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _ParentRoomBadgeRow(
+                          childName: completion.child == null
+                              ? null
+                              : homeProfileDisplayName(
+                                  context,
+                                  completion.child!,
+                                ),
+                          classroomName:
+                              _roomClassName(context, completion.classroom),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _ParentRoomListDateLabel(
+                        date: _roomDateOnlyLabel(
+                          completion.gradedDt ??
+                              completion.submittedDt ??
+                              completion.exercise?.createDt,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  _ParentRoomListTitle(
+                    title: _roomExerciseTitle(context, exercise),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentRoomBadgeRow extends StatelessWidget {
+  const _ParentRoomBadgeRow({
+    required this.childName,
+    required this.classroomName,
+  });
+
+  final String? childName;
+  final String classroomName;
+
+  @override
+  Widget build(BuildContext context) {
+    final cleanChildName = childName?.trim();
+    final cleanClassroom = classroomName.trim();
+
+    return Wrap(
+      spacing: 5,
+      runSpacing: 4,
+      children: [
+        if (cleanChildName?.isNotEmpty == true)
+          _ParentRoomChip(
+            label: cleanChildName!,
+            color: const Color(0xFFEAF7F7),
+            textColor: const Color(0xFF7F8FA0),
+          ),
+        if (cleanClassroom.isNotEmpty)
+          _ParentRoomChip(
+            label: cleanClassroom,
+            color: const Color(0xFFEAF7F7),
+            textColor: const Color(0xFF7F8FA0),
+          ),
+      ],
+    );
+  }
+}
+
+class _ParentRoomListTitle extends StatelessWidget {
+  const _ParentRoomListTitle({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(
+        color: Color(0xFF17233F),
+        fontSize: FontSize.normal,
+        fontWeight: FontWeight.w900,
+        height: 1.1,
+      ),
+    );
+  }
+}
+
+class _ParentRoomListDateLabel extends StatelessWidget {
+  const _ParentRoomListDateLabel({required this.date});
+
+  final String date;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(
+          Icons.alarm_rounded,
+          color: Color(0xFF9AA6B5),
+          size: 13,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          date,
+          style: const TextStyle(
+            color: Color(0xFF90A0B6),
+            fontSize: FontSize.caption * 0.76,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ParentRoomListIconBox extends StatelessWidget {
+  const _ParentRoomListIconBox({
+    required this.icon,
+    required this.color,
+    required this.backgroundColor,
+    this.asset,
+  });
+
+  final IconData icon;
+  final String? asset;
+  final Color color;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(11),
+      ),
+      child: asset == null
+          ? Icon(icon, color: color, size: 24)
+          : Center(
+              child: SvgPicture.asset(
+                asset!,
+                width: 25,
+                height: 25,
+                colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+              ),
+            ),
+    );
+  }
+}
+
+class _ParentRoomEmptyLine extends StatelessWidget {
+  const _ParentRoomEmptyLine({
+    required this.icon,
+    required this.text,
+  });
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _ParentRoomListIconBox(
+          icon: icon,
+          color: const Color(0xFF339395),
+          backgroundColor: const Color(0xFFEAF3F3),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF6D778A),
+              fontSize: FontSize.small,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ParentRoomPendingCard extends StatelessWidget {
   const _ParentRoomPendingCard({
     required this.pending,
@@ -712,15 +1106,15 @@ class _ParentRoomPendingCard extends StatelessWidget {
       accent: accent.color,
       compact: compact,
       onTap: onTap,
-      leading: isExpired
-          ? _ParentRoomScoreIcon(score: 0, color: accent.color)
-          : _ParentRoomStatusIcon(
-              icon: dueSoon
-                  ? Icons.notification_important_outlined
-                  : Icons.assignment_outlined,
-              color: accent.color,
-              backgroundColor: accent.badge,
-            ),
+      leading: _ParentRoomStatusIcon(
+        icon: isExpired
+            ? Icons.warning_amber_rounded
+            : dueSoon
+                ? Icons.notification_important_outlined
+                : Icons.assignment_outlined,
+        color: accent.color,
+        backgroundColor: accent.badge,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1891,6 +2285,26 @@ String _roomPurposeLabel(BuildContext context, String? purpose) {
   return (color: const Color(0xFF147A8F), badge: const Color(0xFFDDF4F8));
 }
 
+({Color color, Color background, IconData icon, String? asset})
+    _roomPurposeListAccent(String? purpose) {
+  final normalized = purpose?.trim().toUpperCase();
+  if (normalized == classroomExercisePurposeQuiz ||
+      normalized == classroomExercisePurposeExam) {
+    return (
+      color: const Color(0xFFBD1C21),
+      background: const Color(0xFFFFEFF1),
+      icon: Icons.analytics_outlined,
+      asset: 'assets/images/parent_room_assessment.svg',
+    );
+  }
+  return (
+    color: const Color(0xFF147A8F),
+    background: const Color(0xFFEAF6FF),
+    icon: Icons.menu_book_outlined,
+    asset: null,
+  );
+}
+
 Color _roomScoreAccent(int? scorePercentage) {
   final score = ((scorePercentage ?? 0) / 10).round();
   if (score >= 8) {
@@ -1910,6 +2324,15 @@ String _roomExerciseDueLabel(
     return context.getText(AppKeys.teacherAssignmentDueLabel);
   }
   return context.formatText(AppKeys.studentHomeworkDueFormat, {'date': date});
+}
+
+String _roomDateOnlyLabel(String? value) {
+  final parsed = DateTime.tryParse(value?.trim() ?? '')?.toLocal();
+  if (parsed == null) {
+    return '--/--/----';
+  }
+  String twoDigits(int value) => value.toString().padLeft(2, '0');
+  return '${twoDigits(parsed.day)}/${twoDigits(parsed.month)}/${parsed.year}';
 }
 
 bool _roomExerciseDueSoon(ClassroomExercise? exercise) {
