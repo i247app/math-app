@@ -700,6 +700,7 @@ class _ParentModeThreeContent extends StatelessWidget {
     final showGameSuggestions = pendingExercises.isEmpty || completions.isEmpty;
     final visiblePendingExercises =
         pendingExercises.take(2).toList(growable: false);
+    final visibleCompletions = completions.take(2).toList(growable: false);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -721,7 +722,7 @@ class _ParentModeThreeContent extends StatelessWidget {
             order: 1,
             child: _ParentModeThreeSection(
               title: 'Nhiệm vụ',
-              onViewAll: onViewTasks,
+              onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
               child: Column(
                 children: [
                   for (var index = 0;
@@ -749,15 +750,17 @@ class _ParentModeThreeContent extends StatelessWidget {
             order: 2,
             child: _ParentModeThreeSection(
               title: context.getText(AppKeys.assessmentResultTitle),
-              onViewAll: onViewResults,
+              onViewAll: completions.length > 2 ? onViewResults : null,
               child: Column(
                 children: [
-                  for (final completion in completions.take(2)) ...[
+                  for (var index = 0;
+                      index < visibleCompletions.length;
+                      index++) ...[
                     _ParentModeThreeResultItem(
-                      completion: completion,
-                      onTap: () => onCompletionTap(completion),
+                      completion: visibleCompletions[index],
+                      onTap: () => onCompletionTap(visibleCompletions[index]),
                     ),
-                    if (completion != completions.take(2).last)
+                    if (index != visibleCompletions.length - 1)
                       const Divider(
                         height: 24,
                         indent: 62,
@@ -899,12 +902,12 @@ class _ParentModeThreeSection extends StatelessWidget {
   const _ParentModeThreeSection({
     required this.title,
     required this.child,
-    required this.onViewAll,
+    this.onViewAll,
   });
 
   final String title;
   final Widget child;
-  final VoidCallback onViewAll;
+  final VoidCallback? onViewAll;
 
   @override
   Widget build(BuildContext context) {
@@ -939,24 +942,25 @@ class _ParentModeThreeSection extends StatelessWidget {
                   ),
                 ),
               ),
-              TextButton.icon(
-                onPressed: onViewAll,
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF2775FF),
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                label: Text(
-                  context.getText(AppKeys.viewAll),
-                  style: const TextStyle(
-                    fontSize: FontSize.caption,
-                    fontWeight: FontWeight.w800,
+              if (onViewAll != null)
+                TextButton.icon(
+                  onPressed: onViewAll,
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF2775FF),
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
+                  label: Text(
+                    context.getText(AppKeys.viewAll),
+                    style: const TextStyle(
+                      fontSize: FontSize.caption,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  icon: const Icon(Icons.chevron_right_rounded, size: 18),
+                  iconAlignment: IconAlignment.end,
                 ),
-                icon: const Icon(Icons.chevron_right_rounded, size: 18),
-                iconAlignment: IconAlignment.end,
-              ),
             ],
           ),
           const SizedBox(height: 10),

@@ -552,6 +552,19 @@ class _ParentRoomClassGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (entries.length == 1) {
+      final entry = entries.first;
+      return SizedBox(
+        width: double.infinity,
+        height: 101,
+        child: _ParentRoomClassCard(
+          entry: entry,
+          index: 0,
+          onTap: () => onTap(entry),
+        ),
+      );
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
