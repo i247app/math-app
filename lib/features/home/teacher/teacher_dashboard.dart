@@ -18,6 +18,7 @@ class TeacherDashboard extends StatelessWidget {
         scale: args.scale,
         onCompleteProfile: args.onCompleteTeacherProfile,
         onOpenClassroomTab: args.onOpenClassroomTab,
+        onOpenStudyTab: args.onOpenReviewTab,
         exerciseService: args.assignmentService,
         activeRefreshTick: args.activeRefreshTick,
         isActive: args.isActive,

@@ -9,6 +9,7 @@ class TeacherHomeTab extends StatefulWidget {
     required this.scale,
     required this.onCompleteProfile,
     this.onOpenClassroomTab,
+    this.onOpenStudyTab,
     ClassroomExerciseService? exerciseService,
     HomeLayoutService? homeLayoutService,
     this.activeRefreshTick = 0,
@@ -22,6 +23,7 @@ class TeacherHomeTab extends StatefulWidget {
   final double scale;
   final Future<void> Function() onCompleteProfile;
   final VoidCallback? onOpenClassroomTab;
+  final VoidCallback? onOpenStudyTab;
   final int activeRefreshTick;
   final bool isActive;
   final ClassroomExerciseService? _exerciseService;
@@ -366,6 +368,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                   _TeacherHomeSectionHeader(
                     scale: scale,
                     title: context.getText(AppKeys.teacherRecentlyAssigned),
+                    onViewAll: widget.onOpenStudyTab,
                   ),
                   SizedBox(height: 12 * scale),
                   if (_isLoadingAssignments &&
@@ -710,10 +713,12 @@ class _TeacherHomeSectionHeader extends StatelessWidget {
   const _TeacherHomeSectionHeader({
     required this.scale,
     required this.title,
+    this.onViewAll,
   });
 
   final double scale;
   final String title;
+  final VoidCallback? onViewAll;
 
   @override
   Widget build(BuildContext context) {
@@ -732,14 +737,24 @@ class _TeacherHomeSectionHeader extends StatelessWidget {
             ),
           ),
         ),
-        Text(
-          context.getText(AppKeys.viewAllUpper),
-          style: GoogleFonts.andika(
-            color: _teacherInk,
-            fontSize: FontSize.small * scale,
-            fontWeight: FontWeight.w800,
-            decoration: TextDecoration.underline,
-            height: 1.25,
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onViewAll,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 4 * scale,
+              vertical: 4 * scale,
+            ),
+            child: Text(
+              context.getText(AppKeys.viewAllUpper),
+              style: GoogleFonts.andika(
+                color: _teacherInk,
+                fontSize: FontSize.small * scale,
+                fontWeight: FontWeight.w800,
+                decoration: TextDecoration.underline,
+                height: 1.25,
+              ),
+            ),
           ),
         ),
       ],
