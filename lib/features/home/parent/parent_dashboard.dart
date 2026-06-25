@@ -74,13 +74,6 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   @override
   void didUpdateWidget(covariant _ParentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!oldWidget.args.isActive && widget.args.isActive) {
-      _loadHome();
-      return;
-    }
-    if (!widget.args.isActive) {
-      return;
-    }
     final oldProfileId = ActiveProfileSession.profileStableId(
       oldWidget.args.activeProfile,
     );
@@ -97,11 +90,28 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         oldWidget.args.user?.id != widget.args.user?.id ||
         oldChildIds != childIds) {
       _hasLoadedHome = false;
+      _resetModeEntrances();
+      if (widget.args.isActive) {
+        _loadHome();
+      }
+      return;
+    }
+    if (!oldWidget.args.isActive && widget.args.isActive) {
       _loadHome();
+      return;
+    }
+    if (!widget.args.isActive) {
+      return;
     } else if (oldWidget.args.activeRefreshTick !=
         widget.args.activeRefreshTick) {
       _loadHome();
     }
+  }
+
+  void _resetModeEntrances() {
+    _hasPlayedModeOneEntrance = false;
+    _hasPlayedModeTwoEntrance = false;
+    _hasPlayedModeThreeEntrance = false;
   }
 
   List<StudentProfile> get _children {
@@ -1902,21 +1912,16 @@ class _ParentHomeEntranceState extends State<_ParentHomeEntrance> {
       return widget.child;
     }
 
-    return AnimatedOpacity(
-      opacity: _isVisible ? 1 : 0,
-      duration: const Duration(milliseconds: 280),
-      curve: Curves.easeOut,
-      child: AnimatedSlide(
-        offset: _isVisible ? Offset.zero : const Offset(0, 0.055),
-        duration: const Duration(milliseconds: 420),
-        curve: Curves.easeOutCubic,
-        child: AnimatedScale(
-          scale: _isVisible ? 1 : 0.94,
-          duration: const Duration(milliseconds: 520),
-          curve: Curves.easeOutBack,
-          onEnd: _isVisible ? _notifyFinished : null,
-          child: widget.child,
-        ),
+    return AnimatedSlide(
+      offset: _isVisible ? Offset.zero : const Offset(0, 0.055),
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutCubic,
+      child: AnimatedScale(
+        scale: _isVisible ? 1 : 0.94,
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeOutBack,
+        onEnd: _isVisible ? _notifyFinished : null,
+        child: widget.child,
       ),
     );
   }

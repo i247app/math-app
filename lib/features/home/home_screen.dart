@@ -195,6 +195,12 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void didUpdateWidget(covariant HomeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final oldProfileId = ActiveProfileSession.profileStableId(
+      oldWidget.activeProfile,
+    );
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (oldWidget.user?.id != widget.user?.id) {
       _prefetchedGrades = const <GradeModel>[];
       _prefetchedGradeUserId = null;
@@ -215,8 +221,11 @@ class _HomeScreenState extends State<HomeScreen>
         widget.activeRole == ProfileRole.parent) {
       _playParentHomeEntrance();
     }
-    if (oldWidget.activeProfile != widget.activeProfile) {
+    if (oldProfileId != profileId) {
       _isProfileMenuOpen = false;
+      if (widget.activeRole == ProfileRole.parent) {
+        _playParentHomeEntrance();
+      }
     }
   }
 

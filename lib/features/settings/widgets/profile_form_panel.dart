@@ -257,6 +257,11 @@ class _AddProfilePanel extends StatelessWidget {
   }
 }
 
+void _dismissProfileFormKeyboard() {
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
+}
+
 class _AddProfileAvatar extends StatelessWidget {
   const _AddProfileAvatar({
     required this.avatarKey,
@@ -573,7 +578,10 @@ class _AddProfileDropdown<T> extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _openBottomSheet(context, selectedValue),
+          onTap: () {
+            _dismissProfileFormKeyboard();
+            _openBottomSheet(context, selectedValue);
+          },
           borderRadius: BorderRadius.circular(14 * scale),
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
@@ -611,6 +619,7 @@ class _AddProfileDropdown<T> extends StatelessWidget {
   }
 
   Future<void> _openBottomSheet(BuildContext context, T? selectedValue) async {
+    _dismissProfileFormKeyboard();
     final result = await showModalBottomSheet<_AddProfileSelectResult<T>>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -711,9 +720,12 @@ class _AddProfileDropdown<T> extends StatelessWidget {
                                   size: 22 * scale,
                                 )
                               : null,
-                          onTap: () => Navigator.of(context).pop(
-                            _AddProfileSelectResult<T>(item),
-                          ),
+                          onTap: () {
+                            _dismissProfileFormKeyboard();
+                            Navigator.of(context).pop(
+                              _AddProfileSelectResult<T>(item),
+                            );
+                          },
                         ),
                       );
                     },
@@ -726,8 +738,15 @@ class _AddProfileDropdown<T> extends StatelessWidget {
       },
     );
 
+    _dismissProfileFormKeyboard();
+    if (!context.mounted) {
+      return;
+    }
     if (result != null) {
       onChanged(result.value);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _dismissProfileFormKeyboard();
+      });
     }
   }
 }
