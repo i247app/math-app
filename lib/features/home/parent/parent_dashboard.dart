@@ -661,6 +661,7 @@ class _ParentModeThreeContent extends StatelessWidget {
     required this.pendingExercises,
     required this.completions,
     required this.entranceBuilder,
+    required this.onAssessmentTap,
     required this.onPendingTap,
     required this.onCompletionTap,
     required this.onViewTasks,
@@ -675,6 +676,7 @@ class _ParentModeThreeContent extends StatelessWidget {
   final List<HomeLayoutPendingExercise> pendingExercises;
   final List<HomeLayoutRecentCompletion> completions;
   final _ParentHomeEntranceBuilder entranceBuilder;
+  final VoidCallback onAssessmentTap;
   final ValueChanged<HomeLayoutPendingExercise> onPendingTap;
   final ValueChanged<HomeLayoutRecentCompletion> onCompletionTap;
   final VoidCallback onViewTasks;
@@ -705,15 +707,12 @@ class _ParentModeThreeContent extends StatelessWidget {
         const SizedBox(height: 12),
         entranceBuilder(
           order: 1,
-          child: _ParentModeThreeSection(
-            title: 'Nhiệm vụ',
-            onViewAll: onViewTasks,
-            child: pendingExercises.isEmpty
-                ? _ParentModeThreeEmptyLine(
-                    icon: Icons.assignment_outlined,
-                    text: context.getText(AppKeys.studentNoHomeworkTitle),
-                  )
-                : Column(
+          child: pendingExercises.isEmpty
+              ? _ParentModeOneAssessmentBanner(onTap: onAssessmentTap)
+              : _ParentModeThreeSection(
+                  title: 'Nhiệm vụ',
+                  onViewAll: onViewTasks,
+                  child: Column(
                     children: [
                       for (final pending in pendingExercises.take(2)) ...[
                         _ParentModeThreeTaskItem(
@@ -729,20 +728,17 @@ class _ParentModeThreeContent extends StatelessWidget {
                       ],
                     ],
                   ),
-          ),
+                ),
         ),
         const SizedBox(height: 14),
         entranceBuilder(
           order: 2,
-          child: _ParentModeThreeSection(
-            title: context.getText(AppKeys.assessmentResultTitle),
-            onViewAll: onViewResults,
-            child: completions.isEmpty
-                ? _ParentModeThreeEmptyLine(
-                    icon: Icons.fact_check_outlined,
-                    text: context.getText(AppKeys.noCompletedHomeworkTitle),
-                  )
-                : Column(
+          child: completions.isEmpty
+              ? const _ParentModeThreeGameSuggestions()
+              : _ParentModeThreeSection(
+                  title: context.getText(AppKeys.assessmentResultTitle),
+                  onViewAll: onViewResults,
+                  child: Column(
                     children: [
                       for (final completion in completions.take(2)) ...[
                         _ParentModeThreeResultItem(
@@ -758,7 +754,7 @@ class _ParentModeThreeContent extends StatelessWidget {
                       ],
                     ],
                   ),
-          ),
+                ),
         ),
         const SizedBox(height: 14),
         entranceBuilder(
@@ -778,6 +774,31 @@ class _ParentModeThreeContent extends StatelessWidget {
           const SizedBox(height: 10),
           _ParentHomeErrorCard(message: errorMessage!, onRetry: onRetry),
         ],
+      ],
+    );
+  }
+}
+
+class _ParentModeThreeGameSuggestions extends StatelessWidget {
+  const _ParentModeThreeGameSuggestions();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        Expanded(
+          child: _StudentGamePreviewCard(
+            asset: 'assets/images/game_numi_farm_banner.png',
+            background: Color(0xFFDDF3EE),
+          ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: _StudentGamePreviewCard(
+            background: Color(0xFF111C4B),
+            child: _StudentMathSquadronPreviewArtwork(),
+          ),
+        ),
       ],
     );
   }
