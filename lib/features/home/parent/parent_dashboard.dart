@@ -698,6 +698,8 @@ class _ParentModeThreeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final primarySummary = _parentPrimarySummary(summaries);
     final showGameSuggestions = pendingExercises.isEmpty || completions.isEmpty;
+    final visiblePendingExercises =
+        pendingExercises.take(2).toList(growable: false);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -722,12 +724,14 @@ class _ParentModeThreeContent extends StatelessWidget {
               onViewAll: onViewTasks,
               child: Column(
                 children: [
-                  for (final pending in pendingExercises.take(2)) ...[
-                    _ParentModeThreeTaskItem(
-                      pending: pending,
-                      onTap: () => onPendingTap(pending),
+                  for (var index = 0;
+                      index < visiblePendingExercises.length;
+                      index++) ...[
+                    _ParentRoomPendingListItem(
+                      pending: visiblePendingExercises[index],
+                      onTap: () => onPendingTap(visiblePendingExercises[index]),
                     ),
-                    if (pending != pendingExercises.take(2).last)
+                    if (index != visiblePendingExercises.length - 1)
                       const Divider(
                         height: 24,
                         indent: 62,
@@ -958,54 +962,6 @@ class _ParentModeThreeSection extends StatelessWidget {
           const SizedBox(height: 10),
           child,
         ],
-      ),
-    );
-  }
-}
-
-class _ParentModeThreeTaskItem extends StatelessWidget {
-  const _ParentModeThreeTaskItem({
-    required this.pending,
-    required this.onTap,
-  });
-
-  final HomeLayoutPendingExercise pending;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final exercise = pending.exercise;
-    final accent = _parentExerciseAccent(exercise?.purpose);
-    final title = _parentExerciseTitle(context, exercise);
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Row(
-          children: [
-            _ParentModeThreeIconBox(
-              icon: accent.icon,
-              color: accent.color,
-              backgroundColor: accent.background,
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: _ParentModeThreeExerciseText(
-                title: title,
-                childName: pending.child == null
-                    ? null
-                    : homeProfileDisplayName(context, pending.child!),
-                classroomName: pending.classroom?.name,
-              ),
-            ),
-            const SizedBox(width: 8),
-            _ParentModeThreeDateLabel(
-              date: _parentExerciseDateLabel(exercise?.endDate),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -1402,25 +1358,6 @@ _ParentChildSummary? _parentPrimarySummary(
     }
   }
   return summaries.isEmpty ? null : summaries.first;
-}
-
-({IconData icon, Color color, Color background}) _parentExerciseAccent(
-  String? purpose,
-) {
-  final normalized = purpose?.trim().toUpperCase();
-  if (normalized == classroomExercisePurposeQuiz ||
-      normalized == classroomExercisePurposeExam) {
-    return (
-      icon: Icons.show_chart_rounded,
-      color: const Color(0xFFCC2228),
-      background: const Color(0xFFFFECEF),
-    );
-  }
-  return (
-    icon: Icons.menu_book_rounded,
-    color: const Color(0xFF147A8F),
-    background: const Color(0xFFEAF6FF),
-  );
 }
 
 String _parentExerciseTitle(
