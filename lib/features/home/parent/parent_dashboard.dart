@@ -982,6 +982,7 @@ class _ParentModeThreeResultItem extends StatelessWidget {
     final score = ((completion.scorePercentage ?? 0) / 10).round().clamp(0, 10);
     final color =
         score >= 8 ? const Color(0xFF07824C) : const Color(0xFFFF6B17);
+    final classroomName = completion.classroom?.name?.trim();
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
@@ -993,129 +994,45 @@ class _ParentModeThreeResultItem extends StatelessWidget {
             _ParentModeThreeScore(score: score, color: color),
             const SizedBox(width: 14),
             Expanded(
-              child: _ParentModeThreeExerciseText(
-                title: _parentExerciseTitle(context, exercise),
-                childName: completion.child == null
-                    ? null
-                    : homeProfileDisplayName(context, completion.child!),
-                classroomName: completion.classroom?.name,
-              ),
-            ),
-            const SizedBox(width: 8),
-            _ParentModeThreeDateLabel(
-              date: _parentExerciseDateLabel(
-                completion.gradedDt ??
-                    completion.submittedDt ??
-                    completion.exercise?.createDt,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _ParentRoomBadgeRow(
+                          childName: completion.child == null
+                              ? null
+                              : homeProfileDisplayName(
+                                  context,
+                                  completion.child!,
+                                ),
+                          classroomName: classroomName?.isNotEmpty == true
+                              ? classroomName!
+                              : context.getText(AppKeys.teacherClassFallback),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _ParentRoomListDateLabel(
+                        date: _roomDateOnlyLabel(
+                          completion.gradedDt ??
+                              completion.submittedDt ??
+                              completion.exercise?.createDt,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  _ParentRoomListTitle(
+                    title: _parentExerciseTitle(context, exercise),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _ParentModeThreeExerciseText extends StatelessWidget {
-  const _ParentModeThreeExerciseText({
-    required this.title,
-    required this.childName,
-    required this.classroomName,
-  });
-
-  final String title;
-  final String? childName;
-  final String? classroomName;
-
-  @override
-  Widget build(BuildContext context) {
-    final cleanChildName = childName?.trim();
-    final cleanClassroom = classroomName?.trim();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          spacing: 5,
-          runSpacing: 4,
-          children: [
-            if (cleanChildName?.isNotEmpty == true)
-              _ParentModeThreeTag(label: cleanChildName!),
-            if (cleanClassroom?.isNotEmpty == true)
-              _ParentModeThreeTag(label: cleanClassroom!),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Text(
-          title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Color(0xFF17233F),
-            fontSize: FontSize.normal,
-            fontWeight: FontWeight.w900,
-            height: 1.1,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ParentModeThreeTag extends StatelessWidget {
-  const _ParentModeThreeTag({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 82),
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF4FA),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: Color(0xFF8C9AB0),
-          fontSize: FontSize.caption * 0.68,
-          fontWeight: FontWeight.w800,
-          height: 1,
-        ),
-      ),
-    );
-  }
-}
-
-class _ParentModeThreeDateLabel extends StatelessWidget {
-  const _ParentModeThreeDateLabel({required this.date});
-
-  final String date;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(
-          Icons.calendar_today_outlined,
-          color: Color(0xFF9AA6B5),
-          size: 12,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          date,
-          style: const TextStyle(
-            color: Color(0xFF90A0B6),
-            fontSize: FontSize.caption * 0.76,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -1369,15 +1286,6 @@ String _parentExerciseTitle(
     return title;
   }
   return context.getText(AppKeys.studentHomework);
-}
-
-String _parentExerciseDateLabel(String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '')?.toLocal();
-  if (parsed == null) {
-    return '--/--/----';
-  }
-  return '${parsed.day.toString().padLeft(2, '0')}/'
-      '${parsed.month.toString().padLeft(2, '0')}/${parsed.year}';
 }
 
 List<_ParentChildSummary> _summariesFromLayout(ParentHomeLayout? parent) {
