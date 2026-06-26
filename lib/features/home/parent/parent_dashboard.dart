@@ -844,7 +844,7 @@ class _ParentModeThreeClassCard extends StatelessWidget {
       height: 100,
       padding: const EdgeInsets.fromLTRB(12, 13, 12, 12),
       decoration: BoxDecoration(
-        color: Colors.black87,
+        color: const Color(0xFFE7F6F5),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFCBE6E4)),
       ),
