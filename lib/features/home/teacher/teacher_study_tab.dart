@@ -364,6 +364,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       );
     }
     final scale = widget.scale;
+    final visibleExercises = _exercises.take(10).toList(growable: false);
     return ColoredBox(
       color: const Color(0xFFF9FFFF),
       child: Column(
@@ -457,16 +458,16 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                         )
                       else ...[
                         for (var index = 0;
-                            index < _exercises.length;
+                            index < visibleExercises.length;
                             index++) ...[
                           _TeacherStudyExerciseCard(
-                            exercise: _exercises[index],
+                            exercise: visibleExercises[index],
                             scale: scale,
                             onTap: () => _openExerciseDetail(
-                              _exercises[index],
+                              visibleExercises[index],
                             ),
                           ),
-                          if (index != _exercises.length - 1)
+                          if (index != visibleExercises.length - 1)
                             SizedBox(height: 14 * scale),
                         ],
                       ],
