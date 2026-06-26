@@ -4,7 +4,7 @@ abstract final class FontSize {
   static const double normal = 16.0;
   static const double small = 14.0;
   static const double caption = 13.0;
-  static const double xsmall = 11.0;
+  static const double xsmall = 12.0;
 
   static const double date = 13.0;
 
