@@ -958,16 +958,16 @@ class _ParentRoomBadgeRow extends StatelessWidget {
       children: [
         if (cleanChildName?.isNotEmpty == true)
           _ParentRoomChip(
-            label: cleanChildName!,
-            color: const Color(0xFFEAF7F7),
-            textColor: const Color(0xFF7F8FA0),
-          ),
+              label: cleanChildName!,
+              color: const Color(0xFFEAF7F7),
+              textColor: const Color(0xFF7F8FA0),
+              fontSize: FontSize.xsmall),
         if (cleanClassroom.isNotEmpty)
           _ParentRoomChip(
-            label: cleanClassroom,
-            color: const Color(0xFFEAF7F7),
-            textColor: const Color(0xFF7F8FA0),
-          ),
+              label: cleanClassroom,
+              color: const Color(0xFFEAF7F7),
+              textColor: const Color(0xFF7F8FA0),
+              fontSize: FontSize.xsmall),
       ],
     );
   }
@@ -1175,6 +1175,7 @@ class _ParentRoomPendingCard extends StatelessWidget {
                 label: statusLabel,
                 color: accent.badge,
                 textColor: accent.color,
+                fontSize: FontSize.xsmall,
               ),
             ],
           ),
@@ -1267,6 +1268,7 @@ class _ParentRoomCompletionCard extends StatelessWidget {
             label: purpose,
             color: accent.withValues(alpha: 0.13),
             textColor: accent,
+            fontSize: FontSize.xsmall,
           ),
         ],
       ),
@@ -1444,12 +1446,14 @@ class _ParentRoomTaskHeader extends StatelessWidget {
             label: childName!,
             color: const Color(0xFFF2F4F6),
             textColor: const Color(0xFF4F5960),
+            fontSize: FontSize.xsmall,
           ),
         const SizedBox(width: 5),
         _ParentRoomChip(
           label: classroomName,
           color: const Color(0xFFF2F4F6),
           textColor: const Color(0xFF4F5960),
+          fontSize: FontSize.xsmall,
         ),
       ],
     );
@@ -1458,6 +1462,7 @@ class _ParentRoomTaskHeader extends StatelessWidget {
 
 class _ParentRoomChip extends StatelessWidget {
   const _ParentRoomChip({
+    required this.fontSize,
     required this.label,
     required this.color,
     required this.textColor,
@@ -1466,7 +1471,7 @@ class _ParentRoomChip extends StatelessWidget {
   final String label;
   final Color color;
   final Color textColor;
-
+  final double fontSize;
   @override
   Widget build(BuildContext context) {
     return Container(
