@@ -959,10 +959,10 @@ class _HeaderBar extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     color: Color(0xFF6782AA),
-                                    fontSize: FontSize.caption,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.8,
-                                    height: 1,
+                                    fontSize: FontSize.small,
+                                    fontWeight: FontWeight.w400,
+                                    // letterSpacing: 0.8,
+                                    // height: 1,
                                   ),
                                 ),
                                 SizedBox(height: contentHeight * 0.06),
@@ -976,9 +976,9 @@ class _HeaderBar extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           color: Color(0xFF002B6A),
-                                          fontSize: FontSize.large,
-                                          fontWeight: FontWeight.w900,
-                                          height: 1,
+                                          fontSize: FontSize.small,
+                                          fontWeight: FontWeight.w600,
+                                          // height: 1,
                                         ),
                                       ),
                                     ),
@@ -1065,15 +1065,13 @@ class _HeaderBar extends StatelessWidget {
                                 _homeRoleLabel(context, role),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: _muted.withValues(alpha: 0.6),
-                                  fontSize: FontSize.caption * typographyScale,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.8,
-                                  height: 1,
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: FontSize.small,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              SizedBox(height: contentHeight * 0.06),
+                              SizedBox(height: 4),
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -1082,13 +1080,10 @@ class _HeaderBar extends StatelessWidget {
                                       '$name👋',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: const Color(0xFF002B6A),
-                                        fontSize:
-                                            FontSize.large * typographyScale,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1,
-                                        letterSpacing: 0,
+                                      style: const TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: FontSize.small,
+                                        fontWeight: FontWeight.w600
                                       ),
                                     ),
                                   ),
