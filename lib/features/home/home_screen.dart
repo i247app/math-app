@@ -960,7 +960,7 @@ class _HeaderBar extends StatelessWidget {
                                   style: TextStyle(
                                     color: const Color(0xFF6782AA),
                                     fontSize:
-                                        FontSize.avatarMini * typographyScale,
+                                        FontSize.caption * typographyScale,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.8,
                                     height: 1,
@@ -977,8 +977,8 @@ class _HeaderBar extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           color: const Color(0xFF002B6A),
-                                          fontSize: FontSize.avatarName *
-                                              typographyScale,
+                                          fontSize:
+                                              FontSize.large * typographyScale,
                                           fontWeight: FontWeight.w900,
                                           height: 1,
                                         ),
@@ -1069,8 +1069,7 @@ class _HeaderBar extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: _muted.withValues(alpha: 0.6),
-                                  fontSize:
-                                      FontSize.avatarMini * typographyScale,
+                                  fontSize: FontSize.caption * typographyScale,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 1.8,
                                   height: 1,
@@ -1087,8 +1086,8 @@ class _HeaderBar extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: const Color(0xFF002B6A),
-                                        fontSize: FontSize.avatarName *
-                                            typographyScale,
+                                        fontSize:
+                                            FontSize.large * typographyScale,
                                         fontWeight: FontWeight.w900,
                                         height: 1,
                                         letterSpacing: 0,

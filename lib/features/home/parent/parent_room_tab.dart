@@ -1014,7 +1014,7 @@ class _ParentRoomListDateLabel extends StatelessWidget {
           date,
           style: const TextStyle(
             color: Color(0xFF90A0B6),
-            fontSize: FontSize.caption * 0.76,
+            fontSize: FontSize.date,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -1434,7 +1434,7 @@ class _ParentRoomTaskHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Color(0xFF6B5C62),
-              fontSize: FontSize.caption * 0.82,
+              fontSize: FontSize.date,
               fontWeight: FontWeight.w700,
             ),
           ),
