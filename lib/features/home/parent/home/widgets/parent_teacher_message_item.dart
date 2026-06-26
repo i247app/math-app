@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentModeThreeMessageItem extends StatelessWidget {
-  const _ParentModeThreeMessageItem({
+class _ParentTeacherMessageItem extends StatelessWidget {
+  const _ParentTeacherMessageItem({
     required this.summary,
     required this.index,
   });

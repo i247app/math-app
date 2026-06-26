@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentModeThreeSection extends StatelessWidget {
-  const _ParentModeThreeSection({
+class _ParentDashboardSection extends StatelessWidget {
+  const _ParentDashboardSection({
     required this.title,
     required this.child,
     this.onViewAll,

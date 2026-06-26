@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentModeThreeContent extends StatelessWidget {
-  const _ParentModeThreeContent({
+class _ParentChildOverviewContent extends StatelessWidget {
+  const _ParentChildOverviewContent({
     required this.summaries,
     required this.pendingExercises,
     required this.completions,
@@ -46,7 +46,7 @@ class _ParentModeThreeContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _ParentModeThreeClassCard(summary: primarySummary),
+                child: _ParentChildClassSummaryCard(summary: primarySummary),
               ),
             ],
           ),
@@ -55,7 +55,7 @@ class _ParentModeThreeContent extends StatelessWidget {
         if (pendingExercises.isNotEmpty) ...[
           entranceBuilder(
             order: 1,
-            child: _ParentModeThreeSection(
+            child: _ParentDashboardSection(
               title: 'Nhiệm vụ',
               onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
               child: Column(
@@ -63,7 +63,7 @@ class _ParentModeThreeContent extends StatelessWidget {
                   for (var index = 0;
                       index < visiblePendingExercises.length;
                       index++) ...[
-                    _ParentRoomPendingListItem(
+                    _ParentPendingTaskListItem(
                       pending: visiblePendingExercises[index],
                       onTap: () => onPendingTap(visiblePendingExercises[index]),
                     ),
@@ -83,7 +83,7 @@ class _ParentModeThreeContent extends StatelessWidget {
         if (completions.isNotEmpty) ...[
           entranceBuilder(
             order: 2,
-            child: _ParentModeThreeSection(
+            child: _ParentDashboardSection(
               title: context.getText(AppKeys.assessmentResultTitle),
               onViewAll: completions.length > 2 ? onViewResults : null,
               child: Column(
@@ -91,7 +91,7 @@ class _ParentModeThreeContent extends StatelessWidget {
                   for (var index = 0;
                       index < visibleCompletions.length;
                       index++) ...[
-                    _ParentRoomCompletionListItem(
+                    _ParentCompletedTaskListItem(
                       completion: visibleCompletions[index],
                       onTap: () => onCompletionTap(visibleCompletions[index]),
                     ),
@@ -111,10 +111,10 @@ class _ParentModeThreeContent extends StatelessWidget {
         entranceBuilder(
           order: 3,
           markOnEnd: !showGameSuggestions,
-          child: _ParentModeThreeSection(
+          child: _ParentDashboardSection(
             title: 'Tin nhắn',
             onViewAll: onViewMessages,
-            child: _ParentModeThreeMessages(summaries: summaries),
+            child: _ParentTeacherMessagesList(summaries: summaries),
           ),
         ),
         if (showGameSuggestions) ...[
@@ -122,7 +122,7 @@ class _ParentModeThreeContent extends StatelessWidget {
           entranceBuilder(
             order: 4,
             markOnEnd: true,
-            child: const _ParentModeThreeGameSuggestions(),
+            child: const _ParentGameSuggestionsRow(),
           ),
         ],
         if (isRefreshing) ...[

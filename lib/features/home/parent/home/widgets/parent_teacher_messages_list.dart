@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentModeThreeMessages extends StatelessWidget {
-  const _ParentModeThreeMessages({required this.summaries});
+class _ParentTeacherMessagesList extends StatelessWidget {
+  const _ParentTeacherMessagesList({required this.summaries});
 
   final List<_ParentChildSummary> summaries;
 
@@ -9,7 +9,7 @@ class _ParentModeThreeMessages extends StatelessWidget {
   Widget build(BuildContext context) {
     final visibleSummaries = summaries.take(2).toList(growable: false);
     if (visibleSummaries.isEmpty) {
-      return _ParentRoomEmptyLine(
+      return _ParentEmptyTaskLine(
         icon: Icons.mail_outline_rounded,
         text: context.getText(AppKeys.homeMessageBodyOne),
       );
@@ -18,7 +18,7 @@ class _ParentModeThreeMessages extends StatelessWidget {
     return Column(
       children: [
         for (var index = 0; index < visibleSummaries.length; index++) ...[
-          _ParentModeThreeMessageItem(
+          _ParentTeacherMessageItem(
             summary: visibleSummaries[index],
             index: index,
           ),

@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentRoomPendingListItem extends StatelessWidget {
-  const _ParentRoomPendingListItem({
+class _ParentPendingTaskListItem extends StatelessWidget {
+  const _ParentPendingTaskListItem({
     required this.pending,
     required this.onTap,
     this.isExpired = false,
@@ -35,7 +35,7 @@ class _ParentRoomPendingListItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
           children: [
-            _ParentRoomListIconBox(
+            _ParentTaskIconBox(
               icon: accent.icon,
               asset: accent.asset,
               color: accent.color,
@@ -50,13 +50,13 @@ class _ParentRoomPendingListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: _ParentRoomBadgeRow(
+                        child: _ParentTaskMetaBadges(
                           childName: childName,
                           classroomName: classroomName,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      _ParentRoomListDateLabel(
+                      _ParentTaskDateLabel(
                         date: _roomDateOnlyLabel(
                           exercise?.endDate ?? exercise?.createDt,
                         ),
@@ -64,7 +64,7 @@ class _ParentRoomPendingListItem extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 5),
-                  _ParentRoomListTitle(title: title),
+                  _ParentTaskTitle(title: title),
                 ],
               ),
             ),

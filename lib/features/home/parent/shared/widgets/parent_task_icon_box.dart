@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentRoomListIconBox extends StatelessWidget {
-  const _ParentRoomListIconBox({
+class _ParentTaskIconBox extends StatelessWidget {
+  const _ParentTaskIconBox({
     required this.icon,
     required this.color,
     required this.backgroundColor,

@@ -32,7 +32,7 @@ class _ParentRoomCompletionCard extends StatelessWidget {
       accent: accent,
       compact: compact,
       onTap: onTap,
-      leading: _ParentRoomScoreIcon(score: score, color: accent),
+      leading: _ParentTaskScoreRing(score: score, color: accent),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -54,7 +54,7 @@ class _ParentRoomCompletionCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 7),
-          _ParentRoomChip(
+          _ParentTaskMetaChip(
             label: purpose,
             color: accent.withValues(alpha: 0.13),
             textColor: accent,

@@ -28,14 +28,14 @@ class _ParentRoomTaskHeader extends StatelessWidget {
           ),
         ),
         if (childName != null)
-          _ParentRoomChip(
+          _ParentTaskMetaChip(
             label: childName!,
             color: const Color(0xFFF2F4F6),
             textColor: const Color(0xFF4F5960),
             fontSize: FontSize.xxs,
           ),
         const SizedBox(width: 5),
-        _ParentRoomChip(
+        _ParentTaskMetaChip(
           label: classroomName,
           color: const Color(0xFFF2F4F6),
           textColor: const Color(0xFF4F5960),

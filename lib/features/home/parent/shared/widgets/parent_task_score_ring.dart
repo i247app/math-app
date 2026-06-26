@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentRoomScoreIcon extends StatelessWidget {
-  const _ParentRoomScoreIcon({
+class _ParentTaskScoreRing extends StatelessWidget {
+  const _ParentTaskScoreRing({
     required this.score,
     required this.color,
   });

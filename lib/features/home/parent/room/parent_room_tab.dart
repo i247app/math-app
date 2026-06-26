@@ -199,14 +199,14 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
               'Nhiệm vụ(${pendingExercises.length + expiredExercises.length})',
           onViewAll: widget.args.onOpenClassroomTab,
           child: pendingExercises.isEmpty && expiredExercises.isEmpty
-              ? _ParentRoomEmptyLine(
+              ? _ParentEmptyTaskLine(
                   icon: Icons.assignment_turned_in_outlined,
                   text: context.getText(AppKeys.studentNoHomeworkTitle),
                 )
               : Column(
                   children: [
                     for (final pending in pendingExercises.take(3)) ...[
-                      _ParentRoomPendingListItem(
+                      _ParentPendingTaskListItem(
                         pending: pending,
                         onTap: () => _openPendingExercise(pending),
                       ),
@@ -219,7 +219,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                         ),
                     ],
                     for (final expired in expiredExercises.take(3)) ...[
-                      _ParentRoomPendingListItem(
+                      _ParentPendingTaskListItem(
                         pending: expired,
                         isExpired: true,
                         onTap: () => _showExpiredExerciseMessage(context),
@@ -239,14 +239,14 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           title: 'Kết quả',
           onViewAll: widget.args.onOpenClassroomTab,
           child: completions.isEmpty
-              ? _ParentRoomEmptyLine(
+              ? _ParentEmptyTaskLine(
                   icon: Icons.fact_check_outlined,
                   text: context.getText(AppKeys.noCompletedHomeworkTitle),
                 )
               : Column(
                   children: [
                     for (final completion in completions.take(5)) ...[
-                      _ParentRoomCompletionListItem(
+                      _ParentCompletedTaskListItem(
                         completion: completion,
                         onTap: () => _openCompletionResult(completion),
                       ),

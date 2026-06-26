@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentModeThreeGameSuggestions extends StatelessWidget {
-  const _ParentModeThreeGameSuggestions();
+class _ParentGameSuggestionsRow extends StatelessWidget {
+  const _ParentGameSuggestionsRow();
 
   @override
   Widget build(BuildContext context) {

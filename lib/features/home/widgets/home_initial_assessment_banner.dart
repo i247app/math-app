@@ -1,7 +1,7 @@
-part of '../../../home_screen.dart';
+part of '../home_screen.dart';
 
-class _ParentModeOneAssessmentBanner extends StatelessWidget {
-  const _ParentModeOneAssessmentBanner({required this.onTap});
+class _HomeInitialAssessmentBanner extends StatelessWidget {
+  const _HomeInitialAssessmentBanner({required this.onTap});
 
   final VoidCallback onTap;
 

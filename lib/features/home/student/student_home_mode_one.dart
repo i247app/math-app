@@ -7,7 +7,7 @@ extension _StudentHomeModeOneView on _StudentHomeContentState {
       children: [
         _studentModeEntrance(
           order: 0,
-          child: _ParentModeOneAssessmentBanner(
+          child: _HomeInitialAssessmentBanner(
             onTap: () => _openGradeSelection(quizPurposeAssessment),
           ),
         ),

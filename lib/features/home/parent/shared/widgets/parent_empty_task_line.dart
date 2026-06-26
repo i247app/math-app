@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentRoomEmptyLine extends StatelessWidget {
-  const _ParentRoomEmptyLine({
+class _ParentEmptyTaskLine extends StatelessWidget {
+  const _ParentEmptyTaskLine({
     required this.icon,
     required this.text,
   });
@@ -13,7 +13,7 @@ class _ParentRoomEmptyLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _ParentRoomListIconBox(
+        _ParentTaskIconBox(
           icon: icon,
           color: const Color(0xFF339395),
           backgroundColor: const Color(0xFFEAF3F3),

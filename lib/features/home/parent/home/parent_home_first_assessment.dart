@@ -7,7 +7,7 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
       children: [
         _modeOneFadeIn(
           order: 1,
-          child: _ParentModeOneAssessmentBanner(onTap: _openAssessment),
+          child: _HomeInitialAssessmentBanner(onTap: _openAssessment),
         ),
         const SizedBox(height: 8),
         _modeOneFadeIn(

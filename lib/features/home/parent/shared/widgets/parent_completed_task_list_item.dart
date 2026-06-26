@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentRoomCompletionListItem extends StatelessWidget {
-  const _ParentRoomCompletionListItem({
+class _ParentCompletedTaskListItem extends StatelessWidget {
+  const _ParentCompletedTaskListItem({
     required this.completion,
     required this.onTap,
   });
@@ -23,7 +23,7 @@ class _ParentRoomCompletionListItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
           children: [
-            _ParentRoomScoreIcon(score: score, color: color),
+            _ParentTaskScoreRing(score: score, color: color),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -33,7 +33,7 @@ class _ParentRoomCompletionListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: _ParentRoomBadgeRow(
+                        child: _ParentTaskMetaBadges(
                           childName: completion.child == null
                               ? null
                               : homeProfileDisplayName(
@@ -45,7 +45,7 @@ class _ParentRoomCompletionListItem extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      _ParentRoomListDateLabel(
+                      _ParentTaskDateLabel(
                         date: _roomDateOnlyLabel(
                           completion.gradedDt ??
                               completion.submittedDt ??
@@ -55,7 +55,7 @@ class _ParentRoomCompletionListItem extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 5),
-                  _ParentRoomListTitle(
+                  _ParentTaskTitle(
                     title: _roomExerciseTitle(context, exercise),
                   ),
                 ],

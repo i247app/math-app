@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentModeThreeClassCard extends StatelessWidget {
-  const _ParentModeThreeClassCard({required this.summary});
+class _ParentChildClassSummaryCard extends StatelessWidget {
+  const _ParentChildClassSummaryCard({required this.summary});
 
   final _ParentChildSummary? summary;
 

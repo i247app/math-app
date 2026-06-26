@@ -56,7 +56,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                       onViewAll: () => _parentRoomShowComingSoon(context),
                       child: pendingExercises.isEmpty &&
                               expiredExercises.isEmpty
-                          ? _ParentRoomEmptyLine(
+                          ? _ParentEmptyTaskLine(
                               icon: Icons.assignment_turned_in_outlined,
                               text: context.getText(
                                 AppKeys.studentNoHomeworkTitle,
@@ -65,7 +65,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                           : Column(
                               children: [
                                 for (final pending in pendingExercises) ...[
-                                  _ParentRoomPendingListItem(
+                                  _ParentPendingTaskListItem(
                                     pending: pending,
                                     onTap: () => _openPendingExercise(
                                       context,
@@ -81,7 +81,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                                     ),
                                 ],
                                 for (final expired in expiredExercises) ...[
-                                  _ParentRoomPendingListItem(
+                                  _ParentPendingTaskListItem(
                                     pending: expired,
                                     isExpired: true,
                                     onTap: () =>
@@ -102,7 +102,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                       title: 'Kết quả',
                       onViewAll: () => _parentRoomShowComingSoon(context),
                       child: completions.isEmpty
-                          ? _ParentRoomEmptyLine(
+                          ? _ParentEmptyTaskLine(
                               icon: Icons.fact_check_outlined,
                               text: context.getText(
                                 AppKeys.noCompletedHomeworkTitle,
@@ -111,7 +111,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                           : Column(
                               children: [
                                 for (final completion in completions) ...[
-                                  _ParentRoomCompletionListItem(
+                                  _ParentCompletedTaskListItem(
                                     completion: completion,
                                     onTap: () => _openCompletionResult(
                                       context,

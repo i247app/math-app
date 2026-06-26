@@ -33,7 +33,7 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
           padding: padding,
           child: _isLoading && !_hasLoadedHome
               ? const _ParentChildDashboardLoading()
-              : _ParentModeThreeContent(
+              : _ParentChildOverviewContent(
                   summaries: _childSummaries,
                   pendingExercises: parent?.pendingExercises ??
                       const <HomeLayoutPendingExercise>[],

@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentRoomChip extends StatelessWidget {
-  const _ParentRoomChip({
+class _ParentTaskMetaChip extends StatelessWidget {
+  const _ParentTaskMetaChip({
     required this.fontSize,
     required this.label,
     required this.color,

@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentRoomListDateLabel extends StatelessWidget {
-  const _ParentRoomListDateLabel({required this.date});
+class _ParentTaskDateLabel extends StatelessWidget {
+  const _ParentTaskDateLabel({required this.date});
 
   final String date;
 

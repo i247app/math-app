@@ -76,7 +76,7 @@ class _ParentRoomPendingCard extends StatelessWidget {
                   ),
                 ),
               ),
-              _ParentRoomChip(
+              _ParentTaskMetaChip(
                 label: statusLabel,
                 color: accent.badge,
                 textColor: accent.color,

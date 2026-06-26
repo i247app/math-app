@@ -1,7 +1,7 @@
 part of '../../../home_screen.dart';
 
-class _ParentRoomListTitle extends StatelessWidget {
-  const _ParentRoomListTitle({required this.title});
+class _ParentTaskTitle extends StatelessWidget {
+  const _ParentTaskTitle({required this.title});
 
   final String title;
 
