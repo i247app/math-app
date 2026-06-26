@@ -736,7 +736,7 @@ class _ParentModeThreeContent extends StatelessWidget {
                       const Divider(
                         height: 24,
                         indent: 62,
-                        color: Colors.black87,
+                        color: Color(0xFFE9EEF2),
                       ),
                   ],
                 ],

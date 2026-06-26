@@ -985,7 +985,7 @@ class _ParentRoomListTitle extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: const TextStyle(
-        color: Color(0xFF17233F),
+        color: Colors.black87,
         fontSize: FontSize.normal,
         fontWeight: FontWeight.w900,
         height: 1.1,
