@@ -1487,7 +1487,7 @@ class _ParentRoomChip extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: textColor,
-          fontSize: FontSize.caption * 0.68,
+          fontSize: FontSize.xsmall,
           fontWeight: FontWeight.w800,
         ),
       ),
