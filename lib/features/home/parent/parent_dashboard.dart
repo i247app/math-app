@@ -1197,6 +1197,7 @@ class _ParentModeThreeMessageItem extends StatelessWidget {
     final body = context.getText(
       index.isEven ? AppKeys.homeMessageBodyOne : AppKeys.homeMessageBodyTwo,
     );
+    final useUpdatedTypography = index == 0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -1222,18 +1223,22 @@ class _ParentModeThreeMessageItem extends StatelessWidget {
                         teacherName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF17233F),
-                          fontSize: FontSize.normal,
+                        style: TextStyle(
+                          color: const Color(0xFF17233F),
+                          fontSize: useUpdatedTypography
+                              ? FontSize.large
+                              : FontSize.normal,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
                     Text(
                       time,
-                      style: const TextStyle(
-                        color: Color(0xFF8B9BB1),
-                        fontSize: FontSize.caption * 0.74,
+                      style: TextStyle(
+                        color: const Color(0xFF8B9BB1),
+                        fontSize: useUpdatedTypography
+                            ? FontSize.date
+                            : FontSize.caption * 0.74,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1244,9 +1249,11 @@ class _ParentModeThreeMessageItem extends StatelessWidget {
                   '$className - ${childName.toUpperCase()}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF8390A5),
-                    fontSize: FontSize.caption * 0.76,
+                  style: TextStyle(
+                    color: const Color(0xFF8390A5),
+                    fontSize: useUpdatedTypography
+                        ? FontSize.date
+                        : FontSize.caption * 0.76,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -1255,9 +1262,11 @@ class _ParentModeThreeMessageItem extends StatelessWidget {
                   body,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF697895),
-                    fontSize: FontSize.caption,
+                  style: TextStyle(
+                    color: const Color(0xFF697895),
+                    fontSize: useUpdatedTypography
+                        ? FontSize.small
+                        : FontSize.caption,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

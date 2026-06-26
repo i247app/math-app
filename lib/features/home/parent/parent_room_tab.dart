@@ -1007,7 +1007,7 @@ class _ParentRoomListDateLabel extends StatelessWidget {
         const Icon(
           Icons.alarm_rounded,
           color: Colors.black87,
-          size: 13,
+          size: FontSize.xsmall,
         ),
         const SizedBox(width: 4),
         Text(
