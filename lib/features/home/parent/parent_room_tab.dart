@@ -1006,14 +1006,14 @@ class _ParentRoomListDateLabel extends StatelessWidget {
       children: [
         const Icon(
           Icons.alarm_rounded,
-          color: Color(0xFF9AA6B5),
+          color: Colors.black87,
           size: 13,
         ),
         const SizedBox(width: 4),
         Text(
           date,
           style: const TextStyle(
-            color: Color(0xFF90A0B6),
+            color: Colors.black87,
             fontSize: FontSize.date,
             fontWeight: FontWeight.w700,
           ),
