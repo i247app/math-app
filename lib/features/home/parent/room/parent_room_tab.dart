@@ -121,7 +121,11 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       color: const Color(0xFFF8FAFA),
       child: Column(
         children: [
-          _ParentRoomHeader(topInset: topInset, scale: scale),
+          HomeTabHeader(
+            title: context.getText(AppKeys.navRoom),
+            topInset: topInset,
+            scale: scale,
+          ),
           Expanded(
             child: RefreshIndicator(
               color: const Color(0xFF339395),

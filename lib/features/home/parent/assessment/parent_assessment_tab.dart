@@ -121,8 +121,8 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     }
     return _entries.where((entry) {
       final searchable = <String>[
-        _parentQuizTitle(context, entry.quiz),
-        _parentQuizDateLabel(entry.quiz),
+        _homeQuizTitle(context, entry.quiz),
+        _homeQuizDateLabel(entry.quiz),
       ].join(' ').toLowerCase();
       return searchable.contains(query);
     }).toList(growable: false);
@@ -196,7 +196,8 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           ),
           slivers: [
             SliverToBoxAdapter(
-              child: _ParentAssessmentHeader(
+              child: HomeTabHeader(
+                title: context.getText(AppKeys.parentAssessmentTabTitle),
                 topInset: topInset,
                 scale: scale,
               ),

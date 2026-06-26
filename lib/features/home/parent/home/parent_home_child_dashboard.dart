@@ -39,7 +39,7 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
                       const <HomeLayoutPendingExercise>[],
                   completions: parent?.recentCompletions ??
                       const <HomeLayoutRecentCompletion>[],
-                  entranceBuilder: _modeThreeFadeIn,
+                  entranceBuilder: _childOverviewFadeIn,
                   onPendingTap: _openPendingExercise,
                   onCompletionTap: _openCompletionResult,
                   onViewTasks: widget.args.onOpenClassroomTab,

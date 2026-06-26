@@ -18,9 +18,9 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
   List<_ParentChildSummary> _childSummaries = const <_ParentChildSummary>[];
   int _childLoadRequestId = 0;
-  bool _hasPlayedModeOneEntrance = false;
-  bool _hasPlayedModeTwoEntrance = false;
-  bool _hasPlayedModeThreeEntrance = false;
+  bool _hasPlayedInitialAssessmentEntrance = false;
+  bool _hasPlayedCompletedAssessmentEntrance = false;
+  bool _hasPlayedClassroomOverviewEntrance = false;
 
   @override
   void initState() {
@@ -68,9 +68,9 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   }
 
   void _resetModeEntrances() {
-    _hasPlayedModeOneEntrance = false;
-    _hasPlayedModeTwoEntrance = false;
-    _hasPlayedModeThreeEntrance = false;
+    _hasPlayedInitialAssessmentEntrance = false;
+    _hasPlayedCompletedAssessmentEntrance = false;
+    _hasPlayedClassroomOverviewEntrance = false;
   }
 
   List<StudentProfile> get _children {
@@ -162,73 +162,73 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     }
   }
 
-  Widget _modeOneFadeIn({
+  Widget _initialAssessmentFadeIn({
     required Widget child,
     int order = 0,
     bool markOnEnd = false,
   }) {
-    if (_hasPlayedModeOneEntrance) {
+    if (_hasPlayedInitialAssessmentEntrance) {
       return child;
     }
 
     return _ParentHomeEntrance(
       order: order,
-      onFinished: markOnEnd ? _markModeOneEntrancePlayed : null,
+      onFinished: markOnEnd ? _markInitialAssessmentEntrancePlayed : null,
       child: child,
     );
   }
 
-  void _markModeOneEntrancePlayed() {
-    if (!mounted || _hasPlayedModeOneEntrance) {
+  void _markInitialAssessmentEntrancePlayed() {
+    if (!mounted || _hasPlayedInitialAssessmentEntrance) {
       return;
     }
-    setState(() => _hasPlayedModeOneEntrance = true);
+    setState(() => _hasPlayedInitialAssessmentEntrance = true);
   }
 
-  Widget _modeTwoFadeIn({
+  Widget _completedAssessmentFadeIn({
     required Widget child,
     int order = 0,
     bool markOnEnd = false,
   }) {
-    if (_hasPlayedModeTwoEntrance) {
+    if (_hasPlayedCompletedAssessmentEntrance) {
       return child;
     }
 
     return _ParentHomeEntrance(
       order: order,
-      onFinished: markOnEnd ? _markModeTwoEntrancePlayed : null,
+      onFinished: markOnEnd ? _markCompletedAssessmentEntrancePlayed : null,
       child: child,
     );
   }
 
-  void _markModeTwoEntrancePlayed() {
-    if (!mounted || _hasPlayedModeTwoEntrance) {
+  void _markCompletedAssessmentEntrancePlayed() {
+    if (!mounted || _hasPlayedCompletedAssessmentEntrance) {
       return;
     }
-    setState(() => _hasPlayedModeTwoEntrance = true);
+    setState(() => _hasPlayedCompletedAssessmentEntrance = true);
   }
 
-  Widget _modeThreeFadeIn({
+  Widget _childOverviewFadeIn({
     required Widget child,
     int order = 0,
     bool markOnEnd = false,
   }) {
-    if (_hasPlayedModeThreeEntrance) {
+    if (_hasPlayedClassroomOverviewEntrance) {
       return child;
     }
 
     return _ParentHomeEntrance(
       order: order,
-      onFinished: markOnEnd ? _markModeThreeEntrancePlayed : null,
+      onFinished: markOnEnd ? _markChildOverviewEntrancePlayed : null,
       child: child,
     );
   }
 
-  void _markModeThreeEntrancePlayed() {
-    if (!mounted || _hasPlayedModeThreeEntrance) {
+  void _markChildOverviewEntrancePlayed() {
+    if (!mounted || _hasPlayedClassroomOverviewEntrance) {
       return;
     }
-    setState(() => _hasPlayedModeThreeEntrance = true);
+    setState(() => _hasPlayedClassroomOverviewEntrance = true);
   }
 
   @override
@@ -263,14 +263,14 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!_isLoading && !hasCompletedAssessment)
-              _modeOneFadeIn(
+              _initialAssessmentFadeIn(
                 order: 0,
                 child: _ParentLearningStreakCard(
                   hasCompletedAssessment: hasCompletedAssessment,
                 ),
               )
             else if (!_isLoading && hasCompletedAssessment)
-              _modeTwoFadeIn(
+              _completedAssessmentFadeIn(
                 order: 0,
                 child: _ParentLearningStreakCard(
                   hasCompletedAssessment: hasCompletedAssessment,
@@ -390,7 +390,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       final shouldCreate = await showDialog<bool>(
         context: context,
         barrierColor: const Color(0xFF001741).withValues(alpha: 0.48),
-        builder: (_) => const _ParentNoStudentDialog(),
+        builder: (_) => const _HomeMissingStudentDialog(),
       );
       if (shouldCreate == true && mounted) {
         await _openCreateStudentProfile();

@@ -1,0 +1,74 @@
+part of '../../../home_screen.dart';
+
+class _StudentClassroomTabCard extends StatelessWidget {
+  const _StudentClassroomTabCard({
+    required this.classroom,
+    required this.onTap,
+  });
+
+  final ClassroomModel classroom;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = classroom.name?.trim().isNotEmpty == true
+        ? classroom.name!.trim()
+        : context.getText(AppKeys.teacherClassFallback);
+    final teacher = classroom.teacherName?.trim().isNotEmpty == true
+        ? classroom.teacherName!.trim()
+        : context.getText(AppKeys.teacherFallback);
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Ink(
+          padding: const EdgeInsets.fromLTRB(16, 22, 12, 18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: const Color(0xFFD4D8E3)),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF002B6A).withValues(alpha: 0.10),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color(0xFF002B6A),
+                  fontSize: FontSize.xxxl,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _StudentClassroomMetaRow(
+                icon: Icons.person_rounded,
+                label: teacher,
+              ),
+              const SizedBox(height: 7),
+              _StudentClassroomMetaRow(
+                icon: Icons.groups_rounded,
+                label: context.formatText(
+                  AppKeys.teacherStudentCount,
+                  {'count': classroom.displayStudentCount},
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

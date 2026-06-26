@@ -5,16 +5,16 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _modeTwoFadeIn(
+        _completedAssessmentFadeIn(
           order: 1,
-          child: _ParentImageAction(
+          child: _HomeImageAction(
             asset: _parentHomeAfterReviewBanner,
             height: 214,
             onTap: widget.args.onOpenReviewTab,
           ),
         ),
         const SizedBox(height: 8),
-        _modeTwoFadeIn(
+        _completedAssessmentFadeIn(
           order: 2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,13 +22,13 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
               Expanded(
                 child: Column(
                   children: [
-                    _ParentImageAction(
+                    _HomeImageAction(
                       asset: _parentHomeRace,
                       height: 83,
                       onTap: widget.args.onOpenReviewTab,
                     ),
                     const SizedBox(height: 7),
-                    _ParentImageAction(
+                    _HomeImageAction(
                       asset: _parentHomeShop,
                       height: 83,
                       onTap: widget.args.onOpenReviewTab,
@@ -38,7 +38,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _ParentImageAction(
+                child: _HomeImageAction(
                   asset: _parentHomeClassroom,
                   height: 173,
                   onTap: _showClassroomMessage,
@@ -49,11 +49,11 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
         ),
         const SizedBox(height: 12),
         for (final entry in _completedAssessments.take(2).indexed) ...[
-          _modeTwoFadeIn(
+          _completedAssessmentFadeIn(
             order: 3 + entry.$1,
             markOnEnd: entry.$1 == 1 ||
                 entry.$1 == _completedAssessments.take(2).length - 1,
-            child: _ParentAssessmentResultCard(
+            child: _HomeAssessmentResultCard(
               quiz: entry.$2,
               onTap: () => _openParentAssessmentResult(entry.$2),
             ),

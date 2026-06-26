@@ -27,7 +27,7 @@ class _HomeInitialAssessmentBanner extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: Ink.image(
-            image: const AssetImage(_parentHomeModeOneAssessmentBanner),
+            image: const AssetImage(_homeInitialAssessmentBanner),
             height: 225,
             fit: BoxFit.cover,
             child: const SizedBox(width: double.infinity),

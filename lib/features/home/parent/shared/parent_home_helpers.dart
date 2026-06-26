@@ -55,7 +55,7 @@ DateTime _quizDate(GeneratedQuiz quiz) {
       DateTime.fromMillisecondsSinceEpoch(0);
 }
 
-String _parentQuizDateLabel(GeneratedQuiz quiz) {
+String _homeQuizDateLabel(GeneratedQuiz quiz) {
   final date = _quizDate(quiz).toLocal();
   if (date.millisecondsSinceEpoch == 0) {
     return '--/--/----';
@@ -64,7 +64,7 @@ String _parentQuizDateLabel(GeneratedQuiz quiz) {
       '${date.month.toString().padLeft(2, '0')}/${date.year}';
 }
 
-String _parentQuizTitle(BuildContext context, GeneratedQuiz quiz) {
+String _homeQuizTitle(BuildContext context, GeneratedQuiz quiz) {
   final title = quiz.title?.trim();
   if (title != null && title.isNotEmpty) {
     return title;
@@ -76,7 +76,7 @@ String _parentQuizTitle(BuildContext context, GeneratedQuiz quiz) {
   return context.getText(AppKeys.mathAssessment);
 }
 
-String? _parentQuizShortText(GeneratedQuiz quiz) {
+String? _homeQuizShortText(GeneratedQuiz quiz) {
   final shortText = quiz.shortText?.trim();
   if (shortText == null || shortText.isEmpty) {
     return null;

@@ -5,18 +5,18 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _modeOneFadeIn(
+        _initialAssessmentFadeIn(
           order: 1,
           child: _HomeInitialAssessmentBanner(onTap: _openAssessment),
         ),
         const SizedBox(height: 8),
-        _modeOneFadeIn(
+        _initialAssessmentFadeIn(
           order: 2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _ParentImageAction(
+                child: _HomeImageAction(
                   asset: _parentHomeAfterReviewBanner,
                   height: 160,
                   alignment: Alignment.centerLeft,
@@ -25,7 +25,7 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _ParentImageAction(
+                child: _HomeImageAction(
                   asset: _parentHomeClassroom,
                   height: 160,
                   onTap: _showClassroomMessage,
@@ -35,10 +35,10 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
           ),
         ),
         const SizedBox(height: 12),
-        _modeOneFadeIn(
+        _initialAssessmentFadeIn(
           order: 3,
           markOnEnd: true,
-          child: _ParentStartGuideCard(
+          child: _HomeStartGuideCard(
             onAssessmentTap: _openAssessment,
             onRoadmapTap: widget.args.onOpenReviewTab,
             onClassroomTap: _showClassroomMessage,

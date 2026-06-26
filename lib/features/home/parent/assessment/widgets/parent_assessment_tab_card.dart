@@ -16,7 +16,7 @@ class _ParentAssessmentTabCard extends StatelessWidget {
     final percent = entry.quiz.grading?.scorePercentage;
     final scoreStyle = _parentAssessmentScoreStyle(context, percent);
     final dateParts = _parentAssessmentDateParts(entry.quiz.createDt);
-    final shortText = _parentQuizShortText(entry.quiz);
+    final shortText = _homeQuizShortText(entry.quiz);
     final radius = BorderRadius.circular(24 * scale);
 
     return Material(
@@ -81,7 +81,7 @@ class _ParentAssessmentTabCard extends StatelessWidget {
                     ),
                     SizedBox(height: 7 * scale),
                     Text(
-                      _parentQuizTitle(context, entry.quiz),
+                      _homeQuizTitle(context, entry.quiz),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
