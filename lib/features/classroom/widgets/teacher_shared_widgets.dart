@@ -260,7 +260,7 @@ class _TeacherScreenAppBar extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: _teacherTeal,
-              fontSize: FontSize.title * scale,
+              fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w700,
               height: 1,
             ),
@@ -534,7 +534,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                   label,
                   style: GoogleFonts.andika(
                     color: _teacherTeal,
-                    fontSize: FontSize.title * scale,
+                    fontSize: FontSize.xxxl * scale,
                     fontWeight: FontWeight.w700,
                     height: 1.15,
                   ),
@@ -763,7 +763,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                       label,
                       style: GoogleFonts.andika(
                         color: _teacherTeal,
-                        fontSize: FontSize.title * scale,
+                        fontSize: FontSize.xxxl * scale,
                         fontWeight: FontWeight.w700,
                         height: 1.15,
                       ),

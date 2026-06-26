@@ -259,7 +259,7 @@ class _LanguageOptionCard extends StatelessWidget {
                 ),
                 child: Text(
                   flag,
-                  style: TextStyle(fontSize: FontSize.title * scale, height: 1),
+                  style: TextStyle(fontSize: FontSize.xxxl * scale, height: 1),
                 ),
               ),
               SizedBox(width: 16 * scale),

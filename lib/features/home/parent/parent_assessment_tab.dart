@@ -350,7 +350,7 @@ class _ParentAssessmentHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontSize: FontSize.title,
+          fontSize: FontSize.xxxl,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
@@ -825,12 +825,12 @@ class _ParentAssessmentTabCard extends StatelessWidget {
                       children: [
                         _ParentAssessmentMetaItem(
                           icon: Icons.calendar_month_outlined,
-                          label: dateParts.date,
+                          label: dateParts.dt,
                           scale: scale,
                         ),
                         _ParentAssessmentMetaItem(
                           icon: Icons.schedule_rounded,
-                          label: dateParts.time,
+                          label: dateParts.tm,
                           scale: scale,
                         ),
                       ],
@@ -853,11 +853,10 @@ class _ParentAssessmentTabCard extends StatelessWidget {
                         shortText,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: const Color(0xFF5D4A54),
-                          fontSize: FontSize.small * scale,
+                        style: const TextStyle(
+                          color: Color(0xFF5D4A54),
+                          fontSize: FontSize.small,
                           fontWeight: FontWeight.w500,
-                          height: 1.22,
                         ),
                       ),
                     ],
@@ -1003,15 +1002,15 @@ class _ParentAssessmentMetaItem extends StatelessWidget {
   );
 }
 
-({String date, String time}) _parentAssessmentDateParts(String? isoDate) {
+({String dt, String tm}) _parentAssessmentDateParts(String? isoDate) {
   final parsed = DateTime.tryParse(isoDate ?? '')?.toLocal();
   if (parsed == null) {
-    return (date: '--/--/----', time: '--:--');
+    return (dt: '--/--/----', tm: '--:--');
   }
   String twoDigits(int value) => value.toString().padLeft(2, '0');
   return (
-    date: '${twoDigits(parsed.day)}/${twoDigits(parsed.month)}/${parsed.year}',
-    time: '${twoDigits(parsed.hour)}:${twoDigits(parsed.minute)}',
+    dt: '${twoDigits(parsed.day)}/${twoDigits(parsed.month)}/${parsed.year}',
+    tm: '${twoDigits(parsed.hour)}:${twoDigits(parsed.minute)}',
   );
 }
 

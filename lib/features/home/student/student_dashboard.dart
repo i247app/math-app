@@ -1166,7 +1166,7 @@ class _ParentNoStudentDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFF001741),
-                    fontSize: FontSize.title,
+                    fontSize: FontSize.xxxl,
                     fontWeight: FontWeight.w900,
                     height: 1.2,
                     letterSpacing: 0,
@@ -2227,7 +2227,7 @@ class _StudentClassroomHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontSize: FontSize.title,
+          fontSize: FontSize.xxxl,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
@@ -2459,7 +2459,7 @@ class _StudentClassroomTabCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Color(0xFF002B6A),
-                  fontSize: FontSize.title,
+                  fontSize: FontSize.xxxl,
                   fontWeight: FontWeight.w900,
                   height: 1,
                 ),

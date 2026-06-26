@@ -27,7 +27,7 @@ class TeacherReportTab extends StatelessWidget {
             context.getText(AppKeys.teacherReportTitle),
             style: GoogleFonts.andika(
               color: _teacherTeal,
-              fontSize: FontSize.title * scale,
+              fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w700,
               height: 1.15,
             ),

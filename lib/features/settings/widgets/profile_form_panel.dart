@@ -427,7 +427,7 @@ class _AddProfileAvatar extends StatelessWidget {
                     context.getText(AppKeys.chooseAvatar),
                     style: GoogleFonts.andika(
                       color: _teal,
-                      fontSize: FontSize.title * scale,
+                      fontSize: FontSize.xxxl * scale,
                       fontWeight: FontWeight.w900,
                       height: 1.15,
                       letterSpacing: 0,
@@ -666,7 +666,7 @@ class _AddProfileDropdown<T> extends StatelessWidget {
                   label,
                   style: GoogleFonts.andika(
                     color: _teal,
-                    fontSize: FontSize.title * scale,
+                    fontSize: FontSize.xxxl * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.15,
                   ),

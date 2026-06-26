@@ -56,7 +56,7 @@ class _SettingsMenuPanel extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.andika(
             color: _deepInk,
-            fontSize: FontSize.title * scale,
+            fontSize: FontSize.xxxl * scale,
             fontWeight: FontWeight.w700,
             height: 1.05,
             letterSpacing: 0,
@@ -598,7 +598,7 @@ class _LanguageSheetOption extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Text(flag, style: TextStyle(fontSize: FontSize.title * scale)),
+              Text(flag, style: TextStyle(fontSize: FontSize.xxxl * scale)),
               SizedBox(width: 12 * scale),
               Expanded(
                 child: Text(

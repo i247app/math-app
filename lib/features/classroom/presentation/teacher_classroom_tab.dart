@@ -244,7 +244,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: _teacherTeal,
-                    fontSize: FontSize.title,
+                    fontSize: FontSize.xxxl,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0,
                   ),

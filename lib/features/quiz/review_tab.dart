@@ -496,7 +496,7 @@ class _ReviewHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontSize: FontSize.title,
+          fontSize: FontSize.xxxl,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
@@ -556,7 +556,7 @@ class _ReviewProfileStatePanel extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: const Color(0xFF253228),
-              fontSize: FontSize.title * scale,
+              fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w900,
               height: 1,
               letterSpacing: 0,
@@ -657,7 +657,7 @@ class _StatTile extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               icon,
-              style: TextStyle(fontSize: FontSize.title * scale, height: 1),
+              style: TextStyle(fontSize: FontSize.xxxl * scale, height: 1),
             ),
           ),
           SizedBox(width: 14 * scale),
@@ -672,7 +672,7 @@ class _StatTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: _reviewInk,
-                    fontSize: FontSize.title * scale,
+                    fontSize: FontSize.xxxl * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -786,7 +786,7 @@ class _ChapterCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: _reviewInk,
-                              fontSize: FontSize.title * scale,
+                              fontSize: FontSize.xxxl * scale,
                               fontWeight: FontWeight.w900,
                               height: 1.08,
                               letterSpacing: 0,
@@ -848,7 +848,7 @@ class _Badge extends StatelessWidget {
       child: Text(
         icon,
         style: TextStyle(
-          fontSize: FontSize.title * scale,
+          fontSize: FontSize.xxxl * scale,
           height: 1,
           color: Colors.black,
         ),

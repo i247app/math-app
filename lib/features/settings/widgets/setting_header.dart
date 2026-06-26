@@ -55,7 +55,7 @@ class _SettingHeader extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
                 color: const Color(0xFF339395),
-                fontSize: FontSize.title,
+                fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0,
               ),

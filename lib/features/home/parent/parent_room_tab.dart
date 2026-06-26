@@ -532,7 +532,7 @@ class _ParentRoomHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
           color: const Color(0xFF339395),
-          fontSize: FontSize.title,
+          fontSize: FontSize.xxxl,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),
@@ -961,13 +961,13 @@ class _ParentRoomBadgeRow extends StatelessWidget {
               label: cleanChildName!,
               color: const Color(0xFFEAF7F7),
               textColor: const Color(0xFF7F8FA0),
-              fontSize: FontSize.xsmall),
+              fontSize: FontSize.xxs),
         if (cleanClassroom.isNotEmpty)
           _ParentRoomChip(
               label: cleanClassroom,
               color: const Color(0xFFEAF7F7),
               textColor: const Color(0xFF7F8FA0),
-              fontSize: FontSize.xsmall),
+              fontSize: FontSize.xxs),
       ],
     );
   }
@@ -1007,14 +1007,14 @@ class _ParentRoomListDateLabel extends StatelessWidget {
         const Icon(
           Icons.alarm_rounded,
           color: Colors.black87,
-          size: FontSize.xsmall,
+          size: FontSize.xxs,
         ),
         const SizedBox(width: 4),
         Text(
           date,
           style: const TextStyle(
             color: Colors.black87,
-            fontSize: FontSize.xsmall,
+            fontSize: FontSize.xxs,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -1175,7 +1175,7 @@ class _ParentRoomPendingCard extends StatelessWidget {
                 label: statusLabel,
                 color: accent.badge,
                 textColor: accent.color,
-                fontSize: FontSize.xsmall,
+                fontSize: FontSize.xxs,
               ),
             ],
           ),
@@ -1268,7 +1268,7 @@ class _ParentRoomCompletionCard extends StatelessWidget {
             label: purpose,
             color: accent.withValues(alpha: 0.13),
             textColor: accent,
-            fontSize: FontSize.xsmall,
+            fontSize: FontSize.xxs,
           ),
         ],
       ),
@@ -1330,7 +1330,7 @@ class _ParentRoomScoreIcon extends StatelessWidget {
               '$score',
               style: TextStyle(
                 color: color,
-                fontSize: FontSize.title,
+                fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w900,
                 height: 1,
               ),
@@ -1436,7 +1436,7 @@ class _ParentRoomTaskHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Color(0xFF6B5C62),
-              fontSize: FontSize.date,
+              fontSize: FontSize.xs,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -1446,14 +1446,14 @@ class _ParentRoomTaskHeader extends StatelessWidget {
             label: childName!,
             color: const Color(0xFFF2F4F6),
             textColor: const Color(0xFF4F5960),
-            fontSize: FontSize.xsmall,
+            fontSize: FontSize.xxs,
           ),
         const SizedBox(width: 5),
         _ParentRoomChip(
           label: classroomName,
           color: const Color(0xFFF2F4F6),
           textColor: const Color(0xFF4F5960),
-          fontSize: FontSize.xsmall,
+          fontSize: FontSize.xxs,
         ),
       ],
     );
@@ -1487,7 +1487,7 @@ class _ParentRoomChip extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: textColor,
-          fontSize: FontSize.xsmall,
+          fontSize: FontSize.xxs,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -1599,7 +1599,7 @@ class _ParentRoomDetailHero extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Color(0xFF121B42),
-                    fontSize: FontSize.title,
+                    fontSize: FontSize.xxxl,
                     fontWeight: FontWeight.w900,
                   ),
                 ),

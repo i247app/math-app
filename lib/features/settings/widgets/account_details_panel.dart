@@ -370,7 +370,7 @@ class _AccountPhoneField extends StatelessWidget {
               scale: scale,
               textStyle: GoogleFonts.andika(
                 color: Colors.black,
-                fontSize: FontSize.title * scale,
+                fontSize: FontSize.xxxl * scale,
                 fontWeight: FontWeight.w900,
                 height: 1,
                 letterSpacing: 0,

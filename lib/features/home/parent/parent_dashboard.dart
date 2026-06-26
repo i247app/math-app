@@ -573,7 +573,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFF001741),
-                    fontSize: FontSize.title,
+                    fontSize: FontSize.xxxl,
                     fontWeight: FontWeight.w900,
                     height: 1.2,
                   ),
@@ -872,7 +872,7 @@ class _ParentModeThreeClassCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.black87,
-              fontSize: FontSize.title,
+              fontSize: FontSize.xxxl,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1093,7 +1093,7 @@ class _ParentModeThreeScore extends StatelessWidget {
               '$score',
               style: TextStyle(
                 color: color,
-                fontSize: FontSize.title,
+                fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w900,
                 height: 1,
               ),
@@ -1232,7 +1232,7 @@ class _ParentModeThreeMessageItem extends StatelessWidget {
                       time,
                       style: const TextStyle(
                         color: Colors.black87,
-                        fontSize: FontSize.xsmall,
+                        fontSize: FontSize.xxs,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -2202,7 +2202,7 @@ class _ParentAssessmentResultCard extends StatelessWidget {
                         '$score',
                         style: TextStyle(
                           color: scoreColor,
-                          fontSize: FontSize.title,
+                          fontSize: FontSize.xxxl,
                           fontWeight: FontWeight.w900,
                           height: 1,
                         ),

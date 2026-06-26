@@ -1307,7 +1307,7 @@ class _ProfileStatePanel extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
               color: _deepInk,
-              fontSize: FontSize.title * scale,
+              fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
