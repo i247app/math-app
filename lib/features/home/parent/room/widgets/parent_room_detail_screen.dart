@@ -1,0 +1,183 @@
+part of '../../../home_screen.dart';
+
+class _ParentRoomDetailScreen extends StatelessWidget {
+  const _ParentRoomDetailScreen({
+    required this.entry,
+    required this.pendingExercises,
+    required this.expiredExercises,
+    required this.completions,
+    required this.exerciseService,
+    required this.onRefreshLayout,
+  });
+
+  final _ParentRoomEntry entry;
+  final List<HomeLayoutPendingExercise> pendingExercises;
+  final List<HomeLayoutPendingExercise> expiredExercises;
+  final List<HomeLayoutRecentCompletion> completions;
+  final ClassroomExerciseService exerciseService;
+  final Future<void> Function() onRefreshLayout;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = _roomClassName(context, entry.classroom);
+    return Scaffold(
+      backgroundColor: const Color(0xFFFBFCFC),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            _ParentRoomDetailTopBar(
+              title: title,
+              onBack: () => Navigator.of(context).maybePop(),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(
+                  14,
+                  18,
+                  14,
+                  MediaQuery.paddingOf(context).bottom + 28,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _ParentRoomDetailHero(entry: entry),
+                    const SizedBox(height: 18),
+                    _ParentRoomDetailShortcuts(
+                      pendingCount:
+                          pendingExercises.length + expiredExercises.length,
+                      completedCount: completions.length,
+                    ),
+                    const SizedBox(height: 26),
+                    _ParentRoomListSection(
+                      title:
+                          'Nhiệm vụ(${pendingExercises.length + expiredExercises.length})',
+                      onViewAll: () => _parentRoomShowComingSoon(context),
+                      child: pendingExercises.isEmpty &&
+                              expiredExercises.isEmpty
+                          ? _ParentRoomEmptyLine(
+                              icon: Icons.assignment_turned_in_outlined,
+                              text: context.getText(
+                                AppKeys.studentNoHomeworkTitle,
+                              ),
+                            )
+                          : Column(
+                              children: [
+                                for (final pending in pendingExercises) ...[
+                                  _ParentRoomPendingListItem(
+                                    pending: pending,
+                                    onTap: () => _openPendingExercise(
+                                      context,
+                                      pending,
+                                    ),
+                                  ),
+                                  if (pending != pendingExercises.last ||
+                                      expiredExercises.isNotEmpty)
+                                    const Divider(
+                                      height: 24,
+                                      indent: 62,
+                                      color: Color(0xFFE9EEF2),
+                                    ),
+                                ],
+                                for (final expired in expiredExercises) ...[
+                                  _ParentRoomPendingListItem(
+                                    pending: expired,
+                                    isExpired: true,
+                                    onTap: () =>
+                                        _showExpiredExerciseMessage(context),
+                                  ),
+                                  if (expired != expiredExercises.last)
+                                    const Divider(
+                                      height: 24,
+                                      indent: 62,
+                                      color: Color(0xFFE9EEF2),
+                                    ),
+                                ],
+                              ],
+                            ),
+                    ),
+                    const SizedBox(height: 14),
+                    _ParentRoomListSection(
+                      title: 'Kết quả',
+                      onViewAll: () => _parentRoomShowComingSoon(context),
+                      child: completions.isEmpty
+                          ? _ParentRoomEmptyLine(
+                              icon: Icons.fact_check_outlined,
+                              text: context.getText(
+                                AppKeys.noCompletedHomeworkTitle,
+                              ),
+                            )
+                          : Column(
+                              children: [
+                                for (final completion in completions) ...[
+                                  _ParentRoomCompletionListItem(
+                                    completion: completion,
+                                    onTap: () => _openCompletionResult(
+                                      context,
+                                      completion,
+                                    ),
+                                  ),
+                                  if (completion != completions.last)
+                                    const Divider(
+                                      height: 24,
+                                      indent: 62,
+                                      color: Color(0xFFE9EEF2),
+                                    ),
+                                ],
+                              ],
+                            ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openPendingExercise(
+    BuildContext context,
+    HomeLayoutPendingExercise pending,
+  ) async {
+    final exercise = pending.exercise;
+    final exerciseId = pending.classroomExerciseId ?? exercise?.stableId;
+    final profileId = _layoutChildId(pending.child) ?? entry.memberProfileId;
+    if (exerciseId == null ||
+        exerciseId <= 0 ||
+        profileId == null ||
+        profileId <= 0) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => StudentHomeworkAttemptScreen(
+          exerciseId: exerciseId,
+          profileId: profileId,
+          initialExercise: exercise,
+          exerciseService: exerciseService,
+        ),
+      ),
+    );
+    await onRefreshLayout();
+  }
+
+  void _openCompletionResult(
+    BuildContext context,
+    HomeLayoutRecentCompletion completion,
+  ) {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => StudentHomeworkResultScreen(
+          summary: _homeworkSummaryFromCompletion(context, completion),
+        ),
+      ),
+    );
+  }
+}

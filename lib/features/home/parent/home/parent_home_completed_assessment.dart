@@ -1,4 +1,4 @@
-part of '../home_screen.dart';
+part of '../../home_screen.dart';
 
 extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
   Widget _buildCompletedState() {

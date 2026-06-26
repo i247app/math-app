@@ -45,17 +45,99 @@ import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
 
+part 'parent/assessment/helpers/parent_assessment_helpers.dart';
+part 'parent/assessment/models/parent_assessment_entry.dart';
+part 'parent/assessment/parent_assessment_tab.dart';
+part 'parent/assessment/widgets/parent_assessment_chart_painter.dart';
+part 'parent/assessment/widgets/parent_assessment_header.dart';
+part 'parent/assessment/widgets/parent_assessment_list_skeleton.dart';
+part 'parent/assessment/widgets/parent_assessment_meta_item.dart';
+part 'parent/assessment/widgets/parent_assessment_progress_chart.dart';
+part 'parent/assessment/widgets/parent_assessment_score_badge.dart';
+part 'parent/assessment/widgets/parent_assessment_search_field.dart';
+part 'parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
+part 'parent/assessment/widgets/parent_assessment_state_card.dart';
+part 'parent/assessment/widgets/parent_assessment_tab_card.dart';
+part 'parent/assessment/widgets/parent_review_tab_banner.dart';
+part 'parent/home/helpers/parent_child_dashboard_helpers.dart';
+part 'parent/home/models/parent_child_summary.dart';
+part 'parent/home/models/parent_home_entrance_builder.dart';
+part 'parent/home/parent_home_child_dashboard.dart';
+part 'parent/home/parent_home_completed_assessment.dart';
+part 'parent/home/parent_home_first_assessment.dart';
+part 'parent/home/parent_home_tab.dart';
+part 'parent/home/widgets/parent_assessment_result_card.dart';
+part 'parent/home/widgets/parent_dashed_circle_painter.dart';
+part 'parent/home/widgets/parent_guide_item.dart';
+part 'parent/home/widgets/parent_home_error_card.dart';
+part 'parent/home/widgets/parent_home_loading_card.dart';
+part 'parent/home/widgets/parent_home_refresh_label.dart';
+part 'parent/home/widgets/parent_learning_streak_card.dart';
+part 'parent/home/widgets/parent_mode_three_class_card.dart';
+part 'parent/home/widgets/parent_mode_three_content.dart';
+part 'parent/home/widgets/parent_mode_three_game_suggestions.dart';
+part 'parent/home/widgets/parent_mode_three_message_item.dart';
+part 'parent/home/widgets/parent_mode_three_messages.dart';
+part 'parent/home/widgets/parent_mode_one_assessment_banner.dart';
+part 'parent/home/widgets/parent_mode_three_section.dart';
+part 'parent/home/widgets/parent_profile_dialog_action.dart';
+part 'parent/home/widgets/parent_select_student_dialog.dart';
+part 'parent/home/widgets/parent_start_guide_card.dart';
+part 'parent/home/widgets/parent_streak_day_state.dart';
+part 'parent/home/widgets/parent_streak_day.dart';
 part 'parent/parent_dashboard.dart';
-part 'parent/parent_home_first_assessment.dart';
-part 'parent/parent_home_completed_assessment.dart';
-part 'parent/parent_home_child_dashboard.dart';
-part 'parent/parent_assessment_tab.dart';
-part 'parent/parent_room_tab.dart';
+part 'parent/room/helpers/parent_room_helpers.dart';
+part 'parent/room/models/parent_room_entry.dart';
+part 'parent/room/parent_room_tab.dart';
+part 'parent/room/widgets/parent_room_class_card.dart';
+part 'parent/room/widgets/parent_room_class_grid.dart';
+part 'parent/room/widgets/parent_room_completion_card.dart';
+part 'parent/room/widgets/parent_room_detail_hero.dart';
+part 'parent/room/widgets/parent_room_detail_meta.dart';
+part 'parent/room/widgets/parent_room_detail_screen.dart';
+part 'parent/room/widgets/parent_room_detail_shortcuts.dart';
+part 'parent/room/widgets/parent_room_detail_top_bar.dart';
+part 'parent/room/widgets/parent_room_empty_box.dart';
+part 'parent/room/widgets/parent_room_header.dart';
+part 'parent/room/widgets/parent_room_list_section.dart';
+part 'parent/room/widgets/parent_room_loading_content.dart';
+part 'parent/room/widgets/parent_room_loading.dart';
+part 'parent/room/widgets/parent_room_pending_card.dart';
+part 'parent/room/widgets/parent_room_section_title.dart';
+part 'parent/room/widgets/parent_room_shortcut_tile.dart';
+part 'parent/room/widgets/parent_room_skeleton_block.dart';
+part 'parent/room/widgets/parent_room_skeleton_line.dart';
+part 'parent/room/widgets/parent_room_state_card.dart';
+part 'parent/room/widgets/parent_room_status_icon.dart';
+part 'parent/room/widgets/parent_room_task_header.dart';
+part 'parent/room/widgets/parent_room_task_shell.dart';
+part 'parent/shared/parent_home_helpers.dart';
+part 'parent/shared/widgets/parent_child_dashboard_loading.dart';
+part 'parent/shared/widgets/parent_home_entrance.dart';
+part 'parent/shared/widgets/parent_image_action.dart';
+part 'parent/shared/widgets/parent_room_badge_row.dart';
+part 'parent/shared/widgets/parent_room_chip.dart';
+part 'parent/shared/widgets/parent_room_completion_list_item.dart';
+part 'parent/shared/widgets/parent_room_empty_line.dart';
+part 'parent/shared/widgets/parent_room_list_date_label.dart';
+part 'parent/shared/widgets/parent_room_list_icon_box.dart';
+part 'parent/shared/widgets/parent_room_list_title.dart';
+part 'parent/shared/widgets/parent_room_pending_list_item.dart';
+part 'parent/shared/widgets/parent_room_score_icon.dart';
+part 'parent/shared/widgets/parent_shimmer_transform.dart';
+part 'parent/shared/widgets/parent_skeleton_block.dart';
+part 'parent/shared/widgets/parent_skeleton_line.dart';
+part 'parent/shared/widgets/parent_skeleton_shimmer.dart';
 part 'student/student_dashboard.dart';
 part 'student/student_home_mode_one.dart';
 part 'student/student_home_mode_two.dart';
 part 'student/student_home_mode_three.dart';
 part 'teacher/teacher_dashboard.dart';
+part 'widgets/home_dashboard_args.dart';
+part 'widgets/home_role_dashboard.dart';
+part 'widgets/home_background.dart';
+part 'widgets/home_header_bar.dart';
+part 'widgets/home_bottom_navigation.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
@@ -366,9 +448,9 @@ class _HomeScreenState extends State<HomeScreen>
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  const Positioned.fill(child: _HomeBackground()),
+                  const Positioned.fill(child: HomeBackground()),
                   Positioned.fill(
-                    child: _RoleDashboard(
+                    child: HomeRoleDashboard(
                       key: ValueKey(
                         '${widget.activeRole}-${ActiveProfileSession.profileStableId(widget.activeProfile)}',
                       ),
@@ -445,7 +527,7 @@ class _HomeScreenState extends State<HomeScreen>
                       left: 0,
                       right: 0,
                       top: 0,
-                      child: _HeaderBar(
+                      child: HomeHeaderBar(
                         height: headerHeight,
                         topInset: topInset,
                         horizontalPadding: s(24),
@@ -485,7 +567,7 @@ class _HomeScreenState extends State<HomeScreen>
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    child: _BottomNavigation(
+                    child: HomeBottomNavigation(
                       height: navHeight,
                       bottomInset: bottomInset,
                       scale: scale,
@@ -629,930 +711,4 @@ class _HomeScreenState extends State<HomeScreen>
       await widget.onRefreshProfiles();
     }
   }
-}
-
-class HomeDashboardArgs {
-  const HomeDashboardArgs({
-    required this.activeTab,
-    required this.isActive,
-    required this.user,
-    required this.profiles,
-    required this.activeProfile,
-    required this.profileLoadError,
-    required this.onRefreshProfiles,
-    required this.onActivateProfile,
-    required this.initialGrades,
-    required this.gradeService,
-    required this.classroomService,
-    required this.assignmentService,
-    required this.quizService,
-    required this.onLogout,
-    required this.onAddProfileFromReview,
-    required this.onProfileSaved,
-    required this.openAddProfileRequestId,
-    required this.onCompleteTeacherProfile,
-    required this.onOpenClassroomTab,
-    required this.onOpenReviewTab,
-    required this.onOpenProfileMenu,
-    required this.onParentAssessmentStateChanged,
-    required this.parentHomeEntrance,
-    required this.activeRefreshTick,
-    required this.bottomPadding,
-    required this.headerHeight,
-    required this.scale,
-  });
-
-  final int activeTab;
-  final bool isActive;
-  final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
-  final String? profileLoadError;
-  final Future<void> Function() onRefreshProfiles;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
-  final List<GradeModel> initialGrades;
-  final GradeService gradeService;
-  final ClassroomService classroomService;
-  final ClassroomExerciseService assignmentService;
-  final QuizService quizService;
-  final VoidCallback onLogout;
-  final VoidCallback onAddProfileFromReview;
-  final VoidCallback onProfileSaved;
-  final int openAddProfileRequestId;
-  final Future<void> Function() onCompleteTeacherProfile;
-  final VoidCallback onOpenClassroomTab;
-  final VoidCallback onOpenReviewTab;
-  final VoidCallback onOpenProfileMenu;
-  final ValueChanged<bool> onParentAssessmentStateChanged;
-  final Animation<double> parentHomeEntrance;
-  final int activeRefreshTick;
-  final double bottomPadding;
-  final double headerHeight;
-  final double scale;
-
-  EdgeInsets get contentPadding => EdgeInsets.only(
-        left: 24 * scale,
-        right: 24 * scale,
-        top: headerHeight + (activeTab == 0 ? 0 : 24 * scale),
-        bottom: bottomPadding,
-      );
-}
-
-class _RoleDashboard extends StatefulWidget {
-  const _RoleDashboard({
-    super.key,
-    required this.activeTab,
-    required this.user,
-    required this.profiles,
-    required this.activeProfile,
-    required this.activeRole,
-    required this.profileLoadError,
-    required this.onRefreshProfiles,
-    required this.onActivateProfile,
-    required this.initialGrades,
-    required this.gradeService,
-    required this.classroomService,
-    required this.assignmentService,
-    required this.quizService,
-    required this.onLogout,
-    required this.onAddProfileFromReview,
-    required this.onProfileSaved,
-    required this.openAddProfileRequestId,
-    required this.onCompleteTeacherProfile,
-    required this.onOpenClassroomTab,
-    required this.onOpenReviewTab,
-    required this.onOpenProfileMenu,
-    required this.onParentAssessmentStateChanged,
-    required this.parentHomeEntrance,
-    required this.bottomPadding,
-    required this.headerHeight,
-    required this.scale,
-  });
-
-  final int activeTab;
-  final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
-  final ProfileRole activeRole;
-  final String? profileLoadError;
-  final Future<void> Function() onRefreshProfiles;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
-  final List<GradeModel> initialGrades;
-  final GradeService gradeService;
-  final ClassroomService classroomService;
-  final ClassroomExerciseService assignmentService;
-  final QuizService quizService;
-  final VoidCallback onLogout;
-  final VoidCallback onAddProfileFromReview;
-  final VoidCallback onProfileSaved;
-  final int openAddProfileRequestId;
-  final Future<void> Function() onCompleteTeacherProfile;
-  final VoidCallback onOpenClassroomTab;
-  final VoidCallback onOpenReviewTab;
-  final VoidCallback onOpenProfileMenu;
-  final ValueChanged<bool> onParentAssessmentStateChanged;
-  final Animation<double> parentHomeEntrance;
-  final double bottomPadding;
-  final double headerHeight;
-  final double scale;
-
-  @override
-  State<_RoleDashboard> createState() => _RoleDashboardState();
-}
-
-class _RoleDashboardState extends State<_RoleDashboard> {
-  late final Set<int> _visitedTabs = <int>{widget.activeTab};
-  late final Set<int> _activatedTabs = <int>{widget.activeTab};
-  final Map<int, int> _activationTicks = <int, int>{};
-
-  @override
-  void initState() {
-    super.initState();
-    _activationTicks[widget.activeTab] = 1;
-    WidgetsBinding.instance.addPostFrameCallback((_) => _prewarmTabs());
-  }
-
-  Future<void> _prewarmTabs() async {
-    await Future<void>.delayed(const Duration(milliseconds: 300));
-    const tabOrder = <int>[1, 2, 3, 4, 0];
-    for (final tab in tabOrder) {
-      if (!mounted) {
-        return;
-      }
-      if (tab == widget.activeTab || _visitedTabs.contains(tab)) {
-        continue;
-      }
-
-      setState(() {
-        _visitedTabs.add(tab);
-        _activationTicks[tab] = 1;
-      });
-      await WidgetsBinding.instance.endOfFrame;
-      await Future<void>.delayed(const Duration(milliseconds: 100));
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant _RoleDashboard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.activeTab != widget.activeTab) {
-      _visitedTabs.add(widget.activeTab);
-      final isFirstActivation = _activatedTabs.add(widget.activeTab);
-      if (isFirstActivation) {
-        _activationTicks[widget.activeTab] ??= 1;
-      } else {
-        _activationTicks[widget.activeTab] =
-            (_activationTicks[widget.activeTab] ?? 0) + 1;
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const maxTabIndex = 4;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        for (var tab = 0; tab <= maxTabIndex; tab++)
-          if (_visitedTabs.contains(tab))
-            Offstage(
-              key: ValueKey('home-tab-$tab'),
-              offstage: tab != widget.activeTab,
-              child: TickerMode(
-                enabled: tab == widget.activeTab,
-                child: _buildTab(context, tab),
-              ),
-            ),
-      ],
-    );
-  }
-
-  Widget _buildTab(BuildContext context, int tab) {
-    final args = HomeDashboardArgs(
-      activeTab: tab,
-      isActive: tab == widget.activeTab,
-      user: widget.user,
-      profiles: widget.profiles,
-      activeProfile: widget.activeProfile,
-      profileLoadError: widget.profileLoadError,
-      onRefreshProfiles: widget.onRefreshProfiles,
-      onActivateProfile: widget.onActivateProfile,
-      initialGrades: widget.initialGrades,
-      gradeService: widget.gradeService,
-      classroomService: widget.classroomService,
-      assignmentService: widget.assignmentService,
-      quizService: widget.quizService,
-      onLogout: widget.onLogout,
-      onAddProfileFromReview: widget.onAddProfileFromReview,
-      onProfileSaved: widget.onProfileSaved,
-      openAddProfileRequestId: widget.openAddProfileRequestId,
-      onCompleteTeacherProfile: widget.onCompleteTeacherProfile,
-      onOpenClassroomTab: widget.onOpenClassroomTab,
-      onOpenReviewTab: widget.onOpenReviewTab,
-      onOpenProfileMenu: widget.onOpenProfileMenu,
-      onParentAssessmentStateChanged: widget.onParentAssessmentStateChanged,
-      parentHomeEntrance: widget.parentHomeEntrance,
-      activeRefreshTick: _activationTicks[tab] ?? 0,
-      bottomPadding: widget.bottomPadding,
-      headerHeight: tab == 0 ? widget.headerHeight : 0,
-      scale: widget.scale,
-    );
-
-    return switch (widget.activeRole) {
-      ProfileRole.parent => ParentDashboard(args: args),
-      ProfileRole.student => StudentDashboard(args: args),
-      ProfileRole.teacher => TeacherDashboard(args: args),
-    };
-  }
-}
-
-class _HomeBackground extends StatelessWidget {
-  const _HomeBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x3300504B),
-            blurRadius: 44,
-            offset: Offset(0, 28),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HeaderBar extends StatelessWidget {
-  const _HeaderBar({
-    required this.height,
-    required this.topInset,
-    required this.horizontalPadding,
-    required this.name,
-    required this.profile,
-    required this.role,
-    required this.canSwitchProfile,
-    required this.isProfileMenuOpen,
-    required this.parentStreakCount,
-    required this.onProfileTap,
-  });
-
-  final double height;
-  final double topInset;
-  final double horizontalPadding;
-  final String name;
-  final StudentProfile? profile;
-  final ProfileRole role;
-  final bool canSwitchProfile;
-  final bool isProfileMenuOpen;
-  final int parentStreakCount;
-  final VoidCallback? onProfileTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final contentHeight = height - topInset;
-    final typographyScale =
-        contentHeight / (role == ProfileRole.parent ? 64 : 98);
-    if (role == ProfileRole.parent) {
-      return ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            height: height,
-            padding: EdgeInsets.fromLTRB(
-              horizontalPadding * 0.82,
-              topInset + contentHeight * 0.10,
-              horizontalPadding * 0.72,
-              contentHeight * 0.10,
-            ),
-            color: Colors.white.withValues(alpha: 0.96),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Semantics(
-                    button: canSwitchProfile,
-                    child: InkWell(
-                      onTap: onProfileTap,
-                      borderRadius: BorderRadius.circular(16),
-                      child: Row(
-                        children: [
-                          ProfileAvatarImage(
-                            size: contentHeight * 0.74,
-                            avatarKey: profile?.avatarKey,
-                            avatarUrl: profile?.avatarUrl,
-                            borderColor:
-                                const Color(0xFFE7DAC8).withValues(alpha: 0.9),
-                            borderWidth: 1.5,
-                          ),
-                          SizedBox(width: contentHeight * 0.16),
-                          Flexible(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _homeRoleLabel(context, role),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Color(0xFF6782AA),
-                                    fontSize: FontSize.small,
-                                    fontWeight: FontWeight.w400,
-                                    // letterSpacing: 0.8,
-                                    // height: 1,
-                                  ),
-                                ),
-                                SizedBox(height: contentHeight * 0.06),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        name,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Color(0xFF002B6A),
-                                          fontSize: FontSize.small,
-                                          fontWeight: FontWeight.w600,
-                                          // height: 1,
-                                        ),
-                                      ),
-                                    ),
-                                    if (canSwitchProfile) ...[
-                                      SizedBox(width: contentHeight * 0.04),
-                                      AnimatedRotation(
-                                        turns: isProfileMenuOpen ? 0.5 : 0,
-                                        duration:
-                                            const Duration(milliseconds: 180),
-                                        child: Icon(
-                                          Icons.keyboard_arrow_down_rounded,
-                                          size: contentHeight * 0.26,
-                                          color: const Color(0xFF8294B0),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                _ParentFireBadge(
-                  count: parentStreakCount,
-                  height: contentHeight * 0.48,
-                ),
-                SizedBox(width: contentHeight * 0.12),
-                _NotificationButton(size: contentHeight * 0.58),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    final startPadding = role == ProfileRole.student
-        ? horizontalPadding * 0.82
-        : horizontalPadding;
-    final endPadding = role == ProfileRole.student
-        ? horizontalPadding * 0.72
-        : horizontalPadding;
-
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          height: height,
-          padding: EdgeInsets.fromLTRB(
-            startPadding,
-            topInset + contentHeight * 0.20,
-            endPadding,
-            contentHeight * 0.21,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.94),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Semantics(
-                  button: canSwitchProfile,
-                  child: InkWell(
-                    onTap: onProfileTap,
-                    borderRadius: BorderRadius.circular(16),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _StudentAvatar(
-                          size: contentHeight * 0.45,
-                          avatarKey: profile?.avatarKey,
-                          avatarUrl: profile?.avatarUrl,
-                        ),
-                        SizedBox(width: contentHeight * 0.14),
-                        Flexible(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _homeRoleLabel(context, role),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: FontSize.small,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      '$name👋',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: FontSize.small,
-                                        fontWeight: FontWeight.w600
-                                      ),
-                                    ),
-                                  ),
-                                  if (canSwitchProfile) ...[
-                                    SizedBox(width: contentHeight * 0.06),
-                                    AnimatedRotation(
-                                      turns: isProfileMenuOpen ? 0.5 : 0,
-                                      duration:
-                                          const Duration(milliseconds: 180),
-                                      child: Icon(
-                                        Icons.keyboard_arrow_down_rounded,
-                                        size: contentHeight * 0.18,
-                                        color: const Color(0xFF8294B0),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              _NotificationButton(size: contentHeight * 0.45),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ParentFireBadge extends StatelessWidget {
-  const _ParentFireBadge({
-    required this.count,
-    required this.height,
-  });
-
-  final int count;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      constraints: BoxConstraints(minWidth: height * 1.5),
-      padding: EdgeInsets.symmetric(horizontal: height * 0.30),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF4EC),
-        borderRadius: BorderRadius.circular(height),
-        border: Border.all(color: const Color(0xFFFFCBAF)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.local_fire_department_rounded,
-            color: const Color(0xFFFF650B),
-            size: height * 0.66,
-          ),
-          Text(
-            '$count',
-            style: TextStyle(
-              color: const Color(0xFFFF650B),
-              fontSize: FontSize.caption * (height / 30),
-              fontWeight: FontWeight.w900,
-              height: 1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StudentAvatar extends StatelessWidget {
-  const _StudentAvatar({required this.size, this.avatarKey, this.avatarUrl});
-
-  final double size;
-  final String? avatarKey;
-  final String? avatarUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: _teal.withValues(alpha: 0.05),
-                spreadRadius: size * 0.08,
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.11),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: ProfileAvatarImage(
-            size: size,
-            avatarKey: avatarKey,
-            avatarUrl: avatarUrl,
-          ),
-        ),
-        Positioned(
-          right: -size * 0.05,
-          bottom: -size * 0.05,
-          child: Container(
-            width: size * 0.32,
-            height: size * 0.32,
-            decoration: BoxDecoration(
-              color: const Color(0xFF22C55E),
-              shape: BoxShape.circle,
-              border: Border.all(color: _mintBackground, width: size * 0.05),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _NotificationButton extends StatelessWidget {
-  const _NotificationButton({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      shadowColor: Colors.black.withValues(alpha: 0.08),
-      elevation: 2,
-      borderRadius: BorderRadius.circular(size * 0.36),
-      child: InkWell(
-        onTap: HapticFeedback.selectionClick,
-        borderRadius: BorderRadius.circular(size * 0.36),
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: Center(
-            child: SvgPicture.asset(
-              _studentHomeBell,
-              width: size * 0.40,
-              height: size * 0.50,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ignore: unused_element
-class _BottomNavigation extends StatelessWidget {
-  const _BottomNavigation({
-    required this.height,
-    required this.bottomInset,
-    required this.scale,
-    required this.activeIndex,
-    required this.activeRole,
-    required this.user,
-    required this.onTabSelected,
-  });
-
-  final double height;
-  final double bottomInset;
-  final double scale;
-  final int activeIndex;
-  final ProfileRole activeRole;
-  final LoginUser? user;
-  final ValueChanged<int> onTabSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final items = switch (activeRole) {
-      ProfileRole.teacher => [
-          _NavItemData(
-            Icons.home_filled,
-            context.getText(AppKeys.navHome),
-            null,
-          ),
-          _NavItemData(
-            Icons.bar_chart_rounded,
-            context.getText(AppKeys.navClassroom),
-            null,
-          ),
-          _NavItemData(
-            Icons.menu_book_rounded,
-            context.getText(AppKeys.navStudy),
-            null,
-          ),
-          _NavItemData(
-            Icons.chat_bubble_outline_rounded,
-            context.getText(AppKeys.navMembers),
-            null,
-          ),
-          _NavItemData(null, context.getText(AppKeys.navSettings), user),
-        ],
-      ProfileRole.student => [
-          _NavItemData(
-            null,
-            context.getText(AppKeys.navHome),
-            null,
-            assetPath: _studentHomeNavHome,
-          ),
-          _NavItemData(
-            null,
-            context.getText(AppKeys.navClassroom),
-            null,
-            assetPath: _studentHomeNavClass,
-          ),
-          _NavItemData(
-            null,
-            context.getText(AppKeys.navReview),
-            null,
-            assetPath: _studentHomeNavReport,
-          ),
-          _NavItemData(
-            null,
-            context.getText(AppKeys.navHistory),
-            null,
-            assetPath: _studentHomeNavMessage,
-          ),
-          _NavItemData(
-            null,
-            context.getText(AppKeys.navSettings),
-            null,
-            assetPath: _studentHomeNavSettings,
-          ),
-        ],
-      ProfileRole.parent => [
-          _NavItemData(
-            Icons.home_filled,
-            context.getText(AppKeys.navHome),
-            null,
-          ),
-          _NavItemData(
-            Icons.assignment_turned_in_outlined,
-            context.getText(AppKeys.navAssessment),
-            null,
-          ),
-          _NavItemData(
-            Icons.meeting_room_outlined,
-            context.getText(AppKeys.navRoom),
-            null,
-          ),
-          _NavItemData(
-            Icons.sports_esports_rounded,
-            context.getText(AppKeys.navGames),
-            null,
-          ),
-          _NavItemData(null, context.getText(AppKeys.navSettings), user),
-        ],
-    };
-
-    final radius = BorderRadius.vertical(
-      top: Radius.circular(48 * scale),
-    );
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 30 * scale,
-            offset: Offset(0, -8 * scale),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            height: height,
-            padding: EdgeInsets.fromLTRB(
-              20 * scale,
-              12 * scale,
-              20 * scale,
-              bottomInset + 12 * scale,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.92),
-              borderRadius: radius,
-            ),
-            child: Row(
-              children: List.generate(items.length, (index) {
-                return Expanded(
-                  child: _AnimatedNavItem(
-                    data: items[index],
-                    active: activeIndex == index,
-                    teacherStyle: activeRole == ProfileRole.teacher,
-                    scale: scale,
-                    onTap: () => onTabSelected(index),
-                  ),
-                );
-              }),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _AnimatedNavItem extends StatelessWidget {
-  const _AnimatedNavItem({
-    required this.data,
-    required this.active,
-    required this.teacherStyle,
-    required this.scale,
-    required this.onTap,
-  });
-
-  final _NavItemData data;
-  final bool active;
-  final bool teacherStyle;
-  final double scale;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    const activeColor = Color(0xFF38898B);
-    final inactiveColor = const Color(0xFF515F54).withValues(alpha: 0.68);
-
-    return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 120),
-      curve: Curves.easeOutCubic,
-      tween: Tween<double>(end: active ? 1 : 0),
-      builder: (context, value, child) {
-        final color = Color.lerp(inactiveColor, Colors.white, value)!;
-        return AnimatedScale(
-          duration: const Duration(milliseconds: 120),
-          curve: Curves.easeOutCubic,
-          scale: active ? 1 : 0.98,
-          child: Semantics(
-            selected: active,
-            button: true,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(48 * scale),
-                child: Container(
-                  height: 60 * scale,
-                  margin: EdgeInsets.symmetric(horizontal: 2 * scale),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 4 * scale,
-                    vertical: 9 * scale,
-                  ),
-                  decoration: BoxDecoration(
-                    color: active ? activeColor : Colors.transparent,
-                    borderRadius: BorderRadius.circular(48 * scale),
-                    boxShadow: active && !teacherStyle
-                        ? [
-                            BoxShadow(
-                              color: _teal.withValues(alpha: 0.20),
-                              blurRadius: 15 * scale,
-                              offset: Offset(0, 10 * scale),
-                            ),
-                            BoxShadow(
-                              color: _teal.withValues(alpha: 0.20),
-                              blurRadius: 6 * scale,
-                              offset: Offset(0, 4 * scale),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox.square(
-                        dimension: 22 * scale,
-                        child: Center(
-                          child: data.user != null
-                              ? _UserAvatarWidget(
-                                  user: data.user!,
-                                  size: 20 * scale,
-                                  color: color,
-                                )
-                              : data.assetPath != null
-                                  ? SvgPicture.asset(
-                                      data.assetPath!,
-                                      width: 20 * scale,
-                                      height: 20 * scale,
-                                      colorFilter: ColorFilter.mode(
-                                        color,
-                                        BlendMode.srcIn,
-                                      ),
-                                    )
-                                  : Icon(
-                                      data.icon,
-                                      color: color,
-                                      size: 20 * scale,
-                                    ),
-                        ),
-                      ),
-                      SizedBox(height: 4 * scale),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          data.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.andika(
-                            color: color,
-                            fontSize: FontSize.caption * 0.77 * scale,
-                            fontWeight: FontWeight.w900,
-                            height: 1,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _UserAvatarWidget extends StatelessWidget {
-  const _UserAvatarWidget({
-    required this.user,
-    required this.size,
-    required this.color,
-  });
-
-  final LoginUser user;
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProfileAvatarImage(
-      size: size,
-      avatarUrl: user.avatarUrl,
-      foregroundColor: color,
-      borderColor: color,
-      borderWidth: 1.5,
-      iconScale: 0.58,
-    );
-  }
-}
-
-class _NavItemData {
-  const _NavItemData(
-    this.icon,
-    this.label,
-    this.user, {
-    this.assetPath,
-  });
-
-  final IconData? icon;
-  final String label;
-  final LoginUser? user;
-  final String? assetPath;
 }

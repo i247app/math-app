@@ -1,4 +1,4 @@
-part of '../home_screen.dart';
+part of '../../home_screen.dart';
 
 extension _ParentHomeChildDashboardView on _ParentHomeContentState {
   Widget _buildChildDashboard() {
