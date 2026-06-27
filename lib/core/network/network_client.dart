@@ -366,6 +366,20 @@ class NetworkApi {
     return quizResponse;
   }
 
+  Future<void> warmUpAi() async {
+    final responseJson = await _networkClient.postJson(
+      '/connect/init-ai',
+      const <String, dynamic>{},
+    );
+    final mstatus = responseJson['mstatus'];
+    if (mstatus is int && mstatus != 200) {
+      throw NetworkException(
+        _apiErrorMessage(responseJson),
+        status: mstatus,
+      );
+    }
+  }
+
   Future<SubmitQuizResponse> submitQuiz(
     SubmitQuizRequest request,
   ) async {
