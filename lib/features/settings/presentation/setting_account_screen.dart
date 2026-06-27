@@ -1,39 +1,27 @@
-part of '../setting_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _SettingScreenArgs {
-  const _SettingScreenArgs({
-    required this.user,
-    required this.profiles,
-    required this.activeProfile,
-    required this.profileLoadError,
-    required this.onLogout,
-    required this.onActivateProfile,
-    required this.onRefreshProfiles,
-    required this.onProfileSaved,
-    required this.scale,
-  });
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/profile/avatar_picker.dart';
+import 'package:numi_flutter/features/settings/helpers/settings_account_helpers.dart';
+import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
+import 'package:numi_flutter/features/settings/widgets/account/account_screen_skeleton.dart';
+import 'package:numi_flutter/features/settings/widgets/account_details_panel.dart';
+import 'package:numi_flutter/features/settings/widgets/setting_header.dart';
+import 'package:numi_flutter/features/settings/widgets/setting_safe_screen.dart';
 
-  final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
-  final String? profileLoadError;
-  final VoidCallback onLogout;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
-  final Future<void> Function()? onRefreshProfiles;
-  final VoidCallback? onProfileSaved;
-  final double scale;
-}
+class SettingAccountScreen extends StatefulWidget {
+  const SettingAccountScreen({super.key, required this.args});
 
-class _SettingAccountScreen extends StatefulWidget {
-  const _SettingAccountScreen({required this.args});
-
-  final _SettingScreenArgs args;
+  final SettingScreenArgs args;
 
   @override
-  State<_SettingAccountScreen> createState() => _SettingAccountScreenState();
+  State<SettingAccountScreen> createState() => _SettingAccountScreenState();
 }
 
-class _SettingAccountScreenState extends State<_SettingAccountScreen>
+class _SettingAccountScreenState extends State<SettingAccountScreen>
     with SingleTickerProviderStateMixin {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
   final OtpAuthService _authService = OtpAuthApi();
@@ -63,10 +51,16 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
   void initState() {
     super.initState();
     _user = widget.args.user;
+    if (_user != null) {
+      _applyUser(_user);
+      _isLoadingAccount = false;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _entranceController.forward();
-        _prepareAccount();
+        if (_user == null) {
+          _prepareAccount();
+        }
       }
     });
   }
@@ -81,8 +75,8 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
   }
 
   void _applyUser(LoginUser? user) {
-    _usernameController.text = _SettingTabState._fallbackUsername(user);
-    _phoneController.text = _SettingTabState._displayPhone(user?.phone);
+    _usernameController.text = settingsFallbackUsername(user);
+    _phoneController.text = settingsDisplayPhone(user?.phone);
     _emailController.text = user?.email?.trim() ?? '';
   }
 
@@ -91,7 +85,6 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
     final userFuture = initialUser != null
         ? Future<LoginUser?>.value(initialUser)
         : _authService.restoreSession();
-    await Future<void>.delayed(const Duration(milliseconds: 500));
     try {
       final user = await userFuture;
       if (!mounted) {
@@ -156,8 +149,8 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
       final updatedUser = await _authService.updateUser(
         userId: userId,
         name: name,
-        phone: _SettingTabState._normalizedPhone(_phoneController.text),
-        email: _SettingTabState._emptyToNull(_emailController.text),
+        phone: settingsNormalizedPhone(_phoneController.text),
+        email: settingsEmptyToNull(_emailController.text),
         avatarPath: avatarPath,
       );
       if (!mounted) {

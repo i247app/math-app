@@ -24,6 +24,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   static const _designHeight = 844.0;
 
   bool _isChangingLanguage = false;
+  bool _showChangingLanguageOverlay = false;
 
   Future<void> _changeLanguage(AppLanguage language) async {
     HapticFeedback.selectionClick();
@@ -34,17 +35,36 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
 
     setState(() => _isChangingLanguage = true);
     try {
-      await Future.wait<void>([
-        lingo.setLanguage(language),
-        Future<void>.delayed(settingsLanguageSwitchMinimumDuration),
-      ]);
+      await _runWithDeferredOverlay(() => lingo.setLanguage(language));
       if (mounted) {
-        setState(() => _isChangingLanguage = false);
+        setState(() {
+          _isChangingLanguage = false;
+          _showChangingLanguageOverlay = false;
+        });
       }
     } catch (_) {
       if (mounted) {
-        setState(() => _isChangingLanguage = false);
+        setState(() {
+          _isChangingLanguage = false;
+          _showChangingLanguageOverlay = false;
+        });
       }
+    }
+  }
+
+  Future<void> _runWithDeferredOverlay(Future<void> Function() action) async {
+    var completed = false;
+    Future<void>.delayed(settingsLoadingDelay, () {
+      if (completed || !mounted) {
+        return;
+      }
+      setState(() => _showChangingLanguageOverlay = true);
+    });
+
+    try {
+      await action();
+    } finally {
+      completed = true;
     }
   }
 
@@ -102,7 +122,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 ),
               ),
             ),
-            if (_isChangingLanguage)
+            if (_showChangingLanguageOverlay)
               Positioned.fill(
                 child: LoadingScreen(
                   message: context.getText(AppKeys.switchingLanguage),

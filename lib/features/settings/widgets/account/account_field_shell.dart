@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/settings/widgets/common/settings_field_shell.dart';
 
 class AccountFieldShell extends StatelessWidget {
   const AccountFieldShell({
@@ -19,44 +20,24 @@ class AccountFieldShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: const Color(0xFF604950),
-                  fontSize: FontSize.normal * scale,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  letterSpacing: 0,
-                ),
-              ),
-            ),
-            if (trailing != null) trailing!,
-          ],
-        ),
-        SizedBox(height: 12 * scale),
-        Container(
-          height: 60 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12 * scale),
-            border: Border.all(
-              color: const Color(0xFFCFCFCF),
-              width: 1.2 * scale,
-            ),
-          ),
-          alignment: Alignment.center,
-          child: child,
-        ),
-      ],
+    return SettingsFieldShell(
+      label: label,
+      scale: scale,
+      trailing: trailing,
+      labelGap: 12,
+      height: 60,
+      horizontalPadding: 20,
+      borderRadius: 12,
+      borderColor: const Color(0xFFCFCFCF),
+      borderWidth: 1.2,
+      labelStyle: GoogleFonts.andika(
+        color: const Color(0xFF604950),
+        fontSize: FontSize.normal * scale,
+        fontWeight: FontWeight.w900,
+        height: 1,
+        letterSpacing: 0,
+      ),
+      child: child,
     );
   }
 }

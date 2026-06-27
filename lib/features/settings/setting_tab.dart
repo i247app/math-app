@@ -22,21 +22,18 @@ import 'package:numi_flutter/features/auth/presentation/passcode_screen.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 import 'package:numi_flutter/core/localization/app_language.dart';
 import 'package:numi_flutter/core/localization/lingo_scope.dart';
+import 'package:numi_flutter/features/settings/cache/settings_profile_options_cache.dart';
+import 'package:numi_flutter/features/settings/helpers/settings_account_helpers.dart';
+import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
+import 'package:numi_flutter/features/settings/presentation/setting_account_screen.dart';
 import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/account_details_panel.dart';
-import 'package:numi_flutter/features/settings/widgets/account/account_screen_skeleton.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_form_panel.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list_panel.dart';
 import 'package:numi_flutter/features/settings/widgets/setting_header.dart';
 import 'package:numi_flutter/features/settings/widgets/setting_safe_screen.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/passcode_settings_sheet.dart';
 import 'package:numi_flutter/features/settings/widgets/settings_menu_panel.dart';
-
-part 'presentation/setting_account_screen.dart';
-part 'presentation/setting_profile_form_screen.dart';
-part 'presentation/setting_profile_list_screen.dart';
-
-const _profileSwitchMinimumDuration = Duration(milliseconds: 1500);
 
 enum SettingPageView { settings, account, profile, addProfile }
 
@@ -365,8 +362,8 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   void _applyUser(LoginUser? user) {
-    _usernameController.text = _fallbackUsername(user);
-    _phoneController.text = _displayPhone(user?.phone);
+    _usernameController.text = settingsFallbackUsername(user);
+    _phoneController.text = settingsDisplayPhone(user?.phone);
     _emailController.text = user?.email?.trim() ?? '';
   }
 
@@ -615,7 +612,7 @@ class _SettingTabState extends State<SettingTab> {
     StudentProfile? editingProfile, {
     bool openAddProfileOnStart = false,
   }) {
-    final args = _SettingScreenArgs(
+    final args = SettingScreenArgs(
       user: widget.user,
       profiles: _profiles,
       activeProfile: widget.activeProfile,
@@ -628,16 +625,57 @@ class _SettingTabState extends State<SettingTab> {
     );
 
     return switch (view) {
-      SettingPageView.account => _SettingAccountScreen(args: args),
-      SettingPageView.profile => _SettingProfileListScreen(
-          args: args,
-          openAddProfileOnStart: openAddProfileOnStart,
+      SettingPageView.account => SettingAccountScreen(args: args),
+      SettingPageView.profile => SettingSafeScreen(
+          child: SettingTab.page(
+            user: args.user,
+            profiles: args.profiles,
+            activeProfile: args.activeProfile,
+            profileLoadError: args.profileLoadError,
+            onLogout: args.onLogout,
+            onActivateProfile: args.onActivateProfile,
+            onRefreshProfiles: args.onRefreshProfiles,
+            onProfileSaved: args.onProfileSaved,
+            bottomPadding: 0,
+            scale: args.scale,
+            initialView: SettingPageView.profile,
+            isPushedPage: true,
+            openAddProfileOnStart: openAddProfileOnStart,
+          ),
         ),
-      SettingPageView.addProfile => _SettingProfileFormScreen(
-          args: args,
-          editingProfile: editingProfile,
+      SettingPageView.addProfile => SettingSafeScreen(
+          child: SettingTab.page(
+            user: args.user,
+            profiles: args.profiles,
+            activeProfile: args.activeProfile,
+            profileLoadError: args.profileLoadError,
+            onLogout: args.onLogout,
+            onActivateProfile: args.onActivateProfile,
+            onRefreshProfiles: args.onRefreshProfiles,
+            onProfileSaved: () => Navigator.of(context).pop(true),
+            bottomPadding: 0,
+            scale: args.scale,
+            initialView: SettingPageView.addProfile,
+            initialEditingProfile: editingProfile,
+            isPushedPage: true,
+          ),
         ),
-      SettingPageView.settings => _SettingProfileListScreen(args: args),
+      SettingPageView.settings => SettingSafeScreen(
+          child: SettingTab.page(
+            user: args.user,
+            profiles: args.profiles,
+            activeProfile: args.activeProfile,
+            profileLoadError: args.profileLoadError,
+            onLogout: args.onLogout,
+            onActivateProfile: args.onActivateProfile,
+            onRefreshProfiles: args.onRefreshProfiles,
+            onProfileSaved: args.onProfileSaved,
+            bottomPadding: 0,
+            scale: args.scale,
+            initialView: SettingPageView.profile,
+            isPushedPage: true,
+          ),
+        ),
     };
   }
 
@@ -653,20 +691,44 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     setState(() => _isChangingLanguage = true);
-    _showFullScreenLoading(context.getText(AppKeys.switchingLanguage));
     try {
-      await Future.wait<void>([
-        lingo.setLanguage(language),
-        Future<void>.delayed(_profileSwitchMinimumDuration),
-      ]);
+      await _runWithDeferredLoading(
+        action: () => lingo.setLanguage(language),
+        show: () =>
+            _showFullScreenLoading(context.getText(AppKeys.switchingLanguage)),
+        hide: _hideFullScreenLoading,
+      );
       if (mounted) {
-        _hideFullScreenLoading();
         setState(() => _isChangingLanguage = false);
       }
     } catch (_) {
       if (mounted) {
-        _hideFullScreenLoading();
         setState(() => _isChangingLanguage = false);
+      }
+    }
+  }
+
+  Future<T> _runWithDeferredLoading<T>({
+    required Future<T> Function() action,
+    required VoidCallback show,
+    required VoidCallback hide,
+  }) async {
+    var completed = false;
+    var visible = false;
+    Future<void>.delayed(settingsLoadingDelay, () {
+      if (completed || !mounted) {
+        return;
+      }
+      visible = true;
+      show();
+    });
+
+    try {
+      return await action();
+    } finally {
+      completed = true;
+      if (visible && mounted) {
+        hide();
       }
     }
   }
@@ -831,8 +893,8 @@ class _SettingTabState extends State<SettingTab> {
       final updatedUser = await _authService.updateUser(
         userId: userId,
         name: name,
-        phone: _normalizedPhone(_phoneController.text),
-        email: _emptyToNull(_emailController.text),
+        phone: settingsNormalizedPhone(_phoneController.text),
+        email: settingsEmptyToNull(_emailController.text),
         avatarPath: avatarPath,
       );
       if (!mounted) {
@@ -985,6 +1047,13 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
 
+    final userId = widget.user?.id;
+    if (userId != null &&
+        userId > 0 &&
+        _applyCachedProfileOptions(userId: userId)) {
+      return;
+    }
+
     _loadProfileOptions();
   }
 
@@ -1000,6 +1069,13 @@ class _SettingTabState extends State<SettingTab> {
         _profileOptionsError =
             context.readText(AppKeys.profileOptionsMissingAccount);
       });
+      return;
+    }
+
+    if (_applyCachedProfileOptions(
+      userId: userId,
+      profileToSelect: profileToSelect,
+    )) {
       return;
     }
 
@@ -1019,24 +1095,25 @@ class _SettingTabState extends State<SettingTab> {
       final grades = results[1] as List<GradeModel>;
       final programs = results[2] as List<ProgramModel>;
       final semesters = results[3] as List<SemesterModel>;
+      SettingsProfileOptionsCache.instance.save(
+        userId: userId,
+        schools: schools,
+        grades: grades,
+        programs: programs,
+        semesters: semesters,
+      );
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _schoolOptions = schools;
-        _gradeOptions = grades;
-        _programOptions = programs;
-        _semesterOptions = semesters;
-        final profile = profileToSelect ?? _editingProfile;
-        if (profile != null) {
-          _selectOptionsForProfile(profile);
-        } else {
-          _selectedSchool = null;
-          _selectedGrade = null;
-          _selectedProgram = null;
-          _selectedSemester ??= semesters.isEmpty ? null : semesters.first;
-        }
+        _applyProfileOptions(
+          schools: schools,
+          grades: grades,
+          programs: programs,
+          semesters: semesters,
+          profileToSelect: profileToSelect,
+        );
         _isLoadingProfileOptions = false;
       });
     } on GradeException catch (error) {
@@ -1078,6 +1155,54 @@ class _SettingTabState extends State<SettingTab> {
             context.readText(AppKeys.profileOptionsLoadFailed);
         _isLoadingProfileOptions = false;
       });
+    }
+  }
+
+  bool _applyCachedProfileOptions({
+    required int userId,
+    StudentProfile? profileToSelect,
+  }) {
+    final cached = SettingsProfileOptionsCache.instance.readFresh(
+      userId: userId,
+    );
+    if (cached == null) {
+      return false;
+    }
+    if (mounted) {
+      setState(() {
+        _applyProfileOptions(
+          schools: cached.schools,
+          grades: cached.grades,
+          programs: cached.programs,
+          semesters: cached.semesters,
+          profileToSelect: profileToSelect,
+        );
+        _isLoadingProfileOptions = false;
+        _profileOptionsError = null;
+      });
+    }
+    return true;
+  }
+
+  void _applyProfileOptions({
+    required List<SchoolModel> schools,
+    required List<GradeModel> grades,
+    required List<ProgramModel> programs,
+    required List<SemesterModel> semesters,
+    StudentProfile? profileToSelect,
+  }) {
+    _schoolOptions = schools;
+    _gradeOptions = grades;
+    _programOptions = programs;
+    _semesterOptions = semesters;
+    final profile = profileToSelect ?? _editingProfile;
+    if (profile != null) {
+      _selectOptionsForProfile(profile);
+    } else {
+      _selectedSchool = null;
+      _selectedGrade = null;
+      _selectedProgram = null;
+      _selectedSemester ??= semesters.isEmpty ? null : semesters.first;
     }
   }
 
@@ -1201,7 +1326,7 @@ class _SettingTabState extends State<SettingTab> {
           await _profileService.updateProfile(
             profileId: profileId,
             schoolId: school!.schoolId!,
-            name: _emptyToNull(name),
+            name: settingsEmptyToNull(name),
             gradeId: isTeacherProfile ? null : grade?.gradeId,
             programId: isTeacherProfile ? null : program?.programId,
             semesterId: isTeacherProfile ? null : semester?.semesterId,
@@ -1220,21 +1345,18 @@ class _SettingTabState extends State<SettingTab> {
       }
 
       if (isUpdatingProfile) {
-        await Future.wait<void>([
-          widget.onRefreshProfiles?.call() ?? Future<void>.value(),
-          Future<void>.delayed(_profileSwitchMinimumDuration),
-        ]);
+        await (widget.onRefreshProfiles?.call() ?? Future<void>.value());
         if (!mounted) {
           return;
         }
       }
 
       if (createdActiveProfile != null) {
-        setState(() => _isSwitchingProfile = true);
-        await Future.wait<void>([
-          widget.onActivateProfile(createdActiveProfile),
-          Future<void>.delayed(_profileSwitchMinimumDuration),
-        ]);
+        await _runWithDeferredLoading(
+          action: () => widget.onActivateProfile(createdActiveProfile!),
+          show: () => setState(() => _isSwitchingProfile = true),
+          hide: () => setState(() => _isSwitchingProfile = false),
+        );
         if (!mounted) {
           return;
         }
@@ -1351,14 +1473,14 @@ class _SettingTabState extends State<SettingTab> {
     HapticFeedback.selectionClick();
     setState(() {
       _isSettingDefaultProfile = true;
-      _isSwitchingProfile = true;
     });
 
     try {
-      await Future.wait<void>([
-        widget.onActivateProfile(selectedProfile),
-        Future<void>.delayed(_profileSwitchMinimumDuration),
-      ]);
+      await _runWithDeferredLoading(
+        action: () => widget.onActivateProfile(selectedProfile),
+        show: () => setState(() => _isSwitchingProfile = true),
+        hide: () => setState(() => _isSwitchingProfile = false),
+      );
       if (!mounted) {
         return;
       }
@@ -1549,7 +1671,8 @@ class _SettingTabState extends State<SettingTab> {
                                   activeProfile: widget.activeProfile,
                                   fallbackAvatarUrl: _effectiveUser?.avatarUrl,
                                   fallbackAvatarPath: _localAvatarPath,
-                                  username: _fallbackUsername(_effectiveUser),
+                                  username:
+                                      settingsFallbackUsername(_effectiveUser),
                                   scale: scale,
                                   currentLanguage: lingo.language,
                                   hasPasscode: _hasPasscode,
@@ -1675,61 +1798,11 @@ class _SettingTabState extends State<SettingTab> {
     );
   }
 
-  static String _fallbackUsername(LoginUser? user) {
-    final name = user?.name?.trim();
-    if (name != null && name.isNotEmpty) {
-      return name;
-    }
-
-    final email = user?.email?.trim();
-    if (email != null && email.isNotEmpty) {
-      return email.split('@').first;
-    }
-
-    return 'alex_parent';
-  }
-
-  static String _displayPhone(String? value) {
-    final phone = value?.trim();
-    if (phone == null || phone.isEmpty) {
-      return '090 123 4567';
-    }
-
-    final digits = phone.replaceAll(RegExp(r'\D'), '');
-    if (digits.startsWith('84') && digits.length > 2) {
-      return _formatLocalPhone('0${digits.substring(2)}');
-    }
-
-    return _formatLocalPhone(digits);
-  }
-
   void _applyParentContactFields() {
     final user = _effectiveUser;
-    final phone = user?.phone?.trim() ?? '';
-    final digits = phone.replaceAll(RegExp(r'\D'), '');
-    _profilePhoneController.text = digits.startsWith('84') && digits.length > 2
-        ? _formatLocalPhone('0${digits.substring(2)}')
-        : _formatLocalPhone(digits);
+    _profilePhoneController.text =
+        settingsDisplayPhone(user?.phone, fallback: '');
     _profileEmailController.text = user?.email?.trim() ?? '';
-  }
-
-  static String? _normalizedPhone(String value) {
-    final digits = value.replaceAll(RegExp(r'\D'), '');
-    return digits.isEmpty ? null : digits;
-  }
-
-  static String? _emptyToNull(String value) {
-    final trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
-  }
-
-  static String _formatLocalPhone(String digits) {
-    if (digits.length == 10 && digits.startsWith('0')) {
-      return '${digits.substring(0, 3)} ${digits.substring(3, 6)} '
-          '${digits.substring(6)}';
-    }
-
-    return digits;
   }
 
   void _markSettingsMenuEntrancePlayed() {

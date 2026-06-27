@@ -1,12 +1,18 @@
-part of '../setting_tab.dart';
+import 'package:flutter/material.dart';
 
-class _SettingProfileFormScreen extends StatelessWidget {
-  const _SettingProfileFormScreen({
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
+import 'package:numi_flutter/features/settings/setting_tab.dart';
+import 'package:numi_flutter/features/settings/widgets/setting_safe_screen.dart';
+
+class SettingProfileFormScreen extends StatelessWidget {
+  const SettingProfileFormScreen({
+    super.key,
     required this.args,
     this.editingProfile,
   });
 
-  final _SettingScreenArgs args;
+  final SettingScreenArgs args;
   final StudentProfile? editingProfile;
 
   @override
