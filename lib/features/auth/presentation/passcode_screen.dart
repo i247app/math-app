@@ -230,7 +230,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                   children: [
                                     Positioned(
                                       left: 20,
-                                      top: 16,
+                                      top: 28,
                                       width: 44,
                                       height: 44,
                                       child: _PasscodeBackButton(

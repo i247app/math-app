@@ -92,7 +92,7 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: compact ? 0 : 8),
+                  const SizedBox(height: 28),
                   Row(
                     children: [
                       CircleIconButton(

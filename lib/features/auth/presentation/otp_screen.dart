@@ -227,7 +227,7 @@ class _OtpScreenState extends State<OtpScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 12),
+              const SizedBox(height: 28),
               CircleIconButton(
                 icon: Icons.arrow_back_rounded,
                 onPressed: widget.onBack,
