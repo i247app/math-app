@@ -1,7 +1,9 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _HomeInitialAssessmentBanner extends StatelessWidget {
-  const _HomeInitialAssessmentBanner({required this.onTap});
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+
+class HomeInitialAssessmentBanner extends StatelessWidget {
+  const HomeInitialAssessmentBanner({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -27,7 +29,7 @@ class _HomeInitialAssessmentBanner extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: Ink.image(
-            image: const AssetImage(_homeInitialAssessmentBanner),
+            image: const AssetImage(homeInitialAssessmentBannerAsset),
             height: 225,
             fit: BoxFit.cover,
             child: const SizedBox(width: double.infinity),

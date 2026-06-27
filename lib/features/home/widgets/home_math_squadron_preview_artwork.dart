@@ -1,7 +1,10 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _HomeMathSquadronPreviewArtwork extends StatelessWidget {
-  const _HomeMathSquadronPreviewArtwork();
+import 'package:numi_flutter/features/home/widgets/home_math_squadron_laser.dart';
+import 'package:numi_flutter/features/home/widgets/home_math_squadron_target.dart';
+
+class HomeMathSquadronPreviewArtwork extends StatelessWidget {
+  const HomeMathSquadronPreviewArtwork({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class _HomeMathSquadronPreviewArtwork extends StatelessWidget {
           ),
           Positioned(
             top: 13,
-            child: _HomeMathSquadronTarget(),
+            child: HomeMathSquadronTarget(),
           ),
           Positioned(
             bottom: 12,
@@ -44,7 +47,7 @@ class _HomeMathSquadronPreviewArtwork extends StatelessWidget {
           ),
           Positioned(
             bottom: 48,
-            child: _HomeMathSquadronLaser(),
+            child: HomeMathSquadronLaser(),
           ),
         ],
       ),

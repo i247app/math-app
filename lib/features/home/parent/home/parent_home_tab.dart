@@ -412,7 +412,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       final shouldCreate = await showDialog<bool>(
         context: context,
         barrierColor: const Color(0xFF001741).withValues(alpha: 0.48),
-        builder: (_) => const _HomeMissingStudentDialog(),
+        builder: (_) => const HomeMissingStudentDialog(),
       );
       if (shouldCreate == true && mounted) {
         await _openCreateStudentProfile();

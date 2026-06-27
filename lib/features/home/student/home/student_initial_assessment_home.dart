@@ -7,7 +7,7 @@ extension _StudentInitialAssessmentHomeView on _StudentHomeContentState {
       children: [
         _studentHomeEntrance(
           order: 0,
-          child: _HomeInitialAssessmentBanner(
+          child: HomeInitialAssessmentBanner(
             onTap: () => _openGradeSelection(quizPurposeAssessment),
           ),
         ),
@@ -18,7 +18,7 @@ extension _StudentInitialAssessmentHomeView on _StudentHomeContentState {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _HomeImageAction(
+                child: HomeImageAction(
                   asset: _parentHomeAfterReviewBanner,
                   height: 160,
                   alignment: Alignment.centerLeft,
@@ -27,7 +27,7 @@ extension _StudentInitialAssessmentHomeView on _StudentHomeContentState {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _HomeImageAction(
+                child: HomeImageAction(
                   asset: _parentHomeClassroom,
                   height: 160,
                   onTap: widget.activeRole == ProfileRole.student
@@ -42,7 +42,7 @@ extension _StudentInitialAssessmentHomeView on _StudentHomeContentState {
         _studentHomeEntrance(
           order: 2,
           markOnEnd: true,
-          child: _HomeStartGuideCard(
+          child: HomeStartGuideCard(
             onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
             onRoadmapTap: widget.onOpenReviewTab,
             onClassroomTap: widget.onOpenClassroomTab,

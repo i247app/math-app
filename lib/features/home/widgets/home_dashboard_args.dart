@@ -1,4 +1,12 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
+
+import 'package:numi_flutter/core/network/grade_models.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/classroom/classroom_api.dart';
+import 'package:numi_flutter/features/homework/homework_api.dart';
+import 'package:numi_flutter/features/profile/grade_api.dart';
+import 'package:numi_flutter/features/quiz/quiz_api.dart';
 
 class HomeDashboardArgs {
   const HomeDashboardArgs({
