@@ -1,8 +1,5 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/app/numi_app.dart';
@@ -13,7 +10,6 @@ import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
 import 'package:numi_flutter/core/network/program_models.dart';
 import 'package:numi_flutter/core/network/semester_models.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/avatar_picker.dart';
@@ -22,47 +18,25 @@ import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/auth/passcode_service.dart';
 import 'package:numi_flutter/features/profile/profile_api.dart';
 import 'package:numi_flutter/features/profile/school_api.dart';
-import 'package:numi_flutter/features/profile/profile_avatar.dart';
 import 'package:numi_flutter/features/auth/presentation/passcode_screen.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
-import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 import 'package:numi_flutter/core/localization/app_language.dart';
 import 'package:numi_flutter/core/localization/lingo_scope.dart';
+import 'package:numi_flutter/features/settings/settings_style.dart';
+import 'package:numi_flutter/features/settings/widgets/account_details_panel.dart';
+import 'package:numi_flutter/features/settings/widgets/account/account_screen_skeleton.dart';
+import 'package:numi_flutter/features/settings/widgets/profile_form_panel.dart';
+import 'package:numi_flutter/features/settings/widgets/profile_list_panel.dart';
+import 'package:numi_flutter/features/settings/widgets/setting_header.dart';
+import 'package:numi_flutter/features/settings/widgets/setting_safe_screen.dart';
+import 'package:numi_flutter/features/settings/widgets/menu/passcode_settings_sheet.dart';
+import 'package:numi_flutter/features/settings/widgets/settings_menu_panel.dart';
 
 part 'presentation/setting_account_screen.dart';
 part 'presentation/setting_profile_form_screen.dart';
 part 'presentation/setting_profile_list_screen.dart';
-part 'widgets/setting_header.dart';
-part 'widgets/settings_menu_panel.dart';
-part 'widgets/account_details_panel.dart';
-part 'widgets/profile_form_panel.dart';
-part 'widgets/profile_list_panel.dart';
 
-const _navy = Color(0xFF339395);
-const _teal = Color(0xFF339395);
-const _muted = Color(0xFF515F54);
-const _deepInk = Color(0xFF253228);
-const _orange = Color(0xFFDE5E31);
-const _idTypeMoet = 'MOET';
-const _idTypePublicId = 'PUBLIC_ID';
 const _profileSwitchMinimumDuration = Duration(milliseconds: 1500);
-const _settingsMenuFadeInDuration = Duration(milliseconds: 900);
-
-class _ProfileIdTypeOption {
-  const _ProfileIdTypeOption(this.value, this.label);
-
-  final String value;
-  final String label;
-}
-
-const _studentIdTypeOptions = <_ProfileIdTypeOption>[
-  _ProfileIdTypeOption(_idTypeMoet, AppKeys.idTypeMoetLabel),
-];
-
-const _teacherIdTypeOptions = <_ProfileIdTypeOption>[
-  _ProfileIdTypeOption(_idTypeMoet, AppKeys.idTypeTeacherMoetLabel),
-  _ProfileIdTypeOption(_idTypePublicId, AppKeys.idTypePublicIdLabel),
-];
 
 enum SettingPageView { settings, account, profile, addProfile }
 
@@ -438,17 +412,17 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
 
-    final action = await showModalBottomSheet<_PasscodeSettingsAction>(
+    final action = await showModalBottomSheet<PasscodeSettingsAction>(
       context: context,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(alpha: 0.32),
       builder: (sheetContext) {
-        return _PasscodeSettingsSheet(
+        return PasscodeSettingsSheet(
           scale: widget.scale,
           onChange: () =>
-              Navigator.of(sheetContext).pop(_PasscodeSettingsAction.change),
+              Navigator.of(sheetContext).pop(PasscodeSettingsAction.change),
           onRemove: () =>
-              Navigator.of(sheetContext).pop(_PasscodeSettingsAction.remove),
+              Navigator.of(sheetContext).pop(PasscodeSettingsAction.remove),
         );
       },
     );
@@ -458,9 +432,9 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     switch (action) {
-      case _PasscodeSettingsAction.change:
+      case PasscodeSettingsAction.change:
         await _changePasscode(userId);
-      case _PasscodeSettingsAction.remove:
+      case PasscodeSettingsAction.remove:
         await _removePasscode(userId);
     }
   }
@@ -1200,7 +1174,7 @@ class _SettingTabState extends State<SettingTab> {
           isDefault: _profiles.isEmpty,
           role: formRole,
           avatarKey: _selectedProfileAvatarKey,
-          idType: isTeacherProfile ? normalizedIdType : _idTypeMoet,
+          idType: isTeacherProfile ? normalizedIdType : settingsIdTypeMoet,
           studentId: isTeacherProfile ? null : profileIdValue,
           teacherId: shouldSubmitTeacherId ? profileIdValue : null,
         );
@@ -1235,7 +1209,7 @@ class _SettingTabState extends State<SettingTab> {
             role: formRole,
             dob: _dateOnly(editingProfile.dob),
             avatarKey: _selectedProfileAvatarKey,
-            idType: isTeacherProfile ? normalizedIdType : _idTypeMoet,
+            idType: isTeacherProfile ? normalizedIdType : settingsIdTypeMoet,
             studentId: isTeacherProfile ? null : profileIdValue,
             teacherId: shouldSubmitTeacherId ? profileIdValue : null,
           );
@@ -1521,7 +1495,7 @@ class _SettingTabState extends State<SettingTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _SettingHeader(
+                    SettingHeader(
                       title: headerTitle,
                       canGoBack: canGoBack,
                       onBack: _view == SettingPageView.addProfile
@@ -1569,7 +1543,7 @@ class _SettingTabState extends State<SettingTab> {
                               );
                             },
                             child: switch (_view) {
-                              SettingPageView.settings => _SettingsMenuPanel(
+                              SettingPageView.settings => SettingsMenuPanel(
                                   key: ValueKey(
                                       _viewKey(SettingPageView.settings)),
                                   activeProfile: widget.activeProfile,
@@ -1592,7 +1566,7 @@ class _SettingTabState extends State<SettingTab> {
                                   onLanguageChanged: _changeLanguage,
                                   onLogoutTap: widget.onLogout,
                                 ),
-                              SettingPageView.account => _AccountDetailsPanel(
+                              SettingPageView.account => AccountDetailsPanel(
                                   key: ValueKey(
                                       _viewKey(SettingPageView.account)),
                                   avatarUrl: _effectiveUser?.avatarUrl,
@@ -1612,7 +1586,7 @@ class _SettingTabState extends State<SettingTab> {
                                   scale: scale,
                                 ),
                               SettingPageView.profile =>
-                                _ProfilePlaceholderPanel(
+                                ProfilePlaceholderPanel(
                                   key: ValueKey(
                                       _viewKey(SettingPageView.profile)),
                                   profiles: _profiles,
@@ -1631,7 +1605,7 @@ class _SettingTabState extends State<SettingTab> {
                                   scale: scale,
                                   canAddProfile: _canCreateProfile,
                                 ),
-                              SettingPageView.addProfile => _AddProfilePanel(
+                              SettingPageView.addProfile => AddProfilePanel(
                                   key: ValueKey(
                                       _viewKey(SettingPageView.addProfile)),
                                   nameController: _profileNameController,
@@ -1890,14 +1864,14 @@ class _SettingTabState extends State<SettingTab> {
   static String? _normalizedProfileIdType(String? value, String role) {
     final normalized = value?.trim().toUpperCase();
     if (role != 'TEACHER' && (normalized == null || normalized.isEmpty)) {
-      return _idTypeMoet;
+      return settingsIdTypeMoet;
     }
     if (normalized == null || normalized.isEmpty) {
       return null;
     }
 
     final allowedOptions =
-        role == 'TEACHER' ? _teacherIdTypeOptions : _studentIdTypeOptions;
+        role == 'TEACHER' ? teacherIdTypeOptions : studentIdTypeOptions;
     final isAllowed =
         allowedOptions.any((option) => option.value == normalized);
     return isAllowed ? normalized : null;

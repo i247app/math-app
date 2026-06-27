@@ -11,7 +11,7 @@ class _SettingProfileFormScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _SettingSafeScreen(
+    return SettingSafeScreen(
       child: SettingTab.page(
         user: args.user,
         profiles: args.profiles,

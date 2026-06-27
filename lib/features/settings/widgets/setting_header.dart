@@ -1,7 +1,12 @@
-part of '../setting_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _SettingHeader extends StatelessWidget {
-  const _SettingHeader({
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/settings/settings_style.dart';
+
+class SettingHeader extends StatelessWidget {
+  const SettingHeader({
+    super.key,
     required this.title,
     required this.canGoBack,
     required this.onBack,
@@ -88,7 +93,7 @@ class _SettingHeaderButton extends StatelessWidget {
       child: SizedBox(
         width: 40 * scale,
         height: 40 * scale,
-        child: Icon(icon, color: _teal, size: 22 * scale),
+        child: Icon(icon, color: settingsTeal, size: 22 * scale),
       ),
     );
   }

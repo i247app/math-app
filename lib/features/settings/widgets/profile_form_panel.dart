@@ -1,7 +1,21 @@
-part of '../setting_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _AddProfilePanel extends StatelessWidget {
-  const _AddProfilePanel({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/grade_models.dart';
+import 'package:numi_flutter/core/network/program_models.dart';
+import 'package:numi_flutter/core/network/school_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/settings/settings_style.dart';
+import 'package:numi_flutter/features/settings/widgets/account/settings_cancel_button.dart';
+import 'package:numi_flutter/features/settings/widgets/account/settings_save_button.dart';
+import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_avatar.dart';
+import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_dropdown.dart';
+import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_text_field.dart';
+
+class AddProfilePanel extends StatelessWidget {
+  const AddProfilePanel({
     super.key,
     required this.nameController,
     required this.phoneController,
@@ -70,7 +84,7 @@ class _AddProfilePanel extends StatelessWidget {
     final isTeacherProfile = role == 'TEACHER';
     final isParentProfile = role == 'PARENT';
     final idTypeOptions =
-        isTeacherProfile ? _teacherIdTypeOptions : _studentIdTypeOptions;
+        isTeacherProfile ? teacherIdTypeOptions : studentIdTypeOptions;
     final selectedIdTypeOption = _firstIdTypeOption(
       idTypeOptions,
       selectedIdType,
@@ -79,7 +93,7 @@ class _AddProfilePanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _AddProfileAvatar(
+        AddProfileAvatar(
           avatarKey: avatarKey,
           avatarUrl: avatarUrl,
           scale: scale,
@@ -87,7 +101,7 @@ class _AddProfilePanel extends StatelessWidget {
           onClear: onClearAvatar,
         ),
         SizedBox(height: 28 * scale),
-        _AddProfileTextField(
+        AddProfileTextField(
           label: context.getText(AppKeys.fullName),
           controller: nameController,
           hintText: isTeacherProfile
@@ -99,7 +113,7 @@ class _AddProfilePanel extends StatelessWidget {
         ),
         if (isParentProfile) ...[
           SizedBox(height: 18 * scale),
-          _AddProfileTextField(
+          AddProfileTextField(
             label: context.getText(AppKeys.email),
             controller: emailController,
             hintText: context.getText(AppKeys.parentProfileEmailHint),
@@ -107,7 +121,7 @@ class _AddProfilePanel extends StatelessWidget {
             scale: scale,
           ),
           SizedBox(height: 18 * scale),
-          _AddProfileTextField(
+          AddProfileTextField(
             label: context.getText(AppKeys.phoneNumber),
             controller: phoneController,
             hintText: context.getText(AppKeys.parentProfilePhoneHint),
@@ -122,13 +136,13 @@ class _AddProfilePanel extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 58 * scale),
               child: Center(
                 child: CircularProgressIndicator(
-                  color: _teal,
+                  color: settingsTeal,
                   strokeWidth: 3 * scale,
                 ),
               ),
             ),
           if (!isLoadingOptions) ...[
-            _AddProfileDropdown<SchoolModel>(
+            AddProfileDropdown<SchoolModel>(
               label: context.getText(AppKeys.school),
               hintText: context.getText(AppKeys.notSelected),
               value: selectedSchool,
@@ -141,7 +155,7 @@ class _AddProfilePanel extends StatelessWidget {
             ),
             SizedBox(height: 18 * scale),
             if (!isTeacherProfile) ...[
-              _AddProfileDropdown<ProgramModel>(
+              AddProfileDropdown<ProgramModel>(
                 label: context.getText(AppKeys.learningProgram),
                 hintText: context.getText(AppKeys.notSelected),
                 value: selectedProgram,
@@ -153,7 +167,7 @@ class _AddProfilePanel extends StatelessWidget {
                 scale: scale,
               ),
               SizedBox(height: 18 * scale),
-              _AddProfileDropdown<GradeModel>(
+              AddProfileDropdown<GradeModel>(
                 label: context.getText(AppKeys.grade),
                 hintText: context.getText(AppKeys.notSelected),
                 value: selectedGrade,
@@ -167,7 +181,7 @@ class _AddProfilePanel extends StatelessWidget {
               SizedBox(height: 18 * scale),
             ],
             if (isTeacherProfile) ...[
-              _AddProfileDropdown<_ProfileIdTypeOption>(
+              AddProfileDropdown<ProfileIdTypeOption>(
                 label: context.getText(AppKeys.profileIdTypeLabel),
                 hintText: context.getText(AppKeys.profileIdTypeHint),
                 value: selectedIdTypeOption,
@@ -178,7 +192,7 @@ class _AddProfilePanel extends StatelessWidget {
               ),
               SizedBox(height: 18 * scale),
             ],
-            _AddProfileTextField(
+            AddProfileTextField(
               label: context.getText(AppKeys.profileIdValueLabel),
               controller: idController,
               hintText: isTeacherProfile
@@ -194,7 +208,7 @@ class _AddProfilePanel extends StatelessWidget {
             error,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: _orange,
+              color: settingsOrange,
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w800,
               height: 1.25,
@@ -209,7 +223,7 @@ class _AddProfilePanel extends StatelessWidget {
                 child: Text(
                   context.getText(AppKeys.reloadOptions),
                   style: GoogleFonts.andika(
-                    color: _teal,
+                    color: settingsTeal,
                     fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0,
@@ -223,11 +237,14 @@ class _AddProfilePanel extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _CancelButton(scale: scale, onTap: isSaving ? () {} : onCancel),
+            SettingsCancelButton(
+              scale: scale,
+              onTap: isSaving ? () {} : onCancel,
+            ),
             SizedBox(width: 14 * scale),
             Opacity(
               opacity: isSaving ? 0.72 : 1,
-              child: _SaveButton(
+              child: SettingsSaveButton(
                 scale: scale,
                 enabled: canSave,
                 onTap: onSave,
@@ -239,8 +256,8 @@ class _AddProfilePanel extends StatelessWidget {
     );
   }
 
-  static _ProfileIdTypeOption? _firstIdTypeOption(
-    List<_ProfileIdTypeOption> options,
+  static ProfileIdTypeOption? _firstIdTypeOption(
+    List<ProfileIdTypeOption> options,
     String? value,
   ) {
     final normalized = value?.trim().toUpperCase();
@@ -254,550 +271,5 @@ class _AddProfilePanel extends StatelessWidget {
       }
     }
     return null;
-  }
-}
-
-void _dismissProfileFormKeyboard() {
-  FocusManager.instance.primaryFocus?.unfocus();
-  SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
-}
-
-class _AddProfileAvatar extends StatelessWidget {
-  const _AddProfileAvatar({
-    required this.avatarKey,
-    required this.avatarUrl,
-    required this.scale,
-    required this.onChanged,
-    required this.onClear,
-  });
-
-  final String? avatarKey;
-  final String? avatarUrl;
-  final double scale;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    final key = avatarKey?.trim();
-    final url = avatarUrl?.trim();
-    final hasCatalogAvatar = ProfileAvatarCatalog.urlForKey(key) != null;
-    final size = 124 * scale;
-
-    return Center(
-      child: Semantics(
-        button: true,
-        label: context.getText(AppKeys.chooseAvatar),
-        child: SizedBox(
-          width: size + 24 * scale,
-          height: size + 24 * scale,
-          child: Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: [
-              GestureDetector(
-                onTap: () => _openAvatarSheet(context, key),
-                child: Container(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE2EAED),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.12),
-                        blurRadius: 12 * scale,
-                        offset: Offset(0, 4 * scale),
-                      ),
-                    ],
-                  ),
-                  child: ProfileAvatarImage(
-                    size: size,
-                    avatarKey: key,
-                    avatarUrl: hasCatalogAvatar ? null : url,
-                    foregroundColor: const Color(0xFFD3DEE1),
-                    borderColor: Colors.white,
-                    borderWidth: 4 * scale,
-                  ),
-                ),
-              ),
-              if (key != null && key.isNotEmpty)
-                Positioned(
-                  left: 14 * scale,
-                  bottom: 18 * scale,
-                  child: Material(
-                    color: const Color(0xFFFFD8D8),
-                    elevation: 5,
-                    shadowColor:
-                        const Color(0xFFE83434).withValues(alpha: 0.16),
-                    shape: const CircleBorder(),
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: onClear,
-                      child: SizedBox(
-                        width: 38 * scale,
-                        height: 38 * scale,
-                        child: Icon(
-                          Icons.close_rounded,
-                          color: const Color(0xFFE83434),
-                          size: 22 * scale,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              Positioned(
-                right: 10 * scale,
-                bottom: 18 * scale,
-                child: Material(
-                  color: _teal,
-                  elevation: 5,
-                  shadowColor: _teal.withValues(alpha: 0.24),
-                  shape: const CircleBorder(),
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () => _openAvatarSheet(context, key),
-                    child: SizedBox(
-                      width: 36 * scale,
-                      height: 36 * scale,
-                      child: Icon(
-                        Icons.photo_camera_outlined,
-                        color: Colors.white,
-                        size: 18 * scale,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _openAvatarSheet(
-      BuildContext context, String? selectedKey) async {
-    final result = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return FractionallySizedBox(
-          heightFactor: 0.68,
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(
-              20 * scale,
-              10 * scale,
-              20 * scale,
-              bottomInset + 20 * scale,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(28 * scale),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.10),
-                  blurRadius: 24 * scale,
-                  offset: Offset(0, -8 * scale),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              top: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 46 * scale,
-                      height: 5 * scale,
-                      margin: EdgeInsets.only(bottom: 14 * scale),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE2E9EC),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    context.getText(AppKeys.chooseAvatar),
-                    style: GoogleFonts.andika(
-                      color: _teal,
-                      fontSize: FontSize.xxxl * scale,
-                      fontWeight: FontWeight.w900,
-                      height: 1.15,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  SizedBox(height: 18 * scale),
-                  Expanded(
-                    child: GridView.builder(
-                      padding: EdgeInsets.zero,
-                      physics: const BouncingScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 16 * scale,
-                        crossAxisSpacing: 16 * scale,
-                      ),
-                      itemCount: ProfileAvatarCatalog.options.length,
-                      itemBuilder: (context, index) {
-                        final option = ProfileAvatarCatalog.options[index];
-                        final isSelected = option.key == selectedKey;
-
-                        return Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            customBorder: const CircleBorder(),
-                            onTap: () => Navigator.of(context).pop(option.key),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                ProfileAvatarImage(
-                                  size: 82 * scale,
-                                  avatarKey: option.key,
-                                  borderColor:
-                                      isSelected ? _teal : Colors.transparent,
-                                  borderWidth: 4 * scale,
-                                ),
-                                if (isSelected)
-                                  Positioned(
-                                    right: 4 * scale,
-                                    bottom: 4 * scale,
-                                    child: Icon(
-                                      Icons.check_circle_rounded,
-                                      color: _teal,
-                                      size: 24 * scale,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
-    if (result != null) {
-      onChanged(result);
-    }
-  }
-}
-
-class _AddProfileTextField extends StatelessWidget {
-  const _AddProfileTextField({
-    required this.label,
-    required this.controller,
-    required this.hintText,
-    required this.scale,
-    this.keyboardType,
-  });
-
-  final String label;
-  final TextEditingController controller;
-  final String hintText;
-  final double scale;
-  final TextInputType? keyboardType;
-
-  @override
-  Widget build(BuildContext context) {
-    return _AddProfileFieldShell(
-      label: label,
-      scale: scale,
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        textInputAction: TextInputAction.next,
-        onTapOutside: (_) => FocusScope.of(context).unfocus(),
-        style: GoogleFonts.andika(
-          color: _deepInk,
-          fontSize: FontSize.normal * scale,
-          fontWeight: FontWeight.w800,
-          height: 1,
-          letterSpacing: 0,
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: GoogleFonts.andika(
-            color: const Color(0xFFA8B1B2),
-            fontSize: FontSize.small * scale,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0,
-          ),
-          isCollapsed: true,
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.zero,
-        ),
-      ),
-    );
-  }
-}
-
-class _AddProfileDropdown<T> extends StatelessWidget {
-  const _AddProfileDropdown({
-    required this.label,
-    required this.hintText,
-    required this.value,
-    required this.items,
-    required this.itemLabel,
-    required this.onChanged,
-    required this.scale,
-    this.allowEmpty = false,
-    this.emptyLabel,
-  });
-
-  final String label;
-  final String hintText;
-  final T? value;
-  final List<T> items;
-  final String Function(T item) itemLabel;
-  final ValueChanged<T?> onChanged;
-  final double scale;
-  final bool allowEmpty;
-  final String? emptyLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final selectedValue = items.contains(value) ? value : null;
-    final selectedLabel =
-        selectedValue == null ? null : itemLabel(selectedValue);
-
-    return _AddProfileFieldShell(
-      label: label,
-      scale: scale,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            _dismissProfileFormKeyboard();
-            _openBottomSheet(context, selectedValue);
-          },
-          borderRadius: BorderRadius.circular(14 * scale),
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          hoverColor: Colors.transparent,
-          focusColor: Colors.transparent,
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  selectedLabel ?? hintText,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.andika(
-                    color: selectedLabel == null
-                        ? const Color(0xFFA8B1B2)
-                        : _deepInk,
-                    fontSize: FontSize.normal * scale,
-                    fontWeight: selectedLabel == null
-                        ? FontWeight.w800
-                        : FontWeight.w900,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-              Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: _teal,
-                size: 24 * scale,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _openBottomSheet(BuildContext context, T? selectedValue) async {
-    _dismissProfileFormKeyboard();
-    final result = await showModalBottomSheet<_AddProfileSelectResult<T>>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return Container(
-          padding: EdgeInsets.fromLTRB(
-            20 * scale,
-            10 * scale,
-            20 * scale,
-            bottomInset + 18 * scale,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(28 * scale),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.10),
-                blurRadius: 24 * scale,
-                offset: Offset(0, -8 * scale),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 46 * scale,
-                    height: 5 * scale,
-                    margin: EdgeInsets.only(bottom: 14 * scale),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE2E9EC),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                Text(
-                  label,
-                  style: GoogleFonts.andika(
-                    color: _teal,
-                    fontSize: FontSize.xxxl * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1.15,
-                  ),
-                ),
-                SizedBox(height: 10 * scale),
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: 360 * scale),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: items.length + (allowEmpty ? 1 : 0),
-                    separatorBuilder: (_, __) => const Divider(
-                      height: 1,
-                      color: Color(0xFFEFF4F5),
-                    ),
-                    itemBuilder: (context, index) {
-                      final isEmptyOption = allowEmpty && index == 0;
-                      final item = isEmptyOption
-                          ? null
-                          : items[index - (allowEmpty ? 1 : 0)];
-                      final optionLabel = isEmptyOption
-                          ? emptyLabel ??
-                              context.getText(AppKeys.profileIdTypeNone)
-                          : itemLabel(item as T);
-                      final isSelected = isEmptyOption
-                          ? selectedValue == null
-                          : identical(item, selectedValue) ||
-                              item == selectedValue;
-
-                      return Material(
-                        color: Colors.transparent,
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(
-                            optionLabel,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.andika(
-                              color: _deepInk,
-                              fontSize: FontSize.normal * scale,
-                              fontWeight: isSelected
-                                  ? FontWeight.w900
-                                  : FontWeight.w700,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                          trailing: isSelected
-                              ? Icon(
-                                  Icons.check_circle_rounded,
-                                  color: _teal,
-                                  size: 22 * scale,
-                                )
-                              : null,
-                          onTap: () {
-                            _dismissProfileFormKeyboard();
-                            Navigator.of(context).pop(
-                              _AddProfileSelectResult<T>(item),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    _dismissProfileFormKeyboard();
-    if (!context.mounted) {
-      return;
-    }
-    if (result != null) {
-      onChanged(result.value);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _dismissProfileFormKeyboard();
-      });
-    }
-  }
-}
-
-class _AddProfileSelectResult<T> {
-  const _AddProfileSelectResult(this.value);
-
-  final T? value;
-}
-
-class _AddProfileFieldShell extends StatelessWidget {
-  const _AddProfileFieldShell({
-    required this.label,
-    required this.child,
-    required this.scale,
-  });
-
-  final String label;
-  final Widget child;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.andika(
-            color: const Color(0xFF604950),
-            fontSize: FontSize.small * scale,
-            fontWeight: FontWeight.w900,
-            height: 1,
-            letterSpacing: 0,
-          ),
-        ),
-        SizedBox(height: 8 * scale),
-        Container(
-          height: 56 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 16 * scale),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14 * scale),
-            border: Border.all(color: const Color(0xFFD8E4E7), width: 1.6),
-          ),
-          alignment: Alignment.center,
-          child: child,
-        ),
-      ],
-    );
   }
 }
