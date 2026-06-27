@@ -9,7 +9,15 @@ class _ParentLearningStreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const dayLabels = <String>['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    final dayLabels = <String>[
+      context.getText(AppKeys.parentWeekdaySun),
+      context.getText(AppKeys.parentWeekdayMon),
+      context.getText(AppKeys.parentWeekdayTue),
+      context.getText(AppKeys.parentWeekdayWed),
+      context.getText(AppKeys.parentWeekdayThu),
+      context.getText(AppKeys.parentWeekdayFri),
+      context.getText(AppKeys.parentWeekdaySat),
+    ];
     final states = hasCompletedAssessment
         ? const <_ParentStreakDayState>[
             _ParentStreakDayState.done,

@@ -104,6 +104,16 @@ class AppKeys {
       'parent_child_dashboard_load_failed';
   static const parentTeacherFeedback = 'parent_teacher_feedback';
   static const parentTeacherReminder = 'parent_teacher_reminder';
+  static const parentTasksTitle = 'parent_tasks_title';
+  static const parentTasksCountTitle = 'parent_tasks_count_title';
+  static const parentMessagesTitle = 'parent_messages_title';
+  static const parentWeekdaySun = 'parent_weekday_sun';
+  static const parentWeekdayMon = 'parent_weekday_mon';
+  static const parentWeekdayTue = 'parent_weekday_tue';
+  static const parentWeekdayWed = 'parent_weekday_wed';
+  static const parentWeekdayThu = 'parent_weekday_thu';
+  static const parentWeekdayFri = 'parent_weekday_fri';
+  static const parentWeekdaySat = 'parent_weekday_sat';
   static const yourAchievement = 'your_achievement';
   static const studentHomework = 'student_homework';
   static const studentClassroom = 'student_classroom';

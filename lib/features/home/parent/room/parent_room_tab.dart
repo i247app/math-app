@@ -239,8 +239,9 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ),
         const SizedBox(height: 18),
         _ParentRoomListSection(
-          title:
-              'Nhiệm vụ(${pendingExercises.length + expiredExercises.length})',
+          title: context.formatText(AppKeys.parentTasksCountTitle, {
+            'count': pendingExercises.length + expiredExercises.length,
+          }),
           onViewAll: widget.args.onOpenClassroomTab,
           child: pendingExercises.isEmpty && expiredExercises.isEmpty
               ? _ParentEmptyTaskLine(
@@ -279,7 +280,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ),
         const SizedBox(height: 14),
         _ParentRoomListSection(
-          title: 'Kết quả',
+          title: context.getText(AppKeys.assessmentResultTitle),
           onViewAll: widget.args.onOpenClassroomTab,
           child: completions.isEmpty
               ? _ParentEmptyTaskLine(

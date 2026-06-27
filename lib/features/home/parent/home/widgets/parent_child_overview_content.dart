@@ -54,7 +54,7 @@ class _ParentChildOverviewContent extends StatelessWidget {
           entranceBuilder(
             order: 1,
             child: _ParentDashboardSection(
-              title: 'Nhiệm vụ',
+              title: context.getText(AppKeys.parentTasksTitle),
               onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
               child: Column(
                 children: [
@@ -109,7 +109,7 @@ class _ParentChildOverviewContent extends StatelessWidget {
           order: 3,
           markOnEnd: !showGameSuggestions,
           child: _ParentDashboardSection(
-            title: 'Tin nhắn',
+            title: context.getText(AppKeys.parentMessagesTitle),
             onViewAll: onViewMessages,
             child: _ParentTeacherMessagesList(summaries: summaries),
           ),

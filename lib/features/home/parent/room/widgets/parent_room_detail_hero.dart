@@ -10,8 +10,10 @@ class _ParentRoomDetailHero extends StatelessWidget {
     final className = _roomClassName(context, entry.classroom);
     final teacherName = _roomTeacherName(context, entry);
     final grade = entry.classroom.gradeId == null
-        ? context.getText(AppKeys.teacherAssignmentClassGrade)
-        : '${context.getText(AppKeys.teacherAssignmentClassGrade)} ${entry.classroom.gradeId}';
+        ? context.getText(AppKeys.grade)
+        : context.formatText(AppKeys.studentGradeFilter, {
+            'grade': entry.classroom.gradeId,
+          });
     final description = entry.classroom.description?.trim();
 
     return Container(

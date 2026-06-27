@@ -51,8 +51,13 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 26),
                     _ParentRoomListSection(
-                      title:
-                          'Nhiệm vụ(${pendingExercises.length + expiredExercises.length})',
+                      title: context.formatText(
+                        AppKeys.parentTasksCountTitle,
+                        {
+                          'count':
+                              pendingExercises.length + expiredExercises.length,
+                        },
+                      ),
                       onViewAll: () => _parentRoomShowComingSoon(context),
                       child: pendingExercises.isEmpty &&
                               expiredExercises.isEmpty
@@ -95,7 +100,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 14),
                     _ParentRoomListSection(
-                      title: 'Kết quả',
+                      title: context.getText(AppKeys.assessmentResultTitle),
                       onViewAll: () => _parentRoomShowComingSoon(context),
                       child: completions.isEmpty
                           ? _ParentEmptyTaskLine(
