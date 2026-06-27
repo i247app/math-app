@@ -56,7 +56,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
 
   static const _mascotAsset = 'assets/images/pin_figma_mascot.png';
   static const _backIconAsset = 'assets/images/pin_figma_back.svg';
-  static const _arrowIconAsset = 'assets/images/pin_figma_arrow.svg';
 
   bool get _isConfirmingSetup =>
       widget.mode == PasscodeScreenMode.setup && _firstPasscode != null;
@@ -383,7 +382,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                                 ? _handleSubmit
                                                 : null,
                                             isBusy: widget.isBusy,
-                                            arrowAsset: _arrowIconAsset,
                                           ),
                                         ),
                                       ),
@@ -627,13 +625,11 @@ class _PasscodeActionButton extends StatelessWidget {
   const _PasscodeActionButton({
     required this.label,
     required this.onPressed,
-    required this.arrowAsset,
     this.isBusy = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
-  final String arrowAsset;
   final bool isBusy;
 
   @override
@@ -681,12 +677,6 @@ class _PasscodeActionButton extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    SvgPicture.asset(
-                      arrowAsset,
-                      width: 13.33,
-                      height: 13.33,
                     ),
                   ],
                 ),
