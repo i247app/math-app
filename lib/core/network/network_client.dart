@@ -366,9 +366,9 @@ class NetworkApi {
     return quizResponse;
   }
 
-  Future<void> warmUpAi() async {
+  Future<void> aiShake() async {
     final responseJson = await _networkClient.postJson(
-      '/connect/init-ai',
+      '/ai/shake',
       const <String, dynamic>{},
     );
     final mstatus = responseJson['mstatus'];

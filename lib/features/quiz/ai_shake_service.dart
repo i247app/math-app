@@ -1,12 +1,12 @@
 import 'package:numi_flutter/core/network/network_client.dart';
 
-class AiWarmUpService {
-  AiWarmUpService({
+class AIShakeService {
+  AIShakeService({
     NetworkApi? networkApi,
     this.cooldown = const Duration(minutes: 15),
   }) : _networkApi = networkApi ?? NetworkApi.shared;
 
-  static final shared = AiWarmUpService();
+  static final shared = AIShakeService();
 
   final NetworkApi _networkApi;
   final Duration cooldown;
@@ -14,7 +14,7 @@ class AiWarmUpService {
   DateTime? _lastAttemptAt;
   Future<void>? _inFlight;
 
-  Future<void> warmUp() {
+  Future<void> aiShake() {
     final inFlight = _inFlight;
     if (inFlight != null) {
       return inFlight;
@@ -28,7 +28,7 @@ class AiWarmUpService {
 
     _lastAttemptAt = now;
     final request = _networkApi
-        .warmUpAi()
+        .aiShake()
         .catchError((Object _) {})
         .whenComplete(() => _inFlight = null);
     _inFlight = request;

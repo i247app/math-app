@@ -12,7 +12,7 @@ import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
-import 'package:numi_flutter/features/quiz/ai_warm_up_service.dart';
+import 'package:numi_flutter/features/quiz/ai_shake_service.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/assessment_screen.dart';
 
@@ -70,7 +70,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
       preferredGradeLabel: widget.initialGradeLabel,
     );
     if (widget.quizPurpose == quizPurposeAssessment) {
-      unawaited(AiWarmUpService.shared.warmUp());
+      unawaited(AIShakeService.shared.aiShake());
     }
     if (grades.isEmpty) {
       loadGrades();
