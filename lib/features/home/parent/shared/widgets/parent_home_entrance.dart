@@ -47,16 +47,21 @@ class _ParentHomeEntranceState extends State<_ParentHomeEntrance> {
       return widget.child;
     }
 
-    return AnimatedSlide(
-      offset: _isVisible ? Offset.zero : const Offset(0, 0.055),
-      duration: const Duration(milliseconds: 420),
-      curve: Curves.easeOutCubic,
-      child: AnimatedScale(
-        scale: _isVisible ? 1 : 0.94,
-        duration: const Duration(milliseconds: 520),
-        curve: Curves.easeOutBack,
-        onEnd: _isVisible ? _notifyFinished : null,
-        child: widget.child,
+    return AnimatedOpacity(
+      opacity: _isVisible ? 1 : 0,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOut,
+      child: AnimatedSlide(
+        offset: _isVisible ? Offset.zero : const Offset(0, 0.055),
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+        child: AnimatedScale(
+          scale: _isVisible ? 1 : 0.94,
+          duration: const Duration(milliseconds: 520),
+          curve: Curves.easeOutBack,
+          onEnd: _isVisible ? _notifyFinished : null,
+          child: widget.child,
+        ),
       ),
     );
   }

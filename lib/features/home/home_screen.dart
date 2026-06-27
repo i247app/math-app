@@ -444,10 +444,7 @@ class _HomeScreenState extends State<HomeScreen>
 
               double s(double value) => value * scale;
               final navHeight = s(88) + bottomInset;
-              final headerHeight = s(
-                    widget.activeRole == ProfileRole.parent ? 64 : 98,
-                  ) +
-                  topInset;
+              final headerHeight = s(64) + topInset;
               final showHeader = widget.activeRole != ProfileRole.teacher &&
                   navigation.activeTab == 0;
               final switchableProfiles = widget.profiles
@@ -549,7 +546,7 @@ class _HomeScreenState extends State<HomeScreen>
                           child: HomeHeaderBar(
                             height: headerHeight,
                             topInset: topInset,
-                            horizontalPadding: s(24),
+                            horizontalPadding: s(14),
                             name: studentName,
                             profile: widget.activeProfile,
                             role: widget.activeRole,
@@ -569,9 +566,7 @@ class _HomeScreenState extends State<HomeScreen>
                           switchableProfiles.isNotEmpty)
                         Positioned(
                           left: s(28),
-                          top: widget.activeRole == ProfileRole.parent
-                              ? headerHeight - s(6)
-                              : headerHeight - s(22),
+                          top: headerHeight - s(6),
                           child: HomeProfileMenu(
                             profiles: switchableProfiles,
                             scale: scale,
