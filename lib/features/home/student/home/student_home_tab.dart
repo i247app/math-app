@@ -137,11 +137,11 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       _hasPlayedClassroomOverviewEntrance = false;
       _loadHomeLayout();
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
-      _loadHomeLayout();
+      _loadHomeLayout(forceRefresh: true);
     }
   }
 
-  Future<void> _loadHomeLayout() async {
+  Future<void> _loadHomeLayout({bool forceRefresh = false}) async {
     final requestId = ++_homeLayoutRequestId;
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
@@ -161,9 +161,19 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       return;
     }
 
+    final cache = HomeProfileCache.instance;
+    final cachedSnapshot = cache.getStudent(profileId);
+    if (!forceRefresh && cachedSnapshot != null) {
+      setState(() => _applySnapshot(cachedSnapshot));
+      if (!cachedSnapshot.isStale) {
+        return;
+      }
+    }
+
+    final hadRenderableContent = _hasLoadedHomeLayout;
     setState(() {
       _isLoadingHomeLayout = true;
-      if (!_hasLoadedHomeLayout) {
+      if (!hadRenderableContent) {
         _layoutClassrooms = const <ClassroomModel>[];
         _modeHomeworkExercises = const <ClassroomExercise>[];
         _completedAssessments = const <GeneratedQuiz>[];
@@ -210,8 +220,24 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
         _isLoadingModeHomework = false;
         _completedAssessments = _quizzesFromLayoutQuizzes(layout.quizzes);
       });
+      cache.putStudent(
+        StudentHomeSnapshot(
+          profileId: profileId,
+          layoutClassrooms: classrooms,
+          modeHomeworkExercises: pendingExercises,
+          completedAssessments: _quizzesFromLayoutQuizzes(layout.quizzes),
+          cachedAt: DateTime.now(),
+        ),
+      );
     } catch (_) {
       if (!mounted || requestId != _homeLayoutRequestId) {
+        return;
+      }
+      if (hadRenderableContent) {
+        setState(() {
+          _isLoadingHomeLayout = false;
+          _isLoadingModeHomework = false;
+        });
         return;
       }
       setState(() {
@@ -223,6 +249,19 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
         _isLoadingModeHomework = false;
       });
     }
+  }
+
+  void _applySnapshot(StudentHomeSnapshot snapshot) {
+    _isLoadingHomeLayout = false;
+    _hasLoadedHomeLayout = true;
+    _layoutClassrooms = snapshot.layoutClassrooms;
+    _modeHomeworkExercises = snapshot.modeHomeworkExercises;
+    _modeHomeworkClassroomId = snapshot.layoutClassrooms.isEmpty
+        ? null
+        : snapshot.layoutClassrooms.first.stableId;
+    _modeHomeworkProfileId = snapshot.profileId;
+    _isLoadingModeHomework = false;
+    _completedAssessments = snapshot.completedAssessments;
   }
 
   Future<void> _loadClassrooms({bool forceRefresh = false}) async {
@@ -510,7 +549,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoadingHomeSections = !_hasLoadedHomeLayout || _isLoadingHomeLayout;
+    final isLoadingHomeSections = _isLoadingHomeLayout && !_hasLoadedHomeLayout;
     final hasClassroom =
         widget.activeRole == ProfileRole.student && _classrooms.isNotEmpty;
     final hasCompletedAssessment = _completedAssessments.isNotEmpty;

@@ -109,10 +109,21 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       return;
     }
 
+    final cache = HomeProfileCache.instance;
+    final cachedSnapshot = cache.getTeacher(profileId);
+    if (!forceRefresh && cachedSnapshot != null) {
+      setState(() => _applySnapshot(cachedSnapshot));
+      if (!cachedSnapshot.isStale) {
+        return;
+      }
+    }
+
+    final hadRenderableContent =
+        _hasLoadedHomeLayout && _loadedProfileId == profileId;
     setState(() {
       _isLoadingHomeLayout = true;
       _isLoadingAssignments = true;
-      if (_loadedProfileId != profileId) {
+      if (!hadRenderableContent) {
         _layoutClassrooms = const <ClassroomModel>[];
         _recentAssignments = const <ClassroomExercise>[];
         _hasLoadedHomeLayout = false;
@@ -159,6 +170,14 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         _hasLoadedAssignments = true;
         _homeLayoutError = null;
       });
+      cache.putTeacher(
+        TeacherHomeSnapshot(
+          profileId: profileId,
+          layoutClassrooms: classrooms,
+          recentAssignments: assignments,
+          cachedAt: DateTime.now(),
+        ),
+      );
     } catch (error) {
       if (!mounted ||
           _loadedProfileId != profileId ||
@@ -168,6 +187,14 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       final message = error is HomeLayoutException
           ? error.message
           : context.readText(AppKeys.teacherStudyLoadFailed);
+      if (hadRenderableContent) {
+        setState(() {
+          _isLoadingHomeLayout = false;
+          _isLoadingAssignments = false;
+          _homeLayoutError = message;
+        });
+        return;
+      }
       setState(() {
         _layoutClassrooms = const <ClassroomModel>[];
         _recentAssignments = const <ClassroomExercise>[];
@@ -178,6 +205,17 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         _homeLayoutError = message;
       });
     }
+  }
+
+  void _applySnapshot(TeacherHomeSnapshot snapshot) {
+    _loadedProfileId = snapshot.profileId;
+    _layoutClassrooms = snapshot.layoutClassrooms;
+    _recentAssignments = snapshot.recentAssignments;
+    _isLoadingHomeLayout = false;
+    _hasLoadedHomeLayout = true;
+    _isLoadingAssignments = false;
+    _hasLoadedAssignments = true;
+    _homeLayoutError = null;
   }
 
   Future<void> _refreshClassrooms() {

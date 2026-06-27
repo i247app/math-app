@@ -26,6 +26,7 @@ class HomeRoleDashboard extends StatefulWidget {
     required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
     required this.parentHomeEntrance,
+    required this.profileResetSignal,
     required this.bottomPadding,
     required this.headerHeight,
     required this.scale,
@@ -54,6 +55,7 @@ class HomeRoleDashboard extends StatefulWidget {
   final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final Animation<double> parentHomeEntrance;
+  final int profileResetSignal;
   final double bottomPadding;
   final double headerHeight;
   final double scale;
@@ -66,6 +68,7 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
   late final Set<int> _visitedTabs = <int>{widget.activeTab};
   late final Set<int> _activatedTabs = <int>{widget.activeTab};
   final Map<int, int> _activationTicks = <int, int>{};
+  late int _lastProfileResetSignal = widget.profileResetSignal;
 
   @override
   void initState() {
@@ -105,6 +108,13 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
       } else {
         _activationTicks[widget.activeTab] =
             (_activationTicks[widget.activeTab] ?? 0) + 1;
+      }
+    }
+
+    if (widget.profileResetSignal != _lastProfileResetSignal) {
+      _lastProfileResetSignal = widget.profileResetSignal;
+      for (final tab in _activationTicks.keys.toList()) {
+        _activationTicks[tab] = (_activationTicks[tab] ?? 0) + 1;
       }
     }
   }

@@ -45,13 +45,14 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     final childIds = _studentProfiles(widget.args.profiles)
         .map(ActiveProfileSession.profileStableId)
         .join(',');
-    if (oldProfileId != profileId ||
+    final shouldForceRefresh =
         oldWidget.args.user?.id != widget.args.user?.id ||
-        oldChildIds != childIds) {
+            oldChildIds != childIds;
+    if (oldProfileId != profileId || shouldForceRefresh) {
       _hasLoadedHome = false;
       _resetModeEntrances();
       if (widget.args.isActive) {
-        _loadHome();
+        _loadHome(forceRefresh: shouldForceRefresh);
       }
       return;
     }
@@ -63,7 +64,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       return;
     } else if (oldWidget.args.activeRefreshTick !=
         widget.args.activeRefreshTick) {
-      _loadHome();
+      _loadHome(forceRefresh: true);
     }
   }
 
@@ -82,7 +83,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     return _studentProfiles(widget.args.profiles);
   }
 
-  Future<void> _loadHome() async {
+  Future<void> _loadHome({bool forceRefresh = false}) async {
     final requestId = ++_childLoadRequestId;
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
@@ -103,15 +104,30 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       return;
     }
 
+    final cache = HomeProfileCache.instance;
+    final cachedSnapshot = cache.getParent(profileId);
+    if (!forceRefresh && cachedSnapshot != null) {
+      setState(() => _applySnapshot(cachedSnapshot));
+      widget.args.onParentAssessmentStateChanged(
+        cachedSnapshot.completedAssessments.isNotEmpty,
+      );
+      if (!cachedSnapshot.isStale) {
+        return;
+      }
+    }
+
+    final hadRenderableContent = _hasLoadedHome;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
-      if (!_hasLoadedHome) {
+      if (!hadRenderableContent) {
         _childSummaries = const <_ParentChildSummary>[];
         _completedAssessments = const <GeneratedQuiz>[];
       }
     });
-    widget.args.onParentAssessmentStateChanged(false);
+    if (!hadRenderableContent) {
+      widget.args.onParentAssessmentStateChanged(false);
+    }
 
     try {
       final layout = await _homeLayoutService.getLayout(profileId: profileId);
@@ -129,11 +145,26 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         _childSummaries = summaries;
         _completedAssessments = completedAssessments;
       });
+      cache.putParent(
+        ParentHomeSnapshot(
+          profileId: profileId,
+          homeLayout: layout,
+          completedAssessments: completedAssessments,
+          cachedAt: DateTime.now(),
+        ),
+      );
       widget.args.onParentAssessmentStateChanged(
         completedAssessments.isNotEmpty,
       );
     } on HomeLayoutException catch (error) {
       if (!mounted) {
+        return;
+      }
+      if (hadRenderableContent) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = error.message;
+        });
         return;
       }
       setState(() {
@@ -149,6 +180,14 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       if (!mounted) {
         return;
       }
+      if (hadRenderableContent) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage =
+              context.readText(AppKeys.parentChildDashboardLoadFailed);
+        });
+        return;
+      }
       setState(() {
         _isLoading = false;
         _hasLoadedHome = true;
@@ -160,6 +199,16 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       });
       widget.args.onParentAssessmentStateChanged(false);
     }
+  }
+
+  void _applySnapshot(ParentHomeSnapshot snapshot) {
+    final parent = snapshot.homeLayout.parent;
+    _isLoading = false;
+    _hasLoadedHome = true;
+    _errorMessage = null;
+    _homeLayout = snapshot.homeLayout;
+    _childSummaries = _summariesFromLayout(parent);
+    _completedAssessments = snapshot.completedAssessments;
   }
 
   Widget _initialAssessmentFadeIn({

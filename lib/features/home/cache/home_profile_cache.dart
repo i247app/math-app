@@ -1,0 +1,64 @@
+import 'package:numi_flutter/features/home/parent/cache/parent_home_snapshot.dart';
+import 'package:numi_flutter/features/home/student/cache/student_home_snapshot.dart';
+import 'package:numi_flutter/features/home/teacher/cache/teacher_home_snapshot.dart';
+
+/// In-memory, per-session cache for home-screen data indexed by profile ID.
+///
+/// Implements a stale-while-revalidate strategy:
+/// - On profile switch → check cache → show cached data immediately (if any)
+/// - If snapshot [isStale] → background refresh while user sees cached content
+/// - If no cache → show skeleton → load → cache result
+///
+/// Lifetime: tied to the [HomeScreen] widget (create in [_HomeScreenState],
+/// pass down to tabs via [HomeProfileCache.instance] or constructor injection).
+///
+/// Call [invalidateAll] on logout.
+class HomeProfileCache {
+  HomeProfileCache._();
+
+  static final HomeProfileCache instance = HomeProfileCache._();
+
+  final Map<int, StudentHomeSnapshot> _student = {};
+  final Map<int, ParentHomeSnapshot> _parent = {};
+  final Map<int, TeacherHomeSnapshot> _teacher = {};
+
+  // ── Student ─────────────────────────────────────────────────────────────────
+
+  StudentHomeSnapshot? getStudent(int profileId) => _student[profileId];
+
+  void putStudent(StudentHomeSnapshot snapshot) {
+    _student[snapshot.profileId] = snapshot;
+  }
+
+  // ── Parent ──────────────────────────────────────────────────────────────────
+
+  ParentHomeSnapshot? getParent(int profileId) => _parent[profileId];
+
+  void putParent(ParentHomeSnapshot snapshot) {
+    _parent[snapshot.profileId] = snapshot;
+  }
+
+  // ── Teacher ─────────────────────────────────────────────────────────────────
+
+  TeacherHomeSnapshot? getTeacher(int profileId) => _teacher[profileId];
+
+  void putTeacher(TeacherHomeSnapshot snapshot) {
+    _teacher[snapshot.profileId] = snapshot;
+  }
+
+  // ── Invalidation ────────────────────────────────────────────────────────────
+
+  /// Removes all cached snapshots. Call this on logout.
+  void invalidateAll() {
+    _student.clear();
+    _parent.clear();
+    _teacher.clear();
+  }
+
+  /// Removes cached data for a single profile across all roles.
+  void invalidateProfile(int profileId) {
+    _student.remove(profileId);
+    _parent.remove(profileId);
+    _teacher.remove(profileId);
+  }
+}
