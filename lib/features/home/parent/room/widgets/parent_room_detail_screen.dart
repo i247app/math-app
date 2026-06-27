@@ -67,10 +67,6 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                                 for (final pending in pendingExercises) ...[
                                   _ParentPendingTaskListItem(
                                     pending: pending,
-                                    onTap: () => _openPendingExercise(
-                                      context,
-                                      pending,
-                                    ),
                                   ),
                                   if (pending != pendingExercises.last ||
                                       expiredExercises.isNotEmpty)
@@ -137,34 +133,6 @@ class _ParentRoomDetailScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _openPendingExercise(
-    BuildContext context,
-    HomeLayoutPendingExercise pending,
-  ) async {
-    final exercise = pending.exercise;
-    final exerciseId = pending.classroomExerciseId ?? exercise?.stableId;
-    final profileId = _layoutChildId(pending.child) ?? entry.memberProfileId;
-    if (exerciseId == null ||
-        exerciseId <= 0 ||
-        profileId == null ||
-        profileId <= 0) {
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (_) => StudentHomeworkAttemptScreen(
-          exerciseId: exerciseId,
-          profileId: profileId,
-          initialExercise: exercise,
-          exerciseService: exerciseService,
-        ),
-      ),
-    );
-    await onRefreshLayout();
   }
 
   void _openCompletionResult(

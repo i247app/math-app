@@ -6,7 +6,6 @@ class _ParentChildOverviewContent extends StatelessWidget {
     required this.pendingExercises,
     required this.completions,
     required this.entranceBuilder,
-    required this.onPendingTap,
     required this.onCompletionTap,
     required this.onViewTasks,
     required this.onViewResults,
@@ -20,7 +19,6 @@ class _ParentChildOverviewContent extends StatelessWidget {
   final List<HomeLayoutPendingExercise> pendingExercises;
   final List<HomeLayoutRecentCompletion> completions;
   final _ParentHomeEntranceBuilder entranceBuilder;
-  final ValueChanged<HomeLayoutPendingExercise> onPendingTap;
   final ValueChanged<HomeLayoutRecentCompletion> onCompletionTap;
   final VoidCallback onViewTasks;
   final VoidCallback onViewResults;
@@ -65,7 +63,6 @@ class _ParentChildOverviewContent extends StatelessWidget {
                       index++) ...[
                     _ParentPendingTaskListItem(
                       pending: visiblePendingExercises[index],
-                      onTap: () => onPendingTap(visiblePendingExercises[index]),
                     ),
                     if (index != visiblePendingExercises.length - 1)
                       const Divider(

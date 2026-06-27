@@ -212,7 +212,6 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                     for (final pending in pendingExercises.take(3)) ...[
                       _ParentPendingTaskListItem(
                         pending: pending,
-                        onTap: () => _openPendingExercise(pending),
                       ),
                       if (pending != pendingExercises.take(3).last ||
                           expiredExercises.isNotEmpty)
@@ -266,33 +265,6 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ),
       ],
     );
-  }
-
-  Future<void> _openPendingExercise(HomeLayoutPendingExercise pending) async {
-    final exercise = pending.exercise;
-    final exerciseId = pending.classroomExerciseId ?? exercise?.stableId;
-    final profileId = _layoutChildId(pending.child);
-    if (exerciseId == null ||
-        exerciseId <= 0 ||
-        profileId == null ||
-        profileId <= 0) {
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (_) => StudentHomeworkAttemptScreen(
-          exerciseId: exerciseId,
-          profileId: profileId,
-          initialExercise: exercise,
-          exerciseService: widget.args.assignmentService,
-        ),
-      ),
-    );
-    if (mounted) {
-      await _loadLayout();
-    }
   }
 
   void _openCompletionResult(HomeLayoutRecentCompletion completion) {

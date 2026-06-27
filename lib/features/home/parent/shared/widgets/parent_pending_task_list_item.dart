@@ -3,12 +3,12 @@ part of '../../../home_screen.dart';
 class _ParentPendingTaskListItem extends StatelessWidget {
   const _ParentPendingTaskListItem({
     required this.pending,
-    required this.onTap,
+    this.onTap,
     this.isExpired = false,
   });
 
   final HomeLayoutPendingExercise pending;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool isExpired;
 
   @override

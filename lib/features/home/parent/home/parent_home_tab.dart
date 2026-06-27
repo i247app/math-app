@@ -390,33 +390,6 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     );
   }
 
-  Future<void> _openPendingExercise(HomeLayoutPendingExercise pending) async {
-    final exercise = pending.exercise;
-    final exerciseId = pending.classroomExerciseId ?? exercise?.stableId;
-    final profileId = _layoutChildId(pending.child);
-    if (exerciseId == null ||
-        exerciseId <= 0 ||
-        profileId == null ||
-        profileId <= 0) {
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (_) => StudentHomeworkAttemptScreen(
-          exerciseId: exerciseId,
-          profileId: profileId,
-          initialExercise: exercise,
-          exerciseService: widget.args.assignmentService,
-        ),
-      ),
-    );
-    if (mounted) {
-      await _loadHome();
-    }
-  }
-
   void _openQuizReview(GeneratedQuiz quiz) {
     final quizId = quiz.quizId ?? quiz.id;
     if (quizId == null || quizId <= 0) {
