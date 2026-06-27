@@ -365,7 +365,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
           profileId: ActiveProfileSession.profileStableId(
             widget.args.activeProfile,
           ),
-          initialGradeId: _profileGradeId(widget.args.activeProfile),
+          initialGradeId: profileGradeId(widget.args.activeProfile),
           initialGradeLabel: widget.args.activeProfile?.grade?.label,
         ),
       ),

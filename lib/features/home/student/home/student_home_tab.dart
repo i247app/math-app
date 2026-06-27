@@ -801,7 +801,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
           profileId: ActiveProfileSession.profileStableId(
             widget.activeProfile,
           ),
-          initialGradeId: _profileGradeId(widget.activeProfile),
+          initialGradeId: profileGradeId(widget.activeProfile),
           initialGradeLabel: widget.activeProfile?.grade?.label,
         ),
       ),

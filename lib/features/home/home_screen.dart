@@ -25,10 +25,12 @@ import 'package:numi_flutter/features/home/cache/home_profile_cache.dart';
 import 'package:numi_flutter/features/home/home_api.dart';
 import 'package:numi_flutter/features/home/home_profile_controller.dart';
 import 'package:numi_flutter/features/home/home_tab_cubit.dart';
+import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
 import 'package:numi_flutter/features/home/parent/cache/parent_home_snapshot.dart';
 import 'package:numi_flutter/features/home/parent/parent_home_cubit.dart';
 import 'package:numi_flutter/features/home/student/cache/student_home_snapshot.dart';
 import 'package:numi_flutter/features/home/student/student_home_cubit.dart';
+import 'package:numi_flutter/features/home/teacher/teacher_dashboard.dart';
 import 'package:numi_flutter/features/home/teacher/teacher_home_cubit.dart';
 import 'package:numi_flutter/features/home/widgets/home_background.dart';
 import 'package:numi_flutter/features/home/widgets/home_bottom_navigation.dart';
@@ -51,7 +53,6 @@ import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart'
 import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
-import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
 import 'package:numi_flutter/features/quiz/history_tab.dart';
 import 'package:numi_flutter/features/quiz/review_tab.dart';
 import 'package:numi_flutter/features/settings/setting_tab.dart';
@@ -59,7 +60,6 @@ import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
 
 part 'parent/assessment/helpers/parent_assessment_helpers.dart';
-part 'helpers/home_dashboard_helpers.dart';
 part 'parent/assessment/models/parent_assessment_entry.dart';
 part 'parent/assessment/parent_assessment_tab.dart';
 part 'parent/assessment/widgets/parent_assessment_chart_painter.dart';
@@ -179,7 +179,6 @@ part 'student/shared/widgets/student_home_sections_loading.dart';
 part 'student/shared/widgets/student_inline_error_panel.dart';
 part 'student/shared/widgets/student_section_header.dart';
 part 'student/shared/widgets/student_state_card.dart';
-part 'teacher/teacher_dashboard.dart';
 part 'widgets/home_assessment_result_card.dart';
 part 'widgets/home_role_dashboard.dart';
 

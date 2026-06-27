@@ -1,6 +1,10 @@
-part of '../home_screen.dart';
+import 'package:flutter/widgets.dart';
 
-Widget _dashboardSettings(HomeDashboardArgs args) {
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi_flutter/features/settings/setting_tab.dart';
+
+Widget dashboardSettings(HomeDashboardArgs args) {
   return SettingTab(
     user: args.user,
     profiles: args.profiles,
@@ -17,5 +21,5 @@ Widget _dashboardSettings(HomeDashboardArgs args) {
   );
 }
 
-int? _profileGradeId(StudentProfile? profile) =>
+int? profileGradeId(StudentProfile? profile) =>
     profile?.grade?.gradeId ?? profile?.grade?.id ?? profile?.gradeId;
