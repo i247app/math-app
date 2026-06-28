@@ -105,7 +105,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
             _matchSchool(schools, widget.activeProfile?.schoolId) ??
                 (schools.isEmpty ? null : schools.first);
       });
-    } catch (error) {
+    } catch (_) {
       if (!mounted) {
         return;
       }
@@ -202,117 +202,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
                   scale: scale,
                   onBack: () => Navigator.of(context).maybePop(),
                 ),
-                Expanded(
-                  child: _isLoadingOptions
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            color: _teacherTeal,
-                          ),
-                        )
-                      : _optionsError != null
-                          ? _TeacherFullScreenError(
-                              message: _optionsError!,
-                              onRetry: _loadOptions,
-                              scale: scale,
-                            )
-                          : SingleChildScrollView(
-                              physics: const BouncingScrollPhysics(),
-                              keyboardDismissBehavior:
-                                  ScrollViewKeyboardDismissBehavior.onDrag,
-                              padding: EdgeInsets.fromLTRB(
-                                28 * scale,
-                                24 * scale,
-                                28 * scale,
-                                24 * scale,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  _ClassAvatarPicker(
-                                    scale: scale,
-                                    avatarPath: _avatarPath,
-                                    onTap: _pickAvatar,
-                                  ),
-                                  SizedBox(height: 20 * scale),
-                                  _TeacherDropdownField<GradeModel>(
-                                    label: context
-                                        .getText(AppKeys.teacherGradeLevel),
-                                    value: _selectedGrade,
-                                    items: _grades,
-                                    displayText: _gradeLabel,
-                                    onChanged: (value) =>
-                                        setState(() => _selectedGrade = value),
-                                    scale: scale,
-                                  ),
-                                  SizedBox(height: 14 * scale),
-                                  _TeacherTextField(
-                                    label: context
-                                        .getText(AppKeys.teacherClassName),
-                                    hintText: context.getText(
-                                      AppKeys.teacherClassNameHint,
-                                    ),
-                                    controller: _nameController,
-                                    scale: scale,
-                                  ),
-                                  SizedBox(height: 14 * scale),
-                                  _TeacherMultiSelectField<ProgramModel>(
-                                    label: context
-                                        .getText(AppKeys.learningProgram),
-                                    values: _selectedPrograms,
-                                    items: _programs,
-                                    displayText: _programLabel,
-                                    itemId: _programStableId,
-                                    emptyText:
-                                        context.getText(AppKeys.chooseProgram),
-                                    onChanged: (values) => setState(
-                                      () => _selectedPrograms = values,
-                                    ),
-                                    scale: scale,
-                                  ),
-                                  SizedBox(height: 14 * scale),
-                                  _TeacherDropdownField<SchoolModel>(
-                                    label: context.getText(AppKeys.school),
-                                    value: _selectedSchool,
-                                    items: _schools,
-                                    displayText: _schoolLabel,
-                                    onChanged: (value) =>
-                                        setState(() => _selectedSchool = value),
-                                    scale: scale,
-                                    outlined: true,
-                                  ),
-                                  SizedBox(height: 14 * scale),
-                                  _TeacherTextField(
-                                    label: context.getText(
-                                      AppKeys.teacherClassDescription,
-                                    ),
-                                    hintText: context.getText(
-                                      AppKeys.teacherClassDescriptionHint,
-                                    ),
-                                    controller: _descriptionController,
-                                    scale: scale,
-                                    maxLines: 4,
-                                  ),
-                                  SizedBox(height: 28 * scale),
-                                  Center(
-                                    child: _TeacherPrimaryButton(
-                                      label: _isSubmitting
-                                          ? context.getText(
-                                              AppKeys.teacherCreating,
-                                            )
-                                          : context.getText(
-                                              AppKeys.teacherCreate,
-                                            ),
-                                      icon: Icons.arrow_forward_rounded,
-                                      width: 230 * scale,
-                                      height: 56 * scale,
-                                      scale: scale,
-                                      onPressed: _isSubmitting ? null : _submit,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                ),
+                Expanded(child: _buildContent(scale)),
               ],
             );
           },
@@ -320,10 +210,40 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       ),
     );
   }
-}
 
-class _CreateClassResult {
-  const _CreateClassResult({this.classroom});
-
-  final ClassroomModel? classroom;
+  Widget _buildContent(double scale) {
+    if (_isLoadingOptions) {
+      return const Center(
+        child: CircularProgressIndicator(color: _teacherTeal),
+      );
+    }
+    final optionsError = _optionsError;
+    if (optionsError != null) {
+      return _TeacherFullScreenError(
+        message: optionsError,
+        onRetry: _loadOptions,
+        scale: scale,
+      );
+    }
+    return _TeacherCreateClassForm(
+      scale: scale,
+      avatarPath: _avatarPath,
+      grades: _grades,
+      programs: _programs,
+      schools: _schools,
+      selectedGrade: _selectedGrade,
+      selectedPrograms: _selectedPrograms,
+      selectedSchool: _selectedSchool,
+      nameController: _nameController,
+      descriptionController: _descriptionController,
+      isSubmitting: _isSubmitting,
+      onPickAvatar: _pickAvatar,
+      onGradeChanged: (value) => setState(() => _selectedGrade = value),
+      onProgramsChanged: (values) => setState(
+        () => _selectedPrograms = values,
+      ),
+      onSchoolChanged: (value) => setState(() => _selectedSchool = value),
+      onSubmit: _submit,
+    );
+  }
 }

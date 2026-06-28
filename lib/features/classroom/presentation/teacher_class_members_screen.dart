@@ -126,115 +126,25 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
             LayoutBuilder(
               builder: (context, constraints) {
                 final scale = math.min(constraints.maxWidth / 390, 1.12);
-                return Column(
-                  children: [
-                    _TeacherScreenAppBar(
-                      title: context.getText(AppKeys.teacherMembersTitle),
-                      scale: scale,
-                      onBack: () => Navigator.of(context).maybePop(),
-                    ),
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: _teacherTeal,
-                        onRefresh: _loadMembers,
-                        child: SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(
-                            parent: BouncingScrollPhysics(),
-                          ),
-                          padding: EdgeInsets.fromLTRB(
-                            15 * scale,
-                            31 * scale,
-                            15 * scale,
-                            MediaQuery.paddingOf(context).bottom + 32 * scale,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: _TeacherMemberAddButton(
-                                  scale: scale,
-                                  onTap: _isSendingInvites
-                                      ? null
-                                      : () => _openStudentSearchSheet(context),
-                                ),
-                              ),
-                              SizedBox(height: 15 * scale),
-                              if (_isLoading &&
-                                  _joinRequests.isEmpty &&
-                                  _members.isEmpty)
-                                Padding(
-                                  padding: EdgeInsets.only(top: 80 * scale),
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      color: _teacherTeal,
-                                    ),
-                                  ),
-                                )
-                              else if (_error != null &&
-                                  _joinRequests.isEmpty &&
-                                  _members.isEmpty)
-                                _TeacherErrorPanel(
-                                  scale: scale,
-                                  message: _error!,
-                                  onRetry: _loadMembers,
-                                )
-                              else ...[
-                                _TeacherMemberSectionTitle(
-                                  scale: scale,
-                                  title: context.formatText(
-                                    AppKeys.teacherJoinRequests,
-                                    {'count': _joinRequests.length},
-                                  ),
-                                ),
-                                SizedBox(height: 10 * scale),
-                                _JoinRequestCard(
-                                  scale: scale,
-                                  requests: _joinRequests,
-                                  processingProfileIds: _processingProfileIds,
-                                  onApprove: (request) => _handleJoinRequest(
-                                    request,
-                                    approve: true,
-                                  ),
-                                  onReject: (request) => _handleJoinRequest(
-                                    request,
-                                    approve: false,
-                                  ),
-                                ),
-                                SizedBox(height: 28 * scale),
-                                _TeacherMemberSectionTitle(
-                                  scale: scale,
-                                  title: context.formatText(
-                                    AppKeys.teacherJoinedStudentsTitle,
-                                    {'count': _members.length},
-                                  ),
-                                ),
-                                SizedBox(height: 8 * scale),
-                                if (_members.isEmpty)
-                                  _TeacherEmptyMemberText(
-                                    scale: scale,
-                                    text: context.getText(
-                                      AppKeys.teacherNoJoinedStudents,
-                                    ),
-                                  )
-                                else
-                                  for (var index = 0;
-                                      index < _members.length;
-                                      index++) ...[
-                                    _JoinedMemberCard(
-                                      scale: scale,
-                                      member: _members[index],
-                                    ),
-                                    if (index != _members.length - 1)
-                                      SizedBox(height: 12 * scale),
-                                  ],
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                return _TeacherClassMembersContent(
+                  scale: scale,
+                  isLoading: _isLoading,
+                  isSendingInvites: _isSendingInvites,
+                  error: _error,
+                  joinRequests: _joinRequests,
+                  members: _members,
+                  processingProfileIds: _processingProfileIds,
+                  onBack: () => Navigator.of(context).maybePop(),
+                  onRefresh: _loadMembers,
+                  onOpenStudentSearch: () => _openStudentSearchSheet(context),
+                  onApprove: (request) => _handleJoinRequest(
+                    request,
+                    approve: true,
+                  ),
+                  onReject: (request) => _handleJoinRequest(
+                    request,
+                    approve: false,
+                  ),
                 );
               },
             ),
@@ -307,36 +217,4 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
       }
     }
   }
-}
-
-bool _isStudentProfile(StudentProfile profile) {
-  final role = profile.role?.trim().toUpperCase();
-  return role == null || role.isEmpty || role == 'STUDENT';
-}
-
-String? _studentSearchSubtitle(BuildContext context, StudentProfile profile) {
-  final studentId = profile.studentId?.trim();
-  if (studentId != null && studentId.isNotEmpty) {
-    return studentId;
-  }
-
-  final grade = profile.grade?.label?.trim();
-  if (grade != null && grade.isNotEmpty) {
-    return grade;
-  }
-
-  return null;
-}
-
-String _classroomMemberName(BuildContext context, ClassroomStudent member) {
-  return _nonEmpty(member.name) ??
-      context.getText(AppKeys.teacherStudentFallback);
-}
-
-String _classroomMemberStatus(BuildContext context, ClassroomStudent member) {
-  final status = _nonEmpty(member.status);
-  if (status == null || status.toUpperCase() == 'ACTIVE') {
-    return context.getText(AppKeys.teacherJustJoined);
-  }
-  return status;
 }

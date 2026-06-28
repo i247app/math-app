@@ -36,6 +36,14 @@ InputDecoration _teacherInputDecoration({
   );
 }
 
+String? _nonEmpty(String? value) {
+  final trimmed = value?.trim();
+  if (trimmed == null || trimmed.isEmpty) {
+    return null;
+  }
+  return trimmed;
+}
+
 String _displayTeacherName(StudentProfile? profile) {
   final name = profile?.name?.trim();
   if (name != null && name.isNotEmpty) {
