@@ -2,32 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
+import 'package:numi_flutter/features/classroom/helpers/student_class_search_helpers.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_class_card.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_filter_panel.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_retry_banner.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_search_field.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_school_filter_bottom_sheet.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_state_card.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/profile/school_api.dart';
-
-const _joinTeal = Color(0xFF38898B);
-const _joinDeepTeal = Color(0xFF2E6F70);
-const _joinBlue = Color(0xFF001741);
-const _joinInk = Color(0xFF161D1F);
-const _joinMuted = Color(0xFF444650);
-const _joinCoral = Color(0xFFF97316);
-const _studentJoinSearchIcon = 'assets/images/student_join_search.png';
-const _studentJoinScanIcon = 'assets/images/student_join_scan.png';
-const _studentJoinFilterIcon = 'assets/images/student_join_filter.svg';
-const _studentJoinDropdownIcon = 'assets/images/student_join_dropdown.svg';
-const _studentJoinBookIcon = 'assets/images/student_join_book.svg';
-const _studentJoinEnterIcon = 'assets/images/student_join_enter.svg';
-const _studentJoinPendingIcon = 'assets/images/student_home_bell.svg';
-const _studentJoinJoinedIcon = 'assets/images/teacher_class_graduation.svg';
 
 class StudentClassSearchContent extends StatefulWidget {
   const StudentClassSearchContent({
@@ -179,8 +170,8 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       if (!mounted ||
           requestId != _searchRequestId ||
           _searchController.text.trim() != search ||
-          !_setEquals(_selectedGradeIds, gradeIds) ||
-          !_setEquals(_selectedSchoolIds, schoolIds)) {
+          !intSetEquals(_selectedGradeIds, gradeIds) ||
+          !intSetEquals(_selectedSchoolIds, schoolIds)) {
         return;
       }
       setState(() => _results = results);
@@ -188,8 +179,8 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       if (!mounted ||
           requestId != _searchRequestId ||
           _searchController.text.trim() != search ||
-          !_setEquals(_selectedGradeIds, gradeIds) ||
-          !_setEquals(_selectedSchoolIds, schoolIds)) {
+          !intSetEquals(_selectedGradeIds, gradeIds) ||
+          !intSetEquals(_selectedSchoolIds, schoolIds)) {
         return;
       }
       setState(() {
@@ -201,8 +192,8 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       if (mounted &&
           requestId == _searchRequestId &&
           _searchController.text.trim() == search &&
-          _setEquals(_selectedGradeIds, gradeIds) &&
-          _setEquals(_selectedSchoolIds, schoolIds)) {
+          intSetEquals(_selectedGradeIds, gradeIds) &&
+          intSetEquals(_selectedSchoolIds, schoolIds)) {
         setState(() => _isSearching = false);
       }
     }
@@ -229,12 +220,12 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     setState(() {
       if (grades != null) {
         _grades = grades
-            .where((grade) => _gradeStableId(grade) != null)
+            .where((grade) => gradeStableId(grade) != null)
             .toList(growable: false);
       }
       if (schools != null) {
         _schools = schools
-            .where((school) => _schoolStableId(school) != null)
+            .where((school) => schoolStableId(school) != null)
             .toList(growable: false);
       }
       _hasLoadedFilters = grades != null && schools != null;
@@ -267,7 +258,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
   }
 
   void _selectGrade(GradeModel grade) {
-    final gradeId = _gradeStableId(grade);
+    final gradeId = gradeStableId(grade);
     if (gradeId == null) {
       return;
     }
@@ -302,7 +293,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        return _SchoolFilterBottomSheet(
+        return StudentJoinSchoolFilterBottomSheet(
           schools: _schools,
           selectedSchoolIds: _selectedSchoolIds,
         );
@@ -311,7 +302,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     if (!mounted || selectedSchoolIds == null) {
       return;
     }
-    if (_setEquals(_selectedSchoolIds, selectedSchoolIds)) {
+    if (intSetEquals(_selectedSchoolIds, selectedSchoolIds)) {
       return;
     }
     HapticFeedback.selectionClick();
@@ -349,7 +340,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       return;
     }
 
-    final code = _classCode(classroom);
+    final code = classroomCode(classroom);
     if (code == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -404,14 +395,14 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _JoinSearchField(
+        StudentJoinSearchField(
           controller: _searchController,
           isSearching: _isSearching,
           onChanged: _onSearchChanged,
           onSubmitted: _search,
         ),
         const SizedBox(height: 14),
-        _JoinFilterPanel(
+        StudentJoinFilterPanel(
           grades: _grades,
           schools: _schools,
           selectedGradeIds: _selectedGradeIds,
@@ -428,7 +419,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
         Text(
           context.getText(AppKeys.studentSearchResults),
           style: const TextStyle(
-            color: _joinBlue,
+            color: studentJoinBlue,
             fontSize: 16,
             fontWeight: FontWeight.w900,
             height: 2,
@@ -443,16 +434,16 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
 
   Widget _buildResults() {
     if (_isSearching && _results.isEmpty) {
-      return const _JoinStateCard(
-        assetPath: _studentJoinSearchIcon,
+      return const StudentJoinStateCard(
+        assetPath: studentJoinSearchIcon,
         titleKey: AppKeys.loading,
         messageKey: AppKeys.studentClassSearchLoading,
       );
     }
 
     if (_error != null && _results.isEmpty) {
-      return _JoinStateCard(
-        assetPath: _studentJoinSearchIcon,
+      return StudentJoinStateCard(
+        assetPath: studentJoinSearchIcon,
         title: _error!,
         messageKey: AppKeys.studentClassSearchRetry,
         actionLabelKey: AppKeys.studentRetry,
@@ -461,8 +452,8 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     }
 
     if (_hasSearched && _results.isEmpty) {
-      return const _JoinStateCard(
-        assetPath: _studentJoinBookIcon,
+      return const StudentJoinStateCard(
+        assetPath: studentJoinBookIcon,
         isSvg: true,
         titleKey: AppKeys.studentNoClassSearchResults,
         messageKey: AppKeys.studentNoClassSearchResultsMessage,
@@ -470,8 +461,8 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     }
 
     if (!_hasSearched) {
-      return const _JoinStateCard(
-        assetPath: _studentJoinSearchIcon,
+      return const StudentJoinStateCard(
+        assetPath: studentJoinSearchIcon,
         titleKey: AppKeys.studentEnterClassCodeTitle,
         messageKey: AppKeys.studentEnterClassCodeMessage,
       );
@@ -483,20 +474,20 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
         if (_isSearching) ...[
           const LinearProgressIndicator(
             minHeight: 3,
-            color: _joinTeal,
+            color: studentJoinTeal,
             backgroundColor: Color(0xFFDDEDEA),
           ),
           const SizedBox(height: 10),
         ],
         if (_error != null) ...[
-          _JoinRetryBanner(
+          StudentJoinRetryBanner(
             message: _error!,
             onRetry: _search,
           ),
           const SizedBox(height: 10),
         ],
         for (var index = 0; index < _results.length; index++) ...[
-          _JoinClassCard(
+          StudentJoinClassCard(
             classroom: _results[index],
             isJoining: _joiningClassroomId == (_results[index].stableId ?? -1),
             onJoin: () => _joinClassroom(_results[index]),
@@ -506,1064 +497,4 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       ],
     );
   }
-}
-
-class _JoinSearchField extends StatelessWidget {
-  const _JoinSearchField({
-    required this.controller,
-    required this.isSearching,
-    required this.onChanged,
-    required this.onSubmitted,
-  });
-
-  final TextEditingController controller;
-  final bool isSearching;
-  final ValueChanged<String> onChanged;
-  final ValueChanged<String> onSubmitted;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      onChanged: onChanged,
-      onSubmitted: onSubmitted,
-      textInputAction: TextInputAction.search,
-      style: const TextStyle(
-        color: _joinInk,
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0,
-      ),
-      decoration: InputDecoration(
-        hintText: context.getText(AppKeys.studentClassCodeHint),
-        hintStyle: TextStyle(
-          color: const Color(0xFF515F54).withValues(alpha: 0.7),
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-        ),
-        filled: true,
-        fillColor: const Color(0xFFEBEEF1),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 19,
-          vertical: 12,
-        ),
-        suffixIcon: Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isSearching)
-                const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              else
-                IconButton(
-                  onPressed: () => onSubmitted(controller.text),
-                  icon: Image.asset(
-                    _studentJoinSearchIcon,
-                    width: 19,
-                    height: 19,
-                    opacity: const AlwaysStoppedAnimation<double>(0.7),
-                  ),
-                  tooltip: context.getText(AppKeys.studentSearchClass),
-                ),
-              Image.asset(
-                _studentJoinScanIcon,
-                width: 21,
-                height: 21,
-                opacity: const AlwaysStoppedAnimation<double>(0.7),
-              ),
-            ],
-          ),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(color: _joinTeal.withValues(alpha: 0.3)),
-        ),
-      ),
-    );
-  }
-}
-
-class _JoinFilterPanel extends StatelessWidget {
-  const _JoinFilterPanel({
-    required this.grades,
-    required this.schools,
-    required this.selectedGradeIds,
-    required this.selectedSchoolIds,
-    required this.isLoading,
-    required this.error,
-    required this.onRetry,
-    required this.onGradeTap,
-    required this.onGradeRemove,
-    required this.onSchoolTap,
-    required this.onSchoolRemove,
-  });
-
-  final List<GradeModel> grades;
-  final List<SchoolModel> schools;
-  final Set<int> selectedGradeIds;
-  final Set<int> selectedSchoolIds;
-  final bool isLoading;
-  final String? error;
-  final VoidCallback onRetry;
-  final ValueChanged<GradeModel> onGradeTap;
-  final ValueChanged<int> onGradeRemove;
-  final VoidCallback onSchoolTap;
-  final ValueChanged<int> onSchoolRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    final selectedSchools = _selectedSchools(schools, selectedSchoolIds);
-    final showSchoolFilter = error == null || schools.isNotEmpty;
-    final showGradeFilter = error == null || grades.isNotEmpty;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF6FFFF),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFCCCCCC).withValues(alpha: .5),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (error != null) ...[
-            _JoinRetryBanner(
-              message: error!,
-              onRetry: onRetry,
-            ),
-            if (showSchoolFilter || showGradeFilter) const SizedBox(height: 13),
-          ],
-          if (showSchoolFilter) ...[
-            _FilterLabel(context.getText(AppKeys.school)),
-            const SizedBox(height: 7),
-            _SchoolFilterField(
-              valueText: selectedSchools.isEmpty
-                  ? context.getText(AppKeys.chooseSchool)
-                  : selectedSchools
-                      .map((school) => _schoolName(context, school))
-                      .join(', '),
-              selected: selectedSchools.isNotEmpty,
-              isLoading: isLoading,
-              onTap: schools.isEmpty ? null : onSchoolTap,
-            ),
-            if (selectedSchools.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final school in selectedSchools)
-                    _SelectedFilterPill(
-                      label: _schoolName(context, school),
-                      onRemove: () {
-                        final schoolId = _schoolStableId(school);
-                        if (schoolId != null) {
-                          onSchoolRemove(schoolId);
-                        }
-                      },
-                    ),
-                ],
-              ),
-            ],
-          ],
-          if (showSchoolFilter && showGradeFilter) const SizedBox(height: 13),
-          if (showGradeFilter) ...[
-            _FilterLabel(context.getText(AppKeys.grade)),
-            const SizedBox(height: 7),
-            if (isLoading && grades.isEmpty)
-              const SizedBox(
-                height: 30,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              )
-            else if (grades.isEmpty)
-              Text(
-                context.getText(AppKeys.noGrades),
-                style: const TextStyle(
-                  color: _joinMuted,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              )
-            else
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                itemCount: grades.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 10,
-                  mainAxisExtent: 30,
-                ),
-                itemBuilder: (context, index) {
-                  final grade = grades[index];
-                  return _GradeChip(
-                    label: _gradeLabel(context, grade),
-                    selected: selectedGradeIds.contains(_gradeStableId(grade)),
-                    onTap: () => onGradeTap(grade),
-                    onRemove: () {
-                      final gradeId = _gradeStableId(grade);
-                      if (gradeId != null) {
-                        onGradeRemove(gradeId);
-                      }
-                    },
-                  );
-                },
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _SchoolFilterField extends StatelessWidget {
-  const _SchoolFilterField({
-    required this.valueText,
-    required this.selected,
-    required this.isLoading,
-    required this.onTap,
-  });
-
-  final String valueText;
-  final bool selected;
-  final bool isLoading;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: isLoading ? null : onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Ink(
-          height: 43,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFC4C6D2)),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  valueText,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: selected ? _joinInk : _joinMuted,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              if (isLoading)
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              else
-                SvgPicture.asset(
-                  _studentJoinDropdownIcon,
-                  width: 10,
-                  height: 5,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SchoolFilterBottomSheet extends StatelessWidget {
-  const _SchoolFilterBottomSheet({
-    required this.schools,
-    required this.selectedSchoolIds,
-  });
-
-  final List<SchoolModel> schools;
-  final Set<int> selectedSchoolIds;
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final draftSelectedIds = Set<int>.from(selectedSchoolIds);
-    return StatefulBuilder(
-      builder: (context, setModalState) {
-        return SafeArea(
-          top: false,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(context).height * 0.72,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
-                  child: Text(
-                    context.getText(AppKeys.chooseSchool),
-                    style: const TextStyle(
-                      color: _joinBlue,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.fromLTRB(8, 0, 8, bottomInset + 12),
-                    children: [
-                      _SchoolOptionTile(
-                        label: context.getText(AppKeys.studentClassAll),
-                        selected: draftSelectedIds.isEmpty,
-                        onTap: () => setModalState(draftSelectedIds.clear),
-                      ),
-                      for (final school in schools)
-                        _SchoolOptionTile(
-                          label: _schoolName(context, school),
-                          selected: draftSelectedIds.contains(
-                            _schoolStableId(school),
-                          ),
-                          onTap: () {
-                            final schoolId = _schoolStableId(school);
-                            if (schoolId == null) {
-                              return;
-                            }
-                            setModalState(() {
-                              if (!draftSelectedIds.add(schoolId)) {
-                                draftSelectedIds.remove(schoolId);
-                              }
-                            });
-                          },
-                        ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 8, 20, bottomInset + 16),
-                  child: ElevatedButton(
-                    onPressed: () =>
-                        Navigator.of(context).pop(draftSelectedIds),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _joinDeepTeal,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size.fromHeight(46),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                    child: Text(
-                      context.getText(AppKeys.continueUpper),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _SchoolOptionTile extends StatelessWidget {
-  const _SchoolOptionTile({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: selected ? _joinTeal : _joinInk,
-                    fontSize: 15,
-                    fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
-                  ),
-                ),
-              ),
-              if (selected)
-                const Icon(
-                  Icons.check_rounded,
-                  color: _joinTeal,
-                  size: 20,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FilterLabel extends StatelessWidget {
-  const _FilterLabel(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: const TextStyle(
-        color: _joinMuted,
-        fontSize: 14,
-        fontWeight: FontWeight.w900,
-        height: 1.1,
-        letterSpacing: 0.7,
-      ),
-    );
-  }
-}
-
-List<SchoolModel> _selectedSchools(
-  List<SchoolModel> schools,
-  Set<int> selectedSchoolIds,
-) {
-  if (selectedSchoolIds.isEmpty) {
-    return const <SchoolModel>[];
-  }
-  return schools
-      .where((school) => selectedSchoolIds.contains(_schoolStableId(school)))
-      .toList(growable: false);
-}
-
-int? _gradeStableId(GradeModel grade) => grade.gradeId ?? grade.id;
-
-int? _schoolStableId(SchoolModel school) => school.schoolId ?? school.id;
-
-String _gradeLabel(BuildContext context, GradeModel grade) {
-  final label = grade.label?.trim();
-  if (label != null && label.isNotEmpty) {
-    return label;
-  }
-  final description = grade.description?.trim();
-  if (description != null && description.isNotEmpty) {
-    return description;
-  }
-  final id = _gradeStableId(grade);
-  return id == null
-      ? context.getText(AppKeys.grade)
-      : context.formatText(AppKeys.studentGradeFilter, {'grade': id});
-}
-
-String _schoolName(BuildContext context, SchoolModel school) {
-  final name = school.name?.trim();
-  if (name != null && name.isNotEmpty) {
-    return name;
-  }
-  final id = _schoolStableId(school);
-  return id == null ? context.getText(AppKeys.school) : 'ID: $id';
-}
-
-bool _setEquals(Set<int> first, Set<int> second) {
-  if (first.length != second.length) {
-    return false;
-  }
-  for (final value in first) {
-    if (!second.contains(value)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-class _GradeChip extends StatelessWidget {
-  const _GradeChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    required this.onRemove,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  final VoidCallback onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(999),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minWidth: 66,
-            minHeight: 30,
-            maxHeight: 30,
-          ),
-          child: Ink(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: selected ? _joinTeal : const Color(0xFFE0E3E6),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      style: TextStyle(
-                        color: selected ? Colors.white : _joinMuted,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        height: 1,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ),
-                ),
-                if (selected) ...[
-                  const SizedBox(width: 4),
-                  GestureDetector(
-                    onTap: onRemove,
-                    child: const Icon(
-                      Icons.close_rounded,
-                      color: Colors.white,
-                      size: 14,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SelectedFilterPill extends StatelessWidget {
-  const _SelectedFilterPill({
-    required this.label,
-    required this.onRemove,
-  });
-
-  final String label;
-  final VoidCallback onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 220),
-      height: 30,
-      padding: const EdgeInsets.only(left: 12, right: 8),
-      decoration: BoxDecoration(
-        color: _joinTeal,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
-          GestureDetector(
-            onTap: onRemove,
-            child: const Icon(
-              Icons.close_rounded,
-              color: Colors.white,
-              size: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _JoinClassCard extends StatelessWidget {
-  const _JoinClassCard({
-    required this.classroom,
-    required this.isJoining,
-    required this.onJoin,
-  });
-
-  final ClassroomModel classroom;
-  final bool isJoining;
-  final VoidCallback onJoin;
-
-  @override
-  Widget build(BuildContext context) {
-    final name = classroom.name?.trim().isNotEmpty == true
-        ? classroom.name!.trim()
-        : context.getText(AppKeys.teacherClassFallback);
-    final teacher = classroom.teacherName?.trim().isNotEmpty == true
-        ? classroom.teacherName!.trim()
-        : classroom.schoolName?.trim().isNotEmpty == true
-            ? classroom.schoolName!.trim()
-            : context.getText(AppKeys.teacherFallback);
-    final code = _classCode(classroom);
-    final action = _JoinClassActionState.fromRelationship(
-      classroom.relationshipStatus,
-    );
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 5,
-            offset: const Offset(3, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 8,
-            height: 87,
-            decoration: const BoxDecoration(
-              color: _joinCoral,
-              borderRadius: BorderRadius.horizontal(left: Radius.circular(12)),
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 16, 16, 16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 46,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFB0C6FF),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        _studentJoinBookIcon,
-                        width: 33,
-                        height: 29.25,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: _joinBlue,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            height: 1.25,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          teacher,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: _joinMuted,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            height: 1.4,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 5,
-                          children: [
-                            if (code != null)
-                              _ClassBadge(
-                                label: context.formatText(
-                                  AppKeys.studentClassCodeLabel,
-                                  {'code': code},
-                                ),
-                                color: const Color(0xFFE5E8EB),
-                                textColor: const Color(0xFF747781),
-                              ),
-                            _ClassBadge(
-                              label: context.getText(action.labelKey),
-                              color: action.badgeColor,
-                              textColor: action.badgeTextColor,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 62,
-                    height: 36,
-                    child: ElevatedButton(
-                      onPressed:
-                          isJoining || !action.canRequest ? null : onJoin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: action.buttonColor,
-                        disabledBackgroundColor: action.buttonColor,
-                        padding: EdgeInsets.zero,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                      child: isJoining
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : SvgPicture.asset(
-                              action.iconPath,
-                              width: action.iconWidth,
-                              height: action.iconHeight,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.white,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _JoinClassActionState {
-  const _JoinClassActionState({
-    required this.labelKey,
-    required this.iconPath,
-    required this.buttonColor,
-    required this.badgeColor,
-    required this.badgeTextColor,
-    required this.canRequest,
-    this.iconWidth = 12,
-    this.iconHeight = 12,
-  });
-
-  final String labelKey;
-  final String iconPath;
-  final Color buttonColor;
-  final Color badgeColor;
-  final Color badgeTextColor;
-  final bool canRequest;
-  final double iconWidth;
-  final double iconHeight;
-
-  static _JoinClassActionState fromRelationship(
-    ClassroomRelationship relationship,
-  ) {
-    switch (relationship) {
-      case ClassroomRelationship.member:
-        return const _JoinClassActionState(
-          labelKey: AppKeys.studentClassRelationshipMember,
-          iconPath: _studentJoinJoinedIcon,
-          buttonColor: Color(0xFF38898B),
-          badgeColor: Color(0xFFDDEDEA),
-          badgeTextColor: Color(0xFF1D5F60),
-          canRequest: false,
-          iconWidth: 18,
-          iconHeight: 18,
-        );
-      case ClassroomRelationship.pendingInvitation:
-        return const _JoinClassActionState(
-          labelKey: AppKeys.studentClassRelationshipPendingInvitation,
-          iconPath: _studentJoinFilterIcon,
-          buttonColor: Color(0xFFF87851),
-          badgeColor: Color(0xFFFFDBD1),
-          badgeTextColor: Color(0xFF3B0900),
-          canRequest: false,
-          iconWidth: 15,
-          iconHeight: 15,
-        );
-      case ClassroomRelationship.pendingRequest:
-        return const _JoinClassActionState(
-          labelKey: AppKeys.studentClassRelationshipPendingRequest,
-          iconPath: _studentJoinPendingIcon,
-          buttonColor: Color(0xFFC4C6D2),
-          badgeColor: Color(0xFFE5E8EB),
-          badgeTextColor: Color(0xFF747781),
-          canRequest: false,
-          iconWidth: 14,
-          iconHeight: 17.5,
-        );
-      case ClassroomRelationship.none:
-        return const _JoinClassActionState(
-          labelKey: AppKeys.studentClassRelationshipNone,
-          iconPath: _studentJoinEnterIcon,
-          buttonColor: _joinDeepTeal,
-          badgeColor: Color(0xFFFFDBD1),
-          badgeTextColor: Color(0xFF3B0900),
-          canRequest: true,
-          iconWidth: 10.5,
-          iconHeight: 10.5,
-        );
-      case ClassroomRelationship.unknown:
-        return const _JoinClassActionState(
-          labelKey: AppKeys.studentClassRelationshipPendingRequest,
-          iconPath: _studentJoinDropdownIcon,
-          buttonColor: Color(0xFFC4C6D2),
-          badgeColor: Color(0xFFE5E8EB),
-          badgeTextColor: Color(0xFF747781),
-          canRequest: false,
-          iconWidth: 12,
-          iconHeight: 12,
-        );
-    }
-  }
-}
-
-class _ClassBadge extends StatelessWidget {
-  const _ClassBadge({
-    required this.label,
-    required this.color,
-    required this.textColor,
-  });
-
-  final String label;
-  final Color color;
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-          height: 1.25,
-          letterSpacing: 0.6,
-        ),
-      ),
-    );
-  }
-}
-
-class _JoinStateCard extends StatelessWidget {
-  const _JoinStateCard({
-    required this.assetPath,
-    this.isSvg = false,
-    this.titleKey,
-    this.title,
-    required this.messageKey,
-    this.actionLabelKey,
-    this.onAction,
-  });
-
-  final String assetPath;
-  final bool isSvg;
-  final String? titleKey;
-  final String? title;
-  final String messageKey;
-  final String? actionLabelKey;
-  final VoidCallback? onAction;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E8EB)),
-      ),
-      child: Column(
-        children: [
-          isSvg
-              ? SvgPicture.asset(assetPath, width: 32, height: 32)
-              : Image.asset(assetPath, width: 32, height: 32),
-          const SizedBox(height: 10),
-          Text(
-            title ?? context.getText(titleKey!),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: _joinBlue,
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            context.getText(messageKey),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.grayText,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              height: 1.25,
-            ),
-          ),
-          if (onAction != null && actionLabelKey != null) ...[
-            const SizedBox(height: 14),
-            OutlinedButton.icon(
-              onPressed: onAction,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: Text(context.getText(actionLabelKey!)),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: _joinDeepTeal,
-                side: const BorderSide(color: _joinDeepTeal),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _JoinRetryBanner extends StatelessWidget {
-  const _JoinRetryBanner({
-    required this.message,
-    required this.onRetry,
-  });
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF4ED),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFF4C7AE)),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.wifi_off_rounded,
-            color: Color(0xFFA03A0F),
-            size: 20,
-          ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(
-                color: Color(0xFF7E2F0E),
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                height: 1.3,
-              ),
-            ),
-          ),
-          IconButton(
-            onPressed: onRetry,
-            tooltip: context.getText(AppKeys.studentRetry),
-            icon: const Icon(
-              Icons.refresh_rounded,
-              color: _joinDeepTeal,
-              size: 22,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-String? _classCode(ClassroomModel classroom) {
-  final code = classroom.classroomCode?.trim();
-  if (code != null && code.isNotEmpty) {
-    return code;
-  }
-  return null;
 }

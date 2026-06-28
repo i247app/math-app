@@ -1,0 +1,88 @@
+part of '../../presentation/teacher_classroom_screens.dart';
+
+class _StudentSearchResultTile extends StatelessWidget {
+  const _StudentSearchResultTile({
+    required this.profile,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final StudentProfile profile;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = profile.name?.trim().isNotEmpty == true
+        ? profile.name!.trim()
+        : context.getText(AppKeys.teacherStudentFallback);
+    final subtitle = _studentSearchSubtitle(context, profile);
+    return Material(
+      color: selected ? const Color(0xFFE8F7F7) : Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: selected ? _teacherTeal : const Color(0xFFE5ECEF),
+            ),
+          ),
+          child: Row(
+            children: [
+              ProfileAvatarImage(
+                size: 44,
+                avatarKey: profile.avatarKey,
+                avatarUrl: profile.avatarUrl,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.andika(
+                        color: const Color(0xFF1E3A5F),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        height: 1.25,
+                      ),
+                    ),
+                    if (subtitle != null)
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.andika(
+                          color: _teacherMuted,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          height: 1.25,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Checkbox(
+                value: selected,
+                activeColor: _teacherTeal,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                onChanged: (_) => onTap(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

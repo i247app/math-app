@@ -1,0 +1,93 @@
+import 'package:flutter/material.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
+
+class StudentJoinSearchField extends StatelessWidget {
+  const StudentJoinSearchField({
+    super.key,
+    required this.controller,
+    required this.isSearching,
+    required this.onChanged,
+    required this.onSubmitted,
+  });
+
+  final TextEditingController controller;
+  final bool isSearching;
+  final ValueChanged<String> onChanged;
+  final ValueChanged<String> onSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      onSubmitted: onSubmitted,
+      textInputAction: TextInputAction.search,
+      style: const TextStyle(
+        color: studentJoinInk,
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0,
+      ),
+      decoration: InputDecoration(
+        hintText: context.getText(AppKeys.studentClassCodeHint),
+        hintStyle: TextStyle(
+          color: const Color(0xFF515F54).withValues(alpha: 0.7),
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+        ),
+        filled: true,
+        fillColor: const Color(0xFFEBEEF1),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 19,
+          vertical: 12,
+        ),
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isSearching)
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                IconButton(
+                  onPressed: () => onSubmitted(controller.text),
+                  icon: Image.asset(
+                    studentJoinSearchIcon,
+                    width: 19,
+                    height: 19,
+                    opacity: const AlwaysStoppedAnimation<double>(0.7),
+                  ),
+                  tooltip: context.getText(AppKeys.studentSearchClass),
+                ),
+              Image.asset(
+                studentJoinScanIcon,
+                width: 21,
+                height: 21,
+                opacity: const AlwaysStoppedAnimation<double>(0.7),
+              ),
+            ],
+          ),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: studentJoinTeal.withValues(alpha: 0.3)),
+        ),
+      ),
+    );
+  }
+}
