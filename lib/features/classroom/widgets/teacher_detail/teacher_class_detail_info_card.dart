@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassDetailInfoCard extends StatelessWidget {
-  const _ClassDetailInfoCard({
+class _TeacherClassDetailInfoCard extends StatelessWidget {
+  const _TeacherClassDetailInfoCard({
     required this.scale,
     required this.classroom,
     required this.grades,
@@ -163,21 +163,21 @@ class _ClassDetailInfoCard extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        _ClassDetailMetaRow(
+                                        _TeacherClassDetailMetaRow(
                                           scale: scale,
                                           iconAsset:
                                               'assets/images/teacher_class_grade.png',
                                           text: grade,
                                         ),
                                         SizedBox(height: 5 * scale),
-                                        _ClassDetailMetaRow(
+                                        _TeacherClassDetailMetaRow(
                                           scale: scale,
                                           iconAsset:
                                               'assets/images/teacher_class_program.png',
                                           text: program,
                                         ),
                                         SizedBox(height: 5 * scale),
-                                        _ClassDetailMetaRow(
+                                        _TeacherClassDetailMetaRow(
                                           scale: scale,
                                           iconAsset:
                                               'assets/images/teacher_class_description.png',
@@ -197,7 +197,7 @@ class _ClassDetailInfoCard extends StatelessWidget {
                         height: 27 * scale,
                         child: Row(
                           children: [
-                            _ClassCodeChip(
+                            _TeacherClassDetailCodeChip(
                               scale: scale,
                               code: code,
                               onCopy: () => _copyClassroomInfo(

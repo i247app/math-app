@@ -48,7 +48,7 @@ class _TeacherClassSectionHeader extends StatelessWidget {
         ),
         if (hasClasses) ...[
           SizedBox(height: 8 * scale),
-          _SmallCoralAddButton(scale: scale, onTap: onAdd),
+          _TeacherSmallCoralAddButton(scale: scale, onTap: onAdd),
         ],
       ],
     );

@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _JoinedMemberAvatar extends StatelessWidget {
-  const _JoinedMemberAvatar({
+class _TeacherJoinedMemberAvatar extends StatelessWidget {
+  const _TeacherJoinedMemberAvatar({
     required this.member,
     required this.scale,
   });
@@ -17,7 +17,8 @@ class _JoinedMemberAvatar extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: _ClassroomMemberAvatar(member: member, size: 56 * scale),
+            child:
+                _TeacherClassroomMemberAvatar(member: member, size: 56 * scale),
           ),
           Positioned(
             right: 0,

@@ -161,7 +161,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _StudentInviteSearchSheet(
+      builder: (sheetContext) => _TeacherStudentInviteSearchSheet(
         profileService: widget._profileService ?? ProfileApi(),
       ),
     );

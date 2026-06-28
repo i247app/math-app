@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _JoinRequestCard extends StatelessWidget {
-  const _JoinRequestCard({
+class _TeacherJoinRequestCard extends StatelessWidget {
+  const _TeacherJoinRequestCard({
     required this.scale,
     required this.requests,
     required this.processingProfileIds,
@@ -43,7 +43,7 @@ class _JoinRequestCard extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 10 * scale),
                 child: const Divider(height: 1, color: Color(0xFFF9FAFB)),
               ),
-            _JoinRequestRow(
+            _TeacherJoinRequestRow(
               scale: scale,
               request: requests[index],
               isProcessing: processingProfileIds.contains(

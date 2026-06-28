@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _MemberTextBlock extends StatelessWidget {
-  const _MemberTextBlock({
+class _TeacherMemberTextBlock extends StatelessWidget {
+  const _TeacherMemberTextBlock({
     required this.name,
     required this.status,
     required this.nameFontSize,

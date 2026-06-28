@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _TeacherClassNumberBadge extends StatelessWidget {
-  const _TeacherClassNumberBadge({
+class _TeacherClassroomNumberBadge extends StatelessWidget {
+  const _TeacherClassroomNumberBadge({
     required this.scale,
     required this.number,
     required this.palette,
@@ -9,7 +9,7 @@ class _TeacherClassNumberBadge extends StatelessWidget {
 
   final double scale;
   final String number;
-  final _TeacherClassNumberPalette palette;
+  final _TeacherClassroomNumberPalette palette;
 
   TextStyle get _numberStyle => TextStyle(
         fontSize: 50 * scale,

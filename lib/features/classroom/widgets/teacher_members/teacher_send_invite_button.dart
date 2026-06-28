@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _SendInviteButton extends StatelessWidget {
-  const _SendInviteButton({
+class _TeacherSendInviteButton extends StatelessWidget {
+  const _TeacherSendInviteButton({
     required this.enabled,
     required this.onTap,
   });

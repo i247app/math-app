@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _JoinRequestRow extends StatelessWidget {
-  const _JoinRequestRow({
+class _TeacherJoinRequestRow extends StatelessWidget {
+  const _TeacherJoinRequestRow({
     required this.scale,
     required this.request,
     required this.isProcessing,
@@ -20,13 +20,13 @@ class _JoinRequestRow extends StatelessWidget {
     final name = _classroomMemberName(context, request);
     return Row(
       children: [
-        _ClassroomMemberAvatar(
+        _TeacherClassroomMemberAvatar(
           member: request,
           size: 40 * scale,
         ),
         SizedBox(width: 12 * scale),
         Expanded(
-          child: _MemberTextBlock(
+          child: _TeacherMemberTextBlock(
             name: name,
             status: context.getText(AppKeys.teacherPendingApproval),
             nameFontSize: 16 * scale,
@@ -51,13 +51,13 @@ class _JoinRequestRow extends StatelessWidget {
             ),
           )
         else ...[
-          _RequestActionIcon(
+          _TeacherRequestActionIcon(
             asset: 'assets/images/teacher_member_accept.png',
             size: 25 * scale,
             onTap: request.profileId == null ? null : onApprove,
           ),
           SizedBox(width: 5 * scale),
-          _RequestActionIcon(
+          _TeacherRequestActionIcon(
             asset: 'assets/images/teacher_member_reject.png',
             size: 23 * scale,
             onTap: request.profileId == null ? null : onReject,

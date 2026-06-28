@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassCodeChip extends StatelessWidget {
-  const _ClassCodeChip({
+class _TeacherClassDetailCodeChip extends StatelessWidget {
+  const _TeacherClassDetailCodeChip({
     required this.scale,
     required this.code,
     required this.onCopy,

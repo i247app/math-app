@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassroomListCard extends StatelessWidget {
-  const _ClassroomListCard({
+class _TeacherClassroomListCard extends StatelessWidget {
+  const _TeacherClassroomListCard({
     required this.scale,
     required this.classroom,
     required this.onTap,
@@ -17,8 +17,8 @@ class _ClassroomListCard extends StatelessWidget {
         classroom.name ?? context.getText(AppKeys.teacherClassFallback);
     final code = classroom.classroomCode ?? classroom.id?.toString() ?? '--';
     final memberCount = classroom.displayStudentCount;
-    final classNumber = _teacherClassNumber(classroom);
-    final numberPalette = _teacherClassNumberPalette(classroom);
+    final classNumber = _teacherClassroomNumber(classroom);
+    final numberPalette = _teacherClassroomNumberPalette(classroom);
 
     return GestureDetector(
       onTap: onTap,
@@ -45,7 +45,7 @@ class _ClassroomListCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _TeacherClassNumberBadge(
+                _TeacherClassroomNumberBadge(
                   scale: scale,
                   number: classNumber,
                   palette: numberPalette,

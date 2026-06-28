@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassFunctionGrid extends StatelessWidget {
-  const _ClassFunctionGrid({
+class _TeacherClassDetailFunctionGrid extends StatelessWidget {
+  const _TeacherClassDetailFunctionGrid({
     required this.scale,
     required this.onOpenAssignments,
     required this.onOpenAssessments,
@@ -22,20 +22,20 @@ class _ClassFunctionGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       children: [
-        _ClassFunctionTile(
+        _TeacherClassDetailFunctionTile(
           scale: scale,
           iconAsset: 'assets/images/classroom_homework.png',
           label: context.getText(AppKeys.teacherAssignments),
           onTap: onOpenAssignments,
         ),
-        _ClassFunctionTile(
+        _TeacherClassDetailFunctionTile(
           scale: scale,
           iconAsset: 'assets/images/teacher_class_assignment.png',
           label: context.getText(AppKeys.teacherAssessments),
           onTap: onOpenAssessments,
         ),
-        _ClassFunctionTile(scale: scale),
-        _ClassFunctionTile(scale: scale),
+        _TeacherClassDetailFunctionTile(scale: scale),
+        _TeacherClassDetailFunctionTile(scale: scale),
       ],
     );
   }

@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _SmallCoralAddButton extends StatelessWidget {
-  const _SmallCoralAddButton({
+class _TeacherSmallCoralAddButton extends StatelessWidget {
+  const _TeacherSmallCoralAddButton({
     required this.scale,
     required this.onTap,
   });

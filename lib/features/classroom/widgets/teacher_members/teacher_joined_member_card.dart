@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _JoinedMemberCard extends StatelessWidget {
-  const _JoinedMemberCard({
+class _TeacherJoinedMemberCard extends StatelessWidget {
+  const _TeacherJoinedMemberCard({
     required this.scale,
     required this.member,
   });
@@ -30,10 +30,10 @@ class _JoinedMemberCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _JoinedMemberAvatar(member: member, scale: scale),
+          _TeacherJoinedMemberAvatar(member: member, scale: scale),
           SizedBox(width: 24 * scale),
           Expanded(
-            child: _MemberTextBlock(
+            child: _TeacherMemberTextBlock(
               name: name,
               status: status,
               nameFontSize: 14 * scale,

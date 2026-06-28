@@ -51,7 +51,7 @@ class _TeacherCreateClassForm extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _ClassAvatarPicker(
+          _TeacherClassAvatarPicker(
             scale: scale,
             avatarPath: avatarPath,
             onTap: onPickAvatar,

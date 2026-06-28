@@ -171,7 +171,8 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       if (!mounted) {
         return;
       }
-      Navigator.of(context).pop(_CreateClassResult(classroom: classroom));
+      Navigator.of(context)
+          .pop(_TeacherCreateClassResult(classroom: classroom));
     } on ClassroomException catch (error) {
       _showSnack(error.message);
     } finally {

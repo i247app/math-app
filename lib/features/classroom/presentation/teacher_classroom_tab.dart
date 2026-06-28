@@ -130,7 +130,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
         .map((classroom) => classroom.stableId)
         .whereType<int>()
         .toSet();
-    final result = await Navigator.of(context).push<_CreateClassResult>(
+    final result = await Navigator.of(context).push<_TeacherCreateClassResult>(
       MaterialPageRoute(
         builder: (_) => TeacherCreateClassScreen(
           user: widget.user,
@@ -154,7 +154,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
   }
 
   ClassroomModel? _createdClassroomFromResult(
-    _CreateClassResult result,
+    _TeacherCreateClassResult result,
     Set<int> previousClassroomIds,
   ) {
     final createdId = result.classroom?.stableId;

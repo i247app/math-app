@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _MemberManagementCard extends StatelessWidget {
-  const _MemberManagementCard({
+class _TeacherClassDetailMemberManagementCard extends StatelessWidget {
+  const _TeacherClassDetailMemberManagementCard({
     required this.scale,
     required this.memberCount,
     required this.requestCount,

@@ -1,16 +1,17 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _StudentInviteSearchSheet extends StatefulWidget {
-  const _StudentInviteSearchSheet({required this.profileService});
+class _TeacherStudentInviteSearchSheet extends StatefulWidget {
+  const _TeacherStudentInviteSearchSheet({required this.profileService});
 
   final ProfileService profileService;
 
   @override
-  State<_StudentInviteSearchSheet> createState() =>
-      _StudentInviteSearchSheetState();
+  State<_TeacherStudentInviteSearchSheet> createState() =>
+      _TeacherStudentInviteSearchSheetState();
 }
 
-class _StudentInviteSearchSheetState extends State<_StudentInviteSearchSheet> {
+class _TeacherStudentInviteSearchSheetState
+    extends State<_TeacherStudentInviteSearchSheet> {
   final TextEditingController _searchController = TextEditingController();
   final Set<int> _selectedProfileIds = <int>{};
   final Map<int, StudentProfile> _selectedProfilesById =
@@ -188,7 +189,7 @@ class _StudentInviteSearchSheetState extends State<_StudentInviteSearchSheet> {
               ),
               const SizedBox(height: 8),
               Expanded(
-                child: _StudentSearchResultList(
+                child: _TeacherStudentSearchResultList(
                   scrollController: scrollController,
                   profiles: _results,
                   selectedProfileIds: _selectedProfileIds,
@@ -199,7 +200,7 @@ class _StudentInviteSearchSheetState extends State<_StudentInviteSearchSheet> {
                 ),
               ),
               const SizedBox(height: 12),
-              _SendInviteButton(
+              _TeacherSendInviteButton(
                 enabled: selectedCount > 0,
                 onTap: selectedCount == 0
                     ? null

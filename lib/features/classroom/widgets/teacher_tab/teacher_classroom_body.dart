@@ -74,7 +74,7 @@ class _TeacherClassroomBody extends StatelessWidget {
               final classroom = displayedClassrooms[index];
               return entranceBuilder(
                 2 + index,
-                _ClassroomListCard(
+                _TeacherClassroomListCard(
                   scale: scale,
                   classroom: classroom,
                   onTap: () => onOpenClassDetail(classroom),

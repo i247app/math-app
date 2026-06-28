@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassDetailMetaRow extends StatelessWidget {
-  const _ClassDetailMetaRow({
+class _TeacherClassDetailMetaRow extends StatelessWidget {
+  const _TeacherClassDetailMetaRow({
     required this.scale,
     required this.iconAsset,
     required this.text,

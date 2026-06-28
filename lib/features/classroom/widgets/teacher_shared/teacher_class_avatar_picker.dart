@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassAvatarPicker extends StatelessWidget {
-  const _ClassAvatarPicker({
+class _TeacherClassAvatarPicker extends StatelessWidget {
+  const _TeacherClassAvatarPicker({
     required this.scale,
     required this.avatarPath,
     required this.onTap,

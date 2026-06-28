@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _RequestActionIcon extends StatelessWidget {
-  const _RequestActionIcon({
+class _TeacherRequestActionIcon extends StatelessWidget {
+  const _TeacherRequestActionIcon({
     required this.asset,
     required this.size,
     required this.onTap,

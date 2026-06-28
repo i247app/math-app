@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _StudentSearchResultList extends StatelessWidget {
-  const _StudentSearchResultList({
+class _TeacherStudentSearchResultList extends StatelessWidget {
+  const _TeacherStudentSearchResultList({
     required this.scrollController,
     required this.profiles,
     required this.selectedProfileIds,
@@ -62,7 +62,7 @@ class _StudentSearchResultList extends StatelessWidget {
         final profile = profiles[index];
         final id = ActiveProfileSession.profileStableId(profile);
         final selected = id != null && selectedProfileIds.contains(id);
-        return _StudentSearchResultTile(
+        return _TeacherStudentSearchResultTile(
           profile: profile,
           selected: selected,
           onTap: () => onToggle(profile),

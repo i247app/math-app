@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassroomMemberAvatar extends StatelessWidget {
-  const _ClassroomMemberAvatar({
+class _TeacherClassroomMemberAvatar extends StatelessWidget {
+  const _TeacherClassroomMemberAvatar({
     required this.member,
     required this.size,
   });

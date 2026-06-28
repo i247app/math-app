@@ -35,7 +35,7 @@ class _TeacherNoClassPanel extends StatelessWidget {
             ),
           ),
           SizedBox(height: 22 * scale),
-          _CoralCreateButton(
+          _TeacherCoralCreateButton(
             scale: scale,
             label: context.getText(
               isProfileComplete

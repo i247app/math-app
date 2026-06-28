@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassFunctionTile extends StatelessWidget {
-  const _ClassFunctionTile({
+class _TeacherClassDetailFunctionTile extends StatelessWidget {
+  const _TeacherClassDetailFunctionTile({
     required this.scale,
     this.iconAsset,
     this.label,

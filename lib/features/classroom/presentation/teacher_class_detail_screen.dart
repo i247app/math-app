@@ -162,7 +162,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                               onRetry: _loadDetail,
                             )
                           else
-                            _ClassDetailInfoCard(
+                            _TeacherClassDetailInfoCard(
                               scale: scale,
                               classroom: classroom,
                               grades: _grades,
@@ -176,7 +176,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                               (_isLoading || _isLoadingLookups))
                             _TeacherBackgroundRefreshLabel(scale: scale),
                           if (_error == null || classroom != null)
-                            _ClassDetailLowerContent(
+                            _TeacherClassDetailLowerContent(
                               scale: scale,
                               memberCount: count,
                               requestCount: requestCount,

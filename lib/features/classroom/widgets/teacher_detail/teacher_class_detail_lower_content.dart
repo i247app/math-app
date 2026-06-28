@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _ClassDetailLowerContent extends StatelessWidget {
-  const _ClassDetailLowerContent({
+class _TeacherClassDetailLowerContent extends StatelessWidget {
+  const _TeacherClassDetailLowerContent({
     required this.scale,
     required this.memberCount,
     required this.requestCount,
@@ -24,7 +24,7 @@ class _ClassDetailLowerContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _MemberManagementCard(
+          _TeacherClassDetailMemberManagementCard(
             scale: scale,
             memberCount: memberCount,
             requestCount: requestCount,
@@ -43,7 +43,7 @@ class _ClassDetailLowerContent extends StatelessWidget {
             ),
           ),
           SizedBox(height: 7 * scale),
-          _ClassFunctionGrid(
+          _TeacherClassDetailFunctionGrid(
             scale: scale,
             onOpenAssignments: onOpenAssignments,
             onOpenAssessments: onOpenAssessments,

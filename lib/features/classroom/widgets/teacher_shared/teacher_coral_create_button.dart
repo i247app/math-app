@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _CoralCreateButton extends StatelessWidget {
-  const _CoralCreateButton({
+class _TeacherCoralCreateButton extends StatelessWidget {
+  const _TeacherCoralCreateButton({
     required this.scale,
     required this.label,
     required this.onTap,

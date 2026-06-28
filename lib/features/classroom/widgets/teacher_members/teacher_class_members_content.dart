@@ -129,7 +129,7 @@ class _TeacherClassMembersLists extends StatelessWidget {
           ),
         ),
         SizedBox(height: 10 * scale),
-        _JoinRequestCard(
+        _TeacherJoinRequestCard(
           scale: scale,
           requests: joinRequests,
           processingProfileIds: processingProfileIds,
@@ -152,7 +152,7 @@ class _TeacherClassMembersLists extends StatelessWidget {
           )
         else
           for (var index = 0; index < members.length; index++) ...[
-            _JoinedMemberCard(
+            _TeacherJoinedMemberCard(
               scale: scale,
               member: members[index],
             ),

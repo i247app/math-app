@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _StudentSearchResultTile extends StatelessWidget {
-  const _StudentSearchResultTile({
+class _TeacherStudentSearchResultTile extends StatelessWidget {
+  const _TeacherStudentSearchResultTile({
     required this.profile,
     required this.selected,
     required this.onTap,
