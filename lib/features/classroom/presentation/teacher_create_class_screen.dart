@@ -67,12 +67,22 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     super.dispose();
   }
 
-  Future<void> _loadOptions() async {
+  Future<void> _loadOptions({bool forceRefresh = false}) async {
     final userId = widget.user?.id;
     if (userId == null || userId <= 0) {
       setState(() {
         _isLoadingOptions = false;
         _optionsError = context.readText(AppKeys.missingAccount);
+      });
+      return;
+    }
+
+    final cachedOptions = _TeacherClassroomLookupCache.shared.get(userId);
+    if (!forceRefresh && cachedOptions != null) {
+      setState(() {
+        _applyOptions(cachedOptions);
+        _isLoadingOptions = false;
+        _optionsError = null;
       });
       return;
     }
@@ -83,28 +93,17 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     });
 
     try {
-      final results = await Future.wait<Object>([
-        _gradeService.listGrades(userId: userId),
-        _profileService.listPrograms(userId: userId),
-        _schoolService.listSchools(),
-      ]);
-      final grades = results[0] as List<GradeModel>;
-      final programs = results[1] as List<ProgramModel>;
-      final schools = results[2] as List<SchoolModel>;
+      final options = await _TeacherClassroomLookupCache.shared.load(
+        userId: userId,
+        gradeService: _gradeService,
+        profileService: _profileService,
+        schoolService: _schoolService,
+        forceRefresh: forceRefresh,
+      );
       if (!mounted) {
         return;
       }
-      setState(() {
-        _grades = grades;
-        _programs = programs;
-        _schools = schools;
-        _selectedGrade = _matchGrade(grades, widget.activeProfile?.gradeId) ??
-            (grades.isEmpty ? null : grades.first);
-        _selectedPrograms = const <ProgramModel>[];
-        _selectedSchool =
-            _matchSchool(schools, widget.activeProfile?.schoolId) ??
-                (schools.isEmpty ? null : schools.first);
-      });
+      setState(() => _applyOptions(options));
     } catch (_) {
       if (!mounted) {
         return;
@@ -119,6 +118,17 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         setState(() => _isLoadingOptions = false);
       }
     }
+  }
+
+  void _applyOptions(_TeacherClassroomLookupOptions options) {
+    _grades = options.grades;
+    _programs = options.programs;
+    _schools = options.schools;
+    _selectedGrade = _matchGrade(_grades, widget.activeProfile?.gradeId) ??
+        (_grades.isEmpty ? null : _grades.first);
+    _selectedPrograms = const <ProgramModel>[];
+    _selectedSchool = _matchSchool(_schools, widget.activeProfile?.schoolId) ??
+        (_schools.isEmpty ? null : _schools.first);
   }
 
   Future<void> _pickAvatar() async {
@@ -171,6 +181,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       if (!mounted) {
         return;
       }
+      context.read<ClassroomCubit>().invalidateOwned(profileId);
       Navigator.of(context)
           .pop(_TeacherCreateClassResult(classroom: classroom));
     } on ClassroomException catch (error) {
@@ -222,7 +233,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     if (optionsError != null) {
       return _TeacherFullScreenError(
         message: optionsError,
-        onRetry: _loadOptions,
+        onRetry: () => _loadOptions(forceRefresh: true),
         scale: scale,
       );
     }

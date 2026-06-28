@@ -2,14 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
+import 'package:numi_flutter/features/classroom/cache/student_class_search_filter_cache.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_search_helpers.dart';
+import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_class_card.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_filter_panel.dart';
@@ -67,6 +70,9 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
   int _searchRequestId = 0;
   int _filterRequestId = 0;
   int? _joiningClassroomId;
+  String? _lastSearch;
+  Set<int> _lastGradeIds = const <int>{};
+  Set<int> _lastSchoolIds = const <int>{};
   final Set<int> _selectedGradeIds = <int>{};
   final Set<int> _selectedSchoolIds = <int>{};
   String? _error;
@@ -125,6 +131,9 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       _hasSearched = false;
       _isLoadingFilters = true;
       _hasLoadedFilters = false;
+      _lastSearch = null;
+      _lastGradeIds = const <int>{};
+      _lastSchoolIds = const <int>{};
       _error = null;
       _filterError = null;
     });
@@ -137,7 +146,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     });
   }
 
-  Future<void> _search([String? rawValue]) async {
+  Future<void> _search([String? rawValue, bool force = false]) async {
     final search = (rawValue ?? _searchController.text).trim();
     final gradeIds = Set<int>.from(_selectedGradeIds);
     final schoolIds = Set<int>.from(_selectedSchoolIds);
@@ -151,6 +160,20 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       });
       return;
     }
+
+    if (!force &&
+        _hasSearched &&
+        !_isSearching &&
+        _error == null &&
+        _lastSearch == search &&
+        intSetEquals(_lastGradeIds, gradeIds) &&
+        intSetEquals(_lastSchoolIds, schoolIds)) {
+      return;
+    }
+
+    _lastSearch = search;
+    _lastGradeIds = Set<int>.unmodifiable(gradeIds);
+    _lastSchoolIds = Set<int>.unmodifiable(schoolIds);
 
     setState(() {
       _isSearching = true;
@@ -199,36 +222,37 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     }
   }
 
-  Future<void> _loadFilterOptions() async {
+  Future<void> _loadFilterOptions({bool forceRefresh = false}) async {
     final requestId = ++_filterRequestId;
     final userId = widget.userId;
+    if (userId != null && userId > 0) {
+      final cachedOptions = StudentClassSearchFilterCache.shared.get(userId);
+      if (!forceRefresh && cachedOptions != null) {
+        setState(() {
+          _applyFilterOptions(cachedOptions);
+          _hasLoadedFilters = true;
+          _filterError = null;
+          _isLoadingFilters = false;
+        });
+        return;
+      }
+    }
+
     setState(() {
       _isLoadingFilters = true;
       _filterError = null;
     });
 
-    final results = await Future.wait<Object?>([
-      _loadGrades(userId),
-      _loadSchools(),
-    ]);
+    final results = await _loadFilterOptionsResult(userId);
     if (!mounted || requestId != _filterRequestId) {
       return;
     }
 
-    final grades = results[0] as List<GradeModel>?;
-    final schools = results[1] as List<SchoolModel>?;
     setState(() {
-      if (grades != null) {
-        _grades = grades
-            .where((grade) => gradeStableId(grade) != null)
-            .toList(growable: false);
+      if (results != null) {
+        _applyFilterOptions(results);
       }
-      if (schools != null) {
-        _schools = schools
-            .where((school) => schoolStableId(school) != null)
-            .toList(growable: false);
-      }
-      _hasLoadedFilters = grades != null && schools != null;
+      _hasLoadedFilters = results != null;
       _filterError = _hasLoadedFilters
           ? null
           : context.readText(AppKeys.studentClassFilterLoadFailed);
@@ -236,25 +260,36 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     });
   }
 
-  Future<List<GradeModel>?> _loadGrades(int? userId) async {
+  Future<StudentClassSearchFilterOptions?> _loadFilterOptionsResult(
+    int? userId,
+  ) async {
     if (userId == null || userId <= 0) {
-      return const <GradeModel>[];
+      return const StudentClassSearchFilterOptions(
+        userId: 0,
+        grades: <GradeModel>[],
+        schools: <SchoolModel>[],
+      );
     }
     try {
-      return await _gradeService
-          .listGrades(userId: userId)
+      return await StudentClassSearchFilterCache.shared
+          .load(
+            userId: userId,
+            gradeService: _gradeService,
+            schoolService: _schoolService,
+          )
           .timeout(_requestTimeout);
     } catch (_) {
       return null;
     }
   }
 
-  Future<List<SchoolModel>?> _loadSchools() async {
-    try {
-      return await _schoolService.listSchools().timeout(_requestTimeout);
-    } catch (_) {
-      return null;
-    }
+  void _applyFilterOptions(StudentClassSearchFilterOptions options) {
+    _grades = options.grades
+        .where((grade) => gradeStableId(grade) != null)
+        .toList(growable: false);
+    _schools = options.schools
+        .where((school) => schoolStableId(school) != null)
+        .toList(growable: false);
   }
 
   void _selectGrade(GradeModel grade) {
@@ -368,7 +403,8 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
         ),
       );
       widget.onJoinRequested?.call();
-      await _search();
+      context.read<ClassroomCubit>().invalidateJoined(widget.profileId);
+      await _search(null, true);
     } catch (error) {
       if (!mounted) {
         return;

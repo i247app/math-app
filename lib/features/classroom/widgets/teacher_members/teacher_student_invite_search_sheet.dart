@@ -21,6 +21,7 @@ class _TeacherStudentInviteSearchSheetState
   List<StudentProfile> _results = const <StudentProfile>[];
   bool _isSearching = false;
   String? _error;
+  String? _lastSubmittedKeyword;
   int _requestSerial = 0;
 
   @override
@@ -43,6 +44,7 @@ class _TeacherStudentInviteSearchSheetState
     _requestSerial += 1;
     final requestId = _requestSerial;
     if (keyword.isEmpty) {
+      _lastSubmittedKeyword = null;
       setState(() {
         _results = const <StudentProfile>[];
         _isSearching = false;
@@ -50,6 +52,10 @@ class _TeacherStudentInviteSearchSheetState
       });
       return;
     }
+    if (_lastSubmittedKeyword == keyword && !_isSearching && _error == null) {
+      return;
+    }
+    _lastSubmittedKeyword = keyword;
 
     setState(() {
       _isSearching = true;

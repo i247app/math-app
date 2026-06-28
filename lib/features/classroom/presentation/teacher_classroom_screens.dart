@@ -35,6 +35,7 @@ import 'package:numi_flutter/features/profile/profile_api.dart';
 import 'package:numi_flutter/features/profile/school_api.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 
+part '../cache/teacher_classroom_lookup_cache.dart';
 part '../../home/teacher/home/helpers/teacher_home_helpers.dart';
 part '../../home/teacher/home/teacher_home_tab.dart';
 part '../../home/teacher/home/widgets/teacher_assignment_skeleton_card.dart';

@@ -228,11 +228,15 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         .map((classroom) => classroom.stableId)
         .whereType<int>()
         .toSet();
+    final classroomCubit = context.read<ClassroomCubit>();
     final result = await Navigator.of(context).push<_TeacherCreateClassResult>(
       MaterialPageRoute(
-        builder: (_) => TeacherCreateClassScreen(
-          user: widget.user,
-          activeProfile: widget.activeProfile,
+        builder: (_) => BlocProvider.value(
+          value: classroomCubit,
+          child: TeacherCreateClassScreen(
+            user: widget.user,
+            activeProfile: widget.activeProfile,
+          ),
         ),
       ),
     );
@@ -294,14 +298,18 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     }
 
     HapticFeedback.selectionClick();
+    final classroomCubit = context.read<ClassroomCubit>();
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
-        builder: (_) => TeacherClassDetailScreen(
-          classroomId: classroomId,
-          profileId: profileId,
-          userId: widget.user?.id,
-          initialClassroom: classroom,
-          initiallyExpanded: initiallyExpanded,
+        builder: (_) => BlocProvider.value(
+          value: classroomCubit,
+          child: TeacherClassDetailScreen(
+            classroomId: classroomId,
+            profileId: profileId,
+            userId: widget.user?.id,
+            initialClassroom: classroom,
+            initiallyExpanded: initiallyExpanded,
+          ),
         ),
       ),
     );

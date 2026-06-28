@@ -24,12 +24,8 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
 
-  List<ClassroomStudent> _joinRequests = const <ClassroomStudent>[];
-  List<ClassroomStudent> _members = const <ClassroomStudent>[];
   final Set<int> _processingProfileIds = <int>{};
-  bool _isLoading = true;
   bool _isSendingInvites = false;
-  String? _error;
 
   @override
   void initState() {
@@ -37,39 +33,12 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
     _loadMembers();
   }
 
-  Future<void> _loadMembers() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-    try {
-      final results = await Future.wait([
-        _classroomService.listJoinRequests(
+  Future<void> _loadMembers({bool forceRefresh = false}) {
+    return context.read<ClassroomCubit>().loadMembers(
           profileId: widget.profileId,
           classroomId: widget.classroomId,
-        ),
-        _classroomService.listStudents(
-          profileId: widget.profileId,
-          classroomId: widget.classroomId,
-        ),
-      ]);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _joinRequests = results[0];
-        _members = results[1];
-      });
-    } on ClassroomException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() => _error = error.message);
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+          forceRefresh: forceRefresh,
+        );
   }
 
   Future<void> _handleJoinRequest(
@@ -80,6 +49,8 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
     if (targetProfileId == null) {
       return;
     }
+    final cubit = context.read<ClassroomCubit>();
+    final messenger = ScaffoldMessenger.of(context);
     setState(() => _processingProfileIds.add(targetProfileId));
     try {
       if (approve) {
@@ -95,12 +66,22 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
           targetProfileId: targetProfileId,
         );
       }
-      await _loadMembers();
+      cubit.invalidateClassroomData(
+        profileId: widget.profileId,
+        classroomId: widget.classroomId,
+        detail: true,
+        members: false,
+      );
+      await cubit.loadMembers(
+        profileId: widget.profileId,
+        classroomId: widget.classroomId,
+        forceRefresh: true,
+      );
     } on ClassroomException catch (error) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context)
+      messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
@@ -126,25 +107,35 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
             LayoutBuilder(
               builder: (context, constraints) {
                 final scale = math.min(constraints.maxWidth / 390, 1.12);
-                return _TeacherClassMembersContent(
-                  scale: scale,
-                  isLoading: _isLoading,
-                  isSendingInvites: _isSendingInvites,
-                  error: _error,
-                  joinRequests: _joinRequests,
-                  members: _members,
-                  processingProfileIds: _processingProfileIds,
-                  onBack: () => Navigator.of(context).maybePop(),
-                  onRefresh: _loadMembers,
-                  onOpenStudentSearch: () => _openStudentSearchSheet(context),
-                  onApprove: (request) => _handleJoinRequest(
-                    request,
-                    approve: true,
+                return BlocSelector<ClassroomCubit, ClassroomState,
+                    ClassroomMembersState>(
+                  selector: (state) => state.members(
+                    widget.profileId,
+                    widget.classroomId,
                   ),
-                  onReject: (request) => _handleJoinRequest(
-                    request,
-                    approve: false,
-                  ),
+                  builder: (context, membersState) {
+                    return _TeacherClassMembersContent(
+                      scale: scale,
+                      isLoading: membersState.isLoading,
+                      isSendingInvites: _isSendingInvites,
+                      error: membersState.errorMessage,
+                      joinRequests: membersState.joinRequests,
+                      members: membersState.members,
+                      processingProfileIds: _processingProfileIds,
+                      onBack: () => Navigator.of(context).maybePop(),
+                      onRefresh: () => _loadMembers(forceRefresh: true),
+                      onOpenStudentSearch: () =>
+                          _openStudentSearchSheet(context),
+                      onApprove: (request) => _handleJoinRequest(
+                        request,
+                        approve: true,
+                      ),
+                      onReject: (request) => _handleJoinRequest(
+                        request,
+                        approve: false,
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -156,6 +147,8 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
   }
 
   Future<void> _openStudentSearchSheet(BuildContext context) async {
+    final cubit = context.read<ClassroomCubit>();
+    final messenger = ScaffoldMessenger.of(context);
     final selected = await showModalBottomSheet<List<StudentProfile>>(
       context: context,
       isScrollControlled: true,
@@ -175,6 +168,10 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
     if (targetProfileIds.isEmpty) {
       return;
     }
+    final successText = context.formatText(
+      AppKeys.teacherInviteRequestQueued,
+      {'count': targetProfileIds.length},
+    );
     setState(() => _isSendingInvites = true);
     try {
       await _classroomService.sendInvitations(
@@ -182,28 +179,34 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
         classroomId: widget.classroomId,
         targetProfileIds: targetProfileIds,
       );
-      if (!context.mounted) {
+      cubit.invalidateClassroomData(
+        profileId: widget.profileId,
+        classroomId: widget.classroomId,
+      );
+      await cubit.loadMembers(
+        profileId: widget.profileId,
+        classroomId: widget.classroomId,
+        forceRefresh: true,
+      );
+      if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context)
+      messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
             content: Text(
-              context.formatText(
-                AppKeys.teacherInviteRequestQueued,
-                {'count': targetProfileIds.length},
-              ),
+              successText,
               style: GoogleFonts.andika(),
             ),
             duration: const Duration(milliseconds: 1400),
           ),
         );
     } on ClassroomException catch (error) {
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context)
+      messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(

@@ -847,13 +847,16 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     }
 
     HapticFeedback.selectionClick();
+    final classroomCubit = context.read<ClassroomCubit>();
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (_) => StudentClassDetailScreen(
-          classroomId: classroomId,
-          profileId: profileId,
-          initialClassroom: classroom,
-          classroomService: _classroomService,
+        builder: (_) => BlocProvider.value(
+          value: classroomCubit,
+          child: StudentClassDetailScreen(
+            classroomId: classroomId,
+            profileId: profileId,
+            initialClassroom: classroom,
+          ),
         ),
       ),
     );
