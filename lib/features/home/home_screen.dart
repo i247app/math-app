@@ -25,12 +25,24 @@ import 'package:numi_flutter/features/home/cache/home_profile_cache.dart';
 import 'package:numi_flutter/features/home/home_api.dart';
 import 'package:numi_flutter/features/home/home_profile_controller.dart';
 import 'package:numi_flutter/features/home/home_tab_cubit.dart';
+import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
 import 'package:numi_flutter/features/home/parent/cache/parent_home_snapshot.dart';
 import 'package:numi_flutter/features/home/parent/parent_home_cubit.dart';
 import 'package:numi_flutter/features/home/student/cache/student_home_snapshot.dart';
 import 'package:numi_flutter/features/home/student/student_home_cubit.dart';
+import 'package:numi_flutter/features/home/teacher/teacher_dashboard.dart';
 import 'package:numi_flutter/features/home/teacher/teacher_home_cubit.dart';
+import 'package:numi_flutter/features/home/widgets/home_background.dart';
+import 'package:numi_flutter/features/home/widgets/home_bottom_navigation.dart';
+import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi_flutter/features/home/widgets/home_game_preview_card.dart';
+import 'package:numi_flutter/features/home/widgets/home_header_bar.dart';
+import 'package:numi_flutter/features/home/widgets/home_image_action.dart';
+import 'package:numi_flutter/features/home/widgets/home_initial_assessment_banner.dart';
+import 'package:numi_flutter/features/home/widgets/home_math_squadron_preview_artwork.dart';
+import 'package:numi_flutter/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
+import 'package:numi_flutter/features/home/widgets/home_start_guide_card.dart';
 import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
 import 'package:numi_flutter/features/games/presentation/games_tab.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
@@ -41,16 +53,13 @@ import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart'
 import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
-import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
 import 'package:numi_flutter/features/quiz/history_tab.dart';
 import 'package:numi_flutter/features/quiz/review_tab.dart';
 import 'package:numi_flutter/features/settings/setting_tab.dart';
 import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
-import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
 
 part 'parent/assessment/helpers/parent_assessment_helpers.dart';
-part 'helpers/home_dashboard_helpers.dart';
 part 'parent/assessment/models/parent_assessment_entry.dart';
 part 'parent/assessment/parent_assessment_tab.dart';
 part 'parent/assessment/widgets/parent_assessment_chart_painter.dart';
@@ -170,33 +179,15 @@ part 'student/shared/widgets/student_home_sections_loading.dart';
 part 'student/shared/widgets/student_inline_error_panel.dart';
 part 'student/shared/widgets/student_section_header.dart';
 part 'student/shared/widgets/student_state_card.dart';
-part 'teacher/teacher_dashboard.dart';
 part 'widgets/home_assessment_result_card.dart';
-part 'widgets/home_guide_item.dart';
-part 'widgets/home_start_guide_card.dart';
-part 'widgets/home_image_action.dart';
-part 'widgets/home_background.dart';
-part 'widgets/home_bottom_navigation.dart';
-part 'widgets/home_dashboard_args.dart';
-part 'widgets/home_game_preview_card.dart';
-part 'widgets/home_header_bar.dart';
-part 'widgets/home_initial_assessment_banner.dart';
-part 'widgets/home_math_squadron_laser.dart';
-part 'widgets/home_math_squadron_preview_artwork.dart';
-part 'widgets/home_math_squadron_target.dart';
-part 'widgets/home_missing_student_dialog.dart';
 part 'widgets/home_role_dashboard.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF515F54);
 const _deepInk = Color(0xFF253228);
-const _mintBackground = Color(0xFFEEF9FB);
-const _studentHomeBell = 'assets/images/student_home_bell.svg';
 const _studentHomeInvite = 'assets/images/student_home_invite.svg';
 const _parentHomeAfterReviewBanner =
     'assets/images/parent_banner_after_review.jpg';
-const _homeInitialAssessmentBanner =
-    'assets/images/parent_home_mode1_assessment_banner.jpg';
 const _parentHomeClassroom = 'assets/images/join_classroom.jpg';
 const _parentHomeRace = 'assets/images/parent_home_race.png';
 const _parentHomeShop = 'assets/images/parent_home_shop.png';
@@ -208,11 +199,6 @@ const _studentParentHomeRejectIcon =
     'assets/images/student_parent_home_reject.png';
 const _studentParentHomeJoinIcon =
     'assets/images/student_parent_home_join_icon.svg';
-const _studentHomeNavHome = 'assets/images/student_home_nav_home.svg';
-const _studentHomeNavClass = 'assets/images/student_home_nav_class.svg';
-const _studentHomeNavReport = 'assets/images/student_home_nav_report.svg';
-const _studentHomeNavMessage = 'assets/images/student_home_nav_message.svg';
-const _studentHomeNavSettings = 'assets/images/student_home_nav_settings.svg';
 const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
 const _homeTeacherAvatarOne = 'assets/images/student_home_avatar.png';
 const _homeTeacherAvatarTwo = 'assets/images/student_class_teacher.png';
@@ -228,14 +214,6 @@ enum _HomeTabDestination {
   study,
   members,
   settings,
-}
-
-String _homeRoleLabel(BuildContext context, ProfileRole role) {
-  return switch (role) {
-    ProfileRole.parent => context.getText(AppKeys.roleParent).toUpperCase(),
-    ProfileRole.teacher => context.getText(AppKeys.roleTeacher).toUpperCase(),
-    ProfileRole.student => context.getText(AppKeys.roleStudent).toUpperCase(),
-  };
 }
 
 class HomeScreen extends StatefulWidget {

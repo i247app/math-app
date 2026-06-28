@@ -1,7 +1,7 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _HomeMathSquadronTarget extends StatelessWidget {
-  const _HomeMathSquadronTarget();
+class HomeMathSquadronTarget extends StatelessWidget {
+  const HomeMathSquadronTarget({super.key});
 
   @override
   Widget build(BuildContext context) {

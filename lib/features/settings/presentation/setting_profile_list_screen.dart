@@ -1,17 +1,22 @@
-part of '../setting_tab.dart';
+import 'package:flutter/material.dart';
 
-class _SettingProfileListScreen extends StatelessWidget {
-  const _SettingProfileListScreen({
+import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
+import 'package:numi_flutter/features/settings/setting_tab.dart';
+import 'package:numi_flutter/features/settings/widgets/setting_safe_screen.dart';
+
+class SettingProfileListScreen extends StatelessWidget {
+  const SettingProfileListScreen({
+    super.key,
     required this.args,
     this.openAddProfileOnStart = false,
   });
 
-  final _SettingScreenArgs args;
+  final SettingScreenArgs args;
   final bool openAddProfileOnStart;
 
   @override
   Widget build(BuildContext context) {
-    return _SettingSafeScreen(
+    return SettingSafeScreen(
       child: SettingTab.page(
         user: args.user,
         profiles: args.profiles,

@@ -45,7 +45,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       _loadAssessments();
     } else if (oldWidget.args.activeRefreshTick !=
         widget.args.activeRefreshTick) {
-      _loadAssessments();
+      _loadAssessments(forceRefresh: true);
     }
   }
 
@@ -64,12 +64,23 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         '${ActiveProfileSession.profileStableId(args.activeProfile)}';
   }
 
-  Future<void> _loadAssessments() async {
+  Future<void> _loadAssessments({bool forceRefresh = false}) async {
     final requestId = ++_loadRequestId;
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
     );
     final userId = widget.args.user?.id;
+    final cache = HomeProfileCache.instance;
+    final cachedSnapshot =
+        profileId == null ? null : cache.getParent(profileId);
+    if (!forceRefresh &&
+        cachedSnapshot != null &&
+        cachedSnapshot.completedAssessments.isNotEmpty) {
+      setState(() => _applyCachedAssessments(cachedSnapshot));
+      if (!cachedSnapshot.isStale) {
+        return;
+      }
+    }
 
     setState(() {
       _isLoading = true;
@@ -112,6 +123,30 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           ? context.readText(AppKeys.parentQuizLoadFailed)
           : null;
     });
+    if (!failed &&
+        profileId != null &&
+        profileId > 0 &&
+        cachedSnapshot != null) {
+      cache.putParent(
+        ParentHomeSnapshot(
+          profileId: profileId,
+          homeLayout: cachedSnapshot.homeLayout,
+          completedAssessments:
+              entries.map((entry) => entry.quiz).toList(growable: false),
+          cachedAt: DateTime.now(),
+        ),
+      );
+    }
+  }
+
+  void _applyCachedAssessments(ParentHomeSnapshot snapshot) {
+    _entries = snapshot.completedAssessments
+        .map((quiz) => _ParentAssessmentEntry(quiz: quiz))
+        .toList(growable: false)
+      ..sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
+    _isLoading = false;
+    _hasCompletedInitialLoad = true;
+    _errorMessage = null;
   }
 
   List<_ParentAssessmentEntry> get _filteredEntries {
@@ -157,7 +192,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           profileId: ActiveProfileSession.profileStableId(
             widget.args.activeProfile,
           ),
-          initialGradeId: _profileGradeId(widget.args.activeProfile),
+          initialGradeId: profileGradeId(widget.args.activeProfile),
           initialGradeLabel: widget.args.activeProfile?.grade?.label,
           onResultBack: () {
             if (!mounted) {
@@ -174,7 +209,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       ),
     );
     if (mounted) {
-      await _loadAssessments();
+      await _loadAssessments(forceRefresh: true);
     }
   }
 
@@ -189,7 +224,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       color: const Color(0xFFF1FBFA),
       child: RefreshIndicator(
         color: const Color(0xFF339395),
-        onRefresh: _loadAssessments,
+        onRefresh: () => _loadAssessments(forceRefresh: true),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),

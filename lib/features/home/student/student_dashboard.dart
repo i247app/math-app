@@ -77,7 +77,7 @@ class StudentDashboard extends StatelessWidget {
     }
 
     if (args.activeTab == 4) {
-      return _dashboardSettings(args);
+      return dashboardSettings(args);
     }
 
     return const SizedBox.shrink();

@@ -1,7 +1,12 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _HomeStartGuideCard extends StatelessWidget {
-  const _HomeStartGuideCard({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/home/widgets/home_guide_item.dart';
+
+class HomeStartGuideCard extends StatelessWidget {
+  const HomeStartGuideCard({
+    super.key,
     required this.onAssessmentTap,
     required this.onRoadmapTap,
     required this.onClassroomTap,
@@ -29,7 +34,7 @@ class _HomeStartGuideCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _HomeGuideItem(
+          HomeGuideItem(
             icon: Icons.fact_check_rounded,
             color: const Color(0xFF069C95),
             title: context.getText(AppKeys.parentAssessmentTitle),
@@ -37,7 +42,7 @@ class _HomeStartGuideCard extends StatelessWidget {
             onTap: onAssessmentTap,
           ),
           const SizedBox(height: 10),
-          _HomeGuideItem(
+          HomeGuideItem(
             icon: Icons.sports_esports_rounded,
             color: const Color(0xFFFF6636),
             title: context.getText(AppKeys.parentRoadmapTitle),
@@ -45,7 +50,7 @@ class _HomeStartGuideCard extends StatelessWidget {
             onTap: onRoadmapTap,
           ),
           const SizedBox(height: 10),
-          _HomeGuideItem(
+          HomeGuideItem(
             icon: Icons.meeting_room_rounded,
             color: const Color(0xFF6451A6),
             title: context.getText(AppKeys.parentJoinRoomTitle),

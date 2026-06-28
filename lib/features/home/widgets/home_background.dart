@@ -1,4 +1,4 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
 
 class HomeBackground extends StatelessWidget {
   const HomeBackground({super.key});

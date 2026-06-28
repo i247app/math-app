@@ -1,7 +1,10 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _HomeGuideItem extends StatelessWidget {
-  const _HomeGuideItem({
+import 'package:numi_flutter/core/theme/font_size.dart';
+
+class HomeGuideItem extends StatelessWidget {
+  const HomeGuideItem({
+    super.key,
     required this.icon,
     required this.color,
     required this.title,

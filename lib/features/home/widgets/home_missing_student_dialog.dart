@@ -1,7 +1,14 @@
-part of '../home_screen.dart';
+import 'dart:ui';
 
-class _HomeMissingStudentDialog extends StatelessWidget {
-  const _HomeMissingStudentDialog();
+import 'package:flutter/material.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+
+class HomeMissingStudentDialog extends StatelessWidget {
+  const HomeMissingStudentDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +59,7 @@ class _HomeMissingStudentDialog extends StatelessWidget {
                       ),
                     ),
                     Image.asset(
-                      _parentNoStudentMascot,
+                      parentNoStudentMascotAsset,
                       width: 220,
                       height: 198,
                       fit: BoxFit.contain,

@@ -1,7 +1,8 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _HomeImageAction extends StatelessWidget {
-  const _HomeImageAction({
+class HomeImageAction extends StatelessWidget {
+  const HomeImageAction({
+    super.key,
     required this.asset,
     required this.height,
     required this.onTap,

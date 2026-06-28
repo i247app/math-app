@@ -1,7 +1,8 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _HomeGamePreviewCard extends StatelessWidget {
-  const _HomeGamePreviewCard({
+class HomeGamePreviewCard extends StatelessWidget {
+  const HomeGamePreviewCard({
+    super.key,
     required this.background,
     this.asset,
     this.child,

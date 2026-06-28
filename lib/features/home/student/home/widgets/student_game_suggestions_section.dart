@@ -52,16 +52,16 @@ class _StudentGameSuggestionsSection extends StatelessWidget {
         const Row(
           children: [
             Expanded(
-              child: _HomeGamePreviewCard(
+              child: HomeGamePreviewCard(
                 asset: 'assets/images/game_numi_farm_banner.png',
                 background: Color(0xFFDDF3EE),
               ),
             ),
             SizedBox(width: 16),
             Expanded(
-              child: _HomeGamePreviewCard(
+              child: HomeGamePreviewCard(
                 background: Color(0xFF111C4B),
-                child: _HomeMathSquadronPreviewArtwork(),
+                child: HomeMathSquadronPreviewArtwork(),
               ),
             ),
           ],

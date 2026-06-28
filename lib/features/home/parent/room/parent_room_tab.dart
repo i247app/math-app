@@ -44,11 +44,11 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     );
     if (oldProfileId != profileId ||
         oldWidget.args.activeRefreshTick != widget.args.activeRefreshTick) {
-      _loadLayout();
+      _loadLayout(forceRefresh: true);
     }
   }
 
-  Future<void> _loadLayout() async {
+  Future<void> _loadLayout({bool forceRefresh = false}) async {
     final requestId = ++_requestId;
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
@@ -66,6 +66,16 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       return;
     }
 
+    final cache = HomeProfileCache.instance;
+    final cachedSnapshot = cache.getParent(profileId);
+    if (!forceRefresh && cachedSnapshot != null) {
+      setState(() => _applySnapshot(cachedSnapshot));
+      if (!cachedSnapshot.isStale) {
+        return;
+      }
+    }
+
+    final hadRenderableContent = _hasLoaded;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -82,8 +92,23 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         _hasLoaded = true;
         _errorMessage = null;
       });
+      cache.putParent(
+        ParentHomeSnapshot(
+          profileId: profileId,
+          homeLayout: layout,
+          completedAssessments: _quizzesFromLayoutQuizzes(layout.quizzes),
+          cachedAt: DateTime.now(),
+        ),
+      );
     } on HomeLayoutException catch (error) {
       if (!mounted) {
+        return;
+      }
+      if (hadRenderableContent) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = error.message;
+        });
         return;
       }
       setState(() {
@@ -95,6 +120,14 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       if (!mounted) {
         return;
       }
+      if (hadRenderableContent) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage =
+              context.readText(AppKeys.parentChildDashboardLoadFailed);
+        });
+        return;
+      }
       setState(() {
         _isLoading = false;
         _hasLoaded = true;
@@ -102,6 +135,13 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             context.readText(AppKeys.parentChildDashboardLoadFailed);
       });
     }
+  }
+
+  void _applySnapshot(ParentHomeSnapshot snapshot) {
+    _layout = snapshot.homeLayout;
+    _isLoading = false;
+    _hasLoaded = true;
+    _errorMessage = null;
   }
 
   @override
@@ -129,7 +169,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           Expanded(
             child: RefreshIndicator(
               color: const Color(0xFF339395),
-              onRefresh: _loadLayout,
+              onRefresh: () => _loadLayout(forceRefresh: true),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(
                   parent: BouncingScrollPhysics(),
@@ -175,7 +215,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         icon: Icons.cloud_off_rounded,
         title: context.getText(AppKeys.historyLoadErrorTitle),
         message: _errorMessage!,
-        onTap: _loadLayout,
+        onTap: () => _loadLayout(forceRefresh: true),
       );
     }
 
@@ -199,8 +239,9 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ),
         const SizedBox(height: 18),
         _ParentRoomListSection(
-          title:
-              'Nhiệm vụ(${pendingExercises.length + expiredExercises.length})',
+          title: context.formatText(AppKeys.parentTasksCountTitle, {
+            'count': pendingExercises.length + expiredExercises.length,
+          }),
           onViewAll: widget.args.onOpenClassroomTab,
           child: pendingExercises.isEmpty && expiredExercises.isEmpty
               ? _ParentEmptyTaskLine(
@@ -239,7 +280,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ),
         const SizedBox(height: 14),
         _ParentRoomListSection(
-          title: 'Kết quả',
+          title: context.getText(AppKeys.assessmentResultTitle),
           onViewAll: widget.args.onOpenClassroomTab,
           child: completions.isEmpty
               ? _ParentEmptyTaskLine(

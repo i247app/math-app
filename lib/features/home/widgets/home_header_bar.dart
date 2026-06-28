@@ -1,4 +1,24 @@
-part of '../home_screen.dart';
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
+
+String homeRoleLabel(BuildContext context, ProfileRole role) {
+  return switch (role) {
+    ProfileRole.parent => context.getText(AppKeys.roleParent).toUpperCase(),
+    ProfileRole.teacher => context.getText(AppKeys.roleTeacher).toUpperCase(),
+    ProfileRole.student => context.getText(AppKeys.roleStudent).toUpperCase(),
+  };
+}
 
 class HomeHeaderBar extends StatelessWidget {
   const HomeHeaderBar({
@@ -72,7 +92,7 @@ class HomeHeaderBar extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _homeRoleLabel(context, role),
+                                homeRoleLabel(context, role),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -209,7 +229,7 @@ class HomeProfileAvatar extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: _teal.withValues(alpha: 0.05),
+                color: homeTeal.withValues(alpha: 0.05),
                 spreadRadius: size * 0.08,
               ),
               BoxShadow(
@@ -237,7 +257,10 @@ class HomeProfileAvatar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF22C55E),
                 shape: BoxShape.circle,
-                border: Border.all(color: _mintBackground, width: size * 0.05),
+                border: Border.all(
+                  color: homeMintBackground,
+                  width: size * 0.05,
+                ),
               ),
             ),
           ),
@@ -266,7 +289,7 @@ class HomeNotificationButton extends StatelessWidget {
           height: size,
           child: Center(
             child: SvgPicture.asset(
-              _studentHomeBell,
+              studentHomeBellAsset,
               width: size * 0.40,
               height: size * 0.50,
             ),

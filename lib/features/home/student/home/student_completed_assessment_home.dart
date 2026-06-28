@@ -7,7 +7,7 @@ extension _StudentCompletedAssessmentHomeView on _StudentHomeContentState {
       children: [
         _studentHomeEntrance(
           order: 0,
-          child: _HomeImageAction(
+          child: HomeImageAction(
             asset: _parentHomeAfterReviewBanner,
             height: 214,
             onTap: widget.onOpenReviewTab,
@@ -22,13 +22,13 @@ extension _StudentCompletedAssessmentHomeView on _StudentHomeContentState {
               Expanded(
                 child: Column(
                   children: [
-                    _HomeImageAction(
+                    HomeImageAction(
                       asset: _parentHomeRace,
                       height: 83,
                       onTap: widget.onOpenReviewTab,
                     ),
                     const SizedBox(height: 7),
-                    _HomeImageAction(
+                    HomeImageAction(
                       asset: _parentHomeShop,
                       height: 83,
                       onTap: widget.onOpenReviewTab,
@@ -38,7 +38,7 @@ extension _StudentCompletedAssessmentHomeView on _StudentHomeContentState {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _HomeImageAction(
+                child: HomeImageAction(
                   asset: _parentHomeClassroom,
                   height: 173,
                   onTap: widget.onOpenClassroomTab,

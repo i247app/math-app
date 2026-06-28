@@ -1,39 +1,27 @@
-part of '../setting_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _SettingScreenArgs {
-  const _SettingScreenArgs({
-    required this.user,
-    required this.profiles,
-    required this.activeProfile,
-    required this.profileLoadError,
-    required this.onLogout,
-    required this.onActivateProfile,
-    required this.onRefreshProfiles,
-    required this.onProfileSaved,
-    required this.scale,
-  });
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/profile/avatar_picker.dart';
+import 'package:numi_flutter/features/settings/helpers/settings_account_helpers.dart';
+import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
+import 'package:numi_flutter/features/settings/widgets/account/account_screen_skeleton.dart';
+import 'package:numi_flutter/features/settings/widgets/account_details_panel.dart';
+import 'package:numi_flutter/features/settings/widgets/setting_header.dart';
+import 'package:numi_flutter/features/settings/widgets/setting_safe_screen.dart';
 
-  final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
-  final String? profileLoadError;
-  final VoidCallback onLogout;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
-  final Future<void> Function()? onRefreshProfiles;
-  final VoidCallback? onProfileSaved;
-  final double scale;
-}
+class SettingAccountScreen extends StatefulWidget {
+  const SettingAccountScreen({super.key, required this.args});
 
-class _SettingAccountScreen extends StatefulWidget {
-  const _SettingAccountScreen({required this.args});
-
-  final _SettingScreenArgs args;
+  final SettingScreenArgs args;
 
   @override
-  State<_SettingAccountScreen> createState() => _SettingAccountScreenState();
+  State<SettingAccountScreen> createState() => _SettingAccountScreenState();
 }
 
-class _SettingAccountScreenState extends State<_SettingAccountScreen>
+class _SettingAccountScreenState extends State<SettingAccountScreen>
     with SingleTickerProviderStateMixin {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
   final OtpAuthService _authService = OtpAuthApi();
@@ -63,10 +51,16 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
   void initState() {
     super.initState();
     _user = widget.args.user;
+    if (_user != null) {
+      _applyUser(_user);
+      _isLoadingAccount = false;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _entranceController.forward();
-        _prepareAccount();
+        if (_user == null) {
+          _prepareAccount();
+        }
       }
     });
   }
@@ -81,8 +75,8 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
   }
 
   void _applyUser(LoginUser? user) {
-    _usernameController.text = _SettingTabState._fallbackUsername(user);
-    _phoneController.text = _SettingTabState._displayPhone(user?.phone);
+    _usernameController.text = settingsFallbackUsername(user);
+    _phoneController.text = settingsDisplayPhone(user?.phone);
     _emailController.text = user?.email?.trim() ?? '';
   }
 
@@ -91,7 +85,6 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
     final userFuture = initialUser != null
         ? Future<LoginUser?>.value(initialUser)
         : _authService.restoreSession();
-    await Future<void>.delayed(const Duration(milliseconds: 500));
     try {
       final user = await userFuture;
       if (!mounted) {
@@ -156,8 +149,8 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
       final updatedUser = await _authService.updateUser(
         userId: userId,
         name: name,
-        phone: _SettingTabState._normalizedPhone(_phoneController.text),
-        email: _SettingTabState._emptyToNull(_emailController.text),
+        phone: settingsNormalizedPhone(_phoneController.text),
+        email: settingsEmptyToNull(_emailController.text),
         avatarPath: avatarPath,
       );
       if (!mounted) {
@@ -231,14 +224,14 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
     final scale = widget.args.scale;
     final screen = PopScope(
       canPop: !_isSaving,
-      child: _SettingSafeScreen(
+      child: SettingSafeScreen(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _SettingHeader(
+              SettingHeader(
                 title: context.getText(AppKeys.accountTitle),
                 canGoBack: true,
                 onBack: _close,
@@ -250,8 +243,8 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24 * scale),
                 child: _isLoadingAccount
-                    ? _AccountScreenSkeleton(scale: scale)
-                    : _AccountDetailsPanel(
+                    ? AccountScreenSkeleton(scale: scale)
+                    : AccountDetailsPanel(
                         avatarUrl: _user?.avatarUrl,
                         avatarPath:
                             _isEditing ? _draftAvatarPath : _localAvatarPath,
@@ -287,120 +280,6 @@ class _SettingAccountScreenState extends State<_SettingAccountScreen>
           child: child,
         );
       },
-    );
-  }
-}
-
-class _AccountScreenSkeleton extends StatefulWidget {
-  const _AccountScreenSkeleton({required this.scale});
-
-  final double scale;
-
-  @override
-  State<_AccountScreenSkeleton> createState() => _AccountScreenSkeletonState();
-}
-
-class _AccountScreenSkeletonState extends State<_AccountScreenSkeleton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1200),
-  )..repeat();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final scale = widget.scale;
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) => ShaderMask(
-        blendMode: BlendMode.srcATop,
-        shaderCallback: (bounds) {
-          final shimmerWidth = bounds.width * 1.2;
-          final start = -shimmerWidth;
-          final dx = start + (bounds.width - start) * _controller.value;
-          return LinearGradient(
-            colors: [
-              Colors.white.withValues(alpha: 0),
-              Colors.white.withValues(alpha: 0.78),
-              Colors.white.withValues(alpha: 0),
-            ],
-            stops: const [0.28, 0.5, 0.72],
-          ).createShader(
-            Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height),
-          );
-        },
-        child: child,
-      ),
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: _AccountSkeletonBlock(
-              width: 36 * scale,
-              height: 36 * scale,
-              radius: 10 * scale,
-            ),
-          ),
-          SizedBox(height: 10 * scale),
-          _AccountSkeletonBlock(
-            width: 126 * scale,
-            height: 126 * scale,
-            radius: 63 * scale,
-          ),
-          SizedBox(height: 24 * scale),
-          for (var index = 0; index < 3; index++) ...[
-            _AccountSkeletonBlock(
-              height: 68 * scale,
-              radius: 16 * scale,
-            ),
-            if (index < 2) SizedBox(height: 20 * scale),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _AccountSkeletonBlock extends StatelessWidget {
-  const _AccountSkeletonBlock({
-    this.width,
-    required this.height,
-    required this.radius,
-  });
-
-  final double? width;
-  final double height;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8EEF0),
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
-  }
-}
-
-class _SettingSafeScreen extends StatelessWidget {
-  const _SettingSafeScreen({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      child: SafeArea(child: child),
     );
   }
 }

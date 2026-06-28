@@ -1,4 +1,16 @@
-part of '../home_screen.dart';
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 
 class HomeBottomNavigation extends StatelessWidget {
   const HomeBottomNavigation({
@@ -51,31 +63,31 @@ class HomeBottomNavigation extends StatelessWidget {
             null,
             context.getText(AppKeys.navHome),
             null,
-            assetPath: _studentHomeNavHome,
+            assetPath: studentHomeNavHomeAsset,
           ),
           HomeNavItemData(
             null,
             context.getText(AppKeys.navClassroom),
             null,
-            assetPath: _studentHomeNavClass,
+            assetPath: studentHomeNavClassAsset,
           ),
           HomeNavItemData(
             null,
             context.getText(AppKeys.navReview),
             null,
-            assetPath: _studentHomeNavReport,
+            assetPath: studentHomeNavReportAsset,
           ),
           HomeNavItemData(
             null,
             context.getText(AppKeys.navHistory),
             null,
-            assetPath: _studentHomeNavMessage,
+            assetPath: studentHomeNavMessageAsset,
           ),
           HomeNavItemData(
             null,
             context.getText(AppKeys.navSettings),
             null,
-            assetPath: _studentHomeNavSettings,
+            assetPath: studentHomeNavSettingsAsset,
           ),
         ],
       ProfileRole.parent => [
@@ -206,12 +218,12 @@ class HomeAnimatedNavItem extends StatelessWidget {
                     boxShadow: active && !teacherStyle
                         ? [
                             BoxShadow(
-                              color: _teal.withValues(alpha: 0.20),
+                              color: homeTeal.withValues(alpha: 0.20),
                               blurRadius: 15 * scale,
                               offset: Offset(0, 10 * scale),
                             ),
                             BoxShadow(
-                              color: _teal.withValues(alpha: 0.20),
+                              color: homeTeal.withValues(alpha: 0.20),
                               blurRadius: 6 * scale,
                               offset: Offset(0, 4 * scale),
                             ),

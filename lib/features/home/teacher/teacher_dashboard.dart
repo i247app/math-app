@@ -1,4 +1,8 @@
-part of '../home_screen.dart';
+import 'package:flutter/widgets.dart';
+
+import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
 
 class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({
@@ -54,7 +58,7 @@ class TeacherDashboard extends StatelessWidget {
     }
 
     if (args.activeTab == 4) {
-      return _dashboardSettings(args);
+      return dashboardSettings(args);
     }
 
     return const SizedBox.shrink();

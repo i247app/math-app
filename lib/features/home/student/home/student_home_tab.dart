@@ -785,7 +785,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     return showDialog<bool>(
       context: context,
       barrierColor: const Color(0xFF001741).withValues(alpha: 0.40),
-      builder: (_) => const _HomeMissingStudentDialog(),
+      builder: (_) => const HomeMissingStudentDialog(),
     );
   }
 
@@ -801,7 +801,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
           profileId: ActiveProfileSession.profileStableId(
             widget.activeProfile,
           ),
-          initialGradeId: _profileGradeId(widget.activeProfile),
+          initialGradeId: profileGradeId(widget.activeProfile),
           initialGradeLabel: widget.activeProfile?.grade?.label,
         ),
       ),

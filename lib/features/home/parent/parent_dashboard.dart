@@ -27,14 +27,14 @@ class ParentDashboard extends StatelessWidget {
         userId: args.user?.id,
         initialGrades: args.initialGrades,
         gradeService: args.gradeService,
-        initialGradeId: _profileGradeId(args.activeProfile),
+        initialGradeId: profileGradeId(args.activeProfile),
         initialGradeLabel: args.activeProfile?.grade?.label,
         bottomPadding: args.bottomPadding,
       );
     }
 
     if (args.activeTab == 4) {
-      return _dashboardSettings(args);
+      return dashboardSettings(args);
     }
 
     return const SizedBox.shrink();
