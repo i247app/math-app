@@ -4,6 +4,7 @@ class HomeRoleDashboard extends StatefulWidget {
   const HomeRoleDashboard({
     super.key,
     required this.activeTab,
+    required this.selectionRevision,
     required this.user,
     required this.profiles,
     required this.activeProfile,
@@ -33,6 +34,7 @@ class HomeRoleDashboard extends StatefulWidget {
   });
 
   final int activeTab;
+  final int selectionRevision;
   final LoginUser? user;
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
@@ -90,7 +92,7 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
 
       setState(() {
         _visitedTabs.add(tab);
-        _activationTicks[tab] = 1;
+        _activationTicks[tab] = 0;
       });
       await WidgetsBinding.instance.endOfFrame;
       await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -102,13 +104,12 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.activeTab != widget.activeTab) {
       _visitedTabs.add(widget.activeTab);
-      final isFirstActivation = _activatedTabs.add(widget.activeTab);
-      if (isFirstActivation) {
-        _activationTicks[widget.activeTab] ??= 1;
-      } else {
-        _activationTicks[widget.activeTab] =
-            (_activationTicks[widget.activeTab] ?? 0) + 1;
-      }
+      _activatedTabs.add(widget.activeTab);
+      _activationTicks[widget.activeTab] =
+          (_activationTicks[widget.activeTab] ?? 0) + 1;
+    } else if (oldWidget.selectionRevision != widget.selectionRevision) {
+      _activationTicks[widget.activeTab] =
+          (_activationTicks[widget.activeTab] ?? 0) + 1;
     }
 
     if (widget.profileResetSignal != _lastProfileResetSignal) {

@@ -108,7 +108,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   void didUpdateWidget(covariant _StudentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadHomeLayout();
+      _loadHomeLayout(forceRefresh: true);
       return;
     }
     if (!widget.isActive) {
@@ -191,12 +191,12 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       final student = layout.student;
       final classrooms = layout.rooms.isNotEmpty
           ? layout.rooms
-              .map((classroom) => classroom.classroom)
-              .toList(growable: false)
+                .map((classroom) => classroom.classroom)
+                .toList(growable: false)
           : student?.classrooms
-                  .map((classroom) => classroom.classroom)
-                  .toList(growable: false) ??
-              const <ClassroomModel>[];
+                    .map((classroom) => classroom.classroom)
+                    .toList(growable: false) ??
+                const <ClassroomModel>[];
       final modernPendingExercises = layout.tasks
           .where((task) => task.isPending)
           .map((task) => task.exercise)
@@ -205,17 +205,18 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       final pendingExercises = layout.tasks.isNotEmpty
           ? modernPendingExercises
           : student?.pendingExercises
-                  .map((pending) => pending.exercise)
-                  .whereType<ClassroomExercise>()
-                  .toList(growable: false) ??
-              const <ClassroomExercise>[];
+                    .map((pending) => pending.exercise)
+                    .whereType<ClassroomExercise>()
+                    .toList(growable: false) ??
+                const <ClassroomExercise>[];
       setState(() {
         _isLoadingHomeLayout = false;
         _hasLoadedHomeLayout = true;
         _layoutClassrooms = classrooms;
         _modeHomeworkExercises = pendingExercises;
-        _modeHomeworkClassroomId =
-            classrooms.isEmpty ? null : classrooms.first.stableId;
+        _modeHomeworkClassroomId = classrooms.isEmpty
+            ? null
+            : classrooms.first.stableId;
         _modeHomeworkProfileId = profileId;
         _isLoadingModeHomework = false;
         _completedAssessments = _quizzesFromLayoutQuizzes(layout.quizzes);
@@ -272,9 +273,9 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       return;
     }
     await context.read<ClassroomCubit>().loadJoined(
-          profileId,
-          forceRefresh: forceRefresh,
-        );
+      profileId,
+      forceRefresh: forceRefresh,
+    );
   }
 
   Future<void> _refreshClassrooms() {
@@ -399,10 +400,9 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
         return;
       }
       exercises.sort(
-        (a, b) =>
-            _studentModeDate(b.createDt ?? b.startDate ?? b.endDate).compareTo(
-          _studentModeDate(a.createDt ?? a.startDate ?? a.endDate),
-        ),
+        (a, b) => _studentModeDate(
+          b.createDt ?? b.startDate ?? b.endDate,
+        ).compareTo(_studentModeDate(a.createDt ?? a.startDate ?? a.endDate)),
       );
       setState(() {
         _modeHomeworkExercises = exercises;
@@ -534,8 +534,9 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
     return _StudentClassroomOverviewEntrance(
       order: order,
-      onFinished:
-          markOnEnd ? _markStudentClassroomOverviewEntrancePlayed : null,
+      onFinished: markOnEnd
+          ? _markStudentClassroomOverviewEntrancePlayed
+          : null,
       child: child,
     );
   }
@@ -560,12 +561,12 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
       child: widget.activeRole == ProfileRole.parent
           ? _buildStudentInitialAssessmentState()
           : isLoadingHomeSections
-              ? const _StudentHomeSectionsLoading()
-              : hasClassroom
-                  ? _buildStudentClassroomOverviewState()
-                  : hasCompletedAssessment
-                      ? _buildStudentCompletedAssessmentState()
-                      : _buildStudentInitialAssessmentState(),
+          ? const _StudentHomeSectionsLoading()
+          : hasClassroom
+          ? _buildStudentClassroomOverviewState()
+          : hasCompletedAssessment
+          ? _buildStudentCompletedAssessmentState()
+          : _buildStudentInitialAssessmentState(),
     );
   }
 
@@ -573,24 +574,24 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
   Widget _buildPanel(BuildContext context) {
     return switch (_activePanel) {
       _StudentHomePanel.homework => _StudentHomeworkPanel(
-          key: const ValueKey(_StudentHomePanel.homework),
-          scale: widget.scale,
-        ),
+        key: const ValueKey(_StudentHomePanel.homework),
+        scale: widget.scale,
+      ),
       _StudentHomePanel.classroom => _StudentClassroomPanel(
-          key: const ValueKey(_StudentHomePanel.classroom),
-          scale: widget.scale,
-          classrooms: _classrooms,
-          isLoading: _isLoadingClassrooms,
-          error: _classroomError,
-          onRetry: _refreshClassrooms,
-          onJoinClassroom: widget.activeRole == ProfileRole.student
-              ? widget.onOpenClassroomTab
-              : _handleParentClassroomEntry,
-        ),
+        key: const ValueKey(_StudentHomePanel.classroom),
+        scale: widget.scale,
+        classrooms: _classrooms,
+        isLoading: _isLoadingClassrooms,
+        error: _classroomError,
+        onRetry: _refreshClassrooms,
+        onJoinClassroom: widget.activeRole == ProfileRole.student
+            ? widget.onOpenClassroomTab
+            : _handleParentClassroomEntry,
+      ),
       _StudentHomePanel.achievement => _StudentAchievementPanel(
-          key: const ValueKey(_StudentHomePanel.achievement),
-          scale: widget.scale,
-        ),
+        key: const ValueKey(_StudentHomePanel.achievement),
+        scale: widget.scale,
+      ),
     };
   }
 
@@ -672,8 +673,9 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
 
   List<StudentProfile> get _studentProfiles {
     return widget.profiles
-        .where((profile) =>
-            ProfileRole.fromProfile(profile) == ProfileRole.student)
+        .where(
+          (profile) => ProfileRole.fromProfile(profile) == ProfileRole.student,
+        )
         .toList();
   }
 
@@ -770,9 +772,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF008080),
               ),
-              child: Text(
-                context.getText(AppKeys.parentSwitchStudentAction),
-              ),
+              child: Text(context.getText(AppKeys.parentSwitchStudentAction)),
             ),
           ],
         );
@@ -798,9 +798,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
           initialGrades: widget.initialGrades,
           gradeService: widget.gradeService,
           quizPurpose: quizPurpose,
-          profileId: ActiveProfileSession.profileStableId(
-            widget.activeProfile,
-          ),
+          profileId: ActiveProfileSession.profileStableId(widget.activeProfile),
           initialGradeId: profileGradeId(widget.activeProfile),
           initialGradeLabel: widget.activeProfile?.grade?.label,
         ),
@@ -816,10 +814,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     HapticFeedback.selectionClick();
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => QuizReviewScreen(
-          quizId: quizId,
-          initialQuiz: quiz,
-        ),
+        builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
       ),
     );
   }

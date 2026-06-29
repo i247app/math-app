@@ -11,8 +11,8 @@ class TeacherStudyTab extends StatefulWidget {
     ClassroomExerciseService? exerciseService,
     this.activeRefreshTick = 0,
     this.isActive = true,
-  })  : _classroomService = classroomService,
-        _exerciseService = exerciseService;
+  }) : _classroomService = classroomService,
+       _exerciseService = exerciseService;
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
@@ -45,8 +45,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   List<ClassroomExercise> _exercises = const <ClassroomExercise>[];
 
   ClassroomCollectionState get _classroomCollection {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (profileId == null || profileId <= 0) {
       return const ClassroomCollectionState(profileId: 0);
     }
@@ -71,14 +72,15 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   void didUpdateWidget(covariant TeacherStudyTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadClassrooms();
+      _loadClassrooms(forceRefresh: true);
       return;
     }
     if (!widget.isActive) {
       return;
     }
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (profileId != _loadedProfileId) {
       _selectedClassroomId = null;
       _loadClassrooms();
@@ -95,8 +97,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   }
 
   Future<void> _loadClassrooms({bool forceRefresh = false}) async {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     _exerciseRequestId++;
     final isInitialProfileLoad =
         !_hasCompletedInitialLoad || profileId != _loadedProfileId;
@@ -122,14 +125,15 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     });
 
     final collection = await context.read<ClassroomCubit>().loadOwned(
-          profileId,
-          forceRefresh: forceRefresh,
-        );
+      profileId,
+      forceRefresh: forceRefresh,
+    );
     if (!mounted || profileId != _loadedProfileId) {
       return;
     }
 
-    final selectedStillExists = _selectedClassroomId == null ||
+    final selectedStillExists =
+        _selectedClassroomId == null ||
         collection.classrooms.any(
           (classroom) => classroom.stableId == _selectedClassroomId,
         );
@@ -155,8 +159,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   }
 
   Future<void> _loadExercises() async {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (profileId == null || _isLoadingClassrooms) {
       return;
     }
@@ -165,10 +170,8 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     final classrooms = _selectedClassroomId == null
         ? _classrooms
         : _classrooms
-            .where(
-              (classroom) => classroom.stableId == _selectedClassroomId,
-            )
-            .toList(growable: false);
+              .where((classroom) => classroom.stableId == _selectedClassroomId)
+              .toList(growable: false);
     final targets = classrooms
         .where((classroom) => classroom.stableId != null)
         .toList(growable: false);
@@ -247,10 +250,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
 
   void _onSearchChanged(String _) {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(
-      const Duration(milliseconds: 350),
-      _loadExercises,
-    );
+    _searchDebounce = Timer(const Duration(milliseconds: 350), _loadExercises);
   }
 
   void _selectClassroom(int? classroomId) {
@@ -272,8 +272,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   }
 
   Future<void> _openCreateExercise() async {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     final classroom = _createClassroomSelection;
     final classroomId = classroom?.stableId;
     if (profileId == null || classroom == null || classroomId == null) {
@@ -318,8 +319,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
 
   void _openExerciseDetail(ClassroomExercise exercise) {
     final exerciseId = exercise.stableId;
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (exerciseId == null || profileId == null) {
       _showTeacherHomeworkSoon(context);
       return;
@@ -335,8 +337,8 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
           purpose: purpose == classroomExercisePurposeExam
               ? classroomExercisePurposeExam
               : purpose == classroomExercisePurposeHomework
-                  ? classroomExercisePurposeHomework
-                  : _selectedPurpose,
+              ? classroomExercisePurposeHomework
+              : _selectedPurpose,
           exerciseService: _exerciseService,
         ),
       ),
@@ -347,17 +349,15 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-        ),
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
       );
   }
 
   @override
   Widget build(BuildContext context) {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (profileId != null && profileId > 0) {
       context.select<ClassroomCubit, ClassroomCollectionState>(
         (cubit) => cubit.owned(profileId),
@@ -458,15 +458,16 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                           ],
                         )
                       else ...[
-                        for (var index = 0;
-                            index < visibleExercises.length;
-                            index++) ...[
+                        for (
+                          var index = 0;
+                          index < visibleExercises.length;
+                          index++
+                        ) ...[
                           _TeacherStudyExerciseCard(
                             exercise: visibleExercises[index],
                             scale: scale,
-                            onTap: () => _openExerciseDetail(
-                              visibleExercises[index],
-                            ),
+                            onTap: () =>
+                                _openExerciseDetail(visibleExercises[index]),
                           ),
                           if (index != visibleExercises.length - 1)
                             SizedBox(height: 14 * scale),

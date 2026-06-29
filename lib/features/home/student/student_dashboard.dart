@@ -58,6 +58,7 @@ class StudentDashboard extends StatelessWidget {
         onAddProfile: args.onAddProfileFromReview,
         bottomPadding: args.bottomPadding,
         scale: args.scale,
+        activeRefreshTick: args.activeRefreshTick,
         isActive: args.isActive,
       );
     }

@@ -1,10 +1,7 @@
 part of '../../home_screen.dart';
 
 class ParentAssessmentTab extends StatefulWidget {
-  const ParentAssessmentTab({
-    super.key,
-    required this.args,
-  });
+  const ParentAssessmentTab({super.key, required this.args});
 
   final HomeDashboardArgs args;
 
@@ -35,7 +32,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   void didUpdateWidget(covariant ParentAssessmentTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.args.isActive && widget.args.isActive) {
-      _loadAssessments();
+      _loadAssessments(forceRefresh: true);
       return;
     }
     if (!widget.args.isActive) {
@@ -71,8 +68,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     );
     final userId = widget.args.user?.id;
     final cache = HomeProfileCache.instance;
-    final cachedSnapshot =
-        profileId == null ? null : cache.getParent(profileId);
+    final cachedSnapshot = profileId == null
+        ? null
+        : cache.getParent(profileId);
     if (!forceRefresh &&
         cachedSnapshot != null &&
         cachedSnapshot.completedAssessments.isNotEmpty) {
@@ -110,9 +108,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       return;
     }
 
-    entries.sort(
-      (a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)),
-    );
+    entries.sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
     setState(() {
       if (!failed || entries.isNotEmpty || _entries.isEmpty) {
         _entries = entries;
@@ -131,8 +127,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         ParentHomeSnapshot(
           profileId: profileId,
           homeLayout: cachedSnapshot.homeLayout,
-          completedAssessments:
-              entries.map((entry) => entry.quiz).toList(growable: false),
+          completedAssessments: entries
+              .map((entry) => entry.quiz)
+              .toList(growable: false),
           cachedAt: DateTime.now(),
         ),
       );
@@ -140,10 +137,11 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   }
 
   void _applyCachedAssessments(ParentHomeSnapshot snapshot) {
-    _entries = snapshot.completedAssessments
-        .map((quiz) => _ParentAssessmentEntry(quiz: quiz))
-        .toList(growable: false)
-      ..sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
+    _entries =
+        snapshot.completedAssessments
+            .map((quiz) => _ParentAssessmentEntry(quiz: quiz))
+            .toList(growable: false)
+          ..sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
     _isLoading = false;
     _hasCompletedInitialLoad = true;
     _errorMessage = null;
@@ -154,13 +152,15 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     if (query.isEmpty) {
       return _entries;
     }
-    return _entries.where((entry) {
-      final searchable = <String>[
-        _homeQuizTitle(context, entry.quiz),
-        _homeQuizDateLabel(entry.quiz),
-      ].join(' ').toLowerCase();
-      return searchable.contains(query);
-    }).toList(growable: false);
+    return _entries
+        .where((entry) {
+          final searchable = <String>[
+            _homeQuizTitle(context, entry.quiz),
+            _homeQuizDateLabel(entry.quiz),
+          ].join(' ').toLowerCase();
+          return searchable.contains(query);
+        })
+        .toList(growable: false);
   }
 
   void _openQuizReview(GeneratedQuiz quiz) {
@@ -171,10 +171,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     HapticFeedback.selectionClick();
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => QuizReviewScreen(
-          quizId: quizId,
-          initialQuiz: quiz,
-        ),
+        builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
       ),
     );
   }
@@ -246,10 +243,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
               ),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  _ParentReviewTabBanner(
-                    onTap: _openAssessment,
-                    scale: scale,
-                  ),
+                  _ParentReviewTabBanner(onTap: _openAssessment, scale: scale),
                   SizedBox(height: 13 * scale),
                   _ParentAssessmentSearchField(
                     controller: _searchController,

@@ -453,6 +453,7 @@ class _HomeScreenState extends State<HomeScreen>
                           // data reload without recreating the widget subtree.
                           profileResetSignal: profileState.profileResetSignal,
                           activeTab: navigation.activeTab,
+                          selectionRevision: navigation.selectionRevision,
                           user: widget.user,
                           profiles: widget.profiles,
                           activeProfile: widget.activeProfile,
@@ -588,10 +589,8 @@ class _HomeScreenState extends State<HomeScreen>
                           activeRole: widget.activeRole,
                           user: widget.user,
                           onTabSelected: (index) {
-                            if (index == navigation.activeTab) {
-                              return;
-                            }
                             if (widget.activeRole == ProfileRole.parent &&
+                                index != navigation.activeTab &&
                                 index == 0) {
                               _playParentHomeEntrance();
                             }

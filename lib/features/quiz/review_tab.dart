@@ -66,6 +66,7 @@ class ReviewTab extends StatefulWidget {
     required this.onAddProfile,
     required this.bottomPadding,
     required this.scale,
+    this.activeRefreshTick = 0,
     this.isActive = true,
   });
 
@@ -77,6 +78,7 @@ class ReviewTab extends StatefulWidget {
   final VoidCallback onAddProfile;
   final double bottomPadding;
   final double scale;
+  final int activeRefreshTick;
   final bool isActive;
 
   @override
@@ -122,6 +124,9 @@ class _ReviewTabState extends State<ReviewTab> {
         (oldWidget.isParentMode ||
             oldWidget.user?.id != widget.user?.id ||
             oldProfileId != profileId)) {
+      _loadChaptersForActiveProfile();
+    } else if (!widget.isParentMode &&
+        oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       _loadChaptersForActiveProfile();
     }
   }
@@ -243,7 +248,8 @@ class _ReviewTabState extends State<ReviewTab> {
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             padding: EdgeInsets.only(
-              bottom: widget.bottomPadding +
+              bottom:
+                  widget.bottomPadding +
                   (hasSelection ? selectedCtaHeight + selectedCtaGap : 0),
             ),
             child: Column(
@@ -337,9 +343,7 @@ class _ReviewTabState extends State<ReviewTab> {
           typeOfQuiz: quizTypeGeneral,
           gradeLabel: assessmentQuizGradeLabel,
           chapters: chapterNames,
-          profileId: ActiveProfileSession.profileStableId(
-            widget.activeProfile,
-          ),
+          profileId: ActiveProfileSession.profileStableId(widget.activeProfile),
         ),
       ),
     );
@@ -483,10 +487,7 @@ class _ReviewHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
-          bottom: BorderSide(
-            color: const Color(0xFFF2F2F2),
-            width: 4 * scale,
-          ),
+          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
         ),
       ),
       alignment: Alignment.center,
@@ -756,10 +757,7 @@ class _ChapterCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _Badge(
-                    icon: chapter.icon,
-                    scale: scale,
-                  ),
+                  _Badge(icon: chapter.icon, scale: scale),
                   SizedBox(width: 14 * scale),
                   Expanded(
                     child: Padding(
@@ -797,19 +795,12 @@ class _ChapterCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 10 * scale),
-                  _SelectCircle(
-                    selected: selected,
-                    scale: scale,
-                  ),
+                  _SelectCircle(selected: selected, scale: scale),
                 ],
               ),
               if (showButton) ...[
                 SizedBox(height: 20 * scale),
-                _TestButton(
-                  enabled: true,
-                  scale: scale,
-                  onTap: onStartTest,
-                ),
+                _TestButton(enabled: true, scale: scale, onTap: onStartTest),
               ],
             ],
           ),
@@ -820,10 +811,7 @@ class _ChapterCard extends StatelessWidget {
 }
 
 class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.icon,
-    required this.scale,
-  });
+  const _Badge({required this.icon, required this.scale});
 
   final String icon;
   final double scale;
@@ -858,10 +846,7 @@ class _Badge extends StatelessWidget {
 }
 
 class _SelectCircle extends StatelessWidget {
-  const _SelectCircle({
-    required this.selected,
-    required this.scale,
-  });
+  const _SelectCircle({required this.selected, required this.scale});
 
   final bool selected;
   final double scale;
@@ -877,10 +862,7 @@ class _SelectCircle extends StatelessWidget {
         shape: BoxShape.circle,
         border: selected
             ? null
-            : Border.all(
-                color: _uncheckedCircle,
-                width: 2.4 * scale,
-              ),
+            : Border.all(color: _uncheckedCircle, width: 2.4 * scale),
       ),
       child: selected
           ? Icon(Icons.check_rounded, color: Colors.white, size: 25 * scale)
@@ -976,8 +958,11 @@ class _StartSelectedButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.star_rounded,
-                  color: const Color(0xFF3B0031), size: 24 * scale),
+              Icon(
+                Icons.star_rounded,
+                color: const Color(0xFF3B0031),
+                size: 24 * scale,
+              ),
               SizedBox(width: 10 * scale),
               Flexible(
                 child: Text(
@@ -1002,10 +987,7 @@ class _StartSelectedButton extends StatelessWidget {
 }
 
 class _ClearSelectionButton extends StatelessWidget {
-  const _ClearSelectionButton({
-    required this.scale,
-    required this.onTap,
-  });
+  const _ClearSelectionButton({required this.scale, required this.onTap});
 
   final double scale;
   final VoidCallback onTap;
@@ -1031,11 +1013,7 @@ class _ClearSelectionButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.close_rounded,
-                  color: _selectPink,
-                  size: 23 * scale,
-                ),
+                Icon(Icons.close_rounded, color: _selectPink, size: 23 * scale),
                 SizedBox(width: 7 * scale),
                 Text(
                   context.getText(AppKeys.clearSelection),
@@ -1096,10 +1074,7 @@ class _DepthButtonSurface extends StatelessWidget {
 }
 
 class _ChapterCardColors {
-  const _ChapterCardColors({
-    required this.background,
-    required this.shadow,
-  });
+  const _ChapterCardColors({required this.background, required this.shadow});
 
   final Color background;
   final Color shadow;
@@ -1108,21 +1083,21 @@ class _ChapterCardColors {
 _ChapterCardColors _chapterColors(int number) {
   return switch (number) {
     1 => const _ChapterCardColors(
-        background: Color(0xFFBFEFF4),
-        shadow: Color(0xFF62C7D2),
-      ),
+      background: Color(0xFFBFEFF4),
+      shadow: Color(0xFF62C7D2),
+    ),
     2 => const _ChapterCardColors(
-        background: Color(0xFFD9F1DD),
-        shadow: Color(0xFF8DD39C),
-      ),
+      background: Color(0xFFD9F1DD),
+      shadow: Color(0xFF8DD39C),
+    ),
     3 => const _ChapterCardColors(
-        background: Color(0xFFEADDF7),
-        shadow: Color(0xFFBDA1DA),
-      ),
+      background: Color(0xFFEADDF7),
+      shadow: Color(0xFFBDA1DA),
+    ),
     _ => const _ChapterCardColors(
-        background: Color(0xFFFFF0B9),
-        shadow: Color(0xFFE8C85A),
-      ),
+      background: Color(0xFFFFF0B9),
+      shadow: Color(0xFFE8C85A),
+    ),
   };
 }
 
@@ -1150,7 +1125,8 @@ int? _profileSemesterId(StudentProfile profile) =>
     profile.semester?.semesterId ?? profile.semester?.id ?? profile.semesterId;
 
 List<PracticeChapter> _practiceChaptersFromApi(List<ChapterModel> chapters) {
-  final sorted = [...chapters]..sort((a, b) {
+  final sorted = [...chapters]
+    ..sort((a, b) {
       final left = a.displayOrder ?? 0;
       final right = b.displayOrder ?? 0;
       if (left != right) {
@@ -1162,7 +1138,8 @@ List<PracticeChapter> _practiceChaptersFromApi(List<ChapterModel> chapters) {
   return List.generate(sorted.length, (index) {
     final chapter = sorted[index];
     final number = index + 1;
-    final lessonCount = chapter.lessonCount ??
+    final lessonCount =
+        chapter.lessonCount ??
         _fallbackPracticeChapter(number)?.lessonCount ??
         0;
 

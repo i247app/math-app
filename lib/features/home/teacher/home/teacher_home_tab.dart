@@ -14,8 +14,8 @@ class TeacherHomeTab extends StatefulWidget {
     HomeLayoutService? homeLayoutService,
     this.activeRefreshTick = 0,
     this.isActive = true,
-  })  : _exerciseService = exerciseService,
-        _homeLayoutService = homeLayoutService;
+  }) : _exerciseService = exerciseService,
+       _homeLayoutService = homeLayoutService;
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
@@ -56,8 +56,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   bool get _hasLoadedClassrooms => _hasLoadedHomeLayout;
 
   String? get _error {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (profileId == null || profileId <= 0) {
       return context.readText(AppKeys.teacherMissingProfileId);
     }
@@ -76,14 +77,15 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   void didUpdateWidget(covariant TeacherHomeTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadClassrooms();
+      _loadClassrooms(forceRefresh: true);
       return;
     }
     if (!widget.isActive) {
       return;
     }
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (profileId != _loadedProfileId) {
       _loadClassrooms();
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
@@ -92,8 +94,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   }
 
   Future<void> _loadClassrooms({bool forceRefresh = false}) async {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     final requestId = ++_homeLayoutRequestId;
     if (profileId == null || profileId <= 0) {
       setState(() {
@@ -143,12 +146,12 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       final teacher = layout.teacher;
       final classrooms = layout.rooms.isNotEmpty
           ? layout.rooms
-              .map((classroom) => classroom.classroom)
-              .toList(growable: false)
+                .map((classroom) => classroom.classroom)
+                .toList(growable: false)
           : teacher?.classrooms
-                  .map((classroom) => classroom.classroom)
-                  .toList(growable: false) ??
-              const <ClassroomModel>[];
+                    .map((classroom) => classroom.classroom)
+                    .toList(growable: false) ??
+                const <ClassroomModel>[];
       final layoutAssignments = layout.tasks
           .where((task) => task.isAssigned)
           .map((task) => task.exercise)
@@ -290,8 +293,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     bool initiallyExpanded = false,
   }) async {
     final classroomId = classroom.stableId;
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (classroomId == null || profileId == null) {
       _showSnack(context.readText(AppKeys.teacherClassOpenFailed));
       return;
@@ -317,8 +321,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
 
   void _openAssignmentDetail(ClassroomExercise exercise) {
     final exerciseId = exercise.stableId;
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (exerciseId == null || profileId == null) {
       _showTeacherHomeworkSoon(context);
       return;

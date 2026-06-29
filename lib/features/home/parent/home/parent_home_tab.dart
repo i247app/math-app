@@ -57,7 +57,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       return;
     }
     if (!oldWidget.args.isActive && widget.args.isActive) {
-      _loadHome();
+      _loadHome(forceRefresh: true);
       return;
     }
     if (!widget.args.isActive) {

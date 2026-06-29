@@ -26,9 +26,8 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
   final TextEditingController _searchController = TextEditingController();
   bool _hasPlayedClassroomEntrance = false;
 
-  int? get _profileId => ActiveProfileSession.profileStableId(
-        widget.activeProfile,
-      );
+  int? get _profileId =>
+      ActiveProfileSession.profileStableId(widget.activeProfile);
 
   ClassroomCollectionState get _classroomCollection {
     final profileId = _profileId;
@@ -64,14 +63,15 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
   void didUpdateWidget(covariant TeacherClassroomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadClassrooms();
+      _loadClassrooms(forceRefresh: true);
       return;
     }
     if (!widget.isActive) {
       return;
     }
-    final oldProfileId =
-        ActiveProfileSession.profileStableId(oldWidget.activeProfile);
+    final oldProfileId = ActiveProfileSession.profileStableId(
+      oldWidget.activeProfile,
+    );
     if (_profileId != oldProfileId) {
       _hasPlayedClassroomEntrance = false;
       _loadClassrooms();
@@ -92,9 +92,9 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
       return;
     }
     await context.read<ClassroomCubit>().loadOwned(
-          profileId,
-          forceRefresh: forceRefresh,
-        );
+      profileId,
+      forceRefresh: forceRefresh,
+    );
   }
 
   Future<void> _refreshClassrooms() {
@@ -185,8 +185,9 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
     bool initiallyExpanded = false,
   }) async {
     final classroomId = classroom.stableId;
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     if (classroomId == null || profileId == null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -258,10 +259,10 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                     searchController: _searchController,
                     entranceBuilder: (order, child, markOnEnd) =>
                         _teacherClassroomEntrance(
-                      order: order,
-                      child: child,
-                      markOnEnd: markOnEnd,
-                    ),
+                          order: order,
+                          child: child,
+                          markOnEnd: markOnEnd,
+                        ),
                     onCreateClass: _openCreateClass,
                     onOpenClassDetail: _openClassDetail,
                   ),

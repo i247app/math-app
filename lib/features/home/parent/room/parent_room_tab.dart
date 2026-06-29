@@ -30,7 +30,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
   void didUpdateWidget(covariant ParentRoomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.args.isActive && widget.args.isActive) {
-      _loadLayout();
+      _loadLayout(forceRefresh: true);
       return;
     }
     if (!widget.args.isActive) {

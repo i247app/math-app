@@ -4,10 +4,12 @@ class HomeTabState {
   const HomeTabState({
     this.activeTab = 0,
     this.previousTab = 0,
+    this.selectionRevision = 0,
   });
 
   final int activeTab;
   final int previousTab;
+  final int selectionRevision;
 }
 
 abstract class HomeTabCubit extends Cubit<HomeTabState> {
@@ -16,7 +18,7 @@ abstract class HomeTabCubit extends Cubit<HomeTabState> {
   final int maxTabIndex;
 
   void selectTab(int index) {
-    if (index < 0 || index > maxTabIndex || index == state.activeTab) {
+    if (index < 0 || index > maxTabIndex) {
       return;
     }
 
@@ -24,6 +26,7 @@ abstract class HomeTabCubit extends Cubit<HomeTabState> {
       HomeTabState(
         activeTab: index,
         previousTab: state.activeTab,
+        selectionRevision: state.selectionRevision + 1,
       ),
     );
   }

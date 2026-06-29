@@ -26,9 +26,8 @@ class _StudentClassroomTab extends StatefulWidget {
 class _StudentClassroomTabState extends State<_StudentClassroomTab> {
   late final ClassroomService _classroomService = widget.classroomService;
 
-  int? get _profileId => ActiveProfileSession.profileStableId(
-        widget.activeProfile,
-      );
+  int? get _profileId =>
+      ActiveProfileSession.profileStableId(widget.activeProfile);
 
   ClassroomCollectionState get _classroomCollection {
     final profileId = _profileId;
@@ -66,7 +65,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
   void didUpdateWidget(covariant _StudentClassroomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadClassrooms();
+      _loadClassrooms(forceRefresh: true);
       return;
     }
     if (!widget.isActive) {
@@ -91,9 +90,9 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
       return;
     }
     await context.read<ClassroomCubit>().loadJoined(
-          profileId,
-          forceRefresh: forceRefresh,
-        );
+      profileId,
+      forceRefresh: forceRefresh,
+    );
   }
 
   Future<void> _refreshClassrooms() {
@@ -140,7 +139,8 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
       );
     }
     final canLoadContent = profileId != null && profileId > 0;
-    final isInitialLoading = canLoadContent &&
+    final isInitialLoading =
+        canLoadContent &&
         _isLoading &&
         _classrooms.isEmpty &&
         !_hasLoadedClassrooms;
