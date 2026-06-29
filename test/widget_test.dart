@@ -14,8 +14,9 @@ void main() {
     expect(find.text('BẮT ĐẦU'), findsOneWidget);
   });
 
-  testWidgets('shows phone length error before enabling OTP button',
-      (WidgetTester tester) async {
+  testWidgets('shows phone length error before enabling OTP button', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(NumiApp(authService: _FakeOtpAuthService()));
 
     await tester.tap(find.text('BẮT ĐẦU'));
@@ -30,8 +31,9 @@ void main() {
     expect(find.text('Đăng nhập'), findsNothing);
   });
 
-  testWidgets('opens OTP screen then home after successful phone login',
-      (WidgetTester tester) async {
+  testWidgets('opens OTP screen then home after successful phone login', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(NumiApp(authService: _FakeOtpAuthService()));
 
     await tester.tap(find.text('BẮT ĐẦU'));
@@ -53,8 +55,9 @@ void main() {
     expect(find.text('0901234567'), findsOneWidget);
   });
 
-  testWidgets('supports US region and numeric-only phone entry',
-      (WidgetTester tester) async {
+  testWidgets('supports US region and numeric-only phone entry', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(NumiApp(authService: _FakeOtpAuthService()));
 
     await tester.tap(find.text('BẮT ĐẦU'));
@@ -67,15 +70,14 @@ void main() {
 
     await tester.enterText(find.byType(EditableText), '202abc5550101');
 
-    final editableText = tester.widget<EditableText>(
-      find.byType(EditableText),
-    );
+    final editableText = tester.widget<EditableText>(find.byType(EditableText));
     expect(editableText.controller.text, '202 555 0101');
     expect(find.text('+1'), findsOneWidget);
   });
 
-  testWidgets('opens signup screen after OTP verification',
-      (WidgetTester tester) async {
+  testWidgets('opens signup screen after OTP verification', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(NumiApp(authService: _FakeOtpAuthService()));
 
     await tester.tap(find.text('BẮT ĐẦU'));
@@ -168,12 +170,7 @@ class _FakeOtpAuthService implements OtpAuthService {
     String? email,
     String? avatarPath,
   }) async {
-    return LoginUser(
-      id: 2,
-      name: name,
-      phone: phone,
-      email: email,
-    );
+    return LoginUser(id: 2, name: name, phone: phone, email: email);
   }
 
   @override
@@ -211,6 +208,11 @@ class _FakeOtpAuthService implements OtpAuthService {
   }
 
   @override
+  Future<void> clearOtpSession(String phone) async {
+    // Fake OTP cleanup - no-op.
+  }
+
+  @override
   Future<void> logout() async {
     // Fake logout - no-op
   }
@@ -223,11 +225,6 @@ class _FakeOtpAuthService implements OtpAuthService {
     String? email,
     String? avatarPath,
   }) async {
-    return LoginUser(
-      id: userId,
-      name: name,
-      phone: phone,
-      email: email,
-    );
+    return LoginUser(id: userId, name: name, phone: phone, email: email);
   }
 }

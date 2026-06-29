@@ -165,8 +165,9 @@ class _OtpScreenState extends State<OtpScreen>
       }
 
       controllers[nextIndex].text = digit;
-      controllers[nextIndex].selection =
-          const TextSelection.collapsed(offset: 1);
+      controllers[nextIndex].selection = const TextSelection.collapsed(
+        offset: 1,
+      );
       nextIndex++;
     }
 
@@ -274,8 +275,8 @@ class _OtpScreenState extends State<OtpScreen>
                 builder: (context, child) {
                   final offset =
                       math.sin(errorShakeController.value * math.pi * 6) *
-                          9 *
-                          (1 - errorShakeController.value);
+                      9 *
+                      (1 - errorShakeController.value);
                   return Transform.translate(
                     offset: Offset(offset, 0),
                     child: child,
@@ -425,26 +426,23 @@ class OtpCard extends StatelessWidget {
                   ),
                 ),
         ),
-        // Resend Timer
         Center(
-          child: GestureDetector(
-            onTap: resendCountdown == 0 ? onResend : null,
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                resendCountdown == 0
-                    ? context.getText(AppKeys.resendOtp)
-                    : context.formatText(
-                        AppKeys.resendOtpAfter,
-                        {'seconds': resendCountdown},
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: SizedBox(
+              height: 22,
+              child: resendCountdown > 0
+                  ? Text(
+                      context.formatText(AppKeys.resendOtpAfter, {
+                        'seconds': resendCountdown,
+                      }),
+                      style: GoogleFonts.andika(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF339395),
                       ),
-                style: GoogleFonts.andika(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF339395), // Teal
-                ),
-              ),
+                    )
+                  : const SizedBox.shrink(),
             ),
           ),
         ),
@@ -453,8 +451,16 @@ class OtpCard extends StatelessWidget {
         _TealActionButton(
           label: isVerifyingOtp
               ? context.getText(AppKeys.otpConfirming)
+              : resendCountdown == 0
+              ? context.getText(AppKeys.resendOtp)
               : context.getText(AppKeys.otpConfirm),
-          onPressed: (isVerifyingOtp || !isFull) ? null : onConfirm,
+          onPressed: isVerifyingOtp
+              ? null
+              : resendCountdown == 0
+              ? onResend
+              : isFull
+              ? onConfirm
+              : null,
         ),
       ],
     );
@@ -552,10 +558,7 @@ class OtpDigitBox extends StatelessWidget {
 }
 
 class _TealActionButton extends StatelessWidget {
-  const _TealActionButton({
-    required this.label,
-    required this.onPressed,
-  });
+  const _TealActionButton({required this.label, required this.onPressed});
 
   final String label;
   final VoidCallback? onPressed;
@@ -577,8 +580,9 @@ class _TealActionButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            disabledBackgroundColor:
-                const Color(0xFFB5BFC2), // Grey when disabled
+            disabledBackgroundColor: const Color(
+              0xFFB5BFC2,
+            ), // Grey when disabled
             disabledForegroundColor: Colors.white,
           ),
           child: Row(
@@ -598,8 +602,6 @@ class _TealActionButton extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_rounded, size: 22),
             ],
           ),
         ),

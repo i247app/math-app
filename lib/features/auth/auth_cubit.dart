@@ -21,12 +21,12 @@ class AuthCubit extends Cubit<AuthState> {
     ProfileService? profileService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
     PasscodeService passcodeService = const SecurePasscodeService(),
-  })  : _avatarPicker = avatarPicker,
-        _authService = authService ?? OtpAuthApi(),
-        _profileService = profileService ?? ProfileApi(),
-        _activeProfileSession = activeProfileSession,
-        _passcodeService = passcodeService,
-        super(const AuthState());
+  }) : _avatarPicker = avatarPicker,
+       _authService = authService ?? OtpAuthApi(),
+       _profileService = profileService ?? ProfileApi(),
+       _activeProfileSession = activeProfileSession,
+       _passcodeService = passcodeService,
+       super(const AuthState());
 
   final AvatarPickerService _avatarPicker;
   final OtpAuthService _authService;
@@ -46,25 +46,55 @@ class AuthCubit extends Cubit<AuthState> {
 
   void openSignup() => emit(state.copyWith(screen: AppScreen.signup));
 
+  void cancelSignupToLogin() {
+    final phone = state.phoneNumber?.trim();
+    if (phone != null && phone.isNotEmpty) {
+      unawaited(_authService.clearOtpSession(phone));
+    }
+
+    emit(
+      state.copyWith(
+        screen: AppScreen.login,
+        phoneNumber: null,
+        isVerifyingOtp: false,
+        isSigningUp: false,
+        otpFlow: OtpFlow.login,
+        clearAuthError: true,
+        clearDevOtp: true,
+        clearOtpExpiry: true,
+        clearOtpError: true,
+        clearPhoneLookup: true,
+        clearLoginUser: true,
+        clearProfiles: true,
+        clearPendingSession: true,
+        clearAvatarPath: true,
+        clearAvatarError: true,
+      ),
+    );
+    unawaited(checkPinLoginAvailability());
+  }
+
   void openHome() => emit(state.copyWith(screen: AppScreen.home));
 
   Future<void> logout() async {
     await _authService.logout();
     if (!isClosed) {
-      emit(state.copyWith(
-        screen: AppScreen.login,
-        clearLoginUser: true,
-        phoneNumber: null,
-        checkedPhone: null,
-        phoneExists: null,
-        phoneLookupUser: null,
-        clearProfiles: true,
-        clearAuthError: true,
-        clearPendingSession: true,
-        clearPasscodeError: true,
-        clearPinLogin: true,
-        passcodeLoginRequiresOtp: false,
-      ));
+      emit(
+        state.copyWith(
+          screen: AppScreen.login,
+          clearLoginUser: true,
+          phoneNumber: null,
+          checkedPhone: null,
+          phoneExists: null,
+          phoneLookupUser: null,
+          clearProfiles: true,
+          clearAuthError: true,
+          clearPendingSession: true,
+          clearPasscodeError: true,
+          clearPinLogin: true,
+          passcodeLoginRequiresOtp: false,
+        ),
+      );
       unawaited(checkPinLoginAvailability());
     }
   }
@@ -328,18 +358,11 @@ class AuthCubit extends Cubit<AuthState> {
           ),
         );
       } on OtpAuthException catch (error) {
-        emit(
-          state.copyWith(
-            isSendingOtp: false,
-            authError: error.message,
-          ),
-        );
+        _emitAuthError(error.message, isSendingOtp: false);
       } catch (_) {
-        emit(
-          state.copyWith(
-            isSendingOtp: false,
-            authError: AppStrings.current(AppKeys.signupOtpFailed),
-          ),
+        _emitAuthError(
+          AppStrings.current(AppKeys.signupOtpFailed),
+          isSendingOtp: false,
         );
       }
       return;
@@ -383,18 +406,11 @@ class AuthCubit extends Cubit<AuthState> {
         return;
       }
 
-      emit(
-        state.copyWith(
-          isSendingOtp: false,
-          authError: error.message,
-        ),
-      );
+      _emitAuthError(error.message, isSendingOtp: false);
     } catch (_) {
-      emit(
-        state.copyWith(
-          isSendingOtp: false,
-          authError: AppStrings.current(AppKeys.loginOtpFailed),
-        ),
+      _emitAuthError(
+        AppStrings.current(AppKeys.loginOtpFailed),
+        isSendingOtp: false,
       );
     }
   }
@@ -458,7 +474,9 @@ class AuthCubit extends Cubit<AuthState> {
         emit(
           state.copyWith(
             isVerifyingOtp: false,
-            authError: AppStrings.current(AppKeys.missingOtpUser),
+            otpError: AppStrings.current(AppKeys.missingOtpUser),
+            otpErrorId: state.otpErrorId + 1,
+            clearAuthError: true,
           ),
         );
         return;
@@ -486,14 +504,18 @@ class AuthCubit extends Cubit<AuthState> {
       emit(
         state.copyWith(
           isVerifyingOtp: false,
-          authError: error.message,
+          otpError: error.message,
+          otpErrorId: state.otpErrorId + 1,
+          clearAuthError: true,
         ),
       );
     } catch (_) {
       emit(
         state.copyWith(
           isVerifyingOtp: false,
-          authError: AppStrings.current(AppKeys.verifyOtpFailed),
+          otpError: AppStrings.current(AppKeys.verifyOtpFailed),
+          otpErrorId: state.otpErrorId + 1,
+          clearAuthError: true,
         ),
       );
     }
@@ -558,12 +580,7 @@ class AuthCubit extends Cubit<AuthState> {
         isSigningUp: false,
       );
     } on OtpAuthException catch (error) {
-      emit(
-        state.copyWith(
-          isSigningUp: false,
-          authError: error.message,
-        ),
-      );
+      emit(state.copyWith(isSigningUp: false, authError: error.message));
     } catch (_) {
       emit(
         state.copyWith(
@@ -852,8 +869,9 @@ class AuthCubit extends Cubit<AuthState> {
         userId: userId,
         profiles: profiles,
       );
-      final activeProfileId =
-          ActiveProfileSession.profileStableId(activeProfile);
+      final activeProfileId = ActiveProfileSession.profileStableId(
+        activeProfile,
+      );
       if (activeProfileId != null) {
         await _activeProfileSession.writeActiveProfileId(
           userId: userId,
@@ -988,6 +1006,36 @@ class AuthCubit extends Cubit<AuthState> {
   void clearAvatar() {
     emit(state.copyWith(clearAvatarPath: true, clearAvatarError: true));
   }
+
+  void _emitAuthError(
+    String message, {
+    bool? isSendingOtp,
+    bool? isVerifyingOtp,
+    bool? isSigningUp,
+  }) {
+    if (state.screen == AppScreen.otp) {
+      emit(
+        state.copyWith(
+          isSendingOtp: isSendingOtp,
+          isVerifyingOtp: isVerifyingOtp,
+          isSigningUp: isSigningUp,
+          otpError: message,
+          otpErrorId: state.otpErrorId + 1,
+          clearAuthError: true,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isSendingOtp: isSendingOtp,
+        isVerifyingOtp: isVerifyingOtp,
+        isSigningUp: isSigningUp,
+        authError: message,
+      ),
+    );
+  }
 }
 
 class _ResolvedProfiles {
@@ -998,9 +1046,9 @@ class _ResolvedProfiles {
   });
 
   const _ResolvedProfiles.empty()
-      : profiles = const <StudentProfile>[],
-        activeProfile = null,
-        errorMessage = null;
+    : profiles = const <StudentProfile>[],
+      activeProfile = null,
+      errorMessage = null;
 
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;

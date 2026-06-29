@@ -51,7 +51,7 @@ class AppStrings {
       AppKeys.otpTitle: 'MÃ XÁC NHẬN',
       AppKeys.otpSentMessage: 'Mã OTP vừa gửi: {code}',
       AppKeys.otpConfirming: 'Đang xác thực...',
-      AppKeys.otpConfirm: 'Gửi OTP',
+      AppKeys.otpConfirm: 'Xác nhận',
       AppKeys.resendOtp: 'Gửi lại mã',
       AppKeys.resendOtpAfter: 'Gửi lại mã sau {seconds} giây',
       AppKeys.signupNameHint: 'Nhập tên người dùng',

@@ -186,10 +186,7 @@ class LoginCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              PhoneRegionMenu(
-                region: region,
-                onChanged: onRegionChanged,
-              ),
+              PhoneRegionMenu(region: region, onChanged: onRegionChanged),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Container(
@@ -258,16 +255,16 @@ class LoginCard extends StatelessWidget {
           child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
               ? const _CheckingDots(key: ValueKey('checking-phone'))
               : (canSendOtp)
-                  ? _GreyActionButton(
-                      label: phoneExists == false
-                          ? context.getText(AppKeys.signup)
-                          : context.getText(AppKeys.login),
-                      onPressed: onSendOtp,
-                    )
-                  : const SizedBox(
-                      key: ValueKey('send-otp-placeholder'),
-                      height: 56, // same height as button to prevent jumping
-                    ),
+              ? _GreyActionButton(
+                  label: phoneExists == false
+                      ? context.getText(AppKeys.signup)
+                      : context.getText(AppKeys.login),
+                  onPressed: onSendOtp,
+                )
+              : const SizedBox(
+                  key: ValueKey('send-otp-placeholder'),
+                  height: 56, // same height as button to prevent jumping
+                ),
         ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
@@ -307,10 +304,7 @@ class LoginCard extends StatelessWidget {
 }
 
 class _GreyActionButton extends StatelessWidget {
-  const _GreyActionButton({
-    required this.label,
-    required this.onPressed,
-  });
+  const _GreyActionButton({required this.label, required this.onPressed});
 
   final String label;
   final VoidCallback onPressed;
@@ -330,20 +324,14 @@ class _GreyActionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label.toUpperCase(),
-              style: GoogleFonts.andika(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.2,
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_forward_rounded, size: 24),
-          ],
+        child: Text(
+          label.toUpperCase(),
+          textAlign: TextAlign.center,
+          style: GoogleFonts.andika(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
     );

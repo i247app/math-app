@@ -98,11 +98,7 @@ extension on AuthUser {
 }
 
 class VerifyOtpResult {
-  const VerifyOtpResult({
-    required this.isValid,
-    this.message,
-    this.user,
-  });
+  const VerifyOtpResult({required this.isValid, this.message, this.user});
 
   final bool isValid;
   final String? message;
@@ -154,17 +150,16 @@ abstract class OtpAuthService {
     String otpType = loginOtpType,
   });
 
+  Future<void> clearOtpSession(String phone);
+
   Future<void> logout();
 }
 
 class OtpAuthApi implements OtpAuthService {
-  OtpAuthApi({
-    String? baseUrl,
-    NetworkApi? networkApi,
-  }) : _networkApi = networkApi ??
-            (baseUrl == null
-                ? NetworkApi.shared
-                : NetworkApi(baseUrl: baseUrl));
+  OtpAuthApi({String? baseUrl, NetworkApi? networkApi})
+    : _networkApi =
+          networkApi ??
+          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
   final Map<String, LoginUser> _loginUsers = {};
@@ -229,11 +224,7 @@ class OtpAuthApi implements OtpAuthService {
     }
 
     _loginUsers[phone] = user;
-    return AuthPhoneLookupResult(
-      phone: phone,
-      exists: true,
-      user: user,
-    );
+    return AuthPhoneLookupResult(phone: phone, exists: true, user: user);
   }
 
   @override
@@ -266,10 +257,7 @@ class OtpAuthApi implements OtpAuthService {
     final SendOtpResponse response;
     try {
       response = await _networkApi.sendOtp(
-        SendOtpRequest(
-          otpType: registerOtpType,
-          identifier: phone,
-        ),
+        SendOtpRequest(otpType: registerOtpType, identifier: phone),
       );
     } on NetworkException catch (error) {
       throw OtpAuthException(error.message, status: error.status);
@@ -311,12 +299,7 @@ class OtpAuthApi implements OtpAuthService {
     final AuthResponse response;
     try {
       response = await _networkApi.signup(
-        SignupRequest(
-          phone: phone,
-          name: name,
-          email: email,
-          role: role,
-        ),
+        SignupRequest(phone: phone, name: name, email: email, role: role),
         avatarPath: avatarPath,
       );
     } on NetworkException catch (error) {
@@ -356,13 +339,9 @@ class OtpAuthApi implements OtpAuthService {
       throw OtpAuthException(error.message, status: error.status);
     }
 
-    final user = response.user?.toLoginUser(fallbackPhone: phone) ??
-        LoginUser(
-          id: userId,
-          name: name,
-          phone: phone,
-          email: email,
-        );
+    final user =
+        response.user?.toLoginUser(fallbackPhone: phone) ??
+        LoginUser(id: userId, name: name, phone: phone, email: email);
     final userPhone = user.phone?.trim();
     if (userPhone != null && userPhone.isNotEmpty) {
       _loginUsers[userPhone] = user;
@@ -379,11 +358,7 @@ class OtpAuthApi implements OtpAuthService {
     final VerifyOtpResponse response;
     try {
       response = await _networkApi.verifyOtp(
-        VerifyOtpRequest(
-          otpType: otpType,
-          identifier: phone,
-          otpCode: otpCode,
-        ),
+        VerifyOtpRequest(otpType: otpType, identifier: phone, otpCode: otpCode),
       );
     } on NetworkException catch (error) {
       throw OtpAuthException(error.message, status: error.status);
@@ -402,6 +377,11 @@ class OtpAuthApi implements OtpAuthService {
       message: response.status,
       user: response.verified ? currentUser ?? user : null,
     );
+  }
+
+  @override
+  Future<void> clearOtpSession(String phone) async {
+    _loginUsers.remove(phone);
   }
 
   static int? _expiresInFrom(String? expiresAt) {
