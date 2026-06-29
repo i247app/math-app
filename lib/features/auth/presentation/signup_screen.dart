@@ -30,6 +30,10 @@ class _SignupScreenState extends State<SignupScreen> {
   final emailController = TextEditingController();
   String? selectedRole;
 
+  static final RegExp _signupNamePattern = RegExp(
+    r'^[A-Za-z0-9À-ÖØ-öø-ỹ]+(?: +[A-Za-z0-9À-ÖØ-öø-ỹ]+)*$',
+  );
+
   static bool _isUsernameExistsError(String? message) {
     final normalized = message?.toLowerCase().trim();
     if (normalized == null || normalized.isEmpty) {
@@ -37,6 +41,11 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     return normalized.contains('username already exists');
+  }
+
+  static bool _isValidSignupName(String value) {
+    final normalized = value.trim();
+    return normalized.isNotEmpty && _signupNamePattern.hasMatch(normalized);
   }
 
   @override
@@ -66,21 +75,26 @@ class _SignupScreenState extends State<SignupScreen> {
     final mascotSize = tight ? 118.0 : 136.0;
 
     final role = selectedRole;
-    final isFormValid =
-        usernameController.text.trim().isNotEmpty && role != null;
+    final username = usernameController.text.trim();
+    final isUsernameValid = _isValidSignupName(username);
+    final isFormValid = isUsernameValid && role != null;
 
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (previous, current) =>
           previous.avatarError != current.avatarError &&
           current.avatarError != null,
       listener: (context, state) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(state.avatarError!)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(state.avatarError!)));
       },
       builder: (context, state) {
+        final localUsernameErrorText = username.isNotEmpty && !isUsernameValid
+            ? context.getText(AppKeys.signupNameInvalid)
+            : null;
         final usernameErrorText =
-            _isUsernameExistsError(state.authError) ? state.authError : null;
+            localUsernameErrorText ??
+            (_isUsernameExistsError(state.authError) ? state.authError : null);
 
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -172,8 +186,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           children: [
                             Expanded(
                               child: _RoleCard(
-                                label:
-                                    context.getText(AppKeys.signupRoleStudent),
+                                label: context.getText(
+                                  AppKeys.signupRoleStudent,
+                                ),
                                 imagePath: 'assets/images/student-icon.png',
                                 isSelected: role == 'STUDENT',
                                 onTap: () =>
@@ -183,8 +198,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: _RoleCard(
-                                label:
-                                    context.getText(AppKeys.signupRoleParent),
+                                label: context.getText(
+                                  AppKeys.signupRoleParent,
+                                ),
                                 imagePath: 'assets/images/parent-icon.png',
                                 isSelected: role == 'PARENT',
                                 onTap: () =>
@@ -194,8 +210,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: _RoleCard(
-                                label:
-                                    context.getText(AppKeys.signupRoleTeacher),
+                                label: context.getText(
+                                  AppKeys.signupRoleTeacher,
+                                ),
                                 imagePath: 'assets/images/teacher-icon.png',
                                 isSelected: role == 'TEACHER',
                                 onTap: () =>
@@ -309,18 +326,24 @@ class SignupTextField extends StatelessWidget {
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+                borderSide: const BorderSide(
+                  color: Color(0xFFE7E7E7),
+                  width: 1.5,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+                borderSide: const BorderSide(
+                  color: Color(0xFFE7E7E7),
+                  width: 1.5,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: Color(0xFF339395), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFF339395),
+                  width: 2,
+                ),
               ),
             ),
             style: GoogleFonts.andika(
@@ -387,9 +410,7 @@ class _RoleCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: Image.asset(imagePath, fit: BoxFit.contain),
-            ),
+            Expanded(child: Image.asset(imagePath, fit: BoxFit.contain)),
             const SizedBox(height: 5),
             FittedBox(
               fit: BoxFit.scaleDown,
@@ -412,10 +433,7 @@ class _RoleCard extends StatelessWidget {
 }
 
 class _TealActionButton extends StatelessWidget {
-  const _TealActionButton({
-    required this.label,
-    required this.onPressed,
-  });
+  const _TealActionButton({required this.label, required this.onPressed});
 
   final String label;
   final VoidCallback? onPressed;
@@ -437,8 +455,9 @@ class _TealActionButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            disabledBackgroundColor:
-                const Color(0xFFB5BFC2), // Grey when disabled
+            disabledBackgroundColor: const Color(
+              0xFFB5BFC2,
+            ), // Grey when disabled
             disabledForegroundColor: Colors.white,
           ),
           child: Row(

@@ -53,6 +53,7 @@ class AppKeys {
   static const signupNameHint = 'signup_name_hint';
   static const signupEmailHint = 'signup_email_hint';
   static const signupNameLabel = 'signup_name_label';
+  static const signupNameInvalid = 'signup_name_invalid';
   static const signupEmailLabel = 'signup_email_label';
   static const signupRoleLabel = 'signup_role_label';
   static const signupRoleStudent = 'signup_role_student';
