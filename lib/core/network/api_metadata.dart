@@ -16,8 +16,8 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
   AppApiMetadataProvider({
     DeviceInfoPlugin? deviceInfoPlugin,
     FlutterSecureStorage storage = const FlutterSecureStorage(),
-  })  : _deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin(),
-        _storage = storage;
+  }) : _deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin(),
+       _storage = storage;
 
   static final instance = AppApiMetadataProvider();
 
@@ -188,6 +188,7 @@ class AppClientInfo {
   String get appVersionLabel => 'Version: $version + $buildNumber';
 }
 
+// Device metadata model
 class _DeviceMetadata {
   const _DeviceMetadata({
     this.deviceId,
