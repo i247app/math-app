@@ -64,11 +64,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     super.initState();
     _gradeService = widget.gradeService ?? GradeApi();
     grades = widget.initialGrades;
-    selectedGradeLabel = _defaultGradeLabel(
-      grades,
-      preferredGradeId: widget.initialGradeId,
-      preferredGradeLabel: widget.initialGradeLabel,
-    );
+    selectedGradeLabel = _initialSelectedGradeLabel(grades);
     if (widget.quizPurpose == quizPurposeAssessment) {
       unawaited(AIShakeService.shared.aiShake());
     }
@@ -105,11 +101,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
         if (!loadedGrades.any(
           (grade) => grade.label?.trim() == selectedGradeLabel,
         )) {
-          selectedGradeLabel = _defaultGradeLabel(
-            loadedGrades,
-            preferredGradeId: widget.initialGradeId,
-            preferredGradeLabel: widget.initialGradeLabel,
-          );
+          selectedGradeLabel = _initialSelectedGradeLabel(loadedGrades);
         }
       });
     } on GradeException catch (error) {
@@ -162,12 +154,19 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
 
     setState(() {
       showGenerationFailed = false;
-      selectedGradeLabel = _defaultGradeLabel(
-        grades,
-        preferredGradeId: widget.initialGradeId,
-        preferredGradeLabel: widget.initialGradeLabel,
-      );
+      selectedGradeLabel = _initialSelectedGradeLabel(grades);
     });
+  }
+
+  String? _initialSelectedGradeLabel(List<GradeModel> grades) {
+    if (widget.quizPurpose == quizPurposeAssessment) {
+      return null;
+    }
+    return _defaultGradeLabel(
+      grades,
+      preferredGradeId: widget.initialGradeId,
+      preferredGradeLabel: widget.initialGradeLabel,
+    );
   }
 
   void selectGrade(_GradeOption option) {
@@ -306,17 +305,11 @@ class _GradeFailureNotice extends StatelessWidget {
       decoration: BoxDecoration(
         color: _gradePeach.withValues(alpha: 0.84),
         borderRadius: BorderRadius.circular(20 * scale),
-        border: Border.all(
-          color: _gradeRust.withValues(alpha: 0.10),
-        ),
+        border: Border.all(color: _gradeRust.withValues(alpha: 0.10)),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: _gradeRust,
-            size: 20 * scale,
-          ),
+          Icon(Icons.info_outline_rounded, color: _gradeRust, size: 20 * scale),
           SizedBox(width: 10 * scale),
           Expanded(
             child: Text(
@@ -427,14 +420,15 @@ class _GradeGrid extends StatelessWidget {
       );
     }
 
-    final items = grades
-        .where((grade) {
-          final label = grade.label?.trim();
-          return label != null && label.isNotEmpty;
-        })
-        .map(_GradeOption.fromGradeModel)
-        .toList()
-      ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
+    final items =
+        grades
+            .where((grade) {
+              final label = grade.label?.trim();
+              return label != null && label.isNotEmpty;
+            })
+            .map(_GradeOption.fromGradeModel)
+            .toList()
+          ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
     if (items.isEmpty) {
       return _GradeLoadError(
@@ -556,11 +550,7 @@ class _GradeLoadError extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.school_outlined,
-            color: _gradeTeal,
-            size: 34 * scale,
-          ),
+          Icon(Icons.school_outlined, color: _gradeTeal, size: 34 * scale),
           SizedBox(height: 12 * scale),
           Text(
             message,
@@ -862,11 +852,7 @@ class _PillActionButton extends StatelessWidget {
 }
 
 class _GradeOption {
-  const _GradeOption(
-    this.number,
-    this.label, {
-    this.displayOrder = 0,
-  });
+  const _GradeOption(this.number, this.label, {this.displayOrder = 0});
 
   factory _GradeOption.fromGradeModel(GradeModel grade) {
     final label = grade.label?.trim() ?? '';
@@ -892,10 +878,9 @@ String? _defaultGradeLabel(
   int? preferredGradeId,
   String? preferredGradeLabel,
 }) {
-  final sortedGrades = grades
-      .where((grade) => grade.label?.trim().isNotEmpty == true)
-      .toList()
-    ..sort((a, b) => (a.displayOrder ?? 0).compareTo(b.displayOrder ?? 0));
+  final sortedGrades =
+      grades.where((grade) => grade.label?.trim().isNotEmpty == true).toList()
+        ..sort((a, b) => (a.displayOrder ?? 0).compareTo(b.displayOrder ?? 0));
   if (sortedGrades.isEmpty) {
     return null;
   }
