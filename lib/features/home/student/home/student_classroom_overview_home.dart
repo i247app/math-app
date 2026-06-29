@@ -4,6 +4,7 @@ extension _StudentClassroomOverviewHomeView on _StudentHomeContentState {
   Widget _buildStudentClassroomOverviewState() {
     final classroom = _classrooms.first;
     final exercises = _modeHomeworkExercises.take(2).toList();
+    final previewCount = exercises.isEmpty ? 1 : exercises.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -19,7 +20,7 @@ extension _StudentClassroomOverviewHomeView on _StudentHomeContentState {
         if (_isLoadingModeHomework && exercises.isEmpty)
           const _StudentHomeSectionsLoading()
         else ...[
-          for (var index = 0; index < 2; index++) ...[
+          for (var index = 0; index < previewCount; index++) ...[
             _studentClassroomOverviewEntrance(
               order: 1 + index,
               child: _StudentHomeworkPreviewCard(
