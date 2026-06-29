@@ -43,13 +43,14 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
   String? _errorMessage;
   int _selectedIndex = 0;
   _ReviewMode _mode = _ReviewMode.retry;
-  final Map<int, String> _selectedAnswers = <int, String>{};
+  final Map<int, String> _submittedAnswers = <int, String>{};
+  final Map<int, String> _retryAnswers = <int, String>{};
 
   @override
   void initState() {
     super.initState();
     _quiz = widget.initialQuiz;
-    _seedSelectedAnswers(widget.initialQuiz);
+    _seedSubmittedAnswers(widget.initialQuiz);
     _loadQuizDetail();
   }
 
@@ -67,7 +68,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
 
       setState(() {
         _quiz = quiz;
-        _seedSelectedAnswers(quiz);
+        _seedSubmittedAnswers(quiz);
         _isLoading = false;
         if (_selectedIndex >= quiz.questions.length) {
           _selectedIndex = 0;
@@ -109,7 +110,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
   void _selectAnswer(int questionNumber, String label) {
     HapticFeedback.selectionClick();
     setState(() {
-      _selectedAnswers[questionNumber] = label.trim().toUpperCase();
+      _retryAnswers[questionNumber] = label.trim().toUpperCase();
     });
   }
 
@@ -128,18 +129,18 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
     _selectQuestion(_selectedIndex + 1);
   }
 
-  void _seedSelectedAnswers(GeneratedQuiz? quiz) {
+  void _seedSubmittedAnswers(GeneratedQuiz? quiz) {
     if (quiz == null) {
       return;
     }
-    _selectedAnswers.clear();
+    _submittedAnswers.clear();
     if (quiz.answers.isEmpty) {
       return;
     }
     for (final answer in quiz.answers) {
       final label = answer.label.trim().toUpperCase();
       if (label.isNotEmpty) {
-        _selectedAnswers[answer.questionNumber] = label;
+        _submittedAnswers[answer.questionNumber] = label;
       }
     }
   }
@@ -173,7 +174,8 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
                       onRetry: _loadQuizDetail,
                       onModeSelected: _selectMode,
                       onQuestionSelected: _selectQuestion,
-                      selectedAnswers: _selectedAnswers,
+                      submittedAnswers: _submittedAnswers,
+                      retryAnswers: _retryAnswers,
                       onAnswerSelected: _selectAnswer,
                       onPrevious: _goToPreviousQuestion,
                       onNext: _goToNextQuestion,
@@ -246,7 +248,8 @@ class _ReviewContent extends StatelessWidget {
     required this.onRetry,
     required this.onModeSelected,
     required this.onQuestionSelected,
-    required this.selectedAnswers,
+    required this.submittedAnswers,
+    required this.retryAnswers,
     required this.onAnswerSelected,
     required this.onPrevious,
     required this.onNext,
@@ -260,7 +263,8 @@ class _ReviewContent extends StatelessWidget {
   final VoidCallback onRetry;
   final ValueChanged<_ReviewMode> onModeSelected;
   final ValueChanged<int> onQuestionSelected;
-  final Map<int, String> selectedAnswers;
+  final Map<int, String> submittedAnswers;
+  final Map<int, String> retryAnswers;
   final void Function(int questionNumber, String label) onAnswerSelected;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
@@ -297,13 +301,13 @@ class _ReviewContent extends StatelessWidget {
               onRetry: onRetry,
             )
           else if (mode == _ReviewMode.result)
-            _ResultQuestionList(quiz: quiz, selectedAnswers: selectedAnswers)
+            _ResultQuestionList(quiz: quiz, selectedAnswers: submittedAnswers)
           else
             _RetryQuestionView(
               questions: questions,
               selectedIndex: safeIndex,
               question: question,
-              selectedAnswers: selectedAnswers,
+              selectedAnswers: retryAnswers,
               onQuestionSelected: onQuestionSelected,
               onAnswerSelected: onAnswerSelected,
               onPrevious: onPrevious,
