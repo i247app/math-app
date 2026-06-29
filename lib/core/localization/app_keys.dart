@@ -300,6 +300,12 @@ class AppKeys {
   static const incorrect = 'incorrect';
   static const time = 'time';
   static const questionNumber = 'question_number';
+  static const testAgain = 'test_again';
+  static const viewResult = 'view_result';
+  static const previous = 'previous';
+  static const next = 'next';
+  static const correctStatus = 'correct_status';
+  static const incorrectStatus = 'incorrect_status';
   static const showAnswerUpper = 'show_answer_upper';
   static const hideAnswerUpper = 'hide_answer_upper';
   static const noAnswer = 'no_answer';
