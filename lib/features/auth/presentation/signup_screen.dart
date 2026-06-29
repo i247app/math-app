@@ -145,7 +145,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
     final tight = width < 370;
-    final mascotSize = tight ? 118.0 : 136.0;
+    final backgroundMascotSize = tight ? 460.0 : 540.0;
 
     final role = selectedRole;
     final gender = selectedGender;
@@ -177,171 +177,199 @@ class _SignupScreenState extends State<SignupScreen> {
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Scaffold(
             backgroundColor: Colors.white,
-            body: ScreenFrame(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 28),
-                  Row(
-                    children: [
-                      CircleIconButton(
-                        icon: Icons.arrow_back_rounded,
-                        onPressed: widget.onBack,
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            context.getText(AppKeys.signup),
-                            style: GoogleFonts.andika(
-                              color: const Color(0xFF339395),
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+            resizeToAvoidBottomInset: false,
+            body: Stack(
+              children: [
+                Positioned(
+                  right: -backgroundMascotSize * 0.36,
+                  bottom: -backgroundMascotSize * 0.24,
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: 0.16,
+                      child: Transform.rotate(
+                        angle: -0.6108652381980153,
+                        child: Image.asset(
+                          'assets/images/numi-mascot.png',
+                          width: backgroundMascotSize,
+                          height: backgroundMascotSize,
+                          fit: BoxFit.contain,
                         ),
                       ),
-                      const SizedBox(width: 52), // To balance the back button
-                    ],
+                    ),
                   ),
-                  SizedBox(height: compact ? 14 : 24),
-                  // Mascot
-                  Center(
-                    child: Container(
-                      width: mascotSize,
-                      height: mascotSize,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 24,
-                            offset: const Offset(0, 12),
+                ),
+                Positioned.fill(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.viewInsetsOf(context).bottom,
+                    ),
+                    child: ScreenFrame(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 28),
+                          Row(
+                            children: [
+                              CircleIconButton(
+                                icon: Icons.arrow_back_rounded,
+                                onPressed: widget.onBack,
+                              ),
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    context.getText(AppKeys.signup),
+                                    style: GoogleFonts.andika(
+                                      color: const Color(0xFF339395),
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 52,
+                              ), // To balance the back button
+                            ],
+                          ),
+                          SizedBox(height: compact ? 18 : 26),
+                          // Inputs
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SignupFieldLabel(
+                                  label: context.getText(
+                                    AppKeys.signupRoleLabel,
+                                  ),
+                                  isRequired: true,
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: _RoleCard(
+                                        label: context.getText(
+                                          AppKeys.signupRoleStudent,
+                                        ),
+                                        imagePath:
+                                            'assets/images/student-icon.png',
+                                        isSelected: role == _studentRole,
+                                        onTap: () => _selectRole(_studentRole),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: _RoleCard(
+                                        label: context.getText(
+                                          AppKeys.signupRoleParent,
+                                        ),
+                                        imagePath:
+                                            'assets/images/parent-icon.png',
+                                        isSelected: role == _parentRole,
+                                        onTap: () => _selectRole(_parentRole),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: _RoleCard(
+                                        label: context.getText(
+                                          AppKeys.signupRoleTeacher,
+                                        ),
+                                        imagePath:
+                                            'assets/images/teacher-icon.png',
+                                        isSelected: role == _teacherRole,
+                                        onTap: () => _selectRole(_teacherRole),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                SignupFieldLabel(
+                                  label: context.getText(
+                                    AppKeys.signupGenderLabel,
+                                  ),
+                                  isRequired: true,
+                                ),
+                                const SizedBox(height: 8),
+                                _SignupDropdownField(
+                                  key: ValueKey(
+                                    'signup-gender-${role ?? 'none'}-${gender ?? 'none'}',
+                                  ),
+                                  value: gender,
+                                  hintText: context.getText(
+                                    role == null
+                                        ? AppKeys.signupGenderSelectRoleHint
+                                        : AppKeys.signupGenderHint,
+                                  ),
+                                  items: genderChoices,
+                                  onChanged: role == null
+                                      ? null
+                                      : (value) => setState(
+                                          () => selectedGender = value,
+                                        ),
+                                ),
+                                const SizedBox(height: 20),
+                                SignupFieldLabel(
+                                  label: context.getText(nameLabelKey),
+                                  isRequired: true,
+                                ),
+                                const SizedBox(height: 8),
+                                SignupTextField(
+                                  controller: usernameController,
+                                  hintText: context.getText(
+                                    AppKeys.signupNameHint,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  errorText: usernameErrorText,
+                                ),
+                                const SizedBox(height: 20),
+                                SignupFieldLabel(
+                                  label: context.getText(
+                                    AppKeys.signupEmailLabel,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                SignupTextField(
+                                  controller: emailController,
+                                  hintText: context.getText(
+                                    AppKeys.signupEmailHint,
+                                  ),
+                                  keyboardType: TextInputType.emailAddress,
+                                  textInputAction: TextInputAction.done,
+                                ),
+                                SizedBox(height: compact ? 32 : 54),
+                                _TealActionButton(
+                                  label: widget.isSigningUp
+                                      ? context.getText(AppKeys.signingUp)
+                                      : context.getText(AppKeys.continueLabel),
+                                  onPressed:
+                                      (widget.isSigningUp || !isFormValid)
+                                      ? null
+                                      : () {
+                                          FocusManager.instance.primaryFocus
+                                              ?.unfocus();
+                                          widget.onContinue(
+                                            usernameController.text,
+                                            emailController.text,
+                                            role,
+                                          );
+                                        },
+                                ),
+                                const SizedBox(height: 32),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      child: Image.asset(
-                        'assets/images/numi-mascot.png',
-                        fit: BoxFit.contain,
-                      ),
                     ),
                   ),
-                  SizedBox(height: compact ? 20 : 30),
-                  // Inputs
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SignupFieldLabel(
-                          label: context.getText(AppKeys.signupRoleLabel),
-                          isRequired: true,
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: _RoleCard(
-                                label: context.getText(
-                                  AppKeys.signupRoleStudent,
-                                ),
-                                imagePath: 'assets/images/student-icon.png',
-                                isSelected: role == _studentRole,
-                                onTap: () => _selectRole(_studentRole),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _RoleCard(
-                                label: context.getText(
-                                  AppKeys.signupRoleParent,
-                                ),
-                                imagePath: 'assets/images/parent-icon.png',
-                                isSelected: role == _parentRole,
-                                onTap: () => _selectRole(_parentRole),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _RoleCard(
-                                label: context.getText(
-                                  AppKeys.signupRoleTeacher,
-                                ),
-                                imagePath: 'assets/images/teacher-icon.png',
-                                isSelected: role == _teacherRole,
-                                onTap: () => _selectRole(_teacherRole),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        SignupFieldLabel(
-                          label: context.getText(AppKeys.signupGenderLabel),
-                          isRequired: true,
-                        ),
-                        const SizedBox(height: 8),
-                        _SignupDropdownField(
-                          key: ValueKey(
-                            'signup-gender-${role ?? 'none'}-${gender ?? 'none'}',
-                          ),
-                          value: gender,
-                          hintText: context.getText(
-                            role == null
-                                ? AppKeys.signupGenderSelectRoleHint
-                                : AppKeys.signupGenderHint,
-                          ),
-                          items: genderChoices,
-                          onChanged: role == null
-                              ? null
-                              : (value) =>
-                                    setState(() => selectedGender = value),
-                        ),
-                        const SizedBox(height: 20),
-                        SignupFieldLabel(
-                          label: context.getText(nameLabelKey),
-                          isRequired: true,
-                        ),
-                        const SizedBox(height: 8),
-                        SignupTextField(
-                          controller: usernameController,
-                          hintText: context.getText(AppKeys.signupNameHint),
-                          textInputAction: TextInputAction.next,
-                          errorText: usernameErrorText,
-                        ),
-                        const SizedBox(height: 20),
-                        SignupFieldLabel(
-                          label: context.getText(AppKeys.signupEmailLabel),
-                        ),
-                        const SizedBox(height: 8),
-                        SignupTextField(
-                          controller: emailController,
-                          hintText: context.getText(AppKeys.signupEmailHint),
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.done,
-                        ),
-                        SizedBox(height: compact ? 32 : 54),
-                        _TealActionButton(
-                          label: widget.isSigningUp
-                              ? context.getText(AppKeys.signingUp)
-                              : context.getText(AppKeys.continueLabel),
-                          onPressed: (widget.isSigningUp || !isFormValid)
-                              ? null
-                              : () {
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                  widget.onContinue(
-                                    usernameController.text,
-                                    emailController.text,
-                                    role,
-                                  );
-                                },
-                        ),
-                        const SizedBox(height: 32),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
