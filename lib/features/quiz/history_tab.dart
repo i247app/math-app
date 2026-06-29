@@ -3,11 +3,15 @@ import 'package:flutter/services.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/classroom/classroom_api.dart';
+import 'package:numi_flutter/features/homework/homework_api.dart';
+import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
@@ -30,6 +34,9 @@ class HistoryTab extends StatefulWidget {
     required this.activeProfile,
     required this.bottomPadding,
     required this.scale,
+    required this.classroomService,
+    required this.assignmentService,
+    this.quizService,
     this.activeRefreshTick = 0,
     this.isActive = true,
   });
@@ -38,6 +45,9 @@ class HistoryTab extends StatefulWidget {
   final StudentProfile? activeProfile;
   final double bottomPadding;
   final double scale;
+  final ClassroomService classroomService;
+  final ClassroomExerciseService assignmentService;
+  final QuizService? quizService;
   final int activeRefreshTick;
   final bool isActive;
 
@@ -47,14 +57,19 @@ class HistoryTab extends StatefulWidget {
 
 class _HistoryTabState extends State<HistoryTab> {
   late final QuizService _quizService =
-      _useFakeQuizApi ? const FakeQuizApi() : QuizApi();
+      widget.quizService ?? (_useFakeQuizApi ? const FakeQuizApi() : QuizApi());
+  late final ClassroomService _classroomService = widget.classroomService;
+  late final ClassroomExerciseService _assignmentService =
+      widget.assignmentService;
   final TextEditingController _searchController = TextEditingController();
 
-  List<GeneratedQuiz> _quizzes = const <GeneratedQuiz>[];
+  List<GeneratedQuiz> _assessmentQuizzes = const <GeneratedQuiz>[];
+  List<ClassroomExercise> _homeworkExercises = const <ClassroomExercise>[];
   bool _isLoading = true;
-  String? _errorMessage;
+  String? _assessmentErrorMessage;
+  String? _homeworkErrorMessage;
   int _loadRequestId = 0;
-  _HistoryQuizFilter _selectedFilter = _HistoryQuizFilter.assessment;
+  _HistoryFilter _selectedFilter = _HistoryFilter.homework;
 
   @override
   void initState() {
@@ -104,43 +119,96 @@ class _HistoryTabState extends State<HistoryTab> {
     if (profileId == null) {
       setState(() {
         _isLoading = false;
-        _errorMessage = context.readText(AppKeys.noAccountForHistory);
-        _quizzes = const <GeneratedQuiz>[];
+        _assessmentErrorMessage = context.readText(AppKeys.noAccountForHistory);
+        _homeworkErrorMessage = _assessmentErrorMessage;
+        _assessmentQuizzes = const <GeneratedQuiz>[];
+        _homeworkExercises = const <ClassroomExercise>[];
       });
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
+      _assessmentErrorMessage = null;
+      _homeworkErrorMessage = null;
     });
+
+    final historyLoadFailedMessage = context.readText(
+      AppKeys.historyLoadFailed,
+    );
+    final homeworkLoadFailedMessage = context.readText(
+      AppKeys.studentHomeworkLoadFailed,
+    );
+    var assessmentQuizzes = const <GeneratedQuiz>[];
+    var homeworkExercises = const <ClassroomExercise>[];
+    String? assessmentError;
+    String? homeworkError;
 
     try {
       final quizzes = await _quizService.listQuizzes(profileId: profileId);
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-      setState(() {
-        _quizzes = quizzes;
-        _isLoading = false;
-      });
+      assessmentQuizzes =
+          quizzes.where(_isAssessmentQuiz).toList(growable: false)
+            ..sort(_compareQuizHistoryDescending);
     } on QuizException catch (error) {
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-      setState(() {
-        _errorMessage = error.message;
-        _isLoading = false;
-      });
+      assessmentError = error.message;
     } catch (_) {
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-      setState(() {
-        _errorMessage = context.readText(AppKeys.historyLoadFailed);
-        _isLoading = false;
-      });
+      assessmentError = historyLoadFailedMessage;
     }
+
+    try {
+      homeworkExercises = await _loadSubmittedHomework(profileId);
+    } on ClassroomException catch (error) {
+      homeworkError = error.message;
+    } on ClassroomExerciseException catch (error) {
+      homeworkError = error.message;
+    } catch (_) {
+      homeworkError = homeworkLoadFailedMessage;
+    }
+
+    if (!mounted || requestId != _loadRequestId) {
+      return;
+    }
+    setState(() {
+      _assessmentQuizzes = assessmentQuizzes;
+      _homeworkExercises = homeworkExercises;
+      _assessmentErrorMessage = assessmentError;
+      _homeworkErrorMessage = homeworkError;
+      _isLoading = false;
+    });
+  }
+
+  Future<List<ClassroomExercise>> _loadSubmittedHomework(int profileId) async {
+    final classrooms = await _classroomService.listMyJoinedClassrooms(
+      profileId: profileId,
+    );
+    final exercises = <ClassroomExercise>[];
+    for (final classroom in classrooms) {
+      final classroomId = classroom.stableId;
+      if (classroomId == null) {
+        continue;
+      }
+      final classroomExercises = await _assignmentService.listExercises(
+        classroomId: classroomId,
+        profileId: profileId,
+        visibility: 'PUBLIC',
+        submissionStatus: 'SUBMITTED',
+        purpose: classroomExercisePurposeHomework,
+      );
+      exercises.addAll(classroomExercises.where(_isSubmittedHomework));
+    }
+
+    final seenIds = <int>{};
+    final deduped = exercises
+        .where((exercise) {
+          final id = exercise.stableId;
+          if (id == null) {
+            return true;
+          }
+          return seenIds.add(id);
+        })
+        .toList(growable: false);
+
+    return deduped..sort(_compareHomeworkHistoryDescending);
   }
 
   void _refreshSearch() {
@@ -149,11 +217,7 @@ class _HistoryTabState extends State<HistoryTab> {
 
   List<GeneratedQuiz> get _filteredQuizzes {
     final query = _searchController.text.trim().toLowerCase();
-    return _quizzes.where((quiz) {
-      if (_quizPurpose(quiz) != _selectedFilter.apiType) {
-        return false;
-      }
-
+    return _assessmentQuizzes.where((quiz) {
       if (query.isEmpty) {
         return true;
       }
@@ -172,7 +236,28 @@ class _HistoryTabState extends State<HistoryTab> {
     }).toList();
   }
 
-  void _selectFilter(_HistoryQuizFilter filter) {
+  List<ClassroomExercise> get _filteredHomeworkExercises {
+    final query = _searchController.text.trim().toLowerCase();
+    return _homeworkExercises.where((exercise) {
+      if (query.isEmpty) {
+        return true;
+      }
+
+      final searchable = <String>[
+        _historyHomeworkTitle(context, exercise),
+        _historyHomeworkShortText(context, exercise) ?? '',
+        exercise.chapterName ?? '',
+        exercise.lessonName ?? '',
+        exercise.purpose ?? '',
+        exercise.status ?? '',
+        exercise.submissionStatus ?? '',
+        ...exercise.questions.map((question) => question.displayPrompt ?? ''),
+      ].join(' ').toLowerCase();
+      return searchable.contains(query);
+    }).toList();
+  }
+
+  void _selectFilter(_HistoryFilter filter) {
     if (_selectedFilter == filter) {
       return;
     }
@@ -185,6 +270,13 @@ class _HistoryTabState extends State<HistoryTab> {
     final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
     final quizzes = _filteredQuizzes;
+    final homeworkExercises = _filteredHomeworkExercises;
+    final selectedItemsCount = _selectedFilter == _HistoryFilter.homework
+        ? homeworkExercises.length
+        : quizzes.length;
+    final selectedErrorMessage = _selectedFilter == _HistoryFilter.homework
+        ? _homeworkErrorMessage
+        : _assessmentErrorMessage;
 
     return ColoredBox(
       color: _historyBackground,
@@ -218,8 +310,11 @@ class _HistoryTabState extends State<HistoryTab> {
               padding: EdgeInsets.symmetric(horizontal: 20 * scale),
               child: _HistoryBody(
                 isLoading: _isLoading,
-                errorMessage: _errorMessage,
+                errorMessage: selectedErrorMessage,
+                selectedFilter: _selectedFilter,
+                selectedItemsCount: selectedItemsCount,
                 quizzes: quizzes,
+                homeworkExercises: homeworkExercises,
                 onRetry: _loadHistory,
                 scale: scale,
               ),
@@ -245,10 +340,7 @@ class _HistoryHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
-          bottom: BorderSide(
-            color: const Color(0xFFF2F2F2),
-            width: 4 * scale,
-          ),
+          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
         ),
       ),
       alignment: Alignment.center,
@@ -268,10 +360,7 @@ class _HistoryHeader extends StatelessWidget {
 }
 
 class _HistorySearchField extends StatelessWidget {
-  const _HistorySearchField({
-    required this.controller,
-    required this.scale,
-  });
+  const _HistorySearchField({required this.controller, required this.scale});
 
   final TextEditingController controller;
   final double scale;
@@ -312,37 +401,30 @@ class _HistorySearchField extends StatelessWidget {
           ),
           prefixIcon: Padding(
             padding: EdgeInsets.only(left: 14 * scale, right: 6 * scale),
-            child: Icon(
-              Icons.search_rounded,
-              color: _navy,
-              size: 22 * scale,
-            ),
+            child: Icon(Icons.search_rounded, color: _navy, size: 22 * scale),
           ),
           suffixIcon: IconButton(
             onPressed: HapticFeedback.selectionClick,
-            icon: Icon(
-              Icons.tune_rounded,
-              color: _navy,
-              size: 22 * scale,
-            ),
+            icon: Icon(Icons.tune_rounded, color: _navy, size: 22 * scale),
           ),
           border: InputBorder.none,
           isCollapsed: true,
           contentPadding: EdgeInsets.symmetric(
-              vertical: 11 * scale, horizontal: 10 * scale),
+            vertical: 11 * scale,
+            horizontal: 10 * scale,
+          ),
         ),
       ),
     );
   }
 }
 
-enum _HistoryQuizFilter {
-  assessment('ASSESSMENT', AppKeys.assessmentTab),
-  practice('PRACTICE', AppKeys.practiceTab);
+enum _HistoryFilter {
+  homework(AppKeys.studentHomework),
+  assessment(AppKeys.assessmentTab);
 
-  const _HistoryQuizFilter(this.apiType, this.labelKey);
+  const _HistoryFilter(this.labelKey);
 
-  final String apiType;
   final String labelKey;
 }
 
@@ -353,8 +435,8 @@ class _HistoryTypeTabs extends StatelessWidget {
     required this.scale,
   });
 
-  final _HistoryQuizFilter selectedFilter;
-  final ValueChanged<_HistoryQuizFilter> onSelected;
+  final _HistoryFilter selectedFilter;
+  final ValueChanged<_HistoryFilter> onSelected;
   final double scale;
 
   @override
@@ -368,7 +450,7 @@ class _HistoryTypeTabs extends StatelessWidget {
       ),
       child: Row(
         children: [
-          for (final filter in _HistoryQuizFilter.values)
+          for (final filter in _HistoryFilter.values)
             Expanded(
               child: _HistoryTypeTabButton(
                 filter: filter,
@@ -391,7 +473,7 @@ class _HistoryTypeTabButton extends StatelessWidget {
     required this.scale,
   });
 
-  final _HistoryQuizFilter filter;
+  final _HistoryFilter filter;
   final bool selected;
   final VoidCallback onTap;
   final double scale;
@@ -433,24 +515,30 @@ class _HistoryBody extends StatelessWidget {
   const _HistoryBody({
     required this.isLoading,
     required this.errorMessage,
+    required this.selectedFilter,
+    required this.selectedItemsCount,
     required this.quizzes,
+    required this.homeworkExercises,
     required this.onRetry,
     required this.scale,
   });
 
   final bool isLoading;
   final String? errorMessage;
+  final _HistoryFilter selectedFilter;
+  final int selectedItemsCount;
   final List<GeneratedQuiz> quizzes;
+  final List<ClassroomExercise> homeworkExercises;
   final VoidCallback onRetry;
   final double scale;
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading && quizzes.isEmpty) {
+    if (isLoading && selectedItemsCount == 0) {
       return _HistoryLoadingState(scale: scale);
     }
 
-    if (errorMessage != null && quizzes.isEmpty) {
+    if (errorMessage != null && selectedItemsCount == 0) {
       return _HistoryMessageState(
         icon: Icons.cloud_off_rounded,
         title: context.getText(AppKeys.historyLoadErrorTitle),
@@ -461,7 +549,7 @@ class _HistoryBody extends StatelessWidget {
       );
     }
 
-    if (quizzes.isEmpty) {
+    if (selectedItemsCount == 0) {
       return _HistoryMessageState(
         icon: Icons.history_toggle_off_rounded,
         title: context.getText(AppKeys.noHistoryTitle),
@@ -470,18 +558,32 @@ class _HistoryBody extends StatelessWidget {
       );
     }
 
-    return Column(
-      children: [
-        for (final quiz in quizzes) ...[
-          _HistoryQuizCard(
-            quiz: quiz,
-            scale: scale,
-            onTap: () => _openQuizReview(context, quiz),
-          ),
-          SizedBox(height: 14 * scale),
+    return switch (selectedFilter) {
+      _HistoryFilter.homework => Column(
+        children: [
+          for (final exercise in homeworkExercises) ...[
+            _HistoryHomeworkCard(
+              exercise: exercise,
+              scale: scale,
+              onTap: () => _openHomeworkResult(context, exercise),
+            ),
+            SizedBox(height: 14 * scale),
+          ],
         ],
-      ],
-    );
+      ),
+      _HistoryFilter.assessment => Column(
+        children: [
+          for (final quiz in quizzes) ...[
+            _HistoryQuizCard(
+              quiz: quiz,
+              scale: scale,
+              onTap: () => _openQuizReview(context, quiz),
+            ),
+            SizedBox(height: 14 * scale),
+          ],
+        ],
+      ),
+    };
   }
 }
 
@@ -497,9 +599,20 @@ void _openQuizReview(BuildContext context, GeneratedQuiz quiz) {
   HapticFeedback.selectionClick();
   Navigator.of(context).push(
     MaterialPageRoute<void>(
-      builder: (_) => QuizReviewScreen(
-        quizId: quizId,
-        initialQuiz: quiz,
+      builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
+    ),
+  );
+}
+
+void _openHomeworkResult(BuildContext context, ClassroomExercise exercise) {
+  HapticFeedback.selectionClick();
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => StudentHomeworkResultScreen(
+        summary: StudentHomeworkResultSummary(
+          scoreText: _historyHomeworkScoreText(exercise),
+          reviewText: context.getText(AppKeys.defaultAiReview),
+        ),
       ),
     ),
   );
@@ -600,11 +713,109 @@ class _HistoryQuizCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: _navy,
-                size: 26 * scale,
+              Icon(Icons.chevron_right_rounded, color: _navy, size: 26 * scale),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HistoryHomeworkCard extends StatelessWidget {
+  const _HistoryHomeworkCard({
+    required this.exercise,
+    required this.scale,
+    required this.onTap,
+  });
+
+  final ClassroomExercise exercise;
+  final double scale;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scorePercent = _historyHomeworkScorePercentage(exercise);
+    final dateParts = _historyDateParts(_historyHomeworkDateText(exercise));
+    final radius = BorderRadius.circular(24 * scale);
+
+    return Material(
+      color: Colors.white,
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Container(
+          constraints: BoxConstraints(minHeight: 116 * scale),
+          padding: EdgeInsets.fromLTRB(
+            16 * scale,
+            14 * scale,
+            10 * scale,
+            14 * scale,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: radius,
+            border: Border.all(color: _cardBorder, width: 1.3 * scale),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.07),
+                blurRadius: 12 * scale,
+                offset: Offset(0, 4 * scale),
               ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (scorePercent != null)
+                _HistoryScoreBadge(
+                  percentage: scorePercent,
+                  colors: _scoreColors(context, scorePercent),
+                  scale: scale,
+                )
+              else
+                _HistorySubmittedBadge(scale: scale),
+              SizedBox(width: 12 * scale),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _HistoryMetaRow(parts: dateParts, scale: scale),
+                    SizedBox(height: 7 * scale),
+                    Text(
+                      _historyHomeworkTitle(context, exercise),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: _deepInk,
+                        fontSize: FontSize.normal * scale,
+                        fontWeight: FontWeight.w800,
+                        height: 1.28,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    if (_historyHomeworkShortText(context, exercise)
+                        case final shortText?) ...[
+                      SizedBox(height: 4 * scale),
+                      Text(
+                        shortText,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _muted,
+                          fontSize: FontSize.small * scale,
+                          fontWeight: FontWeight.w500,
+                          height: 1.22,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: _navy, size: 26 * scale),
             ],
           ),
         ),
@@ -614,10 +825,7 @@ class _HistoryQuizCard extends StatelessWidget {
 }
 
 class _HistoryMetaRow extends StatelessWidget {
-  const _HistoryMetaRow({
-    required this.parts,
-    required this.scale,
-  });
+  const _HistoryMetaRow({required this.parts, required this.scale});
 
   final _HistoryDateParts parts;
   final double scale;
@@ -766,6 +974,51 @@ class _HistoryIncompleteBadge extends StatelessWidget {
   }
 }
 
+class _HistorySubmittedBadge extends StatelessWidget {
+  const _HistorySubmittedBadge({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 56 * scale,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 48 * scale,
+            height: 48 * scale,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE1F8F4),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: _teal.withValues(alpha: 0.26),
+                width: 1.3 * scale,
+              ),
+            ),
+            child: Icon(Icons.check_rounded, color: _teal, size: 26 * scale),
+          ),
+          SizedBox(height: 7 * scale),
+          Text(
+            context.getText(AppKeys.studentHomeworkSubmitted),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: _teal,
+              fontSize: FontSize.caption * 0.77 * scale,
+              fontWeight: FontWeight.w900,
+              height: 1.05,
+              letterSpacing: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _HistoryLoadingState extends StatefulWidget {
   const _HistoryLoadingState({required this.scale});
 
@@ -807,9 +1060,7 @@ class _HistoryLoadingStateState extends State<_HistoryLoadingState>
                 Colors.white.withValues(alpha: 0),
               ],
               stops: const [0.28, 0.5, 0.72],
-            ).createShader(
-              Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height),
-            );
+            ).createShader(Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height));
           },
           child: child,
         );
@@ -993,20 +1244,14 @@ class _HistoryMessageState extends StatelessWidget {
 }
 
 class _ScoreBadgeColors {
-  const _ScoreBadgeColors({
-    required this.foreground,
-    required this.label,
-  });
+  const _ScoreBadgeColors({required this.foreground, required this.label});
 
   final Color foreground;
   final String label;
 }
 
 class _HistoryDateParts {
-  const _HistoryDateParts({
-    required this.date,
-    required this.time,
-  });
+  const _HistoryDateParts({required this.date, required this.time});
 
   final String date;
   final String time;
@@ -1036,6 +1281,99 @@ String? _quizShortText(GeneratedQuiz quiz) {
     return null;
   }
   return shortText;
+}
+
+String _historyHomeworkTitle(BuildContext context, ClassroomExercise exercise) {
+  final title = exercise.title?.trim();
+  if (title != null && title.isNotEmpty) {
+    return title;
+  }
+  final id = exercise.stableId;
+  if (id != null) {
+    return '${context.getText(AppKeys.studentHomework)} #$id';
+  }
+  return context.getText(AppKeys.studentHomework);
+}
+
+String? _historyHomeworkShortText(
+  BuildContext context,
+  ClassroomExercise exercise,
+) {
+  final values = <String?>[
+    exercise.shortText,
+    exercise.description,
+    exercise.lessonName,
+    exercise.chapterName,
+  ];
+  for (final value in values) {
+    final trimmed = value?.trim();
+    if (trimmed != null && trimmed.isNotEmpty) {
+      return trimmed;
+    }
+  }
+  final count = exercise.numQuestions ?? exercise.questions.length;
+  if (count > 0) {
+    return context.formatText(AppKeys.teacherAssignmentQuestionCountFormat, {
+      'count': count,
+    });
+  }
+  return null;
+}
+
+String _historyHomeworkDateText(ClassroomExercise exercise) {
+  final values = <String?>[
+    exercise.modifyDt,
+    exercise.createDt,
+    exercise.endDate,
+    exercise.startDate,
+  ];
+  for (final value in values) {
+    final trimmed = value?.trim();
+    if (trimmed != null && trimmed.isNotEmpty) {
+      return trimmed;
+    }
+  }
+  return '';
+}
+
+String _historyHomeworkScoreText(ClassroomExercise exercise) {
+  final scorePercent = _historyHomeworkScorePercentage(exercise);
+  if (scorePercent != null) {
+    final scoreOutOf10 = (scorePercent / 10).round().clamp(0, 10);
+    return '$scoreOutOf10/10';
+  }
+  return '--/10';
+}
+
+int? _historyHomeworkScorePercentage(ClassroomExercise exercise) {
+  final metadata = exercise.metadata;
+  if (metadata == null) {
+    return null;
+  }
+
+  final percentage = _metadataInt(metadata, const [
+    'score_percentage',
+    'score',
+    'percentage',
+  ]);
+  if (percentage != null) {
+    return percentage.clamp(0, 100);
+  }
+
+  final correct = _metadataInt(metadata, const [
+    'correct_number',
+    'correct_count',
+    'correct_answers',
+  ]);
+  final total = _metadataInt(metadata, const [
+    'total_questions',
+    'question_count',
+    'total',
+  ]);
+  if (correct != null && total != null && total > 0) {
+    return (correct / total * 100).round().clamp(0, 100);
+  }
+  return null;
 }
 
 _ScoreBadgeColors _scoreColors(BuildContext context, int? percent) {
@@ -1078,6 +1416,59 @@ String _quizPurpose(GeneratedQuiz quiz) {
     return purpose.toUpperCase();
   }
   return (quiz.type ?? '').trim().toUpperCase();
+}
+
+bool _isAssessmentQuiz(GeneratedQuiz quiz) {
+  return _quizPurpose(quiz) == 'ASSESSMENT';
+}
+
+bool _isSubmittedHomework(ClassroomExercise exercise) {
+  final purpose = exercise.purpose?.trim().toUpperCase();
+  final isHomework =
+      purpose == null ||
+      purpose.isEmpty ||
+      purpose == classroomExercisePurposeHomework;
+  return isHomework &&
+      exercise.submissionStatus?.trim().toUpperCase() == 'SUBMITTED';
+}
+
+int _compareQuizHistoryDescending(GeneratedQuiz first, GeneratedQuiz second) {
+  final firstDate = _historyDateValue(first.createDt);
+  final secondDate = _historyDateValue(second.createDt);
+  return secondDate.compareTo(firstDate);
+}
+
+int _compareHomeworkHistoryDescending(
+  ClassroomExercise first,
+  ClassroomExercise second,
+) {
+  final firstDate = _historyDateValue(_historyHomeworkDateText(first));
+  final secondDate = _historyDateValue(_historyHomeworkDateText(second));
+  return secondDate.compareTo(firstDate);
+}
+
+DateTime _historyDateValue(String? value) {
+  return DateTime.tryParse(value?.trim() ?? '')?.toLocal() ??
+      DateTime.fromMillisecondsSinceEpoch(0);
+}
+
+int? _metadataInt(Map<String, dynamic> metadata, List<String> keys) {
+  for (final key in keys) {
+    final value = metadata[key];
+    if (value is int) {
+      return value;
+    }
+    if (value is num) {
+      return value.toInt();
+    }
+    if (value is String) {
+      final parsed = int.tryParse(value.trim());
+      if (parsed != null) {
+        return parsed;
+      }
+    }
+  }
+  return null;
 }
 
 _HistoryDateParts _historyDateParts(String? isoDate) {

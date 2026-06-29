@@ -1,10 +1,7 @@
 part of '../home_screen.dart';
 
 class StudentDashboard extends StatelessWidget {
-  const StudentDashboard({
-    super.key,
-    required this.args,
-  });
+  const StudentDashboard({super.key, required this.args});
 
   final HomeDashboardArgs args;
 
@@ -71,6 +68,9 @@ class StudentDashboard extends StatelessWidget {
         activeProfile: args.activeProfile,
         bottomPadding: args.bottomPadding,
         scale: args.scale,
+        classroomService: args.classroomService,
+        assignmentService: args.assignmentService,
+        quizService: args.quizService,
         activeRefreshTick: args.activeRefreshTick,
         isActive: args.isActive,
       );

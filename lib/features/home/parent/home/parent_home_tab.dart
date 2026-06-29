@@ -39,15 +39,15 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
     );
-    final oldChildIds = _studentProfiles(oldWidget.args.profiles)
-        .map(ActiveProfileSession.profileStableId)
-        .join(',');
-    final childIds = _studentProfiles(widget.args.profiles)
-        .map(ActiveProfileSession.profileStableId)
-        .join(',');
+    final oldChildIds = _studentProfiles(
+      oldWidget.args.profiles,
+    ).map(ActiveProfileSession.profileStableId).join(',');
+    final childIds = _studentProfiles(
+      widget.args.profiles,
+    ).map(ActiveProfileSession.profileStableId).join(',');
     final shouldForceRefresh =
         oldWidget.args.user?.id != widget.args.user?.id ||
-            oldChildIds != childIds;
+        oldChildIds != childIds;
     if (oldProfileId != profileId || shouldForceRefresh) {
       _hasLoadedHome = false;
       _resetModeEntrances();
@@ -183,16 +183,18 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       if (hadRenderableContent) {
         setState(() {
           _isLoading = false;
-          _errorMessage =
-              context.readText(AppKeys.parentChildDashboardLoadFailed);
+          _errorMessage = context.readText(
+            AppKeys.parentChildDashboardLoadFailed,
+          );
         });
         return;
       }
       setState(() {
         _isLoading = false;
         _hasLoadedHome = true;
-        _errorMessage =
-            context.readText(AppKeys.parentChildDashboardLoadFailed);
+        _errorMessage = context.readText(
+          AppKeys.parentChildDashboardLoadFailed,
+        );
         _homeLayout = null;
         _childSummaries = const <_ParentChildSummary>[];
         _completedAssessments = const <GeneratedQuiz>[];
@@ -342,10 +344,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
             ],
             if (_errorMessage != null) ...[
               const SizedBox(height: 10),
-              _ParentHomeErrorCard(
-                message: _errorMessage!,
-                onRetry: _loadHome,
-              ),
+              _ParentHomeErrorCard(message: _errorMessage!, onRetry: _loadHome),
             ],
           ],
         ),
@@ -380,14 +379,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   }
 
   void _openCompletionResult(HomeLayoutRecentCompletion completion) {
-    HapticFeedback.selectionClick();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => StudentHomeworkResultScreen(
-          summary: _homeworkSummaryFromCompletion(context, completion),
-        ),
-      ),
-    );
+    _openQuizReview(_quizFromRecentCompletion(completion));
   }
 
   void _openQuizReview(GeneratedQuiz quiz) {
@@ -398,10 +390,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     HapticFeedback.selectionClick();
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => QuizReviewScreen(
-          quizId: quizId,
-          initialQuiz: quiz,
-        ),
+        builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
       ),
     );
   }

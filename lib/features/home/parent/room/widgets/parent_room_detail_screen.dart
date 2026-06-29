@@ -51,16 +51,13 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 26),
                     _ParentRoomListSection(
-                      title: context.formatText(
-                        AppKeys.parentTasksCountTitle,
-                        {
-                          'count':
-                              pendingExercises.length + expiredExercises.length,
-                        },
-                      ),
+                      title: context.formatText(AppKeys.parentTasksCountTitle, {
+                        'count':
+                            pendingExercises.length + expiredExercises.length,
+                      }),
                       onViewAll: () => _parentRoomShowComingSoon(context),
-                      child: pendingExercises.isEmpty &&
-                              expiredExercises.isEmpty
+                      child:
+                          pendingExercises.isEmpty && expiredExercises.isEmpty
                           ? _ParentEmptyTaskLine(
                               icon: Icons.assignment_turned_in_outlined,
                               text: context.getText(
@@ -70,9 +67,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                           : Column(
                               children: [
                                 for (final pending in pendingExercises) ...[
-                                  _ParentPendingTaskListItem(
-                                    pending: pending,
-                                  ),
+                                  _ParentPendingTaskListItem(pending: pending),
                                   if (pending != pendingExercises.last ||
                                       expiredExercises.isNotEmpty)
                                     const Divider(
@@ -144,12 +139,15 @@ class _ParentRoomDetailScreen extends StatelessWidget {
     BuildContext context,
     HomeLayoutRecentCompletion completion,
   ) {
+    final quiz = _quizFromRecentCompletion(completion);
+    final quizId = quiz.quizId ?? quiz.id;
+    if (quizId == null || quizId <= 0) {
+      return;
+    }
     HapticFeedback.selectionClick();
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => StudentHomeworkResultScreen(
-          summary: _homeworkSummaryFromCompletion(context, completion),
-        ),
+        builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
       ),
     );
   }

@@ -123,16 +123,18 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       if (hadRenderableContent) {
         setState(() {
           _isLoading = false;
-          _errorMessage =
-              context.readText(AppKeys.parentChildDashboardLoadFailed);
+          _errorMessage = context.readText(
+            AppKeys.parentChildDashboardLoadFailed,
+          );
         });
         return;
       }
       setState(() {
         _isLoading = false;
         _hasLoaded = true;
-        _errorMessage =
-            context.readText(AppKeys.parentChildDashboardLoadFailed);
+        _errorMessage = context.readText(
+          AppKeys.parentChildDashboardLoadFailed,
+        );
       });
     }
   }
@@ -233,10 +235,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       key: const ValueKey('room-content'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _ParentRoomClassGrid(
-          entries: entries,
-          onTap: _openRoomDetail,
-        ),
+        _ParentRoomClassGrid(entries: entries, onTap: _openRoomDetail),
         const SizedBox(height: 18),
         _ParentRoomListSection(
           title: context.formatText(AppKeys.parentTasksCountTitle, {
@@ -251,9 +250,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
               : Column(
                   children: [
                     for (final pending in pendingExercises.take(3)) ...[
-                      _ParentPendingTaskListItem(
-                        pending: pending,
-                      ),
+                      _ParentPendingTaskListItem(pending: pending),
                       if (pending != pendingExercises.take(3).last ||
                           expiredExercises.isNotEmpty)
                         const Divider(
@@ -309,12 +306,15 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
   }
 
   void _openCompletionResult(HomeLayoutRecentCompletion completion) {
+    final quiz = _quizFromRecentCompletion(completion);
+    final quizId = quiz.quizId ?? quiz.id;
+    if (quizId == null || quizId <= 0) {
+      return;
+    }
     HapticFeedback.selectionClick();
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => StudentHomeworkResultScreen(
-          summary: _homeworkSummaryFromCompletion(context, completion),
-        ),
+        builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
       ),
     );
   }
