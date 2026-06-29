@@ -36,88 +36,95 @@ class HomeBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = switch (activeRole) {
       ProfileRole.teacher => [
-          HomeNavItemData(
-            Icons.home_filled,
-            context.getText(AppKeys.navHome),
-            null,
-          ),
-          HomeNavItemData(
-            Icons.bar_chart_rounded,
-            context.getText(AppKeys.navClassroom),
-            null,
-          ),
-          HomeNavItemData(
-            Icons.menu_book_rounded,
-            context.getText(AppKeys.navStudy),
-            null,
-          ),
-          HomeNavItemData(
-            Icons.chat_bubble_outline_rounded,
-            context.getText(AppKeys.navMembers),
-            null,
-          ),
-          HomeNavItemData(null, context.getText(AppKeys.navSettings), user),
-        ],
+        HomeNavItemData(
+          Icons.home_filled,
+          context.getText(AppKeys.navHome),
+          null,
+        ),
+        HomeNavItemData(
+          Icons.bar_chart_rounded,
+          context.getText(AppKeys.navClassroom),
+          null,
+        ),
+        HomeNavItemData(
+          Icons.menu_book_rounded,
+          context.getText(AppKeys.navStudy),
+          null,
+        ),
+        HomeNavItemData(
+          Icons.chat_bubble_outline_rounded,
+          context.getText(AppKeys.navMembers),
+          null,
+        ),
+        HomeNavItemData(null, context.getText(AppKeys.navSettings), user),
+      ],
       ProfileRole.student => [
-          HomeNavItemData(
-            null,
-            context.getText(AppKeys.navHome),
-            null,
-            assetPath: studentHomeNavHomeAsset,
-          ),
-          HomeNavItemData(
-            null,
-            context.getText(AppKeys.navClassroom),
-            null,
-            assetPath: studentHomeNavClassAsset,
-          ),
-          HomeNavItemData(
-            null,
-            context.getText(AppKeys.navReview),
-            null,
-            assetPath: studentHomeNavReportAsset,
-          ),
-          HomeNavItemData(
-            null,
-            context.getText(AppKeys.navHistory),
-            null,
-            assetPath: studentHomeNavMessageAsset,
-          ),
-          HomeNavItemData(
-            null,
-            context.getText(AppKeys.navSettings),
-            null,
-            assetPath: studentHomeNavSettingsAsset,
-          ),
-        ],
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navHome),
+          null,
+          assetPath: studentHomeNavHomeAsset,
+        ),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navClassroom),
+          null,
+          assetPath: studentHomeNavClassAsset,
+        ),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navReview),
+          null,
+          assetPath: studentHomeNavReportAsset,
+        ),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navHistory),
+          null,
+          assetPath: studentHomeNavMessageAsset,
+        ),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navSettings),
+          null,
+          assetPath: studentHomeNavSettingsAsset,
+        ),
+      ],
       ProfileRole.parent => [
-          HomeNavItemData(
-            Icons.home_filled,
-            context.getText(AppKeys.navHome),
-            null,
-          ),
-          HomeNavItemData(
-            Icons.assignment_turned_in_outlined,
-            context.getText(AppKeys.navAssessment),
-            null,
-          ),
-          HomeNavItemData(
-            Icons.meeting_room_outlined,
-            context.getText(AppKeys.navRoom),
-            null,
-          ),
-          HomeNavItemData(
-            Icons.sports_esports_rounded,
-            context.getText(AppKeys.navGames),
-            null,
-          ),
-          HomeNavItemData(null, context.getText(AppKeys.navSettings), user),
-        ],
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navHome),
+          null,
+          assetPath: parentHomeNavHomeAsset,
+        ),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navAssessment),
+          null,
+          assetPath: parentHomeNavAssessmentAsset,
+        ),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navRoom),
+          null,
+          assetPath: parentHomeNavRoomAsset,
+        ),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navGames),
+          null,
+          assetPath: parentHomeNavGameAsset,
+        ),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navSettings),
+          null,
+          assetPath: parentHomeNavSettingsAsset,
+        ),
+      ],
     };
 
-    final radius = BorderRadius.vertical(
-      top: Radius.circular(48 * scale),
-    );
+    final radius = BorderRadius.vertical(top: Radius.circular(48 * scale));
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -235,29 +242,7 @@ class HomeAnimatedNavItem extends StatelessWidget {
                     children: [
                       SizedBox.square(
                         dimension: 22 * scale,
-                        child: Center(
-                          child: data.user != null
-                              ? HomeUserAvatarWidget(
-                                  user: data.user!,
-                                  size: 20 * scale,
-                                  color: color,
-                                )
-                              : data.assetPath != null
-                                  ? SvgPicture.asset(
-                                      data.assetPath!,
-                                      width: 20 * scale,
-                                      height: 20 * scale,
-                                      colorFilter: ColorFilter.mode(
-                                        color,
-                                        BlendMode.srcIn,
-                                      ),
-                                    )
-                                  : Icon(
-                                      data.icon,
-                                      color: color,
-                                      size: 20 * scale,
-                                    ),
-                        ),
+                        child: Center(child: _buildIcon(color)),
                       ),
                       SizedBox(height: 4 * scale),
                       SizedBox(
@@ -285,6 +270,25 @@ class HomeAnimatedNavItem extends StatelessWidget {
         );
       },
     );
+  }
+
+  Widget _buildIcon(Color color) {
+    final user = data.user;
+    if (user != null) {
+      return HomeUserAvatarWidget(user: user, size: 20 * scale, color: color);
+    }
+
+    final assetPath = data.assetPath;
+    if (assetPath != null) {
+      return SvgPicture.asset(
+        assetPath,
+        width: 20 * scale,
+        height: 20 * scale,
+        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      );
+    }
+
+    return Icon(data.icon, color: color, size: 20 * scale);
   }
 }
 
@@ -314,12 +318,7 @@ class HomeUserAvatarWidget extends StatelessWidget {
 }
 
 class HomeNavItemData {
-  const HomeNavItemData(
-    this.icon,
-    this.label,
-    this.user, {
-    this.assetPath,
-  });
+  const HomeNavItemData(this.icon, this.label, this.user, {this.assetPath});
 
   final IconData? icon;
   final String label;
