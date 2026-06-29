@@ -158,7 +158,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
             Expanded(
               child: quiz == null
                   ? _isLoading
-                        ? const _ReviewLoadingContent()
+                        ? const _ReviewLoadingContent(showHeaderSkeleton: false)
                         : _ReviewStatePanel(
                             isLoading: false,
                             message: _errorMessage,
@@ -273,10 +273,6 @@ class _ReviewContent extends StatelessWidget {
         : selectedIndex.clamp(0, questions.length - 1);
     final question = questions.isEmpty ? null : questions[safeIndex];
 
-    if (isLoading && question == null) {
-      return const _ReviewLoadingContent();
-    }
-
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(13, 10, 13, 34),
@@ -292,7 +288,9 @@ class _ReviewContent extends StatelessWidget {
           const SizedBox(height: 12),
           _StatsCard(quiz: quiz),
           const SizedBox(height: 11),
-          if (question == null)
+          if (isLoading && question == null)
+            const _ReviewQuestionLoadingSection()
+          else if (question == null)
             _ReviewStatePanel(
               isLoading: false,
               message: context.getText(AppKeys.emptyQuizQuestions),
@@ -1208,7 +1206,9 @@ class _ReviewCard extends StatelessWidget {
 }
 
 class _ReviewLoadingContent extends StatefulWidget {
-  const _ReviewLoadingContent();
+  const _ReviewLoadingContent({this.showHeaderSkeleton = true});
+
+  final bool showHeaderSkeleton;
 
   @override
   State<_ReviewLoadingContent> createState() => _ReviewLoadingContentState();
@@ -1245,97 +1245,117 @@ class _ReviewLoadingContentState extends State<_ReviewLoadingContent>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _SkeletonBlock(progress: progress, height: 44, borderRadius: 12),
-              const SizedBox(height: 12),
-              _ReviewCard(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    for (var index = 0; index < 4; index++)
-                      Column(
-                        children: [
-                          _SkeletonBlock(
-                            progress: progress,
-                            width: 39,
-                            height: 39,
-                            borderRadius: 999,
-                          ),
-                          const SizedBox(height: 8),
-                          _SkeletonBlock(
-                            progress: progress,
-                            width: 34,
-                            height: 18,
-                            borderRadius: 6,
-                          ),
-                          const SizedBox(height: 5),
-                          _SkeletonBlock(
-                            progress: progress,
-                            width: 54,
-                            height: 12,
-                            borderRadius: 5,
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (var index = 0; index < 5; index++) ...[
-                    _SkeletonBlock(
-                      progress: progress,
-                      width: 40,
-                      height: 40,
-                      borderRadius: 999,
-                    ),
-                    if (index != 4) const SizedBox(width: 11),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 20),
-              _SkeletonBlock(progress: progress, height: 146, borderRadius: 14),
-              const SizedBox(height: 23),
-              for (var index = 0; index < 4; index++) ...[
+              if (widget.showHeaderSkeleton) ...[
                 _SkeletonBlock(
                   progress: progress,
-                  height: 59,
+                  height: 44,
                   borderRadius: 12,
                 ),
-                if (index != 3) const SizedBox(height: 10),
-              ],
-              const SizedBox(height: 13),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _SkeletonBlock(
-                        progress: progress,
-                        height: 40,
-                        borderRadius: 9,
-                      ),
-                    ),
-                    const SizedBox(width: 28),
-                    Expanded(
-                      child: _SkeletonBlock(
-                        progress: progress,
-                        height: 40,
-                        borderRadius: 9,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 12),
+                _SkeletonBlock(
+                  progress: progress,
+                  height: 94,
+                  borderRadius: 14,
                 ),
-              ),
+                const SizedBox(height: 24),
+              ],
+              _ReviewQuestionLoadingSection(progress: progress),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _ReviewQuestionLoadingSection extends StatefulWidget {
+  const _ReviewQuestionLoadingSection({this.progress});
+
+  final double? progress;
+
+  @override
+  State<_ReviewQuestionLoadingSection> createState() =>
+      _ReviewQuestionLoadingSectionState();
+}
+
+class _ReviewQuestionLoadingSectionState
+    extends State<_ReviewQuestionLoadingSection>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.progress == null) {
+      _controller = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1300),
+      )..repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = _controller;
+    if (controller == null) {
+      return _ReviewQuestionSkeleton(progress: widget.progress ?? 0);
+    }
+
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        return _ReviewQuestionSkeleton(progress: controller.value);
+      },
+    );
+  }
+}
+
+class _ReviewQuestionSkeleton extends StatelessWidget {
+  const _ReviewQuestionSkeleton({required this.progress});
+
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SkeletonBlock(progress: progress, height: 146, borderRadius: 14),
+        const SizedBox(height: 23),
+        for (var index = 0; index < 4; index++) ...[
+          _SkeletonBlock(progress: progress, height: 59, borderRadius: 12),
+          if (index != 3) const SizedBox(height: 10),
+        ],
+        const SizedBox(height: 13),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              Expanded(
+                child: _SkeletonBlock(
+                  progress: progress,
+                  height: 40,
+                  borderRadius: 9,
+                ),
+              ),
+              const SizedBox(width: 28),
+              Expanded(
+                child: _SkeletonBlock(
+                  progress: progress,
+                  height: 40,
+                  borderRadius: 9,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -1345,13 +1365,11 @@ class _SkeletonBlock extends StatelessWidget {
     required this.progress,
     required this.height,
     required this.borderRadius,
-    this.width,
   });
 
   final double progress;
   final double height;
   final double borderRadius;
-  final double? width;
 
   @override
   Widget build(BuildContext context) {
@@ -1371,7 +1389,6 @@ class _SkeletonBlock extends StatelessWidget {
         ).createShader(bounds);
       },
       child: Container(
-        width: width,
         height: height,
         decoration: BoxDecoration(
           color: const Color(0xFFE5F3F5),
