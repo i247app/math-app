@@ -59,6 +59,20 @@ class AppKeys {
   static const signupRoleStudent = 'signup_role_student';
   static const signupRoleParent = 'signup_role_parent';
   static const signupRoleTeacher = 'signup_role_teacher';
+  static const signupGenderLabel = 'signup_gender_label';
+  static const signupGenderHint = 'signup_gender_hint';
+  static const signupGenderSelectRoleHint = 'signup_gender_select_role_hint';
+  static const signupGenderStudentMale = 'signup_gender_student_male';
+  static const signupGenderStudentFemale = 'signup_gender_student_female';
+  static const signupGenderParentFather = 'signup_gender_parent_father';
+  static const signupGenderParentMother = 'signup_gender_parent_mother';
+  static const signupGenderTeacherMale = 'signup_gender_teacher_male';
+  static const signupGenderTeacherFemale = 'signup_gender_teacher_female';
+  static const signupNameLabelFather = 'signup_name_label_father';
+  static const signupNameLabelMother = 'signup_name_label_mother';
+  static const signupNameLabelTeacherMale = 'signup_name_label_teacher_male';
+  static const signupNameLabelTeacherFemale =
+      'signup_name_label_teacher_female';
   static const signupEmailDescription = 'signup_email_description';
   static const avatarUpper = 'avatar_upper';
   static const chooseAvatar = 'choose_avatar';

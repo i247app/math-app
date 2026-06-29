@@ -29,6 +29,17 @@ class _SignupScreenState extends State<SignupScreen> {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   String? selectedRole;
+  String? selectedGender;
+
+  static const _studentRole = 'STUDENT';
+  static const _parentRole = 'PARENT';
+  static const _teacherRole = 'TEACHER';
+  static const _studentMale = 'student_male';
+  static const _studentFemale = 'student_female';
+  static const _parentFather = 'parent_father';
+  static const _parentMother = 'parent_mother';
+  static const _teacherMale = 'teacher_male';
+  static const _teacherFemale = 'teacher_female';
 
   static final RegExp _signupNamePattern = RegExp(
     r'^[A-Za-z0-9À-ÖØ-öø-ỹ]+(?: +[A-Za-z0-9À-ÖØ-öø-ỹ]+)*$',
@@ -46,6 +57,68 @@ class _SignupScreenState extends State<SignupScreen> {
   static bool _isValidSignupName(String value) {
     final normalized = value.trim();
     return normalized.isNotEmpty && _signupNamePattern.hasMatch(normalized);
+  }
+
+  static List<_SignupGenderChoice> _genderChoicesForRole(String? role) {
+    return switch (role) {
+      _studentRole => const [
+        _SignupGenderChoice(
+          value: _studentMale,
+          labelKey: AppKeys.signupGenderStudentMale,
+        ),
+        _SignupGenderChoice(
+          value: _studentFemale,
+          labelKey: AppKeys.signupGenderStudentFemale,
+        ),
+      ],
+      _parentRole => const [
+        _SignupGenderChoice(
+          value: _parentFather,
+          labelKey: AppKeys.signupGenderParentFather,
+        ),
+        _SignupGenderChoice(
+          value: _parentMother,
+          labelKey: AppKeys.signupGenderParentMother,
+        ),
+      ],
+      _teacherRole => const [
+        _SignupGenderChoice(
+          value: _teacherMale,
+          labelKey: AppKeys.signupGenderTeacherMale,
+        ),
+        _SignupGenderChoice(
+          value: _teacherFemale,
+          labelKey: AppKeys.signupGenderTeacherFemale,
+        ),
+      ],
+      _ => const [],
+    };
+  }
+
+  static String _signupNameLabelKey(String? role, String? gender) {
+    if (role == _parentRole && gender == _parentFather) {
+      return AppKeys.signupNameLabelFather;
+    }
+    if (role == _parentRole && gender == _parentMother) {
+      return AppKeys.signupNameLabelMother;
+    }
+    if (role == _teacherRole && gender == _teacherMale) {
+      return AppKeys.signupNameLabelTeacherMale;
+    }
+    if (role == _teacherRole && gender == _teacherFemale) {
+      return AppKeys.signupNameLabelTeacherFemale;
+    }
+
+    return AppKeys.signupNameLabel;
+  }
+
+  void _selectRole(String role) {
+    setState(() {
+      if (selectedRole != role) {
+        selectedGender = null;
+      }
+      selectedRole = role;
+    });
   }
 
   @override
@@ -75,9 +148,12 @@ class _SignupScreenState extends State<SignupScreen> {
     final mascotSize = tight ? 118.0 : 136.0;
 
     final role = selectedRole;
+    final gender = selectedGender;
     final username = usernameController.text.trim();
     final isUsernameValid = _isValidSignupName(username);
-    final isFormValid = isUsernameValid && role != null;
+    final isFormValid = isUsernameValid && role != null && gender != null;
+    final genderChoices = _genderChoicesForRole(role);
+    final nameLabelKey = _signupNameLabelKey(role, gender);
 
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (previous, current) =>
@@ -158,7 +234,72 @@ class _SignupScreenState extends State<SignupScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SignupFieldLabel(
-                          label: context.getText(AppKeys.signupNameLabel),
+                          label: context.getText(AppKeys.signupRoleLabel),
+                          isRequired: true,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: _RoleCard(
+                                label: context.getText(
+                                  AppKeys.signupRoleStudent,
+                                ),
+                                imagePath: 'assets/images/student-icon.png',
+                                isSelected: role == _studentRole,
+                                onTap: () => _selectRole(_studentRole),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _RoleCard(
+                                label: context.getText(
+                                  AppKeys.signupRoleParent,
+                                ),
+                                imagePath: 'assets/images/parent-icon.png',
+                                isSelected: role == _parentRole,
+                                onTap: () => _selectRole(_parentRole),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _RoleCard(
+                                label: context.getText(
+                                  AppKeys.signupRoleTeacher,
+                                ),
+                                imagePath: 'assets/images/teacher-icon.png',
+                                isSelected: role == _teacherRole,
+                                onTap: () => _selectRole(_teacherRole),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        SignupFieldLabel(
+                          label: context.getText(AppKeys.signupGenderLabel),
+                          isRequired: true,
+                        ),
+                        const SizedBox(height: 8),
+                        _SignupDropdownField(
+                          key: ValueKey(
+                            'signup-gender-${role ?? 'none'}-${gender ?? 'none'}',
+                          ),
+                          value: gender,
+                          hintText: context.getText(
+                            role == null
+                                ? AppKeys.signupGenderSelectRoleHint
+                                : AppKeys.signupGenderHint,
+                          ),
+                          items: genderChoices,
+                          onChanged: role == null
+                              ? null
+                              : (value) =>
+                                    setState(() => selectedGender = value),
+                        ),
+                        const SizedBox(height: 20),
+                        SignupFieldLabel(
+                          label: context.getText(nameLabelKey),
                           isRequired: true,
                         ),
                         const SizedBox(height: 8),
@@ -178,48 +319,6 @@ class _SignupScreenState extends State<SignupScreen> {
                           hintText: context.getText(AppKeys.signupEmailHint),
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.done,
-                        ),
-                        SizedBox(height: compact ? 24 : 28),
-                        // Roles
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: _RoleCard(
-                                label: context.getText(
-                                  AppKeys.signupRoleStudent,
-                                ),
-                                imagePath: 'assets/images/student-icon.png',
-                                isSelected: role == 'STUDENT',
-                                onTap: () =>
-                                    setState(() => selectedRole = 'STUDENT'),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _RoleCard(
-                                label: context.getText(
-                                  AppKeys.signupRoleParent,
-                                ),
-                                imagePath: 'assets/images/parent-icon.png',
-                                isSelected: role == 'PARENT',
-                                onTap: () =>
-                                    setState(() => selectedRole = 'PARENT'),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _RoleCard(
-                                label: context.getText(
-                                  AppKeys.signupRoleTeacher,
-                                ),
-                                imagePath: 'assets/images/teacher-icon.png',
-                                isSelected: role == 'TEACHER',
-                                onTap: () =>
-                                    setState(() => selectedRole = 'TEACHER'),
-                              ),
-                            ),
-                          ],
                         ),
                         SizedBox(height: compact ? 32 : 54),
                         _TealActionButton(
@@ -279,6 +378,89 @@ class SignupFieldLabel extends StatelessWidget {
               style: TextStyle(color: Color(0xFFE74657)),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _SignupGenderChoice {
+  const _SignupGenderChoice({required this.value, required this.labelKey});
+
+  final String value;
+  final String labelKey;
+}
+
+class _SignupDropdownField extends StatelessWidget {
+  const _SignupDropdownField({
+    super.key,
+    required this.value,
+    required this.hintText,
+    required this.items,
+    required this.onChanged,
+  });
+
+  final String? value;
+  final String hintText;
+  final List<_SignupGenderChoice> items;
+  final ValueChanged<String?>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = GoogleFonts.andika(
+      color: AppColors.ink,
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      letterSpacing: 0,
+    );
+    final hintStyle = GoogleFonts.andika(
+      color: const Color(0xFF7E9088),
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      letterSpacing: 0,
+    );
+
+    return SizedBox(
+      height: 58,
+      child: DropdownButtonFormField<String>(
+        initialValue: value,
+        isExpanded: true,
+        icon: const Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: Color(0xFF339395),
+        ),
+        hint: Text(hintText, style: hintStyle),
+        disabledHint: Text(hintText, style: hintStyle),
+        items: items
+            .map(
+              (item) => DropdownMenuItem<String>(
+                value: item.value,
+                child: Text(context.getText(item.labelKey), style: textStyle),
+              ),
+            )
+            .toList(),
+        onChanged: onChanged,
+        style: textStyle,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF339395), width: 2),
+          ),
+        ),
       ),
     );
   }
