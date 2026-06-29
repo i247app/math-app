@@ -236,6 +236,7 @@ class AppStrings {
           'Nộp bài tập thất bại. Vui lòng thử lại.',
       AppKeys.studentHomeworkMissingExercise: 'Không tìm thấy bài tập để nộp.',
       AppKeys.studentHomeworkAlreadySubmitted: 'Bạn đã nộp bài tập này rồi.',
+      AppKeys.studentHomeworkNotOpen: 'Bài tập chưa mở.',
       AppKeys.assessmentAction: 'Đánh Giá',
       AppKeys.viewAll: 'Xem tất cả',
       AppKeys.viewAllUpper: 'XEM TẤT CẢ',
@@ -937,6 +938,7 @@ class AppStrings {
           'Could not find homework to submit.',
       AppKeys.studentHomeworkAlreadySubmitted:
           'You have already submitted this homework.',
+      AppKeys.studentHomeworkNotOpen: 'This homework is not open yet.',
       AppKeys.assessmentAction: 'Assessment',
       AppKeys.viewAll: 'View all',
       AppKeys.viewAllUpper: 'VIEW ALL',

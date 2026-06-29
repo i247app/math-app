@@ -231,6 +231,7 @@ class AppKeys {
       'student_homework_missing_exercise';
   static const studentHomeworkAlreadySubmitted =
       'student_homework_already_submitted';
+  static const studentHomeworkNotOpen = 'student_homework_not_open';
   static const assessmentAction = 'assessment_action';
   static const viewAll = 'view_all';
   static const viewAllUpper = 'view_all_upper';

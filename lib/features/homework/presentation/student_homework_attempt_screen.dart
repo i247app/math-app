@@ -131,9 +131,7 @@ class _StudentHomeworkAttemptScreenState
     setState(() => _questionIndex++);
   }
 
-  Future<void> _submitHomework(
-    List<_HomeworkAttemptQuestion> questions,
-  ) async {
+  Future<void> _submitHomework(List<_HomeworkAttemptQuestion> questions) async {
     if (_isSubmitting) {
       return;
     }
@@ -141,8 +139,9 @@ class _StudentHomeworkAttemptScreenState
     final exerciseId = (_exercise?.stableId ?? widget.exerciseId);
     if (exerciseId <= 0) {
       setState(() {
-        _errorMessage =
-            context.readText(AppKeys.studentHomeworkMissingExercise);
+        _errorMessage = context.readText(
+          AppKeys.studentHomeworkMissingExercise,
+        );
         _errorRetryAction = null;
       });
       return;
@@ -161,6 +160,12 @@ class _StudentHomeworkAttemptScreenState
         SubmitClassroomExerciseAnswer(
           questionNumber: questions[index].questionNumber,
           label: _selectedAnswerLabels[index]!,
+          answer: questions[index].selectedAnswerContent(
+            _selectedAnswerLabels[index]!,
+          ),
+          answerContent: questions[index].selectedAnswerContent(
+            _selectedAnswerLabels[index]!,
+          ),
         ),
     ];
 
@@ -171,6 +176,7 @@ class _StudentHomeworkAttemptScreenState
       _errorRetryAction = null;
     });
 
+    var shouldResetSubmitting = true;
     try {
       final submission = await _exerciseService.submitExercise(
         profileId: widget.profileId,
@@ -183,8 +189,9 @@ class _StudentHomeworkAttemptScreenState
       final exercise = _exercise;
       if (exercise == null) {
         setState(() {
-          _errorMessage =
-              context.readText(AppKeys.studentHomeworkMissingExercise);
+          _errorMessage = context.readText(
+            AppKeys.studentHomeworkMissingExercise,
+          );
           _errorRetryAction = null;
         });
         return;
@@ -192,11 +199,7 @@ class _StudentHomeworkAttemptScreenState
       Navigator.of(context).pushReplacement<bool, void>(
         MaterialPageRoute<bool>(
           builder: (_) => StudentHomeworkResultScreen(
-            summary: studentHomeworkResultSummary(
-              exercise: exercise,
-              submission: submission,
-              answers: answers,
-            ),
+            summary: studentHomeworkResultSummary(submission: submission),
           ),
         ),
       );
@@ -204,12 +207,17 @@ class _StudentHomeworkAttemptScreenState
       if (!mounted) {
         return;
       }
-      setState(() {
-        _errorMessage = error.message.trim().isEmpty
-            ? context.readText(AppKeys.studentHomeworkSubmitFailed)
-            : error.message;
-        _errorRetryAction = () => _submitHomework(questions);
-      });
+      if (error.status == 12706) {
+        shouldResetSubmitting = false;
+        _returnFromNotOpenHomework();
+      } else {
+        setState(() {
+          _errorMessage = error.message.trim().isEmpty
+              ? context.readText(AppKeys.studentHomeworkSubmitFailed)
+              : error.message;
+          _errorRetryAction = () => _submitHomework(questions);
+        });
+      }
     } catch (_) {
       if (!mounted) {
         return;
@@ -219,10 +227,24 @@ class _StudentHomeworkAttemptScreenState
         _errorRetryAction = () => _submitHomework(questions);
       });
     } finally {
-      if (mounted) {
+      if (mounted && shouldResetSubmitting) {
         setState(() => _isSubmitting = false);
       }
     }
+  }
+
+  void _returnFromNotOpenHomework() {
+    final message = context.readText(AppKeys.studentHomeworkNotOpen);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(milliseconds: 1800),
+        ),
+      );
+    Navigator.of(context).maybePop();
   }
 
   @override
@@ -240,14 +262,16 @@ class _StudentHomeworkAttemptScreenState
                 .clamp(0.78, 1.18);
             final s = scale.toDouble();
             final questions = _attemptQuestions(_exercise);
-            final questionError =
-                _isLoading ? null : _questionDataError(context, questions);
+            final questionError = _isLoading
+                ? null
+                : _questionDataError(context, questions);
             final effectiveError = _errorMessage ?? questionError;
             final currentQuestion = questions.isEmpty
                 ? null
                 : questions[_questionIndex.clamp(0, questions.length - 1)];
             final selectedAnswerLabel = _selectedAnswerLabels[_questionIndex];
-            final isQuestionContentVisible = !_isLoading &&
+            final isQuestionContentVisible =
+                !_isLoading &&
                 !_isSubmitting &&
                 effectiveError == null &&
                 currentQuestion != null;
@@ -278,54 +302,49 @@ class _StudentHomeworkAttemptScreenState
                             onRetry: _errorRetryAction ?? _loadDetail,
                           )
                         : _isSubmitting
-                            ? _HomeworkAttemptLoader(
-                                key: const ValueKey('homework-submit-loader'),
-                                scale: s,
-                                message:
-                                    context.getText(AppKeys.submittingForYou),
-                              )
-                            : _isLoading
-                                ? _HomeworkAttemptLoader(
-                                    key: const ValueKey('homework-loader'),
-                                    scale: s,
-                                    message: context.getText(
-                                      AppKeys.studentHomework,
-                                    ),
-                                  )
-                                : SingleChildScrollView(
-                                    key: const ValueKey('homework-content'),
-                                    physics: const BouncingScrollPhysics(),
-                                    padding: EdgeInsets.fromLTRB(
-                                      24 * s,
-                                      0,
-                                      24 * s,
-                                      24 * s,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        _HomeworkAttemptProgressSection(
-                                          scale: s,
-                                          currentQuestion: _questionIndex + 1,
-                                          totalQuestions: questions.length,
-                                        ),
-                                        SizedBox(height: 32 * s),
-                                        _HomeworkAttemptQuestionCard(
-                                          scale: s,
-                                          question: currentQuestion!.prompt,
-                                        ),
-                                        SizedBox(height: 32 * s),
-                                        _HomeworkAttemptAnswerGrid(
-                                          scale: s,
-                                          answers: currentQuestion.answers,
-                                          selectedAnswerLabel:
-                                              selectedAnswerLabel,
-                                          onSelected: _selectAnswer,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                        ? _HomeworkAttemptLoader(
+                            key: const ValueKey('homework-submit-loader'),
+                            scale: s,
+                            message: context.getText(AppKeys.submittingForYou),
+                          )
+                        : _isLoading
+                        ? _HomeworkAttemptLoader(
+                            key: const ValueKey('homework-loader'),
+                            scale: s,
+                            message: context.getText(AppKeys.studentHomework),
+                          )
+                        : SingleChildScrollView(
+                            key: const ValueKey('homework-content'),
+                            physics: const BouncingScrollPhysics(),
+                            padding: EdgeInsets.fromLTRB(
+                              24 * s,
+                              0,
+                              24 * s,
+                              24 * s,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _HomeworkAttemptProgressSection(
+                                  scale: s,
+                                  currentQuestion: _questionIndex + 1,
+                                  totalQuestions: questions.length,
+                                ),
+                                SizedBox(height: 32 * s),
+                                _HomeworkAttemptQuestionCard(
+                                  scale: s,
+                                  question: currentQuestion!.prompt,
+                                ),
+                                SizedBox(height: 32 * s),
+                                _HomeworkAttemptAnswerGrid(
+                                  scale: s,
+                                  answers: currentQuestion.answers,
+                                  selectedAnswerLabel: selectedAnswerLabel,
+                                  onSelected: _selectAnswer,
+                                ),
+                              ],
+                            ),
+                          ),
                   ),
                 ),
                 if (!_isLoading && !_isSubmitting)
@@ -442,11 +461,7 @@ class _HomeworkHeaderIconButton extends StatelessWidget {
         child: SizedBox(
           width: 34 * scale,
           height: 34 * scale,
-          child: Icon(
-            icon,
-            color: _homeworkAttemptTeal,
-            size: 22 * scale,
-          ),
+          child: Icon(icon, color: _homeworkAttemptTeal, size: 22 * scale),
         ),
       ),
     );
@@ -466,8 +481,9 @@ class _HomeworkAttemptProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress =
-        totalQuestions == 0 ? 0.0 : currentQuestion / totalQuestions;
+    final progress = totalQuestions == 0
+        ? 0.0
+        : currentQuestion / totalQuestions;
     final progressValue = progress.clamp(0.0, 1.0);
 
     return Column(
@@ -493,8 +509,10 @@ class _HomeworkAttemptProgressSection extends StatelessWidget {
             builder: (context, constraints) {
               final inset = 4 * scale;
               final trackWidth = constraints.maxWidth;
-              final fillWidth =
-                  math.max(0.0, (trackWidth - inset * 2) * progressValue);
+              final fillWidth = math.max(
+                0.0,
+                (trackWidth - inset * 2) * progressValue,
+              );
 
               return Container(
                 padding: EdgeInsets.all(inset),
@@ -627,8 +645,9 @@ class _HomeworkAttemptAnswerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor =
-        selected ? _homeworkAttemptTeal : Colors.black.withValues(alpha: 0);
+    final borderColor = selected
+        ? _homeworkAttemptTeal
+        : Colors.black.withValues(alpha: 0);
     final textColor = selected ? _homeworkAttemptTeal : _homeworkAttemptInk;
 
     return Material(
@@ -756,8 +775,8 @@ class _HomeworkAttemptBottomBar extends StatelessWidget {
                   label: isSubmitting
                       ? context.getText(AppKeys.submittingUpper)
                       : isLastQuestion
-                          ? context.getText(AppKeys.submitUpper)
-                          : context.getText(AppKeys.continueUpper),
+                      ? context.getText(AppKeys.submitUpper)
+                      : context.getText(AppKeys.continueUpper),
                   icon: isLastQuestion
                       ? Icons.check_rounded
                       : Icons.arrow_forward_rounded,
@@ -801,8 +820,9 @@ class _HomeworkBottomActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
-    final effectiveForeground =
-        enabled ? foreground : foreground.withValues(alpha: 0.38);
+    final effectiveForeground = enabled
+        ? foreground
+        : foreground.withValues(alpha: 0.38);
 
     return Material(
       color: Colors.transparent,
@@ -919,11 +939,7 @@ class _HomeworkAttemptErrorState extends StatelessWidget {
 }
 
 class _HomeworkAttemptLoader extends StatefulWidget {
-  const _HomeworkAttemptLoader({
-    super.key,
-    required this.scale,
-    this.message,
-  });
+  const _HomeworkAttemptLoader({super.key, required this.scale, this.message});
 
   final double scale;
   final String? message;
@@ -969,8 +985,8 @@ class _HomeworkAttemptLoaderState extends State<_HomeworkAttemptLoader>
                       (_controller.value - (index * 0.075)) % 1.0;
                   final lift = delayedProgress <= 0.20
                       ? -34 *
-                          widget.scale *
-                          math.sin(delayedProgress / 0.20 * math.pi)
+                            widget.scale *
+                            math.sin(delayedProgress / 0.20 * math.pi)
                       : 0.0;
 
                   return Transform.translate(
@@ -1023,21 +1039,25 @@ class _HomeworkAttemptQuestion {
   final int questionNumber;
   final String prompt;
   final List<_HomeworkAttemptAnswer> answers;
+
+  String? selectedAnswerContent(String label) {
+    for (final answer in answers) {
+      if (answer.label == label) {
+        return answer.content;
+      }
+    }
+    return null;
+  }
 }
 
 class _HomeworkAttemptAnswer {
-  const _HomeworkAttemptAnswer({
-    required this.label,
-    required this.content,
-  });
+  const _HomeworkAttemptAnswer({required this.label, required this.content});
 
   final String label;
   final String content;
 }
 
-List<_HomeworkAttemptQuestion> _attemptQuestions(
-  ClassroomExercise? exercise,
-) {
+List<_HomeworkAttemptQuestion> _attemptQuestions(ClassroomExercise? exercise) {
   final questions = exercise?.questions ?? const <ClassroomExerciseQuestion>[];
   return <_HomeworkAttemptQuestion>[
     for (var index = 0; index < questions.length; index++)
@@ -1045,9 +1065,11 @@ List<_HomeworkAttemptQuestion> _attemptQuestions(
         questionNumber: questions[index].questionNumber ?? index + 1,
         prompt: questions[index].displayPrompt ?? '',
         answers: <_HomeworkAttemptAnswer>[
-          for (var answerIndex = 0;
-              answerIndex < questions[index].answers.length;
-              answerIndex++)
+          for (
+            var answerIndex = 0;
+            answerIndex < questions[index].answers.length;
+            answerIndex++
+          )
             if (questions[index].answers[answerIndex].trim().isNotEmpty)
               _HomeworkAttemptAnswer(
                 label: _answerLabel(answerIndex),

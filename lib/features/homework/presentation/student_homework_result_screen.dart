@@ -19,10 +19,7 @@ const _homeworkResultAiAccent = Color(0xFFE8FEFF);
 const _homeworkResultMascotBorder = Color(0xFF974320);
 
 class StudentHomeworkResultScreen extends StatelessWidget {
-  const StudentHomeworkResultScreen({
-    super.key,
-    required this.summary,
-  });
+  const StudentHomeworkResultScreen({super.key, required this.summary});
 
   final StudentHomeworkResultSummary summary;
 
@@ -40,8 +37,10 @@ class StudentHomeworkResultScreen extends StatelessWidget {
             builder: (context, constraints) {
               final width = math.min(constraints.maxWidth, 430.0);
               final height = constraints.maxHeight;
-              final scale =
-                  math.min(width / _designWidth, height / _designHeight);
+              final scale = math.min(
+                width / _designWidth,
+                height / _designHeight,
+              );
               double s(double value) => value * scale;
 
               return Center(
@@ -195,11 +194,7 @@ class _HomeworkHeaderIconButton extends StatelessWidget {
         child: SizedBox(
           width: 40 * scale,
           height: 40 * scale,
-          child: Icon(
-            icon,
-            color: _homeworkResultHeaderTeal,
-            size: 23 * scale,
-          ),
+          child: Icon(icon, color: _homeworkResultHeaderTeal, size: 23 * scale),
         ),
       ),
     );
@@ -207,10 +202,7 @@ class _HomeworkHeaderIconButton extends StatelessWidget {
 }
 
 class _HomeworkScoreRing extends StatelessWidget {
-  const _HomeworkScoreRing({
-    required this.scale,
-    required this.scoreText,
-  });
+  const _HomeworkScoreRing({required this.scale, required this.scoreText});
 
   final double scale;
   final String scoreText;
@@ -218,10 +210,12 @@ class _HomeworkScoreRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final slashIndex = scoreText.indexOf('/');
-    final scoreValue =
-        slashIndex == -1 ? scoreText : scoreText.substring(0, slashIndex);
-    final scoreTotal =
-        slashIndex == -1 ? '/10' : scoreText.substring(slashIndex);
+    final scoreValue = slashIndex == -1
+        ? scoreText
+        : scoreText.substring(0, slashIndex);
+    final scoreTotal = slashIndex == -1
+        ? '/10'
+        : scoreText.substring(slashIndex);
 
     return Center(
       child: SizedBox(
@@ -311,10 +305,7 @@ class _HomeworkScoreRing extends StatelessWidget {
 }
 
 class _HomeworkReviewCard extends StatelessWidget {
-  const _HomeworkReviewCard({
-    required this.scale,
-    required this.reviewText,
-  });
+  const _HomeworkReviewCard({required this.scale, required this.reviewText});
 
   final double scale;
   final String reviewText;
@@ -482,26 +473,16 @@ class _HomeworkCloseButton extends StatelessWidget {
 }
 
 StudentHomeworkResultSummary studentHomeworkResultSummary({
-  required ClassroomExercise exercise,
   required ClassroomExerciseSubmissionResponse submission,
-  required List<SubmitClassroomExerciseAnswer> answers,
 }) {
   final grading = submission.grading;
   return StudentHomeworkResultSummary(
-    scoreText: _homeworkScoreText(
-      grading: grading,
-      exercise: exercise,
-      answers: answers,
-    ),
+    scoreText: _homeworkScoreText(grading),
     reviewText: _homeworkReviewText(grading),
   );
 }
 
-String _homeworkScoreText({
-  required ClassroomExerciseSubmissionGrading? grading,
-  required ClassroomExercise exercise,
-  required List<SubmitClassroomExerciseAnswer> answers,
-}) {
+String _homeworkScoreText(ClassroomExerciseSubmissionGrading? grading) {
   final scorePercentage = grading?.scorePercentage;
   if (scorePercentage != null) {
     final scoreOutOf10 = (scorePercentage / 10).round().clamp(0, 10);
@@ -515,13 +496,7 @@ String _homeworkScoreText({
     return '${scoreOutOf10.clamp(0, 10)}/10';
   }
 
-  final localScore = _localHomeworkScore(exercise, answers);
-  if (localScore != null) {
-    final scoreOutOf10 = (localScore.correct / localScore.total * 10).round();
-    return '${scoreOutOf10.clamp(0, 10)}/10';
-  }
-
-  return '${answers.length}/${math.max(answers.length, 1)}';
+  return '--/10';
 }
 
 String _homeworkReviewText(ClassroomExerciseSubmissionGrading? grading) {
@@ -531,47 +506,6 @@ String _homeworkReviewText(ClassroomExerciseSubmissionGrading? grading) {
   }
 
   return AppStrings.current(AppKeys.defaultAiReview);
-}
-
-_LocalHomeworkScore? _localHomeworkScore(
-  ClassroomExercise exercise,
-  List<SubmitClassroomExerciseAnswer> answers,
-) {
-  final answerByQuestion = <int, String>{
-    for (final answer in answers) answer.questionNumber: answer.label,
-  };
-  var correct = 0;
-  var total = 0;
-  for (final question in exercise.questions) {
-    final correctAnswer = question.correctAnswer?.trim().toUpperCase();
-    final questionNumber = question.questionNumber;
-    if (correctAnswer == null ||
-        correctAnswer.isEmpty ||
-        questionNumber == null ||
-        !answerByQuestion.containsKey(questionNumber)) {
-      continue;
-    }
-    total++;
-    if (answerByQuestion[questionNumber]?.trim().toUpperCase() ==
-        correctAnswer) {
-      correct++;
-    }
-  }
-
-  if (total == 0) {
-    return null;
-  }
-  return _LocalHomeworkScore(correct: correct, total: total);
-}
-
-class _LocalHomeworkScore {
-  const _LocalHomeworkScore({
-    required this.correct,
-    required this.total,
-  });
-
-  final int correct;
-  final int total;
 }
 
 void _closeHomeworkResult(BuildContext context) {

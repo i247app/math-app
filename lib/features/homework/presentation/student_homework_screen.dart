@@ -10,6 +10,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
+import 'package:numi_flutter/features/homework/student_homework_open_guard.dart';
 
 const _studentHomeworkBg = Color(0xFFF6FFFF);
 const _studentHomeworkTeal = Color(0xFF38898C);
@@ -120,14 +121,19 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
       return;
     }
 
+    if (showStudentHomeworkNotOpenSnackIfNeeded(context, exercise)) {
+      return;
+    }
+
     final exerciseId = exercise.stableId;
     if (exerciseId == null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content:
-                Text(context.getText(AppKeys.studentHomeworkMissingExercise)),
+            content: Text(
+              context.getText(AppKeys.studentHomeworkMissingExercise),
+            ),
             behavior: SnackBarBehavior.floating,
             duration: const Duration(milliseconds: 1400),
           ),
@@ -194,8 +200,9 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                       _StudentHomeworkMessage(message: _error!)
                     else if (_exercises.isEmpty)
                       _StudentHomeworkMessage(
-                        message:
-                            context.getText(AppKeys.studentNoHomeworkMessage),
+                        message: context.getText(
+                          AppKeys.studentNoHomeworkMessage,
+                        ),
                       )
                     else if (visibleExercises.isEmpty && _isLoading)
                       _StudentHomeworkMessage(
@@ -203,17 +210,21 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                       )
                     else if (visibleExercises.isEmpty)
                       _StudentHomeworkMessage(
-                        message:
-                            context.getText(AppKeys.studentNoHomeworkMessage),
+                        message: context.getText(
+                          AppKeys.studentNoHomeworkMessage,
+                        ),
                       )
                     else ...[
-                      for (var index = 0;
-                          index < visibleExercises.length;
-                          index++)
+                      for (
+                        var index = 0;
+                        index < visibleExercises.length;
+                        index++
+                      )
                         Padding(
                           padding: EdgeInsets.only(
-                            bottom:
-                                index == visibleExercises.length - 1 ? 0 : 14,
+                            bottom: index == visibleExercises.length - 1
+                                ? 0
+                                : 14,
                           ),
                           child: _HomeworkAssignmentCard(
                             exercise: visibleExercises[index],
@@ -277,10 +288,7 @@ class _StudentHomeworkMessage extends StatelessWidget {
 }
 
 class _StudentHomeworkTopBar extends StatelessWidget {
-  const _StudentHomeworkTopBar({
-    required this.title,
-    required this.onBack,
-  });
+  const _StudentHomeworkTopBar({required this.title, required this.onBack});
 
   final String title;
   final VoidCallback onBack;
@@ -515,10 +523,7 @@ class _HomeworkFilterChip extends StatelessWidget {
 }
 
 class _HomeworkAssignmentCard extends StatelessWidget {
-  const _HomeworkAssignmentCard({
-    required this.exercise,
-    required this.onTap,
-  });
+  const _HomeworkAssignmentCard({required this.exercise, required this.onTap});
 
   final ClassroomExercise exercise;
   final VoidCallback onTap;
@@ -653,13 +658,13 @@ class _HomeworkStatusBadge extends StatelessWidget {
     final labelKey = submitted
         ? AppKeys.studentHomeworkSubmitted
         : overdue
-            ? AppKeys.studentHomeworkOverdue
-            : AppKeys.studentHomeworkNotSubmitted;
+        ? AppKeys.studentHomeworkOverdue
+        : AppKeys.studentHomeworkNotSubmitted;
     final color = submitted
         ? const Color(0xFF2E7D32)
         : overdue
-            ? const Color(0xFFC2410C)
-            : _studentHomeworkTeal;
+        ? const Color(0xFFC2410C)
+        : _studentHomeworkTeal;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -699,10 +704,9 @@ String _studentHomeworkQuestionCount(
 ) {
   final count = exercise.numQuestions ?? exercise.questions.length;
   if (count > 0) {
-    return context.formatText(
-      AppKeys.teacherAssignmentQuestionCountFormat,
-      {'count': count},
-    );
+    return context.formatText(AppKeys.teacherAssignmentQuestionCountFormat, {
+      'count': count,
+    });
   }
   return '';
 }
@@ -740,15 +744,17 @@ List<ClassroomExercise> _filteredExercises(
   List<ClassroomExercise> exercises,
   _HomeworkFilter filter,
 ) {
-  return exercises.where((exercise) {
-    final submitted = _studentHomeworkIsSubmitted(exercise);
-    final overdue = _studentHomeworkIsOverdue(exercise);
-    return switch (filter) {
-      _HomeworkFilter.notSubmitted => !submitted && !overdue,
-      _HomeworkFilter.submitted => submitted,
-      _HomeworkFilter.overdue => overdue,
-    };
-  }).toList(growable: false);
+  return exercises
+      .where((exercise) {
+        final submitted = _studentHomeworkIsSubmitted(exercise);
+        final overdue = _studentHomeworkIsOverdue(exercise);
+        return switch (filter) {
+          _HomeworkFilter.notSubmitted => !submitted && !overdue,
+          _HomeworkFilter.submitted => submitted,
+          _HomeworkFilter.overdue => overdue,
+        };
+      })
+      .toList(growable: false);
 }
 
 bool _studentHomeworkIsSubmitted(ClassroomExercise exercise) {

@@ -44,9 +44,7 @@ class UpdateClassroomExerciseRequest {
   final String visibility;
   final String purpose;
 
-  factory UpdateClassroomExerciseRequest.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory UpdateClassroomExerciseRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateClassroomExerciseRequestFromJson(json);
 
   Map<String, dynamic> toJson() => _$UpdateClassroomExerciseRequestToJson(this);
@@ -64,27 +62,27 @@ class SubmitClassroomExerciseRequest {
   final int classroomExerciseId;
   final List<SubmitClassroomExerciseAnswer> answers;
 
-  factory SubmitClassroomExerciseRequest.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory SubmitClassroomExerciseRequest.fromJson(Map<String, dynamic> json) =>
       _$SubmitClassroomExerciseRequestFromJson(json);
 
   Map<String, dynamic> toJson() => _$SubmitClassroomExerciseRequestToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class SubmitClassroomExerciseAnswer {
   const SubmitClassroomExerciseAnswer({
     required this.questionNumber,
     required this.label,
+    this.answer,
+    this.answerContent,
   });
 
   final int questionNumber;
   final String label;
+  final String? answer;
+  final String? answerContent;
 
-  factory SubmitClassroomExerciseAnswer.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory SubmitClassroomExerciseAnswer.fromJson(Map<String, dynamic> json) =>
       _$SubmitClassroomExerciseAnswerFromJson(json);
 
   Map<String, dynamic> toJson() => _$SubmitClassroomExerciseAnswerToJson(this);
@@ -122,9 +120,7 @@ class CreateClassroomExerciseRequest {
   final String endDate;
   final String purpose;
 
-  factory CreateClassroomExerciseRequest.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory CreateClassroomExerciseRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateClassroomExerciseRequestFromJson(json);
 
   Map<String, dynamic> toJson() => _$CreateClassroomExerciseRequestToJson(this);
@@ -152,12 +148,14 @@ class ClassroomExerciseSubmissionResponse {
     Map<String, dynamic> json,
   ) {
     final data = json['data'];
-    final submission = json['submission'] ??
+    final submission =
+        json['submission'] ??
         json['classroom_exercise_submission'] ??
         _nestedValue(data, 'submission') ??
         _nestedValue(data, 'classroom_exercise_submission') ??
         data;
-    final grading = json['grading'] ??
+    final grading =
+        json['grading'] ??
         json['result'] ??
         _nestedValue(json['submission'], 'grading') ??
         _nestedValue(json['submission'], 'result') ??
@@ -165,12 +163,10 @@ class ClassroomExerciseSubmissionResponse {
         _nestedValue(submission, 'result') ??
         submission;
 
-    return _$ClassroomExerciseSubmissionResponseFromJson(
-      <String, dynamic>{
-        ...json,
-        'grading': grading,
-      },
-    );
+    return _$ClassroomExerciseSubmissionResponseFromJson(<String, dynamic>{
+      ...json,
+      'grading': grading,
+    });
   }
 
   Map<String, dynamic> toJson() =>
@@ -198,22 +194,22 @@ class ClassroomExerciseSubmissionGrading {
   factory ClassroomExerciseSubmissionGrading.fromJson(
     Map<String, dynamic> json,
   ) {
-    return _$ClassroomExerciseSubmissionGradingFromJson(
-      <String, dynamic>{
-        ...json,
-        'ai_review': json['ai_review'] ??
-            json['review'] ??
-            json['feedback'] ??
-            json['message'],
-        'correct_number': json['correct_number'] ??
-            json['correct_count'] ??
-            json['correct_answers'],
-        'score_percentage':
-            json['score_percentage'] ?? json['score'] ?? json['percentage'],
-        'total_questions':
-            json['total_questions'] ?? json['question_count'] ?? json['total'],
-      },
-    );
+    return _$ClassroomExerciseSubmissionGradingFromJson(<String, dynamic>{
+      ...json,
+      'ai_review':
+          json['ai_review'] ??
+          json['review'] ??
+          json['feedback'] ??
+          json['message'],
+      'correct_number':
+          json['correct_number'] ??
+          json['correct_count'] ??
+          json['correct_answers'],
+      'score_percentage':
+          json['score_percentage'] ?? json['score'] ?? json['percentage'],
+      'total_questions':
+          json['total_questions'] ?? json['question_count'] ?? json['total'],
+    });
   }
 
   Map<String, dynamic> toJson() =>
@@ -242,7 +238,8 @@ class ClassroomExerciseListResponse {
 
   factory ClassroomExerciseListResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
-    final exercisesValue = json['exercises'] ??
+    final exercisesValue =
+        json['exercises'] ??
         json['classroom_exercises'] ??
         json['items'] ??
         _nestedValue(data, 'exercises') ??
@@ -250,12 +247,10 @@ class ClassroomExerciseListResponse {
         _nestedValue(data, 'items') ??
         data;
 
-    return _$ClassroomExerciseListResponseFromJson(
-      <String, dynamic>{
-        ...json,
-        'exercises': exercisesValue,
-      },
-    );
+    return _$ClassroomExerciseListResponseFromJson(<String, dynamic>{
+      ...json,
+      'exercises': exercisesValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomExerciseListResponseToJson(this);
@@ -281,19 +276,18 @@ class ClassroomExerciseResponse {
 
   factory ClassroomExerciseResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
-    final exerciseValue = json['exercise'] ??
+    final exerciseValue =
+        json['exercise'] ??
         json['classroom_exercise'] ??
         _nestedValue(data, 'exercise') ??
         _nestedValue(data, 'classroom_exercise') ??
         data;
 
-    return _$ClassroomExerciseResponseFromJson(
-      <String, dynamic>{
-        ...json,
-        'mstatus': json['mstatus'] ?? (exerciseValue == null ? null : 200),
-        'exercise': exerciseValue,
-      },
-    );
+    return _$ClassroomExerciseResponseFromJson(<String, dynamic>{
+      ...json,
+      'mstatus': json['mstatus'] ?? (exerciseValue == null ? null : 200),
+      'exercise': exerciseValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomExerciseResponseToJson(this);
@@ -399,35 +393,36 @@ class ClassroomExercise {
   final List<ClassroomExerciseQuestion> questions;
 
   factory ClassroomExercise.fromJson(Map<String, dynamic> json) {
-    final questionsValue = json['questions'] ??
+    final questionsValue =
+        json['questions'] ??
         json['exercise_questions'] ??
         json['items'] ??
         _nestedValue(json['data'], 'questions') ??
         _nestedValue(json['data'], 'exercise_questions');
 
-    return _$ClassroomExerciseFromJson(
-      <String, dynamic>{
-        ...json,
-        'exercise_id': json['exercise_id'] ?? json['assignment_id'],
-        'classroom_exercise_id':
-            json['classroom_exercise_id'] ?? json['assignment_id'],
-        'num_questions': json['num_questions'] ?? json['total_questions'],
-        'profile_id': json['profile_id'] ?? json['creator_profile_id'],
-        'description': json['description'] ??
-            json['assignment_description'] ??
-            json['exercise_description'] ??
-            json['short_text'] ??
-            _nestedValue(json['metadata'], 'description'),
-        'short_text': json['short_text'] ??
-            json['short_description'] ??
-            _nestedValue(json['metadata'], 'short_text') ??
-            _nestedValue(json['metadata'], 'short_description'),
-        'status': json['status'] ?? json['exercise_status'],
-        'purpose': json['purpose'] ?? json['type'],
-        'submission_status': json['submission_status'],
-        'questions': questionsValue,
-      },
-    );
+    return _$ClassroomExerciseFromJson(<String, dynamic>{
+      ...json,
+      'exercise_id': json['exercise_id'] ?? json['assignment_id'],
+      'classroom_exercise_id':
+          json['classroom_exercise_id'] ?? json['assignment_id'],
+      'num_questions': json['num_questions'] ?? json['total_questions'],
+      'profile_id': json['profile_id'] ?? json['creator_profile_id'],
+      'description':
+          json['description'] ??
+          json['assignment_description'] ??
+          json['exercise_description'] ??
+          json['short_text'] ??
+          _nestedValue(json['metadata'], 'description'),
+      'short_text':
+          json['short_text'] ??
+          json['short_description'] ??
+          _nestedValue(json['metadata'], 'short_text') ??
+          _nestedValue(json['metadata'], 'short_description'),
+      'status': json['status'] ?? json['exercise_status'],
+      'purpose': json['purpose'] ?? json['type'],
+      'submission_status': json['submission_status'],
+      'questions': questionsValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomExerciseToJson(this);
@@ -466,21 +461,20 @@ class ClassroomExerciseQuestion {
   final List<String> answers;
 
   factory ClassroomExerciseQuestion.fromJson(Map<String, dynamic> json) {
-    return _$ClassroomExerciseQuestionFromJson(
-      <String, dynamic>{
-        ...json,
-        'question_id': json['question_id'] ?? json['id'],
-        'question_number': json['question_number'] ?? json['number'],
-        'content': json['content'] ??
-            json['question_content'] ??
-            json['question_text'] ??
-            json['question_name'] ??
-            json['text'],
-        'answers': json['answers'] ?? json['options'] ?? json['choices'],
-        'correct_answer':
-            json['correct_answer'] ?? json['right_answer'] ?? json['answer'],
-      },
-    );
+    return _$ClassroomExerciseQuestionFromJson(<String, dynamic>{
+      ...json,
+      'question_id': json['question_id'] ?? json['id'],
+      'question_number': json['question_number'] ?? json['number'],
+      'content':
+          json['content'] ??
+          json['question_content'] ??
+          json['question_text'] ??
+          json['question_name'] ??
+          json['text'],
+      'answers': json['answers'] ?? json['options'] ?? json['choices'],
+      'correct_answer':
+          json['correct_answer'] ?? json['right_answer'] ?? json['answer'],
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomExerciseQuestionToJson(this);
@@ -581,7 +575,8 @@ List<String> _stringListFromJson(Object? value) {
       .map((item) {
         if (item case final Map<String, dynamic> json) {
           return _stringFromJson(
-              json['content'] ?? json['value'] ?? json['label']);
+            json['content'] ?? json['value'] ?? json['label'],
+          );
         }
         if (item case final Map<Object?, Object?> json) {
           return _stringFromJson(

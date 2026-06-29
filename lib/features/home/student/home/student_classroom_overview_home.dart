@@ -54,6 +54,10 @@ extension _StudentClassroomOverviewHomeView on _StudentHomeContentState {
       return;
     }
 
+    if (showStudentHomeworkNotOpenSnackIfNeeded(context, exercise)) {
+      return;
+    }
+
     HapticFeedback.selectionClick();
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(

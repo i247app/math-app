@@ -52,6 +52,7 @@ import 'package:numi_flutter/features/quiz/presentation/grade_selection_screen.d
 import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
+import 'package:numi_flutter/features/homework/student_homework_open_guard.dart';
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
 import 'package:numi_flutter/features/quiz/history_tab.dart';
 import 'package:numi_flutter/features/quiz/review_tab.dart';
@@ -232,10 +233,10 @@ class HomeScreen extends StatefulWidget {
     ClassroomService? classroomService,
     ClassroomExerciseService? assignmentService,
     QuizService? quizService,
-  })  : _gradeService = gradeService,
-        _classroomService = classroomService,
-        _assignmentService = assignmentService,
-        _quizService = quizService;
+  }) : _gradeService = gradeService,
+       _classroomService = classroomService,
+       _assignmentService = assignmentService,
+       _quizService = quizService;
 
   final LoginUser? user;
   final List<StudentProfile> profiles;
@@ -336,50 +337,50 @@ class _HomeScreenState extends State<HomeScreen>
   }) {
     final destination = switch (fromRole) {
       ProfileRole.parent => switch (currentIndex) {
-          1 => _HomeTabDestination.assessment,
-          2 => _HomeTabDestination.room,
-          3 => _HomeTabDestination.review,
-          4 => _HomeTabDestination.settings,
-          _ => _HomeTabDestination.home,
-        },
+        1 => _HomeTabDestination.assessment,
+        2 => _HomeTabDestination.room,
+        3 => _HomeTabDestination.review,
+        4 => _HomeTabDestination.settings,
+        _ => _HomeTabDestination.home,
+      },
       ProfileRole.student => switch (currentIndex) {
-          1 => _HomeTabDestination.classroom,
-          2 => _HomeTabDestination.review,
-          3 => _HomeTabDestination.history,
-          4 => _HomeTabDestination.settings,
-          _ => _HomeTabDestination.home,
-        },
+        1 => _HomeTabDestination.classroom,
+        2 => _HomeTabDestination.review,
+        3 => _HomeTabDestination.history,
+        4 => _HomeTabDestination.settings,
+        _ => _HomeTabDestination.home,
+      },
       ProfileRole.teacher => switch (currentIndex) {
-          1 => _HomeTabDestination.classroom,
-          2 => _HomeTabDestination.study,
-          3 => _HomeTabDestination.members,
-          4 => _HomeTabDestination.settings,
-          _ => _HomeTabDestination.home,
-        },
+        1 => _HomeTabDestination.classroom,
+        2 => _HomeTabDestination.study,
+        3 => _HomeTabDestination.members,
+        4 => _HomeTabDestination.settings,
+        _ => _HomeTabDestination.home,
+      },
     };
 
     return switch (toRole) {
       ProfileRole.parent => switch (destination) {
-          _HomeTabDestination.assessment => 1,
-          _HomeTabDestination.room || _HomeTabDestination.classroom => 2,
-          _HomeTabDestination.review => 3,
-          _HomeTabDestination.settings => 4,
-          _ => 0,
-        },
+        _HomeTabDestination.assessment => 1,
+        _HomeTabDestination.room || _HomeTabDestination.classroom => 2,
+        _HomeTabDestination.review => 3,
+        _HomeTabDestination.settings => 4,
+        _ => 0,
+      },
       ProfileRole.student => switch (destination) {
-          _HomeTabDestination.classroom || _HomeTabDestination.room => 1,
-          _HomeTabDestination.review => 2,
-          _HomeTabDestination.history => 3,
-          _HomeTabDestination.settings => 4,
-          _ => 0,
-        },
+        _HomeTabDestination.classroom || _HomeTabDestination.room => 1,
+        _HomeTabDestination.review => 2,
+        _HomeTabDestination.history => 3,
+        _HomeTabDestination.settings => 4,
+        _ => 0,
+      },
       ProfileRole.teacher => switch (destination) {
-          _HomeTabDestination.classroom || _HomeTabDestination.room => 1,
-          _HomeTabDestination.study => 2,
-          _HomeTabDestination.members => 3,
-          _HomeTabDestination.settings => 4,
-          _ => 0,
-        },
+        _HomeTabDestination.classroom || _HomeTabDestination.room => 1,
+        _HomeTabDestination.study => 2,
+        _HomeTabDestination.members => 3,
+        _HomeTabDestination.settings => 4,
+        _ => 0,
+      },
     };
   }
 
@@ -411,7 +412,9 @@ class _HomeScreenState extends State<HomeScreen>
               final topInset = MediaQuery.paddingOf(context).top;
               final bottomInset = MediaQuery.paddingOf(context).bottom;
               final scale = math.min(
-                  layoutWidth / _designWidth, viewportHeight / _designHeight);
+                layoutWidth / _designWidth,
+                viewportHeight / _designHeight,
+              );
               final studentName = compactHomeProfileName(
                 _displayProfileName(
                   context,
@@ -423,14 +426,16 @@ class _HomeScreenState extends State<HomeScreen>
               double s(double value) => value * scale;
               final navHeight = s(88) + bottomInset;
               final headerHeight = s(64) + topInset;
-              final showHeader = widget.activeRole != ProfileRole.teacher &&
+              final showHeader =
+                  widget.activeRole != ProfileRole.teacher &&
                   navigation.activeTab == 0;
               final switchableProfiles = widget.profiles
                   .where(
                     (profile) =>
                         ActiveProfileSession.profileStableId(profile) !=
                         ActiveProfileSession.profileStableId(
-                            widget.activeProfile),
+                          widget.activeProfile,
+                        ),
                   )
                   .toList(growable: false);
               final isMenuOpen = profileState.isMenuOpen;

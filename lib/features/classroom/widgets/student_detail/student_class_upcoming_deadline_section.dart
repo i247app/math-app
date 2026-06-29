@@ -11,6 +11,7 @@ import 'package:numi_flutter/features/classroom/widgets/student_detail/student_c
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_section_title.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_upcoming_deadline_tile.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
+import 'package:numi_flutter/features/homework/student_homework_open_guard.dart';
 
 class StudentClassUpcomingDeadlineSection extends StatelessWidget {
   const StudentClassUpcomingDeadlineSection({
@@ -67,10 +68,8 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
               ),
               child: StudentClassUpcomingDeadlineTile(
                 exercise: upcomingExercises[index],
-                onTap: () => _openHomeworkAttempt(
-                  context,
-                  upcomingExercises[index],
-                ),
+                onTap: () =>
+                    _openHomeworkAttempt(context, upcomingExercises[index]),
               ),
             ),
         if (isLoading && upcomingExercises.isNotEmpty)
@@ -79,12 +78,13 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
     );
   }
 
-  void _openHomeworkAttempt(
-    BuildContext context,
-    ClassroomExercise exercise,
-  ) {
+  void _openHomeworkAttempt(BuildContext context, ClassroomExercise exercise) {
     if (studentClassHomeworkIsSubmitted(exercise)) {
       _showSnack(context, AppKeys.studentHomeworkAlreadySubmitted);
+      return;
+    }
+
+    if (showStudentHomeworkNotOpenSnackIfNeeded(context, exercise)) {
       return;
     }
 
