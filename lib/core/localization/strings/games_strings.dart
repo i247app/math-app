@@ -1,0 +1,168 @@
+import '../app_keys.dart';
+
+const gamesStrings = <String, Map<String, String>>{
+  'vi': {
+    AppKeys.gamesGradeTitle: 'Chá»n lá»›p Ä‘á»ƒ báº¯t Ä‘áº§u',
+    AppKeys.gamesGradeSubtitle:
+        'NUMI sáº½ Ä‘iá»u chá»‰nh ná»™i dung vÃ  Ä‘á»™ khÃ³ theo lá»›p cá»§a bÃ©.',
+    AppKeys.gamesSelectGrade: 'Chá»n lá»›p nÃ y',
+    AppKeys.gamesChooseTitle: 'Chá»n má»™t hÃ nh trÃ¬nh',
+    AppKeys.gamesChooseSubtitle:
+        'Chá»n game Ä‘á»ƒ má»Ÿ báº£n Ä‘á»“ vÃ  báº¯t Ä‘áº§u hÃ nh trÃ¬nh thá»­ thÃ¡ch.',
+    AppKeys.gamesPrototype: 'Báº¢N MáºªU',
+    AppKeys.gamesLevelCount: '{count} mÃ n',
+    AppKeys.gamesLevelLabel: 'MÃ n {level}',
+    AppKeys.gamesLevelComingSoon:
+        'MÃ n {level} Ä‘Ã£ sáºµn sÃ ng cho game Ä‘Æ°á»£c chá»n sau.',
+    AppKeys.gamesJourneyOne: 'NÃ´ng tráº¡i Numi',
+    AppKeys.gamesJourneyTwo: 'HÃ nh trÃ¬nh Numi 02',
+    AppKeys.gamesJourneyThree: 'HÃ nh trÃ¬nh Numi 03',
+    AppKeys.gamesFarmTitle: 'NÃ´ng tráº¡i Numi',
+    AppKeys.gamesFarmStageOneTitle: 'Äáº¿m vÃ  thu hoáº¡ch tá»« 1 Ä‘áº¿n 5',
+    AppKeys.gamesFarmStageTwoTitle: 'Äáº¿m vÃ  thu hoáº¡ch tá»« 1 Ä‘áº¿n 10',
+    AppKeys.gamesFarmStageThreeTitle: 'So sÃ¡nh hai giá» nÃ´ng sáº£n',
+    AppKeys.gamesFarmStageFourTitle: 'Gá»™p giá» - phÃ©p cá»™ng trong 10',
+    AppKeys.gamesFarmStageFiveTitle: 'Bá»›t nÃ´ng sáº£n - phÃ©p trá»« trong 10',
+    AppKeys.gamesFarmOrderLabel: 'ÄÆ N HÃ€NG Cá»¦A NUMI',
+    AppKeys.gamesFarmHarvestPrefix: 'HÃ£y hÃ¡i',
+    AppKeys.gamesFarmHarvestSuffix: 'cá»§ cÃ  rá»‘t',
+    AppKeys.gamesFarmCorrect: 'CHÃNH XÃC!',
+    AppKeys.gamesFarmIncorrect: 'CHÆ¯A ÄÃšNG!',
+    AppKeys.gamesFarmBasketReady: 'Giá» cÃ  rá»‘t Ä‘Ã£ Ä‘á»§ rá»“i!',
+    AppKeys.gamesFarmComparePrompt: 'Chá»n dáº¥u Ä‘Ãºng giá»¯a hai giá»',
+    AppKeys.gamesFarmAdditionPrompt: 'Hai giá» cÃ³ táº¥t cáº£ bao nhiÃªu?',
+    AppKeys.gamesFarmSubtractionPrompt: 'Sau khi bá»›t Ä‘i cÃ²n bao nhiÃªu?',
+    AppKeys.gamesFarmCarrot: 'CÃ  rá»‘t',
+    AppKeys.gamesFarmCheck: 'KIá»‚M TRA',
+    AppKeys.gamesFarmNext: 'TIáº¾P Tá»¤C',
+    AppKeys.gamesFarmFinish: 'HOÃ€N THÃ€NH',
+    AppKeys.gamesFarmCompleteTitle: 'Thu hoáº¡ch xong!',
+    AppKeys.gamesFarmCompleteMessage:
+        'BÃ© Ä‘Ã£ hoÃ n thÃ nh xuáº¥t sáº¯c MÃ n {stage} cá»§a NÃ´ng tráº¡i Numi.',
+    AppKeys.gamesFarmBackToMap: 'Vá»€ Báº¢N Äá»’',
+    AppKeys.gamesFarmTime: 'Thá»i gian',
+    AppKeys.gamesFarmCorrectCount: 'ÄÃºng',
+    AppKeys.gamesFarmWrongCount: 'Sai',
+    AppKeys.gamesSquadronTitle: 'Phi Ä‘á»™i ToÃ¡n há»c',
+    AppKeys.gamesSquadronLevelOne: 'MÃ n 1 Â· Tuáº§n tra sá»‘ há»c',
+    AppKeys.gamesSquadronLevelTwo: 'MÃ n 2 Â· VÃ nh Ä‘ai cá»­u chÆ°Æ¡ng',
+    AppKeys.gamesSquadronLevelThree: 'MÃ n 3 Â· BOSS Drone NhÃ¢n Chia',
+    AppKeys.gamesSquadronLevelFour: 'MÃ n 4 Â· Truy tÃ¬m áº©n sá»‘',
+    AppKeys.gamesSquadronLevelFive: 'MÃ n 5 Â· BOSS PhÃ¡o Ä‘Ã i 1.000',
+    AppKeys.gamesSquadronLevelSix: 'MÃ n 6 Â· Cá»•ng khÃ´ng-thá»i gian',
+    AppKeys.gamesSquadronLevelSeven: 'MÃ n 7 Â· BOSS Vua ThiÃªn Tháº¡ch',
+    AppKeys.gamesSquadronBossLevel: 'BOSS Â· MÃ€N {level}',
+    AppKeys.gamesSquadronBossEnergy: 'NÄ‚NG LÆ¯á»¢NG BOSS',
+    AppKeys.gamesSquadronMission: 'CHáº M Má»¤C TIÃŠU ÄÃšNG',
+    AppKeys.gamesSquadronComplete: 'Nhiá»‡m vá»¥ hoÃ n thÃ nh!',
+    AppKeys.gamesSquadronBossDefeated: 'ÄÃ£ háº¡ Boss!',
+    AppKeys.gamesSquadronTryAgain: 'Phi thuyá»n cáº§n sá»­a chá»¯a!',
+    AppKeys.gamesSquadronLevelComplete:
+        'BÃ© Ä‘Ã£ hoÃ n thÃ nh MÃ n {level} cá»§a Phi Ä‘á»™i ToÃ¡n há»c.',
+    AppKeys.gamesSquadronNeedAccuracy:
+        'Cáº§n phÃ¡ Ã­t nháº¥t 10 trong 30 thiÃªn tháº¡ch toÃ¡n vÃ  giá»¯ láº¡i khiÃªn Ä‘á»ƒ qua mÃ n.',
+    AppKeys.gamesSquadronExitTitle: 'Rá»i nhiá»‡m vá»¥?',
+    AppKeys.gamesSquadronExitMessage:
+        'Tiáº¿n Ä‘á»™ cá»§a lÆ°á»£t chÆ¡i nÃ y sáº½ khÃ´ng Ä‘Æ°á»£c lÆ°u.',
+    AppKeys.gamesSquadronKeepPlaying: 'CHÆ I TIáº¾P',
+    AppKeys.gamesSquadronFlightHint:
+        'KÃ©o tÃ u Ä‘á»ƒ nÃ© â€¢ Chá»n Ä‘áº¡n Ä‘Ã¡p Ã¡n â€¢ Báº¯n thiÃªn tháº¡ch',
+    AppKeys.gamesSquadronChooseAmmoFirst:
+        'HÃ£y chá»n má»™t viÃªn Ä‘áº¡n Ä‘Ã¡p Ã¡n trÆ°á»›c khi báº¯n!',
+    AppKeys.gamesSquadronFire: 'Báº®N',
+    AppKeys.gamesSquadronSelectTarget:
+        'Cháº¡m vÃ o thiÃªn tháº¡ch hoáº·c bá»™ pháº­n boss Ä‘á»ƒ khÃ³a má»¥c tiÃªu!',
+    AppKeys.gamesSquadronCurrentAmmo: 'Äáº N HIá»†N Táº I',
+    AppKeys.gamesSquadronTargetLocked:
+        'ÄÃ£ khÃ³a má»¥c tiÃªu â€¢ Sáºµn sÃ ng báº¯n',
+    AppKeys.gamesSquadronTapMeteor:
+        'Cháº¡m vÃ o má»™t má»¥c tiÃªu Ä‘á»ƒ ngáº¯m',
+    AppKeys.gamesSquadronNextAmmo: 'Äáº¡n káº¿ tiáº¿p: {ammo}',
+    AppKeys.gamesSquadronLaserWarning: 'Cáº¢NH BÃO LASER â€¢ HÃƒY NÃ‰!',
+    AppKeys.gamesSquadronAimShip:
+        'Di chuyá»ƒn tÃ u vÃ o Ä‘Ãºng lÃ n rá»“i báº¯n tháº³ng',
+    AppKeys.gamesSquadronReloading: 'ÄANG Náº P',
+  },
+  'en': {
+    AppKeys.gamesGradeTitle: 'Choose a grade to begin',
+    AppKeys.gamesGradeSubtitle:
+        'NUMI will match the content and difficulty to the child\'s grade.',
+    AppKeys.gamesSelectGrade: 'Choose this grade',
+    AppKeys.gamesChooseTitle: 'Choose an adventure',
+    AppKeys.gamesChooseSubtitle:
+        'Choose a game to open its map and begin the challenge.',
+    AppKeys.gamesPrototype: 'PROTOTYPE',
+    AppKeys.gamesLevelCount: '{count} stages',
+    AppKeys.gamesLevelLabel: 'Stage {level}',
+    AppKeys.gamesLevelComingSoon:
+        'Stage {level} is ready for the game we choose next.',
+    AppKeys.gamesJourneyOne: 'Numi Farm',
+    AppKeys.gamesJourneyTwo: 'Numi Journey 02',
+    AppKeys.gamesJourneyThree: 'Numi Journey 03',
+    AppKeys.gamesFarmTitle: 'Numi Farm',
+    AppKeys.gamesFarmStageOneTitle: 'Count and harvest from 1 to 5',
+    AppKeys.gamesFarmStageTwoTitle: 'Count and harvest from 1 to 10',
+    AppKeys.gamesFarmStageThreeTitle: 'Compare two produce baskets',
+    AppKeys.gamesFarmStageFourTitle: 'Combine baskets - add within 10',
+    AppKeys.gamesFarmStageFiveTitle: 'Remove produce - subtract within 10',
+    AppKeys.gamesFarmOrderLabel: 'NUMI\'S ORDER',
+    AppKeys.gamesFarmHarvestPrefix: 'Pick',
+    AppKeys.gamesFarmHarvestSuffix: 'carrots',
+    AppKeys.gamesFarmCorrect: 'THAT\'S RIGHT!',
+    AppKeys.gamesFarmIncorrect: 'NOT QUITE!',
+    AppKeys.gamesFarmBasketReady: 'The carrot basket is ready!',
+    AppKeys.gamesFarmComparePrompt:
+        'Choose the correct sign between the baskets',
+    AppKeys.gamesFarmAdditionPrompt: 'How many items are in both baskets?',
+    AppKeys.gamesFarmSubtractionPrompt:
+        'How many items remain after taking some away?',
+    AppKeys.gamesFarmCarrot: 'Carrot',
+    AppKeys.gamesFarmCheck: 'CHECK',
+    AppKeys.gamesFarmNext: 'CONTINUE',
+    AppKeys.gamesFarmFinish: 'FINISH',
+    AppKeys.gamesFarmCompleteTitle: 'Harvest complete!',
+    AppKeys.gamesFarmCompleteMessage:
+        'You completed Stage {stage} of Numi Farm.',
+    AppKeys.gamesFarmBackToMap: 'BACK TO MAP',
+    AppKeys.gamesFarmTime: 'Time',
+    AppKeys.gamesFarmCorrectCount: 'Correct',
+    AppKeys.gamesFarmWrongCount: 'Wrong',
+    AppKeys.gamesSquadronTitle: 'Math Squadron',
+    AppKeys.gamesSquadronLevelOne: 'Stage 1 Â· Number Patrol',
+    AppKeys.gamesSquadronLevelTwo: 'Stage 2 Â· Times-table Belt',
+    AppKeys.gamesSquadronLevelThree: 'Stage 3 Â· BOSS Multiply Drone',
+    AppKeys.gamesSquadronLevelFour: 'Stage 4 Â· Find the Unknown',
+    AppKeys.gamesSquadronLevelFive: 'Stage 5 Â· BOSS Fortress 1,000',
+    AppKeys.gamesSquadronLevelSix: 'Stage 6 Â· Space-time Gate',
+    AppKeys.gamesSquadronLevelSeven: 'Stage 7 Â· BOSS Meteor King',
+    AppKeys.gamesSquadronBossLevel: 'BOSS Â· STAGE {level}',
+    AppKeys.gamesSquadronBossEnergy: 'BOSS ENERGY',
+    AppKeys.gamesSquadronMission: 'TAP THE CORRECT TARGET',
+    AppKeys.gamesSquadronComplete: 'Mission complete!',
+    AppKeys.gamesSquadronBossDefeated: 'Boss defeated!',
+    AppKeys.gamesSquadronTryAgain: 'Ship needs repairs!',
+    AppKeys.gamesSquadronLevelComplete:
+        'You completed Stage {level} of Math Squadron.',
+    AppKeys.gamesSquadronNeedAccuracy:
+        'Destroy at least 10 of 30 math meteors and keep a shield to pass.',
+    AppKeys.gamesSquadronExitTitle: 'Leave mission?',
+    AppKeys.gamesSquadronExitMessage:
+        'Progress from this play session will not be saved.',
+    AppKeys.gamesSquadronKeepPlaying: 'KEEP PLAYING',
+    AppKeys.gamesSquadronFlightHint:
+        'Drag to dodge â€¢ Choose answer ammo â€¢ Fire',
+    AppKeys.gamesSquadronChooseAmmoFirst:
+        'Choose an answer charge before firing!',
+    AppKeys.gamesSquadronFire: 'FIRE',
+    AppKeys.gamesSquadronSelectTarget:
+        'Tap a meteor or boss part to lock the target!',
+    AppKeys.gamesSquadronCurrentAmmo: 'CURRENT AMMO',
+    AppKeys.gamesSquadronTargetLocked: 'Target locked â€¢ Ready to fire',
+    AppKeys.gamesSquadronTapMeteor: 'Tap a target to aim',
+    AppKeys.gamesSquadronNextAmmo: 'Next ammo: {ammo}',
+    AppKeys.gamesSquadronLaserWarning: 'LASER WARNING â€¢ DODGE!',
+    AppKeys.gamesSquadronAimShip:
+        'Move the ship into a lane and fire straight ahead',
+    AppKeys.gamesSquadronReloading: 'RELOAD',
+  },
+};
