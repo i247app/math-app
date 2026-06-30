@@ -10,11 +10,11 @@ class TeacherCreateClassScreen extends StatefulWidget {
     ProfileService? profileService,
     SchoolService? schoolService,
     AvatarPickerService? avatarPicker,
-  })  : _classroomService = classroomService,
-        _gradeService = gradeService,
-        _profileService = profileService,
-        _schoolService = schoolService,
-        _avatarPicker = avatarPicker;
+  }) : _classroomService = classroomService,
+       _gradeService = gradeService,
+       _profileService = profileService,
+       _schoolService = schoolService,
+       _avatarPicker = avatarPicker;
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
@@ -84,6 +84,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         _isLoadingOptions = false;
         _optionsError = null;
       });
+      unawaited(_loadOptions(forceRefresh: true));
       return;
     }
 
@@ -124,10 +125,12 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     _grades = options.grades;
     _programs = options.programs;
     _schools = options.schools;
-    _selectedGrade = _matchGrade(_grades, widget.activeProfile?.gradeId) ??
+    _selectedGrade =
+        _matchGrade(_grades, widget.activeProfile?.gradeId) ??
         (_grades.isEmpty ? null : _grades.first);
     _selectedPrograms = const <ProgramModel>[];
-    _selectedSchool = _matchSchool(_schools, widget.activeProfile?.schoolId) ??
+    _selectedSchool =
+        _matchSchool(_schools, widget.activeProfile?.schoolId) ??
         (_schools.isEmpty ? null : _schools.first);
   }
 
@@ -144,8 +147,9 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
   }
 
   Future<void> _submit() async {
-    final profileId =
-        ActiveProfileSession.profileStableId(widget.activeProfile);
+    final profileId = ActiveProfileSession.profileStableId(
+      widget.activeProfile,
+    );
     final gradeId = _gradeStableId(_selectedGrade);
     final programIds = _selectedPrograms
         .map(_programStableId)
@@ -182,8 +186,9 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         return;
       }
       context.read<ClassroomCubit>().invalidateOwned(profileId);
-      Navigator.of(context)
-          .pop(_TeacherCreateClassResult(classroom: classroom));
+      Navigator.of(
+        context,
+      ).pop(_TeacherCreateClassResult(classroom: classroom));
     } on ClassroomException catch (error) {
       _showSnack(error.message);
     } finally {
@@ -251,9 +256,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       isSubmitting: _isSubmitting,
       onPickAvatar: _pickAvatar,
       onGradeChanged: (value) => setState(() => _selectedGrade = value),
-      onProgramsChanged: (values) => setState(
-        () => _selectedPrograms = values,
-      ),
+      onProgramsChanged: (values) => setState(() => _selectedPrograms = values),
       onSchoolChanged: (value) => setState(() => _selectedSchool = value),
       onSubmit: _submit,
     );

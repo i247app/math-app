@@ -37,6 +37,23 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
   }
 
   Future<void> _loadExercises({bool forceRefresh = false}) async {
+    if (!forceRefresh) {
+      final cachedExercises = _TeacherHomeworkCache.peekList(
+        classroomId: widget.classroomId,
+        profileId: widget.profileId,
+        purpose: widget.purpose,
+      );
+      if (cachedExercises != null) {
+        setState(() {
+          _exercises = cachedExercises;
+          _isLoading = true;
+          _error = null;
+        });
+        await _loadExercises(forceRefresh: true);
+        return;
+      }
+    }
+
     setState(() {
       _isLoading = true;
       _error = null;

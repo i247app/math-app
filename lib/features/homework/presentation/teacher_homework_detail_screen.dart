@@ -50,6 +50,27 @@ class _TeacherHomeworkDetailScreenState
   }
 
   Future<void> _loadDetail({bool forceRefresh = false}) async {
+    if (!forceRefresh) {
+      final cachedExercise = _TeacherHomeworkCache.peekDetail(
+        exerciseId: widget.exerciseId,
+        profileId: widget.profileId,
+      );
+      if (cachedExercise != null) {
+        final visibility = _normalizeExerciseVisibility(
+          cachedExercise.visibility,
+        );
+        setState(() {
+          _exercise = cachedExercise;
+          _savedVisibility = visibility;
+          _editingVisibility = visibility;
+          _isLoading = true;
+          _error = null;
+        });
+        await _loadDetail(forceRefresh: true);
+        return;
+      }
+    }
+
     setState(() {
       _isLoading = true;
       _error = null;
@@ -69,7 +90,9 @@ class _TeacherHomeworkDetailScreenState
       setState(() {
         _exercise = exercise ?? _exercise;
         _savedVisibility = visibility;
-        _editingVisibility = visibility;
+        if (!_hasVisibilityChange) {
+          _editingVisibility = visibility;
+        }
       });
     } on ClassroomExerciseException catch (error) {
       if (!mounted) {

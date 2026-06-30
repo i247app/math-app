@@ -7,8 +7,8 @@ class TeacherClassMembersScreen extends StatefulWidget {
     required this.profileId,
     ClassroomService? classroomService,
     ProfileService? profileService,
-  })  : _classroomService = classroomService,
-        _profileService = profileService;
+  }) : _classroomService = classroomService,
+       _profileService = profileService;
 
   final int classroomId;
   final int profileId;
@@ -30,15 +30,15 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
   @override
   void initState() {
     super.initState();
-    _loadMembers();
+    _loadMembers(forceRefresh: true);
   }
 
   Future<void> _loadMembers({bool forceRefresh = false}) {
     return context.read<ClassroomCubit>().loadMembers(
-          profileId: widget.profileId,
-          classroomId: widget.classroomId,
-          forceRefresh: forceRefresh,
-        );
+      profileId: widget.profileId,
+      classroomId: widget.classroomId,
+      forceRefresh: forceRefresh,
+    );
   }
 
   Future<void> _handleJoinRequest(
@@ -107,12 +107,13 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
             LayoutBuilder(
               builder: (context, constraints) {
                 final scale = math.min(constraints.maxWidth / 390, 1.12);
-                return BlocSelector<ClassroomCubit, ClassroomState,
-                    ClassroomMembersState>(
-                  selector: (state) => state.members(
-                    widget.profileId,
-                    widget.classroomId,
-                  ),
+                return BlocSelector<
+                  ClassroomCubit,
+                  ClassroomState,
+                  ClassroomMembersState
+                >(
+                  selector: (state) =>
+                      state.members(widget.profileId, widget.classroomId),
                   builder: (context, membersState) {
                     return _TeacherClassMembersContent(
                       scale: scale,
@@ -126,14 +127,10 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
                       onRefresh: () => _loadMembers(forceRefresh: true),
                       onOpenStudentSearch: () =>
                           _openStudentSearchSheet(context),
-                      onApprove: (request) => _handleJoinRequest(
-                        request,
-                        approve: true,
-                      ),
-                      onReject: (request) => _handleJoinRequest(
-                        request,
-                        approve: false,
-                      ),
+                      onApprove: (request) =>
+                          _handleJoinRequest(request, approve: true),
+                      onReject: (request) =>
+                          _handleJoinRequest(request, approve: false),
                     );
                   },
                 );
@@ -168,10 +165,9 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
     if (targetProfileIds.isEmpty) {
       return;
     }
-    final successText = context.formatText(
-      AppKeys.teacherInviteRequestQueued,
-      {'count': targetProfileIds.length},
-    );
+    final successText = context.formatText(AppKeys.teacherInviteRequestQueued, {
+      'count': targetProfileIds.length,
+    });
     setState(() => _isSendingInvites = true);
     try {
       await _classroomService.sendInvitations(
@@ -195,10 +191,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text(
-              successText,
-              style: GoogleFonts.andika(),
-            ),
+            content: Text(successText, style: GoogleFonts.andika()),
             duration: const Duration(milliseconds: 1400),
           ),
         );

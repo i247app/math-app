@@ -93,6 +93,25 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
   }) async {
     final normalizedSearch = search?.trim() ?? _searchController.text.trim();
     final requestSubmissionStatus = _activeFilter.submissionStatus;
+    final requestSearch = normalizedSearch.isEmpty ? null : normalizedSearch;
+    if (!forceRefresh) {
+      final cachedExercises = StudentHomeworkCache.peekList(
+        classroomId: widget.classroomId,
+        profileId: widget.profileId,
+        search: requestSearch,
+        visibility: 'PUBLIC',
+        submissionStatus: requestSubmissionStatus,
+      );
+      if (cachedExercises != null) {
+        setState(() {
+          _exercises = cachedExercises;
+          _isLoading = true;
+          _error = null;
+        });
+        await _loadExercises(search: normalizedSearch, forceRefresh: true);
+        return;
+      }
+    }
     setState(() {
       _isLoading = true;
       _error = null;
@@ -102,7 +121,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
         service: _exerciseService,
         classroomId: widget.classroomId,
         profileId: widget.profileId,
-        search: normalizedSearch.isEmpty ? null : normalizedSearch,
+        search: requestSearch,
         visibility: 'PUBLIC',
         submissionStatus: requestSubmissionStatus,
         forceRefresh: forceRefresh,

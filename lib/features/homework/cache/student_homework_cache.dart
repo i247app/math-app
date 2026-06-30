@@ -61,6 +61,22 @@ class StudentHomeworkCache {
     return request;
   }
 
+  static List<ClassroomExercise>? peekList({
+    required int classroomId,
+    required int profileId,
+    String? search,
+    String? visibility,
+    String? submissionStatus,
+  }) {
+    return _lists[_StudentHomeworkListKey(
+      classroomId: classroomId,
+      profileId: profileId,
+      search: search,
+      visibility: visibility,
+      submissionStatus: submissionStatus,
+    )];
+  }
+
   static Future<ClassroomExercise?> loadDetail({
     required ClassroomExerciseService service,
     required int exerciseId,
@@ -95,6 +111,18 @@ class StudentHomeworkCache {
         .whenComplete(() => _pendingDetails.remove(key));
     _pendingDetails[key] = request;
     return request;
+  }
+
+  static ClassroomExercise? peekFullDetail({
+    required int exerciseId,
+    required int profileId,
+  }) {
+    final cached =
+        _details[_StudentHomeworkDetailKey(
+          profileId: profileId,
+          exerciseId: exerciseId,
+        )];
+    return cached?.hasFullDetail == true ? cached!.exercise : null;
   }
 
   static void seedDetail({

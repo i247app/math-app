@@ -12,10 +12,10 @@ class TeacherClassDetailScreen extends StatefulWidget {
     GradeService? gradeService,
     ProfileService? profileService,
     SchoolService? schoolService,
-  })  : _classroomService = classroomService,
-        _gradeService = gradeService,
-        _profileService = profileService,
-        _schoolService = schoolService;
+  }) : _classroomService = classroomService,
+       _gradeService = gradeService,
+       _profileService = profileService,
+       _schoolService = schoolService;
 
   final int classroomId;
   final int profileId;
@@ -51,17 +51,17 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   void initState() {
     super.initState();
     _isInfoExpanded = widget.initiallyExpanded;
-    _loadDetail();
+    _loadDetail(forceRefresh: true);
     _loadLookupOptions();
   }
 
   Future<void> _loadDetail({bool forceRefresh = false}) {
     return context.read<ClassroomCubit>().loadDetail(
-          profileId: widget.profileId,
-          classroomId: widget.classroomId,
-          initialClassroom: widget.initialClassroom,
-          forceRefresh: forceRefresh,
-        );
+      profileId: widget.profileId,
+      classroomId: widget.classroomId,
+      initialClassroom: widget.initialClassroom,
+      forceRefresh: forceRefresh,
+    );
   }
 
   Future<void> _loadLookupOptions({bool forceRefresh = false}) async {
@@ -73,6 +73,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
     final cachedOptions = _TeacherClassroomLookupCache.shared.get(userId);
     if (!forceRefresh && cachedOptions != null) {
       setState(() => _applyLookupOptions(cachedOptions));
+      unawaited(_loadLookupOptions(forceRefresh: true));
       return;
     }
 
@@ -162,7 +163,8 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                                   grades: _grades,
                                   programs: _programs,
                                   schools: _schools,
-                                  isLoading: detailState.isLoading &&
+                                  isLoading:
+                                      detailState.isLoading &&
                                       classroom == null,
                                   isExpanded: _isInfoExpanded,
                                   onToggleExpanded: _toggleInfoExpanded,

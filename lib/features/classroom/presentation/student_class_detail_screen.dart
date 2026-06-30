@@ -45,7 +45,7 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _loadDetail();
+    _loadDetail(forceRefresh: true);
     _loadHomeworkExercises();
   }
 
@@ -58,11 +58,11 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
 
   Future<void> _loadDetail({bool forceRefresh = false}) {
     return context.read<ClassroomCubit>().loadDetail(
-          profileId: widget.profileId,
-          classroomId: widget.classroomId,
-          initialClassroom: widget.initialClassroom,
-          forceRefresh: forceRefresh,
-        );
+      profileId: widget.profileId,
+      classroomId: widget.classroomId,
+      initialClassroom: widget.initialClassroom,
+      forceRefresh: forceRefresh,
+    );
   }
 
   Future<void> _loadHomeworkExercises() async {
@@ -96,7 +96,8 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
       selector: (state) => state.detail(widget.profileId, widget.classroomId),
       builder: (context, detailState) {
         final classroom = detailState.classroom ?? widget.initialClassroom;
-        final title = studentClassNonEmpty(classroom?.name) ??
+        final title =
+            studentClassNonEmpty(classroom?.name) ??
             context.getText(AppKeys.studentClassDetailTitle);
 
         return Scaffold(
@@ -143,7 +144,8 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                               classroomId: widget.classroomId,
                               profileId: widget.profileId,
                               homeworkCount: _homeworkExercises.length,
-                              isLoadingHomework: _isLoadingHomework &&
+                              isLoadingHomework:
+                                  _isLoadingHomework &&
                                   _homeworkExercises.isEmpty,
                             ),
                             const SizedBox(height: 23),

@@ -33,9 +33,9 @@ class StudentClassSearchContent extends StatefulWidget {
     ClassroomService? classroomService,
     GradeService? gradeService,
     SchoolService? schoolService,
-  })  : _classroomService = classroomService,
-        _gradeService = gradeService,
-        _schoolService = schoolService;
+  }) : _classroomService = classroomService,
+       _gradeService = gradeService,
+       _schoolService = schoolService;
 
   final int profileId;
   final int? userId;
@@ -234,6 +234,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
           _filterError = null;
           _isLoadingFilters = false;
         });
+        unawaited(_loadFilterOptions(forceRefresh: true));
         return;
       }
     }
@@ -276,6 +277,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
             userId: userId,
             gradeService: _gradeService,
             schoolService: _schoolService,
+            forceRefresh: true,
           )
           .timeout(_requestTimeout);
     } catch (_) {
@@ -516,10 +518,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
           const SizedBox(height: 10),
         ],
         if (_error != null) ...[
-          StudentJoinRetryBanner(
-            message: _error!,
-            onRetry: _search,
-          ),
+          StudentJoinRetryBanner(message: _error!, onRetry: _search),
           const SizedBox(height: 10),
         ],
         for (var index = 0; index < _results.length; index++) ...[

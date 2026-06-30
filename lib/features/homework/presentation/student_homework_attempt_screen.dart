@@ -82,6 +82,23 @@ class _StudentHomeworkAttemptScreenState
   }
 
   Future<void> _loadDetail({bool forceRefresh = false}) async {
+    if (!forceRefresh) {
+      final cachedExercise = StudentHomeworkCache.peekFullDetail(
+        exerciseId: widget.exerciseId,
+        profileId: widget.profileId,
+      );
+      if (cachedExercise != null) {
+        setState(() {
+          _exercise = cachedExercise;
+          _isLoading = true;
+          _errorMessage = null;
+          _errorRetryAction = null;
+        });
+        await _loadDetail(forceRefresh: true);
+        return;
+      }
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -98,10 +115,14 @@ class _StudentHomeworkAttemptScreenState
       if (!mounted) {
         return;
       }
+      final shouldResetProgress =
+          !forceRefresh || _exercise == null || _selectedAnswerLabels.isEmpty;
       setState(() {
         _exercise = exercise ?? _exercise;
-        _questionIndex = 0;
-        _selectedAnswerLabels.clear();
+        if (shouldResetProgress) {
+          _questionIndex = 0;
+          _selectedAnswerLabels.clear();
+        }
       });
     } on ClassroomExerciseException catch (error) {
       if (!mounted) {
