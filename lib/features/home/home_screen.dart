@@ -51,7 +51,6 @@ import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/grade_selection_screen.dart';
 import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
-import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
 import 'package:numi_flutter/features/homework/student_homework_open_guard.dart';
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
 import 'package:numi_flutter/features/quiz/history_tab.dart';

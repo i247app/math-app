@@ -17,21 +17,24 @@ List<_ParentChildSummary> _summariesFromLayout(ParentHomeLayout? parent) {
     return const <_ParentChildSummary>[];
   }
 
-  return children.map((child) {
-    final childId = ActiveProfileSession.profileStableId(child);
-    final assessments = <GeneratedQuiz>[
-      for (final completion
-          in parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[])
-        if (_layoutChildId(completion.child) == childId)
-          _quizFromRecentCompletion(completion),
-    ]..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+  return children
+      .map((child) {
+        final childId = ActiveProfileSession.profileStableId(child);
+        final assessments = <GeneratedQuiz>[
+          for (final completion
+              in parent?.recentCompletions ??
+                  const <HomeLayoutRecentCompletion>[])
+            if (_layoutChildId(completion.child) == childId)
+              _quizFromRecentCompletion(completion),
+        ]..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
 
-    return _ParentChildSummary(
-      profile: child,
-      classroom: _classroomForLayoutChild(parent, child),
-      assessments: assessments,
-    );
-  }).toList(growable: false);
+        return _ParentChildSummary(
+          profile: child,
+          classroom: _classroomForLayoutChild(parent, child),
+          assessments: assessments,
+        );
+      })
+      .toList(growable: false);
 }
 
 List<GeneratedQuiz> _quizzesFromLayoutQuizzes(List<HomeLayoutQuiz> quizzes) {
@@ -116,7 +119,9 @@ ClassroomModel? _classroomForLayoutChild(
 }
 
 ClassroomModel? _layoutClassroomById(
-    ParentHomeLayout parent, int? classroomId) {
+  ParentHomeLayout parent,
+  int? classroomId,
+) {
   if (classroomId == null) {
     return null;
   }
@@ -130,7 +135,8 @@ ClassroomModel? _layoutClassroomById(
 
 GeneratedQuiz _quizFromRecentCompletion(HomeLayoutRecentCompletion completion) {
   final exercise = completion.exercise;
-  final exerciseId = completion.classroomExerciseId ??
+  final exerciseId =
+      completion.classroomExerciseId ??
       exercise?.classroomExerciseId ??
       exercise?.exerciseId ??
       exercise?.id;
@@ -153,35 +159,6 @@ GeneratedQuiz _quizFromRecentCompletion(HomeLayoutRecentCompletion completion) {
       totalQuestions: totalQuestions,
     ),
     questions: const <QuizQuestion>[],
-  );
-}
-
-StudentHomeworkResultSummary _homeworkSummaryFromCompletion(
-  BuildContext context,
-  HomeLayoutRecentCompletion completion,
-) {
-  final scorePercentage = completion.scorePercentage;
-  if (scorePercentage != null) {
-    final scoreOutOf10 = (scorePercentage / 10).round().clamp(0, 10);
-    return StudentHomeworkResultSummary(
-      scoreText: '$scoreOutOf10/10',
-      reviewText: context.getText(AppKeys.defaultAiReview),
-    );
-  }
-
-  final correctNumber = completion.correctNumber;
-  final totalQuestions = completion.totalQuestions;
-  if (correctNumber != null && totalQuestions != null && totalQuestions > 0) {
-    final scoreOutOf10 = (correctNumber / totalQuestions * 10).round();
-    return StudentHomeworkResultSummary(
-      scoreText: '${scoreOutOf10.clamp(0, 10)}/10',
-      reviewText: context.getText(AppKeys.defaultAiReview),
-    );
-  }
-
-  return StudentHomeworkResultSummary(
-    scoreText: '--/10',
-    reviewText: context.getText(AppKeys.defaultAiReview),
   );
 }
 

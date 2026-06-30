@@ -36,6 +36,7 @@ import 'package:numi_flutter/features/profile/school_api.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 
 part '../cache/teacher_classroom_lookup_cache.dart';
+part '../../homework/cache/teacher_homework_cache.dart';
 part '../../home/teacher/home/helpers/teacher_home_helpers.dart';
 part '../../home/teacher/home/teacher_home_tab.dart';
 part '../../home/teacher/home/widgets/teacher_assignment_skeleton_card.dart';
@@ -92,8 +93,38 @@ part '../widgets/teacher_detail/teacher_class_detail_function_grid.dart';
 part '../widgets/teacher_detail/teacher_class_detail_function_tile.dart';
 part '../widgets/teacher_detail/teacher_class_detail_member_management_card.dart';
 part '../../homework/presentation/teacher_homework_screen.dart';
+part '../../homework/widgets/teacher_list/teacher_homework_add_button.dart';
+part '../../homework/widgets/teacher_list/teacher_homework_search_field.dart';
+part '../../homework/widgets/teacher_list/teacher_homework_section_header.dart';
+part '../../homework/widgets/teacher_list/teacher_exercise_copy.dart';
+part '../../homework/widgets/teacher_list/teacher_assignment_card.dart';
+part '../../homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
+part '../../homework/widgets/teacher_list/teacher_exercise_helpers.dart';
 part '../../homework/presentation/teacher_homework_detail_screen.dart';
+part '../../homework/widgets/teacher_detail/teacher_assignment_info_card.dart';
+part '../../homework/widgets/teacher_detail/teacher_assignment_info_row.dart';
+part '../../homework/widgets/teacher_detail/teacher_assignment_labeled_value.dart';
+part '../../homework/widgets/teacher_detail/teacher_assignment_switch.dart';
+part '../../homework/widgets/teacher_detail/teacher_assignment_stat_due.dart';
+part '../../homework/widgets/teacher_detail/teacher_assignment_stat_questions.dart';
+part '../../homework/widgets/teacher_detail/teacher_assignment_stat.dart';
+part '../../homework/widgets/teacher_detail/teacher_question_card.dart';
+part '../../homework/widgets/teacher_detail/teacher_answer_option.dart';
+part '../../homework/widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
 part '../../homework/presentation/teacher_create_homework_screen.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_class_selector.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_class_bottom_sheet.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_program_bottom_sheet.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_class_summary.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_class_meta.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_labeled_input.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_label.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_input.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_publish_switch.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_select_field.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_date_field.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_submit_button.dart';
+part '../../homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
 part 'teacher_class_members_screen.dart';
 part '../widgets/teacher_members/teacher_class_members_content.dart';
 part '../widgets/teacher_members/teacher_member_helpers.dart';
@@ -144,16 +175,12 @@ String _teacherMemberSummaryText(
   required int requests,
 }) {
   if (requests <= 0) {
-    return context.formatText(
-      AppKeys.teacherMemberSummaryNoRequests,
-      {'members': members},
-    );
-  }
-  return context.formatText(
-    AppKeys.teacherMemberSummary,
-    {
+    return context.formatText(AppKeys.teacherMemberSummaryNoRequests, {
       'members': members,
-      'requests': requests,
-    },
-  );
+    });
+  }
+  return context.formatText(AppKeys.teacherMemberSummary, {
+    'members': members,
+    'requests': requests,
+  });
 }
