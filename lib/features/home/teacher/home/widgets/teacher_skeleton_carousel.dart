@@ -25,12 +25,9 @@ class _TeacherSkeletonCarousel extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: itemCount,
-        separatorBuilder: (_, __) => SizedBox(width: 16 * scale),
+        separatorBuilder: (_, _) => SizedBox(width: 16 * scale),
         itemBuilder: (context, index) {
-          return SizedBox(
-            width: itemWidth,
-            child: builder(context),
-          );
+          return SizedBox(width: itemWidth, child: builder(context));
         },
       ),
     );

@@ -21,7 +21,7 @@ class _TeacherRecentAssignmentCarousel extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: assignments.length,
-        separatorBuilder: (_, __) => SizedBox(width: 14 * scale),
+        separatorBuilder: (_, _) => SizedBox(width: 14 * scale),
         itemBuilder: (context, index) {
           final assignment = assignments[index];
           return SizedBox(

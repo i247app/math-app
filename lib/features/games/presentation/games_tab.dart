@@ -118,7 +118,8 @@ class _GamesTabState extends State<GamesTab> {
     final userId = widget.userId;
     if (userId == null || userId <= 0 || _isLoadingGrades) {
       setState(
-          () => _gradeError = context.readText(AppKeys.noAccountForGrades));
+        () => _gradeError = context.readText(AppKeys.noAccountForGrades),
+      );
       return;
     }
 
@@ -192,11 +193,9 @@ class _GamesTabState extends State<GamesTab> {
       final stageScreen = lesson.number <= 2
           ? NumiFarmHarvestStageScreen(stage: lesson.number)
           : NumiFarmChoiceStageScreen(stage: lesson.number);
-      final completed = await Navigator.of(context).push<bool>(
-        MaterialPageRoute<bool>(
-          builder: (_) => stageScreen,
-        ),
-      );
+      final completed = await Navigator.of(
+        context,
+      ).push<bool>(MaterialPageRoute<bool>(builder: (_) => stageScreen));
       if (completed == true &&
           mounted &&
           _farmCompletedStages < lesson.number) {
@@ -229,10 +228,9 @@ class _GamesTabState extends State<GamesTab> {
       ..showSnackBar(
         SnackBar(
           content: Text(
-            context.formatText(
-              AppKeys.gamesLevelComingSoon,
-              {'level': lesson.number},
-            ),
+            context.formatText(AppKeys.gamesLevelComingSoon, {
+              'level': lesson.number,
+            }),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -257,36 +255,36 @@ class _GamesTabState extends State<GamesTab> {
       ),
       child: switch (_step) {
         _GamesStep.grade => _GamesGradeSelection(
-            key: const ValueKey('games-grade-selection'),
-            grades: _grades,
-            isLoading: _isLoadingGrades,
-            errorMessage: _gradeError,
-            bottomPadding: widget.bottomPadding,
-            onRetry: _loadGrades,
-            onSelected: _selectGrade,
-          ),
+          key: const ValueKey('games-grade-selection'),
+          grades: _grades,
+          isLoading: _isLoadingGrades,
+          errorMessage: _gradeError,
+          bottomPadding: widget.bottomPadding,
+          onRetry: _loadGrades,
+          onSelected: _selectGrade,
+        ),
         _GamesStep.game => _GamesCatalog(
-            key: const ValueKey('games-catalog'),
-            selectedGrade: _selectedGrade!,
-            bottomPadding: widget.bottomPadding,
-            onChangeGrade: _changeGrade,
-            onSelected: _selectGame,
-          ),
+          key: const ValueKey('games-catalog'),
+          selectedGrade: _selectedGrade!,
+          bottomPadding: widget.bottomPadding,
+          onChangeGrade: _changeGrade,
+          onSelected: _selectGame,
+        ),
         _GamesStep.map => _GamesMap(
-            key: ValueKey(
-              'games-map-${_selectedGame!.id}-$_farmCompletedStages-$_squadronCompletedStages',
-            ),
-            game: _selectedGame!,
-            grade: _selectedGrade!,
-            completedStages: switch (_selectedGame!.id) {
-              'journey-1' => _farmCompletedStages,
-              'math-squadron' => _squadronCompletedStages,
-              _ => 0,
-            },
-            bottomPadding: widget.bottomPadding,
-            onBack: _backToGames,
-            onLevelTap: _openLevel,
+          key: ValueKey(
+            'games-map-${_selectedGame!.id}-$_farmCompletedStages-$_squadronCompletedStages',
           ),
+          game: _selectedGame!,
+          grade: _selectedGrade!,
+          completedStages: switch (_selectedGame!.id) {
+            'journey-1' => _farmCompletedStages,
+            'math-squadron' => _squadronCompletedStages,
+            _ => 0,
+          },
+          bottomPadding: widget.bottomPadding,
+          onBack: _backToGames,
+          onLevelTap: _openLevel,
+        ),
       },
     );
   }
@@ -312,10 +310,11 @@ class _GamesGradeSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final visibleGrades = grades
-        .where((grade) => grade.label?.trim().isNotEmpty == true)
-        .toList()
-      ..sort((a, b) => (a.displayOrder ?? 0).compareTo(b.displayOrder ?? 0));
+    final visibleGrades =
+        grades.where((grade) => grade.label?.trim().isNotEmpty == true).toList()
+          ..sort(
+            (a, b) => (a.displayOrder ?? 0).compareTo(b.displayOrder ?? 0),
+          );
 
     return ColoredBox(
       color: Colors.white,
@@ -332,9 +331,7 @@ class _GamesGradeSelection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _GamesEyebrow(
-                      label: context.getText(AppKeys.navGames),
-                    ),
+                    _GamesEyebrow(label: context.getText(AppKeys.navGames)),
                     const SizedBox(height: 16),
                     Text(
                       context.getText(AppKeys.gamesGradeTitle),
@@ -484,7 +481,7 @@ class _GamesCatalog extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(24, 0, 24, bottomPadding + 24),
               sliver: SliverList.separated(
                 itemCount: games.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                separatorBuilder: (_, _) => const SizedBox(height: 16),
                 itemBuilder: (context, index) => _GamesEntrance(
                   order: index + 1,
                   child: _GamePreviewCard(
@@ -526,10 +523,7 @@ class _GamesMap extends StatelessWidget {
       (index) => PracticeLesson(
         number: index + 1,
         title: game.levelTitleKeys == null
-            ? context.formatText(
-                AppKeys.gamesLevelLabel,
-                {'level': index + 1},
-              )
+            ? context.formatText(AppKeys.gamesLevelLabel, {'level': index + 1})
             : context.getText(game.levelTitleKeys![index]),
       ),
     );
@@ -663,20 +657,17 @@ class _GamesGradeCard extends StatelessWidget {
 }
 
 class _ThreeDimensionalNumber extends StatelessWidget {
-  const _ThreeDimensionalNumber({
-    required this.number,
-    required this.palette,
-  });
+  const _ThreeDimensionalNumber({required this.number, required this.palette});
 
   final String number;
   final _GradeNumberPalette palette;
 
   TextStyle get _numberStyle => const TextStyle(
-        fontSize: 76,
-        fontWeight: FontWeight.w900,
-        height: 1,
-        letterSpacing: -3,
-      );
+    fontSize: 76,
+    fontWeight: FontWeight.w900,
+    height: 1,
+    letterSpacing: -3,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -717,8 +708,10 @@ class _ThreeDimensionalNumber extends StatelessWidget {
               colors: [palette.top, palette.bottom],
               stops: const [0.12, 0.88],
             ).createShader(bounds),
-            child:
-                Text(number, style: _numberStyle.copyWith(color: Colors.white)),
+            child: Text(
+              number,
+              style: _numberStyle.copyWith(color: Colors.white),
+            ),
           ),
           Positioned(
             top: 22,
@@ -870,10 +863,9 @@ class _GamePreviewCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      context.formatText(
-                        AppKeys.gamesLevelCount,
-                        {'count': game.levelCount},
-                      ),
+                      context.formatText(AppKeys.gamesLevelCount, {
+                        'count': game.levelCount,
+                      }),
                       style: const TextStyle(
                         color: _gamesMuted,
                         fontSize: 13,
@@ -921,7 +913,7 @@ class _GamesGradeLoading extends StatelessWidget {
         crossAxisSpacing: 14,
         childAspectRatio: 1.1,
       ),
-      itemBuilder: (_, __) => Container(
+      itemBuilder: (_, _) => Container(
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(28),
@@ -975,10 +967,7 @@ class _GamesMessageCard extends StatelessWidget {
 }
 
 class _GamesEntrance extends StatefulWidget {
-  const _GamesEntrance({
-    required this.order,
-    required this.child,
-  });
+  const _GamesEntrance({required this.order, required this.child});
 
   final int order;
   final Widget child;
@@ -1169,8 +1158,11 @@ class _MathSquadronPreviewArtwork extends StatelessWidget {
           ),
           const Positioned(
             bottom: 12,
-            child:
-                Icon(Icons.flight_rounded, color: Color(0xFF61DAFF), size: 45),
+            child: Icon(
+              Icons.flight_rounded,
+              color: Color(0xFF61DAFF),
+              size: 45,
+            ),
           ),
           Positioned(
             bottom: 48,

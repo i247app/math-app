@@ -1,10 +1,7 @@
 part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
 
 class _ClassThumb extends StatelessWidget {
-  const _ClassThumb({
-    required this.classroom,
-    required this.scale,
-  });
+  const _ClassThumb({required this.classroom, required this.scale});
 
   final ClassroomModel classroom;
   final double scale;
@@ -25,7 +22,7 @@ class _ClassThumb extends StatelessWidget {
           ? Image.network(
               imageUrl!.trim(),
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _ClassDefaultImage(scale: scale),
+              errorBuilder: (_, _, _) => _ClassDefaultImage(scale: scale),
             )
           : _ClassDefaultImage(scale: scale),
     );

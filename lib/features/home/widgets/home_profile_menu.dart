@@ -51,7 +51,7 @@ class HomeProfileMenu extends StatelessWidget {
               shrinkWrap: true,
               padding: EdgeInsets.symmetric(vertical: 6 * scale),
               itemCount: profiles.length,
-              separatorBuilder: (_, __) => SizedBox(height: scale),
+              separatorBuilder: (_, _) => SizedBox(height: scale),
               itemBuilder: (context, index) {
                 final profile = profiles[index];
                 final name = compactHomeProfileName(
@@ -94,11 +94,11 @@ class HomeProfileMenu extends StatelessWidget {
   }
 
   TextStyle get _nameStyle => TextStyle(
-        color: const Color(0xFF002B6A),
-        fontSize: FontSize.avatarName * scale,
-        fontWeight: FontWeight.w900,
-        height: 1.1,
-      );
+    color: const Color(0xFF002B6A),
+    fontSize: FontSize.avatarName * scale,
+    fontWeight: FontWeight.w900,
+    height: 1.1,
+  );
 
   double _preferredWidth(BuildContext context) {
     var longestNameWidth = 0.0;
@@ -135,10 +135,7 @@ String compactHomeProfileName(String name) {
   return '${parts.first} ${parts.last}';
 }
 
-String homeProfileDisplayName(
-  BuildContext context,
-  StudentProfile profile,
-) {
+String homeProfileDisplayName(BuildContext context, StudentProfile profile) {
   final name = profile.name?.trim();
   if (name != null && name.isNotEmpty) {
     return name;

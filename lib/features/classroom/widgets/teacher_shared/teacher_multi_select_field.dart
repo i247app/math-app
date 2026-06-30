@@ -55,7 +55,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                       child: Text(
                         values.isEmpty
                             ? (emptyText ??
-                                context.getText(AppKeys.teacherNoOptions))
+                                  context.getText(AppKeys.teacherNoOptions))
                             : selectedLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -179,10 +179,8 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                         shrinkWrap: true,
                         physics: const BouncingScrollPhysics(),
                         itemCount: items.length,
-                        separatorBuilder: (_, __) => const Divider(
-                          height: 1,
-                          color: Color(0xFFEFF4F5),
-                        ),
+                        separatorBuilder: (_, _) =>
+                            const Divider(height: 1, color: Color(0xFFEFF4F5)),
                         itemBuilder: (context, index) {
                           final item = items[index];
                           final id = itemId(item);

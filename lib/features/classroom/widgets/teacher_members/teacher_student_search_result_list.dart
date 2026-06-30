@@ -57,7 +57,7 @@ class _TeacherStudentSearchResultList extends StatelessWidget {
       controller: scrollController,
       padding: EdgeInsets.zero,
       itemCount: profiles.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final profile = profiles[index];
         final id = ActiveProfileSession.profileStableId(profile);

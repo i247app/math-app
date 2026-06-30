@@ -21,7 +21,7 @@ class _TeacherStudyClassFilters extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: classrooms.length + 1,
-        separatorBuilder: (_, __) => SizedBox(width: 7 * scale),
+        separatorBuilder: (_, _) => SizedBox(width: 7 * scale),
         itemBuilder: (context, index) {
           if (index == 0) {
             return _TeacherStudyFilterChip(

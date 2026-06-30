@@ -18,7 +18,7 @@ class _TeacherClassroomBody extends StatelessWidget {
   final List<ClassroomModel> displayedClassrooms;
   final TextEditingController searchController;
   final Widget Function(int order, Widget child, bool markOnEnd)
-      entranceBuilder;
+  entranceBuilder;
   final VoidCallback onCreateClass;
   final ValueChanged<ClassroomModel> onOpenClassDetail;
 
@@ -29,10 +29,7 @@ class _TeacherClassroomBody extends StatelessWidget {
       children: [
         entranceBuilder(
           0,
-          _TeacherClassroomAddButton(
-            scale: scale,
-            onTap: onCreateClass,
-          ),
+          _TeacherClassroomAddButton(scale: scale, onTap: onCreateClass),
           false,
         ),
         SizedBox(height: 16 * scale),
@@ -48,10 +45,7 @@ class _TeacherClassroomBody extends StatelessWidget {
         if (error != null && classrooms.isEmpty)
           entranceBuilder(
             2,
-            _TeacherClassroomEmptyState(
-              scale: scale,
-              message: error!,
-            ),
+            _TeacherClassroomEmptyState(scale: scale, message: error!),
             true,
           )
         else if (classrooms.isEmpty)
@@ -69,7 +63,7 @@ class _TeacherClassroomBody extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             padding: EdgeInsets.zero,
             itemCount: displayedClassrooms.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16 * scale),
+            separatorBuilder: (_, _) => SizedBox(height: 16 * scale),
             itemBuilder: (context, index) {
               final classroom = displayedClassrooms[index];
               return entranceBuilder(

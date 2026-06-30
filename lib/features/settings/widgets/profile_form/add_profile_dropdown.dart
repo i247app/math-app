@@ -36,8 +36,9 @@ class AddProfileDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedValue = items.contains(value) ? value : null;
-    final selectedLabel =
-        selectedValue == null ? null : itemLabel(selectedValue);
+    final selectedLabel = selectedValue == null
+        ? null
+        : itemLabel(selectedValue);
 
     return AddProfileFieldShell(
       label: label,
@@ -145,10 +146,8 @@ class AddProfileDropdown<T> extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const BouncingScrollPhysics(),
                     itemCount: items.length + (allowEmpty ? 1 : 0),
-                    separatorBuilder: (_, __) => const Divider(
-                      height: 1,
-                      color: Color(0xFFEFF4F5),
-                    ),
+                    separatorBuilder: (_, _) =>
+                        const Divider(height: 1, color: Color(0xFFEFF4F5)),
                     itemBuilder: (context, index) {
                       final isEmptyOption = allowEmpty && index == 0;
                       final item = isEmptyOption
@@ -156,12 +155,12 @@ class AddProfileDropdown<T> extends StatelessWidget {
                           : items[index - (allowEmpty ? 1 : 0)];
                       final optionLabel = isEmptyOption
                           ? emptyLabel ??
-                              context.getText(AppKeys.profileIdTypeNone)
+                                context.getText(AppKeys.profileIdTypeNone)
                           : itemLabel(item as T);
                       final isSelected = isEmptyOption
                           ? selectedValue == null
                           : identical(item, selectedValue) ||
-                              item == selectedValue;
+                                item == selectedValue;
 
                       return Material(
                         color: Colors.transparent,
@@ -189,9 +188,9 @@ class AddProfileDropdown<T> extends StatelessWidget {
                               : null,
                           onTap: () {
                             dismissProfileFormKeyboard();
-                            Navigator.of(context).pop(
-                              AddProfileSelectResult<T>(item),
-                            );
+                            Navigator.of(
+                              context,
+                            ).pop(AddProfileSelectResult<T>(item));
                           },
                         ),
                       );

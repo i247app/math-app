@@ -31,8 +31,9 @@ class _TeacherDropdownField<T> extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: canSelect ? () => _openSelector(context) : null,
-          borderRadius:
-              BorderRadius.circular(outlined ? 16 * scale : 12 * scale),
+          borderRadius: BorderRadius.circular(
+            outlined ? 16 * scale : 12 * scale,
+          ),
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
@@ -137,10 +138,8 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const BouncingScrollPhysics(),
                     itemCount: items.length,
-                    separatorBuilder: (_, __) => const Divider(
-                      height: 1,
-                      color: Color(0xFFEFF4F5),
-                    ),
+                    separatorBuilder: (_, _) =>
+                        const Divider(height: 1, color: Color(0xFFEFF4F5)),
                     itemBuilder: (context, index) {
                       final item = items[index];
                       final isSelected = identical(item, value);

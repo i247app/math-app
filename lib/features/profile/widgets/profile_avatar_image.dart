@@ -57,7 +57,7 @@ class ProfileAvatarImage extends StatelessWidget {
             ? Image.file(
                 File(localPath),
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
+                errorBuilder: (_, _, _) =>
                     _assetNetworkOrFallback(assetPath, url),
               )
             : _assetNetworkOrFallback(assetPath, url),
@@ -70,7 +70,7 @@ class ProfileAvatarImage extends StatelessWidget {
         ? Image.asset(
             assetPath,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _networkOrFallback(url),
+            errorBuilder: (_, _, _) => _networkOrFallback(url),
           )
         : _networkOrFallback(url);
   }
@@ -81,7 +81,7 @@ class ProfileAvatarImage extends StatelessWidget {
         : Image.network(
             url,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _fallback(),
+            errorBuilder: (_, _, _) => _fallback(),
           );
   }
 
@@ -104,10 +104,6 @@ class ProfileAvatarImage extends StatelessWidget {
       );
     }
 
-    return Icon(
-      fallbackIcon,
-      color: foregroundColor,
-      size: size * iconScale,
-    );
+    return Icon(fallbackIcon, color: foregroundColor, size: size * iconScale);
   }
 }

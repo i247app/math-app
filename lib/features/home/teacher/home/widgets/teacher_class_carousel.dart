@@ -21,7 +21,7 @@ class _TeacherClassCarousel extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: classrooms.length,
-        separatorBuilder: (_, __) => SizedBox(width: 16 * scale),
+        separatorBuilder: (_, _) => SizedBox(width: 16 * scale),
         itemBuilder: (context, index) {
           final classroom = classrooms[index];
           return SizedBox(
