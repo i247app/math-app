@@ -2,14 +2,14 @@ import '../app_keys.dart';
 
 const networkStrings = <String, Map<String, String>>{
   'vi': {
-    AppKeys.apiBaseUrlMissing: 'ChÆ°a cáº¥u hÃ¬nh API_BASE_URL.',
-    AppKeys.invalidServerResponse: 'Response tá»« server khÃ´ng há»£p lá»‡.',
-    AppKeys.apiConnectTimeout: 'Káº¿t ná»‘i API quÃ¡ thá»i gian chá».',
-    AppKeys.apiReceiveTimeout: 'API pháº£n há»“i quÃ¡ thá»i gian chá».',
-    AppKeys.apiConnectFailed: 'KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c API: {message}',
-    AppKeys.apiBadCertificate: 'Chá»©ng chá»‰ API khÃ´ng há»£p lá»‡.',
-    AppKeys.apiRequestCanceled: 'Request Ä‘Ã£ bá»‹ há»§y.',
-    AppKeys.apiConnectionFailed: 'KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c API.',
+    AppKeys.apiBaseUrlMissing: 'Chưa cấu hình API_BASE_URL.',
+    AppKeys.invalidServerResponse: 'Response từ server không hợp lệ.',
+    AppKeys.apiConnectTimeout: 'Kết nối API quá thời gian chờ.',
+    AppKeys.apiReceiveTimeout: 'API phản hồi quá thời gian chờ.',
+    AppKeys.apiConnectFailed: 'Không kết nối được API: {message}',
+    AppKeys.apiBadCertificate: 'Chứng chỉ API không hợp lệ.',
+    AppKeys.apiRequestCanceled: 'Request đã bị hủy.',
+    AppKeys.apiConnectionFailed: 'Không kết nối được API.',
   },
   'en': {
     AppKeys.apiBaseUrlMissing: 'API_BASE_URL is not configured.',

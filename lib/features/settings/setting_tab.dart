@@ -1650,7 +1650,7 @@ class _SettingTabState extends State<SettingTab> {
                                 alignment: Alignment.topCenter,
                                 children: [
                                   for (final child in previousChildren) child,
-                                  if (currentChild != null) currentChild,
+                                  ?currentChild,
                                 ],
                               );
                             },

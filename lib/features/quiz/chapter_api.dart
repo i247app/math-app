@@ -20,13 +20,10 @@ abstract class ChapterService {
 }
 
 class ChapterApi implements ChapterService {
-  ChapterApi({
-    String? baseUrl,
-    NetworkApi? networkApi,
-  }) : _networkApi = networkApi ??
-            (baseUrl == null
-                ? NetworkApi.shared
-                : NetworkApi(baseUrl: baseUrl));
+  ChapterApi({String? baseUrl, NetworkApi? networkApi})
+    : _networkApi =
+          networkApi ??
+          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 

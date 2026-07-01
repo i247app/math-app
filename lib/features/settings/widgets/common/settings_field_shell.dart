@@ -43,7 +43,7 @@ class SettingsFieldShell extends StatelessWidget {
                 style: labelStyle,
               ),
             ),
-            if (trailing != null) trailing!,
+            ?trailing,
           ],
         ),
         SizedBox(height: labelGap * scale),
@@ -53,10 +53,7 @@ class SettingsFieldShell extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(borderRadius * scale),
-            border: Border.all(
-              color: borderColor,
-              width: borderWidth * scale,
-            ),
+            border: Border.all(color: borderColor, width: borderWidth * scale),
           ),
           alignment: Alignment.center,
           child: child,

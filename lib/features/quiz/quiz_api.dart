@@ -30,10 +30,7 @@ abstract class QuizService {
     int? profileId,
   });
 
-  Future<List<GeneratedQuiz>> listQuizzes({
-    int? userId,
-    int? profileId,
-  });
+  Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId});
 
   Future<GeneratedQuiz> submitQuiz({
     required int quizId,
@@ -103,10 +100,7 @@ class FakeQuizApi implements QuizService {
   }
 
   @override
-  Future<List<GeneratedQuiz>> listQuizzes({
-    int? userId,
-    int? profileId,
-  }) async {
+  Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId}) async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     final response = QuizListResponse.fromJson(_fakeQuizListResponse());
     if (response.mstatus != 200) {
@@ -139,13 +133,10 @@ class FakeQuizApi implements QuizService {
 }
 
 class QuizApi implements QuizService {
-  QuizApi({
-    String? baseUrl,
-    NetworkApi? networkApi,
-  }) : _networkApi = networkApi ??
-            (baseUrl == null
-                ? NetworkApi.shared
-                : NetworkApi(baseUrl: baseUrl));
+  QuizApi({String? baseUrl, NetworkApi? networkApi})
+    : _networkApi =
+          networkApi ??
+          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 
@@ -167,8 +158,8 @@ class QuizApi implements QuizService {
           typeOfQuiz: typeOfQuiz,
           gradeLabel: previousQuizId == null
               ? cleanGradeLabel?.isNotEmpty == true
-                  ? cleanGradeLabel
-                  : assessmentQuizGradeLabel
+                    ? cleanGradeLabel
+                    : assessmentQuizGradeLabel
               : null,
           previousQuizId: previousQuizId,
           chapters: _cleanChapters(chapters),
@@ -215,10 +206,7 @@ class QuizApi implements QuizService {
   }
 
   @override
-  Future<List<GeneratedQuiz>> listQuizzes({
-    int? userId,
-    int? profileId,
-  }) async {
+  Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId}) async {
     if (userId == null && profileId == null) {
       throw QuizException(
         AppStrings.current(AppKeys.missingUserOrProfileForHistory),
@@ -228,10 +216,7 @@ class QuizApi implements QuizService {
     final QuizListResponse response;
     try {
       response = await _networkApi.listQuizzes(
-        QuizListRequest(
-          userId: userId,
-          profileId: profileId,
-        ),
+        QuizListRequest(userId: userId, profileId: profileId),
       );
     } on NetworkException catch (error) {
       throw QuizException(error.message, status: error.status);
@@ -387,11 +372,7 @@ Map<String, Object?> _fakeSubmitQuizResponse(
       'total_questions': 5,
     };
 
-  return <String, Object?>{
-    'mstatus': 200,
-    'quiz': quiz,
-    'status': 'Success',
-  };
+  return <String, Object?>{'mstatus': 200, 'quiz': quiz, 'status': 'Success'};
 }
 
 Map<String, Object?> _fakeQuizListResponse() {

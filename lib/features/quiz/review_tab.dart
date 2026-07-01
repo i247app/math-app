@@ -11,9 +11,35 @@ import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/quiz/chapter_api.dart';
 import 'package:numi_flutter/features/quiz/practice_catalog.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/quiz/cache/review_chapter_cache.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/assessment_screen.dart';
 import 'package:numi_flutter/features/quiz/presentation/practice_chapter_screen.dart';
+
+part 'widgets/review_tab/review_header.dart';
+part 'widgets/review_tab/review_profile_state_panel.dart';
+part 'widgets/review_tab/stat_tile.dart';
+part 'widgets/review_tab/chapter_card.dart';
+part 'widgets/review_tab/badge.dart';
+part 'widgets/review_tab/select_circle.dart';
+part 'widgets/review_tab/test_button.dart';
+part 'widgets/review_tab/start_selected_button.dart';
+part 'widgets/review_tab/clear_selection_button.dart';
+part 'widgets/review_tab/depth_button_surface.dart';
+part 'widgets/review_tab/chapter_card_colors.dart';
+part 'widgets/review_tab/chapter_colors.dart';
+part 'widgets/review_tab/chapter_meta_text.dart';
+part 'widgets/review_tab/profile_program_id.dart';
+part 'widgets/review_tab/profile_grade_id.dart';
+part 'widgets/review_tab/profile_semester_id.dart';
+part 'widgets/review_tab/practice_chapters_from_api.dart';
+part 'widgets/review_tab/fallback_practice_chapter.dart';
+part 'widgets/review_tab/chapter_label.dart';
+part 'widgets/review_tab/chapter_description.dart';
+part 'widgets/review_tab/practice_chapter_id.dart';
+part 'widgets/review_tab/non_empty.dart';
+part 'widgets/review_tab/chapter_icon.dart';
+part 'widgets/review_tab/fake_completed_lessons.dart';
 
 const _reviewInk = Color(0xFF14213D);
 const _reviewMuted = Color(0xFF77859A);
@@ -127,11 +153,13 @@ class _ReviewTabState extends State<ReviewTab> {
       _loadChaptersForActiveProfile();
     } else if (!widget.isParentMode &&
         oldWidget.activeRefreshTick != widget.activeRefreshTick) {
-      _loadChaptersForActiveProfile();
+      _loadChaptersForActiveProfile(forceRefresh: true);
     }
   }
 
-  Future<void> _loadChaptersForActiveProfile() async {
+  Future<void> _loadChaptersForActiveProfile({
+    bool forceRefresh = false,
+  }) async {
     final requestId = ++_loadRequestId;
     final profile = widget.activeProfile;
     if (profile == null) {
@@ -150,13 +178,18 @@ class _ReviewTabState extends State<ReviewTab> {
       _selectedChapterNumbers.clear();
     });
 
-    await _loadChaptersForProfile(profile, requestId);
+    await _loadChaptersForProfile(
+      profile,
+      requestId,
+      forceRefresh: forceRefresh,
+    );
   }
 
   Future<void> _loadChaptersForProfile(
     StudentProfile? profile,
-    int requestId,
-  ) async {
+    int requestId, {
+    bool forceRefresh = false,
+  }) async {
     if (profile == null) {
       return;
     }
@@ -172,16 +205,42 @@ class _ReviewTabState extends State<ReviewTab> {
       return;
     }
 
-    setState(() {
-      _isLoadingChapters = true;
-      _chapterLoadError = null;
-    });
+    final cachedChapters = ReviewChapterCache.peekChapters(
+      programId: programId,
+      gradeId: gradeId,
+      semesterId: semesterId,
+    );
+    if (cachedChapters != null) {
+      setState(() {
+        _chapters = _practiceChaptersFromApi(cachedChapters);
+        _chapterLoadError = null;
+        _isLoadingChapters = false;
+      });
+    } else {
+      setState(() {
+        _isLoadingChapters = true;
+        _chapterLoadError = null;
+      });
+    }
+
+    final shouldRefresh =
+        forceRefresh ||
+        !ReviewChapterCache.isFresh(
+          programId: programId,
+          gradeId: gradeId,
+          semesterId: semesterId,
+        );
+    if (!shouldRefresh) {
+      return;
+    }
 
     try {
-      final chapters = await _chapterService.listChapters(
+      final chapters = await ReviewChapterCache.loadChapters(
+        service: _chapterService,
         programId: programId,
         gradeId: gradeId,
         semesterId: semesterId,
+        forceRefresh: forceRefresh || cachedChapters != null,
       );
       if (!mounted || requestId != _loadRequestId) {
         return;
@@ -414,7 +473,7 @@ class _ReviewTabState extends State<ReviewTab> {
         title: context.getText(AppKeys.chapterLoadErrorTitle),
         message: chapterError,
         buttonLabel: context.getText(AppKeys.retry),
-        onTap: _loadChaptersForActiveProfile,
+        onTap: () => _loadChaptersForActiveProfile(forceRefresh: true),
         scale: scale,
       );
     }
@@ -425,7 +484,7 @@ class _ReviewTabState extends State<ReviewTab> {
         title: context.getText(AppKeys.noChapterTitle),
         message: context.getText(AppKeys.noChapterMessage),
         buttonLabel: context.getText(AppKeys.retry),
-        onTap: _loadChaptersForActiveProfile,
+        onTap: () => _loadChaptersForActiveProfile(forceRefresh: true),
         scale: scale,
       );
     }
@@ -471,736 +530,4 @@ class _ReviewTabState extends State<ReviewTab> {
       ],
     );
   }
-}
-
-class _ReviewHeader extends StatelessWidget {
-  const _ReviewHeader({required this.scale, required this.topInset});
-
-  final double scale;
-  final double topInset;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: topInset + 60 * scale,
-      padding: EdgeInsets.only(top: topInset),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        context.getText(AppKeys.reviewTitle),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.andika(
-          color: const Color(0xFF339395),
-          fontSize: FontSize.xxxl,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0,
-        ),
-      ),
-    );
-  }
-}
-
-class _ReviewProfileStatePanel extends StatelessWidget {
-  const _ReviewProfileStatePanel({
-    required this.icon,
-    required this.title,
-    required this.message,
-    required this.buttonLabel,
-    required this.onTap,
-    required this.scale,
-  });
-
-  final IconData icon;
-  final String title;
-  final String message;
-  final String buttonLabel;
-  final VoidCallback onTap;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: 78 * scale),
-      padding: EdgeInsets.symmetric(
-        horizontal: 28 * scale,
-        vertical: 54 * scale,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(28 * scale),
-        border: Border.all(
-          color: const Color(0xFFE3DDDF).withValues(alpha: 0.70),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF5E7775).withValues(alpha: 0.06),
-            blurRadius: 22 * scale,
-            offset: Offset(0, 10 * scale),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: const Color(0xFF00776F), size: 58 * scale),
-          SizedBox(height: 40 * scale),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: const Color(0xFF253228),
-              fontSize: FontSize.xxxl * scale,
-              fontWeight: FontWeight.w900,
-              height: 1,
-              letterSpacing: 0,
-            ),
-          ),
-          SizedBox(height: 24 * scale),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: const Color(0xFF515F54),
-              fontSize: FontSize.large * scale,
-              fontWeight: FontWeight.w800,
-              height: 1.25,
-              letterSpacing: 0,
-            ),
-          ),
-          SizedBox(height: 34 * scale),
-          Material(
-            color: _headerNavy,
-            shadowColor: _headerNavy.withValues(alpha: 0.20),
-            elevation: 4,
-            borderRadius: BorderRadius.circular(22 * scale),
-            child: InkWell(
-              onTap: () {
-                HapticFeedback.mediumImpact();
-                onTap();
-              },
-              borderRadius: BorderRadius.circular(22 * scale),
-              child: Container(
-                constraints: BoxConstraints(minWidth: 154 * scale),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 28 * scale,
-                  vertical: 15 * scale,
-                ),
-                child: Text(
-                  buttonLabel,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: FontSize.large * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatTile extends StatelessWidget {
-  const _StatTile({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.scale,
-  });
-
-  final String icon;
-  final String value;
-  final String label;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 18 * scale,
-        vertical: 14 * scale,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22 * scale),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 18 * scale,
-            offset: Offset(0, 8 * scale),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 46 * scale,
-            height: 46 * scale,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF7F2FF),
-              borderRadius: BorderRadius.circular(12 * scale),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              icon,
-              style: TextStyle(fontSize: FontSize.xxxl * scale, height: 1),
-            ),
-          ),
-          SizedBox(width: 14 * scale),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _reviewInk,
-                    fontSize: FontSize.xxxl * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-                SizedBox(height: 4 * scale),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _reviewMuted,
-                    fontSize: FontSize.normal * scale,
-                    fontWeight: FontWeight.w800,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ChapterCard extends StatelessWidget {
-  const _ChapterCard({
-    required this.chapter,
-    required this.completedLessons,
-    required this.totalLessons,
-    required this.selected,
-    required this.selectionMode,
-    required this.onToggleSelected,
-    required this.onStartTest,
-    required this.scale,
-  });
-
-  final PracticeChapter chapter;
-  final int completedLessons;
-  final int totalLessons;
-  final bool selected;
-  final bool selectionMode;
-  final VoidCallback onToggleSelected;
-  final VoidCallback onStartTest;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = _chapterColors(chapter.number);
-    final showButton = !selectionMode;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onToggleSelected,
-        borderRadius: BorderRadius.circular(28 * scale),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          padding: EdgeInsets.all(20 * scale),
-          decoration: BoxDecoration(
-            color: colors.background,
-            borderRadius: BorderRadius.circular(28 * scale),
-            border: selected
-                ? Border.all(color: _selectPink, width: 2.5 * scale)
-                : null,
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withValues(alpha: 0.13),
-                blurRadius: 22 * scale,
-                offset: Offset(0, 10 * scale),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _Badge(icon: chapter.icon, scale: scale),
-                  SizedBox(width: 14 * scale),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 3 * scale),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _chapterMetaText(context, chapter),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: _reviewMuted,
-                              fontSize: FontSize.normal * scale,
-                              fontWeight: FontWeight.w900,
-                              height: 1,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                          SizedBox(height: 6 * scale),
-                          Text(
-                            chapter.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: _reviewInk,
-                              fontSize: FontSize.xxxl * scale,
-                              fontWeight: FontWeight.w900,
-                              height: 1.08,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10 * scale),
-                  _SelectCircle(selected: selected, scale: scale),
-                ],
-              ),
-              if (showButton) ...[
-                SizedBox(height: 20 * scale),
-                _TestButton(enabled: true, scale: scale, onTap: onStartTest),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge({required this.icon, required this.scale});
-
-  final String icon;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 58 * scale,
-      height: 58 * scale,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16 * scale),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
-            blurRadius: 8 * scale,
-            offset: Offset(0, 4 * scale),
-          ),
-        ],
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        icon,
-        style: TextStyle(
-          fontSize: FontSize.xxxl * scale,
-          height: 1,
-          color: Colors.black,
-        ),
-      ),
-    );
-  }
-}
-
-class _SelectCircle extends StatelessWidget {
-  const _SelectCircle({required this.selected, required this.scale});
-
-  final bool selected;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      width: 34 * scale,
-      height: 34 * scale,
-      decoration: BoxDecoration(
-        color: selected ? _checkPink : Colors.transparent,
-        shape: BoxShape.circle,
-        border: selected
-            ? null
-            : Border.all(color: _uncheckedCircle, width: 2.4 * scale),
-      ),
-      child: selected
-          ? Icon(Icons.check_rounded, color: Colors.white, size: 25 * scale)
-          : null,
-    );
-  }
-}
-
-class _TestButton extends StatelessWidget {
-  const _TestButton({
-    required this.enabled,
-    required this.scale,
-    required this.onTap,
-  });
-
-  final bool enabled;
-  final double scale;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-      opacity: enabled ? 1 : 0.52,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: enabled ? onTap : null,
-          borderRadius: BorderRadius.circular(16 * scale),
-          child: _DepthButtonSurface(
-            radius: 16 * scale,
-            depth: 8 * scale,
-            padding: EdgeInsets.symmetric(
-              horizontal: 20 * scale,
-              vertical: 17 * scale,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.star_rounded,
-                  color: const Color(0xFF3B0031),
-                  size: 25 * scale,
-                ),
-                SizedBox(width: 14 * scale),
-                Flexible(
-                  child: Text(
-                    context.getText(AppKeys.test),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: const Color(0xFF3B0031),
-                      fontSize: FontSize.large * scale,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StartSelectedButton extends StatelessWidget {
-  const _StartSelectedButton({
-    required this.count,
-    required this.scale,
-    required this.onTap,
-  });
-
-  final int count;
-  final double scale;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18 * scale),
-        child: _DepthButtonSurface(
-          radius: 18 * scale,
-          depth: 8 * scale,
-          padding: EdgeInsets.symmetric(
-            horizontal: 18 * scale,
-            vertical: 18 * scale,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.star_rounded,
-                color: const Color(0xFF3B0031),
-                size: 24 * scale,
-              ),
-              SizedBox(width: 10 * scale),
-              Flexible(
-                child: Text(
-                  context.formatText(AppKeys.startTest, {'count': count}),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: const Color(0xFF3B0031),
-                    fontSize: FontSize.large * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ClearSelectionButton extends StatelessWidget {
-  const _ClearSelectionButton({required this.scale, required this.onTap});
-
-  final double scale;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      elevation: 6,
-      shadowColor: Colors.black.withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(18 * scale),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18 * scale),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minWidth: 106 * scale),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 14 * scale,
-              vertical: 22 * scale,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.close_rounded, color: _selectPink, size: 23 * scale),
-                SizedBox(width: 7 * scale),
-                Text(
-                  context.getText(AppKeys.clearSelection),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _selectPink,
-                    fontSize: FontSize.small * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DepthButtonSurface extends StatelessWidget {
-  const _DepthButtonSurface({
-    required this.radius,
-    required this.depth,
-    required this.padding,
-    required this.child,
-  });
-
-  final double radius;
-  final double depth;
-  final EdgeInsetsGeometry padding;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: DecoratedBox(
-        decoration: const BoxDecoration(color: _testShadow),
-        child: Padding(
-          padding: EdgeInsets.only(bottom: depth),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: _testYellow,
-              borderRadius: BorderRadius.circular(radius),
-            ),
-            child: Padding(
-              padding: padding,
-              child: Center(child: child),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ChapterCardColors {
-  const _ChapterCardColors({required this.background, required this.shadow});
-
-  final Color background;
-  final Color shadow;
-}
-
-_ChapterCardColors _chapterColors(int number) {
-  return switch (number) {
-    1 => const _ChapterCardColors(
-      background: Color(0xFFBFEFF4),
-      shadow: Color(0xFF62C7D2),
-    ),
-    2 => const _ChapterCardColors(
-      background: Color(0xFFD9F1DD),
-      shadow: Color(0xFF8DD39C),
-    ),
-    3 => const _ChapterCardColors(
-      background: Color(0xFFEADDF7),
-      shadow: Color(0xFFBDA1DA),
-    ),
-    _ => const _ChapterCardColors(
-      background: Color(0xFFFFF0B9),
-      shadow: Color(0xFFE8C85A),
-    ),
-  };
-}
-
-String _chapterMetaText(BuildContext context, PracticeChapter chapter) {
-  final label = chapter.description?.trim();
-  if (label != null && label.isNotEmpty) {
-    return label;
-  }
-
-  if (chapter.lessonCount <= 0) {
-    return '${context.getText(AppKeys.chapter)} ${chapter.number}';
-  }
-
-  return '${context.getText(AppKeys.chapter)} ${chapter.number} • '
-      '${chapter.lessonCount} ${context.getText(AppKeys.lessons)}';
-}
-
-int? _profileProgramId(StudentProfile profile) =>
-    profile.program?.programId ?? profile.program?.id ?? profile.programId;
-
-int? _profileGradeId(StudentProfile profile) =>
-    profile.grade?.gradeId ?? profile.grade?.id ?? profile.gradeId;
-
-int? _profileSemesterId(StudentProfile profile) =>
-    profile.semester?.semesterId ?? profile.semester?.id ?? profile.semesterId;
-
-List<PracticeChapter> _practiceChaptersFromApi(List<ChapterModel> chapters) {
-  final sorted = [...chapters]
-    ..sort((a, b) {
-      final left = a.displayOrder ?? 0;
-      final right = b.displayOrder ?? 0;
-      if (left != right) {
-        return left.compareTo(right);
-      }
-      return _chapterLabel(a).compareTo(_chapterLabel(b));
-    });
-
-  return List.generate(sorted.length, (index) {
-    final chapter = sorted[index];
-    final number = index + 1;
-    final lessonCount =
-        chapter.lessonCount ??
-        _fallbackPracticeChapter(number)?.lessonCount ??
-        0;
-
-    return PracticeChapter(
-      id: _practiceChapterId(chapter),
-      number: number,
-      title: _chapterDescription(chapter) ?? _chapterLabel(chapter),
-      description: _chapterLabel(chapter),
-      lessons: const <PracticeLesson>[],
-      lessonCountOverride: lessonCount,
-      completedLessons: _fakeCompletedLessons(number, lessonCount),
-      icon: _chapterIcon(number),
-    );
-  });
-}
-
-PracticeChapter? _fallbackPracticeChapter(int number) {
-  for (final chapter in gradeOnePracticeChapters) {
-    if (chapter.number == number) {
-      return chapter;
-    }
-  }
-  return null;
-}
-
-String _chapterLabel(ChapterModel chapter) {
-  return _nonEmpty(chapter.label) ?? 'Chapter';
-}
-
-String? _chapterDescription(ChapterModel chapter) {
-  return _nonEmpty(chapter.description);
-}
-
-String _practiceChapterId(ChapterModel chapter) {
-  final id = chapter.chapterId ?? chapter.id;
-  return id == null ? 'chapter-${chapter.displayOrder ?? 0}' : '$id';
-}
-
-String? _nonEmpty(String? value) {
-  final trimmed = value?.trim();
-  if (trimmed == null || trimmed.isEmpty) {
-    return null;
-  }
-  return trimmed;
-}
-
-String _chapterIcon(int number) {
-  return switch (number) {
-    2 => '🎯',
-    4 => '🔥',
-    _ => '🏆',
-  };
-}
-
-int _fakeCompletedLessons(int chapterNumber, int lessonCount) {
-  if (lessonCount <= 0) {
-    return 0;
-  }
-  return switch (chapterNumber) {
-    1 => lessonCount,
-    2 => (lessonCount * 0.38).round().clamp(1, lessonCount),
-    _ => 0,
-  };
 }

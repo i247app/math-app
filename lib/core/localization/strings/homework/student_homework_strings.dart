@@ -2,34 +2,32 @@ import '../../app_keys.dart';
 
 const studentHomeworkStrings = <String, Map<String, String>>{
   'vi': {
-    AppKeys.studentHomework: 'BÃ i táº­p',
-    AppKeys.studentHomeworkSearchHint: 'TÃ¬m kiáº¿m bÃ i táº­p',
-    AppKeys.studentHomeworkNotSubmitted: 'ChÆ°a ná»™p',
-    AppKeys.studentHomeworkSubmitted: 'ÄÃ£ ná»™p',
-    AppKeys.studentHomeworkOverdue: 'QuÃ¡ háº¡n',
+    AppKeys.studentHomework: 'Bài tập',
+    AppKeys.studentHomeworkSearchHint: 'Tìm kiếm bài tập',
+    AppKeys.studentHomeworkNotSubmitted: 'Chưa nộp',
+    AppKeys.studentHomeworkSubmitted: 'Đã nộp',
+    AppKeys.studentHomeworkOverdue: 'Quá hạn',
     AppKeys.studentHomeworkAssignedAt: '14:00 29/05/2026',
-    AppKeys.studentHomeworkReviewTitle: 'BÃ i Táº­p Ã”n Luyá»‡n',
-    AppKeys.studentHomeworkQuestionCount: '30 cÃ¢u há»i',
-    AppKeys.studentHomeworkDueDate: 'Háº¡n ná»™p: 31/05/2026',
-    AppKeys.studentHomeworkDueFormat: 'Háº¡n ná»™p: {date}',
+    AppKeys.studentHomeworkReviewTitle: 'Bài Tập Ôn Luyện',
+    AppKeys.studentHomeworkQuestionCount: '30 câu hỏi',
+    AppKeys.studentHomeworkDueDate: 'Hạn nộp: 31/05/2026',
+    AppKeys.studentHomeworkDueFormat: 'Hạn nộp: {date}',
     AppKeys.studentHomeworkLoadFailed:
-        'KhÃ´ng thá»ƒ táº£i bÃ i táº­p. Vui lÃ²ng thá»­ láº¡i.',
-    AppKeys.studentHomeworkNoQuestions: 'BÃ i táº­p chÆ°a cÃ³ cÃ¢u há»i.',
+        'Không thể tải bài tập. Vui lòng thử lại.',
+    AppKeys.studentHomeworkNoQuestions: 'Bài tập chưa có câu hỏi.',
     AppKeys.studentHomeworkQuestionMissingAnswers:
-        'BÃ i táº­p cÃ³ cÃ¢u há»i chÆ°a cÃ³ Ä‘Ã¡p Ã¡n.',
-    AppKeys.studentHomeworkSubmitSuccess: 'ÄÃ£ ná»™p bÃ i táº­p.',
+        'Bài tập có câu hỏi chưa có đáp án.',
+    AppKeys.studentHomeworkSubmitSuccess: 'Đã nộp bài tập.',
     AppKeys.studentHomeworkSubmitFailed:
-        'Ná»™p bÃ i táº­p tháº¥t báº¡i. Vui lÃ²ng thá»­ láº¡i.',
-    AppKeys.studentHomeworkMissingExercise:
-        'KhÃ´ng tÃ¬m tháº¥y bÃ i táº­p Ä‘á»ƒ ná»™p.',
-    AppKeys.studentHomeworkAlreadySubmitted:
-        'Báº¡n Ä‘Ã£ ná»™p bÃ i táº­p nÃ y rá»“i.',
-    AppKeys.studentHomeworkNotOpen: 'BÃ i táº­p chÆ°a má»Ÿ.',
-    AppKeys.noCompletedHomeworkTitle: 'ChÆ°a cÃ³ bÃ i táº­p nÃ o hoÃ n thÃ nh',
+        'Nộp bài tập thất bại. Vui lòng thử lại.',
+    AppKeys.studentHomeworkMissingExercise: 'Không tìm thấy bài tập để nộp.',
+    AppKeys.studentHomeworkAlreadySubmitted: 'Bạn đã nộp bài tập này rồi.',
+    AppKeys.studentHomeworkNotOpen: 'Bài tập chưa mở.',
+    AppKeys.noCompletedHomeworkTitle: 'Chưa có bài tập nào hoàn thành',
     AppKeys.noCompletedHomeworkMessage:
-        'Káº¿t quáº£ bÃ i táº­p cá»§a bÃ© sáº½ xuáº¥t hiá»‡n táº¡i Ä‘Ã¢y.',
-    AppKeys.homeworkExpiredCannotSubmit: 'BÃ i táº­p Ä‘Ã£ quÃ¡ háº¡n ná»™p.',
-    AppKeys.homeworkDueSoon: 'Sáº¯p háº¿t háº¡n',
+        'Kết quả bài tập của bé sẽ xuất hiện tại đây.',
+    AppKeys.homeworkExpiredCannotSubmit: 'Bài tập đã quá hạn nộp.',
+    AppKeys.homeworkDueSoon: 'Sắp hết hạn',
     AppKeys.homeworkFailed: 'Failed',
   },
   'en': {

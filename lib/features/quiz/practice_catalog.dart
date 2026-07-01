@@ -1,8 +1,5 @@
 class PracticeLesson {
-  const PracticeLesson({
-    required this.number,
-    required this.title,
-  });
+  const PracticeLesson({required this.number, required this.title});
 
   final int number;
   final String title;
@@ -85,25 +82,37 @@ const gradeOnePracticeChapters = <PracticeChapter>[
     lessons: [
       PracticeLesson(number: 18, title: 'Phép cộng trong phạm vi 10'),
       PracticeLesson(
-          number: 19, title: 'Phép cộng trong phạm vi 10 (tiếp theo)'),
+        number: 19,
+        title: 'Phép cộng trong phạm vi 10 (tiếp theo)',
+      ),
       PracticeLesson(number: 20, title: 'Luyện tập'),
       PracticeLesson(
-          number: 21, title: 'Phép cộng trong phạm vi 10 (tiếp theo)'),
+        number: 21,
+        title: 'Phép cộng trong phạm vi 10 (tiếp theo)',
+      ),
       PracticeLesson(number: 22, title: 'Luyện tập'),
       PracticeLesson(
-          number: 23, title: 'Phép cộng trong phạm vi 10 (tiếp theo)'),
+        number: 23,
+        title: 'Phép cộng trong phạm vi 10 (tiếp theo)',
+      ),
       PracticeLesson(number: 24, title: 'Luyện tập'),
       PracticeLesson(number: 25, title: 'Bảng cộng trong phạm vi 10'),
       PracticeLesson(number: 26, title: 'Luyện tập'),
       PracticeLesson(number: 27, title: 'Phép trừ trong phạm vi 10'),
       PracticeLesson(
-          number: 28, title: 'Phép trừ trong phạm vi 10 (tiếp theo)'),
+        number: 28,
+        title: 'Phép trừ trong phạm vi 10 (tiếp theo)',
+      ),
       PracticeLesson(number: 29, title: 'Luyện tập'),
       PracticeLesson(
-          number: 30, title: 'Phép trừ trong phạm vi 10 (tiếp theo)'),
+        number: 30,
+        title: 'Phép trừ trong phạm vi 10 (tiếp theo)',
+      ),
       PracticeLesson(number: 31, title: 'Luyện tập'),
       PracticeLesson(
-          number: 32, title: 'Phép trừ trong phạm vi 10 (tiếp theo)'),
+        number: 32,
+        title: 'Phép trừ trong phạm vi 10 (tiếp theo)',
+      ),
       PracticeLesson(number: 33, title: 'Luyện tập'),
       PracticeLesson(number: 34, title: 'Bảng trừ trong phạm vi 10'),
       PracticeLesson(number: 35, title: 'Luyện tập'),
@@ -120,7 +129,9 @@ const gradeOnePracticeChapters = <PracticeChapter>[
     lessons: [
       PracticeLesson(number: 39, title: 'Các số từ 11 đến 20'),
       PracticeLesson(
-          number: 40, title: 'Ki-lô-mét (Giới thiệu đơn vị đo độ dài: cm)'),
+        number: 40,
+        title: 'Ki-lô-mét (Giới thiệu đơn vị đo độ dài: cm)',
+      ),
       PracticeLesson(number: 41, title: 'Thực hành đo độ dài'),
       PracticeLesson(number: 42, title: 'Luyện tập'),
       PracticeLesson(number: 43, title: 'Các số tròn chục'),
@@ -136,7 +147,9 @@ const gradeOnePracticeChapters = <PracticeChapter>[
       PracticeLesson(number: 53, title: 'Dài hơn - Ngắn hơn'),
       PracticeLesson(number: 54, title: 'Đo độ dài'),
       PracticeLesson(
-          number: 55, title: 'Xăng-ti-mét. Đo độ dài theo đơn vị xăng-ti-mét'),
+        number: 55,
+        title: 'Xăng-ti-mét. Đo độ dài theo đơn vị xăng-ti-mét',
+      ),
       PracticeLesson(number: 56, title: 'Em vui học Toán'),
       PracticeLesson(number: 57, title: 'Ôn tập chủ đề 3'),
     ],
@@ -166,7 +179,9 @@ const gradeOnePracticeChapters = <PracticeChapter>[
       PracticeLesson(number: 74, title: 'Ôn tập chủ đề 4'),
       PracticeLesson(number: 75, title: 'Ôn tập các số trong phạm vi 100'),
       PracticeLesson(
-          number: 76, title: 'Ôn tập phép cộng, phép trừ trong phạm vi 100'),
+        number: 76,
+        title: 'Ôn tập phép cộng, phép trừ trong phạm vi 100',
+      ),
       PracticeLesson(number: 77, title: 'Ôn tập về hình học và đo lường'),
       PracticeLesson(number: 78, title: 'Ôn tập chung'),
     ],
