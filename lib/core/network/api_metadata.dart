@@ -31,20 +31,19 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
   Future<Map<String, Object>> buildMetadata() async {
     final clientInfo = await loadClientInfo();
     return <String, Object>{
-      'client_info': <String, Object>{
-        'device_id': clientInfo.deviceId,
-        'device_name': clientInfo.deviceName,
-        'device_push_token': clientInfo.devicePushToken,
-        'push_token': clientInfo.devicePushToken,
-        'model_name': clientInfo.modelName,
-        'platform': clientInfo.platform,
-        'system_version': clientInfo.systemVersion,
-        'timestamp': DateTime.now().toIso8601String(),
-        'version': clientInfo.version,
-        'build': clientInfo.buildNumber,
-        'app_version': clientInfo.appVersionLabel,
-        'language': AppLanguageState.currentApiCode,
-      },
+      'device_id': clientInfo.deviceId,
+      'device_name': clientInfo.deviceName,
+      'device_push_token': clientInfo.devicePushToken,
+      'push_token': clientInfo.devicePushToken,
+      'model_name': clientInfo.modelName,
+      'platform': clientInfo.platform,
+      'system_version': clientInfo.systemVersion,
+      'timestamp': DateTime.now().toIso8601String(),
+      'version': clientInfo.version,
+      'build': clientInfo.buildNumber,
+      'app_version': clientInfo.appVersionLabel,
+      'language': AppLanguageState.currentApiCode,
+      'ip_address': await _ipAddress(),
     };
   }
 
@@ -159,6 +158,28 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
     final bytes = List<int>.generate(16, (_) => random.nextInt(256));
     final hex = bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0'));
     return hex.join();
+  }
+
+  static Future<String> _ipAddress() async {
+    try {
+      final interfaces = await NetworkInterface.list(
+        type: InternetAddressType.IPv4,
+        includeLinkLocal: false,
+        includeLoopback: false,
+      );
+      for (final interface in interfaces) {
+        for (final address in interface.addresses) {
+          final ipAddress = address.address.trim();
+          if (ipAddress.isNotEmpty) {
+            return ipAddress;
+          }
+        }
+      }
+    } catch (error) {
+      debugPrint('AppApiMetadataProvider ip address error: $error');
+    }
+
+    return '';
   }
 }
 
