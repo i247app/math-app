@@ -1,7 +1,15 @@
-part of '../../presentation/assessment_screen.dart';
+import 'dart:ui';
 
-class _AssessmentHeader extends StatelessWidget {
-  const _AssessmentHeader({required this.scale});
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+
+class AssessmentHeader extends StatelessWidget {
+  const AssessmentHeader({super.key, required this.scale});
 
   final double scale;
 
@@ -15,7 +23,7 @@ class _AssessmentHeader extends StatelessWidget {
           height: 80 * scale,
           padding: EdgeInsets.symmetric(horizontal: 24 * scale),
           decoration: BoxDecoration(
-            color: _assessmentMint.withValues(alpha: 0.84),
+            color: AssessmentStyle.mint.withValues(alpha: 0.84),
             borderRadius: BorderRadius.vertical(
               bottom: Radius.circular(32 * scale),
             ),
@@ -29,9 +37,11 @@ class _AssessmentHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _HeaderIconButton(
+              QuizHeaderIconButton(
                 icon: Icons.close_rounded,
+                color: AssessmentStyle.teal,
                 scale: scale,
+                circle: true,
                 onTap: () => Navigator.of(context).maybePop(),
               ),
               SizedBox(width: 16 * scale),
@@ -41,7 +51,7 @@ class _AssessmentHeader extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: _assessmentTeal,
+                    color: AssessmentStyle.teal,
                     fontSize: 20 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -49,9 +59,11 @@ class _AssessmentHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              _HeaderIconButton(
+              QuizHeaderIconButton(
                 icon: Icons.help_outline_rounded,
+                color: AssessmentStyle.teal,
                 scale: scale,
+                circle: true,
                 onTap: HapticFeedback.selectionClick,
               ),
             ],

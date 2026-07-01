@@ -1,7 +1,10 @@
-part of '../../presentation/assessment_screen.dart';
+import 'package:flutter/material.dart';
 
-class _GeneratingQuestionLoader extends StatefulWidget {
-  const _GeneratingQuestionLoader({
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
+
+class GeneratingQuestionLoader extends StatelessWidget {
+  const GeneratingQuestionLoader({
     super.key,
     required this.scale,
     this.message,
@@ -11,6 +14,25 @@ class _GeneratingQuestionLoader extends StatefulWidget {
   final String? message;
 
   @override
-  State<_GeneratingQuestionLoader> createState() =>
-      _GeneratingQuestionLoaderState();
+  @override
+  Widget build(BuildContext context) {
+    return QuizWaveLoader(
+      scale: scale,
+      message: message,
+      letterStyle: TextStyle(
+        color: AssessmentStyle.teal,
+        fontSize: 40 * scale,
+        fontWeight: FontWeight.w900,
+        height: 1,
+        letterSpacing: 3 * scale,
+      ),
+      messageStyle: TextStyle(
+        color: AssessmentStyle.muted,
+        fontSize: 16 * scale,
+        fontWeight: FontWeight.w800,
+        height: 1.35,
+        letterSpacing: 0,
+      ),
+    );
+  }
 }

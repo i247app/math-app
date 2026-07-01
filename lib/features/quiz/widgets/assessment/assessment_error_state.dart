@@ -1,7 +1,12 @@
-part of '../../presentation/assessment_screen.dart';
+import 'package:flutter/material.dart';
 
-class _AssessmentErrorState extends StatelessWidget {
-  const _AssessmentErrorState({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/bottom_action_button.dart';
+
+class AssessmentErrorState extends StatelessWidget {
+  const AssessmentErrorState({
     super.key,
     required this.scale,
     required this.message,
@@ -24,12 +29,12 @@ class _AssessmentErrorState extends StatelessWidget {
               width: 72 * scale,
               height: 72 * scale,
               decoration: BoxDecoration(
-                color: _assessmentPeach.withValues(alpha: 0.58),
+                color: AssessmentStyle.peach.withValues(alpha: 0.58),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.refresh_rounded,
-                color: _assessmentRust,
+                color: AssessmentStyle.rust,
                 size: 34 * scale,
               ),
             ),
@@ -38,7 +43,7 @@ class _AssessmentErrorState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: _assessmentMuted,
+                color: AssessmentStyle.muted,
                 fontSize: 15 * scale,
                 fontWeight: FontWeight.w800,
                 height: 1.35,
@@ -48,7 +53,7 @@ class _AssessmentErrorState extends StatelessWidget {
             SizedBox(height: 24 * scale),
             SizedBox(
               width: 168 * scale,
-              child: _BottomActionButton(
+              child: AssessmentBottomActionButton(
                 label: context.getText(AppKeys.retryUpper),
                 icon: Icons.refresh_rounded,
                 foreground: const Color(0xFFBEFFF9),
@@ -57,7 +62,7 @@ class _AssessmentErrorState extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [_assessmentTeal, Color(0xFF73F1E7)],
+                  colors: [AssessmentStyle.teal, Color(0xFF73F1E7)],
                 ),
               ),
             ),

@@ -1,7 +1,15 @@
-part of '../../presentation/assessment_screen.dart';
+import 'dart:ui';
 
-class _AssessmentBottomBar extends StatelessWidget {
-  const _AssessmentBottomBar({
+import 'package:flutter/material.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/bottom_action_button.dart';
+
+class AssessmentBottomBar extends StatelessWidget {
+  const AssessmentBottomBar({
+    super.key,
     required this.scale,
     required this.canGoBack,
     required this.isLastQuestion,
@@ -31,7 +39,7 @@ class _AssessmentBottomBar extends StatelessWidget {
             24 * scale,
           ),
           decoration: BoxDecoration(
-            color: _assessmentMint.withValues(alpha: 0.90),
+            color: AssessmentStyle.mint.withValues(alpha: 0.90),
             border: Border(
               top: BorderSide(
                 color: const Color(0xFFCDE2CF).withValues(alpha: 0.30),
@@ -41,18 +49,18 @@ class _AssessmentBottomBar extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: _BottomActionButton(
+                child: AssessmentBottomActionButton(
                   label: context.getText(AppKeys.previousQuestionUpper),
                   icon: Icons.arrow_back_rounded,
-                  background: _assessmentPeach.withValues(alpha: 0.50),
-                  foreground: _assessmentRust,
+                  background: AssessmentStyle.peach.withValues(alpha: 0.50),
+                  foreground: AssessmentStyle.rust,
                   scale: scale,
                   onTap: canGoBack && !isSubmitting ? onBack : null,
                 ),
               ),
               SizedBox(width: 48 * scale),
               Expanded(
-                child: _BottomActionButton(
+                child: AssessmentBottomActionButton(
                   label: isSubmitting
                       ? context.getText(AppKeys.submittingUpper)
                       : isLastQuestion
@@ -67,7 +75,7 @@ class _AssessmentBottomBar extends StatelessWidget {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [_assessmentTeal, Color(0xFF73F1E7)],
+                    colors: [AssessmentStyle.teal, Color(0xFF73F1E7)],
                   ),
                 ),
               ),

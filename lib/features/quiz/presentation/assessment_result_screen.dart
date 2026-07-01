@@ -10,12 +10,12 @@ import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/features/quiz/cache/quiz_cache.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
 import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 
 part '../widgets/assessment_result/test_again_loader.dart';
-part '../widgets/assessment_result/test_again_loader_state.dart';
 part '../widgets/assessment_result/result_header.dart';
-part '../widgets/assessment_result/header_icon_button.dart';
 part '../widgets/assessment_result/score_ring.dart';
 part '../widgets/assessment_result/score_number.dart';
 part '../widgets/assessment_result/ai_review_card.dart';

@@ -1,7 +1,14 @@
-part of '../../presentation/assessment_screen.dart';
+import 'dart:math' as math;
 
-class _ProgressSection extends StatelessWidget {
-  const _ProgressSection({
+import 'package:flutter/material.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+
+class AssessmentProgressSection extends StatelessWidget {
+  const AssessmentProgressSection({
+    super.key,
     required this.scale,
     required this.currentQuestion,
     required this.totalQuestions,
@@ -27,7 +34,7 @@ class _ProgressSection extends StatelessWidget {
             'total': totalQuestions,
           }),
           style: TextStyle(
-            color: _assessmentMuted,
+            color: AssessmentStyle.muted,
             fontSize: 16 * scale,
             fontWeight: FontWeight.w900,
             height: 1.5,
@@ -49,7 +56,7 @@ class _ProgressSection extends StatelessWidget {
               return Container(
                 padding: EdgeInsets.all(inset),
                 decoration: BoxDecoration(
-                  color: _assessmentPeach,
+                  color: AssessmentStyle.peach,
                   borderRadius: BorderRadius.circular(999),
                   boxShadow: [
                     BoxShadow(
@@ -67,7 +74,7 @@ class _ProgressSection extends StatelessWidget {
                   width: fillWidth,
                   height: double.infinity,
                   decoration: BoxDecoration(
-                    color: _assessmentProgress,
+                    color: AssessmentStyle.progress,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: DecoratedBox(

@@ -1,7 +1,10 @@
-part of '../../presentation/assessment_screen.dart';
+import 'package:flutter/material.dart';
 
-class _BottomActionButton extends StatelessWidget {
-  const _BottomActionButton({
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+
+class AssessmentBottomActionButton extends StatelessWidget {
+  const AssessmentBottomActionButton({
+    super.key,
     required this.label,
     required this.icon,
     required this.foreground,
@@ -42,7 +45,7 @@ class _BottomActionButton extends StatelessWidget {
                 ? null
                 : [
                     BoxShadow(
-                      color: _assessmentTeal.withValues(alpha: 0.20),
+                      color: AssessmentStyle.teal.withValues(alpha: 0.20),
                       blurRadius: 6 * scale,
                       offset: Offset(0, 4 * scale),
                     ),

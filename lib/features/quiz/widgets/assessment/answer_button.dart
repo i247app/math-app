@@ -1,7 +1,11 @@
-part of '../../presentation/assessment_screen.dart';
+import 'package:flutter/material.dart';
 
-class _AnswerButton extends StatelessWidget {
-  const _AnswerButton({
+import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+
+class AssessmentAnswerButton extends StatelessWidget {
+  const AssessmentAnswerButton({
+    super.key,
     required this.answer,
     required this.selected,
     required this.scale,
@@ -16,9 +20,9 @@ class _AnswerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = selected
-        ? _assessmentTeal
+        ? AssessmentStyle.teal
         : Colors.black.withValues(alpha: 0);
-    final textColor = selected ? _assessmentTeal : _assessmentInk;
+    final textColor = selected ? AssessmentStyle.teal : AssessmentStyle.ink;
 
     return Material(
       color: Colors.transparent,
@@ -73,7 +77,7 @@ class _AnswerButton extends StatelessWidget {
                 padding: EdgeInsets.only(top: 4 * scale),
                 child: const DecoratedBox(
                   decoration: BoxDecoration(
-                    color: _assessmentTeal,
+                    color: AssessmentStyle.teal,
                     shape: BoxShape.circle,
                   ),
                 ),

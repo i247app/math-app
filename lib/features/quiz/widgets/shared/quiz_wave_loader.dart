@@ -1,6 +1,28 @@
-part of '../../presentation/assessment_screen.dart';
+import 'dart:math' as math;
 
-class _GeneratingQuestionLoaderState extends State<_GeneratingQuestionLoader>
+import 'package:flutter/material.dart';
+
+class QuizWaveLoader extends StatefulWidget {
+  const QuizWaveLoader({
+    super.key,
+    required this.scale,
+    required this.letterStyle,
+    this.message,
+    this.messageStyle,
+    this.messageHorizontalPadding = 32,
+  });
+
+  final double scale;
+  final TextStyle letterStyle;
+  final String? message;
+  final TextStyle? messageStyle;
+  final double messageHorizontalPadding;
+
+  @override
+  State<QuizWaveLoader> createState() => _QuizWaveLoaderState();
+}
+
+class _QuizWaveLoaderState extends State<QuizWaveLoader>
     with SingleTickerProviderStateMixin {
   late final AnimationController controller;
 
@@ -43,33 +65,20 @@ class _GeneratingQuestionLoaderState extends State<_GeneratingQuestionLoader>
 
                   return Transform.translate(
                     offset: Offset(0, lift),
-                    child: Text(
-                      letters[index],
-                      style: TextStyle(
-                        color: _assessmentTeal,
-                        fontSize: 40 * widget.scale,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                        letterSpacing: 3 * widget.scale,
-                      ),
-                    ),
+                    child: Text(letters[index], style: widget.letterStyle),
                   );
                 }),
               ),
               if (widget.message != null) ...[
                 SizedBox(height: 18 * widget.scale),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 32 * widget.scale),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: widget.messageHorizontalPadding * widget.scale,
+                  ),
                   child: Text(
                     widget.message!,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: _assessmentMuted,
-                      fontSize: 16 * widget.scale,
-                      fontWeight: FontWeight.w800,
-                      height: 1.35,
-                      letterSpacing: 0,
-                    ),
+                    style: widget.messageStyle,
                   ),
                 ),
               ],

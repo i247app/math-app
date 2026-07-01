@@ -1,7 +1,11 @@
-part of '../../presentation/assessment_screen.dart';
+import 'package:flutter/material.dart';
 
-class _AnswerGrid extends StatelessWidget {
-  const _AnswerGrid({
+import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/answer_button.dart';
+
+class AssessmentAnswerGrid extends StatelessWidget {
+  const AssessmentAnswerGrid({
+    super.key,
     required this.scale,
     required this.answers,
     required this.selectedAnswerLabel,
@@ -27,7 +31,7 @@ class _AnswerGrid extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final answer = answers[index];
-        return _AnswerButton(
+        return AssessmentAnswerButton(
           answer: answer,
           selected: answer.label == selectedAnswerLabel,
           scale: scale,

@@ -1,7 +1,13 @@
-part of '../../presentation/assessment_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuestionCard extends StatelessWidget {
-  const _QuestionCard({required this.scale, required this.question});
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+
+class AssessmentQuestionCard extends StatelessWidget {
+  const AssessmentQuestionCard({
+    super.key,
+    required this.scale,
+    required this.question,
+  });
 
   final double scale;
   final String question;
@@ -23,7 +29,7 @@ class _QuestionCard extends StatelessWidget {
           question,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: _assessmentInk,
+            color: AssessmentStyle.ink,
             fontSize: 72 * scale,
             fontWeight: FontWeight.w900,
             height: 1,

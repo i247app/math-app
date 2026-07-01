@@ -26,9 +26,13 @@ class _ResultHeader extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: _HeaderIconButton(
+            child: QuizHeaderIconButton(
               icon: Icons.arrow_back_rounded,
+              color: _resultHeaderTeal,
               scale: scale,
+              size: 40,
+              iconSize: 23,
+              borderRadius: 12,
               onTap: onBack,
             ),
           ),
