@@ -1,6 +1,6 @@
 import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/profile/models/profile_role.dart';
 
 class AppSessionState {
   const AppSessionState({

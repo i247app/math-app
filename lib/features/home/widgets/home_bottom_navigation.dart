@@ -9,7 +9,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
-import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/profile/models/profile_role.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 
 class HomeBottomNavigation extends StatelessWidget {

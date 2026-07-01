@@ -69,18 +69,17 @@ class ProfileAvatarCatalog {
     ),
   ];
 
+  static final Map<String, ProfileAvatarOption> _optionsByKey =
+      Map.unmodifiable(<String, ProfileAvatarOption>{
+        for (final option in options) option.key: option,
+      });
+
   static String? urlForKey(String? key) {
     final normalized = key?.trim();
     if (normalized == null || normalized.isEmpty) {
       return null;
     }
-
-    for (final option in options) {
-      if (option.key == normalized) {
-        return option.url;
-      }
-    }
-    return null;
+    return _optionsByKey[normalized]?.url;
   }
 
   static String? assetPathForKey(String? key) {
@@ -88,12 +87,6 @@ class ProfileAvatarCatalog {
     if (normalized == null || normalized.isEmpty) {
       return null;
     }
-
-    for (final option in options) {
-      if (option.key == normalized) {
-        return option.assetPath;
-      }
-    }
-    return null;
+    return _optionsByKey[normalized]?.assetPath;
   }
 }
