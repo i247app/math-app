@@ -202,7 +202,8 @@ class NetworkClient {
         type == DioExceptionType.sendTimeout) {
       return AppStrings.current(AppKeys.apiConnectTimeout);
     }
-    if (type == DioExceptionType.receiveTimeout) {
+    if (type == DioExceptionType.receiveTimeout ||
+        type.name == 'transformTimeout') {
       return AppStrings.current(AppKeys.apiReceiveTimeout);
     }
     if (type == DioExceptionType.connectionError) {

@@ -235,7 +235,7 @@ class LoginCard extends StatelessWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           child: phoneErrorText == null
-              ? const SizedBox(height: 24)
+              ? SizedBox(height: canLoginWithPin ? 18 : 24)
               : Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 16),
                   child: Text(
@@ -249,29 +249,12 @@ class LoginCard extends StatelessWidget {
                   ),
                 ),
         ),
-        // Actions
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 220),
-          child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
-              ? const _CheckingDots(key: ValueKey('checking-phone'))
-              : (canSendOtp)
-              ? _GreyActionButton(
-                  label: phoneExists == false
-                      ? context.getText(AppKeys.signup)
-                      : context.getText(AppKeys.login),
-                  onPressed: onSendOtp,
-                )
-              : const SizedBox(
-                  key: ValueKey('send-otp-placeholder'),
-                  height: 56, // same height as button to prevent jumping
-                ),
-        ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           child: canLoginWithPin
               ? Padding(
                   key: const ValueKey('login-with-pin'),
-                  padding: const EdgeInsets.only(top: 18),
+                  padding: const EdgeInsets.only(bottom: 12),
                   child: Center(
                     child: InkWell(
                       onTap: onLoginWithPin,
@@ -297,6 +280,23 @@ class LoginCard extends StatelessWidget {
                   ),
                 )
               : const SizedBox.shrink(key: ValueKey('no-pin-login')),
+        ),
+        // Actions
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 220),
+          child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
+              ? const _CheckingDots(key: ValueKey('checking-phone'))
+              : (canSendOtp)
+              ? _GreyActionButton(
+                  label: phoneExists == false
+                      ? context.getText(AppKeys.signup)
+                      : context.getText(AppKeys.login),
+                  onPressed: onSendOtp,
+                )
+              : const SizedBox(
+                  key: ValueKey('send-otp-placeholder'),
+                  height: 56, // same height as button to prevent jumping
+                ),
         ),
       ],
     );
