@@ -21,6 +21,8 @@ class PhoneCheckResult {
 class SendOtpResult {
   const SendOtpResult({
     required this.expiresIn,
+    this.requiredOtp = true,
+    this.user,
     this.otpId,
     this.otpCode,
     this.purpose,
@@ -28,6 +30,8 @@ class SendOtpResult {
     this.message,
   });
 
+  final bool requiredOtp;
+  final LoginUser? user;
   final String? otpId;
   final String? otpCode;
   final String? purpose;
@@ -69,6 +73,8 @@ class AuthPhoneLookupResult {
     this.expiresIn,
     this.message,
     this.status,
+    this.requiredOtp = true,
+    this.isTrusted,
   });
 
   final String phone;
@@ -80,6 +86,8 @@ class AuthPhoneLookupResult {
   final int? expiresIn;
   final String? message;
   final int? status;
+  final bool requiredOtp;
+  final bool? isTrusted;
 }
 
 extension on AuthUser {
@@ -119,6 +127,8 @@ abstract class OtpAuthService {
   Future<PhoneCheckResult> checkPhone(String phone);
 
   Future<AuthPhoneLookupResult> checkAuthPhone(String phone);
+
+  Future<AuthPhoneLookupResult> loginByPhone(String phone);
 
   Future<LoginUser?> restoreSession();
 
@@ -201,9 +211,14 @@ class OtpAuthApi implements OtpAuthService {
 
   @override
   Future<AuthPhoneLookupResult> checkAuthPhone(String phone) async {
+    return loginByPhone(phone);
+  }
+
+  @override
+  Future<AuthPhoneLookupResult> loginByPhone(String phone) async {
     final AuthResponse response;
     try {
-      response = await _networkApi.authOtp(LoginRequest(phone: phone));
+      response = await _networkApi.login(LoginRequest(phone: phone));
     } on NetworkException catch (error) {
       if (_isUserNotFoundStatus(error.status)) {
         _loginUsers.remove(phone);
@@ -224,24 +239,25 @@ class OtpAuthApi implements OtpAuthService {
     }
 
     _loginUsers[phone] = user;
-    return AuthPhoneLookupResult(phone: phone, exists: true, user: user);
+    return AuthPhoneLookupResult(
+      phone: phone,
+      exists: true,
+      user: user,
+      requiredOtp: response.requiredOtp ?? true,
+      isTrusted: response.isTrusted,
+    );
   }
 
   @override
   Future<SendOtpResult> sendLoginOtp(String phone) async {
-    final AuthResponse response;
+    final SendOtpResponse response;
     try {
-      response = await _networkApi.authOtp(LoginRequest(phone: phone));
+      response = await _networkApi.sendOtp(
+        SendOtpRequest(otpType: loginOtpType, identifier: phone),
+      );
     } on NetworkException catch (error) {
       throw OtpAuthException(error.message, status: error.status);
     }
-
-    final user = response.user?.toLoginUser(fallbackPhone: phone);
-    if (user == null) {
-      throw OtpAuthException(AppStrings.current(AppKeys.missingOtpUser));
-    }
-
-    _loginUsers[phone] = user;
 
     return SendOtpResult(
       otpCode: response.otpCode,
@@ -279,7 +295,7 @@ class OtpAuthApi implements OtpAuthService {
       return cachedUser;
     }
 
-    final result = await checkAuthPhone(phone);
+    final result = await loginByPhone(phone);
     final user = result.user;
     if (!result.exists || user == null) {
       throw const OtpAuthException('User not found', status: 202);

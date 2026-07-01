@@ -371,24 +371,57 @@ class AuthCubit extends Cubit<AuthState> {
     emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
 
     try {
-      final otp = await _authService.sendLoginOtp(phone);
+      final result = await _authService.loginByPhone(phone);
+      final user = result.user;
+      if (!result.exists) {
+        emit(
+          state.copyWith(
+            screen: AppScreen.login,
+            phoneNumber: phone,
+            checkedPhone: phone,
+            phoneExists: false,
+            phoneLookupError: result.message,
+            phoneLookupErrorStatus: result.status,
+            isSendingOtp: false,
+            clearAuthError: true,
+          ),
+        );
+        return;
+      }
+
+      if (user == null) {
+        emit(
+          state.copyWith(
+            isSendingOtp: false,
+            authError: AppStrings.current(AppKeys.missingOtpUser),
+          ),
+        );
+        return;
+      }
+
+      if (_canSkipLoginOtp(result)) {
+        final profileResolution = await _profilesForUser(user);
+        await _emitHomeOrPasscodeSetup(
+          user: user,
+          profileResolution: profileResolution,
+          isSendingOtp: false,
+        );
+        return;
+      }
+
       emit(
         state.copyWith(
           screen: AppScreen.otp,
           phoneNumber: phone,
-          otpExpiresAt: otp.expiresAt,
-          otpExpiresIn: otp.expiresIn,
-          devOtpCode: otp.otpCode,
-          devOtpPurpose: otp.purpose,
-          otpPreviewId: state.otpPreviewId + 1,
           otpFlow: OtpFlow.login,
-          isSendingOtp: false,
+          isSendingOtp: true,
           clearAuthError: true,
-          clearDevOtp: otp.otpCode == null,
-          clearOtpExpiry: otp.expiresAt == null,
+          clearDevOtp: true,
+          clearOtpExpiry: true,
           clearOtpError: true,
         ),
       );
+      await _sendLoginOtp(phone);
     } on OtpAuthException catch (error) {
       if (_isUserNotFoundStatus(error.status)) {
         emit(
@@ -411,6 +444,76 @@ class AuthCubit extends Cubit<AuthState> {
       _emitAuthError(
         AppStrings.current(AppKeys.loginOtpFailed),
         isSendingOtp: false,
+      );
+    }
+  }
+
+  Future<void> resendLoginOtp() async {
+    final phone = state.phoneNumber;
+    if (state.isSendingOtp || phone == null || phone.trim().isEmpty) {
+      return;
+    }
+
+    await _sendLoginOtp(phone);
+  }
+
+  Future<void> _sendLoginOtp(String phone) async {
+    emit(
+      state.copyWith(
+        isSendingOtp: true,
+        clearAuthError: true,
+        clearOtpError: true,
+      ),
+    );
+
+    try {
+      final otp = await _authService.sendLoginOtp(phone);
+      if (state.phoneNumber != phone) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          screen: AppScreen.otp,
+          phoneNumber: phone,
+          otpExpiresAt: otp.expiresAt,
+          otpExpiresIn: otp.expiresIn,
+          devOtpCode: otp.otpCode,
+          devOtpPurpose: otp.purpose,
+          otpPreviewId: state.otpPreviewId + 1,
+          otpFlow: OtpFlow.login,
+          isSendingOtp: false,
+          clearAuthError: true,
+          clearDevOtp: otp.otpCode == null,
+          clearOtpExpiry: otp.expiresAt == null,
+          clearOtpError: true,
+        ),
+      );
+    } on OtpAuthException catch (error) {
+      if (state.phoneNumber != phone) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          isSendingOtp: false,
+          otpError: error.message,
+          otpErrorId: state.otpErrorId + 1,
+          clearAuthError: true,
+        ),
+      );
+    } catch (_) {
+      if (state.phoneNumber != phone) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          isSendingOtp: false,
+          otpError: AppStrings.current(AppKeys.loginOtpFailed),
+          otpErrorId: state.otpErrorId + 1,
+          clearAuthError: true,
+        ),
       );
     }
   }
@@ -531,6 +634,10 @@ class AuthCubit extends Cubit<AuthState> {
 
   static bool _blocksLoginActions(int? status) {
     return status == 4006;
+  }
+
+  static bool _canSkipLoginOtp(AuthPhoneLookupResult result) {
+    return result.isTrusted == true && !result.requiredOtp;
   }
 
   Future<void> submitSignup({
@@ -703,27 +810,48 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     try {
-      final otp = await _authService.sendLoginOtp(phone);
+      final result = await _authService.loginByPhone(phone);
+      final user = result.user ?? pinUser;
+      if (_canSkipLoginOtp(result)) {
+        final profileResolution = await _profilesForUser(user);
+        await _rememberAuthenticatedAccount(user);
+        emit(
+          state.copyWith(
+            screen: AppScreen.home,
+            isPasscodeBusy: false,
+            loginUser: user,
+            profiles: profileResolution.profiles,
+            activeProfile: profileResolution.activeProfile,
+            profileLoadError: profileResolution.errorMessage,
+            clearAuthError: true,
+            clearOtpError: true,
+            clearActiveProfile: profileResolution.activeProfile == null,
+            clearProfileLoadError: profileResolution.errorMessage == null,
+            clearPendingSession: true,
+            clearPasscodeError: true,
+            passcodeLoginRequiresOtp: false,
+          ),
+        );
+        return;
+      }
+
       emit(
         state.copyWith(
           screen: AppScreen.otp,
           isPasscodeBusy: false,
           phoneNumber: phone,
-          otpExpiresAt: otp.expiresAt,
-          otpExpiresIn: otp.expiresIn,
-          devOtpCode: otp.otpCode,
-          devOtpPurpose: otp.purpose,
-          otpPreviewId: state.otpPreviewId + 1,
+          isSendingOtp: true,
           otpFlow: OtpFlow.login,
           clearAuthError: true,
-          clearDevOtp: otp.otpCode == null,
-          clearOtpExpiry: otp.expiresAt == null,
+          clearDevOtp: true,
+          clearOtpExpiry: true,
           clearOtpError: true,
           clearPendingSession: true,
           clearPasscodeError: true,
           passcodeLoginRequiresOtp: false,
         ),
       );
+      await _sendLoginOtp(phone);
     } on OtpAuthException catch (error) {
       emit(
         state.copyWith(
@@ -754,6 +882,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> _emitHomeOrPasscodeSetup({
     required LoginUser user,
     required _ResolvedProfiles profileResolution,
+    bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
   }) async {
@@ -763,6 +892,7 @@ class AuthCubit extends Cubit<AuthState> {
       emit(
         state.copyWith(
           screen: AppScreen.home,
+          isSendingOtp: isSendingOtp,
           isVerifyingOtp: isVerifyingOtp,
           isSigningUp: isSigningUp,
           loginUser: user,
@@ -784,6 +914,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(
       state.copyWith(
         screen: AppScreen.passcode,
+        isSendingOtp: isSendingOtp,
         isVerifyingOtp: isVerifyingOtp,
         isSigningUp: isSigningUp,
         pendingLoginUser: user,

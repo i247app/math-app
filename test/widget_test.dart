@@ -42,6 +42,9 @@ void main() {
     await tester.enterText(find.byType(EditableText), '0901234567');
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('ĐĂNG NHẬP'));
+    await tester.pumpAndSettle();
+
     expect(find.text('MÃ XÁC NHẬN'), findsOneWidget);
     final otpDigits = '7152'.split('');
     for (var index = 0; index < otpDigits.length; index++) {
@@ -86,8 +89,11 @@ void main() {
     await tester.enterText(find.byType(EditableText), '0999999999');
     await tester.pumpAndSettle();
 
-    expect(find.text('Đăng ký'), findsOneWidget);
-    await tester.tap(find.text('Đăng ký'));
+    await tester.tap(find.text('ĐĂNG NHẬP'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('ĐĂNG KÝ'), findsOneWidget);
+    await tester.tap(find.text('ĐĂNG KÝ'));
     await tester.pumpAndSettle();
 
     expect(find.text('MÃ XÁC NHẬN'), findsOneWidget);
@@ -148,6 +154,11 @@ class _FakeOtpAuthService implements OtpAuthService {
       exists: true,
       user: LoginUser(id: 1, phone: phone),
     );
+  }
+
+  @override
+  Future<AuthPhoneLookupResult> loginByPhone(String phone) {
+    return checkAuthPhone(phone);
   }
 
   @override

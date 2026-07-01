@@ -4,12 +4,7 @@ part 'auth_models.g.dart';
 
 @JsonSerializable(includeIfNull: false)
 class SignupRequest {
-  const SignupRequest({
-    required this.phone,
-    this.email,
-    this.name,
-    this.role,
-  });
+  const SignupRequest({required this.phone, this.email, this.name, this.role});
 
   final String phone;
   final String? email;
@@ -57,10 +52,7 @@ class LoginRequest {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class SendOtpRequest {
-  const SendOtpRequest({
-    required this.otpType,
-    required this.identifier,
-  });
+  const SendOtpRequest({required this.otpType, required this.identifier});
 
   final String otpType;
   final String identifier;
@@ -96,6 +88,8 @@ class AuthResponse {
     this.status,
     this.mmessage,
     this.debug,
+    this.isTrusted,
+    this.requiredOtp,
     this.accessToken,
     this.expiresAt,
     this.otpCode,
@@ -107,6 +101,10 @@ class AuthResponse {
   final String? status;
   final String? mmessage;
   final String? debug;
+  @JsonKey(name: 'is_trusted')
+  final bool? isTrusted;
+  @JsonKey(name: 'required_otp')
+  final bool? requiredOtp;
   @JsonKey(name: 'access_token')
   final String? accessToken;
   @JsonKey(name: 'expires_at')

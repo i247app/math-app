@@ -372,13 +372,9 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                       key: const ValueKey('otp'),
                       onBack: cubit.openLogin,
                       onConfirm: cubit.verifyLoginOtp,
-                      onResend: () {
-                        final phone = state.phoneNumber;
-                        if (phone != null) {
-                          cubit.submitLoginPhone(phone);
-                        }
-                      },
-                      isVerifyingOtp: state.isVerifyingOtp,
+                      onResend: cubit.resendLoginOtp,
+                      isVerifyingOtp:
+                          state.isVerifyingOtp || state.isSendingOtp,
                       resendSeconds: state.otpExpiresIn ?? 0,
                       resendResetId: state.otpPreviewId,
                       devOtpCode: state.devOtpCode,

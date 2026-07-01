@@ -38,7 +38,7 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
       'model_name': clientInfo.modelName,
       'platform': clientInfo.platform,
       'system_version': clientInfo.systemVersion,
-      'timestamp': DateTime.now().toIso8601String(),
+      'timestamp': DateTime.now().toUtc().toIso8601String(),
       'version': clientInfo.version,
       'build': clientInfo.buildNumber,
       'app_version': clientInfo.appVersionLabel,

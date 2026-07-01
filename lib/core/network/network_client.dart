@@ -293,8 +293,12 @@ class NetworkApi {
     return authResponse;
   }
 
+  Future<AuthResponse> login(LoginRequest request) {
+    return _post('/auth/login', request.toJson());
+  }
+
   Future<AuthResponse> authOtp(LoginRequest request) {
-    return _post('/auth/otp', request.toJson());
+    return login(request);
   }
 
   Future<AuthResponse> loginResume() {
