@@ -2,18 +2,16 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/auth/widgets/passcode/passcode_action_button.dart';
+import 'package:numi_flutter/features/auth/widgets/passcode/passcode_back_button.dart';
+import 'package:numi_flutter/features/auth/widgets/passcode/passcode_input_row.dart';
+import 'package:numi_flutter/features/auth/widgets/passcode/passcode_skip_button.dart';
 
-enum PasscodeScreenMode {
-  setup,
-  unlock,
-  verify,
-}
+enum PasscodeScreenMode { setup, unlock, verify }
 
 class PasscodeScreen extends StatefulWidget {
   const PasscodeScreen({
@@ -63,8 +61,10 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   @override
   void initState() {
     super.initState();
-    _controllers =
-        List.generate(passcodeLength, (_) => TextEditingController());
+    _controllers = List.generate(
+      passcodeLength,
+      (_) => TextEditingController(),
+    );
     _focusNodes = List.generate(passcodeLength, (_) => FocusNode());
     _shakeController = AnimationController(
       vsync: this,
@@ -111,8 +111,9 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         break;
       }
       _controllers[nextIndex].text = digit;
-      _controllers[nextIndex].selection =
-          const TextSelection.collapsed(offset: 1);
+      _controllers[nextIndex].selection = const TextSelection.collapsed(
+        offset: 1,
+      );
       nextIndex++;
     }
 
@@ -232,7 +233,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                       top: 28,
                                       width: 44,
                                       height: 44,
-                                      child: _PasscodeBackButton(
+                                      child: PasscodeBackButton(
                                         iconAsset: _backIconAsset,
                                         onPressed: widget.onBack,
                                       ),
@@ -320,7 +321,8 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                       child: AnimatedBuilder(
                                         animation: _shakeController,
                                         builder: (context, child) {
-                                          final offset = math.sin(
+                                          final offset =
+                                              math.sin(
                                                 _shakeController.value *
                                                     math.pi *
                                                     6,
@@ -332,7 +334,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                             child: child,
                                           );
                                         },
-                                        child: _PasscodeInputRow(
+                                        child: PasscodeInputRow(
                                           controllers: _controllers,
                                           focusNodes: _focusNodes,
                                           hasError: errorText != null,
@@ -347,8 +349,9 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                       right: 34,
                                       top: 491,
                                       child: AnimatedSwitcher(
-                                        duration:
-                                            const Duration(milliseconds: 180),
+                                        duration: const Duration(
+                                          milliseconds: 180,
+                                        ),
                                         child: errorText == null
                                             ? const SizedBox(height: 24)
                                             : Text(
@@ -356,8 +359,9 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                                 key: ValueKey(errorText),
                                                 textAlign: TextAlign.center,
                                                 style: GoogleFonts.andika(
-                                                  color:
-                                                      const Color(0xFFD9534F),
+                                                  color: const Color(
+                                                    0xFFD9534F,
+                                                  ),
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w800,
                                                   height: 1.25,
@@ -375,9 +379,10 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                         child: SizedBox(
                                           width: 230,
                                           height: 58,
-                                          child: _PasscodeActionButton(
-                                            label: context
-                                                .getText(_primaryLabelKey),
+                                          child: PasscodeActionButton(
+                                            label: context.getText(
+                                              _primaryLabelKey,
+                                            ),
                                             onPressed: isFull && !widget.isBusy
                                                 ? _handleSubmit
                                                 : null,
@@ -391,9 +396,10 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                         left: 0,
                                         right: 0,
                                         top: 626,
-                                        child: _PasscodeSkipButton(
-                                          label: context
-                                              .getText(AppKeys.passcodeSkip),
+                                        child: PasscodeSkipButton(
+                                          label: context.getText(
+                                            AppKeys.passcodeSkip,
+                                          ),
                                           onPressed: widget.isBusy
                                               ? null
                                               : widget.onSkip,
@@ -453,273 +459,5 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       PasscodeScreenMode.unlock => AppKeys.unlockPasscodeSubtitle,
       PasscodeScreenMode.verify => AppKeys.verifyPasscodeSubtitle,
     };
-  }
-}
-
-class _PasscodeBackButton extends StatelessWidget {
-  const _PasscodeBackButton({
-    required this.iconAsset,
-    required this.onPressed,
-  });
-
-  final String iconAsset;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.8),
-      shadowColor: Colors.black.withValues(alpha: 0.08),
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(999),
-        side: BorderSide(
-          color: const Color(0xFFA2B1A3).withValues(alpha: 0.1),
-        ),
-      ),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(999),
-        child: Center(
-          child: SvgPicture.asset(
-            iconAsset,
-            width: 16,
-            height: 16,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PasscodeInputRow extends StatelessWidget {
-  const _PasscodeInputRow({
-    required this.controllers,
-    required this.focusNodes,
-    required this.hasError,
-    required this.onChanged,
-    required this.onEmptyBackspace,
-  });
-
-  final List<TextEditingController> controllers;
-  final List<FocusNode> focusNodes;
-  final bool hasError;
-  final void Function(int index, String value) onChanged;
-  final void Function(int index) onEmptyBackspace;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(4, (index) {
-        return Padding(
-          padding: EdgeInsets.only(left: index == 0 ? 0 : 12),
-          child: SizedBox(
-            width: 64,
-            height: 70,
-            child: _PasscodeDigitBox(
-              controller: controllers[index],
-              focusNode: focusNodes[index],
-              autofocus: index == 0,
-              textInputAction:
-                  index == 3 ? TextInputAction.done : TextInputAction.next,
-              hasError: hasError,
-              onChanged: (value) => onChanged(index, value),
-              onEmptyBackspace: () => onEmptyBackspace(index),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-}
-
-class _PasscodeDigitBox extends StatelessWidget {
-  const _PasscodeDigitBox({
-    required this.controller,
-    required this.focusNode,
-    required this.autofocus,
-    required this.textInputAction,
-    required this.hasError,
-    required this.onChanged,
-    required this.onEmptyBackspace,
-  });
-
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool autofocus;
-  final TextInputAction textInputAction;
-  final bool hasError;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onEmptyBackspace;
-
-  @override
-  Widget build(BuildContext context) {
-    return Focus(
-      onKeyEvent: (node, event) {
-        if (event is KeyDownEvent &&
-            event.logicalKey == LogicalKeyboardKey.backspace &&
-            controller.text.isEmpty) {
-          onEmptyBackspace();
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: hasError ? const Color(0xFFD9534F) : const Color(0xFF6E7474),
-            width: 3,
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0xFFDCBFC8),
-              blurRadius: 0,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: TextField(
-            controller: controller,
-            focusNode: focusNode,
-            autofocus: autofocus,
-            textAlign: TextAlign.center,
-            textAlignVertical: TextAlignVertical.center,
-            keyboardType: TextInputType.number,
-            textInputAction: textInputAction,
-            obscureText: true,
-            obscuringCharacter: '•',
-            maxLength: 1,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            onChanged: onChanged,
-            onTap: () {
-              controller.selection = TextSelection(
-                baseOffset: 0,
-                extentOffset: controller.text.length,
-              );
-            },
-            style: GoogleFonts.andika(
-              color: AppColors.ink,
-              fontSize: 34,
-              fontWeight: FontWeight.w700,
-              height: 1,
-              letterSpacing: 0,
-            ),
-            decoration: const InputDecoration(
-              counterText: '',
-              border: InputBorder.none,
-              isCollapsed: true,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PasscodeActionButton extends StatelessWidget {
-  const _PasscodeActionButton({
-    required this.label,
-    required this.onPressed,
-    this.isBusy = false,
-  });
-
-  final String label;
-  final VoidCallback? onPressed;
-  final bool isBusy;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 230,
-        height: 58,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF38898D),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            disabledBackgroundColor: const Color(0xFFB5BFC2),
-            disabledForegroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          child: isBusy
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.4,
-                    color: Colors.white,
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          label,
-                          maxLines: 1,
-                          style: GoogleFonts.andika(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            height: 1.1,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PasscodeSkipButton extends StatelessWidget {
-  const _PasscodeSkipButton({
-    required this.label,
-    required this.onPressed,
-  });
-
-  final String label;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(10),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Text(
-            label,
-            style: GoogleFonts.andika(
-              color: onPressed == null
-                  ? const Color(0xFF001741).withValues(alpha: 0.45)
-                  : const Color(0xFF001741),
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              height: 20 / 16,
-              decoration: TextDecoration.underline,
-              decorationColor: onPressed == null
-                  ? const Color(0xFF001741).withValues(alpha: 0.45)
-                  : const Color(0xFF001741),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

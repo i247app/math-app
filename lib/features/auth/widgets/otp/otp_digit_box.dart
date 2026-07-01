@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/core/theme/app_colors.dart';
+
+class OtpDigitBox extends StatelessWidget {
+  const OtpDigitBox({
+    super.key,
+    required this.controller,
+    required this.focusNode,
+    required this.autofocus,
+    required this.textInputAction,
+    required this.onChanged,
+    required this.onEmptyBackspace,
+    required this.hasError,
+  });
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool autofocus;
+  final TextInputAction textInputAction;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onEmptyBackspace;
+  final bool hasError;
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.backspace &&
+            controller.text.isEmpty) {
+          onEmptyBackspace();
+          return KeyEventResult.handled;
+        }
+
+        return KeyEventResult.ignored;
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: hasError ? const Color(0xFFD9534F) : const Color(0xFFF47B55),
+            width: 2.3,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFF47B55).withValues(alpha: 0.22),
+              blurRadius: 0,
+              offset: const Offset(0, 5),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 14,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Center(
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            autofocus: autofocus,
+            textAlign: TextAlign.center,
+            textAlignVertical: TextAlignVertical.center,
+            keyboardType: TextInputType.number,
+            textInputAction: textInputAction,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onChanged: onChanged,
+            onTap: () {
+              controller.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: controller.text.length,
+              );
+            },
+            style: GoogleFonts.andika(
+              color: AppColors.ink,
+              fontSize: 36,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0,
+            ),
+            decoration: const InputDecoration(
+              counterText: '',
+              border: InputBorder.none,
+              isCollapsed: true,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/utils/phone_input_formatter.dart';
+import 'package:numi_flutter/features/auth/phone_region.dart';
+import 'package:numi_flutter/features/auth/widgets/login/login_action_button.dart';
+import 'package:numi_flutter/features/auth/widgets/login/login_checking_dots.dart';
+import 'package:numi_flutter/features/auth/widgets/login/phone_region_menu.dart';
+
+class LoginCard extends StatelessWidget {
+  const LoginCard({
+    super.key,
+    required this.controller,
+    required this.region,
+    required this.onRegionChanged,
+    required this.onSendOtp,
+    required this.isSendingOtp,
+    required this.isCheckingAuthPhone,
+    required this.canSendOtp,
+    required this.canLoginWithPin,
+    required this.onLoginWithPin,
+    required this.onPhoneChanged,
+    this.phoneExists,
+    this.phoneErrorText,
+  });
+
+  final TextEditingController controller;
+  final PhoneRegion region;
+  final ValueChanged<PhoneRegion> onRegionChanged;
+  final VoidCallback onSendOtp;
+  final bool isSendingOtp;
+  final bool isCheckingAuthPhone;
+  final bool canSendOtp;
+  final bool canLoginWithPin;
+  final VoidCallback onLoginWithPin;
+  final ValueChanged<String> onPhoneChanged;
+  final bool? phoneExists;
+  final String? phoneErrorText;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFB5BFC2), width: 1.5),
+          ),
+          child: Row(
+            children: [
+              PhoneRegionMenu(region: region, onChanged: onRegionChanged),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Container(
+                  width: 1,
+                  height: 24,
+                  color: const Color(0xFFE2E8F0),
+                ),
+              ),
+              Expanded(
+                child: TextField(
+                  key: ValueKey(region),
+                  controller: controller,
+                  keyboardType: TextInputType.phone,
+                  autofillHints: null,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  enableIMEPersonalizedLearning: false,
+                  smartDashesType: SmartDashesType.disabled,
+                  smartQuotesType: SmartQuotesType.disabled,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    PhoneInputFormatter(region),
+                  ],
+                  onChanged: onPhoneChanged,
+                  decoration: InputDecoration(
+                    hintText: region.hint,
+                    hintStyle: GoogleFonts.andika(
+                      color: const Color(0xFFB9C2C5),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                    ),
+                    border: InputBorder.none,
+                    isCollapsed: true,
+                  ),
+                  style: GoogleFonts.andika(
+                    color: AppColors.ink,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 180),
+          child: phoneErrorText == null
+              ? SizedBox(height: canLoginWithPin ? 18 : 24)
+              : Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 16),
+                  child: Text(
+                    phoneErrorText!,
+                    style: const TextStyle(
+                      color: Color(0xFFD9534F),
+                      fontSize: 13,
+                      height: 1.25,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 180),
+          child: canLoginWithPin
+              ? Padding(
+                  key: const ValueKey('login-with-pin'),
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Center(
+                    child: InkWell(
+                      onTap: onLoginWithPin,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        child: Text(
+                          context.getText(AppKeys.loginWithPin),
+                          style: GoogleFonts.andika(
+                            color: const Color(0xFF001741),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            height: 20 / 16,
+                            decoration: TextDecoration.underline,
+                            decorationColor: const Color(0xFF001741),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(key: ValueKey('no-pin-login')),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 220),
+          child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
+              ? const LoginCheckingDots(key: ValueKey('checking-phone'))
+              : (canSendOtp)
+              ? LoginActionButton(
+                  label: phoneExists == false
+                      ? context.getText(AppKeys.signup)
+                      : context.getText(AppKeys.login),
+                  onPressed: onSendOtp,
+                )
+              : const SizedBox(
+                  key: ValueKey('send-otp-placeholder'),
+                  height: 56,
+                ),
+        ),
+      ],
+    );
+  }
+}
