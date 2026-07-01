@@ -54,7 +54,7 @@ class _HistoryBody extends StatelessWidget {
             _HistoryHomeworkCard(
               exercise: exercise,
               scale: scale,
-              onTap: () => _openHomeworkResult(context, exercise),
+              onTap: () => _historyOpenHomeworkResult(context, exercise),
             ),
             SizedBox(height: 14 * scale),
           ],
@@ -66,7 +66,7 @@ class _HistoryBody extends StatelessWidget {
             _HistoryQuizCard(
               quiz: quiz,
               scale: scale,
-              onTap: () => _openQuizReview(context, quiz),
+              onTap: () => _historyOpenQuizReview(context, quiz),
             ),
             SizedBox(height: 14 * scale),
           ],

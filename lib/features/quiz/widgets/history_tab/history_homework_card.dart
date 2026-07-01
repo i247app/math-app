@@ -14,7 +14,9 @@ class _HistoryHomeworkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scorePercent = _historyHomeworkScorePercentage(exercise);
-    final dateParts = _historyDateParts(_historyHomeworkDateText(exercise));
+    final dateParts = _historyDatePartsFromIso(
+      _historyHomeworkDateText(exercise),
+    );
     final radius = BorderRadius.circular(24 * scale);
 
     return Material(
@@ -49,7 +51,7 @@ class _HistoryHomeworkCard extends StatelessWidget {
               if (scorePercent != null)
                 _HistoryScoreBadge(
                   percentage: scorePercent,
-                  colors: _scoreColors(context, scorePercent),
+                  colors: _historyScoreColors(context, scorePercent),
                   scale: scale,
                 )
               else

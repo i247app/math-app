@@ -9,39 +9,39 @@ import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/features/quiz/cache/quiz_cache.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 
-part '../widgets/quiz_review/review_header.dart';
-part '../widgets/quiz_review/review_content.dart';
-part '../widgets/quiz_review/mode_tabs.dart';
-part '../widgets/quiz_review/mode_tab_button.dart';
-part '../widgets/quiz_review/stats_card.dart';
-part '../widgets/quiz_review/stat_item.dart';
-part '../widgets/quiz_review/question_selector.dart';
-part '../widgets/quiz_review/centered_text.dart';
-part '../widgets/quiz_review/question_card.dart';
-part '../widgets/quiz_review/retry_question_view.dart';
-part '../widgets/quiz_review/result_question_list.dart';
-part '../widgets/quiz_review/result_question_card.dart';
-part '../widgets/quiz_review/question_badge.dart';
-part '../widgets/quiz_review/question_status.dart';
-part '../widgets/quiz_review/question_navigation_bar.dart';
-part '../widgets/quiz_review/nav_button.dart';
-part '../widgets/quiz_review/answer_list.dart';
-part '../widgets/quiz_review/answer_tile.dart';
-part '../widgets/quiz_review/review_card.dart';
-part '../widgets/quiz_review/review_loading_content.dart';
-part '../widgets/quiz_review/review_loading_content_state.dart';
-part '../widgets/quiz_review/review_question_loading_section.dart';
-part '../widgets/quiz_review/review_question_loading_section_state.dart';
-part '../widgets/quiz_review/review_question_skeleton.dart';
-part '../widgets/quiz_review/skeleton_block.dart';
-part '../widgets/quiz_review/inline_error.dart';
-part '../widgets/quiz_review/review_state_panel.dart';
-part '../widgets/quiz_review/selected_answer_label.dart';
-part '../widgets/quiz_review/correct_answer_label.dart';
-part '../widgets/quiz_review/computed_correct_count.dart';
-part '../widgets/quiz_review/time_label.dart';
-part '../widgets/quiz_review/question_font_size.dart';
-part '../widgets/quiz_review/two_digits.dart';
+part '../widgets/quiz_review/quiz_review_header.dart';
+part '../widgets/quiz_review/quiz_review_content.dart';
+part '../widgets/quiz_review/quiz_review_mode_tabs.dart';
+part '../widgets/quiz_review/quiz_review_mode_tab_button.dart';
+part '../widgets/quiz_review/quiz_review_stats_card.dart';
+part '../widgets/quiz_review/quiz_review_stat_item.dart';
+part '../widgets/quiz_review/quiz_review_question_selector.dart';
+part '../widgets/quiz_review/quiz_review_centered_text.dart';
+part '../widgets/quiz_review/quiz_review_question_card.dart';
+part '../widgets/quiz_review/quiz_review_retry_question_view.dart';
+part '../widgets/quiz_review/quiz_review_result_question_list.dart';
+part '../widgets/quiz_review/quiz_review_result_question_card.dart';
+part '../widgets/quiz_review/quiz_review_question_badge.dart';
+part '../widgets/quiz_review/quiz_review_question_status.dart';
+part '../widgets/quiz_review/quiz_review_question_navigation_bar.dart';
+part '../widgets/quiz_review/quiz_review_nav_button.dart';
+part '../widgets/quiz_review/quiz_review_answer_list.dart';
+part '../widgets/quiz_review/quiz_review_answer_tile.dart';
+part '../widgets/quiz_review/quiz_review_card.dart';
+part '../widgets/quiz_review/quiz_review_loading_content.dart';
+part '../widgets/quiz_review/quiz_review_loading_content_state.dart';
+part '../widgets/quiz_review/quiz_review_question_loading_section.dart';
+part '../widgets/quiz_review/quiz_review_question_loading_section_state.dart';
+part '../widgets/quiz_review/quiz_review_question_skeleton.dart';
+part '../widgets/quiz_review/quiz_review_skeleton_block.dart';
+part '../widgets/quiz_review/quiz_review_inline_error.dart';
+part '../widgets/quiz_review/quiz_review_state_panel.dart';
+part '../widgets/quiz_review/quiz_review_selected_answer_label.dart';
+part '../widgets/quiz_review/quiz_review_correct_answer_label.dart';
+part '../widgets/quiz_review/quiz_review_computed_correct_count.dart';
+part '../widgets/quiz_review/quiz_review_time_label.dart';
+part '../widgets/quiz_review/quiz_review_question_font_size.dart';
+part '../widgets/quiz_review/quiz_review_two_digits.dart';
 
 const _reviewBackground = Color(0xFFEEF9FB);
 const _teal = Color(0xFF007A78);
@@ -56,7 +56,7 @@ const _deepInk = Color(0xFF1F2B2B);
 const _cardBorder = Color(0xFFDCE8EA);
 const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
-enum _ReviewMode { retry, result }
+enum _QuizReviewMode { retry, result }
 
 class QuizReviewScreen extends StatefulWidget {
   const QuizReviewScreen({super.key, required this.quizId, this.initialQuiz});
@@ -78,7 +78,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
   String? _errorMessage;
   int _selectedIndex = 0;
   int _loadRequestId = 0;
-  _ReviewMode _mode = _ReviewMode.retry;
+  _QuizReviewMode _mode = _QuizReviewMode.retry;
   final Map<int, String> _submittedAnswers = <int, String>{};
   final Map<int, String> _retryAnswers = <int, String>{};
 
@@ -160,7 +160,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
     });
   }
 
-  void _selectMode(_ReviewMode mode) {
+  void _selectMode(_QuizReviewMode mode) {
     HapticFeedback.selectionClick();
     setState(() => _mode = mode);
   }
@@ -213,17 +213,19 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
         bottom: false,
         child: Column(
           children: [
-            _ReviewHeader(onBack: () => Navigator.of(context).pop()),
+            _QuizReviewHeader(onBack: () => Navigator.of(context).pop()),
             Expanded(
               child: quiz == null
                   ? _isLoading
-                        ? const _ReviewLoadingContent(showHeaderSkeleton: false)
-                        : _ReviewStatePanel(
+                        ? const _QuizReviewLoadingContent(
+                            showHeaderSkeleton: false,
+                          )
+                        : _QuizReviewStatePanel(
                             isLoading: false,
                             message: _errorMessage,
                             onRetry: () => _loadQuizDetail(forceRefresh: true),
                           )
-                  : _ReviewContent(
+                  : _QuizReviewContent(
                       quiz: quiz,
                       selectedIndex: _selectedIndex,
                       mode: _mode,

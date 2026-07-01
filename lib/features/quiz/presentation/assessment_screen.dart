@@ -9,14 +9,14 @@ import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/features/quiz/controllers/assessment_controller.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/assessment_result_screen.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/answer_grid.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_answer_grid.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_bottom_bar.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_error_state.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_generating_loader.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_header.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_progress_section.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_question_card.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/generating_question_loader.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/progress_section.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/question_card.dart';
 
 const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
@@ -288,7 +288,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                       onRetry: retryErrorAction,
                                     )
                                   : isSubmittingQuiz
-                                  ? GeneratingQuestionLoader(
+                                  ? AssessmentGeneratingLoader(
                                       key: const ValueKey('submit-loader'),
                                       scale: scale,
                                       message: context.getText(
@@ -296,7 +296,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                       ),
                                     )
                                   : isGeneratingQuestion
-                                  ? GeneratingQuestionLoader(
+                                  ? AssessmentGeneratingLoader(
                                       key: const ValueKey('question-loader'),
                                       scale: scale,
                                       message: context.getText(

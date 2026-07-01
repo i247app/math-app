@@ -8,7 +8,7 @@ class _HistoryScoreBadge extends StatelessWidget {
   });
 
   final int percentage;
-  final _ScoreBadgeColors colors;
+  final _HistoryScoreBadgeColors colors;
   final double scale;
 
   @override

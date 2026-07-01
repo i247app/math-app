@@ -15,8 +15,8 @@ class _HistoryQuizCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final grading = quiz.grading;
     final percent = grading?.scorePercentage;
-    final scoreColors = _scoreColors(context, percent);
-    final dateParts = _historyDateParts(quiz.createDt);
+    final scoreColors = _historyScoreColors(context, percent);
+    final dateParts = _historyDatePartsFromIso(quiz.createDt);
 
     final radius = BorderRadius.circular(24 * scale);
 
@@ -66,7 +66,7 @@ class _HistoryQuizCard extends StatelessWidget {
                     _HistoryMetaRow(parts: dateParts, scale: scale),
                     SizedBox(height: 7 * scale),
                     Text(
-                      _quizTitle(context, quiz),
+                      _historyQuizTitle(context, quiz),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -77,7 +77,7 @@ class _HistoryQuizCard extends StatelessWidget {
                         letterSpacing: 0,
                       ),
                     ),
-                    if (_quizShortText(quiz) case final shortText?) ...[
+                    if (_historyQuizShortText(quiz) case final shortText?) ...[
                       SizedBox(height: 4 * scale),
                       Text(
                         shortText,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/bottom_action_button.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
 
 class AssessmentErrorState extends StatelessWidget {
   const AssessmentErrorState({

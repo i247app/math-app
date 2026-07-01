@@ -6,7 +6,7 @@ int? _historyHomeworkScorePercentage(ClassroomExercise exercise) {
     return null;
   }
 
-  final percentage = _metadataInt(metadata, const [
+  final percentage = _historyMetadataInt(metadata, const [
     'score_percentage',
     'score',
     'percentage',
@@ -15,12 +15,12 @@ int? _historyHomeworkScorePercentage(ClassroomExercise exercise) {
     return percentage.clamp(0, 100);
   }
 
-  final correct = _metadataInt(metadata, const [
+  final correct = _historyMetadataInt(metadata, const [
     'correct_number',
     'correct_count',
     'correct_answers',
   ]);
-  final total = _metadataInt(metadata, const [
+  final total = _historyMetadataInt(metadata, const [
     'total_questions',
     'question_count',
     'total',

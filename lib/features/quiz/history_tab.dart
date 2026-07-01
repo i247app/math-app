@@ -25,8 +25,8 @@ part 'widgets/history_tab/history_filter.dart';
 part 'widgets/history_tab/history_type_tabs.dart';
 part 'widgets/history_tab/history_type_tab_button.dart';
 part 'widgets/history_tab/history_body.dart';
-part 'widgets/history_tab/open_quiz_review.dart';
-part 'widgets/history_tab/open_homework_result.dart';
+part 'widgets/history_tab/history_open_quiz_review.dart';
+part 'widgets/history_tab/history_open_homework_result.dart';
 part 'widgets/history_tab/history_quiz_card.dart';
 part 'widgets/history_tab/history_homework_card.dart';
 part 'widgets/history_tab/history_meta_row.dart';
@@ -39,25 +39,25 @@ part 'widgets/history_tab/history_loading_state_state.dart';
 part 'widgets/history_tab/history_skeleton_card.dart';
 part 'widgets/history_tab/history_skeleton_block.dart';
 part 'widgets/history_tab/history_message_state.dart';
-part 'widgets/history_tab/score_badge_colors.dart';
+part 'widgets/history_tab/history_score_badge_colors.dart';
 part 'widgets/history_tab/history_date_parts.dart';
-part 'widgets/history_tab/quiz_title.dart';
-part 'widgets/history_tab/quiz_short_text.dart';
+part 'widgets/history_tab/history_quiz_title.dart';
+part 'widgets/history_tab/history_quiz_short_text.dart';
 part 'widgets/history_tab/history_homework_title.dart';
 part 'widgets/history_tab/history_homework_short_text.dart';
 part 'widgets/history_tab/history_homework_date_text.dart';
 part 'widgets/history_tab/history_homework_score_text.dart';
 part 'widgets/history_tab/history_homework_score_percentage.dart';
-part 'widgets/history_tab/score_colors.dart';
-part 'widgets/history_tab/quiz_purpose.dart';
-part 'widgets/history_tab/is_assessment_quiz.dart';
-part 'widgets/history_tab/is_submitted_homework.dart';
-part 'widgets/history_tab/compare_quiz_history_descending.dart';
-part 'widgets/history_tab/compare_homework_history_descending.dart';
+part 'widgets/history_tab/history_score_colors.dart';
+part 'widgets/history_tab/history_quiz_purpose.dart';
+part 'widgets/history_tab/history_is_assessment_quiz.dart';
+part 'widgets/history_tab/history_is_submitted_homework.dart';
+part 'widgets/history_tab/history_compare_quiz_descending.dart';
+part 'widgets/history_tab/history_compare_homework_descending.dart';
 part 'widgets/history_tab/history_date_value.dart';
-part 'widgets/history_tab/metadata_int.dart';
-part 'widgets/history_tab/history_date_parts_2.dart';
-part 'widgets/history_tab/two_digits.dart';
+part 'widgets/history_tab/history_metadata_int.dart';
+part 'widgets/history_tab/history_date_parts_from_iso.dart';
+part 'widgets/history_tab/history_two_digits.dart';
 
 const _teal = Color(0xFF006762);
 const _muted = Color(0xFF5D4A54);
@@ -178,14 +178,18 @@ class _HistoryTabState extends State<HistoryTab> {
       setState(() {
         if (cachedQuizzes != null) {
           _assessmentQuizzes =
-              cachedQuizzes.where(_isAssessmentQuiz).toList(growable: false)
-                ..sort(_compareQuizHistoryDescending);
+              cachedQuizzes
+                  .where(_historyIsAssessmentQuiz)
+                  .toList(growable: false)
+                ..sort(_historyCompareQuizDescending);
           _assessmentErrorMessage = null;
         }
         if (cachedHomework != null) {
           _homeworkExercises =
-              cachedHomework.where(_isSubmittedHomework).toList(growable: false)
-                ..sort(_compareHomeworkHistoryDescending);
+              cachedHomework
+                  .where(_historyIsSubmittedHomework)
+                  .toList(growable: false)
+                ..sort(_historyCompareHomeworkDescending);
           _homeworkErrorMessage = null;
         }
         _isLoading = false;
@@ -225,8 +229,8 @@ class _HistoryTabState extends State<HistoryTab> {
           )
           .then((quizzes) {
             assessmentQuizzes =
-                quizzes.where(_isAssessmentQuiz).toList(growable: false)
-                  ..sort(_compareQuizHistoryDescending);
+                quizzes.where(_historyIsAssessmentQuiz).toList(growable: false)
+                  ..sort(_historyCompareQuizDescending);
           })
           .catchError((Object error) {
             assessmentError = _assessmentHistoryErrorMessage(
@@ -271,8 +275,8 @@ class _HistoryTabState extends State<HistoryTab> {
       profileId: profileId,
       forceRefresh: forceRefresh,
     );
-    return exercises.where(_isSubmittedHomework).toList(growable: false)
-      ..sort(_compareHomeworkHistoryDescending);
+    return exercises.where(_historyIsSubmittedHomework).toList(growable: false)
+      ..sort(_historyCompareHomeworkDescending);
   }
 
   String _assessmentHistoryErrorMessage(Object error, String fallbackMessage) {
@@ -301,7 +305,7 @@ class _HistoryTabState extends State<HistoryTab> {
       }
 
       final searchable = <String>[
-        _quizTitle(context, quiz),
+        _historyQuizTitle(context, quiz),
         quiz.shortText ?? '',
         quiz.purpose ?? '',
         quiz.typeOfQuiz ?? '',
