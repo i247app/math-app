@@ -233,7 +233,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ), // To balance the back button
                             ],
                           ),
-                          SizedBox(height: compact ? 18 : 26),
+                          SizedBox(height: compact ? 32 : 40),
                           // Inputs
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),

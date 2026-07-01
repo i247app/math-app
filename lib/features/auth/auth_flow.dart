@@ -170,14 +170,15 @@ class _NumiHomeState extends State<NumiHome> {
           child: BlocBuilder<AuthCubit, AuthState>(
             buildWhen: (previous, current) => previous.screen != current.screen,
             builder: (context, scaffoldState) {
-              final usePlainLoginBackground =
-                  scaffoldState.screen == AppScreen.login;
+              final usePlainAuthBackground =
+                  scaffoldState.screen == AppScreen.login ||
+                  scaffoldState.screen == AppScreen.signup;
               return AnnotatedRegion<SystemUiOverlayStyle>(
                 value: SystemUiOverlayStyle.dark,
                 child: Scaffold(
                   resizeToAvoidBottomInset:
                       scaffoldState.screen != AppScreen.home,
-                  body: usePlainLoginBackground
+                  body: usePlainAuthBackground
                       ? ColoredBox(
                           color: Colors.white,
                           child: _OnboardingScreenSwitcher(
