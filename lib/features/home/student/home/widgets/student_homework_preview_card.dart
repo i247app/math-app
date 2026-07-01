@@ -15,12 +15,15 @@ class _StudentHomeworkPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent =
-        index.isEven ? const Color(0xFFC12A73) : const Color(0xFFD33A82);
-    final badgeColor =
-        index.isEven ? const Color(0xFFFFDDE6) : const Color(0xFFDDF4F8);
-    final badgeTextColor =
-        index.isEven ? const Color(0xFFC12A73) : const Color(0xFF32868A);
+    final accent = index.isEven
+        ? const Color(0xFFC12A73)
+        : const Color(0xFFD33A82);
+    final badgeColor = index.isEven
+        ? const Color(0xFFFFDDE6)
+        : const Color(0xFFDDF4F8);
+    final badgeTextColor = index.isEven
+        ? const Color(0xFFC12A73)
+        : const Color(0xFF32868A);
     final title = exercise == null
         ? context.getText(AppKeys.studentNoHomeworkTitle)
         : _studentModeHomeworkTitle(exercise!);

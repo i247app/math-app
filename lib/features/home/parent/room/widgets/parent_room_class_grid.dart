@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentRoomClassGrid extends StatelessWidget {
-  const _ParentRoomClassGrid({
-    required this.entries,
-    required this.onTap,
-  });
+  const _ParentRoomClassGrid({required this.entries, required this.onTap});
 
   final List<_ParentRoomEntry> entries;
   final ValueChanged<_ParentRoomEntry> onTap;

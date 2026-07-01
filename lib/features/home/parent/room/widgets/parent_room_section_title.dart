@@ -2,10 +2,7 @@ part of '../../../home_screen.dart';
 
 // ignore: unused_element
 class _ParentRoomSectionTitle extends StatelessWidget {
-  const _ParentRoomSectionTitle({
-    required this.icon,
-    required this.label,
-  });
+  const _ParentRoomSectionTitle({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -21,11 +18,7 @@ class _ParentRoomSectionTitle extends StatelessWidget {
             color: const Color(0xFFEAF1FF),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            color: const Color(0xFF3265E6),
-            size: 18,
-          ),
+          child: Icon(icon, color: const Color(0xFF3265E6), size: 18),
         ),
         const SizedBox(width: 9),
         Expanded(

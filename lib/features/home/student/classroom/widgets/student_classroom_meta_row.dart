@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _StudentClassroomMetaRow extends StatelessWidget {
-  const _StudentClassroomMetaRow({
-    required this.icon,
-    required this.label,
-  });
+  const _StudentClassroomMetaRow({required this.icon, required this.label});
 
   final IconData icon;
   final String label;

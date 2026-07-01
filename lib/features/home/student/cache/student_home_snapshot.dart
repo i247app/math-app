@@ -33,6 +33,5 @@ class StudentHomeSnapshot {
   /// Snapshot is considered stale after 5 minutes.
   static const _staleDuration = Duration(minutes: 5);
 
-  bool get isStale =>
-      DateTime.now().difference(cachedAt) > _staleDuration;
+  bool get isStale => DateTime.now().difference(cachedAt) > _staleDuration;
 }

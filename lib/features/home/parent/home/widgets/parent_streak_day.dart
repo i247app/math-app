@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentStreakDay extends StatelessWidget {
-  const _ParentStreakDay({
-    required this.label,
-    required this.state,
-  });
+  const _ParentStreakDay({required this.label, required this.state});
 
   final String label;
   final _ParentStreakDayState state;
@@ -28,40 +25,36 @@ class _ParentStreakDay extends StatelessWidget {
           height: 31,
           child: switch (state) {
             _ParentStreakDayState.done => const DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Color(0xFF4FB465),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check_rounded,
-                  color: Colors.white,
-                  size: 19,
-                ),
+              decoration: BoxDecoration(
+                color: Color(0xFF4FB465),
+                shape: BoxShape.circle,
               ),
+              child: Icon(Icons.check_rounded, color: Colors.white, size: 19),
+            ),
             _ParentStreakDayState.current => const DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Color(0xFFFF5F19),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.local_fire_department_rounded,
-                  color: Colors.white,
-                  size: 21,
-                ),
+              decoration: BoxDecoration(
+                color: Color(0xFFFF5F19),
+                shape: BoxShape.circle,
               ),
+              child: Icon(
+                Icons.local_fire_department_rounded,
+                color: Colors.white,
+                size: 21,
+              ),
+            ),
             _ParentStreakDayState.upcoming => const CustomPaint(
-                painter: _ParentDashedCirclePainter(),
-                child: Center(
-                  child: Text(
-                    '5',
-                    style: TextStyle(
-                      color: Color(0xFFC98E7E),
-                      fontSize: FontSize.caption,
-                      fontWeight: FontWeight.w700,
-                    ),
+              painter: _ParentDashedCirclePainter(),
+              child: Center(
+                child: Text(
+                  '5',
+                  style: TextStyle(
+                    color: Color(0xFFC98E7E),
+                    fontSize: FontSize.caption,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
+            ),
           },
         ),
       ],

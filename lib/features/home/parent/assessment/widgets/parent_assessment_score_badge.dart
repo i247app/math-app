@@ -21,8 +21,9 @@ class _ParentAssessmentScoreBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ScoreProgressRing(
-            progress:
-                percentage == null ? 0.0 : percentage!.clamp(0, 100) / 100,
+            progress: percentage == null
+                ? 0.0
+                : percentage!.clamp(0, 100) / 100,
             color: color,
             size: 48 * scale,
             strokeWidth: 5 * scale,

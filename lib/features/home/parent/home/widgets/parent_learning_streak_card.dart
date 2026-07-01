@@ -1,9 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentLearningStreakCard extends StatelessWidget {
-  const _ParentLearningStreakCard({
-    required this.hasCompletedAssessment,
-  });
+  const _ParentLearningStreakCard({required this.hasCompletedAssessment});
 
   final bool hasCompletedAssessment;
 

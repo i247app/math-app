@@ -18,17 +18,9 @@ class _ParentAssessmentProgressChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(10 * scale),
         border: Border.all(color: const Color(0xFFD7D7D7)),
       ),
-      padding: EdgeInsets.fromLTRB(
-        5 * scale,
-        7 * scale,
-        7 * scale,
-        4 * scale,
-      ),
+      padding: EdgeInsets.fromLTRB(5 * scale, 7 * scale, 7 * scale, 4 * scale),
       child: CustomPaint(
-        painter: _ParentAssessmentChartPainter(
-          entries: entries,
-          scale: scale,
-        ),
+        painter: _ParentAssessmentChartPainter(entries: entries, scale: scale),
         child: const SizedBox.expand(),
       ),
     );

@@ -1,10 +1,7 @@
 part of '../home_screen.dart';
 
 class ParentDashboard extends StatelessWidget {
-  const ParentDashboard({
-    super.key,
-    required this.args,
-  });
+  const ParentDashboard({super.key, required this.args});
 
   final HomeDashboardArgs args;
 

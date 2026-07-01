@@ -4,10 +4,12 @@ List<ClassroomExercise> _deduplicateTeacherStudyExercises(
   List<ClassroomExercise> exercises,
 ) {
   final ids = <int>{};
-  return exercises.where((exercise) {
-    final id = exercise.stableId;
-    return id == null || ids.add(id);
-  }).toList(growable: false);
+  return exercises
+      .where((exercise) {
+        final id = exercise.stableId;
+        return id == null || ids.add(id);
+      })
+      .toList(growable: false);
 }
 
 int _compareTeacherStudyExercises(

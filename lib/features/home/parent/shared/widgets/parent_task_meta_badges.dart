@@ -20,16 +20,18 @@ class _ParentTaskMetaBadges extends StatelessWidget {
       children: [
         if (cleanChildName?.isNotEmpty == true)
           _ParentTaskMetaChip(
-              label: cleanChildName!,
-              color: const Color(0xFFEAF7F7),
-              textColor: const Color(0xFF7F8FA0),
-              fontSize: FontSize.xxs),
+            label: cleanChildName!,
+            color: const Color(0xFFEAF7F7),
+            textColor: const Color(0xFF7F8FA0),
+            fontSize: FontSize.xxs,
+          ),
         if (cleanClassroom.isNotEmpty)
           _ParentTaskMetaChip(
-              label: cleanClassroom,
-              color: const Color(0xFFEAF7F7),
-              textColor: const Color(0xFF7F8FA0),
-              fontSize: FontSize.xxs),
+            label: cleanClassroom,
+            color: const Color(0xFFEAF7F7),
+            textColor: const Color(0xFF7F8FA0),
+            fontSize: FontSize.xxs,
+          ),
       ],
     );
   }

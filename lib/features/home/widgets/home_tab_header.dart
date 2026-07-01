@@ -24,10 +24,7 @@ class HomeTabHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
-          bottom: BorderSide(
-            color: const Color(0xFFF2F2F2),
-            width: 4 * scale,
-          ),
+          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
         ),
       ),
       alignment: Alignment.center,

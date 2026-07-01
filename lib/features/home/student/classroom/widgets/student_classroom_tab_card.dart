@@ -60,10 +60,9 @@ class _StudentClassroomTabCard extends StatelessWidget {
               const SizedBox(height: 7),
               _StudentClassroomMetaRow(
                 icon: Icons.groups_rounded,
-                label: context.formatText(
-                  AppKeys.teacherStudentCount,
-                  {'count': classroom.displayStudentCount},
-                ),
+                label: context.formatText(AppKeys.teacherStudentCount, {
+                  'count': classroom.displayStudentCount,
+                }),
               ),
             ],
           ),

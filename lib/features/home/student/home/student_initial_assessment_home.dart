@@ -22,7 +22,7 @@ extension _StudentInitialAssessmentHomeView on _StudentHomeContentState {
                   asset: _parentHomeAfterReviewBanner,
                   height: 160,
                   alignment: Alignment.centerLeft,
-                  onTap: widget.onOpenReviewTab,
+                  onTap: widget.onOpenPracticeTab,
                 ),
               ),
               const SizedBox(width: 10),
@@ -44,7 +44,7 @@ extension _StudentInitialAssessmentHomeView on _StudentHomeContentState {
           markOnEnd: true,
           child: HomeStartGuideCard(
             onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
-            onRoadmapTap: widget.onOpenReviewTab,
+            onRoadmapTap: widget.onOpenPracticeTab,
             onClassroomTap: widget.onOpenClassroomTab,
           ),
         ),

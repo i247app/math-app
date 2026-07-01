@@ -27,7 +27,7 @@ class StudentDashboard extends StatelessWidget {
         assignmentService: args.assignmentService,
         quizService: args.quizService,
         onOpenClassroomTab: args.onOpenClassroomTab,
-        onOpenReviewTab: args.onOpenReviewTab,
+        onOpenPracticeTab: args.onOpenPracticeTab,
         onRefreshProfiles: args.onRefreshProfiles,
         onActivateProfile: args.onActivateProfile,
         onProfileSaved: args.onProfileSaved,
@@ -49,13 +49,13 @@ class StudentDashboard extends StatelessWidget {
     }
 
     if (args.activeTab == 2) {
-      return ReviewTab(
+      return PracticeTab(
         user: args.user,
         activeProfile: args.activeProfile,
         isParentMode: false,
         profileLoadError: args.profileLoadError,
         onRefreshProfiles: args.onRefreshProfiles,
-        onAddProfile: args.onAddProfileFromReview,
+        onAddProfile: args.onAddProfileFromPractice,
         bottomPadding: args.bottomPadding,
         scale: args.scale,
         activeRefreshTick: args.activeRefreshTick,

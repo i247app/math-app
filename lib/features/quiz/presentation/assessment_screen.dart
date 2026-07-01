@@ -18,8 +18,6 @@ import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_progres
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_question_card.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
 
-const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
-
 enum AiAssessmentResult { generationFailed }
 
 class AiAssessmentScreen extends StatefulWidget {
@@ -58,9 +56,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   void initState() {
     super.initState();
     _controller = AssessmentController(
-      quizService:
-          widget.quizService ??
-          (_useFakeQuizApi ? const FakeQuizApi() : QuizApi()),
+      quizService: widget.quizService ?? QuizApi(),
       initialQuiz: widget.initialQuiz,
       purpose: widget.purpose,
       typeOfQuiz: widget.typeOfQuiz,

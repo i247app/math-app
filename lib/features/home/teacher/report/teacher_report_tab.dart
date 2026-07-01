@@ -34,12 +34,7 @@ class TeacherReportTab extends StatelessWidget {
           ),
           SizedBox(height: 18 * scale),
           Padding(
-            padding: EdgeInsets.fromLTRB(
-              4 * scale,
-              0,
-              4 * scale,
-              14 * scale,
-            ),
+            padding: EdgeInsets.fromLTRB(4 * scale, 0, 4 * scale, 14 * scale),
             child: Container(
               padding: EdgeInsets.all(22 * scale),
               decoration: BoxDecoration(

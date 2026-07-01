@@ -92,10 +92,7 @@ List<StudentProfile> _studentProfiles(List<StudentProfile> profiles) {
       .toList(growable: false);
 }
 
-String _parentClassroomName(
-  BuildContext context,
-  _ParentChildSummary summary,
-) {
+String _parentClassroomName(BuildContext context, _ParentChildSummary summary) {
   final name = summary.classroom?.name?.trim();
   if (name != null && name.isNotEmpty) {
     return name;

@@ -18,9 +18,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.94),
               borderRadius: BorderRadius.circular(32),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.42),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.42)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.25),
@@ -43,8 +41,9 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                const Color(0xFFAA2A6C).withValues(alpha: 0.14),
+                            color: const Color(
+                              0xFFAA2A6C,
+                            ).withValues(alpha: 0.14),
                             blurRadius: 26,
                             spreadRadius: 10,
                           ),
@@ -86,9 +85,9 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                   width: double.infinity,
                   height: 60,
                   child: FilledButton(
-                    onPressed: () => Navigator.of(context).pop(
-                      _ParentProfileDialogAction.choose,
-                    ),
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).pop(_ParentProfileDialogAction.choose),
                     style: FilledButton.styleFrom(
                       backgroundColor: const Color(0xFFAA2A6C),
                       shape: RoundedRectangleBorder(
@@ -111,9 +110,9 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                   width: double.infinity,
                   height: 54,
                   child: TextButton(
-                    onPressed: () => Navigator.of(context).pop(
-                      _ParentProfileDialogAction.create,
-                    ),
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).pop(_ParentProfileDialogAction.create),
                     style: TextButton.styleFrom(
                       foregroundColor: const Color(0xFFAA2A6C),
                       shape: RoundedRectangleBorder(

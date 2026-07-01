@@ -25,9 +25,7 @@ class HomeMissingStudentDialog extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.92),
               borderRadius: BorderRadius.circular(32),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.4),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.25),
@@ -50,8 +48,9 @@ class HomeMissingStudentDialog extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                const Color(0xFFAA2A6C).withValues(alpha: 0.16),
+                            color: const Color(
+                              0xFFAA2A6C,
+                            ).withValues(alpha: 0.16),
                             blurRadius: 30,
                             spreadRadius: 12,
                           ),

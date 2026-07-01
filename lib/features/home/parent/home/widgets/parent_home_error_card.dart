@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentHomeErrorCard extends StatelessWidget {
-  const _ParentHomeErrorCard({
-    required this.message,
-    required this.onRetry,
-  });
+  const _ParentHomeErrorCard({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;

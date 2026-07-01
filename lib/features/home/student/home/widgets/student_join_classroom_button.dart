@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _StudentJoinClassroomButton extends StatelessWidget {
-  const _StudentJoinClassroomButton({
-    required this.scale,
-    required this.onTap,
-  });
+  const _StudentJoinClassroomButton({required this.scale, required this.onTap});
 
   final double scale;
   final VoidCallback onTap;

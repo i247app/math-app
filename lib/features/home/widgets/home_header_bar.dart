@@ -114,18 +114,20 @@ class HomeHeaderBar extends StatelessWidget {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: FontSize.small,
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.05),
+                                        color: Colors.black87,
+                                        fontSize: FontSize.small,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.05,
+                                      ),
                                     ),
                                   ),
                                   if (canSwitchProfile) ...[
                                     SizedBox(width: contentHeight * 0.06),
                                     AnimatedRotation(
                                       turns: isProfileMenuOpen ? 0.5 : 0,
-                                      duration:
-                                          const Duration(milliseconds: 180),
+                                      duration: const Duration(
+                                        milliseconds: 180,
+                                      ),
                                       child: Icon(
                                         Icons.keyboard_arrow_down_rounded,
                                         size: contentHeight * 0.18,

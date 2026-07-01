@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentTaskScoreRing extends StatelessWidget {
-  const _ParentTaskScoreRing({
-    required this.score,
-    required this.color,
-  });
+  const _ParentTaskScoreRing({required this.score, required this.color});
 
   final int score;
   final Color color;

@@ -21,11 +21,7 @@ class _StudentJoinClassCta extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              _studentParentHomeJoinIcon,
-              width: 20,
-              height: 20,
-            ),
+            SvgPicture.asset(_studentParentHomeJoinIcon, width: 20, height: 20),
             const SizedBox(width: 7),
             Text(
               context.getText(AppKeys.studentJoinClassroomUpper),

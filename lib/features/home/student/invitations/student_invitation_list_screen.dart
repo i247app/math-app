@@ -166,8 +166,9 @@ class _StudentInvitationListScreenState
                 if (_isLoading && _invitations.isEmpty)
                   const Padding(
                     padding: EdgeInsets.only(top: 120),
-                    child:
-                        Center(child: CircularProgressIndicator(color: _teal)),
+                    child: Center(
+                      child: CircularProgressIndicator(color: _teal),
+                    ),
                   )
                 else if (_error != null && _invitations.isEmpty)
                   _StudentInlineErrorPanel(
@@ -186,14 +187,10 @@ class _StudentInvitationListScreenState
                       isProcessing: _processingClassroomIds.contains(
                         _invitations[index].stableClassroomId,
                       ),
-                      onAccept: () => _handleInvitation(
-                        _invitations[index],
-                        accept: true,
-                      ),
-                      onReject: () => _handleInvitation(
-                        _invitations[index],
-                        accept: false,
-                      ),
+                      onAccept: () =>
+                          _handleInvitation(_invitations[index], accept: true),
+                      onReject: () =>
+                          _handleInvitation(_invitations[index], accept: false),
                     ),
                     if (index != _invitations.length - 1)
                       const SizedBox(height: 12),

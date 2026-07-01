@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentRoomEntry {
-  const _ParentRoomEntry({
-    required this.layoutClassroom,
-    required this.child,
-  });
+  const _ParentRoomEntry({required this.layoutClassroom, required this.child});
 
   final HomeLayoutClassroom layoutClassroom;
   final StudentProfile child;

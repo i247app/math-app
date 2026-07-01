@@ -20,7 +20,7 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
                   asset: _parentHomeAfterReviewBanner,
                   height: 160,
                   alignment: Alignment.centerLeft,
-                  onTap: widget.args.onOpenReviewTab,
+                  onTap: widget.args.onOpenPracticeTab,
                 ),
               ),
               const SizedBox(width: 10),
@@ -40,7 +40,7 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
           markOnEnd: true,
           child: HomeStartGuideCard(
             onAssessmentTap: _openAssessment,
-            onRoadmapTap: widget.args.onOpenReviewTab,
+            onRoadmapTap: widget.args.onOpenPracticeTab,
             onClassroomTap: _showClassroomMessage,
           ),
         ),

@@ -31,8 +31,9 @@ class _ParentChildOverviewContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final primarySummary = _parentPrimarySummary(summaries);
     final showGameSuggestions = pendingExercises.isEmpty || completions.isEmpty;
-    final visiblePendingExercises =
-        pendingExercises.take(2).toList(growable: false);
+    final visiblePendingExercises = pendingExercises
+        .take(2)
+        .toList(growable: false);
     final visibleCompletions = completions.take(2).toList(growable: false);
 
     return Column(
@@ -58,9 +59,11 @@ class _ParentChildOverviewContent extends StatelessWidget {
               onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
               child: Column(
                 children: [
-                  for (var index = 0;
-                      index < visiblePendingExercises.length;
-                      index++) ...[
+                  for (
+                    var index = 0;
+                    index < visiblePendingExercises.length;
+                    index++
+                  ) ...[
                     _ParentPendingTaskListItem(
                       pending: visiblePendingExercises[index],
                     ),
@@ -85,9 +88,11 @@ class _ParentChildOverviewContent extends StatelessWidget {
               onViewAll: completions.length > 2 ? onViewResults : null,
               child: Column(
                 children: [
-                  for (var index = 0;
-                      index < visibleCompletions.length;
-                      index++) ...[
+                  for (
+                    var index = 0;
+                    index < visibleCompletions.length;
+                    index++
+                  ) ...[
                     _ParentCompletedTaskListItem(
                       completion: visibleCompletions[index],
                       onTap: () => onCompletionTap(visibleCompletions[index]),

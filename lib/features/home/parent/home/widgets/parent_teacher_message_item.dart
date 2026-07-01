@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentTeacherMessageItem extends StatelessWidget {
-  const _ParentTeacherMessageItem({
-    required this.summary,
-    required this.index,
-  });
+  const _ParentTeacherMessageItem({required this.summary, required this.index});
 
   final _ParentChildSummary summary;
   final int index;

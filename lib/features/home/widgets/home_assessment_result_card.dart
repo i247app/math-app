@@ -1,10 +1,7 @@
 part of '../home_screen.dart';
 
 class _HomeAssessmentResultCard extends StatelessWidget {
-  const _HomeAssessmentResultCard({
-    required this.quiz,
-    required this.onTap,
-  });
+  const _HomeAssessmentResultCard({required this.quiz, required this.onTap});
 
   final GeneratedQuiz quiz;
   final VoidCallback onTap;
@@ -13,8 +10,9 @@ class _HomeAssessmentResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final percent = (quiz.grading?.scorePercentage ?? 0).clamp(0, 100);
     final score = (percent / 10).round();
-    final scoreColor =
-        score >= 8 ? const Color(0xFF087D47) : const Color(0xFFFF6B17);
+    final scoreColor = score >= 8
+        ? const Color(0xFF087D47)
+        : const Color(0xFFFF6B17);
     final shortText = _homeQuizShortText(quiz);
 
     return Material(

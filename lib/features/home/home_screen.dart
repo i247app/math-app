@@ -54,7 +54,7 @@ import 'package:numi_flutter/features/homework/presentation/student_homework_att
 import 'package:numi_flutter/features/homework/student_homework_open_guard.dart';
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
 import 'package:numi_flutter/features/quiz/history_tab.dart';
-import 'package:numi_flutter/features/quiz/review_tab.dart';
+import 'package:numi_flutter/features/practice/practice_tab.dart';
 import 'package:numi_flutter/features/settings/setting_tab.dart';
 import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
@@ -71,7 +71,7 @@ part 'parent/assessment/widgets/parent_assessment_search_field.dart';
 part 'parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 part 'parent/assessment/widgets/parent_assessment_state_card.dart';
 part 'parent/assessment/widgets/parent_assessment_tab_card.dart';
-part 'parent/assessment/widgets/parent_review_tab_banner.dart';
+part 'parent/assessment/widgets/parent_practice_tab_banner.dart';
 part 'parent/home/helpers/parent_child_dashboard_helpers.dart';
 part 'parent/home/models/parent_child_summary.dart';
 part 'parent/home/models/parent_home_entrance_builder.dart';
@@ -209,7 +209,7 @@ enum _HomeTabDestination {
   classroom,
   room,
   assessment,
-  review,
+  practice,
   history,
   study,
   members,
@@ -269,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen>
   late final HomeProfileController _profileController = HomeProfileController(
     gradeService: widget._gradeService,
   );
-  bool _returnToReviewAfterProfileSave = false;
+  bool _returnToPracticeAfterProfileSave = false;
   int _parentStreakCount = 1;
 
   static const _designWidth = 390.0;
@@ -338,13 +338,13 @@ class _HomeScreenState extends State<HomeScreen>
       ProfileRole.parent => switch (currentIndex) {
         1 => _HomeTabDestination.assessment,
         2 => _HomeTabDestination.room,
-        3 => _HomeTabDestination.review,
+        3 => _HomeTabDestination.practice,
         4 => _HomeTabDestination.settings,
         _ => _HomeTabDestination.home,
       },
       ProfileRole.student => switch (currentIndex) {
         1 => _HomeTabDestination.classroom,
-        2 => _HomeTabDestination.review,
+        2 => _HomeTabDestination.practice,
         3 => _HomeTabDestination.history,
         4 => _HomeTabDestination.settings,
         _ => _HomeTabDestination.home,
@@ -362,13 +362,13 @@ class _HomeScreenState extends State<HomeScreen>
       ProfileRole.parent => switch (destination) {
         _HomeTabDestination.assessment => 1,
         _HomeTabDestination.room || _HomeTabDestination.classroom => 2,
-        _HomeTabDestination.review => 3,
+        _HomeTabDestination.practice => 3,
         _HomeTabDestination.settings => 4,
         _ => 0,
       },
       ProfileRole.student => switch (destination) {
         _HomeTabDestination.classroom || _HomeTabDestination.room => 1,
-        _HomeTabDestination.review => 2,
+        _HomeTabDestination.practice => 2,
         _HomeTabDestination.history => 3,
         _HomeTabDestination.settings => 4,
         _ => 0,
@@ -469,20 +469,20 @@ class _HomeScreenState extends State<HomeScreen>
                             HomeProfileCache.instance.invalidateAll();
                             widget.onLogout();
                           },
-                          onAddProfileFromReview: () {
+                          onAddProfileFromPractice: () {
                             HapticFeedback.selectionClick();
                             _profileController.requestAddProfile();
                             setState(() {
-                              _returnToReviewAfterProfileSave = true;
+                              _returnToPracticeAfterProfileSave = true;
                             });
                             homeCubit.selectTab(4);
                           },
                           onProfileSaved: () {
-                            if (!_returnToReviewAfterProfileSave) {
+                            if (!_returnToPracticeAfterProfileSave) {
                               return;
                             }
                             setState(() {
-                              _returnToReviewAfterProfileSave = false;
+                              _returnToPracticeAfterProfileSave = false;
                             });
                             homeCubit.selectTab(3);
                           },
@@ -492,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen>
                           onOpenClassroomTab: () => homeCubit.selectTab(
                             widget.activeRole == ProfileRole.parent ? 2 : 1,
                           ),
-                          onOpenReviewTab: () {
+                          onOpenPracticeTab: () {
                             HapticFeedback.lightImpact();
                             homeCubit.selectTab(
                               widget.activeRole == ProfileRole.parent ? 3 : 2,

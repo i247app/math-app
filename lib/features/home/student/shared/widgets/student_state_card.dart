@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _StudentStateCard extends StatelessWidget {
-  const _StudentStateCard({
-    required this.titleKey,
-    required this.messageKey,
-  });
+  const _StudentStateCard({required this.titleKey, required this.messageKey});
 
   final String titleKey;
   final String messageKey;
@@ -31,10 +28,7 @@ class _StudentStateCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             clipBehavior: Clip.antiAlias,
-            child: Image.asset(
-              _studentParentHomeClassThumb,
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset(_studentParentHomeClassThumb, fit: BoxFit.cover),
           ),
           const SizedBox(height: 12),
           Text(

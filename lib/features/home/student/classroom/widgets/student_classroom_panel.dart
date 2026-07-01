@@ -34,11 +34,7 @@ class _StudentClassroomPanel extends StatelessWidget {
         if (isLoading && classrooms.isEmpty)
           _StudentLoadingPanel(scale: scale)
         else if (error != null && classrooms.isEmpty)
-          _StudentErrorPanel(
-            scale: scale,
-            message: error!,
-            onRetry: onRetry,
-          )
+          _StudentErrorPanel(scale: scale, message: error!, onRetry: onRetry)
         else if (classrooms.isEmpty)
           _StudentEmptyPanel(
             scale: scale,

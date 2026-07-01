@@ -67,10 +67,9 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                         if (dateParts != null) ...[
                           SizedBox(height: 2 * scale),
                           Text(
-                            context.formatText(
-                              AppKeys.teacherStudyMonth,
-                              {'month': dateParts.month},
-                            ),
+                            context.formatText(AppKeys.teacherStudyMonth, {
+                              'month': dateParts.month,
+                            }),
                             style: GoogleFonts.andika(
                               color: const Color(0xFF6B7280),
                               fontSize: FontSize.caption * 0.77 * scale,
@@ -100,10 +99,9 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                         ),
                         SizedBox(height: 5 * scale),
                         Text(
-                          context.formatText(
-                            AppKeys.teacherAssignmentId,
-                            {'id': exerciseId},
-                          ),
+                          context.formatText(AppKeys.teacherAssignmentId, {
+                            'id': exerciseId,
+                          }),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
@@ -118,10 +116,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                 ],
               ),
               if (dueDate != null) ...[
-                Divider(
-                  height: 16 * scale,
-                  color: const Color(0xFFE9EDF0),
-                ),
+                Divider(height: 16 * scale, color: const Color(0xFFE9EDF0)),
                 Row(
                   children: [
                     SvgPicture.asset(
@@ -136,10 +131,9 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                     SizedBox(width: 7 * scale),
                     Expanded(
                       child: Text(
-                        context.formatText(
-                          AppKeys.teacherStudyDueDate,
-                          {'date': dueDate},
-                        ),
+                        context.formatText(AppKeys.teacherStudyDueDate, {
+                          'date': dueDate,
+                        }),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(

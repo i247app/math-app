@@ -18,10 +18,8 @@ abstract class HomeLayoutService {
 }
 
 class HomeLayoutApi implements HomeLayoutService {
-  HomeLayoutApi({
-    String? baseUrl,
-    NetworkClient? networkClient,
-  }) : _networkClient = networkClient ?? NetworkClient(baseUrl: baseUrl);
+  HomeLayoutApi({String? baseUrl, NetworkClient? networkClient})
+    : _networkClient = networkClient ?? NetworkClient(baseUrl: baseUrl);
 
   final NetworkClient _networkClient;
 

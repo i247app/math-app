@@ -72,7 +72,7 @@ class HomeProfileState {
 /// This is a [ChangeNotifier] so the UI rebuilds cheaply via [ListenableBuilder].
 class HomeProfileController extends ChangeNotifier {
   HomeProfileController({GradeService? gradeService})
-      : _gradeService = gradeService ?? GradeApi();
+    : _gradeService = gradeService ?? GradeApi();
 
   final GradeService _gradeService;
 
@@ -99,18 +99,17 @@ class HomeProfileController extends ChangeNotifier {
       return;
     }
 
-    _update(_state.copyWith(
-      isSwitchingProfile: true,
-      isMenuOpen: false,
-    ));
+    _update(_state.copyWith(isSwitchingProfile: true, isMenuOpen: false));
 
     try {
       await onActivateProfile(profile);
       if (_disposed) return;
-      _update(_state.copyWith(
-        isSwitchingProfile: false,
-        profileResetSignal: _state.profileResetSignal + 1,
-      ));
+      _update(
+        _state.copyWith(
+          isSwitchingProfile: false,
+          profileResetSignal: _state.profileResetSignal + 1,
+        ),
+      );
     } catch (_) {
       if (_disposed) return;
       _update(_state.copyWith(isSwitchingProfile: false));
@@ -138,9 +137,11 @@ class HomeProfileController extends ChangeNotifier {
   /// Increments [HomeProfileState.openAddProfileRequestId] to signal that the
   /// Add Profile form should open.
   void requestAddProfile() {
-    _update(_state.copyWith(
-      openAddProfileRequestId: _state.openAddProfileRequestId + 1,
-    ));
+    _update(
+      _state.copyWith(
+        openAddProfileRequestId: _state.openAddProfileRequestId + 1,
+      ),
+    );
   }
 
   /// Pre-fetches grades for [userId]. Guards against duplicate in-flight
@@ -159,16 +160,20 @@ class HomeProfileController extends ChangeNotifier {
       final grades = await _gradeService.listGrades(userId: userId);
       if (_disposed) return;
       // Discard result if user changed while fetching.
-      _update(_state.copyWith(
-        prefetchedGrades: grades,
-        prefetchedGradeUserId: userId,
-      ));
+      _update(
+        _state.copyWith(
+          prefetchedGrades: grades,
+          prefetchedGradeUserId: userId,
+        ),
+      );
     } catch (_) {
       if (_disposed) return;
-      _update(_state.copyWith(
-        prefetchedGrades: const <GradeModel>[],
-        prefetchedGradeUserId: userId,
-      ));
+      _update(
+        _state.copyWith(
+          prefetchedGrades: const <GradeModel>[],
+          prefetchedGradeUserId: userId,
+        ),
+      );
     } finally {
       _isPrefetchingGrades = false;
     }
@@ -176,10 +181,12 @@ class HomeProfileController extends ChangeNotifier {
 
   /// Call when the user changes so that cached grades are invalidated.
   void invalidateGrades() {
-    _update(_state.copyWith(
-      prefetchedGrades: const <GradeModel>[],
-      prefetchedGradeUserId: null,
-    ));
+    _update(
+      _state.copyWith(
+        prefetchedGrades: const <GradeModel>[],
+        prefetchedGradeUserId: null,
+      ),
+    );
   }
 
   // ── Internals ───────────────────────────────────────────────────────────────

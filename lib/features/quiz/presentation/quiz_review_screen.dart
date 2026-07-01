@@ -53,7 +53,6 @@ const _redSoft = Color(0xFFFFF5F6);
 const _orange = Color(0xFFFF6A1A);
 const _deepInk = Color(0xFF1F2B2B);
 const _cardBorder = Color(0xFFDCE8EA);
-const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
 class QuizReviewScreen extends StatefulWidget {
   const QuizReviewScreen({super.key, required this.quizId, this.initialQuiz});
@@ -73,7 +72,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
     super.initState();
     _controller = QuizReviewController(
       quizId: widget.quizId,
-      quizService: _useFakeQuizApi ? const FakeQuizApi() : QuizApi(),
+      quizService: QuizApi(),
       initialQuiz: widget.initialQuiz,
     );
     _controller.loadQuizDetail();

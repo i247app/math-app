@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentSkeletonShimmer extends StatelessWidget {
-  const _ParentSkeletonShimmer({
-    required this.progress,
-    required this.child,
-  });
+  const _ParentSkeletonShimmer({required this.progress, required this.child});
 
   final double progress;
   final Widget child;

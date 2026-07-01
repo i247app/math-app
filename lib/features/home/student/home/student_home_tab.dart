@@ -15,7 +15,7 @@ class _StudentHomeContent extends StatefulWidget {
     required this.assignmentService,
     required this.quizService,
     required this.onOpenClassroomTab,
-    required this.onOpenReviewTab,
+    required this.onOpenPracticeTab,
     required this.onRefreshProfiles,
     required this.onActivateProfile,
     required this.onProfileSaved,
@@ -36,7 +36,7 @@ class _StudentHomeContent extends StatefulWidget {
   final ClassroomExerciseService assignmentService;
   final QuizService quizService;
   final VoidCallback onOpenClassroomTab;
-  final VoidCallback onOpenReviewTab;
+  final VoidCallback onOpenPracticeTab;
   final Future<void> Function() onRefreshProfiles;
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;

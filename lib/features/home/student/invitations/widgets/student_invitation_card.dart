@@ -23,10 +23,9 @@ class _StudentInvitationCard extends StatelessWidget {
         : context.getText(AppKeys.teacherClassFallback);
     final inviterName = invitation.inviterName?.trim();
     final subtitle = inviterName != null && inviterName.isNotEmpty
-        ? context.formatText(
-            AppKeys.studentInviteSubtitle,
-            {'name': inviterName},
-          )
+        ? context.formatText(AppKeys.studentInviteSubtitle, {
+            'name': inviterName,
+          })
         : context.getText(AppKeys.studentInviteSubtitleFallback);
 
     return Container(
@@ -52,11 +51,7 @@ class _StudentInvitationCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    SvgPicture.asset(
-                      _studentHomeInvite,
-                      width: 36,
-                      height: 32,
-                    ),
+                    SvgPicture.asset(_studentHomeInvite, width: 36, height: 32),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -132,11 +127,7 @@ class _StudentInvitationCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCompact(
-    BuildContext context,
-    String title,
-    String subtitle,
-  ) {
+  Widget _buildCompact(BuildContext context, String title, String subtitle) {
     return Row(
       children: [
         Expanded(
@@ -179,10 +170,7 @@ class _StudentInvitationCard extends StatelessWidget {
               child: SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(
-                  color: _teal,
-                  strokeWidth: 2,
-                ),
+                child: CircularProgressIndicator(color: _teal, strokeWidth: 2),
               ),
             ),
           )

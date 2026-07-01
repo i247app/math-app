@@ -97,7 +97,7 @@ class _ParentAssessmentChartPainter extends CustomPainter {
       final label = date.millisecondsSinceEpoch == 0
           ? '--/--'
           : '${date.day.toString().padLeft(2, '0')}/'
-              '${date.month.toString().padLeft(2, '0')}';
+                '${date.month.toString().padLeft(2, '0')}';
       _paintText(
         canvas,
         label,

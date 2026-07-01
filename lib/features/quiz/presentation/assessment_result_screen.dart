@@ -40,7 +40,6 @@ const _resultCoral = Color(0xFFEC724F);
 const _resultCardBorder = Color(0xFFE5E8EB);
 const _resultAiAccent = Color(0xFFE8FEFF);
 const _resultMascotBorder = Color(0xFF974320);
-const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
 class AssessmentResultScreen extends StatefulWidget {
   const AssessmentResultScreen({
@@ -72,9 +71,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
   @override
   void initState() {
     super.initState();
-    _quizService =
-        widget.quizService ??
-        (_useFakeQuizApi ? const FakeQuizApi() : QuizApi());
+    _quizService = widget.quizService ?? QuizApi();
   }
 
   Future<void> generateTestAgain() async {

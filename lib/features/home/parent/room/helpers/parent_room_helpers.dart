@@ -107,8 +107,9 @@ List<_ParentRoomEntry> _roomEntries(ParentHomeLayout? parent) {
     final childId = _layoutChildId(completion.child);
     final classroomId =
         completion.classroomId ?? completion.exercise?.classroomId;
-    final child =
-        childId == null ? null : childById[childId] ?? completion.child;
+    final child = childId == null
+        ? null
+        : childById[childId] ?? completion.child;
     if (child == null || classroomId == null) {
       continue;
     }
@@ -171,13 +172,15 @@ List<HomeLayoutPendingExercise> _pendingForRoomEntry(
   if (parent == null) {
     return const <HomeLayoutPendingExercise>[];
   }
-  return parent.pendingExercises.where((pending) {
-    return _sameRoom(
-      classroomId: pending.classroomId ?? pending.exercise?.classroomId,
-      childId: _layoutChildId(pending.child),
-      entry: entry,
-    );
-  }).toList(growable: false);
+  return parent.pendingExercises
+      .where((pending) {
+        return _sameRoom(
+          classroomId: pending.classroomId ?? pending.exercise?.classroomId,
+          childId: _layoutChildId(pending.child),
+          entry: entry,
+        );
+      })
+      .toList(growable: false);
 }
 
 List<HomeLayoutPendingExercise> _expiredForRoomEntry(
@@ -187,13 +190,15 @@ List<HomeLayoutPendingExercise> _expiredForRoomEntry(
   if (parent == null) {
     return const <HomeLayoutPendingExercise>[];
   }
-  return parent.expiredExercises.where((expired) {
-    return _sameRoom(
-      classroomId: expired.classroomId ?? expired.exercise?.classroomId,
-      childId: _layoutChildId(expired.child),
-      entry: entry,
-    );
-  }).toList(growable: false);
+  return parent.expiredExercises
+      .where((expired) {
+        return _sameRoom(
+          classroomId: expired.classroomId ?? expired.exercise?.classroomId,
+          childId: _layoutChildId(expired.child),
+          entry: entry,
+        );
+      })
+      .toList(growable: false);
 }
 
 List<HomeLayoutRecentCompletion> _completionsForRoomEntry(
@@ -203,13 +208,16 @@ List<HomeLayoutRecentCompletion> _completionsForRoomEntry(
   if (parent == null) {
     return const <HomeLayoutRecentCompletion>[];
   }
-  return parent.recentCompletions.where((completion) {
-    return _sameRoom(
-      classroomId: completion.classroomId ?? completion.exercise?.classroomId,
-      childId: _layoutChildId(completion.child),
-      entry: entry,
-    );
-  }).toList(growable: false);
+  return parent.recentCompletions
+      .where((completion) {
+        return _sameRoom(
+          classroomId:
+              completion.classroomId ?? completion.exercise?.classroomId,
+          childId: _layoutChildId(completion.child),
+          entry: entry,
+        );
+      })
+      .toList(growable: false);
 }
 
 bool _sameRoom({
@@ -272,7 +280,7 @@ String _roomPurposeLabel(BuildContext context, String? purpose) {
 }
 
 ({Color color, Color background, IconData icon, String? asset})
-    _roomPurposeListAccent(String? purpose) {
+_roomPurposeListAccent(String? purpose) {
   final normalized = purpose?.trim().toUpperCase();
   if (normalized == classroomExercisePurposeQuiz ||
       normalized == classroomExercisePurposeExam) {
@@ -304,7 +312,9 @@ String _roomExerciseCreatedDate(ClassroomExercise? exercise) {
 }
 
 String _roomExerciseDueLabel(
-    BuildContext context, ClassroomExercise? exercise) {
+  BuildContext context,
+  ClassroomExercise? exercise,
+) {
   final date = _roomDateLabel(exercise?.endDate);
   if (date == '--/--/----') {
     return context.getText(AppKeys.teacherAssignmentDueLabel);

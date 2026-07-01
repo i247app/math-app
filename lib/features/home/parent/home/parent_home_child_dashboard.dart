@@ -15,11 +15,7 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFFFFFFF),
-            Color(0xFFF8FCFC),
-            Color(0xFFEFF8F7),
-          ],
+          colors: [Color(0xFFFFFFFF), Color(0xFFF8FCFC), Color(0xFFEFF8F7)],
           stops: [0, 0.42, 1],
         ),
       ),
@@ -35,9 +31,11 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
               ? const _ParentChildDashboardLoading()
               : _ParentChildOverviewContent(
                   summaries: _childSummaries,
-                  pendingExercises: parent?.pendingExercises ??
+                  pendingExercises:
+                      parent?.pendingExercises ??
                       const <HomeLayoutPendingExercise>[],
-                  completions: parent?.recentCompletions ??
+                  completions:
+                      parent?.recentCompletions ??
                       const <HomeLayoutRecentCompletion>[],
                   entranceBuilder: _childOverviewFadeIn,
                   onCompletionTap: _openCompletionResult,

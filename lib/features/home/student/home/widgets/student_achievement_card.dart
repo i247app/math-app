@@ -13,8 +13,9 @@ class _StudentAchievementCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.86),
         borderRadius: BorderRadius.circular(32 * scale),
-        border:
-            Border.all(color: const Color(0xFFA2B1A3).withValues(alpha: 0.1)),
+        border: Border.all(
+          color: const Color(0xFFA2B1A3).withValues(alpha: 0.1),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),

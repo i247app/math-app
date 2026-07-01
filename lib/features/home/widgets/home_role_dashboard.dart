@@ -18,12 +18,12 @@ class HomeRoleDashboard extends StatefulWidget {
     required this.assignmentService,
     required this.quizService,
     required this.onLogout,
-    required this.onAddProfileFromReview,
+    required this.onAddProfileFromPractice,
     required this.onProfileSaved,
     required this.openAddProfileRequestId,
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
-    required this.onOpenReviewTab,
+    required this.onOpenPracticeTab,
     required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
     required this.parentHomeEntrance,
@@ -48,12 +48,12 @@ class HomeRoleDashboard extends StatefulWidget {
   final ClassroomExerciseService assignmentService;
   final QuizService quizService;
   final VoidCallback onLogout;
-  final VoidCallback onAddProfileFromReview;
+  final VoidCallback onAddProfileFromPractice;
   final VoidCallback onProfileSaved;
   final int openAddProfileRequestId;
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
-  final VoidCallback onOpenReviewTab;
+  final VoidCallback onOpenPracticeTab;
   final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final Animation<double> parentHomeEntrance;
@@ -156,12 +156,12 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
       assignmentService: widget.assignmentService,
       quizService: widget.quizService,
       onLogout: widget.onLogout,
-      onAddProfileFromReview: widget.onAddProfileFromReview,
+      onAddProfileFromPractice: widget.onAddProfileFromPractice,
       onProfileSaved: widget.onProfileSaved,
       openAddProfileRequestId: widget.openAddProfileRequestId,
       onCompleteTeacherProfile: widget.onCompleteTeacherProfile,
       onOpenClassroomTab: widget.onOpenClassroomTab,
-      onOpenReviewTab: widget.onOpenReviewTab,
+      onOpenPracticeTab: widget.onOpenPracticeTab,
       onOpenProfileMenu: widget.onOpenProfileMenu,
       onParentAssessmentStateChanged: widget.onParentAssessmentStateChanged,
       parentHomeEntrance: widget.parentHomeEntrance,

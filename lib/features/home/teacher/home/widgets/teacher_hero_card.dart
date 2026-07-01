@@ -9,8 +9,12 @@ class _TeacherHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 92 * scale,
-      padding:
-          EdgeInsets.fromLTRB(14 * scale, 12 * scale, 112 * scale, 18 * scale),
+      padding: EdgeInsets.fromLTRB(
+        14 * scale,
+        12 * scale,
+        112 * scale,
+        18 * scale,
+      ),
       decoration: BoxDecoration(
         color: _teacherHero,
         borderRadius: BorderRadius.circular(24 * scale),

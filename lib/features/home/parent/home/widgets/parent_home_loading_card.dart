@@ -47,23 +47,11 @@ class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _ParentSkeletonLine(
-                        width: 148,
-                        height: 30,
-                        color: color,
-                      ),
+                      _ParentSkeletonLine(width: 148, height: 30, color: color),
                       const SizedBox(height: 14),
-                      _ParentSkeletonLine(
-                        width: 210,
-                        height: 34,
-                        color: color,
-                      ),
+                      _ParentSkeletonLine(width: 210, height: 34, color: color),
                       const Spacer(),
-                      _ParentSkeletonLine(
-                        width: 132,
-                        height: 14,
-                        color: color,
-                      ),
+                      _ParentSkeletonLine(width: 132, height: 14, color: color),
                       const SizedBox(height: 12),
                       _ParentSkeletonBlock(
                         width: 150,

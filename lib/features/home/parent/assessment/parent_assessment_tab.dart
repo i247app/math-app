@@ -243,7 +243,10 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
               ),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  _ParentReviewTabBanner(onTap: _openAssessment, scale: scale),
+                  _ParentPracticeTabBanner(
+                    onTap: _openAssessment,
+                    scale: scale,
+                  ),
                   SizedBox(height: 13 * scale),
                   _ParentAssessmentSearchField(
                     controller: _searchController,

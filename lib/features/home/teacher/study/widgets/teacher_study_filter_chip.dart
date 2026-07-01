@@ -29,8 +29,9 @@ class _TeacherStudyFilterChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: selected ? _teacherDeepTeal : Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border:
-                selected ? null : Border.all(color: const Color(0xFFDDE4E6)),
+            border: selected
+                ? null
+                : Border.all(color: const Color(0xFFDDE4E6)),
             boxShadow: selected
                 ? null
                 : [

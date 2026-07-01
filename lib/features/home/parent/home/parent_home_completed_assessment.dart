@@ -10,7 +10,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
           child: HomeImageAction(
             asset: _parentHomeAfterReviewBanner,
             height: 214,
-            onTap: widget.args.onOpenReviewTab,
+            onTap: widget.args.onOpenPracticeTab,
           ),
         ),
         const SizedBox(height: 8),
@@ -25,13 +25,13 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
                     HomeImageAction(
                       asset: _parentHomeRace,
                       height: 83,
-                      onTap: widget.args.onOpenReviewTab,
+                      onTap: widget.args.onOpenPracticeTab,
                     ),
                     const SizedBox(height: 7),
                     HomeImageAction(
                       asset: _parentHomeShop,
                       height: 83,
-                      onTap: widget.args.onOpenReviewTab,
+                      onTap: widget.args.onOpenPracticeTab,
                     ),
                   ],
                 ),
@@ -51,7 +51,8 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
         for (final entry in _completedAssessments.take(2).indexed) ...[
           _completedAssessmentFadeIn(
             order: 3 + entry.$1,
-            markOnEnd: entry.$1 == 1 ||
+            markOnEnd:
+                entry.$1 == 1 ||
                 entry.$1 == _completedAssessments.take(2).length - 1,
             child: _HomeAssessmentResultCard(
               quiz: entry.$2,

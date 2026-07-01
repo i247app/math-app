@@ -67,10 +67,7 @@ class _StudentMessagePanel extends StatelessWidget {
           ),
           if (actionLabel != null && onAction != null) ...[
             SizedBox(height: 16 * scale),
-            TextButton(
-              onPressed: onAction,
-              child: Text(actionLabel!),
-            ),
+            TextButton(onPressed: onAction, child: Text(actionLabel!)),
           ],
         ],
       ),

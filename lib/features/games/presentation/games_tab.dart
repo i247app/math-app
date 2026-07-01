@@ -9,8 +9,8 @@ import 'package:numi_flutter/features/games/math_squadron/math_squadron_data.dar
 import 'package:numi_flutter/features/games/presentation/math_squadron_stage_screen.dart';
 import 'package:numi_flutter/features/games/presentation/numi_farm_stage_screen.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
-import 'package:numi_flutter/features/quiz/practice_catalog.dart';
-import 'package:numi_flutter/features/quiz/presentation/practice_chapter_screen.dart';
+import 'package:numi_flutter/features/practice/practice_catalog.dart';
+import 'package:numi_flutter/features/practice/presentation/practice_chapter_screen.dart';
 
 const _gamesTeal = Color(0xFF006762);
 const _gamesInk = Color(0xFF253228);

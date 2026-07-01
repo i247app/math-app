@@ -30,7 +30,8 @@ class HomeGamePreviewCard extends StatelessWidget {
       ),
       child: ColoredBox(
         color: background,
-        child: child ??
+        child:
+            child ??
             Image.asset(
               asset!,
               width: double.infinity,

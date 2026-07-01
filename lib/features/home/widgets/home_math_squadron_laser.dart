@@ -11,9 +11,7 @@ class HomeMathSquadronLaser extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF61DAFF),
         borderRadius: BorderRadius.circular(99),
-        boxShadow: const [
-          BoxShadow(color: Color(0xFF61DAFF), blurRadius: 9),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0xFF61DAFF), blurRadius: 9)],
       ),
     );
   }

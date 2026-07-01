@@ -31,13 +31,13 @@ class _ParentRoomPendingCard extends StatelessWidget {
     final accent = isExpired
         ? (color: const Color(0xFFB91C1C), badge: const Color(0xFFFFE2E2))
         : dueSoon
-            ? (color: const Color(0xFFFF7A1A), badge: const Color(0xFFFFF0D8))
-            : _roomPurposeAccent(exercise?.purpose);
+        ? (color: const Color(0xFFFF7A1A), badge: const Color(0xFFFFF0D8))
+        : _roomPurposeAccent(exercise?.purpose);
     final statusLabel = isExpired
         ? context.getText(AppKeys.homeworkFailed)
         : dueSoon
-            ? context.getText(AppKeys.homeworkDueSoon)
-            : purpose;
+        ? context.getText(AppKeys.homeworkDueSoon)
+        : purpose;
 
     return _ParentRoomTaskShell(
       accent: accent.color,
@@ -47,8 +47,8 @@ class _ParentRoomPendingCard extends StatelessWidget {
         icon: isExpired
             ? Icons.warning_amber_rounded
             : dueSoon
-                ? Icons.notification_important_outlined
-                : Icons.assignment_outlined,
+            ? Icons.notification_important_outlined
+            : Icons.assignment_outlined,
         color: accent.color,
         backgroundColor: accent.badge,
       ),

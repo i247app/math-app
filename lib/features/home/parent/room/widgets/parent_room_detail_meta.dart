@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentRoomDetailMeta extends StatelessWidget {
-  const _ParentRoomDetailMeta({
-    required this.icon,
-    required this.label,
-  });
+  const _ParentRoomDetailMeta({required this.icon, required this.label});
 
   final IconData icon;
   final String label;

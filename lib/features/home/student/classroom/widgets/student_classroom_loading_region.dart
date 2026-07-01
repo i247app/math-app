@@ -43,9 +43,7 @@ class _StudentClassroomLoadingRegionState
                   Colors.white.withValues(alpha: 0),
                 ],
                 stops: const [0.28, 0.5, 0.72],
-              ).createShader(
-                Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height),
-              );
+              ).createShader(Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height));
             },
             child: child,
           );
@@ -74,10 +72,7 @@ class _StudentClassroomLoadingRegionState
               radius: 12,
             ),
             const SizedBox(height: 14),
-            const _StudentClassroomSkeletonBlock(
-              height: 48,
-              radius: 20,
-            ),
+            const _StudentClassroomSkeletonBlock(height: 48, radius: 20),
             const SizedBox(height: 14),
             Container(
               height: 205,
@@ -96,10 +91,7 @@ class _StudentClassroomLoadingRegionState
                     radius: 8,
                   ),
                   SizedBox(height: 8),
-                  _StudentClassroomSkeletonBlock(
-                    height: 43,
-                    radius: 8,
-                  ),
+                  _StudentClassroomSkeletonBlock(height: 43, radius: 8),
                   SizedBox(height: 14),
                   _StudentClassroomSkeletonBlock(
                     width: 45,
@@ -141,10 +133,7 @@ class _StudentClassroomLoadingRegionState
               radius: 10,
             ),
             const SizedBox(height: 12),
-            const _StudentClassroomSkeletonBlock(
-              height: 120,
-              radius: 16,
-            ),
+            const _StudentClassroomSkeletonBlock(height: 120, radius: 16),
           ],
         ),
       ),

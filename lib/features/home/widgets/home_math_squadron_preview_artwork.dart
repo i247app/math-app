@@ -22,21 +22,14 @@ class HomeMathSquadronPreviewArtwork extends StatelessWidget {
           Positioned(
             top: 10,
             right: 12,
-            child: Icon(
-              Icons.star_rounded,
-              color: Color(0xFFFFD95A),
-              size: 15,
-            ),
+            child: Icon(Icons.star_rounded, color: Color(0xFFFFD95A), size: 15),
           ),
           Positioned(
             top: 28,
             left: 12,
             child: Icon(Icons.circle, color: Colors.white24, size: 6),
           ),
-          Positioned(
-            top: 13,
-            child: HomeMathSquadronTarget(),
-          ),
+          Positioned(top: 13, child: HomeMathSquadronTarget()),
           Positioned(
             bottom: 12,
             child: Icon(
@@ -45,10 +38,7 @@ class HomeMathSquadronPreviewArtwork extends StatelessWidget {
               size: 45,
             ),
           ),
-          Positioned(
-            bottom: 48,
-            child: HomeMathSquadronLaser(),
-          ),
+          Positioned(bottom: 48, child: HomeMathSquadronLaser()),
         ],
       ),
     );

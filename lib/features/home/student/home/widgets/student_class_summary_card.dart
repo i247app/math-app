@@ -32,10 +32,7 @@ class _StudentClassSummaryCard extends StatelessWidget {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFDDF8EE),
-                Color(0xFFD7E8FF),
-              ],
+              colors: [Color(0xFFDDF8EE), Color(0xFFD7E8FF)],
             ),
           ),
           child: Stack(

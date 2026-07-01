@@ -12,9 +12,7 @@ class HomeMathSquadronTarget extends StatelessWidget {
         color: const Color(0xFFFF625F),
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white54, width: 2),
-        boxShadow: const [
-          BoxShadow(color: Color(0x99FF625F), blurRadius: 14),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x99FF625F), blurRadius: 14)],
       ),
       child: const Center(
         child: Text(

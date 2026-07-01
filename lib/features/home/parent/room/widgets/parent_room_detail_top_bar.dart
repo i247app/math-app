@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentRoomDetailTopBar extends StatelessWidget {
-  const _ParentRoomDetailTopBar({
-    required this.title,
-    required this.onBack,
-  });
+  const _ParentRoomDetailTopBar({required this.title, required this.onBack});
 
   final String title;
   final VoidCallback onBack;
@@ -16,12 +13,7 @@ class _ParentRoomDetailTopBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
       decoration: const BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x0D000000),
-            offset: Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Color(0x0D000000), offset: Offset(0, 4))],
       ),
       child: Stack(
         alignment: Alignment.center,

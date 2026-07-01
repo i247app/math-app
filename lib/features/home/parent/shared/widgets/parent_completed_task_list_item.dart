@@ -13,8 +13,9 @@ class _ParentCompletedTaskListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final exercise = completion.exercise;
     final score = ((completion.scorePercentage ?? 0) / 10).round().clamp(0, 10);
-    final color =
-        score >= 8 ? const Color(0xFF07824C) : const Color(0xFFFF6B17);
+    final color = score >= 8
+        ? const Color(0xFF07824C)
+        : const Color(0xFFFF6B17);
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
@@ -40,8 +41,10 @@ class _ParentCompletedTaskListItem extends StatelessWidget {
                                   context,
                                   completion.child!,
                                 ),
-                          classroomName:
-                              _roomClassName(context, completion.classroom),
+                          classroomName: _roomClassName(
+                            context,
+                            completion.classroom,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

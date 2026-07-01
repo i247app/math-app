@@ -163,10 +163,7 @@ class _ParentChildDashboardLoadingState
                       ),
                       const SizedBox(height: 12),
                       Expanded(
-                        child: _ParentSkeletonBlock(
-                          radius: 13,
-                          color: color,
-                        ),
+                        child: _ParentSkeletonBlock(radius: 13, color: color),
                       ),
                     ],
                   ),

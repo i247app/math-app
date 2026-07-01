@@ -67,7 +67,6 @@ const _orange = Color(0xFFDE8C4B);
 const _historyBackground = Color(0xFFEEF9FB);
 const _cardBorder = Color(0xFFE3DDDF);
 const _activeTab = Color(0xFFFF704D);
-const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
 class HistoryTab extends StatefulWidget {
   const HistoryTab({
@@ -98,8 +97,7 @@ class HistoryTab extends StatefulWidget {
 }
 
 class _HistoryTabState extends State<HistoryTab> {
-  late final QuizService _quizService =
-      widget.quizService ?? (_useFakeQuizApi ? const FakeQuizApi() : QuizApi());
+  late final QuizService _quizService = widget.quizService ?? QuizApi();
   late final ClassroomService _classroomService = widget.classroomService;
   late final ClassroomExerciseService _assignmentService =
       widget.assignmentService;

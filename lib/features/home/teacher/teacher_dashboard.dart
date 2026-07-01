@@ -5,10 +5,7 @@ import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
 import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
 
 class TeacherDashboard extends StatelessWidget {
-  const TeacherDashboard({
-    super.key,
-    required this.args,
-  });
+  const TeacherDashboard({super.key, required this.args});
 
   final HomeDashboardArgs args;
 
@@ -22,7 +19,7 @@ class TeacherDashboard extends StatelessWidget {
         scale: args.scale,
         onCompleteProfile: args.onCompleteTeacherProfile,
         onOpenClassroomTab: args.onOpenClassroomTab,
-        onOpenStudyTab: args.onOpenReviewTab,
+        onOpenStudyTab: args.onOpenPracticeTab,
         exerciseService: args.assignmentService,
         activeRefreshTick: args.activeRefreshTick,
         isActive: args.isActive,

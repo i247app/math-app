@@ -1,10 +1,7 @@
 part of '../../../home_screen.dart';
 
 class _ParentEmptyTaskLine extends StatelessWidget {
-  const _ParentEmptyTaskLine({
-    required this.icon,
-    required this.text,
-  });
+  const _ParentEmptyTaskLine({required this.icon, required this.text});
 
   final IconData icon;
   final String text;
