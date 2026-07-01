@@ -2,10 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 
 class HomeProfileMenu extends StatelessWidget {
@@ -55,7 +54,7 @@ class HomeProfileMenu extends StatelessWidget {
               itemBuilder: (context, index) {
                 final profile = profiles[index];
                 final name = compactHomeProfileName(
-                  homeProfileDisplayName(context, profile),
+                  profileDisplayName(context, profile),
                 );
 
                 return InkWell(
@@ -105,9 +104,7 @@ class HomeProfileMenu extends StatelessWidget {
     for (final profile in profiles) {
       final painter = TextPainter(
         text: TextSpan(
-          text: compactHomeProfileName(
-            homeProfileDisplayName(context, profile),
-          ),
+          text: compactHomeProfileName(profileDisplayName(context, profile)),
           style: _nameStyle,
         ),
         maxLines: 1,
@@ -124,27 +121,9 @@ class HomeProfileMenu extends StatelessWidget {
 }
 
 String compactHomeProfileName(String name) {
-  final parts = name
-      .trim()
-      .split(RegExp(r'\s+'))
-      .where((part) => part.isNotEmpty)
-      .toList(growable: false);
-  if (parts.length <= 2) {
-    return parts.join(' ');
-  }
-  return '${parts.first} ${parts.last}';
+  return compactProfileName(name);
 }
 
 String homeProfileDisplayName(BuildContext context, StudentProfile profile) {
-  final name = profile.name?.trim();
-  if (name != null && name.isNotEmpty) {
-    return name;
-  }
-
-  final profileCode = profile.profileCode?.trim();
-  if (profileCode != null && profileCode.isNotEmpty) {
-    return profileCode;
-  }
-
-  return context.getText(AppKeys.student);
+  return profileDisplayName(context, profile);
 }

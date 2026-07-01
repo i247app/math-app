@@ -12,7 +12,7 @@ import 'package:numi_flutter/core/network/program_models.dart';
 import 'package:numi_flutter/core/network/semester_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/profile/avatar_picker.dart';
+import 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/auth/passcode_service.dart';

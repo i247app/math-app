@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
-import 'package:numi_flutter/features/profile/avatar_picker.dart';
+import 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
 import 'package:numi_flutter/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
 import 'package:numi_flutter/features/settings/widgets/account/account_screen_skeleton.dart';

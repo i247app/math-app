@@ -6,7 +6,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/profile/avatar_picker.dart';
+import 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/auth/passcode_service.dart';
 import 'package:numi_flutter/features/profile/profile_api.dart';

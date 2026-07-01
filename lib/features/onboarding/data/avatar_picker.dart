@@ -1,2 +1,2 @@
 // Compatibility export for older imports.
-export 'package:numi_flutter/features/profile/avatar_picker.dart';
+export 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
