@@ -11,9 +11,10 @@ import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/features/homework/cache/student_homework_cache.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
 
 part '../widgets/student_attempt/student_homework_attempt_header.dart';
-part '../widgets/student_attempt/student_homework_attempt_header_icon_button.dart';
 part '../widgets/student_attempt/student_homework_attempt_progress_section.dart';
 part '../widgets/student_attempt/student_homework_attempt_question_card.dart';
 part '../widgets/student_attempt/student_homework_attempt_answer_grid.dart';
@@ -21,7 +22,6 @@ part '../widgets/student_attempt/student_homework_attempt_answer_button.dart';
 part '../widgets/student_attempt/student_homework_attempt_bottom_bar.dart';
 part '../widgets/student_attempt/student_homework_attempt_bottom_action_button.dart';
 part '../widgets/student_attempt/student_homework_attempt_error_state.dart';
-part '../widgets/student_attempt/student_homework_attempt_loader.dart';
 part '../widgets/student_attempt/student_homework_attempt_helpers.dart';
 
 const _homeworkAttemptMint = Color(0xFFEBFAEC);
@@ -351,16 +351,44 @@ class _StudentHomeworkAttemptScreenState
                             onRetry: _errorRetryAction ?? _loadDetail,
                           )
                         : _isSubmitting
-                        ? _StudentHomeworkAttemptLoader(
+                        ? QuizWaveLoader(
                             key: const ValueKey('homework-submit-loader'),
                             scale: s,
                             message: context.getText(AppKeys.submittingForYou),
+                            letterStyle: TextStyle(
+                              color: _homeworkAttemptTeal,
+                              fontSize: 40 * s,
+                              fontWeight: FontWeight.w900,
+                              height: 1,
+                              letterSpacing: 3 * s,
+                            ),
+                            messageStyle: TextStyle(
+                              color: _homeworkAttemptMuted,
+                              fontSize: 16 * s,
+                              fontWeight: FontWeight.w800,
+                              height: 1.35,
+                              letterSpacing: 0,
+                            ),
                           )
                         : _isLoading
-                        ? _StudentHomeworkAttemptLoader(
+                        ? QuizWaveLoader(
                             key: const ValueKey('homework-loader'),
                             scale: s,
                             message: context.getText(AppKeys.studentHomework),
+                            letterStyle: TextStyle(
+                              color: _homeworkAttemptTeal,
+                              fontSize: 40 * s,
+                              fontWeight: FontWeight.w900,
+                              height: 1,
+                              letterSpacing: 3 * s,
+                            ),
+                            messageStyle: TextStyle(
+                              color: _homeworkAttemptMuted,
+                              fontSize: 16 * s,
+                              fontWeight: FontWeight.w800,
+                              height: 1.35,
+                              letterSpacing: 0,
+                            ),
                           )
                         : SingleChildScrollView(
                             key: const ValueKey('homework-content'),

@@ -8,10 +8,10 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 part '../widgets/student_result/student_homework_result_summary.dart';
 part '../widgets/student_result/student_homework_result_header.dart';
-part '../widgets/student_result/student_homework_result_header_icon_button.dart';
 part '../widgets/student_result/student_homework_score_ring.dart';
 part '../widgets/student_result/student_homework_review_card.dart';
 part '../widgets/student_result/student_homework_close_button.dart';

@@ -25,9 +25,13 @@ class _StudentHomeworkResultHeader extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: _StudentHomeworkResultHeaderIconButton(
+            child: QuizHeaderIconButton(
               icon: Icons.arrow_back_rounded,
+              color: _homeworkResultHeaderTeal,
               scale: scale,
+              size: 40,
+              iconSize: 23,
+              borderRadius: 12,
               onTap: () => _closeHomeworkResult(context),
             ),
           ),

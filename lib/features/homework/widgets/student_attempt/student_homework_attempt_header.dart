@@ -29,9 +29,11 @@ class _StudentHomeworkAttemptHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _StudentHomeworkAttemptHeaderIconButton(
+              QuizHeaderIconButton(
                 icon: Icons.close_rounded,
+                color: _homeworkAttemptTeal,
                 scale: scale,
+                circle: true,
                 onTap: () => Navigator.of(context).maybePop(),
               ),
               SizedBox(width: 16 * scale),
@@ -49,9 +51,11 @@ class _StudentHomeworkAttemptHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              _StudentHomeworkAttemptHeaderIconButton(
+              QuizHeaderIconButton(
                 icon: Icons.help_outline_rounded,
+                color: _homeworkAttemptTeal,
                 scale: scale,
+                circle: true,
                 onTap: HapticFeedback.selectionClick,
               ),
             ],

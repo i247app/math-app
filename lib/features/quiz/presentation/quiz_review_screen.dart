@@ -4,9 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/features/quiz/cache/quiz_cache.dart';
+import 'package:numi_flutter/features/quiz/controllers/quiz_review_controller.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 
 part '../widgets/quiz_review/quiz_review_header.dart';
@@ -56,8 +55,6 @@ const _deepInk = Color(0xFF1F2B2B);
 const _cardBorder = Color(0xFFDCE8EA);
 const _useFakeQuizApi = bool.fromEnvironment('USE_FAKE_QUIZ_API');
 
-enum _QuizReviewMode { retry, result }
-
 class QuizReviewScreen extends StatefulWidget {
   const QuizReviewScreen({super.key, required this.quizId, this.initialQuiz});
 
@@ -69,144 +66,56 @@ class QuizReviewScreen extends StatefulWidget {
 }
 
 class _QuizReviewScreenState extends State<QuizReviewScreen> {
-  late final QuizService _quizService = _useFakeQuizApi
-      ? const FakeQuizApi()
-      : QuizApi();
-
-  GeneratedQuiz? _quiz;
-  bool _isLoading = true;
-  String? _errorMessage;
-  int _selectedIndex = 0;
-  int _loadRequestId = 0;
-  _QuizReviewMode _mode = _QuizReviewMode.retry;
-  final Map<int, String> _submittedAnswers = <int, String>{};
-  final Map<int, String> _retryAnswers = <int, String>{};
+  late final QuizReviewController _controller;
 
   @override
   void initState() {
     super.initState();
-    _quiz = widget.initialQuiz;
-    _seedSubmittedAnswers(widget.initialQuiz);
-    if (widget.initialQuiz != null) {
-      QuizCache.seedDetail(widget.initialQuiz!, fallbackQuizId: widget.quizId);
-    }
-    _loadQuizDetail();
+    _controller = QuizReviewController(
+      quizId: widget.quizId,
+      quizService: _useFakeQuizApi ? const FakeQuizApi() : QuizApi(),
+      initialQuiz: widget.initialQuiz,
+    );
+    _controller.loadQuizDetail();
   }
 
-  Future<void> _loadQuizDetail({bool forceRefresh = false}) async {
-    final requestId = ++_loadRequestId;
-    final cachedQuiz = QuizCache.peekDetail(widget.quizId);
-    if (cachedQuiz != null && _quiz == null) {
-      _quiz = cachedQuiz;
-      _seedSubmittedAnswers(cachedQuiz);
-    }
-
-    final hasVisibleQuiz = _quiz != null;
-    setState(() {
-      _isLoading = !hasVisibleQuiz;
-      _errorMessage = null;
-    });
-
-    final shouldRefresh =
-        forceRefresh || !QuizCache.isDetailFresh(widget.quizId);
-    if (!shouldRefresh) {
-      setState(() => _isLoading = false);
-      return;
-    }
-
-    try {
-      final quiz = await QuizCache.loadDetail(
-        service: _quizService,
-        quizId: widget.quizId,
-        forceRefresh: forceRefresh || hasVisibleQuiz,
-      );
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-
-      setState(() {
-        _quiz = quiz;
-        _seedSubmittedAnswers(quiz);
-        _isLoading = false;
-        if (_selectedIndex >= quiz.questions.length) {
-          _selectedIndex = 0;
-        }
-      });
-    } on QuizException catch (error) {
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-
-      setState(() {
-        _errorMessage = error.message;
-        _isLoading = false;
-      });
-    } catch (_) {
-      if (!mounted || requestId != _loadRequestId) {
-        return;
-      }
-
-      setState(() {
-        _errorMessage = AppStrings.current(AppKeys.quizDetailLoadFailed);
-        _isLoading = false;
-      });
-    }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _selectQuestion(int index) {
-    HapticFeedback.selectionClick();
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (_controller.selectQuestion(index)) {
+      HapticFeedback.selectionClick();
+    }
   }
 
-  void _selectMode(_QuizReviewMode mode) {
-    HapticFeedback.selectionClick();
-    setState(() => _mode = mode);
+  void _selectMode(QuizReviewMode mode) {
+    if (_controller.selectMode(mode)) {
+      HapticFeedback.selectionClick();
+    }
   }
 
   void _selectAnswer(int questionNumber, String label) {
     HapticFeedback.selectionClick();
-    setState(() {
-      _retryAnswers[questionNumber] = label.trim().toUpperCase();
-    });
+    _controller.selectAnswer(questionNumber, label);
   }
 
   void _goToPreviousQuestion() {
-    if (_selectedIndex <= 0) {
-      return;
+    if (_controller.goToPreviousQuestion()) {
+      HapticFeedback.selectionClick();
     }
-    _selectQuestion(_selectedIndex - 1);
   }
 
   void _goToNextQuestion() {
-    final lastIndex = (_quiz?.questions.length ?? 0) - 1;
-    if (_selectedIndex >= lastIndex) {
-      return;
-    }
-    _selectQuestion(_selectedIndex + 1);
-  }
-
-  void _seedSubmittedAnswers(GeneratedQuiz? quiz) {
-    if (quiz == null) {
-      return;
-    }
-    _submittedAnswers.clear();
-    if (quiz.answers.isEmpty) {
-      return;
-    }
-    for (final answer in quiz.answers) {
-      final label = answer.label.trim().toUpperCase();
-      if (label.isNotEmpty) {
-        _submittedAnswers[answer.questionNumber] = label;
-      }
+    if (_controller.goToNextQuestion()) {
+      HapticFeedback.selectionClick();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final quiz = _quiz;
-
     return Scaffold(
       backgroundColor: _reviewBackground,
       body: SafeArea(
@@ -215,31 +124,41 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
           children: [
             _QuizReviewHeader(onBack: () => Navigator.of(context).pop()),
             Expanded(
-              child: quiz == null
-                  ? _isLoading
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  final quiz = _controller.quiz;
+                  if (quiz == null) {
+                    return _controller.isLoading
                         ? const _QuizReviewLoadingContent(
                             showHeaderSkeleton: false,
                           )
                         : _QuizReviewStatePanel(
                             isLoading: false,
-                            message: _errorMessage,
-                            onRetry: () => _loadQuizDetail(forceRefresh: true),
-                          )
-                  : _QuizReviewContent(
-                      quiz: quiz,
-                      selectedIndex: _selectedIndex,
-                      mode: _mode,
-                      isLoading: _isLoading,
-                      errorMessage: _errorMessage,
-                      onRetry: () => _loadQuizDetail(forceRefresh: true),
-                      onModeSelected: _selectMode,
-                      onQuestionSelected: _selectQuestion,
-                      submittedAnswers: _submittedAnswers,
-                      retryAnswers: _retryAnswers,
-                      onAnswerSelected: _selectAnswer,
-                      onPrevious: _goToPreviousQuestion,
-                      onNext: _goToNextQuestion,
-                    ),
+                            message: _controller.errorMessage,
+                            onRetry: () =>
+                                _controller.loadQuizDetail(forceRefresh: true),
+                          );
+                  }
+
+                  return _QuizReviewContent(
+                    quiz: quiz,
+                    selectedIndex: _controller.selectedIndex,
+                    mode: _controller.mode,
+                    isLoading: _controller.isLoading,
+                    errorMessage: _controller.errorMessage,
+                    onRetry: () =>
+                        _controller.loadQuizDetail(forceRefresh: true),
+                    onModeSelected: _selectMode,
+                    onQuestionSelected: _selectQuestion,
+                    submittedAnswers: _controller.submittedAnswers,
+                    retryAnswers: _controller.retryAnswers,
+                    onAnswerSelected: _selectAnswer,
+                    onPrevious: _goToPreviousQuestion,
+                    onNext: _goToNextQuestion,
+                  );
+                },
+              ),
             ),
           ],
         ),

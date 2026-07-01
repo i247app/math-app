@@ -19,11 +19,11 @@ class _QuizReviewContent extends StatelessWidget {
 
   final GeneratedQuiz quiz;
   final int selectedIndex;
-  final _QuizReviewMode mode;
+  final QuizReviewMode mode;
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback onRetry;
-  final ValueChanged<_QuizReviewMode> onModeSelected;
+  final ValueChanged<QuizReviewMode> onModeSelected;
   final ValueChanged<int> onQuestionSelected;
   final Map<int, String> submittedAnswers;
   final Map<int, String> retryAnswers;
@@ -62,7 +62,7 @@ class _QuizReviewContent extends StatelessWidget {
               message: context.getText(AppKeys.emptyQuizQuestions),
               onRetry: onRetry,
             )
-          else if (mode == _QuizReviewMode.result)
+          else if (mode == QuizReviewMode.result)
             _QuizReviewResultQuestionList(
               quiz: quiz,
               selectedAnswers: submittedAnswers,

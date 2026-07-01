@@ -6,8 +6,8 @@ class _QuizReviewModeTabs extends StatelessWidget {
     required this.onSelected,
   });
 
-  final _QuizReviewMode selectedMode;
-  final ValueChanged<_QuizReviewMode> onSelected;
+  final QuizReviewMode selectedMode;
+  final ValueChanged<QuizReviewMode> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +23,15 @@ class _QuizReviewModeTabs extends StatelessWidget {
           Expanded(
             child: _QuizReviewModeTabButton(
               label: context.getText(AppKeys.testAgain),
-              selected: selectedMode == _QuizReviewMode.retry,
-              onTap: () => onSelected(_QuizReviewMode.retry),
+              selected: selectedMode == QuizReviewMode.retry,
+              onTap: () => onSelected(QuizReviewMode.retry),
             ),
           ),
           Expanded(
             child: _QuizReviewModeTabButton(
               label: context.getText(AppKeys.viewResult),
-              selected: selectedMode == _QuizReviewMode.result,
-              onTap: () => onSelected(_QuizReviewMode.result),
+              selected: selectedMode == QuizReviewMode.result,
+              onTap: () => onSelected(QuizReviewMode.result),
             ),
           ),
         ],
