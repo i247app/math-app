@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
@@ -29,16 +30,25 @@ class WelcomeStartButton extends StatelessWidget {
           onStart();
         },
         borderRadius: radius,
-        child: Center(
-          child: Text(
-            context.getText(AppKeys.start).toUpperCase(),
-            style: GoogleFonts.fredoka(
-              color: Colors.white,
-              fontSize: 18 * scale,
-              fontWeight: FontWeight.w700,
-              height: 1.2,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              context.getText(AppKeys.continueLabel),
+              style: GoogleFonts.nunito(
+                color: Colors.white,
+                fontSize: 18 * scale,
+                fontWeight: FontWeight.w900,
+                height: 1.2,
+              ),
             ),
-          ),
+            SizedBox(width: 9 * scale),
+            SvgPicture.asset(
+              'assets/images/welcome_screen/welcome_arrow_right.svg',
+              width: 16 * scale,
+              height: 16 * scale,
+            ),
+          ],
         ),
       ),
     );

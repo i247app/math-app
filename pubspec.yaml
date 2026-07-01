@@ -33,4 +33,5 @@ flutter:
     - .env
     - assets/avatars/
     - assets/images/
+    - assets/images/welcome_screen/
     - assets/sounds/effects/

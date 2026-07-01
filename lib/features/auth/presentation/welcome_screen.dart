@@ -24,7 +24,33 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
 
     _didPrecacheNextScreenAssets = true;
-    precacheImage(const AssetImage('assets/images/numi-mascot.png'), context);
+    const welcomeAssetPrefix = 'assets/images/welcome_screen/';
+    precacheImage(
+      const AssetImage('${welcomeAssetPrefix}welcome_hero_math_friends.png'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('${welcomeAssetPrefix}welcome_logo_mascot.png'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('${welcomeAssetPrefix}welcome_card_assessment.png'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('${welcomeAssetPrefix}welcome_card_teacher_support.png'),
+      context,
+    );
+    precacheImage(
+      const AssetImage(
+        '${welcomeAssetPrefix}welcome_card_progress_tracking.png',
+      ),
+      context,
+    );
+    precacheImage(
+      const AssetImage('${welcomeAssetPrefix}welcome_card_game_learning.png'),
+      context,
+    );
   }
 
   @override

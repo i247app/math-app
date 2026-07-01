@@ -11,11 +11,17 @@ class WelcomeComposition extends StatelessWidget {
 
   final VoidCallback onStart;
 
-  static const _designWidth = 390.0;
+  static const _designWidth = 360.0;
   static const _designHeight = 800.0;
-  static const _mascotAsset = 'assets/images/welcome_figma_mascot.png';
-  static const _wavesAsset = 'assets/images/welcome_figma_waves.png';
-  static const _booksAsset = 'assets/images/welcome_figma_books.png';
+  static const _assetPrefix = 'assets/images/welcome_screen/';
+  static const _heroAsset = '${_assetPrefix}welcome_hero_math_friends.png';
+  static const _mascotLogoAsset = '${_assetPrefix}welcome_logo_mascot.png';
+  static const _assessmentAsset = '${_assetPrefix}welcome_card_assessment.png';
+  static const _teacherAsset =
+      '${_assetPrefix}welcome_card_teacher_support.png';
+  static const _progressAsset =
+      '${_assetPrefix}welcome_card_progress_tracking.png';
+  static const _gameAsset = '${_assetPrefix}welcome_card_game_learning.png';
 
   @override
   Widget build(BuildContext context) {
@@ -23,195 +29,312 @@ class WelcomeComposition extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
-        final scale = math.max(width / _designWidth, height / _designHeight);
+        final scale = math.min(width / _designWidth, height / _designHeight);
         final canvasWidth = _designWidth * scale;
         final canvasHeight = _designHeight * scale;
         final leftOffset = (width - canvasWidth) / 2;
-        const topOffset = 0.0;
+        final topOffset = (height - canvasHeight) / 2;
 
         double s(double value) => value * scale;
 
-        return Stack(
-          clipBehavior: Clip.hardEdge,
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.noScaling),
+          child: Stack(
+            clipBehavior: Clip.hardEdge,
+            children: [
+              const Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        WelcomeStyle.backgroundTop,
+                        WelcomeStyle.background,
+                        Colors.white,
+                      ],
+                      stops: [0, 0.42, 1],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: leftOffset,
+                top: topOffset,
+                width: canvasWidth,
+                height: canvasHeight,
+                child: Stack(
+                  clipBehavior: Clip.hardEdge,
+                  children: [
+                    Positioned(
+                      left: s(16),
+                      top: s(18),
+                      width: s(156),
+                      height: s(32),
+                      child: const _BrandLogo(),
+                    ),
+                    Positioned(
+                      left: s(-128),
+                      top: s(78),
+                      width: s(540),
+                      height: s(360),
+                      child: Image.asset(_heroAsset, fit: BoxFit.contain),
+                    ),
+                    Positioned(
+                      left: s(16),
+                      top: s(388),
+                      width: s(156),
+                      height: s(132),
+                      child: const _FeatureCard(
+                        imageAsset: _assessmentAsset,
+                        imageSize: 54,
+                        title: 'Đánh giá năng lực',
+                        subtitle: 'Hiểu đúng trình độ của con',
+                      ),
+                    ),
+                    Positioned(
+                      left: s(184),
+                      top: s(388),
+                      width: s(156),
+                      height: s(132),
+                      child: const _FeatureCard(
+                        imageAsset: _teacherAsset,
+                        imageSize: 54,
+                        title: 'Hỗ trợ giáo viên',
+                        subtitle: 'Quản lý lớp học dễ dàng',
+                      ),
+                    ),
+                    Positioned(
+                      left: s(16),
+                      top: s(532),
+                      width: s(156),
+                      height: s(132),
+                      child: const _FeatureCard(
+                        imageAsset: _progressAsset,
+                        imageSize: 54,
+                        title: 'Theo dõi tiến độ',
+                        subtitle: 'Bám sát sự tiến bộ của con',
+                      ),
+                    ),
+                    Positioned(
+                      left: s(184),
+                      top: s(532),
+                      width: s(156),
+                      height: s(132),
+                      child: const _FeatureCard(
+                        imageAsset: _gameAsset,
+                        imageSize: 54,
+                        title: 'Học qua game',
+                        subtitle: 'Học mà chơi - Chơi mà giỏi',
+                      ),
+                    ),
+                    Positioned(
+                      left: s(24),
+                      top: s(720),
+                      width: s(56),
+                      height: s(8),
+                      child: const _PageIndicator(),
+                    ),
+                    Positioned(
+                      left: s(202),
+                      top: s(703),
+                      width: s(143),
+                      height: s(42),
+                      child: WelcomeStartButton(onStart: onStart, scale: scale),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _BrandLogo extends StatelessWidget {
+  const _BrandLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scale = constraints.maxHeight / 32;
+
+        return Row(
           children: [
-            const Positioned.fill(
-              child: ColoredBox(color: WelcomeStyle.background),
+            Image.asset(
+              WelcomeComposition._mascotLogoAsset,
+              width: 31 * scale,
+              height: 31 * scale,
+              fit: BoxFit.contain,
             ),
-            Positioned(
-              left: leftOffset,
-              top: topOffset,
-              width: canvasWidth,
-              height: canvasHeight,
-              child: Stack(
-                clipBehavior: Clip.hardEdge,
+            SizedBox(width: 8 * scale),
+            Text.rich(
+              TextSpan(
                 children: [
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(75),
-                    height: s(284),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(284),
-                        height: s(284),
-                        child: Image.asset(_mascotAsset, fit: BoxFit.cover),
-                      ),
+                  TextSpan(
+                    text: 'NUMI',
+                    style: GoogleFonts.fredoka(
+                      color: WelcomeStyle.deepTeal,
+                      fontSize: 20 * scale,
+                      fontWeight: FontWeight.w800,
+                      height: 1,
                     ),
                   ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(329),
-                    height: s(48),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(211),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'NUMI',
-                                  style: GoogleFonts.bagelFatOne(
-                                    color: WelcomeStyle.teal,
-                                    fontSize: s(40),
-                                    height: 1,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'NUMI',
-                                  style: GoogleFonts.bagelFatOne(
-                                    color: WelcomeStyle.coral,
-                                    fontSize: s(40),
-                                    height: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            maxLines: 1,
-                            softWrap: false,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(385),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(170),
-                        child: Text.rich(
-                          TextSpan(
-                            style: GoogleFonts.andika(
-                              color: WelcomeStyle.teal,
-                              fontSize: s(18),
-                              fontWeight: FontWeight.w400,
-                              height: 22.5 / 18,
-                            ),
-                            children: [
-                              const TextSpan(text: 'Học tập '),
-                              TextSpan(
-                                text: 'thông minh\n',
-                                style: GoogleFonts.andika(
-                                  color: WelcomeStyle.taglineCoral,
-                                  fontSize: s(18),
-                                  fontWeight: FontWeight.w400,
-                                  height: 22.5 / 18,
-                                ),
-                              ),
-                              const TextSpan(text: 'Tiến bộ mỗi ngày'),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(443),
-                    height: s(6),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(48),
-                        height: s(6),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: WelcomeStyle.taglineCoral,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(425),
-                    height: s(375),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(470),
-                        height: s(375),
-                        child: Opacity(
-                          opacity: 0.7,
-                          child: ClipRect(
-                            child: Image.asset(
-                              _wavesAsset,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(499),
-                    height: s(209),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(361),
-                        height: s(209),
-                        child: ClipRect(
-                          child: Image.asset(
-                            _booksAsset,
-                            fit: BoxFit.cover,
-                            alignment: Alignment.topCenter,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(688),
-                    height: s(58),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(230),
-                        height: s(58),
-                        child: WelcomeStartButton(
-                          onStart: onStart,
-                          scale: scale,
-                        ),
-                      ),
+                  TextSpan(
+                    text: 'NUMI',
+                    style: GoogleFonts.fredoka(
+                      color: WelcomeStyle.taglineCoral,
+                      fontSize: 20 * scale,
+                      fontWeight: FontWeight.w800,
+                      height: 1,
                     ),
                   ),
                 ],
               ),
+              maxLines: 1,
+              softWrap: false,
             ),
           ],
         );
       },
+    );
+  }
+}
+
+class _FeatureCard extends StatelessWidget {
+  const _FeatureCard({
+    required this.imageAsset,
+    required this.imageSize,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String imageAsset;
+  final double imageSize;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scale = constraints.maxWidth / 156;
+
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8 * scale),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF101828).withValues(alpha: 0.08),
+                offset: Offset(0, 8 * scale),
+                blurRadius: 20 * scale,
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              12 * scale,
+              18 * scale,
+              12 * scale,
+              12 * scale,
+            ),
+            child: Column(
+              children: [
+                Image.asset(
+                  imageAsset,
+                  width: imageSize * scale,
+                  height: imageSize * scale,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 12 * scale),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    style: GoogleFonts.nunito(
+                      color: WelcomeStyle.cardTitle,
+                      fontSize: 15 * scale,
+                      fontWeight: FontWeight.w800,
+                      height: 1.15,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(height: 5 * scale),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    subtitle,
+                    maxLines: 1,
+                    style: GoogleFonts.nunito(
+                      color: WelcomeStyle.cardSubtitle,
+                      fontSize: 10.5 * scale,
+                      fontWeight: FontWeight.w500,
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PageIndicator extends StatelessWidget {
+  const _PageIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scale = constraints.maxWidth / 56;
+        final dotSize = 8 * scale;
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _IndicatorDot(color: WelcomeStyle.inactiveDot, size: dotSize),
+            SizedBox(width: 8 * scale),
+            Container(
+              width: 24 * scale,
+              height: dotSize,
+              decoration: BoxDecoration(
+                color: WelcomeStyle.coral,
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+            SizedBox(width: 8 * scale),
+            _IndicatorDot(color: WelcomeStyle.inactiveDot, size: dotSize),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _IndicatorDot extends StatelessWidget {
+  const _IndicatorDot({required this.color, required this.size});
+
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }
