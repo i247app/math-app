@@ -5,10 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/auth/models/auth_profile_resolution.dart';
+import 'package:numi_flutter/features/profile/services/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/auth/passcode_service.dart';
+import 'package:numi_flutter/features/auth/services/auth_profile_resolver.dart';
 import 'package:numi_flutter/features/profile/profile_api.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
 
@@ -20,18 +22,22 @@ class AuthCubit extends Cubit<AuthState> {
     OtpAuthService? authService,
     ProfileService? profileService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
+    AuthProfileResolver? profileResolver,
     PasscodeService passcodeService = const SecurePasscodeService(),
   }) : _avatarPicker = avatarPicker,
        _authService = authService ?? OtpAuthApi(),
-       _profileService = profileService ?? ProfileApi(),
-       _activeProfileSession = activeProfileSession,
+       _profileResolver =
+           profileResolver ??
+           AuthProfileResolver(
+             profileService: profileService ?? ProfileApi(),
+             activeProfileSession: activeProfileSession,
+           ),
        _passcodeService = passcodeService,
        super(const AuthState());
 
   final AvatarPickerService _avatarPicker;
   final OtpAuthService _authService;
-  final ProfileService _profileService;
-  final ActiveProfileSession _activeProfileSession;
+  final AuthProfileResolver _profileResolver;
   final PasscodeService _passcodeService;
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
@@ -185,8 +191,8 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       final profileResolution = user == null
-          ? const _ResolvedProfiles.empty()
-          : await _profilesForUser(user);
+          ? const AuthProfileResolution.empty()
+          : await _profileResolver.resolveForUser(user);
 
       if (user == null) {
         emit(
@@ -400,7 +406,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       if (_canSkipLoginOtp(result)) {
-        final profileResolution = await _profilesForUser(user);
+        final profileResolution = await _profileResolver.resolveForUser(user);
         await _emitHomeOrPasscodeSetup(
           user: user,
           profileResolution: profileResolution,
@@ -554,8 +560,8 @@ class AuthCubit extends Cubit<AuthState> {
 
       if (otpFlow == OtpFlow.signup) {
         final profileResolution = result.user == null
-            ? const _ResolvedProfiles.empty()
-            : await _profilesForUser(result.user!);
+            ? const AuthProfileResolution.empty()
+            : await _profileResolver.resolveForUser(result.user!);
         emit(
           state.copyWith(
             screen: AppScreen.signup,
@@ -585,7 +591,9 @@ class AuthCubit extends Cubit<AuthState> {
         return;
       }
 
-      final profileResolution = await _profilesForUser(result.user!);
+      final profileResolution = await _profileResolver.resolveForUser(
+        result.user!,
+      );
       await _emitHomeOrPasscodeSetup(
         user: result.user!,
         profileResolution: profileResolution,
@@ -680,7 +688,7 @@ class AuthCubit extends Cubit<AuthState> {
         email: trimmedEmail?.isEmpty == true ? null : trimmedEmail,
         avatarPath: state.avatarPath,
       );
-      final profileResolution = await _profilesForUser(user);
+      final profileResolution = await _profileResolver.resolveForUser(user);
       await _emitHomeOrPasscodeSetup(
         user: user,
         profileResolution: profileResolution,
@@ -813,7 +821,7 @@ class AuthCubit extends Cubit<AuthState> {
       final result = await _authService.loginByPhone(phone);
       final user = result.user ?? pinUser;
       if (_canSkipLoginOtp(result)) {
-        final profileResolution = await _profilesForUser(user);
+        final profileResolution = await _profileResolver.resolveForUser(user);
         await _rememberAuthenticatedAccount(user);
         emit(
           state.copyWith(
@@ -881,7 +889,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> _emitHomeOrPasscodeSetup({
     required LoginUser user,
-    required _ResolvedProfiles profileResolution,
+    required AuthProfileResolution profileResolution,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
@@ -935,7 +943,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> _emitAuthenticatedHome(
     LoginUser user,
-    _ResolvedProfiles profileResolution,
+    AuthProfileResolution profileResolution,
   ) async {
     await _rememberAuthenticatedAccount(user);
     emit(
@@ -988,48 +996,6 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<_ResolvedProfiles> _profilesForUser(LoginUser user) async {
-    final userId = user.id;
-    if (userId <= 0) {
-      return const _ResolvedProfiles.empty();
-    }
-
-    try {
-      final profiles = await _profileService.listProfiles(userId: userId);
-      final activeProfile = await _activeProfileSession.resolveActiveProfile(
-        userId: userId,
-        profiles: profiles,
-      );
-      final activeProfileId = ActiveProfileSession.profileStableId(
-        activeProfile,
-      );
-      if (activeProfileId != null) {
-        await _activeProfileSession.writeActiveProfileId(
-          userId: userId,
-          profileId: activeProfileId,
-        );
-      } else {
-        await _activeProfileSession.clearActiveProfileId(userId);
-      }
-      return _ResolvedProfiles(
-        profiles: profiles,
-        activeProfile: activeProfile,
-      );
-    } on ProfileException catch (error) {
-      return _ResolvedProfiles(
-        profiles: const <StudentProfile>[],
-        activeProfile: null,
-        errorMessage: error.message,
-      );
-    } catch (_) {
-      return _ResolvedProfiles(
-        profiles: const <StudentProfile>[],
-        activeProfile: null,
-        errorMessage: AppStrings.current(AppKeys.profileLoadFailed),
-      );
-    }
-  }
-
   Future<void> _rememberAuthenticatedAccount(LoginUser user) async {
     final userPhone = user.phone?.trim();
     final phone = userPhone != null && userPhone.isNotEmpty
@@ -1055,7 +1021,7 @@ class AuthCubit extends Cubit<AuthState> {
       return;
     }
 
-    final profileResolution = await _profilesForUser(user);
+    final profileResolution = await _profileResolver.resolveForUser(user);
     if (isClosed) {
       return;
     }
@@ -1078,10 +1044,7 @@ class AuthCubit extends Cubit<AuthState> {
       return;
     }
 
-    await _activeProfileSession.writeActiveProfileId(
-      userId: user.id,
-      profileId: profileId,
-    );
+    await _profileResolver.rememberActiveProfile(user: user, profile: profile);
     if (isClosed) {
       return;
     }
@@ -1167,21 +1130,4 @@ class AuthCubit extends Cubit<AuthState> {
       ),
     );
   }
-}
-
-class _ResolvedProfiles {
-  const _ResolvedProfiles({
-    required this.profiles,
-    required this.activeProfile,
-    this.errorMessage,
-  });
-
-  const _ResolvedProfiles.empty()
-    : profiles = const <StudentProfile>[],
-      activeProfile = null,
-      errorMessage = null;
-
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
-  final String? errorMessage;
 }
