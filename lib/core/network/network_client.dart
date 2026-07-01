@@ -33,11 +33,10 @@ class NetworkClient {
     Dio? dio,
     AuthTokenStore? authTokenStore,
     AppApiMetadataProvider? metadataProvider,
-  })  : _baseUrl = _normalizeBaseUrl(baseUrl ?? ApiConfig.baseUrl),
-        _dio = dio ?? Dio(),
-        _authTokenStore = authTokenStore ?? CachedAuthTokenStore.instance,
-        _metadataProvider =
-            metadataProvider ?? AppApiMetadataProvider.instance {
+  }) : _baseUrl = _normalizeBaseUrl(baseUrl ?? ApiConfig.baseUrl),
+       _dio = dio ?? Dio(),
+       _authTokenStore = authTokenStore ?? CachedAuthTokenStore.instance,
+       _metadataProvider = metadataProvider ?? AppApiMetadataProvider.instance {
     _dio.options
       ..baseUrl = _baseUrl
       ..connectTimeout = const Duration(seconds: 15)
@@ -45,9 +44,7 @@ class NetworkClient {
       ..sendTimeout = const Duration(seconds: 15)
       ..responseType = ResponseType.json
       ..validateStatus = (_) => true;
-    _dio.interceptors.add(
-      const DefaultHeadersInterceptor(),
-    );
+    _dio.interceptors.add(const DefaultHeadersInterceptor());
     _dio.interceptors.add(
       MetadataInterceptor(metadataProvider: _metadataProvider),
     );
@@ -57,9 +54,7 @@ class NetworkClient {
     _dio.interceptors.add(
       AuthTokenInterceptor(authTokenStore: _authTokenStore),
     );
-    _dio.interceptors.add(
-      const NetworkLogInterceptor(),
-    );
+    _dio.interceptors.add(const NetworkLogInterceptor());
   }
 
   final String _baseUrl;
@@ -160,8 +155,8 @@ class NetworkClient {
       final Map<String, dynamic> json => json,
       final Map<Object?, Object?> json => Map<String, dynamic>.from(json),
       _ => throw NetworkException(
-          AppStrings.current(AppKeys.invalidServerResponse),
-        ),
+        AppStrings.current(AppKeys.invalidServerResponse),
+      ),
     };
   }
 
@@ -202,25 +197,27 @@ class NetworkClient {
   }
 
   static String _dioErrorMessage(DioException error) {
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-        return AppStrings.current(AppKeys.apiConnectTimeout);
-      case DioExceptionType.receiveTimeout:
-        return AppStrings.current(AppKeys.apiReceiveTimeout);
-      case DioExceptionType.connectionError:
-        return AppStrings.currentFormat(
-          AppKeys.apiConnectFailed,
-          {'message': error.message},
-        );
-      case DioExceptionType.badCertificate:
-        return AppStrings.current(AppKeys.apiBadCertificate);
-      case DioExceptionType.cancel:
-        return AppStrings.current(AppKeys.apiRequestCanceled);
-      case DioExceptionType.badResponse:
-      case DioExceptionType.unknown:
-        return error.message ?? AppStrings.current(AppKeys.apiConnectionFailed);
+    final type = error.type;
+    if (type == DioExceptionType.connectionTimeout ||
+        type == DioExceptionType.sendTimeout) {
+      return AppStrings.current(AppKeys.apiConnectTimeout);
     }
+    if (type == DioExceptionType.receiveTimeout) {
+      return AppStrings.current(AppKeys.apiReceiveTimeout);
+    }
+    if (type == DioExceptionType.connectionError) {
+      return AppStrings.currentFormat(AppKeys.apiConnectFailed, {
+        'message': error.message,
+      });
+    }
+    if (type == DioExceptionType.badCertificate) {
+      return AppStrings.current(AppKeys.apiBadCertificate);
+    }
+    if (type == DioExceptionType.cancel) {
+      return AppStrings.current(AppKeys.apiRequestCanceled);
+    }
+
+    return error.message ?? AppStrings.current(AppKeys.apiConnectionFailed);
   }
 }
 
@@ -229,11 +226,9 @@ class NetworkApi {
 
   NetworkApi._shared() : _networkClient = NetworkClient();
 
-  NetworkApi({
-    String? baseUrl,
-    NetworkClient? networkClient,
-  }) : _networkClient = networkClient ??
-            NetworkClient(baseUrl: baseUrl ?? ApiConfig.baseUrl);
+  NetworkApi({String? baseUrl, NetworkClient? networkClient})
+    : _networkClient =
+          networkClient ?? NetworkClient(baseUrl: baseUrl ?? ApiConfig.baseUrl);
 
   final NetworkClient _networkClient;
 
@@ -344,9 +339,7 @@ class NetworkApi {
     return verifyResponse;
   }
 
-  Future<GenerateQuizResponse> generateQuiz(
-    GenerateQuizRequest request,
-  ) async {
+  Future<GenerateQuizResponse> generateQuiz(GenerateQuizRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/quizzes/generate',
       request.toJson(),
@@ -373,16 +366,11 @@ class NetworkApi {
     );
     final mstatus = responseJson['mstatus'];
     if (mstatus is int && mstatus != 200) {
-      throw NetworkException(
-        _apiErrorMessage(responseJson),
-        status: mstatus,
-      );
+      throw NetworkException(_apiErrorMessage(responseJson), status: mstatus);
     }
   }
 
-  Future<SubmitQuizResponse> submitQuiz(
-    SubmitQuizRequest request,
-  ) async {
+  Future<SubmitQuizResponse> submitQuiz(SubmitQuizRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/quizzes/submit',
       request.toJson(),
@@ -402,9 +390,7 @@ class NetworkApi {
     return quizResponse;
   }
 
-  Future<QuizListResponse> listQuizzes(
-    QuizListRequest request,
-  ) async {
+  Future<QuizListResponse> listQuizzes(QuizListRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/quizzes/list',
       request.toJson(),
@@ -441,9 +427,7 @@ class NetworkApi {
     return quizResponse;
   }
 
-  Future<GradeListResponse> listGrades(
-    GradeListRequest request,
-  ) async {
+  Future<GradeListResponse> listGrades(GradeListRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/grades/list',
       request.toJson(),
@@ -462,9 +446,7 @@ class NetworkApi {
     return gradeResponse;
   }
 
-  Future<ChapterListResponse> listChapters(
-    ChapterListRequest request,
-  ) async {
+  Future<ChapterListResponse> listChapters(ChapterListRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/chapters/list',
       request.toJson(),
@@ -483,9 +465,7 @@ class NetworkApi {
     return chapterResponse;
   }
 
-  Future<ProfileListResponse> listProfiles(
-    ProfileListRequest request,
-  ) async {
+  Future<ProfileListResponse> listProfiles(ProfileListRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/profiles/list',
       request.toJson(),
@@ -504,9 +484,7 @@ class NetworkApi {
     return profileResponse;
   }
 
-  Future<SchoolListResponse> listSchools(
-    SchoolListRequest request,
-  ) async {
+  Future<SchoolListResponse> listSchools(SchoolListRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/schools/list',
       request.toJson(),
@@ -525,9 +503,7 @@ class NetworkApi {
     return schoolResponse;
   }
 
-  Future<ProgramListResponse> listPrograms(
-    ProgramListRequest request,
-  ) async {
+  Future<ProgramListResponse> listPrograms(ProgramListRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/programs/list',
       request.toJson(),
@@ -717,10 +693,7 @@ class NetworkApi {
   Future<ClassroomActionResponse> joinClassroomByCode(
     ClassroomJoinByCodeRequest request,
   ) {
-    return _classroomAction(
-      '/classrooms/join-by-code',
-      request.toJson(),
-    );
+    return _classroomAction('/classrooms/join-by-code', request.toJson());
   }
 
   Future<ClassroomMemberListResponse> listClassroomJoinRequests(
@@ -790,10 +763,7 @@ class NetworkApi {
   Future<ClassroomActionResponse> sendClassroomInvitations(
     ClassroomInvitationSendRequest request,
   ) {
-    return _classroomAction(
-      '/classrooms/invitations/send',
-      request.toJson(),
-    );
+    return _classroomAction('/classrooms/invitations/send', request.toJson());
   }
 
   Future<ClassroomInvitationListResponse> listMyPendingClassroomInvitations(
@@ -822,19 +792,13 @@ class NetworkApi {
   Future<ClassroomActionResponse> acceptClassroomInvitation(
     ClassroomInvitationActionRequest request,
   ) {
-    return _classroomAction(
-      '/classrooms/invitations/accept',
-      request.toJson(),
-    );
+    return _classroomAction('/classrooms/invitations/accept', request.toJson());
   }
 
   Future<ClassroomActionResponse> rejectClassroomInvitation(
     ClassroomInvitationActionRequest request,
   ) {
-    return _classroomAction(
-      '/classrooms/invitations/reject',
-      request.toJson(),
-    );
+    return _classroomAction('/classrooms/invitations/reject', request.toJson());
   }
 
   Future<ClassroomResponse> createClassroom(
@@ -965,8 +929,9 @@ class NetworkApi {
       '/classroom-exercise/submissions/submit',
       request.toJson(),
     );
-    final submissionResponse =
-        ClassroomExerciseSubmissionResponse.fromJson(responseJson);
+    final submissionResponse = ClassroomExerciseSubmissionResponse.fromJson(
+      responseJson,
+    );
     if (submissionResponse.mstatus != 200) {
       throw NetworkException(
         submissionResponse.mmessage ??
@@ -1060,10 +1025,7 @@ class NetworkApi {
   static Map<String, dynamic> _currentUserJson(Map<String, dynamic> json) {
     final mstatus = json['mstatus'];
     if (mstatus is int && mstatus != 200) {
-      throw NetworkException(
-        _apiErrorMessage(json),
-        status: mstatus,
-      );
+      throw NetworkException(_apiErrorMessage(json), status: mstatus);
     }
 
     if (json.containsKey('user') && json['user'] == null) {
