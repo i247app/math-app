@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi_flutter/features/auth/widgets/welcome/numi_brand_text.dart';
 import 'package:numi_flutter/features/auth/widgets/welcome/welcome_start_button.dart';
 import 'package:numi_flutter/features/auth/widgets/welcome/welcome_style.dart';
 
@@ -189,31 +190,10 @@ class _BrandLogo extends StatelessWidget {
                   fit: BoxFit.contain,
                 ),
                 SizedBox(width: 8 * scale),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'NUMI',
-                        style: GoogleFonts.fredoka(
-                          color: WelcomeStyle.deepTeal,
-                          fontSize: 20 * scale,
-                          fontWeight: FontWeight.w800,
-                          height: 1,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'NUMI',
-                        style: GoogleFonts.fredoka(
-                          color: WelcomeStyle.taglineCoral,
-                          fontSize: 20 * scale,
-                          fontWeight: FontWeight.w800,
-                          height: 1,
-                        ),
-                      ),
-                    ],
-                  ),
-                  maxLines: 1,
-                  softWrap: false,
+                NumiBrandText(
+                  fontSize: 20 * scale,
+                  firstColor: WelcomeStyle.deepTeal,
+                  secondColor: WelcomeStyle.taglineCoral,
                 ),
               ],
             ),

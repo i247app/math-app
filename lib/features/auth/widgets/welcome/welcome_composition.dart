@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/auth/widgets/welcome/numi_brand_text.dart';
 import 'package:numi_flutter/features/auth/widgets/welcome/welcome_start_button.dart';
 import 'package:numi_flutter/features/auth/widgets/welcome/welcome_style.dart';
 
@@ -70,30 +71,7 @@ class WelcomeComposition extends StatelessWidget {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
-                          child: Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'NUMI',
-                                  style: GoogleFonts.bagelFatOne(
-                                    color: WelcomeStyle.teal,
-                                    fontSize: s(40),
-                                    height: 1,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'NUMI',
-                                  style: GoogleFonts.bagelFatOne(
-                                    color: WelcomeStyle.coral,
-                                    fontSize: s(40),
-                                    height: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            maxLines: 1,
-                            softWrap: false,
-                          ),
+                          child: NumiBrandText(fontSize: s(40)),
                         ),
                       ),
                     ),

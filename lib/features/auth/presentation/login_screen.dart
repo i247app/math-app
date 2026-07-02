@@ -5,6 +5,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
 import 'package:numi_flutter/features/auth/widgets/login/login_card.dart';
+import 'package:numi_flutter/features/auth/widgets/welcome/numi_brand_text.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -85,17 +86,7 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: compact ? 16 : 24),
               // Title
-              Center(
-                child: Text(
-                  context.getText(AppKeys.phoneLoginBrandName),
-                  style: GoogleFonts.andika(
-                    color: const Color(0xFF339395),
-                    fontSize: 40,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -1,
-                  ),
-                ),
-              ),
+              const Center(child: NumiBrandText(fontSize: 40)),
               const SizedBox(height: 16),
               // Subtitle
               Center(
