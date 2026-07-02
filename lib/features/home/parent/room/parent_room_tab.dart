@@ -17,6 +17,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
   bool _hasLoaded = false;
   String? _errorMessage;
   int _requestId = 0;
+  bool _hasPlayedRoomEntrance = false;
 
   @override
   void initState() {
@@ -44,8 +45,36 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     );
     if (oldProfileId != profileId ||
         oldWidget.args.activeRefreshTick != widget.args.activeRefreshTick) {
+      _resetRoomEntrance();
       _loadLayout(forceRefresh: true);
     }
+  }
+
+  void _resetRoomEntrance() {
+    _hasPlayedRoomEntrance = false;
+  }
+
+  Widget _roomFadeIn({
+    required Widget child,
+    int order = 0,
+    bool markOnEnd = false,
+  }) {
+    if (_hasPlayedRoomEntrance) {
+      return child;
+    }
+
+    return _ParentHomeEntrance(
+      order: order,
+      onFinished: markOnEnd ? _markRoomEntrancePlayed : null,
+      child: child,
+    );
+  }
+
+  void _markRoomEntrancePlayed() {
+    if (!mounted || _hasPlayedRoomEntrance) {
+      return;
+    }
+    setState(() => _hasPlayedRoomEntrance = true);
   }
 
   Future<void> _loadLayout({bool forceRefresh = false}) async {
@@ -212,22 +241,28 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     }
 
     if (_errorMessage != null && entries.isEmpty) {
-      return _ParentRoomStateCard(
-        key: const ValueKey('room-error'),
-        icon: Icons.cloud_off_rounded,
-        title: context.getText(AppKeys.historyLoadErrorTitle),
-        message: _errorMessage!,
-        onTap: () => _loadLayout(forceRefresh: true),
+      return _roomFadeIn(
+        markOnEnd: true,
+        child: _ParentRoomStateCard(
+          key: const ValueKey('room-error'),
+          icon: Icons.cloud_off_rounded,
+          title: context.getText(AppKeys.historyLoadErrorTitle),
+          message: _errorMessage!,
+          onTap: () => _loadLayout(forceRefresh: true),
+        ),
       );
     }
 
     if (entries.isEmpty) {
-      return _ParentRoomStateCard(
-        key: const ValueKey('room-empty'),
-        icon: Icons.meeting_room_outlined,
-        title: context.getText(AppKeys.parentNoClassroom),
-        message: context.getText(AppKeys.parentJoinRoomSubtitle),
-        onTap: _loadLayout,
+      return _roomFadeIn(
+        markOnEnd: true,
+        child: _ParentRoomStateCard(
+          key: const ValueKey('room-empty'),
+          icon: Icons.meeting_room_outlined,
+          title: context.getText(AppKeys.parentNoClassroom),
+          message: context.getText(AppKeys.parentJoinRoomSubtitle),
+          onTap: _loadLayout,
+        ),
       );
     }
 
@@ -235,71 +270,81 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       key: const ValueKey('room-content'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _ParentRoomClassGrid(entries: entries, onTap: _openRoomDetail),
+        _roomFadeIn(
+          order: 0,
+          child: _ParentRoomClassGrid(entries: entries, onTap: _openRoomDetail),
+        ),
         const SizedBox(height: 18),
-        _ParentRoomListSection(
-          title: context.formatText(AppKeys.parentTasksCountTitle, {
-            'count': pendingExercises.length + expiredExercises.length,
-          }),
-          onViewAll: widget.args.onOpenClassroomTab,
-          child: pendingExercises.isEmpty && expiredExercises.isEmpty
-              ? _ParentEmptyTaskLine(
-                  icon: Icons.assignment_turned_in_outlined,
-                  text: context.getText(AppKeys.studentNoHomeworkTitle),
-                )
-              : Column(
-                  children: [
-                    for (final pending in pendingExercises.take(3)) ...[
-                      _ParentPendingTaskListItem(pending: pending),
-                      if (pending != pendingExercises.take(3).last ||
-                          expiredExercises.isNotEmpty)
-                        const Divider(
-                          height: 24,
-                          indent: 62,
-                          color: Color(0xFFE9EEF2),
+        _roomFadeIn(
+          order: 1,
+          child: _ParentRoomListSection(
+            title: context.formatText(AppKeys.parentTasksCountTitle, {
+              'count': pendingExercises.length + expiredExercises.length,
+            }),
+            onViewAll: widget.args.onOpenClassroomTab,
+            child: pendingExercises.isEmpty && expiredExercises.isEmpty
+                ? _ParentEmptyTaskLine(
+                    icon: Icons.assignment_turned_in_outlined,
+                    text: context.getText(AppKeys.studentNoHomeworkTitle),
+                  )
+                : Column(
+                    children: [
+                      for (final pending in pendingExercises.take(3)) ...[
+                        _ParentPendingTaskListItem(pending: pending),
+                        if (pending != pendingExercises.take(3).last ||
+                            expiredExercises.isNotEmpty)
+                          const Divider(
+                            height: 24,
+                            indent: 62,
+                            color: Color(0xFFE9EEF2),
+                          ),
+                      ],
+                      for (final expired in expiredExercises.take(3)) ...[
+                        _ParentPendingTaskListItem(
+                          pending: expired,
+                          isExpired: true,
+                          onTap: () => _showExpiredExerciseMessage(context),
                         ),
+                        if (expired != expiredExercises.take(3).last)
+                          const Divider(
+                            height: 24,
+                            indent: 62,
+                            color: Color(0xFFE9EEF2),
+                          ),
+                      ],
                     ],
-                    for (final expired in expiredExercises.take(3)) ...[
-                      _ParentPendingTaskListItem(
-                        pending: expired,
-                        isExpired: true,
-                        onTap: () => _showExpiredExerciseMessage(context),
-                      ),
-                      if (expired != expiredExercises.take(3).last)
-                        const Divider(
-                          height: 24,
-                          indent: 62,
-                          color: Color(0xFFE9EEF2),
-                        ),
-                    ],
-                  ],
-                ),
+                  ),
+          ),
         ),
         const SizedBox(height: 14),
-        _ParentRoomListSection(
-          title: context.getText(AppKeys.assessmentResultTitle),
-          onViewAll: widget.args.onOpenClassroomTab,
-          child: completions.isEmpty
-              ? _ParentEmptyTaskLine(
-                  icon: Icons.fact_check_outlined,
-                  text: context.getText(AppKeys.noCompletedHomeworkTitle),
-                )
-              : Column(
-                  children: [
-                    for (final completion in completions.take(5)) ...[
-                      _ParentCompletedTaskListItem(
-                        completion: completion,
-                        onTap: () => _openCompletionResult(completion),
-                      ),
-                      if (completion != completions.take(5).last)
-                        const Divider(
-                          height: 24,
-                          indent: 62,
-                          color: Color(0xFFE9EEF2),
+        _roomFadeIn(
+          order: 2,
+          markOnEnd: true,
+          child: _ParentRoomListSection(
+            title: context.getText(AppKeys.assessmentResultTitle),
+            onViewAll: widget.args.onOpenClassroomTab,
+            child: completions.isEmpty
+                ? _ParentEmptyTaskLine(
+                    icon: Icons.fact_check_outlined,
+                    text: context.getText(AppKeys.noCompletedHomeworkTitle),
+                  )
+                : Column(
+                    children: [
+                      for (final completion in completions.take(5)) ...[
+                        _ParentCompletedTaskListItem(
+                          completion: completion,
+                          onTap: () => _openCompletionResult(completion),
                         ),
+                        if (completion != completions.take(5).last)
+                          const Divider(
+                            height: 24,
+                            indent: 62,
+                            color: Color(0xFFE9EEF2),
+                          ),
+                      ],
                     ],
-                  ],
-                ),
+                  ),
+          ),
         ),
       ],
     );
