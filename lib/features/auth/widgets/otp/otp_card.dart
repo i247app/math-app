@@ -11,6 +11,7 @@ class OtpCard extends StatelessWidget {
     super.key,
     required this.controllers,
     required this.focusNodes,
+    required this.autoFocusCode,
     required this.onChanged,
     required this.onEmptyBackspace,
     required this.onConfirm,
@@ -23,6 +24,7 @@ class OtpCard extends StatelessWidget {
 
   final List<TextEditingController> controllers;
   final List<FocusNode> focusNodes;
+  final bool autoFocusCode;
   final void Function(int index, String value) onChanged;
   final ValueChanged<int> onEmptyBackspace;
   final VoidCallback onConfirm;
@@ -61,7 +63,7 @@ class OtpCard extends StatelessWidget {
                     child: OtpDigitBox(
                       controller: controllers[index],
                       focusNode: focusNodes[index],
-                      autofocus: index == 0,
+                      autofocus: autoFocusCode && index == 0,
                       textInputAction: index == 3
                           ? TextInputAction.done
                           : TextInputAction.next,

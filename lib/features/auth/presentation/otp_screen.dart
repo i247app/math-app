@@ -17,6 +17,7 @@ class OtpScreen extends StatefulWidget {
     required this.isVerifyingOtp,
     required this.resendSeconds,
     required this.resendResetId,
+    this.autoFocusCode = false,
     this.devOtpCode,
     this.otpError,
     this.otpErrorId = 0,
@@ -28,6 +29,7 @@ class OtpScreen extends StatefulWidget {
   final bool isVerifyingOtp;
   final int resendSeconds;
   final int resendResetId;
+  final bool autoFocusCode;
   final String? devOtpCode;
   final String? otpError;
   final int otpErrorId;
@@ -57,6 +59,9 @@ class _OtpScreenState extends State<OtpScreen>
       duration: const Duration(milliseconds: 380),
     );
     startResendCountdown(widget.resendSeconds, notify: false);
+    if (widget.autoFocusCode) {
+      requestOtpFocus();
+    }
   }
 
   @override
@@ -74,6 +79,10 @@ class _OtpScreenState extends State<OtpScreen>
 
     if (widget.otpError == null && oldWidget.otpError != null) {
       hideOtpError = false;
+    }
+
+    if (widget.autoFocusCode && !oldWidget.autoFocusCode) {
+      requestOtpFocus();
     }
   }
 
@@ -134,6 +143,10 @@ class _OtpScreenState extends State<OtpScreen>
       hideOtpError = false;
     });
     errorShakeController.forward(from: 0);
+    requestOtpFocus();
+  }
+
+  void requestOtpFocus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         focusNodes.first.requestFocus();
@@ -191,7 +204,6 @@ class _OtpScreenState extends State<OtpScreen>
   void handleConfirm() {
     final otpCode = controllers.map((controller) => controller.text).join();
     if (otpCode.length < controllers.length) {
-      HapticFeedback.selectionClick();
       return;
     }
 
@@ -201,7 +213,6 @@ class _OtpScreenState extends State<OtpScreen>
 
   void handleResend() {
     if (resendCountdown > 0) {
-      HapticFeedback.selectionClick();
       return;
     }
 
@@ -285,6 +296,7 @@ class _OtpScreenState extends State<OtpScreen>
                   child: OtpCard(
                     controllers: controllers,
                     focusNodes: focusNodes,
+                    autoFocusCode: widget.autoFocusCode,
                     onChanged: updateDigit,
                     onEmptyBackspace: handleEmptyBackspace,
                     onConfirm: handleConfirm,

@@ -387,6 +387,7 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                           state.isVerifyingOtp || state.isSendingOtp,
                       resendSeconds: state.otpExpiresIn ?? 0,
                       resendResetId: state.otpPreviewId,
+                      autoFocusCode: state.otpFlow == OtpFlow.signup,
                       devOtpCode: state.devOtpCode,
                       otpError: state.otpError,
                       otpErrorId: state.otpErrorId,
