@@ -174,6 +174,7 @@ class _NumiHomeState extends State<NumiHome> {
               final usePlainAuthBackground =
                   scaffoldState.screen == AppScreen.login ||
                   scaffoldState.screen == AppScreen.otp ||
+                  scaffoldState.screen == AppScreen.passcode ||
                   scaffoldState.screen == AppScreen.signup;
               return AnnotatedRegion<SystemUiOverlayStyle>(
                 value: SystemUiOverlayStyle.dark,
