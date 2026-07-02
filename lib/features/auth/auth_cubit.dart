@@ -721,7 +721,7 @@ class AuthCubit extends Cubit<AuthState> {
             userId: user.id,
             passcode: passcode,
           );
-          _completePendingHome(isPasscodeBusy: false);
+          await _completePendingHome(isPasscodeBusy: false);
         case PasscodeFlow.unlock:
           if (!await _passcodeService.hasPasscode(user.id)) {
             emit(
@@ -757,7 +757,7 @@ class AuthCubit extends Cubit<AuthState> {
             await _sendPinLoginOtp(user);
             return;
           }
-          _completePendingHome(isPasscodeBusy: false);
+          await _completePendingHome(isPasscodeBusy: false);
       }
     } catch (_) {
       emit(
@@ -774,7 +774,7 @@ class AuthCubit extends Cubit<AuthState> {
     if (state.passcodeFlow != PasscodeFlow.setup || !state.passcodeCanSkip) {
       return;
     }
-    _completePendingHome();
+    unawaited(_completePendingHome());
   }
 
   Future<void> cancelPasscodeUnlock() async {
@@ -801,7 +801,10 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> _sendPinLoginOtp(LoginUser pinUser) async {
-    final phone = pinUser.phone?.trim();
+    final rememberedAccount = await _passcodeService.lastPasscodeAccount();
+    final phone = rememberedAccount?.userId == pinUser.id
+        ? rememberedAccount?.phone.trim()
+        : null;
     if (phone == null || phone.isEmpty) {
       emit(
         state.copyWith(
@@ -964,7 +967,7 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  void _completePendingHome({bool? isPasscodeBusy}) {
+  Future<void> _completePendingHome({bool? isPasscodeBusy}) async {
     final user = state.pendingLoginUser;
     if (user == null) {
       emit(
@@ -976,6 +979,11 @@ class AuthCubit extends Cubit<AuthState> {
           passcodeLoginRequiresOtp: false,
         ),
       );
+      return;
+    }
+
+    await _rememberAuthenticatedAccount(user);
+    if (isClosed) {
       return;
     }
 

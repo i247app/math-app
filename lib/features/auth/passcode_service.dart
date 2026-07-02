@@ -10,10 +10,7 @@ class PasscodeException implements Exception {
 }
 
 class PasscodeLoginAccount {
-  const PasscodeLoginAccount({
-    required this.userId,
-    required this.phone,
-  });
+  const PasscodeLoginAccount({required this.userId, required this.phone});
 
   final int userId;
   final String phone;
@@ -31,15 +28,9 @@ abstract class PasscodeService {
     required String phone,
   });
 
-  Future<void> setPasscode({
-    required int userId,
-    required String passcode,
-  });
+  Future<void> setPasscode({required int userId, required String passcode});
 
-  Future<bool> verifyPasscode({
-    required int userId,
-    required String passcode,
-  });
+  Future<bool> verifyPasscode({required int userId, required String passcode});
 
   Future<void> clearPasscode(int userId);
 }
@@ -106,10 +97,7 @@ class SecurePasscodeService implements PasscodeService {
       throw const PasscodeException('Missing login account information.');
     }
 
-    await _storage.write(
-      key: _phoneStorageKey(userId),
-      value: normalizedPhone,
-    );
+    await _storage.write(key: _phoneStorageKey(userId), value: normalizedPhone);
     await _storage.write(key: _lastUserIdKey, value: '$userId');
   }
 
@@ -119,14 +107,8 @@ class SecurePasscodeService implements PasscodeService {
     required String passcode,
   }) async {
     _validateInput(userId: userId, passcode: passcode);
-    await _storage.write(
-      key: _storageKey(userId),
-      value: passcode,
-    );
-    await _storage.write(
-      key: _lastUserIdKey,
-      value: '$userId',
-    );
+    await _storage.write(key: _storageKey(userId), value: passcode);
+    await _storage.write(key: _lastUserIdKey, value: '$userId');
   }
 
   @override
@@ -184,10 +166,7 @@ class SecurePasscodeService implements PasscodeService {
     return null;
   }
 
-  static void _validateInput({
-    required int userId,
-    required String passcode,
-  }) {
+  static void _validateInput({required int userId, required String passcode}) {
     if (userId <= 0) {
       throw const PasscodeException('Missing user id.');
     }
