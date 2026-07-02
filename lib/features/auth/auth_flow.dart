@@ -173,10 +173,12 @@ class _NumiHomeState extends State<NumiHome> {
             builder: (context, scaffoldState) {
               final usePlainAuthBackground =
                   scaffoldState.screen == AppScreen.login ||
+                  scaffoldState.screen == AppScreen.otp ||
                   scaffoldState.screen == AppScreen.signup;
               return AnnotatedRegion<SystemUiOverlayStyle>(
                 value: SystemUiOverlayStyle.dark,
                 child: Scaffold(
+                  backgroundColor: usePlainAuthBackground ? Colors.white : null,
                   resizeToAvoidBottomInset:
                       scaffoldState.screen != AppScreen.home,
                   body: usePlainAuthBackground
