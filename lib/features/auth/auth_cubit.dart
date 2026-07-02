@@ -42,6 +42,9 @@ class AuthCubit extends Cubit<AuthState> {
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
+  void openWelcomeDetails() =>
+      emit(state.copyWith(screen: AppScreen.welcomeDetails));
+
   void openLogin() {
     emit(state.copyWith(screen: AppScreen.login, clearOtpError: true));
     unawaited(checkPinLoginAvailability());

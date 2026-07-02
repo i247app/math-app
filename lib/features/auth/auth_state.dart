@@ -3,24 +3,11 @@ import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
 import 'package:numi_flutter/features/profile/models/profile_role.dart';
 
-enum AppScreen {
-  welcome,
-  login,
-  otp,
-  signup,
-  passcode,
-  home,
-}
+enum AppScreen { welcome, welcomeDetails, login, otp, signup, passcode, home }
 
-enum OtpFlow {
-  login,
-  signup,
-}
+enum OtpFlow { login, signup }
 
-enum PasscodeFlow {
-  setup,
-  unlock,
-}
+enum PasscodeFlow { setup, unlock }
 
 class AuthState {
   const AuthState({
@@ -226,8 +213,9 @@ class AuthState {
       otpFlow: otpFlow ?? this.otpFlow,
       authError: clearAuthError ? null : authError ?? this.authError,
       loginUser: clearLoginUser ? null : loginUser ?? this.loginUser,
-      profiles:
-          clearProfiles ? const <StudentProfile>[] : profiles ?? this.profiles,
+      profiles: clearProfiles
+          ? const <StudentProfile>[]
+          : profiles ?? this.profiles,
       activeProfile: clearProfiles || clearActiveProfile
           ? null
           : activeProfile ?? this.activeProfile,
@@ -237,14 +225,16 @@ class AuthState {
       passcodeFlow: passcodeFlow ?? this.passcodeFlow,
       passcodeCanSkip: passcodeCanSkip ?? this.passcodeCanSkip,
       isPasscodeBusy: isPasscodeBusy ?? this.isPasscodeBusy,
-      passcodeError:
-          clearPasscodeError ? null : passcodeError ?? this.passcodeError,
+      passcodeError: clearPasscodeError
+          ? null
+          : passcodeError ?? this.passcodeError,
       passcodeErrorId: passcodeErrorId ?? this.passcodeErrorId,
       passcodeLoginRequiresOtp:
           passcodeLoginRequiresOtp ?? this.passcodeLoginRequiresOtp,
       isCheckingPinLogin: isCheckingPinLogin ?? this.isCheckingPinLogin,
-      canLoginWithPin:
-          clearPinLogin ? false : canLoginWithPin ?? this.canLoginWithPin,
+      canLoginWithPin: clearPinLogin
+          ? false
+          : canLoginWithPin ?? this.canLoginWithPin,
       pinLoginUser: clearPinLogin || clearPinLoginUser
           ? null
           : pinLoginUser ?? this.pinLoginUser,
@@ -259,8 +249,8 @@ class AuthState {
           : pendingActiveProfile ?? this.pendingActiveProfile,
       pendingProfileLoadError:
           clearPendingSession || clearPendingProfileLoadError
-              ? null
-              : pendingProfileLoadError ?? this.pendingProfileLoadError,
+          ? null
+          : pendingProfileLoadError ?? this.pendingProfileLoadError,
     );
   }
 }

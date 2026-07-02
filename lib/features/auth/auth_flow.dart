@@ -20,6 +20,7 @@ import 'package:numi_flutter/features/auth/presentation/login_screen.dart';
 import 'package:numi_flutter/features/auth/presentation/otp_screen.dart';
 import 'package:numi_flutter/features/auth/presentation/passcode_screen.dart';
 import 'package:numi_flutter/features/auth/presentation/signup_screen.dart';
+import 'package:numi_flutter/features/auth/presentation/welcome_details_screen.dart';
 import 'package:numi_flutter/features/auth/presentation/welcome_screen.dart';
 import 'package:numi_flutter/features/auth/widgets/app_background.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
@@ -301,6 +302,7 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
         final useSafeArea =
             !state.isRestoringSession &&
             state.screen != AppScreen.welcome &&
+            state.screen != AppScreen.welcomeDetails &&
             state.screen != AppScreen.home;
 
         return SafeArea(
@@ -342,6 +344,10 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                 : switch (state.screen) {
                     AppScreen.welcome => WelcomeScreen(
                       key: const ValueKey('welcome'),
+                      onStart: cubit.openWelcomeDetails,
+                    ),
+                    AppScreen.welcomeDetails => WelcomeDetailsScreen(
+                      key: const ValueKey('welcome-details'),
                       onStart: cubit.openLogin,
                     ),
                     AppScreen.login => LoginScreen(

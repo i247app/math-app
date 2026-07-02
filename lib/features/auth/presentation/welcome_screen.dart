@@ -26,6 +26,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     _didPrecacheNextScreenAssets = true;
     const welcomeAssetPrefix = 'assets/images/welcome_screen/';
     precacheImage(
+      const AssetImage('assets/images/welcome_figma_mascot.png'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/welcome_figma_waves.png'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/welcome_figma_books.png'),
+      context,
+    );
+    precacheImage(
       const AssetImage('${welcomeAssetPrefix}welcome_hero_math_friends.png'),
       context,
     );

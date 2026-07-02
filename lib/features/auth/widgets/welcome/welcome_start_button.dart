@@ -12,10 +12,14 @@ class WelcomeStartButton extends StatelessWidget {
     super.key,
     required this.onStart,
     required this.scale,
+    this.labelKey = AppKeys.continueLabel,
+    this.showArrow = true,
   });
 
   final VoidCallback onStart;
   final double scale;
+  final String labelKey;
+  final bool showArrow;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +38,7 @@ class WelcomeStartButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              context.getText(AppKeys.continueLabel),
+              context.getText(labelKey),
               style: GoogleFonts.nunito(
                 color: Colors.white,
                 fontSize: 18 * scale,
@@ -42,12 +46,14 @@ class WelcomeStartButton extends StatelessWidget {
                 height: 1.2,
               ),
             ),
-            SizedBox(width: 9 * scale),
-            SvgPicture.asset(
-              'assets/images/welcome_screen/welcome_arrow_right.svg',
-              width: 16 * scale,
-              height: 16 * scale,
-            ),
+            if (showArrow) ...[
+              SizedBox(width: 9 * scale),
+              SvgPicture.asset(
+                'assets/images/welcome_screen/welcome_arrow_right.svg',
+                width: 16 * scale,
+                height: 16 * scale,
+              ),
+            ],
           ],
         ),
       ),
