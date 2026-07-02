@@ -5,9 +5,14 @@ import 'package:numi_flutter/features/auth/widgets/welcome/welcome_details_compo
 import 'package:numi_flutter/features/auth/widgets/welcome/welcome_style.dart';
 
 class WelcomeDetailsScreen extends StatelessWidget {
-  const WelcomeDetailsScreen({super.key, required this.onStart});
+  const WelcomeDetailsScreen({
+    super.key,
+    required this.onStart,
+    required this.onBack,
+  });
 
   final VoidCallback onStart;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +34,10 @@ class WelcomeDetailsScreen extends StatelessWidget {
                       child: SizedBox(
                         width: constraints.maxWidth,
                         height: constraints.maxHeight,
-                        child: WelcomeDetailsComposition(onStart: onStart),
+                        child: WelcomeDetailsComposition(
+                          onStart: onStart,
+                          onBack: onBack,
+                        ),
                       ),
                     ),
                   ),

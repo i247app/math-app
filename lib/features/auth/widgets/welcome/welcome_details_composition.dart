@@ -1,15 +1,21 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/features/auth/widgets/welcome/welcome_start_button.dart';
 import 'package:numi_flutter/features/auth/widgets/welcome/welcome_style.dart';
 
 class WelcomeDetailsComposition extends StatelessWidget {
-  const WelcomeDetailsComposition({super.key, required this.onStart});
+  const WelcomeDetailsComposition({
+    super.key,
+    required this.onStart,
+    required this.onBack,
+  });
 
   final VoidCallback onStart;
+  final VoidCallback onBack;
 
   static const _designWidth = 360.0;
   static const _designHeight = 800.0;
@@ -73,7 +79,7 @@ class WelcomeDetailsComposition extends StatelessWidget {
                       top: s(18),
                       width: s(156),
                       height: s(32),
-                      child: const _BrandLogo(),
+                      child: _BrandLogo(onTap: onBack),
                     ),
                     Positioned(
                       left: s(-128),
@@ -156,7 +162,9 @@ class WelcomeDetailsComposition extends StatelessWidget {
 }
 
 class _BrandLogo extends StatelessWidget {
-  const _BrandLogo();
+  const _BrandLogo({required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -164,42 +172,52 @@ class _BrandLogo extends StatelessWidget {
       builder: (context, constraints) {
         final scale = constraints.maxHeight / 32;
 
-        return Row(
-          children: [
-            Image.asset(
-              WelcomeDetailsComposition._mascotLogoAsset,
-              width: 31 * scale,
-              height: 31 * scale,
-              fit: BoxFit.contain,
-            ),
-            SizedBox(width: 8 * scale),
-            Text.rich(
-              TextSpan(
-                children: [
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onTap();
+            },
+            borderRadius: BorderRadius.circular(10 * scale),
+            child: Row(
+              children: [
+                Image.asset(
+                  WelcomeDetailsComposition._mascotLogoAsset,
+                  width: 31 * scale,
+                  height: 31 * scale,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(width: 8 * scale),
+                Text.rich(
                   TextSpan(
-                    text: 'NUMI',
-                    style: GoogleFonts.fredoka(
-                      color: WelcomeStyle.deepTeal,
-                      fontSize: 20 * scale,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
-                    ),
+                    children: [
+                      TextSpan(
+                        text: 'NUMI',
+                        style: GoogleFonts.fredoka(
+                          color: WelcomeStyle.deepTeal,
+                          fontSize: 20 * scale,
+                          fontWeight: FontWeight.w800,
+                          height: 1,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'NUMI',
+                        style: GoogleFonts.fredoka(
+                          color: WelcomeStyle.taglineCoral,
+                          fontSize: 20 * scale,
+                          fontWeight: FontWeight.w800,
+                          height: 1,
+                        ),
+                      ),
+                    ],
                   ),
-                  TextSpan(
-                    text: 'NUMI',
-                    style: GoogleFonts.fredoka(
-                      color: WelcomeStyle.taglineCoral,
-                      fontSize: 20 * scale,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
-                    ),
-                  ),
-                ],
-              ),
-              maxLines: 1,
-              softWrap: false,
+                  maxLines: 1,
+                  softWrap: false,
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );

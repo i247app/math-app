@@ -349,6 +349,7 @@ class _OnboardingScreenSwitcher extends StatelessWidget {
                     AppScreen.welcomeDetails => WelcomeDetailsScreen(
                       key: const ValueKey('welcome-details'),
                       onStart: cubit.openLogin,
+                      onBack: cubit.openWelcome,
                     ),
                     AppScreen.login => LoginScreen(
                       key: const ValueKey('login'),
