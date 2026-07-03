@@ -38,9 +38,8 @@ class WelcomeDetailsComposition extends StatelessWidget {
         final height = constraints.maxHeight;
         final scale = math.min(width / _designWidth, height / _designHeight);
         final canvasWidth = _designWidth * scale;
-        final canvasHeight = _designHeight * scale;
-        final leftOffset = (width - canvasWidth) / 2;
-        final topOffset = (height - canvasHeight) / 2;
+        final canvasLeft = (width - canvasWidth) / 2;
+        final topPadding = math.max(0.0, (height - _designHeight * scale) / 2);
 
         double s(double value) => value * scale;
 
@@ -68,96 +67,141 @@ class WelcomeDetailsComposition extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: leftOffset,
-                top: topOffset,
-                width: canvasWidth,
-                height: canvasHeight,
-                child: Stack(
-                  clipBehavior: Clip.hardEdge,
-                  children: [
-                    Positioned(
-                      left: s(16),
-                      top: s(18),
-                      width: s(156),
-                      height: s(32),
-                      child: _BrandLogo(onTap: onBack),
+                left: canvasLeft + s(-128),
+                top: topPadding + s(78),
+                width: s(540),
+                height: s(360),
+                child: IgnorePointer(
+                  child: Image.asset(_heroAsset, fit: BoxFit.contain),
+                ),
+              ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  width: canvasWidth,
+                  height: height,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: topPadding),
+                    child: Column(
+                      children: [
+                        SizedBox(height: s(18)),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: s(16)),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: SizedBox(
+                              width: s(156),
+                              height: s(32),
+                              child: _BrandLogo(onTap: onBack),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: s(338)),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: s(16)),
+                          child: _FeatureGrid(scale: scale),
+                        ),
+                        SizedBox(height: s(39)),
+                        Padding(
+                          padding: EdgeInsets.only(left: s(24), right: s(15)),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: s(56),
+                                height: s(8),
+                                child: const _PageIndicator(),
+                              ),
+                              const Spacer(),
+                              SizedBox(
+                                width: s(143),
+                                height: s(42),
+                                child: WelcomeStartButton(
+                                  onStart: onStart,
+                                  scale: scale,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: s(55)),
+                      ],
                     ),
-                    Positioned(
-                      left: s(-128),
-                      top: s(78),
-                      width: s(540),
-                      height: s(360),
-                      child: Image.asset(_heroAsset, fit: BoxFit.contain),
-                    ),
-                    Positioned(
-                      left: s(16),
-                      top: s(388),
-                      width: s(156),
-                      height: s(132),
-                      child: const _FeatureCard(
-                        imageAsset: _assessmentAsset,
-                        imageSize: 54,
-                        title: 'Đánh giá năng lực',
-                        subtitle: 'Hiểu đúng trình độ của con',
-                      ),
-                    ),
-                    Positioned(
-                      left: s(184),
-                      top: s(388),
-                      width: s(156),
-                      height: s(132),
-                      child: const _FeatureCard(
-                        imageAsset: _teacherAsset,
-                        imageSize: 54,
-                        title: 'Hỗ trợ giáo viên',
-                        subtitle: 'Quản lý lớp học dễ dàng',
-                      ),
-                    ),
-                    Positioned(
-                      left: s(16),
-                      top: s(532),
-                      width: s(156),
-                      height: s(132),
-                      child: const _FeatureCard(
-                        imageAsset: _progressAsset,
-                        imageSize: 54,
-                        title: 'Theo dõi tiến độ',
-                        subtitle: 'Bám sát sự tiến bộ của con',
-                      ),
-                    ),
-                    Positioned(
-                      left: s(184),
-                      top: s(532),
-                      width: s(156),
-                      height: s(132),
-                      child: const _FeatureCard(
-                        imageAsset: _gameAsset,
-                        imageSize: 54,
-                        title: 'Học qua game',
-                        subtitle: 'Học mà chơi - Chơi mà giỏi',
-                      ),
-                    ),
-                    Positioned(
-                      left: s(24),
-                      top: s(720),
-                      width: s(56),
-                      height: s(8),
-                      child: const _PageIndicator(),
-                    ),
-                    Positioned(
-                      left: s(202),
-                      top: s(703),
-                      width: s(143),
-                      height: s(42),
-                      child: WelcomeStartButton(onStart: onStart, scale: scale),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _FeatureGrid extends StatelessWidget {
+  const _FeatureGrid({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final cardWidth = 156 * scale;
+    final cardHeight = 132 * scale;
+    final gap = 12 * scale;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            SizedBox(
+              width: cardWidth,
+              height: cardHeight,
+              child: const _FeatureCard(
+                imageAsset: WelcomeDetailsComposition._assessmentAsset,
+                imageSize: 54,
+                title: 'Đánh giá năng lực',
+                subtitle: 'Hiểu đúng trình độ của con',
+              ),
+            ),
+            SizedBox(width: gap),
+            SizedBox(
+              width: cardWidth,
+              height: cardHeight,
+              child: const _FeatureCard(
+                imageAsset: WelcomeDetailsComposition._teacherAsset,
+                imageSize: 54,
+                title: 'Hỗ trợ giáo viên',
+                subtitle: 'Quản lý lớp học dễ dàng',
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: gap),
+        Row(
+          children: [
+            SizedBox(
+              width: cardWidth,
+              height: cardHeight,
+              child: const _FeatureCard(
+                imageAsset: WelcomeDetailsComposition._progressAsset,
+                imageSize: 54,
+                title: 'Theo dõi tiến độ',
+                subtitle: 'Bám sát sự tiến bộ của con',
+              ),
+            ),
+            SizedBox(width: gap),
+            SizedBox(
+              width: cardWidth,
+              height: cardHeight,
+              child: const _FeatureCard(
+                imageAsset: WelcomeDetailsComposition._gameAsset,
+                imageSize: 54,
+                title: 'Học qua game',
+                subtitle: 'Học mà chơi - Chơi mà giỏi',
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

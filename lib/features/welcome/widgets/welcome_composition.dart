@@ -25,11 +25,9 @@ class WelcomeComposition extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
-        final scale = math.max(width / _designWidth, height / _designHeight);
-        final canvasWidth = _designWidth * scale;
-        final canvasHeight = _designHeight * scale;
-        final leftOffset = (width - canvasWidth) / 2;
-        const topOffset = 0.0;
+        final scale = math.min(width / _designWidth, height / _designHeight);
+        final contentWidth = math.min(width, _designWidth * scale);
+        final compact = height < 720;
 
         double s(double value) => value * scale;
 
@@ -40,159 +38,148 @@ class WelcomeComposition extends StatelessWidget {
               child: ColoredBox(color: WelcomeStyle.background),
             ),
             Positioned(
-              left: leftOffset,
-              top: topOffset,
-              width: canvasWidth,
-              height: canvasHeight,
-              child: Stack(
-                clipBehavior: Clip.hardEdge,
-                children: [
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(75),
-                    height: s(284),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(284),
-                        height: s(284),
-                        child: Image.asset(_mascotAsset, fit: BoxFit.cover),
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: s(375),
+              child: IgnorePointer(
+                child: _WelcomeBottomArt(
+                  scale: scale,
+                  wavesAsset: _wavesAsset,
+                  booksAsset: _booksAsset,
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: contentWidth,
+                height: height,
+                child: Column(
+                  children: [
+                    SizedBox(height: compact ? s(44) : s(70)),
+                    SizedBox(
+                      width: s(compact ? 252 : 284),
+                      height: s(compact ? 252 : 284),
+                      child: Image.asset(_mascotAsset, fit: BoxFit.contain),
+                    ),
+                    SizedBox(height: compact ? s(4) : s(2)),
+                    SizedBox(
+                      width: s(211),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: NumiBrandText(fontSize: s(40)),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(329),
-                    height: s(48),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(211),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: NumiBrandText(fontSize: s(40)),
-                        ),
+                    SizedBox(height: s(8)),
+                    _WelcomeTagline(scale: scale),
+                    SizedBox(height: s(11)),
+                    Container(
+                      width: s(48),
+                      height: s(6),
+                      decoration: BoxDecoration(
+                        color: WelcomeStyle.taglineCoral,
+                        borderRadius: BorderRadius.circular(999),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(385),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(170),
-                        child: Text.rich(
-                          TextSpan(
-                            style: GoogleFonts.andika(
-                              color: WelcomeStyle.teal,
-                              fontSize: s(18),
-                              fontWeight: FontWeight.w400,
-                              height: 22.5 / 18,
-                            ),
-                            children: [
-                              const TextSpan(text: 'Học tập '),
-                              TextSpan(
-                                text: 'thông minh\n',
-                                style: GoogleFonts.andika(
-                                  color: WelcomeStyle.taglineCoral,
-                                  fontSize: s(18),
-                                  fontWeight: FontWeight.w400,
-                                  height: 22.5 / 18,
-                                ),
-                              ),
-                              const TextSpan(text: 'Tiến bộ mỗi ngày'),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                    const Spacer(),
+                    SizedBox(
+                      width: s(230),
+                      height: s(58),
+                      child: WelcomeStartButton(
+                        onStart: onStart,
+                        scale: scale,
+                        labelKey: AppKeys.start,
+                        showArrow: false,
                       ),
                     ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(443),
-                    height: s(6),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(48),
-                        height: s(6),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: WelcomeStyle.taglineCoral,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(425),
-                    height: s(375),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(470),
-                        height: s(375),
-                        child: Opacity(
-                          opacity: 0.7,
-                          child: ClipRect(
-                            child: Image.asset(
-                              _wavesAsset,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(499),
-                    height: s(209),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(361),
-                        height: s(209),
-                        child: ClipRect(
-                          child: Image.asset(
-                            _booksAsset,
-                            fit: BoxFit.cover,
-                            alignment: Alignment.topCenter,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: s(688),
-                    height: s(58),
-                    child: Center(
-                      child: SizedBox(
-                        width: s(230),
-                        height: s(58),
-                        child: WelcomeStartButton(
-                          onStart: onStart,
-                          scale: scale,
-                          labelKey: AppKeys.start,
-                          showArrow: false,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                    SizedBox(height: compact ? s(36) : s(54)),
+                  ],
+                ),
               ),
             ),
           ],
         );
       },
+    );
+  }
+}
+
+class _WelcomeTagline extends StatelessWidget {
+  const _WelcomeTagline({required this.scale});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = GoogleFonts.andika(
+      color: WelcomeStyle.teal,
+      fontSize: 18 * scale,
+      fontWeight: FontWeight.w400,
+      height: 22.5 / 18,
+    );
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Học tập ', style: textStyle),
+            Text(
+              'thông minh',
+              style: textStyle.copyWith(color: WelcomeStyle.taglineCoral),
+            ),
+          ],
+        ),
+        Text('Tiến bộ mỗi ngày', style: textStyle),
+      ],
+    );
+  }
+}
+
+class _WelcomeBottomArt extends StatelessWidget {
+  const _WelcomeBottomArt({
+    required this.scale,
+    required this.wavesAsset,
+    required this.booksAsset,
+  });
+
+  final double scale;
+  final String wavesAsset;
+  final String booksAsset;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: [
+        Positioned(
+          top: 0,
+          width: 470 * scale,
+          height: 375 * scale,
+          child: Opacity(
+            opacity: 0.7,
+            child: Image.asset(
+              wavesAsset,
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+            ),
+          ),
+        ),
+        Positioned(
+          top: 74 * scale,
+          width: 361 * scale,
+          height: 209 * scale,
+          child: Image.asset(
+            booksAsset,
+            fit: BoxFit.contain,
+            alignment: Alignment.topCenter,
+          ),
+        ),
+      ],
     );
   }
 }
