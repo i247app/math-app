@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/auth/widgets/welcome/welcome_style.dart';
+import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
 
 class WelcomeStartButton extends StatelessWidget {
   const WelcomeStartButton({

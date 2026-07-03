@@ -20,10 +20,10 @@ import 'package:numi_flutter/features/auth/presentation/login_screen.dart';
 import 'package:numi_flutter/features/auth/presentation/otp_screen.dart';
 import 'package:numi_flutter/features/auth/presentation/passcode_screen.dart';
 import 'package:numi_flutter/features/auth/presentation/signup_screen.dart';
-import 'package:numi_flutter/features/auth/presentation/welcome_details_screen.dart';
-import 'package:numi_flutter/features/auth/presentation/welcome_screen.dart';
 import 'package:numi_flutter/features/auth/widgets/app_background.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
+import 'package:numi_flutter/features/welcome/presentation/welcome_details_screen.dart';
+import 'package:numi_flutter/features/welcome/presentation/welcome_screen.dart';
 
 class NumiHome extends StatefulWidget {
   const NumiHome({super.key, this.authService});

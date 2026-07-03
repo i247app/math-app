@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/auth/widgets/welcome/welcome_style.dart';
+import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
 
 class NumiBrandText extends StatelessWidget {
   const NumiBrandText({

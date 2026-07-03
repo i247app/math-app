@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/features/auth/widgets/welcome/welcome_details_composition.dart';
-import 'package:numi_flutter/features/auth/widgets/welcome/welcome_style.dart';
+import 'package:numi_flutter/features/welcome/widgets/welcome_details_composition.dart';
+import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
 
 class WelcomeDetailsScreen extends StatelessWidget {
   const WelcomeDetailsScreen({

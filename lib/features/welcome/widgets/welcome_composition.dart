@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/auth/widgets/welcome/numi_brand_text.dart';
-import 'package:numi_flutter/features/auth/widgets/welcome/welcome_start_button.dart';
-import 'package:numi_flutter/features/auth/widgets/welcome/welcome_style.dart';
+import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
+import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
+import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
 
 class WelcomeComposition extends StatelessWidget {
   const WelcomeComposition({super.key, required this.onStart});

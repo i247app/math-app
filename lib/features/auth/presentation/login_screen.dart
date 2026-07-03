@@ -5,7 +5,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
 import 'package:numi_flutter/features/auth/widgets/login/login_card.dart';
-import 'package:numi_flutter/features/auth/widgets/welcome/numi_brand_text.dart';
+import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 
 class LoginScreen extends StatelessWidget {
