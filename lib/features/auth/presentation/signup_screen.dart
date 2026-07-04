@@ -199,7 +199,6 @@ class _SignupScreenState extends State<SignupScreen> {
                         titleFontSize: tight ? 30 : 34,
                         onBack: widget.onBack,
                       ),
-                      SizedBox(height: compact ? 6 : 8),
                       _SignupSectionCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,7 +366,7 @@ class _SignupHeroBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 136,
+      height: 122,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
