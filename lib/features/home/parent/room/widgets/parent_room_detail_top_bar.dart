@@ -21,7 +21,10 @@ class _ParentRoomDetailTopBar extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
-              onPressed: onBack,
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                onBack();
+              },
               icon: const Icon(
                 Icons.arrow_back_rounded,
                 color: Color(0xFF339395),

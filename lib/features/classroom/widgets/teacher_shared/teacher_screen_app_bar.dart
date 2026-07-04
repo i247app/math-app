@@ -34,7 +34,10 @@ class _TeacherScreenAppBar extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
-              onPressed: onBack,
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                onBack();
+              },
               icon: SvgPicture.asset(
                 'assets/images/teacher_class_back.svg',
                 width: 16 * scale,
@@ -54,10 +57,7 @@ class _TeacherScreenAppBar extends StatelessWidget {
             ),
           ),
           if (action != null)
-            Align(
-              alignment: Alignment.centerRight,
-              child: action,
-            ),
+            Align(alignment: Alignment.centerRight, child: action),
         ],
       ),
     );

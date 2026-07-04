@@ -605,6 +605,7 @@ class _SettingTabState extends State<SettingTab> {
     if (!mounted) {
       return;
     }
+    FocusManager.instance.primaryFocus?.unfocus();
     await _loadProfiles();
     if (didSave == true) {
       widget.onProfileSaved?.call();
@@ -756,6 +757,7 @@ class _SettingTabState extends State<SettingTab> {
 
   void _returnToSettings() {
     HapticFeedback.selectionClick();
+    FocusManager.instance.primaryFocus?.unfocus();
     if (widget._isPushedPage) {
       Navigator.of(context).maybePop();
       return;
@@ -770,7 +772,6 @@ class _SettingTabState extends State<SettingTab> {
       _isPickingAccountAvatar = false;
       _draftAvatarPath = null;
     });
-    FocusScope.of(context).unfocus();
     _loadProfiles();
   }
 
@@ -829,6 +830,7 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   void _returnToProfileList() {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (widget._isPushedPage) {
       HapticFeedback.selectionClick();
       Navigator.of(context).maybePop();
@@ -841,7 +843,6 @@ class _SettingTabState extends State<SettingTab> {
       _isForwardTransition = false;
       _profileCreateError = null;
     });
-    FocusScope.of(context).unfocus();
   }
 
   void _cancelAddProfile() {

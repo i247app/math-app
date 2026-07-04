@@ -126,7 +126,10 @@ class CircleIconButton extends StatelessWidget {
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
-        onTap: onPressed,
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          onPressed();
+        },
         child: SizedBox(
           width: size,
           height: size,
@@ -138,11 +141,7 @@ class CircleIconButton extends StatelessWidget {
 }
 
 class ProgressDots extends StatelessWidget {
-  const ProgressDots({
-    super.key,
-    required this.activeIndex,
-    this.count = 4,
-  });
+  const ProgressDots({super.key, required this.activeIndex, this.count = 4});
 
   final int activeIndex;
   final int count;
@@ -180,10 +179,7 @@ class ProgressDots extends StatelessWidget {
 }
 
 class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({
-    super.key,
-    this.message,
-  });
+  const LoadingScreen({super.key, this.message});
 
   final String? message;
 

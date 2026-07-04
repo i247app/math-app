@@ -144,8 +144,9 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
     HapticFeedback.mediumImpact();
     setState(() => _isSaving = true);
     try {
-      final avatarPath =
-          _draftAvatarPath != _snapshotAvatarPath ? _draftAvatarPath : null;
+      final avatarPath = _draftAvatarPath != _snapshotAvatarPath
+          ? _draftAvatarPath
+          : null;
       final updatedUser = await _authService.updateUser(
         userId: userId,
         name: name,
@@ -209,12 +210,13 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _close() {
+    FocusManager.instance.primaryFocus?.unfocus();
     HapticFeedback.selectionClick();
     Navigator.of(context).pop(_didSave);
   }
@@ -224,6 +226,11 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
     final scale = widget.args.scale;
     final screen = PopScope(
       canPop: !_isSaving,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        }
+      },
       child: SettingSafeScreen(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -246,8 +253,9 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
                     ? AccountScreenSkeleton(scale: scale)
                     : AccountDetailsPanel(
                         avatarUrl: _user?.avatarUrl,
-                        avatarPath:
-                            _isEditing ? _draftAvatarPath : _localAvatarPath,
+                        avatarPath: _isEditing
+                            ? _draftAvatarPath
+                            : _localAvatarPath,
                         usernameController: _usernameController,
                         phoneController: _phoneController,
                         emailController: _emailController,
@@ -271,9 +279,7 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
       animation: _entranceController,
       child: screen,
       builder: (context, child) {
-        final scale = Curves.easeOutCubic.transform(
-          _entranceController.value,
-        );
+        final scale = Curves.easeOutCubic.transform(_entranceController.value);
         return Transform.scale(
           scale: 0.97 + 0.03 * scale,
           alignment: Alignment.center,

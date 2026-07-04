@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/features/auth/widgets/otp/otp_card.dart';
+import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -266,17 +267,7 @@ class _OtpScreenState extends State<OtpScreen>
               ),
               SizedBox(height: compact ? 14 : 20),
               // Title
-              Center(
-                child: Text(
-                  'NUMINUMI',
-                  style: GoogleFonts.andika(
-                    color: const Color(0xFF339395), // Teal from image
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
+              const Center(child: NumiBrandText(fontSize: 40)),
               SizedBox(height: compact ? 34 : 54),
               // OTP Card
               AnimatedBuilder(

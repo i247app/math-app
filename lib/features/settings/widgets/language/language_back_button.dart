@@ -19,6 +19,7 @@ class LanguageBackButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(size / 2),
       child: InkWell(
         onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
           HapticFeedback.selectionClick();
           Navigator.of(context).maybePop();
         },

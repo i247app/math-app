@@ -22,7 +22,8 @@ class PlainAccountTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = textStyle ??
+    final style =
+        textStyle ??
         GoogleFonts.andika(
           color: settingsDeepInk,
           fontSize: FontSize.large * scale,
@@ -34,6 +35,7 @@ class PlainAccountTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       readOnly: !enabled,
+      canRequestFocus: enabled,
       enableInteractiveSelection: enabled,
       keyboardType: keyboardType,
       textInputAction: TextInputAction.done,

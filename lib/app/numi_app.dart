@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../core/extension/localization_extension.dart';
@@ -15,8 +16,8 @@ class NumiApp extends StatefulWidget {
   final OtpAuthService? authService;
 
   static void restart(BuildContext context) {
-    final element =
-        context.getElementForInheritedWidgetOfExactType<_NumiRestartScope>();
+    final element = context
+        .getElementForInheritedWidgetOfExactType<_NumiRestartScope>();
     final scope = element?.widget as _NumiRestartScope?;
     assert(scope != null, 'No Numi restart scope found in context.');
     scope?.restart();
@@ -76,6 +77,7 @@ class _NumiAppState extends State<NumiApp> {
                 textTheme: GoogleFonts.andikaTextTheme(),
                 useMaterial3: true,
               ),
+              navigatorObservers: [_KeyboardDismissNavigatorObserver()],
               home: snapshot.connectionState == ConnectionState.done
                   ? NumiHome(authService: widget.authService)
                   : const Scaffold(
@@ -89,11 +91,46 @@ class _NumiAppState extends State<NumiApp> {
   }
 }
 
+class _KeyboardDismissNavigatorObserver extends NavigatorObserver {
+  void _dismissKeyboard({bool afterFrame = false}) {
+    void dismiss() {
+      FocusManager.instance.primaryFocus?.unfocus();
+      SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
+    }
+
+    dismiss();
+    if (afterFrame) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => dismiss());
+    }
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _dismissKeyboard();
+    super.didPush(route, previousRoute);
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _dismissKeyboard(afterFrame: true);
+    super.didPop(route, previousRoute);
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _dismissKeyboard(afterFrame: true);
+    super.didRemove(route, previousRoute);
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    _dismissKeyboard(afterFrame: true);
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+  }
+}
+
 class _NumiRestartScope extends InheritedWidget {
-  const _NumiRestartScope({
-    required this.restart,
-    required super.child,
-  });
+  const _NumiRestartScope({required this.restart, required super.child});
 
   final VoidCallback restart;
 

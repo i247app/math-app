@@ -33,7 +33,10 @@ class QuizHeaderIconButton extends StatelessWidget {
       shape: shape,
       borderRadius: circle ? null : border,
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          onTap();
+        },
         customBorder: circle ? const CircleBorder() : null,
         borderRadius: circle ? null : border,
         child: SizedBox(

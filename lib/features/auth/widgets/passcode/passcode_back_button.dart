@@ -22,7 +22,10 @@ class PasscodeBackButton extends StatelessWidget {
         side: BorderSide(color: const Color(0xFFA2B1A3).withValues(alpha: 0.1)),
       ),
       child: InkWell(
-        onTap: onPressed,
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          onPressed();
+        },
         borderRadius: BorderRadius.circular(999),
         child: Center(
           child: SvgPicture.asset(iconAsset, width: 16, height: 16),

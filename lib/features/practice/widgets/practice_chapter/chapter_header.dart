@@ -28,6 +28,7 @@ class _ChapterHeader extends StatelessWidget {
                 shape: const CircleBorder(),
                 child: InkWell(
                   onTap: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
                     HapticFeedback.selectionClick();
                     Navigator.of(context).pop();
                   },

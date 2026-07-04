@@ -29,10 +29,7 @@ class SettingHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         border: Border(
-          bottom: BorderSide(
-            color: const Color(0xFFF2F2F2),
-            width: 4 * scale,
-          ),
+          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
         ),
       ),
       padding: EdgeInsets.fromLTRB(
@@ -89,7 +86,10 @@ class _SettingHeaderButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        onTap();
+      },
       child: SizedBox(
         width: 40 * scale,
         height: 40 * scale,

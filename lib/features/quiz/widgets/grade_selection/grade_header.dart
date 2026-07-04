@@ -17,6 +17,7 @@ class _GradeHeader extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: IconButton(
             onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
               HapticFeedback.selectionClick();
               Navigator.of(context).maybePop();
             },

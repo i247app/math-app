@@ -43,6 +43,7 @@ class _LearningPathHeader extends StatelessWidget {
                   shape: const CircleBorder(),
                   child: InkWell(
                     onTap: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
                       HapticFeedback.selectionClick();
                       onBack!();
                     },
