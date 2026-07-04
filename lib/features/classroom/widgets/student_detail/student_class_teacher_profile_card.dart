@@ -21,7 +21,8 @@ class StudentClassTeacherProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final teacherName = studentClassNonEmpty(classroom?.teacherName) ??
+    final teacherName =
+        studentClassNonEmpty(classroom?.teacherName) ??
         studentClassNonEmpty(classroom?.owner?.name) ??
         context.getText(AppKeys.teacherFallback);
     final teacherAvatarUrl = studentClassTeacherAvatarUrl(classroom);

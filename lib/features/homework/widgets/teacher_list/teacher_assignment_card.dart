@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherAssignmentCard extends StatelessWidget {
   const _TeacherAssignmentCard({required this.exercise, required this.onTap});
@@ -9,7 +9,7 @@ class _TeacherAssignmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final exerciseId = exercise.stableId?.toString() ?? '-';
-    final dateParts = _teacherExerciseDateParts(exercise.endDate);
+    final dateParts = teacherExerciseDateParts(exercise.endDate);
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(8),
@@ -50,7 +50,7 @@ class _TeacherAssignmentCard extends StatelessWidget {
                     Text(
                       dateParts.day,
                       style: GoogleFonts.andika(
-                        color: _teacherBlue,
+                        color: teacherBlue,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                         height: 1.05,
@@ -77,11 +77,11 @@ class _TeacherAssignmentCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _teacherExerciseTitle(context, exercise),
+                        teacherExerciseTitle(context, exercise),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: _teacherBlue,
+                          color: teacherBlue,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           height: 17.5 / 14,

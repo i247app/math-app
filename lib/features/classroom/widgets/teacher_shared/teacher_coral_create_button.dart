@@ -1,7 +1,8 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _TeacherCoralCreateButton extends StatelessWidget {
-  const _TeacherCoralCreateButton({
+class TeacherCoralCreateButton extends StatelessWidget {
+  const TeacherCoralCreateButton({
+    super.key,
     required this.scale,
     required this.label,
     required this.onTap,
@@ -24,7 +25,7 @@ class _TeacherCoralCreateButton extends StatelessWidget {
             width: 218 * scale,
             height: 65 * scale,
             decoration: BoxDecoration(
-              color: _teacherCoral,
+              color: teacherCoral,
               borderRadius: BorderRadius.circular(12 * scale),
               boxShadow: [
                 BoxShadow(

@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_study_tab.dart';
 
 class _TeacherStudyDateParts {
   const _TeacherStudyDateParts({required this.day, required this.month});

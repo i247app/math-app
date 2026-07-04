@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _CreateHomeworkSubmitButton extends StatelessWidget {
   const _CreateHomeworkSubmitButton({
@@ -17,7 +17,7 @@ class _CreateHomeworkSubmitButton extends StatelessWidget {
       child: FilledButton(
         onPressed: isLoading ? null : onTap,
         style: FilledButton.styleFrom(
-          backgroundColor: _teacherTeal,
+          backgroundColor: teacherTeal,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),

@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_study_tab.dart';
 
 List<ClassroomExercise> _deduplicateTeacherStudyExercises(
   List<ClassroomExercise> exercises,
@@ -69,3 +69,5 @@ String? _teacherStudyDateLabel(BuildContext context, String? value) {
   }
   return '$day/$month/${local.year}';
 }
+
+String _twoDigits(int value) => value.toString().padLeft(2, '0');

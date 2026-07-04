@@ -1,7 +1,8 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _TeacherScreenAppBar extends StatelessWidget {
-  const _TeacherScreenAppBar({
+class TeacherScreenAppBar extends StatelessWidget {
+  const TeacherScreenAppBar({
+    super.key,
     required this.title,
     required this.scale,
     required this.onBack,
@@ -50,7 +51,7 @@ class _TeacherScreenAppBar extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: _teacherTeal,
+              color: teacherTeal,
               fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w700,
               height: 1,

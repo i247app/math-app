@@ -1,4 +1,37 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/classroom/classroom_api.dart';
+import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
+import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
+import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
+import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
+import 'package:numi_flutter/features/homework/homework_api.dart';
+import 'package:numi_flutter/features/homework/presentation/teacher_homework_screen.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+
+part 'helpers/teacher_study_helpers.dart';
+part 'models/teacher_study_date_parts.dart';
+part 'models/teacher_study_exercise_batch.dart';
+part 'widgets/teacher_study_class_filters.dart';
+part 'widgets/teacher_study_exercise_card.dart';
+part 'widgets/teacher_study_filter_chip.dart';
+part 'widgets/teacher_study_loading_indicator.dart';
+part 'widgets/teacher_study_purpose_filters.dart';
+part 'widgets/teacher_study_search_field.dart';
 
 class TeacherStudyTab extends StatefulWidget {
   const TeacherStudyTab({
@@ -323,7 +356,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       widget.activeProfile,
     );
     if (exerciseId == null || profileId == null) {
-      _showTeacherHomeworkSoon(context);
+      showTeacherHomeworkSoon(context);
       return;
     }
 
@@ -375,7 +408,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
           ),
           Expanded(
             child: RefreshIndicator(
-              color: _teacherTeal,
+              color: teacherTeal,
               onRefresh: _refreshClassrooms,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(
@@ -394,7 +427,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                   children: [
                     Align(
                       alignment: Alignment.centerRight,
-                      child: _TeacherHomeworkAddButton(
+                      child: TeacherHomeworkAddButton(
                         onTap: _openCreateExercise,
                       ),
                     ),
@@ -426,7 +459,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                           !_hasCompletedInitialLoad)
                         _TeacherStudyLoadingIndicator(scale: scale)
                       else if (_displayError != null && _exercises.isEmpty)
-                        _TeacherErrorPanel(
+                        TeacherErrorPanel(
                           scale: scale,
                           message: _displayError!,
                           onRetry: _refreshClassrooms,
@@ -434,7 +467,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                       else if (_classrooms.isEmpty)
                         Column(
                           children: [
-                            _TeacherEmptyAssignmentsPanel(
+                            TeacherEmptyAssignmentsPanel(
                               message: context.getText(
                                 AppKeys.teacherEmptyClassroomList,
                               ),
@@ -444,13 +477,13 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                       else if (_exercises.isEmpty)
                         Column(
                           children: [
-                            _TeacherEmptyAssignmentsPanel(
+                            TeacherEmptyAssignmentsPanel(
                               message: _searchController.text.trim().isNotEmpty
                                   ? context.getText(
                                       AppKeys.teacherStudyNoResults,
                                     )
                                   : context.getText(
-                                      _teacherExerciseCopy(
+                                      teacherExerciseCopy(
                                         _selectedPurpose,
                                       ).emptyKey,
                                     ),

@@ -1,10 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
 class _TeacherEmptyMemberText extends StatelessWidget {
-  const _TeacherEmptyMemberText({
-    required this.scale,
-    required this.text,
-  });
+  const _TeacherEmptyMemberText({required this.scale, required this.text});
 
   final double scale;
   final String text;
@@ -25,7 +22,7 @@ class _TeacherEmptyMemberText extends StatelessWidget {
         text,
         textAlign: TextAlign.center,
         style: GoogleFonts.andika(
-          color: _teacherMuted,
+          color: teacherMuted,
           fontSize: 14 * scale,
           fontWeight: FontWeight.w600,
           height: 1.35,

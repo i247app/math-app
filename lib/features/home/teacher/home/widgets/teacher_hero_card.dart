@@ -1,7 +1,7 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
-class _TeacherHeroCard extends StatelessWidget {
-  const _TeacherHeroCard({required this.scale});
+class TeacherHeroCard extends StatelessWidget {
+  const TeacherHeroCard({super.key, required this.scale});
 
   final double scale;
 
@@ -16,7 +16,7 @@ class _TeacherHeroCard extends StatelessWidget {
         18 * scale,
       ),
       decoration: BoxDecoration(
-        color: _teacherHero,
+        color: teacherHero,
         borderRadius: BorderRadius.circular(24 * scale),
         boxShadow: [
           BoxShadow(

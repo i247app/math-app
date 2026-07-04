@@ -1,4 +1,4 @@
-part of '../../classroom/presentation/teacher_classroom_screens.dart';
+part of 'teacher_homework_screen.dart';
 
 class TeacherHomeworkDetailScreen extends StatefulWidget {
   const TeacherHomeworkDetailScreen({
@@ -101,7 +101,7 @@ class _TeacherHomeworkDetailScreenState
       setState(() {
         _error = error.message.trim().isEmpty
             ? context.readText(
-                _teacherExerciseCopy(_effectivePurpose).detailLoadFailedKey,
+                teacherExerciseCopy(_effectivePurpose).detailLoadFailedKey,
               )
             : error.message;
       });
@@ -159,7 +159,7 @@ class _TeacherHomeworkDetailScreenState
             content: Text(
               error.message.trim().isEmpty
                   ? context.readText(
-                      _teacherExerciseCopy(_effectivePurpose).createFailedKey,
+                      teacherExerciseCopy(_effectivePurpose).createFailedKey,
                     )
                   : error.message,
             ),
@@ -185,9 +185,9 @@ class _TeacherHomeworkDetailScreenState
         bottom: false,
         child: Column(
           children: [
-            _TeacherScreenAppBar(
+            TeacherScreenAppBar(
               title: context.getText(
-                _teacherExerciseCopy(_effectivePurpose).titleKey,
+                teacherExerciseCopy(_effectivePurpose).titleKey,
               ),
               scale: 1,
               onBack: () => Navigator.of(context).maybePop(),
@@ -200,13 +200,13 @@ class _TeacherHomeworkDetailScreenState
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: _teacherTeal,
+                                color: teacherTeal,
                               ),
                             )
                           : Text(
                               context.getText(AppKeys.save),
                               style: GoogleFonts.andika(
-                                color: _teacherTeal,
+                                color: teacherTeal,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -216,7 +216,7 @@ class _TeacherHomeworkDetailScreenState
             ),
             Expanded(
               child: RefreshIndicator(
-                color: _teacherTeal,
+                color: teacherTeal,
                 onRefresh: () => _loadDetail(forceRefresh: true),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
@@ -236,12 +236,12 @@ class _TeacherHomeworkDetailScreenState
                           padding: EdgeInsets.only(top: 80),
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: _teacherTeal,
+                              color: teacherTeal,
                             ),
                           ),
                         )
                       else if (_error != null && exercise == null)
-                        _TeacherErrorPanel(
+                        TeacherErrorPanel(
                           scale: 1,
                           message: _error!,
                           onRetry: _loadDetail,
@@ -262,7 +262,7 @@ class _TeacherHomeworkDetailScreenState
                               AppKeys.teacherAssignmentQuestionContent,
                             ),
                             style: GoogleFonts.andika(
-                              color: _teacherBlue,
+                              color: teacherBlue,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               height: 32 / 18,
@@ -282,7 +282,7 @@ class _TeacherHomeworkDetailScreenState
                             ),
                           ),
                         if (_isLoading)
-                          const _TeacherBackgroundRefreshLabel(scale: 1),
+                          const TeacherBackgroundRefreshLabel(scale: 1),
                       ],
                     ],
                   ),

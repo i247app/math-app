@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherHomeSectionHeader extends StatelessWidget {
   const _TeacherHomeSectionHeader({
@@ -39,7 +39,7 @@ class _TeacherHomeSectionHeader extends StatelessWidget {
             child: Text(
               context.getText(AppKeys.viewAllUpper),
               style: GoogleFonts.andika(
-                color: _teacherInk,
+                color: teacherInk,
                 fontSize: FontSize.small * scale,
                 fontWeight: FontWeight.w800,
                 decoration: TextDecoration.underline,

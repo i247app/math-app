@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherClassCarousel extends StatelessWidget {
   const _TeacherClassCarousel({

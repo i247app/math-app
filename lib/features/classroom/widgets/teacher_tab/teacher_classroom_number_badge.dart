@@ -11,11 +11,8 @@ class _TeacherClassroomNumberBadge extends StatelessWidget {
   final String number;
   final _TeacherClassroomNumberPalette palette;
 
-  TextStyle get _numberStyle => TextStyle(
-        fontSize: 50 * scale,
-        fontWeight: FontWeight.w900,
-        height: 1,
-      );
+  TextStyle get _numberStyle =>
+      TextStyle(fontSize: 50 * scale, fontWeight: FontWeight.w900, height: 1);
 
   @override
   Widget build(BuildContext context) {

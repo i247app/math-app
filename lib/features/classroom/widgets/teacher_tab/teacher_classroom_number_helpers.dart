@@ -76,6 +76,6 @@ _TeacherClassroomNumberPalette _teacherClassroomNumberPalette(
 ) {
   final seed =
       classroom.stableId ?? classroom.id ?? classroom.name?.hashCode ?? 0;
-  return _teacherClassroomNumberPalettes[
-      seed.abs() % _teacherClassroomNumberPalettes.length];
+  return _teacherClassroomNumberPalettes[seed.abs() %
+      _teacherClassroomNumberPalettes.length];
 }

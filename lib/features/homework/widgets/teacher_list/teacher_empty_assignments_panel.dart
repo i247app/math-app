@@ -1,7 +1,7 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
-class _TeacherEmptyAssignmentsPanel extends StatelessWidget {
-  const _TeacherEmptyAssignmentsPanel({required this.message});
+class TeacherEmptyAssignmentsPanel extends StatelessWidget {
+  const TeacherEmptyAssignmentsPanel({super.key, required this.message});
 
   final String message;
 
@@ -18,7 +18,7 @@ class _TeacherEmptyAssignmentsPanel extends StatelessWidget {
         message,
         textAlign: TextAlign.center,
         style: GoogleFonts.andika(
-          color: _teacherMuted,
+          color: teacherMuted,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),

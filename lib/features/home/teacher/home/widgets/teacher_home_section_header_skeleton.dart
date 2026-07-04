@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherHomeSectionHeaderSkeleton extends StatefulWidget {
   const _TeacherHomeSectionHeaderSkeleton({required this.scale});
@@ -27,30 +27,30 @@ class _TeacherHomeSectionHeaderSkeletonState
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
-    return _TeacherSkeletonShimmer(
+    return TeacherSkeletonShimmer(
       controller: _controller,
       child: Row(
         children: [
-          _TeacherSkeletonBlock(
+          TeacherSkeletonBlock(
             width: 42 * scale,
             height: 42 * scale,
             radius: 14 * scale,
-            color: _teacherTeal.withValues(alpha: 0.16),
+            color: teacherTeal.withValues(alpha: 0.16),
           ),
           SizedBox(width: 12 * scale),
           Expanded(
-            child: _TeacherSkeletonBlock(
+            child: TeacherSkeletonBlock(
               width: double.infinity,
               height: 22 * scale,
               radius: 10 * scale,
             ),
           ),
           SizedBox(width: 16 * scale),
-          _TeacherSkeletonBlock(
+          TeacherSkeletonBlock(
             width: 82 * scale,
             height: 22 * scale,
             radius: 11 * scale,
-            color: _teacherTeal.withValues(alpha: 0.14),
+            color: teacherTeal.withValues(alpha: 0.14),
           ),
         ],
       ),

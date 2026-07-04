@@ -5,8 +5,8 @@ import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_stat
 
 class ClassroomCubit extends Cubit<ClassroomState> {
   ClassroomCubit({required ClassroomService classroomService})
-      : _classroomService = classroomService,
-        super(const ClassroomState());
+    : _classroomService = classroomService,
+      super(const ClassroomState());
 
   final ClassroomService _classroomService;
   final Map<String, Future<ClassroomCollectionState>> _pendingLoads =
@@ -260,16 +260,14 @@ class ClassroomCubit extends Cubit<ClassroomState> {
   ) async {
     final current = state.collection(type, profileId);
     emit(
-      state.replace(
-        type,
-        current.copyWith(isLoading: true, clearError: true),
-      ),
+      state.replace(type, current.copyWith(isLoading: true, clearError: true)),
     );
 
     try {
       final classrooms = switch (type) {
-        ClassroomCollectionType.owned =>
-          await _classroomService.listClassrooms(profileId: profileId),
+        ClassroomCollectionType.owned => await _classroomService.listClassrooms(
+          profileId: profileId,
+        ),
         ClassroomCollectionType.joined =>
           await _classroomService.listMyJoinedClassrooms(profileId: profileId),
       };
@@ -302,8 +300,9 @@ class ClassroomCubit extends Cubit<ClassroomState> {
     required int generation,
   }) async {
     final current = state.detail(profileId, classroomId);
-    emit(state
-        .replaceDetail(current.copyWith(isLoading: true, clearError: true)));
+    emit(
+      state.replaceDetail(current.copyWith(isLoading: true, clearError: true)),
+    );
 
     try {
       final classroom = await _classroomService.getClassroomDetail(
@@ -429,10 +428,12 @@ class ClassroomCubit extends Cubit<ClassroomState> {
       ClassroomState(
         ownedByProfile: Map.unmodifiable(owned),
         joinedByProfile: Map.unmodifiable(joined),
-        detailByClassroom:
-            state.removeClassroomData(profileId: profileId).detailByClassroom,
-        membersByClassroom:
-            state.removeClassroomData(profileId: profileId).membersByClassroom,
+        detailByClassroom: state
+            .removeClassroomData(profileId: profileId)
+            .detailByClassroom,
+        membersByClassroom: state
+            .removeClassroomData(profileId: profileId)
+            .membersByClassroom,
       ),
     );
   }

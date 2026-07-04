@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherTopBar extends StatelessWidget {
   const _TeacherTopBar({
@@ -13,7 +13,7 @@ class _TeacherTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = _displayTeacherName(profile);
+    final name = displayTeacherName(profile);
     return Container(
       padding: EdgeInsets.fromLTRB(
         18 * scale,
@@ -21,10 +21,10 @@ class _TeacherTopBar extends StatelessWidget {
         18 * scale,
         14 * scale,
       ),
-      decoration: const BoxDecoration(color: _teacherMint),
+      decoration: const BoxDecoration(color: teacherMint),
       child: Row(
         children: [
-          _TeacherAvatar(profile: profile, size: 48 * scale),
+          TeacherAvatar(profile: profile, size: 48 * scale),
           SizedBox(width: 12 * scale),
           Expanded(
             child: Column(
@@ -35,7 +35,7 @@ class _TeacherTopBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: _teacherBlue.withValues(alpha: 0.60),
+                    color: teacherBlue.withValues(alpha: 0.60),
                     fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.6,
@@ -47,7 +47,7 @@ class _TeacherTopBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: _teacherBlue,
+                    color: teacherBlue,
                     fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.1,
@@ -73,7 +73,7 @@ class _TeacherTopBar extends StatelessWidget {
             ),
             child: Icon(
               Icons.notifications_none_rounded,
-              color: _teacherBlue,
+              color: teacherBlue,
               size: 22 * scale,
             ),
           ),

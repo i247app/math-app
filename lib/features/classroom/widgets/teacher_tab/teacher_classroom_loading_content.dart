@@ -12,36 +12,36 @@ class _TeacherClassroomLoadingContent extends StatelessWidget {
       children: [
         Align(
           alignment: Alignment.centerRight,
-          child: _TeacherSkeletonBlock(
+          child: TeacherSkeletonBlock(
             width: 90 * scale,
             height: 36 * scale,
             radius: 12 * scale,
-            color: _teacherCoral.withValues(alpha: 0.18),
+            color: teacherCoral.withValues(alpha: 0.18),
           ),
         ),
         SizedBox(height: 16 * scale),
-        _TeacherSkeletonCard(
+        TeacherSkeletonCard(
           scale: scale,
           padding: EdgeInsets.symmetric(horizontal: 16 * scale),
           child: SizedBox(
             height: 48 * scale,
             child: Row(
               children: [
-                _TeacherSkeletonBlock(
+                TeacherSkeletonBlock(
                   width: 24 * scale,
                   height: 24 * scale,
                   radius: 12 * scale,
                 ),
                 SizedBox(width: 12 * scale),
                 Expanded(
-                  child: _TeacherSkeletonBlock(
+                  child: TeacherSkeletonBlock(
                     width: double.infinity,
                     height: 14 * scale,
                     radius: 7 * scale,
                   ),
                 ),
                 SizedBox(width: 16 * scale),
-                _TeacherSkeletonBlock(
+                TeacherSkeletonBlock(
                   width: 24 * scale,
                   height: 24 * scale,
                   radius: 12 * scale,

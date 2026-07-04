@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _TeacherCreateClassResult {
-  const _TeacherCreateClassResult({this.classroom});
+class TeacherCreateClassResult {
+  const TeacherCreateClassResult({this.classroom});
 
   final ClassroomModel? classroom;
 }

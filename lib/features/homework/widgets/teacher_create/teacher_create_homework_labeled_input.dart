@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _CreateHomeworkLabeledInput extends StatelessWidget {
   const _CreateHomeworkLabeledInput({

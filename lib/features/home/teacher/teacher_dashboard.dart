@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
 import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/teacher/home/teacher_home_tab.dart';
+import 'package:numi_flutter/features/home/teacher/study/teacher_study_tab.dart';
 import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
 
 class TeacherDashboard extends StatelessWidget {

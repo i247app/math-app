@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherHomeworkSectionHeader extends StatelessWidget {
   const _TeacherHomeworkSectionHeader({required this.purpose});
@@ -7,7 +7,7 @@ class _TeacherHomeworkSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final copy = _teacherExerciseCopy(purpose);
+    final copy = teacherExerciseCopy(purpose);
     return Row(
       children: [
         Expanded(
@@ -16,7 +16,7 @@ class _TeacherHomeworkSectionHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: _teacherBlue,
+              color: teacherBlue,
               fontSize: 20,
               fontWeight: FontWeight.w800,
               height: 28 / 20,

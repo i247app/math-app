@@ -20,10 +20,7 @@ class _TeacherJoinRequestRow extends StatelessWidget {
     final name = _classroomMemberName(context, request);
     return Row(
       children: [
-        _TeacherClassroomMemberAvatar(
-          member: request,
-          size: 40 * scale,
-        ),
+        _TeacherClassroomMemberAvatar(member: request, size: 40 * scale),
         SizedBox(width: 12 * scale),
         Expanded(
           child: _TeacherMemberTextBlock(
@@ -32,7 +29,7 @@ class _TeacherJoinRequestRow extends StatelessWidget {
             nameFontSize: 16 * scale,
             statusFontSize: 12 * scale,
             nameColor: const Color(0xFF1E3A5F),
-            statusColor: _teacherMuted,
+            statusColor: teacherMuted,
           ),
         ),
         SizedBox(width: 10 * scale),
@@ -44,7 +41,7 @@ class _TeacherJoinRequestRow extends StatelessWidget {
                 width: 18 * scale,
                 height: 18 * scale,
                 child: const CircularProgressIndicator(
-                  color: _teacherTeal,
+                  color: teacherTeal,
                   strokeWidth: 2,
                 ),
               ),

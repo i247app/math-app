@@ -23,10 +23,12 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = _nonEmpty(classroom?.name) ??
+    final title =
+        _nonEmpty(classroom?.name) ??
         context.getText(AppKeys.teacherClassFallback);
     final grade = _classroomGradeLabel(context, classroom, grades);
-    final program = _classroomProgramLabel(context, classroom, programs) ??
+    final program =
+        _classroomProgramLabel(context, classroom, programs) ??
         context.getText(AppKeys.teacherProgramFallback);
     final schoolName = _classroomSchoolLabel(context, classroom, schools);
     final code = _classCode(classroom);
@@ -69,7 +71,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                 ? SizedBox(
                     height: 164 * scale,
                     child: const Center(
-                      child: CircularProgressIndicator(color: _teacherTeal),
+                      child: CircularProgressIndicator(color: teacherTeal),
                     ),
                   )
                 : Column(
@@ -107,7 +109,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: GoogleFonts.andika(
-                                          color: _teacherInk,
+                                          color: teacherInk,
                                           fontSize: 20 * scale,
                                           fontWeight: FontWeight.w700,
                                           height: 1.6,
@@ -115,12 +117,11 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                                       ),
                                     ),
                                     InkWell(
-                                      onTap: () => _copyClassroomInfo(
-                                        context,
-                                        joinLink,
+                                      onTap: () =>
+                                          _copyClassroomInfo(context, joinLink),
+                                      borderRadius: BorderRadius.circular(
+                                        8 * scale,
                                       ),
-                                      borderRadius:
-                                          BorderRadius.circular(8 * scale),
                                       child: Padding(
                                         padding: EdgeInsets.all(4 * scale),
                                         child: Image.asset(
@@ -200,10 +201,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                             _TeacherClassDetailCodeChip(
                               scale: scale,
                               code: code,
-                              onCopy: () => _copyClassroomInfo(
-                                context,
-                                code,
-                              ),
+                              onCopy: () => _copyClassroomInfo(context, code),
                             ),
                             const Spacer(),
                             Image.asset(
@@ -219,7 +217,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                         height: 38 * scale,
                         padding: EdgeInsets.symmetric(horizontal: 21 * scale),
                         decoration: BoxDecoration(
-                          color: _teacherMint,
+                          color: teacherMint,
                           borderRadius: BorderRadius.circular(16 * scale),
                           border: Border.all(color: const Color(0xFFEFF6FF)),
                         ),
@@ -240,10 +238,8 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                             ),
                             SizedBox(width: 8 * scale),
                             InkWell(
-                              onTap: () => _copyClassroomInfo(
-                                context,
-                                joinLink,
-                              ),
+                              onTap: () =>
+                                  _copyClassroomInfo(context, joinLink),
                               borderRadius: BorderRadius.circular(8 * scale),
                               child: Padding(
                                 padding: EdgeInsets.all(2 * scale),
@@ -273,7 +269,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.andika(
-                                  color: _teacherMuted,
+                                  color: teacherMuted,
                                   fontSize: 13 * scale,
                                   fontWeight: FontWeight.w700,
                                   height: 1.2,

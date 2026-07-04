@@ -7,7 +7,7 @@ class _TeacherClassroomSkeletonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TeacherSkeletonCard(
+    return TeacherSkeletonCard(
       scale: scale,
       padding: EdgeInsets.symmetric(
         horizontal: 18 * scale,
@@ -19,7 +19,7 @@ class _TeacherClassroomSkeletonCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _TeacherSkeletonBlock(
+              TeacherSkeletonBlock(
                 width: 76 * scale,
                 height: 76 * scale,
                 radius: 16 * scale,
@@ -31,13 +31,13 @@ class _TeacherClassroomSkeletonCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _TeacherSkeletonBlock(
+                      TeacherSkeletonBlock(
                         width: 128 * scale,
                         height: 21 * scale,
                         radius: 10.5 * scale,
                       ),
                       SizedBox(height: 16 * scale),
-                      _TeacherSkeletonBlock(
+                      TeacherSkeletonBlock(
                         width: 142 * scale,
                         height: 18 * scale,
                         radius: 9 * scale,
@@ -49,7 +49,7 @@ class _TeacherClassroomSkeletonCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16 * scale),
-          _TeacherSkeletonBlock(
+          TeacherSkeletonBlock(
             width: 132 * scale,
             height: 18 * scale,
             radius: 9 * scale,

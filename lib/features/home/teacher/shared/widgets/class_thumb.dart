@@ -1,7 +1,10 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _ClassThumb extends StatelessWidget {
-  const _ClassThumb({required this.classroom, required this.scale});
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/features/home/teacher/shared/widgets/class_default_image.dart';
+
+class ClassThumb extends StatelessWidget {
+  const ClassThumb({super.key, required this.classroom, required this.scale});
 
   final ClassroomModel classroom;
   final double scale;
@@ -22,9 +25,9 @@ class _ClassThumb extends StatelessWidget {
           ? Image.network(
               imageUrl!.trim(),
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _ClassDefaultImage(scale: scale),
+              errorBuilder: (_, _, _) => ClassDefaultImage(scale: scale),
             )
-          : _ClassDefaultImage(scale: scale),
+          : ClassDefaultImage(scale: scale),
     );
   }
 }

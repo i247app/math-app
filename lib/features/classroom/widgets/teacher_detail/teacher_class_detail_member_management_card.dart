@@ -69,7 +69,7 @@ class _TeacherClassDetailMemberManagementCard extends StatelessWidget {
                       ),
                       SizedBox(height: 2 * scale),
                       Text(
-                        _teacherMemberSummaryText(
+                        teacherMemberSummaryText(
                           context,
                           members: memberCount,
                           requests: requestCount,
@@ -77,7 +77,7 @@ class _TeacherClassDetailMemberManagementCard extends StatelessWidget {
                         maxLines: requestCount > 0 ? 2 : 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: _teacherMuted,
+                          color: teacherMuted,
                           fontSize: 14 * scale,
                           fontWeight: FontWeight.w400,
                           height: 1.25,

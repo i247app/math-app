@@ -1,9 +1,6 @@
 import 'package:numi_flutter/core/network/classroom_models.dart';
 
-enum ClassroomCollectionType {
-  owned,
-  joined,
-}
+enum ClassroomCollectionType { owned, joined }
 
 class ClassroomCollectionState {
   const ClassroomCollectionState({
@@ -38,10 +35,7 @@ class ClassroomCollectionState {
 }
 
 class ClassroomDataKey {
-  const ClassroomDataKey({
-    required this.profileId,
-    required this.classroomId,
-  });
+  const ClassroomDataKey({required this.profileId, required this.classroomId});
 
   final int profileId;
   final int classroomId;
@@ -162,10 +156,7 @@ class ClassroomState {
           profileId: profileId,
           classroomId: classroomId,
         )] ??
-        ClassroomDetailState(
-          profileId: profileId,
-          classroomId: classroomId,
-        );
+        ClassroomDetailState(profileId: profileId, classroomId: classroomId);
   }
 
   ClassroomMembersState members(int profileId, int classroomId) {
@@ -173,10 +164,7 @@ class ClassroomState {
           profileId: profileId,
           classroomId: classroomId,
         )] ??
-        ClassroomMembersState(
-          profileId: profileId,
-          classroomId: classroomId,
-        );
+        ClassroomMembersState(profileId: profileId, classroomId: classroomId);
   }
 
   ClassroomState replace(
@@ -204,9 +192,10 @@ class ClassroomState {
       detailByClassroom,
     );
     details[ClassroomDataKey(
-      profileId: detail.profileId,
-      classroomId: detail.classroomId,
-    )] = detail;
+          profileId: detail.profileId,
+          classroomId: detail.classroomId,
+        )] =
+        detail;
     return ClassroomState(
       ownedByProfile: ownedByProfile,
       joinedByProfile: joinedByProfile,
@@ -220,9 +209,10 @@ class ClassroomState {
       membersByClassroom,
     );
     memberStates[ClassroomDataKey(
-      profileId: members.profileId,
-      classroomId: members.classroomId,
-    )] = members;
+          profileId: members.profileId,
+          classroomId: members.classroomId,
+        )] =
+        members;
     return ClassroomState(
       ownedByProfile: ownedByProfile,
       joinedByProfile: joinedByProfile,

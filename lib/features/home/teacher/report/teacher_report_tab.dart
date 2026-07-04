@@ -1,4 +1,10 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
 
 class TeacherReportTab extends StatelessWidget {
   const TeacherReportTab({
@@ -26,7 +32,7 @@ class TeacherReportTab extends StatelessWidget {
           Text(
             context.getText(AppKeys.teacherReportTitle),
             style: GoogleFonts.andika(
-              color: _teacherTeal,
+              color: teacherTeal,
               fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w700,
               height: 1.15,
@@ -43,7 +49,7 @@ class TeacherReportTab extends StatelessWidget {
                 border: Border.all(color: const Color(0xFFE2E9EC)),
                 boxShadow: [
                   BoxShadow(
-                    color: _teacherBlue.withValues(alpha: 0.06),
+                    color: teacherBlue.withValues(alpha: 0.06),
                     blurRadius: 24 * scale,
                     offset: Offset(0, 10 * scale),
                   ),
@@ -55,12 +61,12 @@ class TeacherReportTab extends StatelessWidget {
                     width: 92 * scale,
                     height: 92 * scale,
                     decoration: BoxDecoration(
-                      color: _teacherHero.withValues(alpha: 0.20),
+                      color: teacherHero.withValues(alpha: 0.20),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.bar_chart_rounded,
-                      color: _teacherTeal,
+                      color: teacherTeal,
                       size: 44 * scale,
                     ),
                   ),
@@ -69,7 +75,7 @@ class TeacherReportTab extends StatelessWidget {
                     context.getText(AppKeys.teacherReportComingSoon),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
-                      color: _teacherInk,
+                      color: teacherInk,
                       fontSize: FontSize.large * scale,
                       fontWeight: FontWeight.w800,
                       height: 1.25,
@@ -80,7 +86,7 @@ class TeacherReportTab extends StatelessWidget {
                     context.getText(AppKeys.teacherReportPlaceholder),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
-                      color: _teacherMuted,
+                      color: teacherMuted,
                       fontSize: FontSize.caption * scale,
                       fontWeight: FontWeight.w500,
                       height: 1.45,

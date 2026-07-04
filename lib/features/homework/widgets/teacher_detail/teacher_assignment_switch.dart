@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherAssignmentSwitch extends StatelessWidget {
   const _TeacherAssignmentSwitch({
@@ -14,7 +14,7 @@ class _TeacherAssignmentSwitch extends StatelessWidget {
     return Switch.adaptive(
       value: visibility == 'PUBLIC',
       activeThumbColor: Colors.white,
-      activeTrackColor: _teacherTeal,
+      activeTrackColor: teacherTeal,
       inactiveThumbColor: Colors.white,
       inactiveTrackColor: const Color(0xFFE87151),
       onChanged: (value) => onChanged(value ? 'PUBLIC' : 'PRIVATE'),

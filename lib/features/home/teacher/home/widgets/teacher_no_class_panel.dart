@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherNoClassPanel extends StatelessWidget {
   const _TeacherNoClassPanel({
@@ -35,7 +35,7 @@ class _TeacherNoClassPanel extends StatelessWidget {
             ),
           ),
           SizedBox(height: 22 * scale),
-          _TeacherCoralCreateButton(
+          TeacherCoralCreateButton(
             scale: scale,
             label: context.getText(
               isProfileComplete

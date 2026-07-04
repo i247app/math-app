@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _CreateHomeworkClassSelector extends StatelessWidget {
   const _CreateHomeworkClassSelector({
@@ -35,7 +35,7 @@ class _CreateHomeworkClassSelector extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: _teacherInk,
+                    color: teacherInk,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     height: 24 / 16,
@@ -48,7 +48,7 @@ class _CreateHomeworkClassSelector extends StatelessWidget {
                   height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: _teacherTeal,
+                    color: teacherTeal,
                   ),
                 )
               else

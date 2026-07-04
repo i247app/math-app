@@ -1,6 +1,6 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
-bool _isTeacherProfileComplete(StudentProfile? profile) {
+bool isTeacherProfileComplete(StudentProfile? profile) {
   return profile?.profileStatus?.trim().toUpperCase() == 'OFFICIAL';
 }
 
@@ -19,7 +19,7 @@ int _compareRecentAssignments(
   return (second.stableId ?? -1).compareTo(first.stableId ?? -1);
 }
 
-String _teacherExercisePurpose(ClassroomExercise exercise) {
+String teacherExercisePurpose(ClassroomExercise exercise) {
   final purpose = exercise.purpose?.trim().toUpperCase();
   if (purpose == classroomExercisePurposeExam ||
       purpose == classroomExercisePurposeQuiz) {

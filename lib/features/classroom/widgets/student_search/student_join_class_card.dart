@@ -29,8 +29,8 @@ class StudentJoinClassCard extends StatelessWidget {
     final teacher = classroom.teacherName?.trim().isNotEmpty == true
         ? classroom.teacherName!.trim()
         : classroom.schoolName?.trim().isNotEmpty == true
-            ? classroom.schoolName!.trim()
-            : context.getText(AppKeys.teacherFallback);
+        ? classroom.schoolName!.trim()
+        : context.getText(AppKeys.teacherFallback);
     final code = classroomCode(classroom);
     final action = StudentJoinClassActionState.fromRelationship(
       classroom.relationshipStatus,
@@ -138,8 +138,9 @@ class StudentJoinClassCard extends StatelessWidget {
                     width: 62,
                     height: 36,
                     child: ElevatedButton(
-                      onPressed:
-                          isJoining || !action.canRequest ? null : onJoin,
+                      onPressed: isJoining || !action.canRequest
+                          ? null
+                          : onJoin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: action.buttonColor,
                         disabledBackgroundColor: action.buttonColor,

@@ -1,7 +1,7 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
-class _TeacherExerciseCopy {
-  const _TeacherExerciseCopy({
+class TeacherExerciseCopy {
+  const TeacherExerciseCopy({
     required this.titleKey,
     required this.createdTitleKey,
     required this.listLoadFailedKey,
@@ -26,9 +26,9 @@ class _TeacherExerciseCopy {
   final String descriptionHintKey;
 }
 
-_TeacherExerciseCopy _teacherExerciseCopy(String purpose) {
+TeacherExerciseCopy teacherExerciseCopy(String purpose) {
   if (purpose.trim().toUpperCase() == classroomExercisePurposeExam) {
-    return const _TeacherExerciseCopy(
+    return const TeacherExerciseCopy(
       titleKey: AppKeys.teacherAssessments,
       createdTitleKey: AppKeys.teacherCreatedAssessments,
       listLoadFailedKey: AppKeys.teacherAssessmentListLoadFailed,
@@ -42,7 +42,7 @@ _TeacherExerciseCopy _teacherExerciseCopy(String purpose) {
     );
   }
 
-  return const _TeacherExerciseCopy(
+  return const TeacherExerciseCopy(
     titleKey: AppKeys.teacherAssignments,
     createdTitleKey: AppKeys.teacherCreatedAssignments,
     listLoadFailedKey: AppKeys.teacherAssignmentListLoadFailed,

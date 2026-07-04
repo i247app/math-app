@@ -56,11 +56,7 @@ class StudentClassCategoryTile extends StatelessWidget {
                   color: backgroundColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: SvgPicture.asset(
-                  iconAsset,
-                  width: 18,
-                  height: 18,
-                ),
+                child: SvgPicture.asset(iconAsset, width: 18, height: 18),
               ),
               const SizedBox(height: 16),
               Text(

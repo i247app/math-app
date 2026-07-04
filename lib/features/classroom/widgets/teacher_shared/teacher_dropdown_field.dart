@@ -57,7 +57,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                     style: GoogleFonts.andika(
                       color: selectedLabel == null
                           ? const Color(0x806B7280)
-                          : _teacherInk,
+                          : teacherInk,
                       fontSize: FontSize.normal * scale,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
@@ -67,8 +67,8 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                 Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: canSelect
-                      ? _teacherTeal
-                      : _teacherMuted.withValues(alpha: 0.45),
+                      ? teacherTeal
+                      : teacherMuted.withValues(alpha: 0.45),
                   size: 22 * scale,
                 ),
               ],
@@ -125,7 +125,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.andika(
-                    color: _teacherTeal,
+                    color: teacherTeal,
                     fontSize: FontSize.xxxl * scale,
                     fontWeight: FontWeight.w700,
                     height: 1.15,
@@ -152,7 +152,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.andika(
-                              color: _teacherInk,
+                              color: teacherInk,
                               fontSize: FontSize.normal * scale,
                               fontWeight: isSelected
                                   ? FontWeight.w800
@@ -162,7 +162,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                           trailing: isSelected
                               ? Icon(
                                   Icons.check_circle_rounded,
-                                  color: _teacherTeal,
+                                  color: teacherTeal,
                                   size: 22 * scale,
                                 )
                               : null,

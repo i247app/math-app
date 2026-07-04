@@ -1,10 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
 class _TeacherSendInviteButton extends StatelessWidget {
-  const _TeacherSendInviteButton({
-    required this.enabled,
-    required this.onTap,
-  });
+  const _TeacherSendInviteButton({required this.enabled, required this.onTap});
 
   final bool enabled;
   final VoidCallback? onTap;
@@ -16,20 +13,17 @@ class _TeacherSendInviteButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: enabled ? onTap : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: _teacherCoral,
+          backgroundColor: teacherCoral,
           disabledBackgroundColor: const Color(0xFFE5E7EB),
           foregroundColor: Colors.white,
-          disabledForegroundColor: _teacherMuted,
+          disabledForegroundColor: teacherMuted,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
         ),
         child: Text(
           context.getText(AppKeys.teacherSendInviteRequest),
-          style: GoogleFonts.andika(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-          ),
+          style: GoogleFonts.andika(fontSize: 16, fontWeight: FontWeight.w800),
         ),
       ),
     );

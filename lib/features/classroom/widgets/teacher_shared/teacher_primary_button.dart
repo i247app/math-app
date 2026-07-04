@@ -39,8 +39,8 @@ class _TeacherPrimaryButton extends StatelessWidget {
           ),
           child: Material(
             color: onPressed == null
-                ? _teacherTeal.withValues(alpha: 0.45)
-                : _teacherTeal,
+                ? teacherTeal.withValues(alpha: 0.45)
+                : teacherTeal,
             borderRadius: BorderRadius.circular(20 * scale),
             clipBehavior: Clip.antiAlias,
             child: InkWell(

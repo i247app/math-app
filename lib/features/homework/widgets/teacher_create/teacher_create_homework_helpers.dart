@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 String _trimOrDefault(String value, String fallback) {
   final trimmed = value.trim();
@@ -63,13 +63,13 @@ String _createHomeworkGradeName(
   ClassroomModel? classroom,
   List<GradeModel> grades,
 ) {
-  final grade = _matchGrade(grades, classroom?.gradeId);
+  final grade = matchGrade(grades, classroom?.gradeId);
   if (grade != null) {
-    return _gradeLabel(grade);
+    return gradeLabel(grade);
   }
   final gradeId = classroom?.gradeId;
   if (gradeId != null) {
-    return '${context.getText(AppKeys.grade)} ${_displayBackendId(gradeId)}';
+    return '${context.getText(AppKeys.grade)} ${displayBackendId(gradeId)}';
   }
   return context.getText(AppKeys.teacherAssignmentClassGrade);
 }
@@ -103,9 +103,9 @@ String? _selectedHomeworkProgramName(
   if (selectedProgramId == null) {
     return null;
   }
-  final program = _matchProgram(programs, selectedProgramId);
+  final program = matchProgram(programs, selectedProgramId);
   if (program != null) {
-    return _programLabel(program);
+    return programLabel(program);
   }
   return '${context.getText(AppKeys.teacherProgramFallback)} '
       '$selectedProgramId';
@@ -116,11 +116,11 @@ String _createHomeworkSchoolName(
   ClassroomModel? classroom,
   List<SchoolModel> schools,
 ) {
-  final school = _matchSchool(schools, classroom?.schoolId);
+  final school = matchSchool(schools, classroom?.schoolId);
   if (school != null) {
-    return _schoolLabel(school);
+    return schoolLabel(school);
   }
-  return _displayBackendId(classroom?.schoolId) ??
+  return displayBackendId(classroom?.schoolId) ??
       context.getText(AppKeys.school);
 }
 
@@ -196,10 +196,10 @@ List<_ClassroomProgramOption> _programOptionsForClassroomWithoutContext(
 
   return ids
       .map((id) {
-        final program = _matchProgram(programs, id);
+        final program = matchProgram(programs, id);
         return _ClassroomProgramOption(
           id: id,
-          label: program == null ? '' : _programLabel(program),
+          label: program == null ? '' : programLabel(program),
         );
       })
       .toList(growable: false);

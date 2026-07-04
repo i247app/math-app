@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherHomeHeroSkeleton extends StatelessWidget {
   const _TeacherHomeHeroSkeleton({required this.scale});
@@ -9,7 +9,7 @@ class _TeacherHomeHeroSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 92 * scale,
-      child: _TeacherSkeletonCard(
+      child: TeacherSkeletonCard(
         scale: scale,
         padding: EdgeInsets.fromLTRB(
           14 * scale,
@@ -24,14 +24,14 @@ class _TeacherHomeHeroSkeleton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _TeacherSkeletonBlock(
+                  TeacherSkeletonBlock(
                     width: 148 * scale,
                     height: 20 * scale,
                     radius: 8 * scale,
-                    color: _teacherTeal.withValues(alpha: 0.18),
+                    color: teacherTeal.withValues(alpha: 0.18),
                   ),
                   SizedBox(height: 10 * scale),
-                  _TeacherSkeletonBlock(
+                  TeacherSkeletonBlock(
                     width: 218 * scale,
                     height: 15 * scale,
                     radius: 8 * scale,
@@ -39,11 +39,11 @@ class _TeacherHomeHeroSkeleton extends StatelessWidget {
                 ],
               ),
             ),
-            _TeacherSkeletonBlock(
+            TeacherSkeletonBlock(
               width: 64 * scale,
               height: 64 * scale,
               radius: 20 * scale,
-              color: _teacherHero.withValues(alpha: 0.22),
+              color: teacherHero.withValues(alpha: 0.22),
             ),
           ],
         ),

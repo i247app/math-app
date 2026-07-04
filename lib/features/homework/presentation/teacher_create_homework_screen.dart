@@ -1,4 +1,4 @@
-part of '../../classroom/presentation/teacher_classroom_screens.dart';
+part of 'teacher_homework_screen.dart';
 
 class TeacherCreateHomeworkScreen extends StatefulWidget {
   const TeacherCreateHomeworkScreen({
@@ -118,7 +118,7 @@ class _TeacherCreateHomeworkScreenState
           SnackBar(
             content: Text(
               context.getText(
-                _teacherExerciseCopy(widget.purpose).createdMessageKey,
+                teacherExerciseCopy(widget.purpose).createdMessageKey,
               ),
             ),
             behavior: SnackBarBehavior.floating,
@@ -133,7 +133,7 @@ class _TeacherCreateHomeworkScreenState
       _showSnack(
         error.message.trim().isEmpty
             ? context.readText(
-                _teacherExerciseCopy(widget.purpose).createFailedKey,
+                teacherExerciseCopy(widget.purpose).createFailedKey,
               )
             : error.message,
       );
@@ -434,9 +434,9 @@ class _TeacherCreateHomeworkScreenState
           bottom: false,
           child: Column(
             children: [
-              _TeacherScreenAppBar(
+              TeacherScreenAppBar(
                 title: context.getText(
-                  _teacherExerciseCopy(widget.purpose).createTitleKey,
+                  teacherExerciseCopy(widget.purpose).createTitleKey,
                 ),
                 scale: 1,
                 onBack: () => Navigator.of(context).maybePop(),
@@ -477,7 +477,7 @@ class _TeacherCreateHomeworkScreenState
                           const SizedBox(height: 22),
                           _CreateHomeworkInput(
                             controller: _titleController,
-                            hintKey: _teacherExerciseCopy(
+                            hintKey: teacherExerciseCopy(
                               widget.purpose,
                             ).titleHintKey,
                             height: 62,
@@ -559,7 +559,7 @@ class _TeacherCreateHomeworkScreenState
                           const SizedBox(height: 17),
                           _CreateHomeworkInput(
                             controller: _descriptionController,
-                            hintKey: _teacherExerciseCopy(
+                            hintKey: teacherExerciseCopy(
                               widget.purpose,
                             ).descriptionHintKey,
                             height: 167,

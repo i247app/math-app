@@ -131,7 +131,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
         .whereType<int>()
         .toSet();
     final classroomCubit = context.read<ClassroomCubit>();
-    final result = await Navigator.of(context).push<_TeacherCreateClassResult>(
+    final result = await Navigator.of(context).push<TeacherCreateClassResult>(
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
           value: classroomCubit,
@@ -158,7 +158,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
   }
 
   ClassroomModel? _createdClassroomFromResult(
-    _TeacherCreateClassResult result,
+    TeacherCreateClassResult result,
     Set<int> previousClassroomIds,
   ) {
     final createdId = result.classroom?.stableId;

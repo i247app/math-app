@@ -1,7 +1,8 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _TeacherSmallCoralAddButton extends StatelessWidget {
-  const _TeacherSmallCoralAddButton({
+class TeacherSmallCoralAddButton extends StatelessWidget {
+  const TeacherSmallCoralAddButton({
+    super.key,
     required this.scale,
     required this.onTap,
   });
@@ -25,7 +26,7 @@ class _TeacherSmallCoralAddButton extends StatelessWidget {
           ],
         ),
         child: Material(
-          color: _teacherCoral,
+          color: teacherCoral,
           borderRadius: radius,
           clipBehavior: Clip.antiAlias,
           child: InkWell(

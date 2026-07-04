@@ -12,10 +12,7 @@ class _TeacherClassroomHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
-          bottom: BorderSide(
-            color: const Color(0xFFF2F2F2),
-            width: 4 * scale,
-          ),
+          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
         ),
       ),
       padding: EdgeInsets.fromLTRB(
@@ -34,7 +31,7 @@ class _TeacherClassroomHeader extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: _teacherTeal,
+                color: teacherTeal,
                 fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w700,
               ),

@@ -1,4 +1,59 @@
-part of '../../classroom/presentation/teacher_classroom_screens.dart';
+import 'dart:async';
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/network/grade_models.dart';
+import 'package:numi_flutter/core/network/program_models.dart';
+import 'package:numi_flutter/core/network/school_models.dart';
+import 'package:numi_flutter/features/classroom/classroom_api.dart';
+import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
+import 'package:numi_flutter/features/homework/homework_api.dart';
+import 'package:numi_flutter/features/profile/grade_api.dart';
+import 'package:numi_flutter/features/profile/profile_api.dart';
+import 'package:numi_flutter/features/profile/school_api.dart';
+
+part '../cache/teacher_homework_cache.dart';
+part 'teacher_homework_detail_screen.dart';
+part 'teacher_create_homework_screen.dart';
+part '../widgets/teacher_list/teacher_homework_add_button.dart';
+part '../widgets/teacher_list/teacher_homework_search_field.dart';
+part '../widgets/teacher_list/teacher_homework_section_header.dart';
+part '../widgets/teacher_list/teacher_exercise_copy.dart';
+part '../widgets/teacher_list/teacher_assignment_card.dart';
+part '../widgets/teacher_list/teacher_empty_assignments_panel.dart';
+part '../widgets/teacher_list/teacher_exercise_helpers.dart';
+part '../widgets/teacher_detail/teacher_assignment_info_card.dart';
+part '../widgets/teacher_detail/teacher_assignment_info_row.dart';
+part '../widgets/teacher_detail/teacher_assignment_labeled_value.dart';
+part '../widgets/teacher_detail/teacher_assignment_switch.dart';
+part '../widgets/teacher_detail/teacher_assignment_stat_due.dart';
+part '../widgets/teacher_detail/teacher_assignment_stat_questions.dart';
+part '../widgets/teacher_detail/teacher_assignment_stat.dart';
+part '../widgets/teacher_detail/teacher_question_card.dart';
+part '../widgets/teacher_detail/teacher_answer_option.dart';
+part '../widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
+part '../widgets/teacher_create/teacher_create_homework_class_selector.dart';
+part '../widgets/teacher_create/teacher_create_homework_class_bottom_sheet.dart';
+part '../widgets/teacher_create/teacher_create_homework_program_bottom_sheet.dart';
+part '../widgets/teacher_create/teacher_create_homework_class_summary.dart';
+part '../widgets/teacher_create/teacher_create_homework_class_meta.dart';
+part '../widgets/teacher_create/teacher_create_homework_labeled_input.dart';
+part '../widgets/teacher_create/teacher_create_homework_label.dart';
+part '../widgets/teacher_create/teacher_create_homework_input.dart';
+part '../widgets/teacher_create/teacher_create_homework_publish_switch.dart';
+part '../widgets/teacher_create/teacher_create_homework_select_field.dart';
+part '../widgets/teacher_create/teacher_create_homework_date_field.dart';
+part '../widgets/teacher_create/teacher_create_homework_submit_button.dart';
+part '../widgets/teacher_create/teacher_create_homework_helpers.dart';
 
 class TeacherHomeworkScreen extends StatefulWidget {
   const TeacherHomeworkScreen({
@@ -78,7 +133,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
       setState(() {
         _error = error.message.trim().isEmpty
             ? context.readText(
-                _teacherExerciseCopy(widget.purpose).listLoadFailedKey,
+                teacherExerciseCopy(widget.purpose).listLoadFailedKey,
               )
             : error.message;
       });
@@ -116,7 +171,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
   void _openExerciseDetail(ClassroomExercise exercise) {
     final exerciseId = exercise.stableId;
     if (exerciseId == null) {
-      _showTeacherHomeworkSoon(context);
+      showTeacherHomeworkSoon(context);
       return;
     }
     _TeacherHomeworkCache.seedDetail(
@@ -145,16 +200,16 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
         bottom: false,
         child: Column(
           children: [
-            _TeacherScreenAppBar(
+            TeacherScreenAppBar(
               title: context.getText(
-                _teacherExerciseCopy(widget.purpose).titleKey,
+                teacherExerciseCopy(widget.purpose).titleKey,
               ),
               scale: 1,
               onBack: () => Navigator.of(context).maybePop(),
             ),
             Expanded(
               child: RefreshIndicator(
-                color: _teacherTeal,
+                color: teacherTeal,
                 onRefresh: () => _loadExercises(forceRefresh: true),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
@@ -171,7 +226,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                     children: [
                       Align(
                         alignment: Alignment.centerRight,
-                        child: _TeacherHomeworkAddButton(
+                        child: TeacherHomeworkAddButton(
                           onTap: _openCreateHomework,
                         ),
                       ),
@@ -185,20 +240,20 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                           padding: EdgeInsets.only(top: 40),
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: _teacherTeal,
+                              color: teacherTeal,
                             ),
                           ),
                         )
                       else if (_error != null && _exercises.isEmpty)
-                        _TeacherErrorPanel(
+                        TeacherErrorPanel(
                           scale: 1,
                           message: _error!,
                           onRetry: _loadExercises,
                         )
                       else if (_exercises.isEmpty)
-                        _TeacherEmptyAssignmentsPanel(
+                        TeacherEmptyAssignmentsPanel(
                           message: context.getText(
-                            _teacherExerciseCopy(widget.purpose).emptyKey,
+                            teacherExerciseCopy(widget.purpose).emptyKey,
                           ),
                         )
                       else ...[
@@ -215,7 +270,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                             const SizedBox(height: 10),
                         ],
                         if (_isLoading)
-                          const _TeacherBackgroundRefreshLabel(scale: 1),
+                          const TeacherBackgroundRefreshLabel(scale: 1),
                       ],
                     ],
                   ),

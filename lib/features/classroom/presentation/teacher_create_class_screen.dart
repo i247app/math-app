@@ -126,11 +126,11 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     _programs = options.programs;
     _schools = options.schools;
     _selectedGrade =
-        _matchGrade(_grades, widget.activeProfile?.gradeId) ??
+        matchGrade(_grades, widget.activeProfile?.gradeId) ??
         (_grades.isEmpty ? null : _grades.first);
     _selectedPrograms = const <ProgramModel>[];
     _selectedSchool =
-        _matchSchool(_schools, widget.activeProfile?.schoolId) ??
+        matchSchool(_schools, widget.activeProfile?.schoolId) ??
         (_schools.isEmpty ? null : _schools.first);
   }
 
@@ -186,9 +186,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         return;
       }
       context.read<ClassroomCubit>().invalidateOwned(profileId);
-      Navigator.of(
-        context,
-      ).pop(_TeacherCreateClassResult(classroom: classroom));
+      Navigator.of(context).pop(TeacherCreateClassResult(classroom: classroom));
     } on ClassroomException catch (error) {
       _showSnack(error.message);
     } finally {
@@ -214,7 +212,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
             final scale = math.min(constraints.maxWidth / 390, 1.12);
             return Column(
               children: [
-                _TeacherScreenAppBar(
+                TeacherScreenAppBar(
                   title: context.getText(AppKeys.teacherCreateClassTitle),
                   scale: scale,
                   onBack: () => Navigator.of(context).maybePop(),
@@ -230,9 +228,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
 
   Widget _buildContent(double scale) {
     if (_isLoadingOptions) {
-      return const Center(
-        child: CircularProgressIndicator(color: _teacherTeal),
-      );
+      return const Center(child: CircularProgressIndicator(color: teacherTeal));
     }
     final optionsError = _optionsError;
     if (optionsError != null) {

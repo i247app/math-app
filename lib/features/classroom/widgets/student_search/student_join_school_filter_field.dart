@@ -54,11 +54,7 @@ class StudentJoinSchoolFilterField extends StatelessWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               else
-                SvgPicture.asset(
-                  studentJoinDropdownIcon,
-                  width: 10,
-                  height: 5,
-                ),
+                SvgPicture.asset(studentJoinDropdownIcon, width: 10, height: 5),
             ],
           ),
         ),

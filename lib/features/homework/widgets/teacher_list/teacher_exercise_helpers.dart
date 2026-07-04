@@ -1,6 +1,6 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
-void _showTeacherHomeworkSoon(BuildContext context) {
+void showTeacherHomeworkSoon(BuildContext context) {
   HapticFeedback.selectionClick();
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
@@ -13,10 +13,7 @@ void _showTeacherHomeworkSoon(BuildContext context) {
     );
 }
 
-String _teacherExerciseTitle(
-  BuildContext context,
-  ClassroomExercise? exercise,
-) {
+String teacherExerciseTitle(BuildContext context, ClassroomExercise? exercise) {
   final title = exercise?.title?.trim();
   if (title != null && title.isNotEmpty) {
     return title;
@@ -28,7 +25,7 @@ String _teacherExerciseTitle(
   return '';
 }
 
-String _teacherExerciseQuestionCount(
+String teacherExerciseQuestionCount(
   BuildContext context,
   ClassroomExercise? exercise,
 ) {
@@ -41,14 +38,14 @@ String _teacherExerciseQuestionCount(
   return '';
 }
 
-String _teacherExerciseDueDate(
+String teacherExerciseDueDate(
   BuildContext context,
   ClassroomExercise? exercise,
 ) {
-  return _teacherExerciseDateTimeLabel(exercise?.endDate) ?? '';
+  return teacherExerciseDateTimeLabel(exercise?.endDate) ?? '';
 }
 
-String? _teacherExerciseDateTimeLabel(String? value) {
+String? teacherExerciseDateTimeLabel(String? value) {
   final parsed = DateTime.tryParse(value?.trim() ?? '');
   if (parsed == null) {
     return null;
@@ -58,13 +55,13 @@ String? _teacherExerciseDateTimeLabel(String? value) {
       '${_twoDigits(local.day)}/${_twoDigits(local.month)}/${local.year}';
 }
 
-_TeacherExerciseDateParts _teacherExerciseDateParts(String? value) {
+TeacherExerciseDateParts teacherExerciseDateParts(String? value) {
   final parsed = DateTime.tryParse(value?.trim() ?? '');
   if (parsed == null) {
-    return const _TeacherExerciseDateParts(day: '23', month: 'TH10');
+    return const TeacherExerciseDateParts(day: '23', month: 'TH10');
   }
   final local = parsed.toLocal();
-  return _TeacherExerciseDateParts(
+  return TeacherExerciseDateParts(
     day: _twoDigits(local.day),
     month: 'TH${_twoDigits(local.month)}',
   );
@@ -72,8 +69,8 @@ _TeacherExerciseDateParts _teacherExerciseDateParts(String? value) {
 
 String _twoDigits(int value) => value.toString().padLeft(2, '0');
 
-class _TeacherExerciseDateParts {
-  const _TeacherExerciseDateParts({required this.day, required this.month});
+class TeacherExerciseDateParts {
+  const TeacherExerciseDateParts({required this.day, required this.month});
 
   final String day;
   final String month;

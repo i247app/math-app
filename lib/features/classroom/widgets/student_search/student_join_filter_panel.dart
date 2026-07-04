@@ -63,10 +63,7 @@ class StudentJoinFilterPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (error != null) ...[
-            StudentJoinRetryBanner(
-              message: error!,
-              onRetry: onRetry,
-            ),
+            StudentJoinRetryBanner(message: error!, onRetry: onRetry),
             if (showSchoolFilter || showGradeFilter) const SizedBox(height: 13),
           ],
           if (showSchoolFilter) ...[
@@ -76,8 +73,8 @@ class StudentJoinFilterPanel extends StatelessWidget {
               valueText: selectedSchools.isEmpty
                   ? context.getText(AppKeys.chooseSchool)
                   : selectedSchools
-                      .map((school) => studentJoinSchoolName(context, school))
-                      .join(', '),
+                        .map((school) => studentJoinSchoolName(context, school))
+                        .join(', '),
               selected: selectedSchools.isNotEmpty,
               isLoading: isLoading,
               onTap: schools.isEmpty ? null : onSchoolTap,

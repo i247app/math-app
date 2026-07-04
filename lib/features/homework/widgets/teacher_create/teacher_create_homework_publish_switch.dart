@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _CreateHomeworkPublishSwitch extends StatelessWidget {
   const _CreateHomeworkPublishSwitch({
@@ -19,7 +19,7 @@ class _CreateHomeworkPublishSwitch extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: _teacherInk,
+              color: teacherInk,
               fontSize: 14,
               fontWeight: FontWeight.w700,
               height: 18 / 14,
@@ -35,7 +35,7 @@ class _CreateHomeworkPublishSwitch extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.andika(
-            color: _teacherInk.withValues(alpha: 0.65),
+            color: teacherInk.withValues(alpha: 0.65),
             fontSize: 12,
             fontWeight: FontWeight.w600,
             height: 16 / 12,
@@ -45,7 +45,7 @@ class _CreateHomeworkPublishSwitch extends StatelessWidget {
         Switch.adaptive(
           value: isPublished,
           activeThumbColor: Colors.white,
-          activeTrackColor: _teacherTeal,
+          activeTrackColor: teacherTeal,
           inactiveThumbColor: Colors.white,
           inactiveTrackColor: const Color(0xFFC4C6D2),
           onChanged: onChanged,

@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherRecentAssignmentCarousel extends StatelessWidget {
   const _TeacherRecentAssignmentCarousel({

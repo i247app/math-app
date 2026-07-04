@@ -111,7 +111,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
       selector: (state) => state.detail(widget.profileId, widget.classroomId),
       builder: (context, detailState) {
         return Scaffold(
-          backgroundColor: _teacherPaleMint,
+          backgroundColor: teacherPaleMint,
           body: SafeArea(
             bottom: false,
             child: LayoutBuilder(
@@ -126,14 +126,14 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
 
                 return Column(
                   children: [
-                    _TeacherScreenAppBar(
+                    TeacherScreenAppBar(
                       title: context.getText(AppKeys.teacherClassDetailTitle),
                       scale: scale,
                       onBack: () => Navigator.of(context).maybePop(),
                     ),
                     Expanded(
                       child: RefreshIndicator(
-                        color: _teacherTeal,
+                        color: teacherTeal,
                         onRefresh: () => _loadDetail(forceRefresh: true),
                         child: SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(
@@ -150,7 +150,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                             children: [
                               if (detailState.errorMessage != null &&
                                   classroom == null)
-                                _TeacherErrorPanel(
+                                TeacherErrorPanel(
                                   scale: scale,
                                   message: detailState.errorMessage!,
                                   onRetry: () =>
@@ -171,7 +171,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                                 ),
                               if (classroom != null &&
                                   (detailState.isLoading || _isLoadingLookups))
-                                _TeacherBackgroundRefreshLabel(scale: scale),
+                                TeacherBackgroundRefreshLabel(scale: scale),
                               if (detailState.errorMessage == null ||
                                   classroom != null)
                                 _TeacherClassDetailLowerContent(

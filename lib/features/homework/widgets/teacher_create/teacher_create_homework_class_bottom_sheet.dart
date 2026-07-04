@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _CreateHomeworkClassBottomSheet extends StatelessWidget {
   const _CreateHomeworkClassBottomSheet({
@@ -46,7 +46,7 @@ class _CreateHomeworkClassBottomSheet extends StatelessWidget {
             Text(
               context.getText(AppKeys.teacherAssignmentSelectClass),
               style: GoogleFonts.andika(
-                color: _teacherTeal,
+                color: teacherTeal,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 height: 1.15,
@@ -74,7 +74,7 @@ class _CreateHomeworkClassBottomSheet extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: _teacherInk,
+                          color: teacherInk,
                           fontSize: 16,
                           fontWeight: isSelected
                               ? FontWeight.w800
@@ -86,7 +86,7 @@ class _CreateHomeworkClassBottomSheet extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: _teacherMuted,
+                          color: teacherMuted,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -94,7 +94,7 @@ class _CreateHomeworkClassBottomSheet extends StatelessWidget {
                       trailing: isSelected
                           ? const Icon(
                               Icons.check_circle_rounded,
-                              color: _teacherTeal,
+                              color: teacherTeal,
                               size: 22,
                             )
                           : null,

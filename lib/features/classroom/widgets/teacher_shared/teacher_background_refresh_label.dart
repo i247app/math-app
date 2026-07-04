@@ -1,7 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _TeacherBackgroundRefreshLabel extends StatelessWidget {
-  const _TeacherBackgroundRefreshLabel({required this.scale});
+class TeacherBackgroundRefreshLabel extends StatelessWidget {
+  const TeacherBackgroundRefreshLabel({super.key, required this.scale});
 
   final double scale;
 
@@ -13,7 +13,7 @@ class _TeacherBackgroundRefreshLabel extends StatelessWidget {
         context.getText(AppKeys.loading),
         textAlign: TextAlign.center,
         style: GoogleFonts.andika(
-          color: _teacherMuted,
+          color: teacherMuted,
           fontSize: FontSize.caption * scale,
           fontWeight: FontWeight.w600,
         ),

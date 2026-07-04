@@ -99,7 +99,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _teacherPaleMint,
+      backgroundColor: teacherPaleMint,
       body: SafeArea(
         bottom: false,
         child: Stack(

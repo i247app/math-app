@@ -15,13 +15,10 @@ class _TeacherClassDetailCodeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 27 * scale,
-      constraints: BoxConstraints(
-        minWidth: 114 * scale,
-        maxWidth: 190 * scale,
-      ),
+      constraints: BoxConstraints(minWidth: 114 * scale, maxWidth: 190 * scale),
       padding: EdgeInsets.symmetric(horizontal: 17 * scale),
       decoration: BoxDecoration(
-        color: _teacherMint,
+        color: teacherMint,
         borderRadius: BorderRadius.circular(8 * scale),
         border: Border.all(color: const Color(0xFFDBEAFE)),
       ),

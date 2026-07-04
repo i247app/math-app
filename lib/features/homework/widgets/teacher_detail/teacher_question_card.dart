@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherQuestionCard extends StatelessWidget {
   const _TeacherQuestionCard({required this.questionNumber, this.question});
@@ -50,7 +50,7 @@ class _TeacherQuestionCard extends StatelessWidget {
               Text(
                 prompt,
                 style: GoogleFonts.andika(
-                  color: _teacherInk,
+                  color: teacherInk,
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   height: 24 / 14,

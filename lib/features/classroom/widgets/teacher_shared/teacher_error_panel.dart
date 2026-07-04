@@ -1,7 +1,8 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
-class _TeacherErrorPanel extends StatelessWidget {
-  const _TeacherErrorPanel({
+class TeacherErrorPanel extends StatelessWidget {
+  const TeacherErrorPanel({
+    super.key,
     required this.scale,
     required this.message,
     required this.onRetry,
@@ -26,7 +27,7 @@ class _TeacherErrorPanel extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: _teacherMuted,
+              color: teacherMuted,
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w600,
             ),

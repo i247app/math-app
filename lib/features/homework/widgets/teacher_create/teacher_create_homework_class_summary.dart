@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _CreateHomeworkClassSummary extends StatelessWidget {
   const _CreateHomeworkClassSummary({
@@ -37,7 +37,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
           ? const SizedBox(
               height: 108,
               child: Center(
-                child: CircularProgressIndicator(color: _teacherTeal),
+                child: CircularProgressIndicator(color: teacherTeal),
               ),
             )
           : Row(
@@ -66,7 +66,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: _teacherBlue,
+                          color: teacherBlue,
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                           height: 20 / 14,
@@ -85,7 +85,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: _teacherInk,
+                          color: teacherInk,
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           height: 32 / 20,

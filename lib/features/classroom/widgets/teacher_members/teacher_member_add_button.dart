@@ -1,10 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
 class _TeacherMemberAddButton extends StatelessWidget {
-  const _TeacherMemberAddButton({
-    required this.scale,
-    required this.onTap,
-  });
+  const _TeacherMemberAddButton({required this.scale, required this.onTap});
 
   final double scale;
   final VoidCallback? onTap;
@@ -23,7 +20,7 @@ class _TeacherMemberAddButton extends StatelessWidget {
         ],
       ),
       child: Material(
-        color: _teacherCoral,
+        color: teacherCoral,
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: InkWell(

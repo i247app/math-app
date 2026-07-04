@@ -18,7 +18,7 @@ class _TeacherClassroomEmptyState extends StatelessWidget {
           message,
           textAlign: TextAlign.center,
           style: GoogleFonts.andika(
-            color: _teacherMuted,
+            color: teacherMuted,
             fontSize: FontSize.normal * scale,
           ),
         ),

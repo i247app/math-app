@@ -1,10 +1,7 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
 class _TeacherJoinedMemberCard extends StatelessWidget {
-  const _TeacherJoinedMemberCard({
-    required this.scale,
-    required this.member,
-  });
+  const _TeacherJoinedMemberCard({required this.scale, required this.member});
 
   final double scale;
   final ClassroomStudent member;

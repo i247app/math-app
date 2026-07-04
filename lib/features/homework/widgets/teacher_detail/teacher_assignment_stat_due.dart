@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherAssignmentStatDue extends StatelessWidget {
   const _TeacherAssignmentStatDue(this.exercise);
@@ -10,7 +10,7 @@ class _TeacherAssignmentStatDue extends StatelessWidget {
     return _TeacherAssignmentStat(
       label: context.getText(AppKeys.teacherAssignmentDueLabel),
       iconAsset: 'assets/images/teacher_homework_detail_calendar.svg',
-      value: _teacherExerciseDueDate(context, exercise),
+      value: teacherExerciseDueDate(context, exercise),
       valueFontSize: 13,
     );
   }

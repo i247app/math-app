@@ -1,7 +1,10 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherSkeletonCard extends StatefulWidget {
-  const _TeacherSkeletonCard({
+import 'package:numi_flutter/features/home/teacher/shared/widgets/teacher_skeleton_shimmer.dart';
+
+class TeacherSkeletonCard extends StatefulWidget {
+  const TeacherSkeletonCard({
+    super.key,
     required this.scale,
     required this.padding,
     required this.child,
@@ -12,10 +15,10 @@ class _TeacherSkeletonCard extends StatefulWidget {
   final Widget child;
 
   @override
-  State<_TeacherSkeletonCard> createState() => _TeacherSkeletonCardState();
+  State<TeacherSkeletonCard> createState() => TeacherSkeletonCardState();
 }
 
-class _TeacherSkeletonCardState extends State<_TeacherSkeletonCard>
+class TeacherSkeletonCardState extends State<TeacherSkeletonCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -30,7 +33,7 @@ class _TeacherSkeletonCardState extends State<_TeacherSkeletonCard>
 
   @override
   Widget build(BuildContext context) {
-    return _TeacherSkeletonShimmer(
+    return TeacherSkeletonShimmer(
       controller: _controller,
       child: DecoratedBox(
         decoration: BoxDecoration(

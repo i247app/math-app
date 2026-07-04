@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_study_tab.dart';
 
 class _TeacherStudyExerciseBatch {
   const _TeacherStudyExerciseBatch({

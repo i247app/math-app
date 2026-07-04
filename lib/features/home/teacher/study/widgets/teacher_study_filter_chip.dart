@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_study_tab.dart';
 
 class _TeacherStudyFilterChip extends StatelessWidget {
   const _TeacherStudyFilterChip({
@@ -27,7 +27,7 @@ class _TeacherStudyFilterChip extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 18 * scale),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? _teacherDeepTeal : Colors.white,
+            color: selected ? teacherDeepTeal : Colors.white,
             borderRadius: BorderRadius.circular(999),
             border: selected
                 ? null

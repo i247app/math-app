@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherAssignmentInfoCard extends StatelessWidget {
   const _TeacherAssignmentInfoCard({
@@ -46,7 +46,7 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      _teacherExerciseClassLabel(context, exercise),
+                      teacherExerciseClassLabel(context, exercise),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
@@ -65,11 +65,11 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                _teacherExerciseTitle(context, exercise),
+                teacherExerciseTitle(context, exercise),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: _teacherBlue,
+                  color: teacherBlue,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   height: 36 / 18,

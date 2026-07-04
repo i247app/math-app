@@ -1,4 +1,47 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
+import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
+import 'package:numi_flutter/features/home/cache/home_profile_cache.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/teacher/cache/teacher_home_snapshot.dart';
+import 'package:numi_flutter/features/home/teacher/shared/widgets/class_thumb.dart';
+import 'package:numi_flutter/features/home/teacher/shared/widgets/teacher_skeleton_block.dart';
+import 'package:numi_flutter/features/home/teacher/shared/widgets/teacher_skeleton_card.dart';
+import 'package:numi_flutter/features/home/teacher/shared/widgets/teacher_skeleton_shimmer.dart';
+import 'package:numi_flutter/features/homework/homework_api.dart';
+import 'package:numi_flutter/features/homework/presentation/teacher_homework_screen.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+
+part 'helpers/teacher_home_helpers.dart';
+part 'widgets/teacher_assignment_skeleton_card.dart';
+part 'widgets/teacher_assignments_loading_panel.dart';
+part 'widgets/teacher_class_card.dart';
+part 'widgets/teacher_class_carousel.dart';
+part 'widgets/teacher_class_section_header.dart';
+part 'widgets/teacher_class_skeleton_card.dart';
+part 'widgets/teacher_hero_card.dart';
+part 'widgets/teacher_home_entrance.dart';
+part 'widgets/teacher_home_hero_skeleton.dart';
+part 'widgets/teacher_home_section_header_skeleton.dart';
+part 'widgets/teacher_home_section_header.dart';
+part 'widgets/teacher_loading_panel.dart';
+part 'widgets/teacher_no_class_panel.dart';
+part 'widgets/teacher_recent_assignment_card.dart';
+part 'widgets/teacher_recent_assignment_carousel.dart';
+part 'widgets/teacher_skeleton_carousel.dart';
+part 'widgets/teacher_top_bar.dart';
 
 class TeacherHomeTab extends StatefulWidget {
   const TeacherHomeTab({
@@ -317,7 +360,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         .whereType<int>()
         .toSet();
     final classroomCubit = context.read<ClassroomCubit>();
-    final result = await Navigator.of(context).push<_TeacherCreateClassResult>(
+    final result = await Navigator.of(context).push<TeacherCreateClassResult>(
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
           value: classroomCubit,
@@ -341,7 +384,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   }
 
   Future<void> _handleClassCreateAction() async {
-    if (!_isTeacherProfileComplete(widget.activeProfile)) {
+    if (!isTeacherProfileComplete(widget.activeProfile)) {
       HapticFeedback.selectionClick();
       await widget.onCompleteProfile();
       return;
@@ -351,7 +394,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   }
 
   ClassroomModel? _findCreatedClassroom(
-    _TeacherCreateClassResult result,
+    TeacherCreateClassResult result,
     Set<int> previousClassroomIds,
   ) {
     final createdId = result.classroom?.stableId;
@@ -410,7 +453,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       widget.activeProfile,
     );
     if (exerciseId == null || profileId == null) {
-      _showTeacherHomeworkSoon(context);
+      showTeacherHomeworkSoon(context);
       return;
     }
 
@@ -421,7 +464,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
           exerciseId: exerciseId,
           profileId: profileId,
           initialExercise: exercise,
-          purpose: _teacherExercisePurpose(exercise),
+          purpose: teacherExercisePurpose(exercise),
           exerciseService: _exerciseService,
         ),
       ),
@@ -454,7 +497,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         if (_isInitialHomeLoading)
           _TeacherLoadingPanel(scale: scale)
         else if (_error != null && _classrooms.isEmpty)
-          _TeacherErrorPanel(
+          TeacherErrorPanel(
             scale: scale,
             message: _error!,
             onRetry: _refreshClassrooms,
@@ -501,7 +544,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         else if (_recentAssignments.isEmpty)
           Column(
             children: [
-              _TeacherEmptyAssignmentsPanel(
+              TeacherEmptyAssignmentsPanel(
                 message: context.getText(AppKeys.teacherNoAssignments),
               ),
             ],
@@ -520,10 +563,10 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
-    final isProfileComplete = _isTeacherProfileComplete(widget.activeProfile);
+    final isProfileComplete = isTeacherProfileComplete(widget.activeProfile);
 
     return RefreshIndicator(
-      color: _teacherTeal,
+      color: teacherTeal,
       onRefresh: _refreshClassrooms,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(
@@ -553,7 +596,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                     order: 1,
                     child: _isInitialHomeLoading
                         ? _TeacherHomeHeroSkeleton(scale: scale)
-                        : _TeacherHeroCard(scale: scale),
+                        : TeacherHeroCard(scale: scale),
                   ),
                   SizedBox(height: 28 * scale),
                   _homeEntrance(

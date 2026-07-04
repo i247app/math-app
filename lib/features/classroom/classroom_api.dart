@@ -14,9 +14,7 @@ class ClassroomException implements Exception {
 abstract class ClassroomService {
   Future<List<ClassroomModel>> listClassrooms({required int profileId});
 
-  Future<List<ClassroomModel>> listMyJoinedClassrooms({
-    required int profileId,
-  });
+  Future<List<ClassroomModel>> listMyJoinedClassrooms({required int profileId});
 
   Future<List<ClassroomModel>> searchClassrooms({
     required int profileId,
@@ -92,26 +90,18 @@ abstract class ClassroomService {
 }
 
 class ClassroomApi implements ClassroomService {
-  ClassroomApi({
-    String? baseUrl,
-    NetworkApi? networkApi,
-  }) : _networkApi = networkApi ??
-            (baseUrl == null
-                ? NetworkApi.shared
-                : NetworkApi(baseUrl: baseUrl));
+  ClassroomApi({String? baseUrl, NetworkApi? networkApi})
+    : _networkApi =
+          networkApi ??
+          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 
   @override
-  Future<List<ClassroomModel>> listClassrooms({
-    required int profileId,
-  }) async {
+  Future<List<ClassroomModel>> listClassrooms({required int profileId}) async {
     try {
       final response = await _networkApi.listClassrooms(
-        ClassroomListRequest(
-          profileId: profileId,
-          ownerProfileId: profileId,
-        ),
+        ClassroomListRequest(profileId: profileId, ownerProfileId: profileId),
       );
       return response.classrooms;
     } on NetworkException catch (error) {
@@ -152,15 +142,19 @@ class ClassroomApi implements ClassroomService {
       final selectedGradeIds = gradeIds?.toSet() ?? const <int>{};
       final selectedSchoolIds = schoolIds?.toSet() ?? const <int>{};
 
-      return response.classrooms.where((classroom) {
-        final matchesGrade = selectedGradeIds.isEmpty ||
-            (classroom.gradeId != null &&
-                selectedGradeIds.contains(classroom.gradeId));
-        final matchesSchool = selectedSchoolIds.isEmpty ||
-            (classroom.schoolId != null &&
-                selectedSchoolIds.contains(classroom.schoolId));
-        return matchesGrade && matchesSchool;
-      }).toList(growable: false);
+      return response.classrooms
+          .where((classroom) {
+            final matchesGrade =
+                selectedGradeIds.isEmpty ||
+                (classroom.gradeId != null &&
+                    selectedGradeIds.contains(classroom.gradeId));
+            final matchesSchool =
+                selectedSchoolIds.isEmpty ||
+                (classroom.schoolId != null &&
+                    selectedSchoolIds.contains(classroom.schoolId));
+            return matchesGrade && matchesSchool;
+          })
+          .toList(growable: false);
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }

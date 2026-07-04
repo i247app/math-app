@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherHomeworkSearchField extends StatelessWidget {
   const _TeacherHomeworkSearchField();

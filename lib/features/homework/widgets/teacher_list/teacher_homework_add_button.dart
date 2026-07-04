@@ -1,14 +1,14 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
-class _TeacherHomeworkAddButton extends StatelessWidget {
-  const _TeacherHomeworkAddButton({required this.onTap});
+class TeacherHomeworkAddButton extends StatelessWidget {
+  const TeacherHomeworkAddButton({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: _teacherCoral,
+      color: teacherCoral,
       borderRadius: BorderRadius.circular(12),
       elevation: 0,
       child: InkWell(

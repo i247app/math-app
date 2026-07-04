@@ -1,7 +1,10 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+import 'dart:ui';
 
-class _TeacherSkeletonShimmer extends StatelessWidget {
-  const _TeacherSkeletonShimmer({
+import 'package:flutter/material.dart';
+
+class TeacherSkeletonShimmer extends StatelessWidget {
+  const TeacherSkeletonShimmer({
+    super.key,
     required this.controller,
     required this.child,
   });

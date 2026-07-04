@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_study_tab.dart';
 
 class _TeacherStudySearchField extends StatelessWidget {
   const _TeacherStudySearchField({
@@ -47,7 +47,7 @@ class _TeacherStudySearchField extends StatelessWidget {
                   FocusManager.instance.primaryFocus?.unfocus(),
               textInputAction: TextInputAction.search,
               style: GoogleFonts.andika(
-                color: _teacherInk,
+                color: teacherInk,
                 fontSize: FontSize.normal * scale,
                 fontWeight: FontWeight.w500,
               ),

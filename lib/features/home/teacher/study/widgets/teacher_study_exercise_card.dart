@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_study_tab.dart';
 
 class _TeacherStudyExerciseCard extends StatelessWidget {
   const _TeacherStudyExerciseCard({
@@ -58,7 +58,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                         Text(
                           dateParts?.day ?? '--',
                           style: GoogleFonts.andika(
-                            color: _teacherBlue,
+                            color: teacherBlue,
                             fontSize: FontSize.large * scale,
                             fontWeight: FontWeight.w800,
                             height: 1,
@@ -87,11 +87,11 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _teacherExerciseTitle(context, exercise),
+                          teacherExerciseTitle(context, exercise),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
-                            color: _teacherBlue,
+                            color: teacherBlue,
                             fontSize: FontSize.normal * scale,
                             fontWeight: FontWeight.w700,
                             height: 1.25,

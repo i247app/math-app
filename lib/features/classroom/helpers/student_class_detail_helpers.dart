@@ -44,26 +44,27 @@ List<ClassroomExercise> upcomingStudentHomeworkExercises(
   List<ClassroomExercise> exercises,
 ) {
   final now = DateTime.now();
-  final upcoming = exercises.where((exercise) {
-    final endDate = DateTime.tryParse(exercise.endDate?.trim() ?? '');
-    return endDate != null && endDate.toLocal().isAfter(now);
-  }).toList(growable: false);
+  final upcoming = exercises
+      .where((exercise) {
+        final endDate = DateTime.tryParse(exercise.endDate?.trim() ?? '');
+        return endDate != null && endDate.toLocal().isAfter(now);
+      })
+      .toList(growable: false);
 
-  return upcoming
-    ..sort((first, second) {
-      final firstEnd = DateTime.tryParse(first.endDate?.trim() ?? '');
-      final secondEnd = DateTime.tryParse(second.endDate?.trim() ?? '');
-      if (firstEnd == null && secondEnd == null) {
-        return 0;
-      }
-      if (firstEnd == null) {
-        return 1;
-      }
-      if (secondEnd == null) {
-        return -1;
-      }
-      return firstEnd.compareTo(secondEnd);
-    });
+  return upcoming..sort((first, second) {
+    final firstEnd = DateTime.tryParse(first.endDate?.trim() ?? '');
+    final secondEnd = DateTime.tryParse(second.endDate?.trim() ?? '');
+    if (firstEnd == null && secondEnd == null) {
+      return 0;
+    }
+    if (firstEnd == null) {
+      return 1;
+    }
+    if (secondEnd == null) {
+      return -1;
+    }
+    return firstEnd.compareTo(secondEnd);
+  });
 }
 
 String studentClassHomeworkTitle(ClassroomExercise exercise) {
@@ -83,10 +84,7 @@ String studentClassHomeworkDueDate(
   if (date == null) {
     return '';
   }
-  return context.formatText(
-    AppKeys.studentHomeworkDueFormat,
-    {'date': date},
-  );
+  return context.formatText(AppKeys.studentHomeworkDueFormat, {'date': date});
 }
 
 bool studentClassHomeworkIsSubmitted(ClassroomExercise exercise) {

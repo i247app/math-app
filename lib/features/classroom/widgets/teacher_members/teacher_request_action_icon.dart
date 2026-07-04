@@ -18,11 +18,7 @@ class _TeacherRequestActionIcon extends StatelessWidget {
       radius: size,
       child: Opacity(
         opacity: onTap == null ? 0.35 : 0.8,
-        child: Image.asset(
-          asset,
-          width: size,
-          height: size,
-        ),
+        child: Image.asset(asset, width: size, height: size),
       ),
     );
   }

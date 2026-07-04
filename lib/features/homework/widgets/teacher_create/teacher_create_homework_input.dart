@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _CreateHomeworkInput extends StatelessWidget {
   const _CreateHomeworkInput({
@@ -27,14 +27,14 @@ class _CreateHomeworkInput extends StatelessWidget {
         textAlignVertical: textAlignVertical,
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         style: GoogleFonts.andika(
-          color: _teacherInk,
+          color: teacherInk,
           fontSize: 14,
           fontWeight: FontWeight.w400,
         ),
         decoration: InputDecoration(
           hintText: context.getText(hintKey),
           hintStyle: GoogleFonts.andika(
-            color: _teacherInk.withValues(alpha: 0.7),
+            color: teacherInk.withValues(alpha: 0.7),
             fontSize: 14,
             fontWeight: FontWeight.w400,
           ),
@@ -50,7 +50,7 @@ class _CreateHomeworkInput extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(radius),
-            borderSide: const BorderSide(color: _teacherTeal, width: 2),
+            borderSide: const BorderSide(color: teacherTeal, width: 2),
           ),
         ),
       ),

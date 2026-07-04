@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherClassSectionHeader extends StatelessWidget {
   const _TeacherClassSectionHeader({
@@ -36,7 +36,7 @@ class _TeacherClassSectionHeader extends StatelessWidget {
               child: Text(
                 context.getText(AppKeys.viewAllUpper),
                 style: GoogleFonts.andika(
-                  color: _teacherInk,
+                  color: teacherInk,
                   fontSize: FontSize.small * scale,
                   fontWeight: FontWeight.w800,
                   decoration: TextDecoration.underline,
@@ -48,7 +48,7 @@ class _TeacherClassSectionHeader extends StatelessWidget {
         ),
         if (hasClasses) ...[
           SizedBox(height: 8 * scale),
-          _TeacherSmallCoralAddButton(scale: scale, onTap: onAdd),
+          TeacherSmallCoralAddButton(scale: scale, onTap: onAdd),
         ],
       ],
     );

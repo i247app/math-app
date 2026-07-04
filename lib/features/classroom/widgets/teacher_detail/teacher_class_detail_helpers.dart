@@ -1,23 +1,21 @@
 part of '../../presentation/teacher_classroom_screens.dart';
 
 String _detailIdLabel(String prefix, int? value) {
-  final displayValue = _displayBackendId(value);
+  final displayValue = displayBackendId(value);
   if (displayValue == null) {
     return prefix;
   }
   return '$prefix $displayValue';
 }
 
-String? _displayBackendId(int? value) => value == null ? null : '$value';
-
 String _classroomGradeLabel(
   BuildContext context,
   ClassroomModel? classroom,
   List<GradeModel> grades,
 ) {
-  final grade = _matchGrade(grades, classroom?.gradeId);
+  final grade = matchGrade(grades, classroom?.gradeId);
   if (grade != null) {
-    return _gradeLabel(grade);
+    return gradeLabel(grade);
   }
   return _detailIdLabel(context.getText(AppKeys.grade), classroom?.gradeId);
 }
@@ -30,11 +28,11 @@ String? _classroomProgramLabel(
   final ids = _classroomProgramIds(classroom);
   final labels = <String>[];
   for (final id in ids) {
-    final program = _matchProgram(programs, id);
+    final program = matchProgram(programs, id);
     labels.add(
       program == null
           ? '${context.getText(AppKeys.teacherProgramFallback)} $id'
-          : _programLabel(program),
+          : programLabel(program),
     );
   }
   if (labels.isNotEmpty) {
@@ -67,11 +65,11 @@ String _classroomSchoolLabel(
   ClassroomModel? classroom,
   List<SchoolModel> schools,
 ) {
-  final school = _matchSchool(schools, classroom?.schoolId);
+  final school = matchSchool(schools, classroom?.schoolId);
   if (school != null) {
-    return _schoolLabel(school);
+    return schoolLabel(school);
   }
-  return _displayBackendId(classroom?.schoolId) ??
+  return displayBackendId(classroom?.schoolId) ??
       context.getText(AppKeys.school);
 }
 

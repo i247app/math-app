@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherClassCard extends StatelessWidget {
   const _TeacherClassCard({
@@ -40,7 +40,7 @@ class _TeacherClassCard extends StatelessWidget {
             padding: EdgeInsets.all(14 * scale),
             child: Column(
               children: [
-                _ClassThumb(classroom: classroom, scale: scale),
+                ClassThumb(classroom: classroom, scale: scale),
                 SizedBox(height: 8 * scale),
                 Text(
                   title,
@@ -58,7 +58,7 @@ class _TeacherClassCard extends StatelessWidget {
                 Divider(color: const Color(0x1AC4C6D2), height: 4 * scale),
                 Flexible(
                   child: Text(
-                    _teacherMemberSummaryText(
+                    teacherMemberSummaryText(
                       context,
                       members: classroom.displayStudentCount,
                       requests: classroom.displayPendingRequestCount,
@@ -67,7 +67,7 @@ class _TeacherClassCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
-                      color: _teacherBlue.withValues(alpha: 0.60),
+                      color: teacherBlue.withValues(alpha: 0.60),
                       fontSize: FontSize.caption * 0.85 * scale,
                       fontWeight: FontWeight.w800,
                       height: 1.2,
@@ -80,7 +80,7 @@ class _TeacherClassCard extends StatelessWidget {
                   width: 69 * scale,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: _teacherDeepTeal,
+                    color: teacherDeepTeal,
                     borderRadius: BorderRadius.circular(5 * scale),
                   ),
                   child: Text(

@@ -4,10 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
 
 class StudentClassTeacherAvatarInitial extends StatelessWidget {
-  const StudentClassTeacherAvatarInitial({
-    super.key,
-    required this.initial,
-  });
+  const StudentClassTeacherAvatarInitial({super.key, required this.initial});
 
   final String initial;
 

@@ -47,7 +47,7 @@ class _TeacherClassDetailFunctionTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.andika(
-                        color: _teacherInk,
+                        color: teacherInk,
                         fontSize: 14 * scale,
                         fontWeight: FontWeight.w700,
                         height: 1.42,

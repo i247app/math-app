@@ -35,7 +35,7 @@ class _TeacherSelectedChip extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: _teacherInk,
+                color: teacherInk,
                 fontSize: FontSize.caption * scale,
                 fontWeight: FontWeight.w400,
                 height: 1.2,
@@ -50,7 +50,7 @@ class _TeacherSelectedChip extends StatelessWidget {
               padding: EdgeInsets.all(2 * scale),
               child: Icon(
                 Icons.close_rounded,
-                color: _teacherInk.withValues(alpha: 0.45),
+                color: teacherInk.withValues(alpha: 0.45),
                 size: 14 * scale,
               ),
             ),

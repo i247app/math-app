@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherAnswerOption extends StatelessWidget {
   const _TeacherAnswerOption({
@@ -16,7 +16,7 @@ class _TeacherAnswerOption extends StatelessWidget {
     final letterBg = selected
         ? const Color(0xFFCDF4F4)
         : const Color(0xFFFFDBD1);
-    final letterColor = selected ? const Color(0xFF1E6467) : _teacherCoral;
+    final letterColor = selected ? const Color(0xFF1E6467) : teacherCoral;
 
     return Container(
       height: 50,
@@ -54,7 +54,7 @@ class _TeacherAnswerOption extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: _teacherInk,
+                color: teacherInk,
                 fontSize: 16,
                 fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
                 height: 24 / 16,

@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_study_tab.dart';
 
 class _TeacherStudyLoadingIndicator extends StatelessWidget {
   const _TeacherStudyLoadingIndicator({required this.scale});
@@ -9,9 +9,7 @@ class _TeacherStudyLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(top: 36 * scale),
-      child: const Center(
-        child: CircularProgressIndicator(color: _teacherTeal),
-      ),
+      child: const Center(child: CircularProgressIndicator(color: teacherTeal)),
     );
   }
 }

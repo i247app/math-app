@@ -1,4 +1,4 @@
-part of '../../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../teacher_home_tab.dart';
 
 class _TeacherRecentAssignmentCard extends StatelessWidget {
   const _TeacherRecentAssignmentCard({
@@ -13,10 +13,10 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateParts = _teacherExerciseDateParts(
+    final dateParts = teacherExerciseDateParts(
       assignment.createDt ?? assignment.startDate ?? assignment.endDate,
     );
-    final timeLabel = _teacherExerciseDateTimeLabel(
+    final timeLabel = teacherExerciseDateTimeLabel(
       assignment.createDt ?? assignment.startDate ?? assignment.endDate,
     );
     return DecoratedBox(
@@ -58,7 +58,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                       Text(
                         dateParts.day,
                         style: GoogleFonts.andika(
-                          color: _teacherBlue,
+                          color: teacherBlue,
                           fontSize: FontSize.large * scale,
                           fontWeight: FontWeight.w900,
                           height: 0.95,
@@ -67,7 +67,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                       Text(
                         dateParts.month,
                         style: GoogleFonts.andika(
-                          color: _teacherMuted,
+                          color: teacherMuted,
                           fontSize: FontSize.caption * 0.7 * scale,
                           fontWeight: FontWeight.w800,
                           height: 1.15,
@@ -78,11 +78,11 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  _teacherExerciseTitle(context, assignment),
+                  teacherExerciseTitle(context, assignment),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: _teacherInk,
+                    color: teacherInk,
                     fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.25,
@@ -91,11 +91,11 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                 SizedBox(height: 8 * scale),
                 Text(
                   timeLabel ??
-                      _teacherExerciseQuestionCount(context, assignment),
+                      teacherExerciseQuestionCount(context, assignment),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: _teacherMuted,
+                    color: teacherMuted,
                     fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w600,
                     height: 1.2,

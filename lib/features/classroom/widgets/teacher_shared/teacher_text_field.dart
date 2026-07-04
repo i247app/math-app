@@ -25,14 +25,11 @@ class _TeacherTextField extends StatelessWidget {
         maxLines: maxLines,
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         style: GoogleFonts.andika(
-          color: _teacherInk,
+          color: teacherInk,
           fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w400,
         ),
-        decoration: _teacherInputDecoration(
-          hintText: hintText,
-          scale: scale,
-        ),
+        decoration: _teacherInputDecoration(hintText: hintText, scale: scale),
       ),
     );
   }

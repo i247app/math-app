@@ -33,14 +33,14 @@ class _TeacherClassMembersContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _TeacherScreenAppBar(
+        TeacherScreenAppBar(
           title: context.getText(AppKeys.teacherMembersTitle),
           scale: scale,
           onBack: onBack,
         ),
         Expanded(
           child: RefreshIndicator(
-            color: _teacherTeal,
+            color: teacherTeal,
             onRefresh: onRefresh,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(
@@ -67,15 +67,13 @@ class _TeacherClassMembersContent extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(top: 80 * scale),
                       child: const Center(
-                        child: CircularProgressIndicator(
-                          color: _teacherTeal,
-                        ),
+                        child: CircularProgressIndicator(color: teacherTeal),
                       ),
                     )
                   else if (error != null &&
                       joinRequests.isEmpty &&
                       members.isEmpty)
-                    _TeacherErrorPanel(
+                    TeacherErrorPanel(
                       scale: scale,
                       message: error!,
                       onRetry: onRefresh,
@@ -123,10 +121,9 @@ class _TeacherClassMembersLists extends StatelessWidget {
       children: [
         _TeacherMemberSectionTitle(
           scale: scale,
-          title: context.formatText(
-            AppKeys.teacherJoinRequests,
-            {'count': joinRequests.length},
-          ),
+          title: context.formatText(AppKeys.teacherJoinRequests, {
+            'count': joinRequests.length,
+          }),
         ),
         SizedBox(height: 10 * scale),
         _TeacherJoinRequestCard(
@@ -139,10 +136,9 @@ class _TeacherClassMembersLists extends StatelessWidget {
         SizedBox(height: 28 * scale),
         _TeacherMemberSectionTitle(
           scale: scale,
-          title: context.formatText(
-            AppKeys.teacherJoinedStudentsTitle,
-            {'count': members.length},
-          ),
+          title: context.formatText(AppKeys.teacherJoinedStudentsTitle, {
+            'count': members.length,
+          }),
         ),
         SizedBox(height: 8 * scale),
         if (members.isEmpty)
@@ -152,10 +148,7 @@ class _TeacherClassMembersLists extends StatelessWidget {
           )
         else
           for (var index = 0; index < members.length; index++) ...[
-            _TeacherJoinedMemberCard(
-              scale: scale,
-              member: members[index],
-            ),
+            _TeacherJoinedMemberCard(scale: scale, member: members[index]),
             if (index != members.length - 1) SizedBox(height: 12 * scale),
           ],
       ],

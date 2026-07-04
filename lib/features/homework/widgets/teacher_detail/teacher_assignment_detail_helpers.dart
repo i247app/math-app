@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 List<_TeacherAssignmentLabeledValue> _exerciseInfoRows(
   BuildContext context,
@@ -37,7 +37,7 @@ List<_TeacherAssignmentLabeledValue> _exerciseInfoRows(
   return rows;
 }
 
-String _teacherExerciseClassLabel(
+String teacherExerciseClassLabel(
   BuildContext context,
   ClassroomExercise? exercise,
 ) {

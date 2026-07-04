@@ -1,4 +1,4 @@
-part of '../../../classroom/presentation/teacher_classroom_screens.dart';
+part of '../../presentation/teacher_homework_screen.dart';
 
 class _TeacherAssignmentStat extends StatelessWidget {
   const _TeacherAssignmentStat({
@@ -41,7 +41,7 @@ class _TeacherAssignmentStat extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: _teacherInk,
+                  color: teacherInk,
                   fontSize: valueFontSize,
                   fontWeight: FontWeight.w400,
                   height: 24 / valueFontSize,
