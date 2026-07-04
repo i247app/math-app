@@ -1,6 +1,6 @@
-part of '../../presentation/assessment_result_screen.dart';
+import 'package:flutter/material.dart';
 
-void _exitToGradeSelection(BuildContext context) {
+void exitToGradeSelection(BuildContext context) {
   final navigator = Navigator.of(context);
   if (navigator.canPop()) {
     navigator.pop();

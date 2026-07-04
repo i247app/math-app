@@ -1,7 +1,8 @@
 part of '../../practice_tab.dart';
 
-class _StartSelectedButton extends StatelessWidget {
-  const _StartSelectedButton({
+class PracticeStartSelectedButton extends StatelessWidget {
+  const PracticeStartSelectedButton({
+    super.key,
     required this.count,
     required this.scale,
     required this.onTap,
@@ -18,7 +19,7 @@ class _StartSelectedButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(18 * scale),
-        child: _DepthButtonSurface(
+        child: PracticeDepthButtonSurface(
           radius: 18 * scale,
           depth: 8 * scale,
           padding: EdgeInsets.symmetric(

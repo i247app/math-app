@@ -1,7 +1,8 @@
 part of '../../practice_tab.dart';
 
-class _TestButton extends StatelessWidget {
-  const _TestButton({
+class PracticeChapterTestButton extends StatelessWidget {
+  const PracticeChapterTestButton({
+    super.key,
     required this.enabled,
     required this.scale,
     required this.onTap,
@@ -20,7 +21,7 @@ class _TestButton extends StatelessWidget {
         child: InkWell(
           onTap: enabled ? onTap : null,
           borderRadius: BorderRadius.circular(16 * scale),
-          child: _DepthButtonSurface(
+          child: PracticeDepthButtonSurface(
             radius: 16 * scale,
             depth: 8 * scale,
             padding: EdgeInsets.symmetric(

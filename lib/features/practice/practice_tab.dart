@@ -39,7 +39,7 @@ part 'widgets/practice_tab/chapter_description.dart';
 part 'widgets/practice_tab/practice_chapter_id.dart';
 part 'widgets/practice_tab/non_empty.dart';
 part 'widgets/practice_tab/chapter_icon.dart';
-part 'widgets/practice_tab/fake_completed_lessons.dart';
+part 'widgets/practice_tab/estimated_completed_lessons.dart';
 
 const _reviewInk = Color(0xFF14213D);
 const _reviewMuted = Color(0xFF77859A);
@@ -314,7 +314,7 @@ class _PracticeTabState extends State<PracticeTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _PracticeHeader(scale: scale, topInset: topInset),
+                PracticeTabHeader(scale: scale, topInset: topInset),
                 SizedBox(height: 18 * scale),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24 * scale),
@@ -336,14 +336,17 @@ class _PracticeTabState extends State<PracticeTab> {
               child: Row(
                 children: [
                   Expanded(
-                    child: _StartSelectedButton(
+                    child: PracticeStartSelectedButton(
                       count: _selectedChapterNumbers.length,
                       scale: scale,
                       onTap: _startSelectedTest,
                     ),
                   ),
                   SizedBox(width: 12 * scale),
-                  _ClearSelectionButton(scale: scale, onTap: _clearSelection),
+                  PracticeClearSelectionButton(
+                    scale: scale,
+                    onTap: _clearSelection,
+                  ),
                 ],
               ),
             ),
@@ -445,7 +448,7 @@ class _PracticeTabState extends State<PracticeTab> {
 
     final error = widget.profileLoadError?.trim();
     if (error != null && error.isNotEmpty) {
-      return _PracticeProfileStatePanel(
+      return PracticeProfileStatePanel(
         icon: Icons.cloud_off_rounded,
         title: context.getText(AppKeys.profileLoadErrorTitle),
         message: error,
@@ -456,7 +459,7 @@ class _PracticeTabState extends State<PracticeTab> {
     }
 
     if (widget.activeProfile == null) {
-      return _PracticeProfileStatePanel(
+      return PracticeProfileStatePanel(
         icon: Icons.groups_2_outlined,
         title: context.getText(AppKeys.noProfileTitle),
         message: context.getText(AppKeys.noProfileMessage),
@@ -468,7 +471,7 @@ class _PracticeTabState extends State<PracticeTab> {
 
     final chapterError = _chapterLoadError?.trim();
     if (chapterError != null && chapterError.isNotEmpty) {
-      return _PracticeProfileStatePanel(
+      return PracticeProfileStatePanel(
         icon: Icons.cloud_off_rounded,
         title: context.getText(AppKeys.chapterLoadErrorTitle),
         message: chapterError,
@@ -479,7 +482,7 @@ class _PracticeTabState extends State<PracticeTab> {
     }
 
     if (chapters.isEmpty) {
-      return _PracticeProfileStatePanel(
+      return PracticeProfileStatePanel(
         icon: Icons.menu_book_outlined,
         title: context.getText(AppKeys.noChapterTitle),
         message: context.getText(AppKeys.noChapterMessage),
@@ -495,7 +498,7 @@ class _PracticeTabState extends State<PracticeTab> {
         Row(
           children: [
             Expanded(
-              child: _StatTile(
+              child: PracticeStatTile(
                 icon: '📝',
                 value: '$totalLessons',
                 label: context.getText(AppKeys.exercises),
@@ -504,7 +507,7 @@ class _PracticeTabState extends State<PracticeTab> {
             ),
             SizedBox(width: 16 * scale),
             Expanded(
-              child: _StatTile(
+              child: PracticeStatTile(
                 icon: '🔥',
                 value: '365',
                 label: context.getText(AppKeys.days),
@@ -515,7 +518,7 @@ class _PracticeTabState extends State<PracticeTab> {
         ),
         SizedBox(height: 26 * scale),
         for (final chapter in chapters) ...[
-          _ChapterCard(
+          PracticeChapterCard(
             chapter: chapter,
             completedLessons: completedLessons,
             totalLessons: totalLessons,

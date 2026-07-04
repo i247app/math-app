@@ -1,7 +1,8 @@
 part of '../../practice_tab.dart';
 
-class _StatTile extends StatelessWidget {
-  const _StatTile({
+class PracticeStatTile extends StatelessWidget {
+  const PracticeStatTile({
+    super.key,
     required this.icon,
     required this.value,
     required this.label,

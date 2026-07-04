@@ -1,7 +1,16 @@
-part of '../../presentation/assessment_result_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _ReviewText extends StatelessWidget {
-  const _ReviewText({required this.scale, required this.reviewText});
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+
+class AssessmentAiReviewText extends StatelessWidget {
+  const AssessmentAiReviewText({
+    super.key,
+    required this.scale,
+    required this.reviewText,
+  });
 
   final double scale;
   final String reviewText;
@@ -12,7 +21,7 @@ class _ReviewText extends StatelessWidget {
     final highlight = context.getText(AppKeys.defaultAiReviewHighlight);
     final highlightIndex = text.toLowerCase().indexOf(highlight);
     final bodyStyle = GoogleFonts.andika(
-      color: _resultMuted,
+      color: AssessmentResultStyle.muted,
       fontSize: 12 * scale,
       fontWeight: FontWeight.w400,
       height: 19.5 / 12,
@@ -41,7 +50,7 @@ class _ReviewText extends StatelessWidget {
               highlightIndex + highlight.length,
             ),
             style: bodyStyle.copyWith(
-              color: _resultTeal,
+              color: AssessmentResultStyle.teal,
               fontWeight: FontWeight.w800,
             ),
           ),

@@ -1,7 +1,11 @@
 part of '../../practice_tab.dart';
 
-class _SelectCircle extends StatelessWidget {
-  const _SelectCircle({required this.selected, required this.scale});
+class PracticeChapterSelectCircle extends StatelessWidget {
+  const PracticeChapterSelectCircle({
+    super.key,
+    required this.selected,
+    required this.scale,
+  });
 
   final bool selected;
   final double scale;

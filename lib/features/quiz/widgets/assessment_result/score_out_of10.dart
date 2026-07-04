@@ -1,6 +1,6 @@
-part of '../../presentation/assessment_result_screen.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
 
-int _scoreOutOf10(QuizGrading? grading) {
+int scoreOutOf10(QuizGrading? grading) {
   final scorePercentage = grading?.scorePercentage;
   if (scorePercentage != null) {
     return (scorePercentage / 10).round().clamp(0, 10);

@@ -1,7 +1,11 @@
 part of '../../practice_tab.dart';
 
-class _ClearSelectionButton extends StatelessWidget {
-  const _ClearSelectionButton({required this.scale, required this.onTap});
+class PracticeClearSelectionButton extends StatelessWidget {
+  const PracticeClearSelectionButton({
+    super.key,
+    required this.scale,
+    required this.onTap,
+  });
 
   final double scale;
   final VoidCallback onTap;

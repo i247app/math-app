@@ -1,7 +1,8 @@
 part of '../../practice_tab.dart';
 
-class _ChapterCard extends StatelessWidget {
-  const _ChapterCard({
+class PracticeChapterCard extends StatelessWidget {
+  const PracticeChapterCard({
+    super.key,
     required this.chapter,
     required this.completedLessons,
     required this.totalLessons,
@@ -56,7 +57,7 @@ class _ChapterCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _Badge(icon: chapter.icon, scale: scale),
+                  PracticeChapterBadge(icon: chapter.icon, scale: scale),
                   SizedBox(width: 14 * scale),
                   Expanded(
                     child: Padding(
@@ -94,12 +95,16 @@ class _ChapterCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 10 * scale),
-                  _SelectCircle(selected: selected, scale: scale),
+                  PracticeChapterSelectCircle(selected: selected, scale: scale),
                 ],
               ),
               if (showButton) ...[
                 SizedBox(height: 20 * scale),
-                _TestButton(enabled: true, scale: scale, onTap: onStartTest),
+                PracticeChapterTestButton(
+                  enabled: true,
+                  scale: scale,
+                  onTap: onStartTest,
+                ),
               ],
             ],
           ),

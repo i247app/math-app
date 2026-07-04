@@ -1,7 +1,15 @@
-part of '../../presentation/assessment_result_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _ScoreRing extends StatelessWidget {
-  const _ScoreRing({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/score_number.dart';
+import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
+
+class AssessmentScoreRing extends StatelessWidget {
+  const AssessmentScoreRing({
+    super.key,
     required this.scale,
     required this.scoreText,
     required this.accentColor,
@@ -47,7 +55,7 @@ class _ScoreRing extends StatelessWidget {
               ),
             ),
             ScoreProgressRing(
-              progress: (_scoreNumber(scoreValue) / 10).clamp(0, 1).toDouble(),
+              progress: (scoreNumber(scoreValue) / 10).clamp(0, 1).toDouble(),
               color: accentColor,
               size: 150 * scale,
               strokeWidth: 9 * scale,
@@ -85,7 +93,7 @@ class _ScoreRing extends StatelessWidget {
                   Text(
                     context.getText(AppKeys.scoreUpper),
                     style: GoogleFonts.andika(
-                      color: _resultMuted,
+                      color: AssessmentResultStyle.muted,
                       fontSize: 10 * scale,
                       fontWeight: FontWeight.w800,
                       height: 15 / 10,

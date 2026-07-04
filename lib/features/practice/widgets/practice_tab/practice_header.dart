@@ -1,7 +1,11 @@
 part of '../../practice_tab.dart';
 
-class _PracticeHeader extends StatelessWidget {
-  const _PracticeHeader({required this.scale, required this.topInset});
+class PracticeTabHeader extends StatelessWidget {
+  const PracticeTabHeader({
+    super.key,
+    required this.scale,
+    required this.topInset,
+  });
 
   final double scale;
   final double topInset;

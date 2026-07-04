@@ -1,7 +1,13 @@
-part of '../../presentation/assessment_result_screen.dart';
+import 'package:flutter/material.dart';
 
-class _ResultBottomBar extends StatelessWidget {
-  const _ResultBottomBar({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_action_button.dart';
+
+class AssessmentResultBottomBar extends StatelessWidget {
+  const AssessmentResultBottomBar({
+    super.key,
     required this.scale,
     required this.onTest,
     required this.onPractice,
@@ -16,17 +22,17 @@ class _ResultBottomBar extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _ResultActionButton(
+        AssessmentResultActionButton(
           label: context.getText(AppKeys.assessmentUpper),
-          background: _resultCoral,
+          background: AssessmentResultStyle.coral,
           scale: scale,
           onTap: onTest,
         ),
         SizedBox(width: 40 * scale),
-        _ResultActionButton(
+        AssessmentResultActionButton(
           label: context.getText(AppKeys.practiceUpper),
           icon: Icons.arrow_forward_rounded,
-          background: _resultHeaderTeal,
+          background: AssessmentResultStyle.headerTeal,
           scale: scale,
           onTap: onPractice,
         ),

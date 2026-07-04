@@ -10,36 +10,15 @@ import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/features/quiz/cache/quiz_cache.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
-import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
-import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
-import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
-
-part '../widgets/assessment_result/test_again_loader.dart';
-part '../widgets/assessment_result/result_header.dart';
-part '../widgets/assessment_result/score_ring.dart';
-part '../widgets/assessment_result/score_number.dart';
-part '../widgets/assessment_result/ai_review_card.dart';
-part '../widgets/assessment_result/review_text.dart';
-part '../widgets/assessment_result/result_bottom_bar.dart';
-part '../widgets/assessment_result/result_action_button.dart';
-part '../widgets/assessment_result/exit_to_grade_selection.dart';
-part '../widgets/assessment_result/score_out_of10.dart';
-part '../widgets/assessment_result/result_level.dart';
-part '../widgets/assessment_result/result_level_2.dart';
-part '../widgets/assessment_result/review_text_2.dart';
-
-const _resultTeal = Color(0xFF006762);
-const _resultHeaderTeal = Color(0xFF38898C);
-const _resultScoreGreen = Color(0xFF006D36);
-const _resultScoreYellow = Color(0xFFD9A400);
-const _resultScoreOrange = Color(0xFFEF6C00);
-const _resultScoreRed = Color(0xFFD32F2F);
-const _resultInk = Color(0xFF253228);
-const _resultMuted = Color(0xFF515F54);
-const _resultCoral = Color(0xFFEC724F);
-const _resultCardBorder = Color(0xFFE5E8EB);
-const _resultAiAccent = Color(0xFFE8FEFF);
-const _resultMascotBorder = Color(0xFF974320);
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/ai_review_card.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_review_text.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/exit_to_grade_selection.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_bottom_bar.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_header.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_level_for_score.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/score_out_of10.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/score_ring.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/test_again_loader.dart';
 
 class AssessmentResultScreen extends StatefulWidget {
   const AssessmentResultScreen({
@@ -169,7 +148,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
       onBack();
       return;
     }
-    _exitToGradeSelection(context);
+    exitToGradeSelection(context);
   }
 
   @override
@@ -190,17 +169,17 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
 
               double s(double value) => value * scale;
               final grading = widget.quiz?.grading;
-              final score = _scoreOutOf10(grading);
+              final score = scoreOutOf10(grading);
               final scoreText = '$score/10';
-              final resultLevel = _resultLevel(score);
-              final reviewText = _reviewText(grading);
+              final resultLevel = resultLevelForScore(score);
+              final reviewText = assessmentResultReviewText(grading);
 
               return Center(
                 child: SizedBox(
                   width: width,
                   height: height,
                   child: isGeneratingAgain
-                      ? _TestAgainLoader(scale: scale)
+                      ? AssessmentTestAgainLoader(scale: scale)
                       : Stack(
                           children: [
                             const Positioned.fill(
@@ -212,7 +191,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               left: 0,
                               right: 0,
                               top: 0,
-                              child: _ResultHeader(
+                              child: AssessmentResultHeader(
                                 scale: scale,
                                 onBack: exitResult,
                               ),
@@ -221,7 +200,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               left: 0,
                               right: 0,
                               top: s(111),
-                              child: _ScoreRing(
+                              child: AssessmentScoreRing(
                                 scale: scale,
                                 scoreText: scoreText,
                                 accentColor: resultLevel.color,
@@ -247,7 +226,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               left: s(26),
                               right: s(26),
                               top: s(369),
-                              child: _AiReviewCard(
+                              child: AssessmentAiReviewCard(
                                 scale: scale,
                                 reviewText: reviewText,
                               ),
@@ -256,7 +235,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                               left: 0,
                               right: 0,
                               top: s(592),
-                              child: _ResultBottomBar(
+                              child: AssessmentResultBottomBar(
                                 scale: scale,
                                 onTest: generateTestAgain,
                                 onPractice: generatePracticeAgain,

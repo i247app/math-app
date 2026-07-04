@@ -1,7 +1,9 @@
-part of '../../presentation/assessment_result_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _ResultActionButton extends StatelessWidget {
-  const _ResultActionButton({
+class AssessmentResultActionButton extends StatelessWidget {
+  const AssessmentResultActionButton({
+    super.key,
     required this.label,
     required this.background,
     required this.scale,

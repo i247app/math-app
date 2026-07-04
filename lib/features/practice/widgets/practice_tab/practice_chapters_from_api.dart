@@ -26,7 +26,7 @@ List<PracticeChapter> _practiceChaptersFromApi(List<ChapterModel> chapters) {
       description: _chapterLabel(chapter),
       lessons: const <PracticeLesson>[],
       lessonCountOverride: lessonCount,
-      completedLessons: _fakeCompletedLessons(number, lessonCount),
+      completedLessons: _estimatedCompletedLessons(number, lessonCount),
       icon: _chapterIcon(number),
     );
   });

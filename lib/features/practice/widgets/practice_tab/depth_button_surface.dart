@@ -1,7 +1,8 @@
 part of '../../practice_tab.dart';
 
-class _DepthButtonSurface extends StatelessWidget {
-  const _DepthButtonSurface({
+class PracticeDepthButtonSurface extends StatelessWidget {
+  const PracticeDepthButtonSurface({
+    super.key,
     required this.radius,
     required this.depth,
     required this.padding,

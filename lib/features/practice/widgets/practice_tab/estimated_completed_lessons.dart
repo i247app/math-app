@@ -1,6 +1,6 @@
 part of '../../practice_tab.dart';
 
-int _fakeCompletedLessons(int chapterNumber, int lessonCount) {
+int _estimatedCompletedLessons(int chapterNumber, int lessonCount) {
   if (lessonCount <= 0) {
     return 0;
   }

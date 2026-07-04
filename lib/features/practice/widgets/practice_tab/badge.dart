@@ -1,7 +1,11 @@
 part of '../../practice_tab.dart';
 
-class _Badge extends StatelessWidget {
-  const _Badge({required this.icon, required this.scale});
+class PracticeChapterBadge extends StatelessWidget {
+  const PracticeChapterBadge({
+    super.key,
+    required this.icon,
+    required this.scale,
+  });
 
   final String icon;
   final double scale;

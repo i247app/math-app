@@ -1,7 +1,8 @@
 part of '../../practice_tab.dart';
 
-class _PracticeProfileStatePanel extends StatelessWidget {
-  const _PracticeProfileStatePanel({
+class PracticeProfileStatePanel extends StatelessWidget {
+  const PracticeProfileStatePanel({
+    super.key,
     required this.icon,
     required this.title,
     required this.message,

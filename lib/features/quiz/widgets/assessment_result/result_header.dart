@@ -1,7 +1,17 @@
-part of '../../presentation/assessment_result_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _ResultHeader extends StatelessWidget {
-  const _ResultHeader({required this.scale, required this.onBack});
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+
+class AssessmentResultHeader extends StatelessWidget {
+  const AssessmentResultHeader({
+    super.key,
+    required this.scale,
+    required this.onBack,
+  });
 
   final double scale;
   final VoidCallback onBack;
@@ -28,7 +38,7 @@ class _ResultHeader extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: QuizHeaderIconButton(
               icon: Icons.arrow_back_rounded,
-              color: _resultHeaderTeal,
+              color: AssessmentResultStyle.headerTeal,
               scale: scale,
               size: 40,
               iconSize: 23,
@@ -42,7 +52,7 @@ class _ResultHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: _resultHeaderTeal,
+              color: AssessmentResultStyle.headerTeal,
               fontSize: 25 * scale,
               fontWeight: FontWeight.w800,
               height: 34 / 25,
