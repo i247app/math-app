@@ -19,7 +19,6 @@ class OtpActionButton extends StatelessWidget {
     return AuthActionButton(
       label: cleanLabel,
       onPressed: onPressed,
-      layout: AuthActionButtonLayout.compact,
       uppercase: true,
     );
   }

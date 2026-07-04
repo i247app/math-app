@@ -371,24 +371,18 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                       ),
                                     ),
                                     Positioned(
-                                      left: 0,
-                                      right: 0,
+                                      left: 34,
+                                      right: 34,
                                       top: 542,
                                       height: 58,
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 230,
-                                          height: 58,
-                                          child: PasscodeActionButton(
-                                            label: context.getText(
-                                              _primaryLabelKey,
-                                            ),
-                                            onPressed: isFull && !widget.isBusy
-                                                ? _handleSubmit
-                                                : null,
-                                            isBusy: widget.isBusy,
-                                          ),
+                                      child: PasscodeActionButton(
+                                        label: context.getText(
+                                          _primaryLabelKey,
                                         ),
+                                        onPressed: isFull && !widget.isBusy
+                                            ? _handleSubmit
+                                            : null,
+                                        isBusy: widget.isBusy,
                                       ),
                                     ),
                                     if (widget.onSkip != null)
