@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
@@ -113,27 +114,38 @@ class _WelcomeTagline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = GoogleFonts.andika(
-      color: WelcomeStyle.teal,
-      fontSize: 18 * scale,
-      fontWeight: FontWeight.w400,
-      height: 22.5 / 18,
-    );
-
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Học tập ', style: textStyle),
             Text(
-              'thông minh',
-              style: textStyle.copyWith(color: WelcomeStyle.taglineCoral),
+              'Toán ',
+              style: TextStyle(
+                fontSize: FontSize.xxl,
+                fontWeight: FontWeight.w500,
+                color: WelcomeStyle.teal,
+              ),
+            ),
+            Text(
+              'AI',
+              style: TextStyle(
+                fontSize: FontSize.xxl,
+                fontWeight: FontWeight.w500,
+                color: WelcomeStyle.taglineCoral,
+              ),
             ),
           ],
         ),
-        Text('Tiến bộ mỗi ngày', style: textStyle),
+        Text(
+          'Học & Đánh giá',
+          style: TextStyle(
+            fontSize: FontSize.xxl,
+            fontWeight: FontWeight.w500,
+            color: WelcomeStyle.teal,
+          ),
+        ),
       ],
     );
   }

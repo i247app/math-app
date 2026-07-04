@@ -1,7 +1,11 @@
-part of '../../presentation/student_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _StudentHomeworkFilterChip extends StatelessWidget {
-  const _StudentHomeworkFilterChip({
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+
+class StudentHomeworkFilterChip extends StatelessWidget {
+  const StudentHomeworkFilterChip({
+    super.key,
     required this.label,
     required this.selected,
     required this.onTap,
@@ -22,7 +26,7 @@ class _StudentHomeworkFilterChip extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? _studentHomeworkActive : const Color(0xFFE5E8EB),
+            color: selected ? studentHomeworkActive : const Color(0xFFE5E8EB),
             borderRadius: BorderRadius.circular(9999),
           ),
           child: Center(
@@ -30,7 +34,7 @@ class _StudentHomeworkFilterChip extends StatelessWidget {
               label,
               maxLines: 1,
               style: GoogleFonts.andika(
-                color: selected ? Colors.white : _studentHomeworkMuted,
+                color: selected ? Colors.white : studentHomeworkMuted,
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 height: 24 / 16,

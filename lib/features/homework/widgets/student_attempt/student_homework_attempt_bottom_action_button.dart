@@ -1,7 +1,10 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
-  const _StudentHomeworkAttemptBottomActionButton({
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+
+class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
+  const StudentHomeworkAttemptBottomActionButton({
+    super.key,
     required this.label,
     required this.icon,
     required this.foreground,
@@ -42,7 +45,7 @@ class _StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
                 ? null
                 : [
                     BoxShadow(
-                      color: _homeworkAttemptTeal.withValues(alpha: 0.20),
+                      color: homeworkAttemptTeal.withValues(alpha: 0.20),
                       blurRadius: 6 * scale,
                       offset: Offset(0, 4 * scale),
                     ),

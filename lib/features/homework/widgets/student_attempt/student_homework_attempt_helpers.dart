@@ -1,7 +1,11 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentHomeworkAttemptQuestion {
-  const _StudentHomeworkAttemptQuestion({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+
+class StudentHomeworkAttemptQuestion {
+  const StudentHomeworkAttemptQuestion({
     required this.questionNumber,
     required this.prompt,
     required this.answers,
@@ -9,7 +13,7 @@ class _StudentHomeworkAttemptQuestion {
 
   final int questionNumber;
   final String prompt;
-  final List<_StudentHomeworkAttemptAnswer> answers;
+  final List<StudentHomeworkAttemptAnswer> answers;
 
   String? selectedAnswerContent(String label) {
     for (final answer in answers) {
@@ -21,8 +25,8 @@ class _StudentHomeworkAttemptQuestion {
   }
 }
 
-class _StudentHomeworkAttemptAnswer {
-  const _StudentHomeworkAttemptAnswer({
+class StudentHomeworkAttemptAnswer {
+  const StudentHomeworkAttemptAnswer({
     required this.label,
     required this.content,
   });
@@ -31,23 +35,23 @@ class _StudentHomeworkAttemptAnswer {
   final String content;
 }
 
-List<_StudentHomeworkAttemptQuestion> _attemptQuestions(
+List<StudentHomeworkAttemptQuestion> studentHomeworkAttemptQuestions(
   ClassroomExercise? exercise,
 ) {
   final questions = exercise?.questions ?? const <ClassroomExerciseQuestion>[];
-  return <_StudentHomeworkAttemptQuestion>[
+  return <StudentHomeworkAttemptQuestion>[
     for (var index = 0; index < questions.length; index++)
-      _StudentHomeworkAttemptQuestion(
+      StudentHomeworkAttemptQuestion(
         questionNumber: questions[index].questionNumber ?? index + 1,
         prompt: questions[index].displayPrompt ?? '',
-        answers: <_StudentHomeworkAttemptAnswer>[
+        answers: <StudentHomeworkAttemptAnswer>[
           for (
             var answerIndex = 0;
             answerIndex < questions[index].answers.length;
             answerIndex++
           )
             if (questions[index].answers[answerIndex].trim().isNotEmpty)
-              _StudentHomeworkAttemptAnswer(
+              StudentHomeworkAttemptAnswer(
                 label: _answerLabel(answerIndex),
                 content: questions[index].answers[answerIndex].trim(),
               ),
@@ -56,9 +60,9 @@ List<_StudentHomeworkAttemptQuestion> _attemptQuestions(
   ];
 }
 
-String? _questionDataError(
+String? studentHomeworkAttemptQuestionDataError(
   BuildContext context,
-  List<_StudentHomeworkAttemptQuestion> questions,
+  List<StudentHomeworkAttemptQuestion> questions,
 ) {
   if (questions.isEmpty) {
     return context.getText(AppKeys.studentHomeworkNoQuestions);

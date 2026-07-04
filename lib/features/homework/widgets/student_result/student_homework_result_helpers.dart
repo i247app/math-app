@@ -1,4 +1,10 @@
-part of '../../presentation/student_homework_result_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/localization/app_strings.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_summary.dart';
 
 StudentHomeworkResultSummary studentHomeworkResultSummary({
   required ClassroomExerciseSubmissionResponse submission,
@@ -36,7 +42,7 @@ String _homeworkReviewText(ClassroomExerciseSubmissionGrading? grading) {
   return AppStrings.current(AppKeys.defaultAiReview);
 }
 
-void _closeHomeworkResult(BuildContext context) {
+void closeStudentHomeworkResult(BuildContext context) {
   HapticFeedback.mediumImpact();
   Navigator.of(context).pop(true);
 }

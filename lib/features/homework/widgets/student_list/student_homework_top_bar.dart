@@ -1,7 +1,15 @@
-part of '../../presentation/student_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _StudentHomeworkTopBar extends StatelessWidget {
-  const _StudentHomeworkTopBar({required this.title, required this.onBack});
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+
+class StudentHomeworkTopBar extends StatelessWidget {
+  const StudentHomeworkTopBar({
+    super.key,
+    required this.title,
+    required this.onBack,
+  });
 
   final String title;
   final VoidCallback onBack;
@@ -49,7 +57,7 @@ class _StudentHomeworkTopBar extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: _studentHomeworkTeal,
+                color: studentHomeworkTeal,
                 fontSize: 25,
                 fontWeight: FontWeight.w700,
                 height: 34 / 25,

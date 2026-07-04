@@ -1,7 +1,12 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentHomeworkAttemptErrorState extends StatelessWidget {
-  const _StudentHomeworkAttemptErrorState({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_bottom_action_button.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+
+class StudentHomeworkAttemptErrorState extends StatelessWidget {
+  const StudentHomeworkAttemptErrorState({
     super.key,
     required this.scale,
     required this.message,
@@ -24,12 +29,12 @@ class _StudentHomeworkAttemptErrorState extends StatelessWidget {
               width: 72 * scale,
               height: 72 * scale,
               decoration: BoxDecoration(
-                color: _homeworkAttemptPeach.withValues(alpha: 0.58),
+                color: homeworkAttemptPeach.withValues(alpha: 0.58),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.refresh_rounded,
-                color: _homeworkAttemptRust,
+                color: homeworkAttemptRust,
                 size: 34 * scale,
               ),
             ),
@@ -38,7 +43,7 @@ class _StudentHomeworkAttemptErrorState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: _homeworkAttemptMuted,
+                color: homeworkAttemptMuted,
                 fontSize: 15 * scale,
                 fontWeight: FontWeight.w800,
                 height: 1.35,
@@ -48,7 +53,7 @@ class _StudentHomeworkAttemptErrorState extends StatelessWidget {
             SizedBox(height: 24 * scale),
             SizedBox(
               width: 168 * scale,
-              child: _StudentHomeworkAttemptBottomActionButton(
+              child: StudentHomeworkAttemptBottomActionButton(
                 label: context.getText(AppKeys.retryUpper),
                 icon: Icons.refresh_rounded,
                 foreground: const Color(0xFFBEFFF9),
@@ -57,7 +62,7 @@ class _StudentHomeworkAttemptErrorState extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [_homeworkAttemptTeal, Color(0xFF73F1E7)],
+                  colors: [homeworkAttemptTeal, Color(0xFF73F1E7)],
                 ),
               ),
             ),

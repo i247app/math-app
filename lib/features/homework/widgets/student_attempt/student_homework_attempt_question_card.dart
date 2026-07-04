@@ -1,7 +1,10 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentHomeworkAttemptQuestionCard extends StatelessWidget {
-  const _StudentHomeworkAttemptQuestionCard({
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+
+class StudentHomeworkAttemptQuestionCard extends StatelessWidget {
+  const StudentHomeworkAttemptQuestionCard({
+    super.key,
     required this.scale,
     required this.question,
   });
@@ -27,7 +30,7 @@ class _StudentHomeworkAttemptQuestionCard extends StatelessWidget {
         question,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: _homeworkAttemptInk,
+          color: homeworkAttemptInk,
           fontSize: 36 * scale,
           fontWeight: FontWeight.w900,
           height: 1.16,

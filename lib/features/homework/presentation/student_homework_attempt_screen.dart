@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,26 +10,16 @@ import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/features/homework/cache/student_homework_cache.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
-import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_answer_grid.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_bottom_bar.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_error_state.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_header.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_progress_section.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_question_card.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_helpers.dart';
 import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
-
-part '../widgets/student_attempt/student_homework_attempt_header.dart';
-part '../widgets/student_attempt/student_homework_attempt_progress_section.dart';
-part '../widgets/student_attempt/student_homework_attempt_question_card.dart';
-part '../widgets/student_attempt/student_homework_attempt_answer_grid.dart';
-part '../widgets/student_attempt/student_homework_attempt_answer_button.dart';
-part '../widgets/student_attempt/student_homework_attempt_bottom_bar.dart';
-part '../widgets/student_attempt/student_homework_attempt_bottom_action_button.dart';
-part '../widgets/student_attempt/student_homework_attempt_error_state.dart';
-part '../widgets/student_attempt/student_homework_attempt_helpers.dart';
-
-const _homeworkAttemptMint = Color(0xFFEBFAEC);
-const _homeworkAttemptTeal = Color(0xFF006762);
-const _homeworkAttemptInk = Color(0xFF253228);
-const _homeworkAttemptMuted = Color(0xFF515F54);
-const _homeworkAttemptPeach = Color(0xFFFFC4B1);
-const _homeworkAttemptRust = Color(0xFFA03A0F);
-const _homeworkAttemptProgress = Color(0xFF00618D);
 
 class StudentHomeworkAttemptScreen extends StatefulWidget {
   const StudentHomeworkAttemptScreen({
@@ -149,7 +138,7 @@ class _StudentHomeworkAttemptScreenState
     }
   }
 
-  void _selectAnswer(_StudentHomeworkAttemptAnswer answer) {
+  void _selectAnswer(StudentHomeworkAttemptAnswer answer) {
     HapticFeedback.selectionClick();
     setState(() => _selectedAnswerLabels[_questionIndex] = answer.label);
   }
@@ -164,7 +153,7 @@ class _StudentHomeworkAttemptScreenState
     setState(() => _questionIndex--);
   }
 
-  void _goToNextQuestion(List<_StudentHomeworkAttemptQuestion> questions) {
+  void _goToNextQuestion(List<StudentHomeworkAttemptQuestion> questions) {
     if (_questionIndex >= questions.length - 1) {
       _submitHomework(questions);
       return;
@@ -175,7 +164,7 @@ class _StudentHomeworkAttemptScreenState
   }
 
   Future<void> _submitHomework(
-    List<_StudentHomeworkAttemptQuestion> questions,
+    List<StudentHomeworkAttemptQuestion> questions,
   ) async {
     if (_isSubmitting) {
       return;
@@ -299,7 +288,7 @@ class _StudentHomeworkAttemptScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _homeworkAttemptMint,
+      backgroundColor: homeworkAttemptMint,
       body: SafeArea(
         bottom: false,
         child: LayoutBuilder(
@@ -310,10 +299,10 @@ class _StudentHomeworkAttemptScreenState
                 .min(width / _designWidth, height / _designHeight)
                 .clamp(0.78, 1.18);
             final s = scale.toDouble();
-            final questions = _attemptQuestions(_exercise);
+            final questions = studentHomeworkAttemptQuestions(_exercise);
             final questionError = _isLoading
                 ? null
-                : _questionDataError(context, questions);
+                : studentHomeworkAttemptQuestionDataError(context, questions);
             final effectiveError = _errorMessage ?? questionError;
             final currentQuestion = questions.isEmpty
                 ? null
@@ -331,7 +320,7 @@ class _StudentHomeworkAttemptScreenState
                   child: ColoredBox(
                     color: _isLoading || _isSubmitting
                         ? Colors.white
-                        : _homeworkAttemptMint,
+                        : homeworkAttemptMint,
                   ),
                 ),
                 Positioned.fill(
@@ -344,7 +333,7 @@ class _StudentHomeworkAttemptScreenState
                     switchInCurve: Curves.easeOutCubic,
                     switchOutCurve: Curves.easeInCubic,
                     child: effectiveError != null
-                        ? _StudentHomeworkAttemptErrorState(
+                        ? StudentHomeworkAttemptErrorState(
                             key: const ValueKey('homework-error'),
                             scale: s,
                             message: effectiveError,
@@ -356,14 +345,14 @@ class _StudentHomeworkAttemptScreenState
                             scale: s,
                             message: context.getText(AppKeys.submittingForYou),
                             letterStyle: TextStyle(
-                              color: _homeworkAttemptTeal,
+                              color: homeworkAttemptTeal,
                               fontSize: 40 * s,
                               fontWeight: FontWeight.w900,
                               height: 1,
                               letterSpacing: 3 * s,
                             ),
                             messageStyle: TextStyle(
-                              color: _homeworkAttemptMuted,
+                              color: homeworkAttemptMuted,
                               fontSize: 16 * s,
                               fontWeight: FontWeight.w800,
                               height: 1.35,
@@ -376,14 +365,14 @@ class _StudentHomeworkAttemptScreenState
                             scale: s,
                             message: context.getText(AppKeys.studentHomework),
                             letterStyle: TextStyle(
-                              color: _homeworkAttemptTeal,
+                              color: homeworkAttemptTeal,
                               fontSize: 40 * s,
                               fontWeight: FontWeight.w900,
                               height: 1,
                               letterSpacing: 3 * s,
                             ),
                             messageStyle: TextStyle(
-                              color: _homeworkAttemptMuted,
+                              color: homeworkAttemptMuted,
                               fontSize: 16 * s,
                               fontWeight: FontWeight.w800,
                               height: 1.35,
@@ -402,18 +391,18 @@ class _StudentHomeworkAttemptScreenState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                _StudentHomeworkAttemptProgressSection(
+                                StudentHomeworkAttemptProgressSection(
                                   scale: s,
                                   currentQuestion: _questionIndex + 1,
                                   totalQuestions: questions.length,
                                 ),
                                 SizedBox(height: 32 * s),
-                                _StudentHomeworkAttemptQuestionCard(
+                                StudentHomeworkAttemptQuestionCard(
                                   scale: s,
                                   question: currentQuestion!.prompt,
                                 ),
                                 SizedBox(height: 32 * s),
-                                _StudentHomeworkAttemptAnswerGrid(
+                                StudentHomeworkAttemptAnswerGrid(
                                   scale: s,
                                   answers: currentQuestion.answers,
                                   selectedAnswerLabel: selectedAnswerLabel,
@@ -429,14 +418,14 @@ class _StudentHomeworkAttemptScreenState
                     left: 0,
                     right: 0,
                     top: 0,
-                    child: _StudentHomeworkAttemptHeader(scale: s),
+                    child: StudentHomeworkAttemptHeader(scale: s),
                   ),
                 if (isQuestionContentVisible)
                   Positioned(
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    child: _StudentHomeworkAttemptBottomBar(
+                    child: StudentHomeworkAttemptBottomBar(
                       scale: s,
                       canGoBack: _questionIndex > 0,
                       isLastQuestion: _questionIndex >= questions.length - 1,

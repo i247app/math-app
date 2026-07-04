@@ -1,13 +1,18 @@
-part of '../../presentation/student_homework_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentHomeworkFilterTabs extends StatelessWidget {
-  const _StudentHomeworkFilterTabs({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter_chip.dart';
+
+class StudentHomeworkFilterTabs extends StatelessWidget {
+  const StudentHomeworkFilterTabs({
+    super.key,
     required this.activeFilter,
     required this.onFilterSelected,
   });
 
-  final _StudentHomeworkFilter activeFilter;
-  final ValueChanged<_StudentHomeworkFilter> onFilterSelected;
+  final StudentHomeworkFilter activeFilter;
+  final ValueChanged<StudentHomeworkFilter> onFilterSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +23,13 @@ class _StudentHomeworkFilterTabs extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          for (final filter in _StudentHomeworkFilter.values) ...[
-            _StudentHomeworkFilterChip(
+          for (final filter in StudentHomeworkFilter.values) ...[
+            StudentHomeworkFilterChip(
               label: context.getText(filter.labelKey),
               selected: filter == activeFilter,
               onTap: () => onFilterSelected(filter),
             ),
-            if (filter != _StudentHomeworkFilter.values.last)
+            if (filter != StudentHomeworkFilter.values.last)
               const SizedBox(width: 8),
           ],
         ],

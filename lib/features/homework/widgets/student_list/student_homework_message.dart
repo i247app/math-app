@@ -1,7 +1,10 @@
-part of '../../presentation/student_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _StudentHomeworkMessage extends StatelessWidget {
-  const _StudentHomeworkMessage({required this.message});
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+
+class StudentHomeworkMessage extends StatelessWidget {
+  const StudentHomeworkMessage({super.key, required this.message});
 
   final String message;
 
@@ -13,7 +16,7 @@ class _StudentHomeworkMessage extends StatelessWidget {
         message,
         textAlign: TextAlign.center,
         style: GoogleFonts.andika(
-          color: _studentHomeworkMuted,
+          color: studentHomeworkMuted,
           fontSize: 15,
           fontWeight: FontWeight.w500,
           height: 22 / 15,

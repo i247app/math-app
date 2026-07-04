@@ -1,11 +1,11 @@
-part of '../../presentation/student_homework_screen.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
 
-enum _StudentHomeworkFilter {
+enum StudentHomeworkFilter {
   notSubmitted(AppKeys.studentHomeworkNotSubmitted, 'NOT_SUBMITTED'),
   submitted(AppKeys.studentHomeworkSubmitted, 'SUBMITTED'),
   overdue(AppKeys.studentHomeworkOverdue, 'NOT_SUBMITTED');
 
-  const _StudentHomeworkFilter(this.labelKey, this.submissionStatus);
+  const StudentHomeworkFilter(this.labelKey, this.submissionStatus);
 
   final String labelKey;
   final String? submissionStatus;

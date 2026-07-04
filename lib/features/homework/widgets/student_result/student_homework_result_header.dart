@@ -1,7 +1,14 @@
-part of '../../presentation/student_homework_result_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _StudentHomeworkResultHeader extends StatelessWidget {
-  const _StudentHomeworkResultHeader({required this.scale});
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_helpers.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+
+class StudentHomeworkResultHeader extends StatelessWidget {
+  const StudentHomeworkResultHeader({super.key, required this.scale});
 
   final double scale;
 
@@ -27,12 +34,12 @@ class _StudentHomeworkResultHeader extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: QuizHeaderIconButton(
               icon: Icons.arrow_back_rounded,
-              color: _homeworkResultHeaderTeal,
+              color: homeworkResultHeaderTeal,
               scale: scale,
               size: 40,
               iconSize: 23,
               borderRadius: 12,
-              onTap: () => _closeHomeworkResult(context),
+              onTap: () => closeStudentHomeworkResult(context),
             ),
           ),
           Text(
@@ -41,7 +48,7 @@ class _StudentHomeworkResultHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: _homeworkResultHeaderTeal,
+              color: homeworkResultHeaderTeal,
               fontSize: 25 * scale,
               fontWeight: FontWeight.w800,
               height: 34 / 25,

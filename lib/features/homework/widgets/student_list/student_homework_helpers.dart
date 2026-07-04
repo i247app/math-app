@@ -1,6 +1,11 @@
-part of '../../presentation/student_homework_screen.dart';
+import 'package:flutter/material.dart';
 
-String _studentHomeworkTitle(ClassroomExercise exercise) {
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter.dart';
+
+String studentHomeworkTitle(ClassroomExercise exercise) {
   final title = exercise.title?.trim();
   if (title != null && title.isNotEmpty) {
     return title;
@@ -9,7 +14,7 @@ String _studentHomeworkTitle(ClassroomExercise exercise) {
   return id == null ? '' : 'ID: $id';
 }
 
-String _studentHomeworkQuestionCount(
+String studentHomeworkQuestionCount(
   BuildContext context,
   ClassroomExercise exercise,
 ) {
@@ -22,7 +27,7 @@ String _studentHomeworkQuestionCount(
   return '';
 }
 
-String _studentHomeworkDueDate(
+String studentHomeworkDueDate(
   BuildContext context,
   ClassroomExercise exercise,
 ) {
@@ -33,7 +38,7 @@ String _studentHomeworkDueDate(
   return '${context.getText(AppKeys.teacherAssignmentDueLabel)}: $date';
 }
 
-String _studentHomeworkCreatedDate(ClassroomExercise exercise) {
+String studentHomeworkCreatedDate(ClassroomExercise exercise) {
   return _studentHomeworkDateLabel(exercise.createDt) ?? '';
 }
 
@@ -51,29 +56,29 @@ String? _studentHomeworkDateLabel(String? value) {
 
 String _studentHomeworkTwoDigits(int value) => value.toString().padLeft(2, '0');
 
-List<ClassroomExercise> _filteredExercises(
+List<ClassroomExercise> filteredStudentHomeworkExercises(
   List<ClassroomExercise> exercises,
-  _StudentHomeworkFilter filter,
+  StudentHomeworkFilter filter,
 ) {
   return exercises
       .where((exercise) {
-        final submitted = _studentHomeworkIsSubmitted(exercise);
-        final overdue = _studentHomeworkIsOverdue(exercise);
+        final submitted = studentHomeworkIsSubmitted(exercise);
+        final overdue = studentHomeworkIsOverdue(exercise);
         return switch (filter) {
-          _StudentHomeworkFilter.notSubmitted => !submitted && !overdue,
-          _StudentHomeworkFilter.submitted => submitted,
-          _StudentHomeworkFilter.overdue => overdue,
+          StudentHomeworkFilter.notSubmitted => !submitted && !overdue,
+          StudentHomeworkFilter.submitted => submitted,
+          StudentHomeworkFilter.overdue => overdue,
         };
       })
       .toList(growable: false);
 }
 
-bool _studentHomeworkIsSubmitted(ClassroomExercise exercise) {
+bool studentHomeworkIsSubmitted(ClassroomExercise exercise) {
   return exercise.submissionStatus?.trim().toUpperCase() == 'SUBMITTED';
 }
 
-bool _studentHomeworkIsOverdue(ClassroomExercise exercise) {
-  if (_studentHomeworkIsSubmitted(exercise)) {
+bool studentHomeworkIsOverdue(ClassroomExercise exercise) {
+  if (studentHomeworkIsSubmitted(exercise)) {
     return false;
   }
   final parsed = DateTime.tryParse(exercise.endDate?.trim() ?? '');

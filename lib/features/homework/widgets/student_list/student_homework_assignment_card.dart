@@ -1,7 +1,16 @@
-part of '../../presentation/student_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _StudentHomeworkAssignmentCard extends StatelessWidget {
-  const _StudentHomeworkAssignmentCard({
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_helpers.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_status_badge.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+
+class StudentHomeworkAssignmentCard extends StatelessWidget {
+  const StudentHomeworkAssignmentCard({
+    super.key,
     required this.exercise,
     required this.onTap,
   });
@@ -43,11 +52,11 @@ class _StudentHomeworkAssignmentCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      _studentHomeworkCreatedDate(exercise),
+                      studentHomeworkCreatedDate(exercise),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
-                        color: _studentHomeworkMuted,
+                        color: studentHomeworkMuted,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         height: 16 / 12,
@@ -55,16 +64,16 @@ class _StudentHomeworkAssignmentCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  _StudentHomeworkStatusBadge(exercise: exercise),
+                  StudentHomeworkStatusBadge(exercise: exercise),
                 ],
               ),
               const SizedBox(height: 8),
               Text(
-                _studentHomeworkTitle(exercise),
+                studentHomeworkTitle(exercise),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: _studentHomeworkInk,
+                  color: studentHomeworkInk,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   height: 28 / 18,
@@ -74,11 +83,11 @@ class _StudentHomeworkAssignmentCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  _studentHomeworkQuestionCount(context, exercise),
+                  studentHomeworkQuestionCount(context, exercise),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: _studentHomeworkMuted,
+                    color: studentHomeworkMuted,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     height: 20 / 14,
@@ -105,11 +114,11 @@ class _StudentHomeworkAssignmentCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        _studentHomeworkDueDate(context, exercise),
+                        studentHomeworkDueDate(context, exercise),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: _studentHomeworkMuted,
+                          color: studentHomeworkMuted,
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                           height: 24 / 16,

@@ -1,14 +1,21 @@
-part of '../../presentation/student_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _StudentHomeworkStatusBadge extends StatelessWidget {
-  const _StudentHomeworkStatusBadge({required this.exercise});
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_helpers.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+
+class StudentHomeworkStatusBadge extends StatelessWidget {
+  const StudentHomeworkStatusBadge({super.key, required this.exercise});
 
   final ClassroomExercise exercise;
 
   @override
   Widget build(BuildContext context) {
-    final submitted = _studentHomeworkIsSubmitted(exercise);
-    final overdue = _studentHomeworkIsOverdue(exercise);
+    final submitted = studentHomeworkIsSubmitted(exercise);
+    final overdue = studentHomeworkIsOverdue(exercise);
     final labelKey = submitted
         ? AppKeys.studentHomeworkSubmitted
         : overdue
@@ -18,7 +25,7 @@ class _StudentHomeworkStatusBadge extends StatelessWidget {
         ? const Color(0xFF2E7D32)
         : overdue
         ? const Color(0xFFC2410C)
-        : _studentHomeworkTeal;
+        : studentHomeworkTeal;
 
     return DecoratedBox(
       decoration: BoxDecoration(

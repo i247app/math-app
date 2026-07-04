@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
@@ -12,23 +10,15 @@ import 'package:numi_flutter/features/homework/cache/student_homework_cache.dart
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi_flutter/features/homework/student_homework_open_guard.dart';
-
-part '../widgets/student_list/student_homework_refresh_label.dart';
-part '../widgets/student_list/student_homework_message.dart';
-part '../widgets/student_list/student_homework_top_bar.dart';
-part '../widgets/student_list/student_homework_search_field.dart';
-part '../widgets/student_list/student_homework_filter_tabs.dart';
-part '../widgets/student_list/student_homework_filter.dart';
-part '../widgets/student_list/student_homework_filter_chip.dart';
-part '../widgets/student_list/student_homework_assignment_card.dart';
-part '../widgets/student_list/student_homework_status_badge.dart';
-part '../widgets/student_list/student_homework_helpers.dart';
-
-const _studentHomeworkBg = Color(0xFFF6FFFF);
-const _studentHomeworkTeal = Color(0xFF38898C);
-const _studentHomeworkActive = Color(0xFF2E6F70);
-const _studentHomeworkInk = Color(0xFF001741);
-const _studentHomeworkMuted = Color(0xFF444650);
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_assignment_card.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter_tabs.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_helpers.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_message.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_refresh_label.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_search_field.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_top_bar.dart';
 
 class StudentHomeworkScreen extends StatefulWidget {
   const StudentHomeworkScreen({
@@ -55,7 +45,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
   bool _isLoading = false;
   String? _error;
   List<ClassroomExercise> _exercises = const <ClassroomExercise>[];
-  _StudentHomeworkFilter _activeFilter = _StudentHomeworkFilter.notSubmitted;
+  StudentHomeworkFilter _activeFilter = StudentHomeworkFilter.notSubmitted;
 
   @override
   void initState() {
@@ -78,7 +68,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
     });
   }
 
-  void _setFilter(_StudentHomeworkFilter filter) {
+  void _setFilter(StudentHomeworkFilter filter) {
     if (_activeFilter == filter) {
       return;
     }
@@ -149,7 +139,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
   }
 
   Future<void> _openExercise(ClassroomExercise exercise) async {
-    if (_studentHomeworkIsSubmitted(exercise)) {
+    if (studentHomeworkIsSubmitted(exercise)) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -205,14 +195,17 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final visibleExercises = _filteredExercises(_exercises, _activeFilter);
+    final visibleExercises = filteredStudentHomeworkExercises(
+      _exercises,
+      _activeFilter,
+    );
     return Scaffold(
-      backgroundColor: _studentHomeworkBg,
+      backgroundColor: studentHomeworkBg,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            _StudentHomeworkTopBar(
+            StudentHomeworkTopBar(
               title: context.getText(AppKeys.studentHomework),
               onBack: () => Navigator.of(context).maybePop(),
             ),
@@ -228,35 +221,35 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _StudentHomeworkSearchField(
+                    StudentHomeworkSearchField(
                       controller: _searchController,
                       onChanged: _onSearchChanged,
                       onSubmitted: (value) => _loadExercises(search: value),
                     ),
                     const SizedBox(height: 17),
-                    _StudentHomeworkFilterTabs(
+                    StudentHomeworkFilterTabs(
                       activeFilter: _activeFilter,
                       onFilterSelected: _setFilter,
                     ),
                     const SizedBox(height: 18),
                     if (_isLoading && _exercises.isEmpty)
-                      _StudentHomeworkMessage(
+                      StudentHomeworkMessage(
                         message: context.getText(AppKeys.loading),
                       )
                     else if (_error != null && _exercises.isEmpty)
-                      _StudentHomeworkMessage(message: _error!)
+                      StudentHomeworkMessage(message: _error!)
                     else if (_exercises.isEmpty)
-                      _StudentHomeworkMessage(
+                      StudentHomeworkMessage(
                         message: context.getText(
                           AppKeys.studentNoHomeworkMessage,
                         ),
                       )
                     else if (visibleExercises.isEmpty && _isLoading)
-                      _StudentHomeworkMessage(
+                      StudentHomeworkMessage(
                         message: context.getText(AppKeys.loading),
                       )
                     else if (visibleExercises.isEmpty)
-                      _StudentHomeworkMessage(
+                      StudentHomeworkMessage(
                         message: context.getText(
                           AppKeys.studentNoHomeworkMessage,
                         ),
@@ -273,12 +266,12 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                                 ? 0
                                 : 14,
                           ),
-                          child: _StudentHomeworkAssignmentCard(
+                          child: StudentHomeworkAssignmentCard(
                             exercise: visibleExercises[index],
                             onTap: () => _openExercise(visibleExercises[index]),
                           ),
                         ),
-                      if (_isLoading) const _StudentHomeworkRefreshLabel(),
+                      if (_isLoading) const StudentHomeworkRefreshLabel(),
                     ],
                   ],
                 ),

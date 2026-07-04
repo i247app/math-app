@@ -1,7 +1,14 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'dart:math' as math;
 
-class _StudentHomeworkAttemptProgressSection extends StatelessWidget {
-  const _StudentHomeworkAttemptProgressSection({
+import 'package:flutter/material.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+
+class StudentHomeworkAttemptProgressSection extends StatelessWidget {
+  const StudentHomeworkAttemptProgressSection({
+    super.key,
     required this.scale,
     required this.currentQuestion,
     required this.totalQuestions,
@@ -27,7 +34,7 @@ class _StudentHomeworkAttemptProgressSection extends StatelessWidget {
             'total': totalQuestions,
           }),
           style: TextStyle(
-            color: _homeworkAttemptMuted,
+            color: homeworkAttemptMuted,
             fontSize: 16 * scale,
             fontWeight: FontWeight.w900,
             height: 1.5,
@@ -49,7 +56,7 @@ class _StudentHomeworkAttemptProgressSection extends StatelessWidget {
               return Container(
                 padding: EdgeInsets.all(inset),
                 decoration: BoxDecoration(
-                  color: _homeworkAttemptPeach,
+                  color: homeworkAttemptPeach,
                   borderRadius: BorderRadius.circular(999),
                   boxShadow: [
                     BoxShadow(
@@ -67,7 +74,7 @@ class _StudentHomeworkAttemptProgressSection extends StatelessWidget {
                   width: fillWidth,
                   height: double.infinity,
                   decoration: BoxDecoration(
-                    color: _homeworkAttemptProgress,
+                    color: homeworkAttemptProgress,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: DecoratedBox(

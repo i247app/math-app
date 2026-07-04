@@ -1,14 +1,18 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentHomeworkAttemptAnswerButton extends StatelessWidget {
-  const _StudentHomeworkAttemptAnswerButton({
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+
+class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
+  const StudentHomeworkAttemptAnswerButton({
+    super.key,
     required this.answer,
     required this.selected,
     required this.scale,
     required this.onTap,
   });
 
-  final _StudentHomeworkAttemptAnswer answer;
+  final StudentHomeworkAttemptAnswer answer;
   final bool selected;
   final double scale;
   final VoidCallback onTap;
@@ -16,9 +20,9 @@ class _StudentHomeworkAttemptAnswerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = selected
-        ? _homeworkAttemptTeal
+        ? homeworkAttemptTeal
         : Colors.black.withValues(alpha: 0);
-    final textColor = selected ? _homeworkAttemptTeal : _homeworkAttemptInk;
+    final textColor = selected ? homeworkAttemptTeal : homeworkAttemptInk;
 
     return Material(
       color: Colors.transparent,

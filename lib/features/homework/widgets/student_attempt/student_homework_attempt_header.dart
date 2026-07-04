@@ -1,7 +1,15 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'dart:ui';
 
-class _StudentHomeworkAttemptHeader extends StatelessWidget {
-  const _StudentHomeworkAttemptHeader({required this.scale});
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+
+class StudentHomeworkAttemptHeader extends StatelessWidget {
+  const StudentHomeworkAttemptHeader({super.key, required this.scale});
 
   final double scale;
 
@@ -15,13 +23,13 @@ class _StudentHomeworkAttemptHeader extends StatelessWidget {
           height: 80 * scale,
           padding: EdgeInsets.symmetric(horizontal: 24 * scale),
           decoration: BoxDecoration(
-            color: _homeworkAttemptMint.withValues(alpha: 0.84),
+            color: homeworkAttemptMint.withValues(alpha: 0.84),
             borderRadius: BorderRadius.vertical(
               bottom: Radius.circular(32 * scale),
             ),
             boxShadow: [
               BoxShadow(
-                color: _homeworkAttemptInk.withValues(alpha: 0.05),
+                color: homeworkAttemptInk.withValues(alpha: 0.05),
                 blurRadius: 2 * scale,
                 offset: Offset(0, 1 * scale),
               ),
@@ -31,7 +39,7 @@ class _StudentHomeworkAttemptHeader extends StatelessWidget {
             children: [
               QuizHeaderIconButton(
                 icon: Icons.close_rounded,
-                color: _homeworkAttemptTeal,
+                color: homeworkAttemptTeal,
                 scale: scale,
                 circle: true,
                 onTap: () => Navigator.of(context).maybePop(),
@@ -43,7 +51,7 @@ class _StudentHomeworkAttemptHeader extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: _homeworkAttemptTeal,
+                    color: homeworkAttemptTeal,
                     fontSize: 20 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -53,7 +61,7 @@ class _StudentHomeworkAttemptHeader extends StatelessWidget {
               ),
               QuizHeaderIconButton(
                 icon: Icons.help_outline_rounded,
-                color: _homeworkAttemptTeal,
+                color: homeworkAttemptTeal,
                 scale: scale,
                 circle: true,
                 onTap: HapticFeedback.selectionClick,

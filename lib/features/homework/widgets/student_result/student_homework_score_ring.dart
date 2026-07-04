@@ -1,7 +1,13 @@
-part of '../../presentation/student_homework_result_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _StudentHomeworkScoreRing extends StatelessWidget {
-  const _StudentHomeworkScoreRing({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+
+class StudentHomeworkScoreRing extends StatelessWidget {
+  const StudentHomeworkScoreRing({
+    super.key,
     required this.scale,
     required this.scoreText,
   });
@@ -50,10 +56,7 @@ class _StudentHomeworkScoreRing extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
-                border: Border.all(
-                  color: _homeworkResultTeal,
-                  width: 9 * scale,
-                ),
+                border: Border.all(color: homeworkResultTeal, width: 9 * scale),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +68,7 @@ class _StudentHomeworkScoreRing extends StatelessWidget {
                         TextSpan(
                           text: scoreValue,
                           style: GoogleFonts.andika(
-                            color: _homeworkResultScoreGreen,
+                            color: homeworkResultScoreGreen,
                             fontSize: 48 * scale,
                             fontWeight: FontWeight.w800,
                             height: 40 / 48,
@@ -89,7 +92,7 @@ class _StudentHomeworkScoreRing extends StatelessWidget {
                   Text(
                     context.getText(AppKeys.scoreUpper),
                     style: GoogleFonts.andika(
-                      color: _homeworkResultMuted,
+                      color: homeworkResultMuted,
                       fontSize: 10 * scale,
                       fontWeight: FontWeight.w800,
                       height: 15 / 10,

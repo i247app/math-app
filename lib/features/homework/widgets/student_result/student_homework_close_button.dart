@@ -1,7 +1,13 @@
-part of '../../presentation/student_homework_result_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _StudentHomeworkCloseButton extends StatelessWidget {
-  const _StudentHomeworkCloseButton({required this.scale});
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_helpers.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+
+class StudentHomeworkCloseButton extends StatelessWidget {
+  const StudentHomeworkCloseButton({super.key, required this.scale});
 
   final double scale;
 
@@ -12,13 +18,13 @@ class _StudentHomeworkCloseButton extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(20 * scale),
         child: InkWell(
-          onTap: () => _closeHomeworkResult(context),
+          onTap: () => closeStudentHomeworkResult(context),
           borderRadius: BorderRadius.circular(20 * scale),
           child: Ink(
             width: 180 * scale,
             height: 57 * scale,
             decoration: BoxDecoration(
-              color: _homeworkResultHeaderTeal,
+              color: homeworkResultHeaderTeal,
               borderRadius: BorderRadius.circular(20 * scale),
               boxShadow: [
                 BoxShadow(

@@ -1,7 +1,15 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'dart:ui';
 
-class _StudentHomeworkAttemptBottomBar extends StatelessWidget {
-  const _StudentHomeworkAttemptBottomBar({
+import 'package:flutter/material.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_bottom_action_button.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+
+class StudentHomeworkAttemptBottomBar extends StatelessWidget {
+  const StudentHomeworkAttemptBottomBar({
+    super.key,
     required this.scale,
     required this.canGoBack,
     required this.isLastQuestion,
@@ -31,7 +39,7 @@ class _StudentHomeworkAttemptBottomBar extends StatelessWidget {
             24 * scale,
           ),
           decoration: BoxDecoration(
-            color: _homeworkAttemptMint.withValues(alpha: 0.90),
+            color: homeworkAttemptMint.withValues(alpha: 0.90),
             border: Border(
               top: BorderSide(
                 color: const Color(0xFFCDE2CF).withValues(alpha: 0.30),
@@ -41,18 +49,18 @@ class _StudentHomeworkAttemptBottomBar extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: _StudentHomeworkAttemptBottomActionButton(
+                child: StudentHomeworkAttemptBottomActionButton(
                   label: context.getText(AppKeys.previousQuestionUpper),
                   icon: Icons.arrow_back_rounded,
-                  background: _homeworkAttemptPeach.withValues(alpha: 0.50),
-                  foreground: _homeworkAttemptRust,
+                  background: homeworkAttemptPeach.withValues(alpha: 0.50),
+                  foreground: homeworkAttemptRust,
                   scale: scale,
                   onTap: canGoBack && !isSubmitting ? onBack : null,
                 ),
               ),
               SizedBox(width: 48 * scale),
               Expanded(
-                child: _StudentHomeworkAttemptBottomActionButton(
+                child: StudentHomeworkAttemptBottomActionButton(
                   label: isSubmitting
                       ? context.getText(AppKeys.submittingUpper)
                       : isLastQuestion
@@ -67,7 +75,7 @@ class _StudentHomeworkAttemptBottomBar extends StatelessWidget {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [_homeworkAttemptTeal, Color(0xFF73F1E7)],
+                    colors: [homeworkAttemptTeal, Color(0xFF73F1E7)],
                   ),
                 ),
               ),

@@ -1,7 +1,11 @@
-part of '../../presentation/student_homework_attempt_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentHomeworkAttemptAnswerGrid extends StatelessWidget {
-  const _StudentHomeworkAttemptAnswerGrid({
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_answer_button.dart';
+import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
+
+class StudentHomeworkAttemptAnswerGrid extends StatelessWidget {
+  const StudentHomeworkAttemptAnswerGrid({
+    super.key,
     required this.scale,
     required this.answers,
     required this.selectedAnswerLabel,
@@ -9,9 +13,9 @@ class _StudentHomeworkAttemptAnswerGrid extends StatelessWidget {
   });
 
   final double scale;
-  final List<_StudentHomeworkAttemptAnswer> answers;
+  final List<StudentHomeworkAttemptAnswer> answers;
   final String? selectedAnswerLabel;
-  final ValueChanged<_StudentHomeworkAttemptAnswer> onSelected;
+  final ValueChanged<StudentHomeworkAttemptAnswer> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,7 @@ class _StudentHomeworkAttemptAnswerGrid extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final answer = answers[index];
-        return _StudentHomeworkAttemptAnswerButton(
+        return StudentHomeworkAttemptAnswerButton(
           answer: answer,
           selected: answer.label == selectedAnswerLabel,
           scale: scale,

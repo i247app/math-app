@@ -6,25 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
-
-part '../widgets/student_result/student_homework_result_summary.dart';
-part '../widgets/student_result/student_homework_result_header.dart';
-part '../widgets/student_result/student_homework_score_ring.dart';
-part '../widgets/student_result/student_homework_review_card.dart';
-part '../widgets/student_result/student_homework_close_button.dart';
-part '../widgets/student_result/student_homework_result_helpers.dart';
-
-const _homeworkResultTeal = Color(0xFF006762);
-const _homeworkResultHeaderTeal = Color(0xFF38898C);
-const _homeworkResultScoreGreen = Color(0xFF006D36);
-const _homeworkResultInk = Color(0xFF253228);
-const _homeworkResultMuted = Color(0xFF515F54);
-const _homeworkResultCardBorder = Color(0xFFE5E8EB);
-const _homeworkResultAiAccent = Color(0xFFE8FEFF);
-const _homeworkResultMascotBorder = Color(0xFF974320);
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_close_button.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_header.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_summary.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_review_card.dart';
+import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_score_ring.dart';
 
 class StudentHomeworkResultScreen extends StatelessWidget {
   const StudentHomeworkResultScreen({super.key, required this.summary});
@@ -66,13 +53,13 @@ class StudentHomeworkResultScreen extends StatelessWidget {
                         left: 0,
                         right: 0,
                         top: 0,
-                        child: _StudentHomeworkResultHeader(scale: scale),
+                        child: StudentHomeworkResultHeader(scale: scale),
                       ),
                       Positioned(
                         left: 0,
                         right: 0,
                         top: s(111),
-                        child: _StudentHomeworkScoreRing(
+                        child: StudentHomeworkScoreRing(
                           scale: scale,
                           scoreText: summary.scoreText,
                         ),
@@ -85,7 +72,7 @@ class StudentHomeworkResultScreen extends StatelessWidget {
                           context.getText(AppKeys.excellentResultTitle),
                           textAlign: TextAlign.center,
                           style: GoogleFonts.andika(
-                            color: _homeworkResultInk,
+                            color: homeworkResultInk,
                             fontSize: 24 * scale,
                             fontWeight: FontWeight.w800,
                             height: 32 / 24,
@@ -97,7 +84,7 @@ class StudentHomeworkResultScreen extends StatelessWidget {
                         left: s(26),
                         right: s(26),
                         top: s(369),
-                        child: _StudentHomeworkReviewCard(
+                        child: StudentHomeworkReviewCard(
                           scale: scale,
                           reviewText: summary.reviewText,
                         ),
@@ -106,7 +93,7 @@ class StudentHomeworkResultScreen extends StatelessWidget {
                         left: s(26),
                         right: s(26),
                         top: s(592),
-                        child: _StudentHomeworkCloseButton(scale: scale),
+                        child: StudentHomeworkCloseButton(scale: scale),
                       ),
                     ],
                   ),
