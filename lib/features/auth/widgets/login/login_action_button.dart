@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/features/auth/widgets/shared/auth_action_button.dart';
 
 class LoginActionButton extends StatelessWidget {
   const LoginActionButton({
@@ -13,29 +14,10 @@ class LoginActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 64,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF339395),
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-        ),
-        child: Text(
-          label.toUpperCase(),
-          textAlign: TextAlign.center,
-          style: GoogleFonts.andika(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ),
+    return AuthActionButton(
+      label: label,
+      onPressed: onPressed,
+      uppercase: true,
     );
   }
 }

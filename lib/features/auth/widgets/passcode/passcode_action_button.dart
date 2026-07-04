@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/features/auth/widgets/shared/auth_action_button.dart';
 
 class PasscodeActionButton extends StatelessWidget {
   const PasscodeActionButton({
@@ -15,54 +16,11 @@ class PasscodeActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 230,
-        height: 58,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF38898D),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            disabledBackgroundColor: const Color(0xFFB5BFC2),
-            disabledForegroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          child: isBusy
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.4,
-                    color: Colors.white,
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          label,
-                          maxLines: 1,
-                          style: GoogleFonts.andika(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            height: 1.1,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ),
+    return AuthActionButton(
+      label: label,
+      onPressed: onPressed,
+      layout: AuthActionButtonLayout.compact,
+      isBusy: isBusy,
     );
   }
 }
