@@ -1,7 +1,9 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'package:flutter/material.dart';
 
-class _GradeBackground extends StatelessWidget {
-  const _GradeBackground();
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+
+class GradeBackground extends StatelessWidget {
+  const GradeBackground({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +12,11 @@ class _GradeBackground extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [_gradeMint, Color(0xFFD8EBD8), _gradeMint],
+          colors: [
+            GradeSelectionStyle.mint,
+            Color(0xFFD8EBD8),
+            GradeSelectionStyle.mint,
+          ],
           stops: [0, 0.80, 1],
         ),
       ),

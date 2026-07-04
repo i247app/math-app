@@ -1,7 +1,9 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'package:flutter/material.dart';
 
-class _GradeSkeletonCard extends StatelessWidget {
-  const _GradeSkeletonCard({required this.scale});
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+
+class GradeSkeletonCard extends StatelessWidget {
+  const GradeSkeletonCard({super.key, required this.scale});
 
   final double scale;
 
@@ -25,7 +27,7 @@ class _GradeSkeletonCard extends StatelessWidget {
             width: 35 * scale,
             height: 35 * scale,
             decoration: BoxDecoration(
-              color: _gradeTeal.withValues(alpha: 0.08),
+              color: GradeSelectionStyle.teal.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
           ),
@@ -34,7 +36,7 @@ class _GradeSkeletonCard extends StatelessWidget {
             width: 72 * scale,
             height: 15 * scale,
             decoration: BoxDecoration(
-              color: _gradeInk.withValues(alpha: 0.08),
+              color: GradeSelectionStyle.ink.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(999),
             ),
           ),

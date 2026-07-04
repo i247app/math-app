@@ -1,7 +1,16 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'package:flutter/material.dart';
 
-class _GradeGrid extends StatelessWidget {
-  const _GradeGrid({
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/grade_models.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_card.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_load_error.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_load_state.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
+
+class GradeGrid extends StatelessWidget {
+  const GradeGrid({
+    super.key,
     required this.scale,
     required this.grades,
     required this.selectedGradeLabel,
@@ -16,17 +25,17 @@ class _GradeGrid extends StatelessWidget {
   final String? selectedGradeLabel;
   final bool isLoading;
   final String? errorMessage;
-  final ValueChanged<_GradeOption> onSelected;
+  final ValueChanged<GradeOption> onSelected;
   final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return _GradeLoadState(scale: scale);
+      return GradeLoadState(scale: scale);
     }
 
     if (errorMessage != null) {
-      return _GradeLoadError(
+      return GradeLoadError(
         scale: scale,
         message: errorMessage!,
         onRetry: onRetry,
@@ -39,12 +48,12 @@ class _GradeGrid extends StatelessWidget {
               final label = grade.label?.trim();
               return label != null && label.isNotEmpty;
             })
-            .map(_GradeOption.fromGradeModel)
+            .map(GradeOption.fromGradeModel)
             .toList()
           ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
     if (items.isEmpty) {
-      return _GradeLoadError(
+      return GradeLoadError(
         scale: scale,
         message: context.getText(AppKeys.noGrades),
         onRetry: onRetry,
@@ -63,7 +72,7 @@ class _GradeGrid extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final option = items[index];
-        return _GradeCard(
+        return GradeCard(
           option: option,
           scale: scale,
           isSelected: option.label == selectedGradeLabel,

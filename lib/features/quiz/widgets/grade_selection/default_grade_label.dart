@@ -1,6 +1,6 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'package:numi_flutter/core/network/grade_models.dart';
 
-String? _defaultGradeLabel(
+String? defaultGradeLabel(
   List<GradeModel> grades, {
   int? preferredGradeId,
   String? preferredGradeLabel,

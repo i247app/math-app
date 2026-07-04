@@ -1,7 +1,14 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'dart:ui';
 
-class _GradeHeader extends StatelessWidget {
-  const _GradeHeader({required this.scale});
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+
+class GradeHeader extends StatelessWidget {
+  const GradeHeader({super.key, required this.scale});
 
   final double scale;
 
@@ -13,7 +20,7 @@ class _GradeHeader extends StatelessWidget {
         child: Container(
           height: 70 * scale,
           padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-          color: _gradeMint.withValues(alpha: 0.78),
+          color: GradeSelectionStyle.mint.withValues(alpha: 0.78),
           alignment: Alignment.centerLeft,
           child: IconButton(
             onPressed: () {
@@ -23,7 +30,7 @@ class _GradeHeader extends StatelessWidget {
             },
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: _gradeTeal,
+              color: GradeSelectionStyle.teal,
               size: 28 * scale,
             ),
             padding: EdgeInsets.zero,

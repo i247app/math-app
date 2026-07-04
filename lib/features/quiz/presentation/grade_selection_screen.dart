@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,33 +8,19 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/quiz/ai_shake_service.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/assessment_screen.dart';
-
-part '../widgets/grade_selection/grade_failure_notice.dart';
-part '../widgets/grade_selection/grade_background.dart';
-part '../widgets/grade_selection/grade_header.dart';
-part '../widgets/grade_selection/grade_grid.dart';
-part '../widgets/grade_selection/grade_load_state.dart';
-part '../widgets/grade_selection/grade_skeleton_card.dart';
-part '../widgets/grade_selection/grade_load_error.dart';
-part '../widgets/grade_selection/grade_card.dart';
-part '../widgets/grade_selection/grade_badge.dart';
-part '../widgets/grade_selection/grade_bottom_bar.dart';
-part '../widgets/grade_selection/pill_action_button.dart';
-part '../widgets/grade_selection/grade_option.dart';
-part '../widgets/grade_selection/grade_number_from_label.dart';
-part '../widgets/grade_selection/default_grade_label.dart';
-
-const _gradeMint = Color(0xFFEBFAEC);
-const _gradeTeal = Color(0xFF006762);
-const _gradeInk = Color(0xFF253228);
-const _gradePeach = Color(0xFFFFDCCA);
-const _gradeRust = Color(0xFFA03A0F);
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/default_grade_label.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_background.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_bottom_bar.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_failure_notice.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_grid.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_header.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
 
 class GradeSelectionScreen extends StatefulWidget {
   const GradeSelectionScreen({
@@ -177,14 +162,14 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     if (widget.quizPurpose == quizPurposeAssessment) {
       return null;
     }
-    return _defaultGradeLabel(
+    return defaultGradeLabel(
       grades,
       preferredGradeId: widget.initialGradeId,
       preferredGradeLabel: widget.initialGradeLabel,
     );
   }
 
-  void selectGrade(_GradeOption option) {
+  void selectGrade(GradeOption option) {
     HapticFeedback.selectionClick();
     setState(() => selectedGradeLabel = option.label);
   }
@@ -204,7 +189,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: _gradeMint,
+        backgroundColor: GradeSelectionStyle.mint,
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -223,7 +208,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                   height: height,
                   child: Stack(
                     children: [
-                      const Positioned.fill(child: _GradeBackground()),
+                      const Positioned.fill(child: GradeBackground()),
                       Positioned.fill(
                         child: SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
@@ -242,7 +227,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color: _gradeInk,
+                                  color: GradeSelectionStyle.ink,
                                   fontSize: s(31),
                                   fontWeight: FontWeight.w900,
                                   height: 1.08,
@@ -257,14 +242,12 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                                           'generate-failed-notice',
                                         ),
                                         padding: EdgeInsets.only(top: s(18)),
-                                        child: _GradeFailureNotice(
-                                          scale: scale,
-                                        ),
+                                        child: GradeFailureNotice(scale: scale),
                                       )
                                     : const SizedBox.shrink(),
                               ),
                               SizedBox(height: s(26)),
-                              _GradeGrid(
+                              GradeGrid(
                                 scale: scale,
                                 grades: grades,
                                 selectedGradeLabel: selectedGradeLabel,
@@ -281,13 +264,13 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                         left: 0,
                         right: 0,
                         top: 0,
-                        child: _GradeHeader(scale: scale),
+                        child: GradeHeader(scale: scale),
                       ),
                       Positioned(
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        child: _GradeBottomBar(
+                        child: GradeBottomBar(
                           scale: scale,
                           onSkip: openAssessment,
                           onContinue: continueWithSelectedGrade,

@@ -1,7 +1,9 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'package:flutter/material.dart';
 
-class _GradeLoadState extends StatelessWidget {
-  const _GradeLoadState({required this.scale});
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_skeleton_card.dart';
+
+class GradeLoadState extends StatelessWidget {
+  const GradeLoadState({super.key, required this.scale});
 
   final double scale;
 
@@ -18,7 +20,7 @@ class _GradeLoadState extends StatelessWidget {
         childAspectRatio: 1.12,
       ),
       itemBuilder: (context, index) {
-        return _GradeSkeletonCard(scale: scale);
+        return GradeSkeletonCard(scale: scale);
       },
     );
   }

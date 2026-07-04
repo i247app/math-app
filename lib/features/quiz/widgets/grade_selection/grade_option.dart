@@ -1,12 +1,13 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'package:numi_flutter/core/network/grade_models.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_number_from_label.dart';
 
-class _GradeOption {
-  const _GradeOption(this.number, this.label, {this.displayOrder = 0});
+class GradeOption {
+  const GradeOption(this.number, this.label, {this.displayOrder = 0});
 
-  factory _GradeOption.fromGradeModel(GradeModel grade) {
+  factory GradeOption.fromGradeModel(GradeModel grade) {
     final label = grade.label?.trim() ?? '';
-    return _GradeOption(
-      _gradeNumberFromLabel(label),
+    return GradeOption(
+      gradeNumberFromLabel(label),
       label,
       displayOrder: grade.displayOrder ?? 0,
     );

@@ -1,7 +1,11 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'package:flutter/material.dart';
 
-class _GradeFailureNotice extends StatelessWidget {
-  const _GradeFailureNotice({required this.scale});
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+
+class GradeFailureNotice extends StatelessWidget {
+  const GradeFailureNotice({super.key, required this.scale});
 
   final double scale;
 
@@ -13,13 +17,19 @@ class _GradeFailureNotice extends StatelessWidget {
         vertical: 12 * scale,
       ),
       decoration: BoxDecoration(
-        color: _gradePeach.withValues(alpha: 0.84),
+        color: GradeSelectionStyle.peach.withValues(alpha: 0.84),
         borderRadius: BorderRadius.circular(20 * scale),
-        border: Border.all(color: _gradeRust.withValues(alpha: 0.10)),
+        border: Border.all(
+          color: GradeSelectionStyle.rust.withValues(alpha: 0.10),
+        ),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded, color: _gradeRust, size: 20 * scale),
+          Icon(
+            Icons.info_outline_rounded,
+            color: GradeSelectionStyle.rust,
+            size: 20 * scale,
+          ),
           SizedBox(width: 10 * scale),
           Expanded(
             child: Text(
@@ -27,7 +37,7 @@ class _GradeFailureNotice extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: _gradeRust,
+                color: GradeSelectionStyle.rust,
                 fontSize: 13 * scale,
                 fontWeight: FontWeight.w900,
                 height: 1.25,

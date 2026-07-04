@@ -1,14 +1,19 @@
-part of '../../presentation/grade_selection_screen.dart';
+import 'package:flutter/material.dart';
 
-class _GradeCard extends StatelessWidget {
-  const _GradeCard({
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_badge.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
+import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+
+class GradeCard extends StatelessWidget {
+  const GradeCard({
+    super.key,
     required this.option,
     required this.scale,
     required this.isSelected,
     required this.onSelected,
   });
 
-  final _GradeOption option;
+  final GradeOption option;
   final double scale;
   final bool isSelected;
   final VoidCallback onSelected;
@@ -39,13 +44,15 @@ class _GradeCard extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.92),
               borderRadius: BorderRadius.circular(28 * scale),
               border: Border.all(
-                color: isSelected ? _gradeTeal : Colors.transparent,
+                color: isSelected
+                    ? GradeSelectionStyle.teal
+                    : Colors.transparent,
                 width: 2 * scale,
               ),
               boxShadow: [
                 BoxShadow(
                   color: isSelected
-                      ? _gradeTeal.withValues(alpha: 0.16)
+                      ? GradeSelectionStyle.teal.withValues(alpha: 0.16)
                       : Colors.black.withValues(alpha: 0.03),
                   blurRadius: isSelected ? 16 * scale : 10 * scale,
                   offset: Offset(0, isSelected ? 7 * scale : 4 * scale),
@@ -55,7 +62,7 @@ class _GradeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _GradeBadge(
+                GradeBadge(
                   option: option,
                   scale: scale,
                   isSelected: isSelected,
@@ -68,7 +75,7 @@ class _GradeCard extends StatelessWidget {
                     option.label,
                     maxLines: 1,
                     style: TextStyle(
-                      color: _gradeInk,
+                      color: GradeSelectionStyle.ink,
                       fontSize: 17 * scale,
                       fontWeight: FontWeight.w900,
                       height: 1,
