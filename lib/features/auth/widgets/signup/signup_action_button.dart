@@ -15,36 +15,29 @@ class SignupActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final cleanLabel = label.replaceAll('→', '').trim();
 
-    return Center(
-      child: SizedBox(
-        width: 230,
-        height: 58,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF339395),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            disabledBackgroundColor: const Color(0xFFB5BFC2),
-            disabledForegroundColor: Colors.white,
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF078B83),
+          foregroundColor: Colors.white,
+          elevation: onPressed == null ? 0 : 10,
+          shadowColor: const Color(0xFF078B83).withValues(alpha: 0.22),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                cleanLabel,
-                style: GoogleFonts.andika(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_rounded, size: 24),
-            ],
+          disabledBackgroundColor: const Color(0xFFB5BFC2),
+          disabledForegroundColor: Colors.white,
+        ),
+        child: Text(
+          cleanLabel,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.andika(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0,
           ),
         ),
       ),

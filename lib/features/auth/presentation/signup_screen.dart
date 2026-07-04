@@ -150,7 +150,6 @@ class _SignupScreenState extends State<SignupScreen> {
     final width = MediaQuery.sizeOf(context).width;
     final compact = height < 760;
     final tight = width < 370;
-    final backgroundMascotSize = tight ? 460.0 : 540.0;
 
     final role = selectedRole;
     final gender = selectedGender;
@@ -183,202 +182,244 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Scaffold(
             backgroundColor: Colors.white,
             resizeToAvoidBottomInset: false,
-            body: Stack(
-              children: [
-                Positioned(
-                  right: -backgroundMascotSize * 0.36,
-                  bottom: -backgroundMascotSize * 0.24,
-                  child: IgnorePointer(
-                    child: Opacity(
-                      opacity: 0.16,
-                      child: Transform.rotate(
-                        angle: -0.6108652381980153,
-                        child: Image.asset(
-                          'assets/images/numi-mascot.png',
-                          width: backgroundMascotSize,
-                          height: backgroundMascotSize,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ),
+            body: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.viewInsetsOf(context).bottom,
                 ),
-                Positioned.fill(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.viewInsetsOf(context).bottom,
-                    ),
-                    child: ScreenFrame(
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 28),
-                          Row(
-                            children: [
-                              CircleIconButton(
-                                icon: Icons.arrow_back_rounded,
-                                onPressed: widget.onBack,
-                              ),
-                              Expanded(
-                                child: Center(
-                                  child: Text(
-                                    context.getText(AppKeys.signup),
-                                    style: GoogleFonts.andika(
-                                      color: const Color(0xFF339395),
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 52,
-                              ), // To balance the back button
-                            ],
-                          ),
-                          SizedBox(height: compact ? 32 : 40),
-                          // Inputs
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                child: ScreenFrame(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: compact ? 10 : 14),
+                      _SignupHeroBanner(
+                        title: context.getText(AppKeys.signup),
+                        titleFontSize: tight ? 30 : 34,
+                        onBack: widget.onBack,
+                      ),
+                      SizedBox(height: compact ? 6 : 8),
+                      _SignupSectionCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SignupFieldLabel(
+                              label: context.getText(AppKeys.signupRoleLabel),
+                              isRequired: true,
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
                               children: [
-                                SignupFieldLabel(
-                                  label: context.getText(
-                                    AppKeys.signupRoleLabel,
-                                  ),
-                                  isRequired: true,
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: SignupRoleCard(
-                                        label: context.getText(
-                                          AppKeys.signupRoleStudent,
-                                        ),
-                                        imagePath:
-                                            'assets/images/student-icon.png',
-                                        isSelected: role == _studentRole,
-                                        onTap: () => _selectRole(_studentRole),
-                                      ),
+                                Expanded(
+                                  child: SignupRoleCard(
+                                    label: context.getText(
+                                      AppKeys.signupRoleStudent,
                                     ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: SignupRoleCard(
-                                        label: context.getText(
-                                          AppKeys.signupRoleParent,
-                                        ),
-                                        imagePath:
-                                            'assets/images/parent-icon.png',
-                                        isSelected: role == _parentRole,
-                                        onTap: () => _selectRole(_parentRole),
-                                      ),
+                                    imagePath: 'assets/images/student-icon.png',
+                                    isSelected: role == _studentRole,
+                                    onTap: () => _selectRole(_studentRole),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: SignupRoleCard(
+                                    label: context.getText(
+                                      AppKeys.signupRoleParent,
                                     ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: SignupRoleCard(
-                                        label: context.getText(
-                                          AppKeys.signupRoleTeacher,
-                                        ),
-                                        imagePath:
-                                            'assets/images/teacher-icon.png',
-                                        isSelected: role == _teacherRole,
-                                        onTap: () => _selectRole(_teacherRole),
-                                      ),
+                                    imagePath: 'assets/images/parent-icon.png',
+                                    isSelected: role == _parentRole,
+                                    onTap: () => _selectRole(_parentRole),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: SignupRoleCard(
+                                    label: context.getText(
+                                      AppKeys.signupRoleTeacher,
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                SignupFieldLabel(
-                                  label: context.getText(
-                                    AppKeys.signupGenderLabel,
-                                  ),
-                                  isRequired: true,
-                                ),
-                                const SizedBox(height: 8),
-                                SignupGenderRadioGroup(
-                                  key: ValueKey(
-                                    'signup-gender-${role ?? 'none'}-${gender ?? 'none'}',
-                                  ),
-                                  value: gender,
-                                  hintText: context.getText(
-                                    role == null
-                                        ? AppKeys.signupGenderSelectRoleHint
-                                        : AppKeys.signupGenderHint,
-                                  ),
-                                  items: genderChoices,
-                                  onChanged: role == null
-                                      ? null
-                                      : (value) => setState(
-                                          () => selectedGender = value,
-                                        ),
-                                ),
-                                const SizedBox(height: 20),
-                                SignupFieldLabel(
-                                  label: context.getText(nameLabelKey),
-                                  isRequired: true,
-                                ),
-                                const SizedBox(height: 8),
-                                SignupTextField(
-                                  controller: usernameController,
-                                  hintText: context.getText(
-                                    AppKeys.signupNameHint,
-                                  ),
-                                  textInputAction: TextInputAction.next,
-                                  errorText: usernameErrorText,
-                                ),
-                                const SizedBox(height: 20),
-                                SignupFieldLabel(
-                                  label: context.getText(
-                                    AppKeys.signupEmailLabel,
+                                    imagePath: 'assets/images/teacher-icon.png',
+                                    isSelected: role == _teacherRole,
+                                    onTap: () => _selectRole(_teacherRole),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                SignupTextField(
-                                  controller: emailController,
-                                  hintText: context.getText(
-                                    AppKeys.signupEmailHint,
-                                  ),
-                                  keyboardType: TextInputType.emailAddress,
-                                  textInputAction: TextInputAction.done,
-                                ),
-                                SizedBox(height: compact ? 32 : 54),
-                                SignupActionButton(
-                                  label: widget.isSigningUp
-                                      ? context.getText(AppKeys.signingUp)
-                                      : context.getText(AppKeys.continueLabel),
-                                  onPressed:
-                                      (widget.isSigningUp || !isFormValid)
-                                      ? null
-                                      : () {
-                                          FocusManager.instance.primaryFocus
-                                              ?.unfocus();
-                                          widget.onContinue(
-                                            usernameController.text,
-                                            emailController.text,
-                                            role,
-                                          );
-                                        },
-                                ),
-                                const SizedBox(height: 32),
                               ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 14),
+                            SignupFieldLabel(
+                              label: context.getText(AppKeys.signupGenderLabel),
+                              isRequired: true,
+                            ),
+                            const SizedBox(height: 6),
+                            SignupGenderRadioGroup(
+                              key: ValueKey(
+                                'signup-gender-${role ?? 'none'}-${gender ?? 'none'}',
+                              ),
+                              value: gender,
+                              hintText: context.getText(
+                                role == null
+                                    ? AppKeys.signupGenderSelectRoleHint
+                                    : AppKeys.signupGenderHint,
+                              ),
+                              items: genderChoices,
+                              onChanged: role == null
+                                  ? null
+                                  : (value) =>
+                                        setState(() => selectedGender = value),
+                            ),
+                            const SizedBox(height: 16),
+                            SignupFieldLabel(
+                              label: context.getText(nameLabelKey),
+                              isRequired: true,
+                            ),
+                            const SizedBox(height: 6),
+                            SignupTextField(
+                              controller: usernameController,
+                              hintText: context.getText(AppKeys.signupNameHint),
+                              prefixIcon: Icons.person_outline_rounded,
+                              textInputAction: TextInputAction.next,
+                              errorText: usernameErrorText,
+                            ),
+                            const SizedBox(height: 16),
+                            SignupFieldLabel(
+                              label: context.getText(AppKeys.signupEmailLabel),
+                            ),
+                            const SizedBox(height: 6),
+                            SignupTextField(
+                              controller: emailController,
+                              hintText: context.getText(
+                                AppKeys.signupEmailHint,
+                              ),
+                              prefixIcon: Icons.mail_outline_rounded,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.done,
+                            ),
+                            SizedBox(height: compact ? 20 : 24),
+                            SignupActionButton(
+                              label: widget.isSigningUp
+                                  ? context.getText(AppKeys.signingUp)
+                                  : context.getText(AppKeys.continueLabel),
+                              onPressed: (widget.isSigningUp || !isFormValid)
+                                  ? null
+                                  : () {
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
+                                      widget.onContinue(
+                                        usernameController.text,
+                                        emailController.text,
+                                        role,
+                                      );
+                                    },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _SignupSectionCard extends StatelessWidget {
+  const _SignupSectionCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 9),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _SignupHeroBanner extends StatelessWidget {
+  const _SignupHeroBanner({
+    required this.title,
+    required this.titleFontSize,
+    required this.onBack,
+  });
+
+  final String title;
+  final double titleFontSize;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 136,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: -64,
+            right: -64,
+            top: -92,
+            height: 218,
+            child: IgnorePointer(
+              child: Image.asset(
+                'assets/images/signup_screen/clourd_background.png',
+                fit: BoxFit.cover,
+                alignment: Alignment.topRight,
+              ),
+            ),
+          ),
+          Positioned(
+            right: -18,
+            top: 8,
+            child: IgnorePointer(
+              child: Image.asset(
+                'assets/images/signup_screen/rocket_transparent.png',
+                width: 148,
+                height: 122,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            top: 0,
+            child: CircleIconButton(
+              icon: Icons.arrow_back_rounded,
+              onPressed: onBack,
+            ),
+          ),
+          Positioned(
+            left: 0,
+            top: 76,
+            child: Text(
+              title,
+              style: GoogleFonts.andika(
+                color: const Color(0xFF078B83),
+                fontSize: titleFontSize,
+                fontWeight: FontWeight.w700,
+                height: 1.05,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

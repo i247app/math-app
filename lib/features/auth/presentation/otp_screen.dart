@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/features/auth/widgets/otp/otp_card.dart';
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';

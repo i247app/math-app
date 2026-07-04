@@ -53,9 +53,9 @@ class _SignupGenderDisabledHint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 58,
+      height: 52,
       alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -65,7 +65,7 @@ class _SignupGenderDisabledHint extends StatelessWidget {
         hintText,
         style: GoogleFonts.andika(
           color: const Color(0xFF7E9088),
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: FontWeight.w400,
           letterSpacing: 0,
         ),
@@ -89,7 +89,7 @@ class _SignupGenderRadioItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final accentColor = const Color(0xFF339395);
     return SizedBox(
-      height: 58,
+      height: 53,
       child: Material(
         color: selected ? const Color(0xFFE8FAF8) : Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -99,7 +99,7 @@ class _SignupGenderRadioItem extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 160),
             curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
@@ -111,7 +111,7 @@ class _SignupGenderRadioItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _SignupGenderRadioMark(selected: selected),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Flexible(
                   child: Text(
                     label,
@@ -120,7 +120,7 @@ class _SignupGenderRadioItem extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
                       color: selected ? accentColor : AppColors.ink,
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0,
                     ),
@@ -145,8 +145,8 @@ class _SignupGenderRadioMark extends StatelessWidget {
     final accentColor = const Color(0xFF339395);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
-      width: 22,
-      height: 22,
+      width: 20,
+      height: 20,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: accentColor, width: selected ? 6 : 2),

@@ -8,6 +8,7 @@ class SignupTextField extends StatelessWidget {
     super.key,
     required this.controller,
     required this.hintText,
+    this.prefixIcon,
     this.keyboardType,
     this.textInputAction,
     this.errorText,
@@ -15,6 +16,7 @@ class SignupTextField extends StatelessWidget {
 
   final TextEditingController controller;
   final String hintText;
+  final IconData? prefixIcon;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final String? errorText;
@@ -25,7 +27,7 @@ class SignupTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 58,
+          height: 53,
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
@@ -37,12 +39,21 @@ class SignupTextField extends StatelessWidget {
               hintText: hintText,
               hintStyle: GoogleFonts.andika(
                 color: const Color(0xFF7E9088),
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w400,
               ),
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              prefixIcon: prefixIcon == null
+                  ? null
+                  : Icon(prefixIcon, color: const Color(0xFFA5B0B1), size: 22),
+              prefixIconConstraints: prefixIcon == null
+                  ? null
+                  : const BoxConstraints(minWidth: 46, minHeight: 53),
+              contentPadding: EdgeInsets.only(
+                left: prefixIcon == null ? 20 : 0,
+                right: 20,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: const BorderSide(
@@ -67,7 +78,7 @@ class SignupTextField extends StatelessWidget {
             ),
             style: GoogleFonts.andika(
               color: AppColors.ink,
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
           ),
