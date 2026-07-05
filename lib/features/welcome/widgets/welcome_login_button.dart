@@ -35,7 +35,7 @@ class WelcomeLoginButton extends StatelessWidget {
           child: Text(
             context.getText(labelKey),
             style: GoogleFonts.nunito(
-              color: WelcomeStyle.teal,
+              color: Colors.brown,
               fontSize: 18 * scale,
               fontWeight: FontWeight.w500,
               height: 1.2,
