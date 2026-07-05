@@ -1,10 +1,12 @@
-part of '../../history_tab.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/features/quiz/widgets/history_tab/history_date_value.dart';
+import 'package:numi_flutter/features/quiz/widgets/history_tab/history_homework_date_text.dart';
 
-int _historyCompareHomeworkDescending(
+int historyCompareHomeworkDescending(
   ClassroomExercise first,
   ClassroomExercise second,
 ) {
-  final firstDate = _historyDateValue(_historyHomeworkDateText(first));
-  final secondDate = _historyDateValue(_historyHomeworkDateText(second));
+  final firstDate = historyDateValue(historyHomeworkDateText(first));
+  final secondDate = historyDateValue(historyHomeworkDateText(second));
   return secondDate.compareTo(firstDate);
 }

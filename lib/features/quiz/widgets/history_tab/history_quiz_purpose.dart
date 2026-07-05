@@ -1,6 +1,6 @@
-part of '../../history_tab.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
 
-String _historyQuizPurpose(GeneratedQuiz quiz) {
+String historyQuizPurpose(GeneratedQuiz quiz) {
   final purpose = quiz.purpose?.trim();
   if (purpose != null && purpose.isNotEmpty) {
     return purpose.toUpperCase();

@@ -1,6 +1,6 @@
-part of '../../history_tab.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 
-bool _historyIsSubmittedHomework(ClassroomExercise exercise) {
+bool historyIsSubmittedHomework(ClassroomExercise exercise) {
   final purpose = exercise.purpose?.trim().toUpperCase();
   final isHomework =
       purpose == null ||

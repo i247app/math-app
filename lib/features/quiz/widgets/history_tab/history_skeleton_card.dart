@@ -18,7 +18,7 @@ class _HistorySkeletonCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: _cardBorder, width: 1.3 * scale),
+        border: Border.all(color: historyCardBorder, width: 1.3 * scale),
       ),
       child: Row(
         children: [

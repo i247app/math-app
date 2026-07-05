@@ -13,10 +13,13 @@ import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_summary.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/quiz/cache/quiz_cache.dart';
-import 'package:numi_flutter/features/quiz/cache/quiz_history_homework_cache.dart';
+import 'package:numi_flutter/features/quiz/controllers/history_controller.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi_flutter/features/quiz/widgets/history_tab/history_homework_date_text.dart';
+import 'package:numi_flutter/features/quiz/widgets/history_tab/history_metadata_int.dart';
+import 'package:numi_flutter/features/quiz/widgets/history_tab/history_quiz_purpose.dart';
+import 'package:numi_flutter/features/quiz/widgets/history_tab/history_style.dart';
 import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -26,8 +29,8 @@ part 'widgets/history_tab/history_filter.dart';
 part 'widgets/history_tab/history_type_tabs.dart';
 part 'widgets/history_tab/history_type_tab_button.dart';
 part 'widgets/history_tab/history_body.dart';
-part 'widgets/history_tab/history_open_quiz_review.dart';
-part 'widgets/history_tab/history_open_homework_result.dart';
+part 'widgets/history_detail/history_open_quiz_review.dart';
+part 'widgets/history_detail/history_open_homework_result.dart';
 part 'widgets/history_tab/history_quiz_card.dart';
 part 'widgets/history_tab/history_homework_card.dart';
 part 'widgets/history_tab/history_meta_row.dart';
@@ -46,28 +49,11 @@ part 'widgets/history_tab/history_quiz_title.dart';
 part 'widgets/history_tab/history_quiz_short_text.dart';
 part 'widgets/history_tab/history_homework_title.dart';
 part 'widgets/history_tab/history_homework_short_text.dart';
-part 'widgets/history_tab/history_homework_date_text.dart';
 part 'widgets/history_tab/history_homework_score_text.dart';
 part 'widgets/history_tab/history_homework_score_percentage.dart';
 part 'widgets/history_tab/history_score_colors.dart';
-part 'widgets/history_tab/history_quiz_purpose.dart';
-part 'widgets/history_tab/history_is_assessment_quiz.dart';
-part 'widgets/history_tab/history_is_submitted_homework.dart';
-part 'widgets/history_tab/history_compare_quiz_descending.dart';
-part 'widgets/history_tab/history_compare_homework_descending.dart';
-part 'widgets/history_tab/history_date_value.dart';
-part 'widgets/history_tab/history_metadata_int.dart';
 part 'widgets/history_tab/history_date_parts_from_iso.dart';
 part 'widgets/history_tab/history_two_digits.dart';
-
-const _teal = Color(0xFF006762);
-const _muted = Color(0xFF5D4A54);
-const _deepInk = Color(0xFF1F2B2B);
-const _navy = Color(0xFF083B78);
-const _orange = Color(0xFFDE8C4B);
-const _historyBackground = Color(0xFFEEF9FB);
-const _cardBorder = Color(0xFFE3DDDF);
-const _activeTab = Color(0xFFFF704D);
 
 class HistoryTab extends StatefulWidget {
   const HistoryTab({
@@ -98,23 +84,19 @@ class HistoryTab extends StatefulWidget {
 }
 
 class _HistoryTabState extends State<HistoryTab> {
-  late final QuizService _quizService = widget.quizService ?? QuizApi();
-  late final ClassroomService _classroomService = widget.classroomService;
-  late final ClassroomExerciseService _assignmentService =
-      widget.assignmentService;
+  late final HistoryController _controller;
   final TextEditingController _searchController = TextEditingController();
 
-  List<GeneratedQuiz> _assessmentQuizzes = const <GeneratedQuiz>[];
-  List<ClassroomExercise> _homeworkExercises = const <ClassroomExercise>[];
-  bool _isLoading = true;
-  String? _assessmentErrorMessage;
-  String? _homeworkErrorMessage;
-  int _loadRequestId = 0;
   _HistoryFilter _selectedFilter = _HistoryFilter.homework;
 
   @override
   void initState() {
     super.initState();
+    _controller = HistoryController(
+      quizService: widget.quizService ?? QuizApi(),
+      classroomService: widget.classroomService,
+      assignmentService: widget.assignmentService,
+    );
     _searchController.addListener(_refreshSearch);
     if (widget.isActive) {
       _loadHistory();
@@ -149,147 +131,18 @@ class _HistoryTabState extends State<HistoryTab> {
     _searchController
       ..removeListener(_refreshSearch)
       ..dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   Future<void> _loadHistory({bool forceRefresh = false}) async {
-    final requestId = ++_loadRequestId;
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
-    if (profileId == null) {
-      setState(() {
-        _isLoading = false;
-        _assessmentErrorMessage = context.readText(AppKeys.noAccountForHistory);
-        _homeworkErrorMessage = _assessmentErrorMessage;
-        _assessmentQuizzes = const <GeneratedQuiz>[];
-        _homeworkExercises = const <ClassroomExercise>[];
-      });
-      return;
-    }
-
-    final cachedQuizzes = QuizCache.peekList(profileId: profileId);
-    final cachedHomework = QuizHistoryHomeworkCache.peekSubmittedHomework(
-      profileId,
-    );
-    final hasCachedData = cachedQuizzes != null || cachedHomework != null;
-    if (hasCachedData) {
-      setState(() {
-        if (cachedQuizzes != null) {
-          _assessmentQuizzes =
-              cachedQuizzes
-                  .where(_historyIsAssessmentQuiz)
-                  .toList(growable: false)
-                ..sort(_historyCompareQuizDescending);
-          _assessmentErrorMessage = null;
-        }
-        if (cachedHomework != null) {
-          _homeworkExercises =
-              cachedHomework
-                  .where(_historyIsSubmittedHomework)
-                  .toList(growable: false)
-                ..sort(_historyCompareHomeworkDescending);
-          _homeworkErrorMessage = null;
-        }
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _isLoading = true;
-        _assessmentErrorMessage = null;
-        _homeworkErrorMessage = null;
-      });
-    }
-
-    final shouldRefresh =
-        forceRefresh ||
-        !QuizCache.isListFresh(profileId: profileId) ||
-        !QuizHistoryHomeworkCache.isFresh(profileId);
-    if (!shouldRefresh) {
-      return;
-    }
-
-    final historyLoadFailedMessage = context.readText(
-      AppKeys.historyLoadFailed,
-    );
-    final homeworkLoadFailedMessage = context.readText(
-      AppKeys.studentHomeworkLoadFailed,
-    );
-    var assessmentQuizzes = const <GeneratedQuiz>[];
-    var homeworkExercises = const <ClassroomExercise>[];
-    String? assessmentError;
-    String? homeworkError;
-
-    await Future.wait<void>([
-      QuizCache.loadList(
-            service: _quizService,
-            profileId: profileId,
-            forceRefresh: forceRefresh || cachedQuizzes != null,
-          )
-          .then((quizzes) {
-            assessmentQuizzes =
-                quizzes.where(_historyIsAssessmentQuiz).toList(growable: false)
-                  ..sort(_historyCompareQuizDescending);
-          })
-          .catchError((Object error) {
-            assessmentError = _assessmentHistoryErrorMessage(
-              error,
-              historyLoadFailedMessage,
-            );
-          }),
-      _loadSubmittedHomework(
-            profileId,
-            forceRefresh: forceRefresh || cachedHomework != null,
-          )
-          .then((exercises) {
-            homeworkExercises = exercises;
-          })
-          .catchError((Object error) {
-            homeworkError = _homeworkHistoryErrorMessage(
-              error,
-              homeworkLoadFailedMessage,
-            );
-          }),
-    ]);
-
-    if (!mounted || requestId != _loadRequestId) {
-      return;
-    }
-    setState(() {
-      _assessmentQuizzes = assessmentQuizzes;
-      _homeworkExercises = homeworkExercises;
-      _assessmentErrorMessage = assessmentError;
-      _homeworkErrorMessage = homeworkError;
-      _isLoading = false;
-    });
-  }
-
-  Future<List<ClassroomExercise>> _loadSubmittedHomework(
-    int profileId, {
-    bool forceRefresh = false,
-  }) async {
-    final exercises = await QuizHistoryHomeworkCache.loadSubmittedHomework(
-      classroomService: _classroomService,
-      assignmentService: _assignmentService,
+    return _controller.loadHistory(
       profileId: profileId,
       forceRefresh: forceRefresh,
     );
-    return exercises.where(_historyIsSubmittedHomework).toList(growable: false)
-      ..sort(_historyCompareHomeworkDescending);
-  }
-
-  String _assessmentHistoryErrorMessage(Object error, String fallbackMessage) {
-    return error is QuizException ? error.message : fallbackMessage;
-  }
-
-  String _homeworkHistoryErrorMessage(Object error, String fallbackMessage) {
-    if (error is ClassroomException) {
-      return error.message;
-    }
-    if (error is ClassroomExerciseException) {
-      return error.message;
-    }
-    return fallbackMessage;
   }
 
   void _refreshSearch() {
@@ -298,7 +151,7 @@ class _HistoryTabState extends State<HistoryTab> {
 
   List<GeneratedQuiz> get _filteredQuizzes {
     final query = _searchController.text.trim().toLowerCase();
-    return _assessmentQuizzes.where((quiz) {
+    return _controller.assessmentQuizzes.where((quiz) {
       if (query.isEmpty) {
         return true;
       }
@@ -319,7 +172,7 @@ class _HistoryTabState extends State<HistoryTab> {
 
   List<ClassroomExercise> get _filteredHomeworkExercises {
     final query = _searchController.text.trim().toLowerCase();
-    return _homeworkExercises.where((exercise) {
+    return _controller.homeworkExercises.where((exercise) {
       if (query.isEmpty) {
         return true;
       }
@@ -350,58 +203,65 @@ class _HistoryTabState extends State<HistoryTab> {
   Widget build(BuildContext context) {
     final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
-    final quizzes = _filteredQuizzes;
-    final homeworkExercises = _filteredHomeworkExercises;
-    final selectedItemsCount = _selectedFilter == _HistoryFilter.homework
-        ? homeworkExercises.length
-        : quizzes.length;
-    final selectedErrorMessage = _selectedFilter == _HistoryFilter.homework
-        ? _homeworkErrorMessage
-        : _assessmentErrorMessage;
 
     return ColoredBox(
-      color: _historyBackground,
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: EdgeInsets.only(bottom: widget.bottomPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _HistoryHeader(scale: scale, topInset: topInset),
-            SizedBox(height: 12 * scale),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-              child: _HistorySearchField(
-                controller: _searchController,
-                scale: scale,
-              ),
+      color: historyBackground,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final quizzes = _filteredQuizzes;
+          final homeworkExercises = _filteredHomeworkExercises;
+          final selectedItemsCount = _selectedFilter == _HistoryFilter.homework
+              ? homeworkExercises.length
+              : quizzes.length;
+          final selectedErrorMessage =
+              _selectedFilter == _HistoryFilter.homework
+              ? _controller.homeworkErrorMessage
+              : _controller.assessmentErrorMessage;
+
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.only(bottom: widget.bottomPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _HistoryHeader(scale: scale, topInset: topInset),
+                SizedBox(height: 12 * scale),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20 * scale),
+                  child: _HistorySearchField(
+                    controller: _searchController,
+                    scale: scale,
+                  ),
+                ),
+                SizedBox(height: 12 * scale),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20 * scale),
+                  child: _HistoryTypeTabs(
+                    selectedFilter: _selectedFilter,
+                    onSelected: _selectFilter,
+                    scale: scale,
+                  ),
+                ),
+                SizedBox(height: 12 * scale),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20 * scale),
+                  child: _HistoryBody(
+                    isLoading: _controller.isLoading,
+                    errorMessage: selectedErrorMessage,
+                    selectedFilter: _selectedFilter,
+                    selectedItemsCount: selectedItemsCount,
+                    quizzes: quizzes,
+                    homeworkExercises: homeworkExercises,
+                    onRetry: () => _loadHistory(forceRefresh: true),
+                    scale: scale,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 12 * scale),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-              child: _HistoryTypeTabs(
-                selectedFilter: _selectedFilter,
-                onSelected: _selectFilter,
-                scale: scale,
-              ),
-            ),
-            SizedBox(height: 12 * scale),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-              child: _HistoryBody(
-                isLoading: _isLoading,
-                errorMessage: selectedErrorMessage,
-                selectedFilter: _selectedFilter,
-                selectedItemsCount: selectedItemsCount,
-                quizzes: quizzes,
-                homeworkExercises: homeworkExercises,
-                onRetry: () => _loadHistory(forceRefresh: true),
-                scale: scale,
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

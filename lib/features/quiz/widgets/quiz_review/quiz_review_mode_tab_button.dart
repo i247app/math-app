@@ -40,7 +40,7 @@ class _QuizReviewModeTabButton extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: selected ? _teal : _deepInk,
+              color: selected ? quizReviewTeal : quizReviewDeepInk,
               fontSize: 14,
               fontWeight: FontWeight.w900,
               height: 1,

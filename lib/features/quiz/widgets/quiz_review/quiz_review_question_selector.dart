@@ -33,13 +33,13 @@ class _QuizReviewQuestionSelector extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: selected ? _teal : Colors.white,
+                    color: selected ? quizReviewTeal : Colors.white,
                     shape: BoxShape.circle,
-                    border: Border.all(color: _teal, width: 1.2),
+                    border: Border.all(color: quizReviewTeal, width: 1.2),
                   ),
                   child: _QuizReviewCenteredText(
                     '${index + 1}',
-                    color: selected ? Colors.white : _teal,
+                    color: selected ? Colors.white : quizReviewTeal,
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
                   ),

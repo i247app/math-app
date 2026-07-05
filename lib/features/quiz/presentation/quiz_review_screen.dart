@@ -7,6 +7,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/features/quiz/controllers/quiz_review_controller.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
+import 'package:numi_flutter/features/quiz/widgets/quiz_review/quiz_review_style.dart';
 
 part '../widgets/quiz_review/quiz_review_header.dart';
 part '../widgets/quiz_review/quiz_review_content.dart';
@@ -41,18 +42,6 @@ part '../widgets/quiz_review/quiz_review_computed_correct_count.dart';
 part '../widgets/quiz_review/quiz_review_time_label.dart';
 part '../widgets/quiz_review/quiz_review_question_font_size.dart';
 part '../widgets/quiz_review/quiz_review_two_digits.dart';
-
-const _reviewBackground = Color(0xFFEEF9FB);
-const _teal = Color(0xFF007A78);
-const _tealSoft = Color(0xFFC8FBF1);
-const _tealLight = Color(0xFFEFFFFC);
-const _navy = Color(0xFF063A7B);
-const _green = Color(0xFF12B8A7);
-const _red = Color(0xFFD71920);
-const _redSoft = Color(0xFFFFF5F6);
-const _orange = Color(0xFFFF6A1A);
-const _deepInk = Color(0xFF1F2B2B);
-const _cardBorder = Color(0xFFDCE8EA);
 
 class QuizReviewScreen extends StatefulWidget {
   const QuizReviewScreen({super.key, required this.quizId, this.initialQuiz});
@@ -116,7 +105,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _reviewBackground,
+      backgroundColor: quizReviewBackground,
       body: SafeArea(
         bottom: false,
         child: Column(

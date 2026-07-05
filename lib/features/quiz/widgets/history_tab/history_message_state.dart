@@ -24,17 +24,17 @@ class _HistoryMessageState extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: _cardBorder),
+        border: Border.all(color: historyCardBorder),
       ),
       child: Column(
         children: [
-          Icon(icon, color: _teal, size: 42 * scale),
+          Icon(icon, color: historyTeal, size: 42 * scale),
           SizedBox(height: 14 * scale),
           Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: _deepInk,
+              color: historyDeepInk,
               fontSize: FontSize.large * scale,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
@@ -45,7 +45,7 @@ class _HistoryMessageState extends StatelessWidget {
             subtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: _muted,
+              color: historyMuted,
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -59,7 +59,7 @@ class _HistoryMessageState extends StatelessWidget {
               child: Text(
                 actionLabel!,
                 style: TextStyle(
-                  color: _teal,
+                  color: historyTeal,
                   fontSize: FontSize.caption * scale,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0,

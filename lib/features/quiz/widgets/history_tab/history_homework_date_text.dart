@@ -1,6 +1,6 @@
-part of '../../history_tab.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 
-String _historyHomeworkDateText(ClassroomExercise exercise) {
+String historyHomeworkDateText(ClassroomExercise exercise) {
   final values = <String?>[
     exercise.modifyDt,
     exercise.createDt,

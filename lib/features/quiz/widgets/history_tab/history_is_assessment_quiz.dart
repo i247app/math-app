@@ -1,5 +1,6 @@
-part of '../../history_tab.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/features/quiz/widgets/history_tab/history_quiz_purpose.dart';
 
-bool _historyIsAssessmentQuiz(GeneratedQuiz quiz) {
-  return _historyQuizPurpose(quiz) == 'ASSESSMENT';
+bool historyIsAssessmentQuiz(GeneratedQuiz quiz) {
+  return historyQuizPurpose(quiz) == 'ASSESSMENT';
 }

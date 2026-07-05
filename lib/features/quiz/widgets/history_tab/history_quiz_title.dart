@@ -7,7 +7,7 @@ String _historyQuizTitle(BuildContext context, GeneratedQuiz quiz) {
 
   final grade = quiz.grading?.aiDetectGrade?.trim();
   final suffix = grade != null && grade.isNotEmpty ? ' $grade' : '';
-  final type = _historyQuizPurpose(quiz);
+  final type = historyQuizPurpose(quiz);
 
   if (type == 'ASSESSMENT') {
     return '${context.getText(AppKeys.mathAssessment)}$suffix';

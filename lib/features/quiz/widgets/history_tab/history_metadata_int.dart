@@ -1,6 +1,4 @@
-part of '../../history_tab.dart';
-
-int? _historyMetadataInt(Map<String, dynamic> metadata, List<String> keys) {
+int? historyMetadataInt(Map<String, dynamic> metadata, List<String> keys) {
   for (final key in keys) {
     final value = metadata[key];
     if (value is int) {

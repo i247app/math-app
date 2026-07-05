@@ -13,7 +13,7 @@ class _HistorySearchField extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30 * scale),
-        border: Border.all(color: _cardBorder),
+        border: Border.all(color: historyCardBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.10),
@@ -27,7 +27,7 @@ class _HistorySearchField extends StatelessWidget {
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         textInputAction: TextInputAction.search,
         style: TextStyle(
-          color: _deepInk,
+          color: historyDeepInk,
           fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w800,
           letterSpacing: 0,
@@ -42,11 +42,19 @@ class _HistorySearchField extends StatelessWidget {
           ),
           prefixIcon: Padding(
             padding: EdgeInsets.only(left: 14 * scale, right: 6 * scale),
-            child: Icon(Icons.search_rounded, color: _navy, size: 22 * scale),
+            child: Icon(
+              Icons.search_rounded,
+              color: historyNavy,
+              size: 22 * scale,
+            ),
           ),
           suffixIcon: IconButton(
             onPressed: HapticFeedback.selectionClick,
-            icon: Icon(Icons.tune_rounded, color: _navy, size: 22 * scale),
+            icon: Icon(
+              Icons.tune_rounded,
+              color: historyNavy,
+              size: 22 * scale,
+            ),
           ),
           border: InputBorder.none,
           isCollapsed: true,

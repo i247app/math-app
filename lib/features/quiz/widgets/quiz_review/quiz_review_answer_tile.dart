@@ -24,18 +24,18 @@ class _QuizReviewAnswerTile extends StatelessWidget {
     final isWrongSelected = hasSelection && isSelected && !isCorrect;
     final isRevealedCorrect = isCorrect && (isSelected || showCorrectAnswer);
     final borderColor = isWrongSelected
-        ? _red
+        ? quizReviewRed
         : isRevealedCorrect
-        ? _teal
-        : _cardBorder;
+        ? quizReviewTeal
+        : quizReviewCardBorder;
     final background = isWrongSelected
-        ? _redSoft
+        ? quizReviewRedSoft
         : isRevealedCorrect
-        ? _tealLight
+        ? quizReviewTealLight
         : Colors.white;
     final foreground = isWrongSelected || isRevealedCorrect
-        ? (isWrongSelected ? _red : _teal)
-        : _deepInk;
+        ? (isWrongSelected ? quizReviewRed : quizReviewTeal)
+        : quizReviewDeepInk;
 
     return Material(
       color: Colors.transparent,
@@ -58,9 +58,9 @@ class _QuizReviewAnswerTile extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   color: isWrongSelected
-                      ? _red
+                      ? quizReviewRed
                       : isRevealedCorrect
-                      ? _green
+                      ? quizReviewGreen
                       : Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -73,7 +73,7 @@ class _QuizReviewAnswerTile extends StatelessWidget {
                   label,
                   color: isWrongSelected || isRevealedCorrect
                       ? Colors.white
-                      : _deepInk,
+                      : quizReviewDeepInk,
                   fontSize: 13,
                   fontWeight: FontWeight.w900,
                   verticalOffset: 1.2,
@@ -100,7 +100,7 @@ class _QuizReviewAnswerTile extends StatelessWidget {
                   width: 20,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: isWrongSelected ? _red : _teal,
+                    color: isWrongSelected ? quizReviewRed : quizReviewTeal,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

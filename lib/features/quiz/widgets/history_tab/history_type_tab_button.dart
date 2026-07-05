@@ -25,7 +25,7 @@ class _HistoryTypeTabButton extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? _activeTab : Colors.transparent,
+            color: selected ? historyActiveTab : Colors.transparent,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
@@ -33,7 +33,7 @@ class _HistoryTypeTabButton extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: selected ? Colors.white : _muted,
+              color: selected ? Colors.white : historyMuted,
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w500,
               height: 1,

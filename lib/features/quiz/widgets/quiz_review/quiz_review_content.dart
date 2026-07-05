@@ -45,7 +45,7 @@ class _QuizReviewContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (isLoading) const LinearProgressIndicator(color: _navy),
+          if (isLoading) const LinearProgressIndicator(color: quizReviewNavy),
           if (errorMessage != null && errorMessage!.isNotEmpty) ...[
             _QuizReviewInlineError(message: errorMessage!, onRetry: onRetry),
             const SizedBox(height: 10),

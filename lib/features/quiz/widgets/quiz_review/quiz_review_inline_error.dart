@@ -15,7 +15,10 @@ class _QuizReviewInlineError extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: _red, fontWeight: FontWeight.w800),
+              style: const TextStyle(
+                color: quizReviewRed,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           TextButton(

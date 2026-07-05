@@ -13,7 +13,7 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final correctLabel = _quizReviewCorrectAnswerLabel(question);
     final isCorrect = selectedLabel != null && selectedLabel == correctLabel;
-    final accent = isCorrect ? _teal : _red;
+    final accent = isCorrect ? quizReviewTeal : quizReviewRed;
 
     return Container(
       clipBehavior: Clip.antiAlias,
@@ -44,9 +44,9 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
                         _QuizReviewQuestionBadge(
                           number: question.questionNumber,
                           color: isCorrect
-                              ? _tealSoft
+                              ? quizReviewTealSoft
                               : const Color(0xFFFFD9DC),
-                          textColor: isCorrect ? _teal : _red,
+                          textColor: isCorrect ? quizReviewTeal : quizReviewRed,
                         ),
                         const Spacer(),
                         _QuizReviewQuestionStatus(isCorrect: isCorrect),
@@ -58,7 +58,7 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: _deepInk,
+                        color: quizReviewDeepInk,
                         fontSize: 23,
                         fontWeight: FontWeight.w900,
                         height: 1.15,

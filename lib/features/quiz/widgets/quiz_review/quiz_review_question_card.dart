@@ -27,8 +27,8 @@ class _QuizReviewQuestionCard extends StatelessWidget {
             alignment: Alignment.topLeft,
             child: _QuizReviewQuestionBadge(
               number: question.questionNumber,
-              color: _tealSoft,
-              textColor: _teal,
+              color: quizReviewTealSoft,
+              textColor: quizReviewTeal,
             ),
           ),
           Center(

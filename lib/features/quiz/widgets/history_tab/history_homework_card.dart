@@ -15,7 +15,7 @@ class _HistoryHomeworkCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scorePercent = _historyHomeworkScorePercentage(exercise);
     final dateParts = _historyDatePartsFromIso(
-      _historyHomeworkDateText(exercise),
+      historyHomeworkDateText(exercise),
     );
     final radius = BorderRadius.circular(24 * scale);
 
@@ -36,7 +36,7 @@ class _HistoryHomeworkCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: radius,
-            border: Border.all(color: _cardBorder, width: 1.3 * scale),
+            border: Border.all(color: historyCardBorder, width: 1.3 * scale),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.07),
@@ -69,7 +69,7 @@ class _HistoryHomeworkCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: _deepInk,
+                        color: historyDeepInk,
                         fontSize: FontSize.normal * scale,
                         fontWeight: FontWeight.w800,
                         height: 1.28,
@@ -84,7 +84,7 @@ class _HistoryHomeworkCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: _muted,
+                          color: historyMuted,
                           fontSize: FontSize.small * scale,
                           fontWeight: FontWeight.w500,
                           height: 1.22,
@@ -95,7 +95,11 @@ class _HistoryHomeworkCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: _navy, size: 26 * scale),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: historyNavy,
+                size: 26 * scale,
+              ),
             ],
           ),
         ),
