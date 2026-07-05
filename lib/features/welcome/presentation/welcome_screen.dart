@@ -5,9 +5,14 @@ import 'package:numi_flutter/features/welcome/widgets/welcome_composition.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({super.key, required this.onStart});
+  const WelcomeScreen({
+    super.key,
+    required this.onStart,
+    required this.onLogin,
+  });
 
   final VoidCallback onStart;
+  final VoidCallback onLogin;
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
@@ -78,7 +83,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               return SizedBox(
                 width: constraints.maxWidth,
                 height: constraints.maxHeight,
-                child: WelcomeComposition(onStart: widget.onStart),
+                child: WelcomeComposition(
+                  onStart: widget.onStart,
+                  onLogin: widget.onLogin,
+                ),
               );
             },
           ),
