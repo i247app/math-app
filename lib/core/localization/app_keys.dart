@@ -25,6 +25,7 @@ class AppKeys {
   static const welcomeSubtitlePrefix = 'welcome_subtitle_prefix';
   static const welcomeSubtitle = 'welcome_subtitle';
   static const start = 'start';
+  static const welcomeLogin = 'login';
 
   static const phoneLoginTitle = 'phone_login_title';
   static const phoneLoginBrandName = 'phone_login_brand_name';

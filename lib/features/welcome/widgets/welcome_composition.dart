@@ -1,13 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
+import 'package:numi_flutter/features/welcome/widgets/welcome_login_button.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
 
@@ -44,8 +42,8 @@ class WelcomeComposition extends StatelessWidget {
           compact ? s(30) : s(48),
         );
         final buttonHeight = s(58);
-        final loginButtonHeight = buttonHeight;
-        final buttonGap = s(10);
+        final loginButtonHeight = s(34);
+        final buttonGap = s(12);
         final startButtonBottom = buttonBottom + loginButtonHeight + buttonGap;
         final bottomArtHeight = math.min(s(375), height * 0.5);
         final mascotSize = math.min(
@@ -85,7 +83,6 @@ class WelcomeComposition extends StatelessWidget {
                     onStart: onStart,
                     scale: scale,
                     labelKey: AppKeys.start,
-                    showArrow: false,
                   ),
                 ),
               ),
@@ -99,7 +96,11 @@ class WelcomeComposition extends StatelessWidget {
                 child: SizedBox(
                   width: s(230),
                   height: loginButtonHeight,
-                  child: _WelcomeLoginButton(onLogin: onLogin, scale: scale),
+                  child: WelcomeLoginButton(
+                    onLogin: onLogin,
+                    scale: scale,
+                    labelKey: AppKeys.welcomeLogin,
+                  ),
                 ),
               ),
             ),
@@ -153,41 +154,6 @@ class WelcomeComposition extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-class _WelcomeLoginButton extends StatelessWidget {
-  const _WelcomeLoginButton({required this.onLogin, required this.scale});
-
-  final VoidCallback onLogin;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(20 * scale);
-
-    return Material(
-      color: WelcomeStyle.teal,
-      borderRadius: radius,
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          onLogin();
-        },
-        borderRadius: radius,
-        child: Center(
-          child: Text(
-            context.getText(AppKeys.login).toUpperCase(),
-            style: GoogleFonts.nunito(
-              color: Colors.white,
-              fontSize: 18 * scale,
-              fontWeight: FontWeight.w900,
-              height: 1.2,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

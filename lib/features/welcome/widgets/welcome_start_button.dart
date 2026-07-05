@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
@@ -13,13 +12,11 @@ class WelcomeStartButton extends StatelessWidget {
     required this.onStart,
     required this.scale,
     this.labelKey = AppKeys.continueLabel,
-    this.showArrow = true,
   });
 
   final VoidCallback onStart;
   final double scale;
   final String labelKey;
-  final bool showArrow;
 
   @override
   Widget build(BuildContext context) {
@@ -46,14 +43,6 @@ class WelcomeStartButton extends StatelessWidget {
                 height: 1.2,
               ),
             ),
-            if (showArrow) ...[
-              SizedBox(width: 9 * scale),
-              SvgPicture.asset(
-                'assets/images/welcome_screen/welcome_arrow_right.svg',
-                width: 16 * scale,
-                height: 16 * scale,
-              ),
-            ],
           ],
         ),
       ),

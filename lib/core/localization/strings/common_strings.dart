@@ -26,6 +26,7 @@ const commonStrings = <String, Map<String, String>>{
     AppKeys.welcomeTitleN: 'NUMI',
     AppKeys.welcomeSubtitlePrefix: 'Hãy cùng Numi',
     AppKeys.welcomeSubtitle: 'trở thành "phù thủy" tính toán nhé!',
+    AppKeys.welcomeLogin: 'Đăng Nhập',
     AppKeys.start: 'BẮT ĐẦU',
     AppKeys.continueLabel: 'Tiếp tục',
     AppKeys.avatarUpper: 'ẢNH ĐẠI DIỆN',
