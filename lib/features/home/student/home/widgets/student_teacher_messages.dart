@@ -8,7 +8,7 @@ class _StudentTeacherMessages extends StatelessWidget {
   Widget build(BuildContext context) {
     const messages = <_StudentTeacherMessageData>[
       _StudentTeacherMessageData(
-        avatarAsset: _homeTeacherAvatarOne,
+        avatarAsset: homeTeacherAvatarOneAsset,
         teacherKey: AppKeys.homeMessageTeacherOne,
         classKey: AppKeys.homeMessageClassOne,
         timeKey: AppKeys.homeMessageTimeOne,
@@ -18,7 +18,7 @@ class _StudentTeacherMessages extends StatelessWidget {
         badgeColor: Color(0xFFF1C6DB),
       ),
       _StudentTeacherMessageData(
-        avatarAsset: _homeTeacherAvatarTwo,
+        avatarAsset: homeTeacherAvatarTwoAsset,
         teacherKey: AppKeys.homeMessageTeacherTwo,
         classKey: AppKeys.homeMessageClassTwo,
         timeKey: AppKeys.homeMessageTimeTwo,

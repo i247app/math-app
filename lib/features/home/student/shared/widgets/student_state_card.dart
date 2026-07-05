@@ -28,7 +28,10 @@ class _StudentStateCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             clipBehavior: Clip.antiAlias,
-            child: Image.asset(_studentParentHomeClassThumb, fit: BoxFit.cover),
+            child: Image.asset(
+              studentParentHomeClassThumbAsset,
+              fit: BoxFit.cover,
+            ),
           ),
           const SizedBox(height: 12),
           Text(

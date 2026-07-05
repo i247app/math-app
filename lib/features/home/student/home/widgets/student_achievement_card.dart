@@ -30,12 +30,12 @@ class _StudentAchievementCard extends StatelessWidget {
             width: 64 * scale,
             height: 64 * scale,
             decoration: BoxDecoration(
-              color: _teal.withValues(alpha: 0.10),
+              color: homeTeal.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(28 * scale),
             ),
             child: Icon(
               Icons.auto_awesome_rounded,
-              color: _teal,
+              color: homeTeal,
               size: 28 * scale,
             ),
           ),
@@ -50,7 +50,7 @@ class _StudentAchievementCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: _deepInk,
+                    color: homeDeepInk,
                     fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.12,
@@ -83,7 +83,7 @@ class _StudentAchievementCard extends StatelessWidget {
             ),
             child: Icon(
               Icons.chevron_right_rounded,
-              color: _teal,
+              color: homeTeal,
               size: 24 * scale,
             ),
           ),

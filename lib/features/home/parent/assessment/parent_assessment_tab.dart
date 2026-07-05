@@ -321,7 +321,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
 
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: _homeFadeInDuration,
+      duration: homeFadeInDuration,
       curve: Curves.easeOut,
       onEnd: _markInitialEntrancePlayed,
       builder: (context, value, animatedChild) {

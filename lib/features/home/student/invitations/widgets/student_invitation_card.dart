@@ -51,7 +51,11 @@ class _StudentInvitationCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    SvgPicture.asset(_studentHomeInvite, width: 36, height: 32),
+                    SvgPicture.asset(
+                      studentHomeInviteAsset,
+                      width: 36,
+                      height: 32,
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -96,7 +100,7 @@ class _StudentInvitationCard extends StatelessWidget {
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(
-                          color: _teal,
+                          color: homeTeal,
                           strokeWidth: 2,
                         ),
                       ),
@@ -170,7 +174,10 @@ class _StudentInvitationCard extends StatelessWidget {
               child: SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(color: _teal, strokeWidth: 2),
+                child: CircularProgressIndicator(
+                  color: homeTeal,
+                  strokeWidth: 2,
+                ),
               ),
             ),
           )
@@ -179,13 +186,13 @@ class _StudentInvitationCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               _StudentInviteIconButton(
-                asset: _studentParentHomeAcceptIcon,
+                asset: studentParentHomeAcceptIconAsset,
                 label: context.getText(AppKeys.accept),
                 onTap: onAccept,
               ),
               const SizedBox(width: 8),
               _StudentInviteIconButton(
-                asset: _studentParentHomeRejectIcon,
+                asset: studentParentHomeRejectIconAsset,
                 label: context.getText(AppKeys.reject),
                 onTap: onReject,
               ),

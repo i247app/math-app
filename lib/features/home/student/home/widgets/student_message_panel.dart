@@ -36,17 +36,17 @@ class _StudentMessagePanel extends StatelessWidget {
             width: 58 * scale,
             height: 58 * scale,
             decoration: BoxDecoration(
-              color: _teal.withValues(alpha: 0.10),
+              color: homeTeal.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(24 * scale),
             ),
-            child: Icon(icon, color: _teal, size: 28 * scale),
+            child: Icon(icon, color: homeTeal, size: 28 * scale),
           ),
           SizedBox(height: 14 * scale),
           Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: _deepInk,
+              color: homeDeepInk,
               fontSize: FontSize.normal * scale,
               fontWeight: FontWeight.w900,
               height: 1.15,

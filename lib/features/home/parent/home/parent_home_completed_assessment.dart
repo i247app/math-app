@@ -8,7 +8,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
         _completedAssessmentFadeIn(
           order: 1,
           child: HomeImageAction(
-            asset: _parentHomeAfterReviewBanner,
+            asset: parentHomeAfterReviewBannerAsset,
             height: 214,
             onTap: widget.args.onOpenPracticeTab,
           ),
@@ -23,13 +23,13 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
                 child: Column(
                   children: [
                     HomeImageAction(
-                      asset: _parentHomeRace,
+                      asset: parentHomeRaceAsset,
                       height: 83,
                       onTap: widget.args.onOpenPracticeTab,
                     ),
                     const SizedBox(height: 7),
                     HomeImageAction(
-                      asset: _parentHomeShop,
+                      asset: parentHomeShopAsset,
                       height: 83,
                       onTap: widget.args.onOpenPracticeTab,
                     ),
@@ -39,7 +39,7 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
               const SizedBox(width: 10),
               Expanded(
                 child: HomeImageAction(
-                  asset: _parentHomeClassroom,
+                  asset: parentHomeClassroomAsset,
                   height: 173,
                   onTap: _showClassroomMessage,
                 ),

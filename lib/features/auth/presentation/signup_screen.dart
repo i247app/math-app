@@ -6,6 +6,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/auth/auth_cubit.dart';
 import 'package:numi_flutter/features/auth/auth_state.dart';
+import 'package:numi_flutter/features/auth/helpers/auth_error_helpers.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_action_button.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_field_label.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_gender_choice.dart';
@@ -49,15 +50,6 @@ class _SignupScreenState extends State<SignupScreen> {
   static final RegExp _signupNamePattern = RegExp(
     r'^[A-Za-z0-9À-ÖØ-öø-ỹ]+(?: +[A-Za-z0-9À-ÖØ-öø-ỹ]+)*$',
   );
-
-  static bool _isUsernameExistsError(String? message) {
-    final normalized = message?.toLowerCase().trim();
-    if (normalized == null || normalized.isEmpty) {
-      return false;
-    }
-
-    return normalized.contains('username already exists');
-  }
 
   static bool _isValidSignupName(String value) {
     final normalized = value.trim();
@@ -174,7 +166,9 @@ class _SignupScreenState extends State<SignupScreen> {
             : null;
         final usernameErrorText =
             localUsernameErrorText ??
-            (_isUsernameExistsError(state.authError) ? state.authError : null);
+            (isSignupUsernameExistsError(state.authError)
+                ? context.getText(AppKeys.signupUsernameExists)
+                : null);
 
         return GestureDetector(
           behavior: HitTestBehavior.translucent,

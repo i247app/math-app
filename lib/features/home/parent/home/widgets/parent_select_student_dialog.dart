@@ -51,7 +51,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                       ),
                     ),
                     Image.asset(
-                      _parentNoStudentMascot,
+                      parentNoStudentMascotAsset,
                       width: 176,
                       height: 158,
                       fit: BoxFit.contain,

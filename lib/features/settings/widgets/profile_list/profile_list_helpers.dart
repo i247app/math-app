@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi_flutter/features/profile/models/profile_role.dart';
 
 String settingsProfileName(BuildContext context, StudentProfile profile) {
@@ -34,9 +35,5 @@ String settingsProfileSchool(BuildContext context, StudentProfile profile) {
 }
 
 String localizedProfileRole(BuildContext context, ProfileRole role) {
-  return switch (role) {
-    ProfileRole.teacher => context.getText(AppKeys.roleTeacher),
-    ProfileRole.parent => context.getText(AppKeys.roleParent),
-    ProfileRole.student => context.getText(AppKeys.roleStudent),
-  };
+  return localizedProfileRoleLabel(context, role);
 }

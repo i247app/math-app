@@ -36,10 +36,14 @@ class _StudentClassroomCard extends StatelessWidget {
             width: 56 * scale,
             height: 56 * scale,
             decoration: BoxDecoration(
-              color: _teal.withValues(alpha: 0.10),
+              color: homeTeal.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(22 * scale),
             ),
-            child: Icon(Icons.school_rounded, color: _teal, size: 27 * scale),
+            child: Icon(
+              Icons.school_rounded,
+              color: homeTeal,
+              size: 27 * scale,
+            ),
           ),
           SizedBox(width: 15 * scale),
           Expanded(
@@ -51,7 +55,7 @@ class _StudentClassroomCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: _deepInk,
+                    color: homeDeepInk,
                     fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.1,
@@ -79,7 +83,7 @@ class _StudentClassroomCard extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10 * scale),
-          Icon(Icons.chevron_right_rounded, color: _teal, size: 26 * scale),
+          Icon(Icons.chevron_right_rounded, color: homeTeal, size: 26 * scale),
         ],
       ),
     );

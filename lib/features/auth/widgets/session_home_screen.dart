@@ -12,14 +12,20 @@ import 'package:numi_flutter/features/session/presentation/bloc/app_session_stat
 class SessionHomeScreen extends StatelessWidget {
   const SessionHomeScreen({super.key});
 
+  static bool _shouldRebuildHome(
+    AppSessionState previous,
+    AppSessionState current,
+  ) {
+    return previous.user != current.user ||
+        previous.profiles != current.profiles ||
+        previous.activeProfile != current.activeProfile ||
+        previous.profileLoadError != current.profileLoadError;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppSessionCubit, AppSessionState>(
-      buildWhen: (previous, current) =>
-          previous.user != current.user ||
-          previous.profiles != current.profiles ||
-          previous.activeProfile != current.activeProfile ||
-          previous.profileLoadError != current.profileLoadError,
+      buildWhen: _shouldRebuildHome,
       builder: (context, session) {
         final onboarding = context.read<AuthCubit>();
         return HomeScreen(

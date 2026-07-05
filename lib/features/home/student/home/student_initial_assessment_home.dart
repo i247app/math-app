@@ -19,7 +19,7 @@ extension _StudentInitialAssessmentHomeView on _StudentHomeContentState {
             children: [
               Expanded(
                 child: HomeImageAction(
-                  asset: _parentHomeAfterReviewBanner,
+                  asset: parentHomeAfterReviewBannerAsset,
                   height: 160,
                   alignment: Alignment.centerLeft,
                   onTap: widget.onOpenPracticeTab,
@@ -28,7 +28,7 @@ extension _StudentInitialAssessmentHomeView on _StudentHomeContentState {
               const SizedBox(width: 10),
               Expanded(
                 child: HomeImageAction(
-                  asset: _parentHomeClassroom,
+                  asset: parentHomeClassroomAsset,
                   height: 160,
                   onTap: widget.activeRole == ProfileRole.student
                       ? widget.onOpenClassroomTab

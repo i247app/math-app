@@ -156,7 +156,7 @@ class _StudentInvitationListScreenState
           top: false,
           child: RefreshIndicator(
             onRefresh: _loadInvitations,
-            color: _teal,
+            color: homeTeal,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
@@ -167,7 +167,7 @@ class _StudentInvitationListScreenState
                   const Padding(
                     padding: EdgeInsets.only(top: 120),
                     child: Center(
-                      child: CircularProgressIndicator(color: _teal),
+                      child: CircularProgressIndicator(color: homeTeal),
                     ),
                   )
                 else if (_error != null && _invitations.isEmpty)

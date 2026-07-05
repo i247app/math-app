@@ -17,6 +17,7 @@ import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
@@ -44,6 +45,7 @@ import 'package:numi_flutter/features/home/widgets/home_missing_student_dialog.d
 import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
 import 'package:numi_flutter/features/home/widgets/home_start_guide_card.dart';
 import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 import 'package:numi_flutter/features/games/presentation/games_tab.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
@@ -55,6 +57,8 @@ import 'package:numi_flutter/features/homework/student_homework_open_guard.dart'
 import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
 import 'package:numi_flutter/features/quiz/history_tab.dart';
 import 'package:numi_flutter/features/practice/practice_tab.dart';
+import 'package:numi_flutter/features/settings/helpers/setting_page_builders.dart';
+import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
 import 'package:numi_flutter/features/settings/setting_tab.dart';
 import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
@@ -182,28 +186,6 @@ part 'student/shared/widgets/student_state_card.dart';
 part 'widgets/home_assessment_result_card.dart';
 part 'widgets/home_role_dashboard.dart';
 
-const _teal = Color(0xFF006762);
-const _muted = Color(0xFF515F54);
-const _deepInk = Color(0xFF253228);
-const _studentHomeInvite = 'assets/images/student_home_invite.svg';
-const _parentHomeAfterReviewBanner =
-    'assets/images/parent_banner_after_review.jpg';
-const _parentHomeClassroom = 'assets/images/join_classroom.jpg';
-const _parentHomeRace = 'assets/images/parent_home_race.png';
-const _parentHomeShop = 'assets/images/parent_home_shop.png';
-const _studentParentHomeClassThumb =
-    'assets/images/student_parent_home_class_thumb.png';
-const _studentParentHomeAcceptIcon =
-    'assets/images/student_parent_home_accept.png';
-const _studentParentHomeRejectIcon =
-    'assets/images/student_parent_home_reject.png';
-const _studentParentHomeJoinIcon =
-    'assets/images/student_parent_home_join_icon.svg';
-const _parentNoStudentMascot = 'assets/images/parent_no_student_mascot.png';
-const _homeTeacherAvatarOne = 'assets/images/student_home_avatar.png';
-const _homeTeacherAvatarTwo = 'assets/images/student_class_teacher.png';
-const _homeFadeInDuration = Duration(milliseconds: 900);
-
 enum _HomeTabDestination {
   home,
   classroom,
@@ -280,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _parentHomeEntranceController = AnimationController(
       vsync: this,
-      duration: _homeFadeInDuration,
+      duration: homeFadeInDuration,
     );
     if (widget.activeRole == ProfileRole.parent) {
       _parentHomeEntranceController.forward();
@@ -640,11 +622,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (name != null && name.isNotEmpty) {
       return name;
     }
-    return switch (role) {
-      ProfileRole.parent => context.getText(AppKeys.roleParent),
-      ProfileRole.teacher => context.getText(AppKeys.roleTeacher),
-      ProfileRole.student => context.getText(AppKeys.roleStudent),
-    };
+    return localizedProfileRoleLabel(context, role);
   }
 
   Future<void> _openTeacherProfileForm() async {
@@ -663,20 +641,22 @@ class _HomeScreenState extends State<HomeScreen>
         builder: (routeContext) => Material(
           color: Colors.white,
           child: SafeArea(
-            child: SettingTab.page(
-              user: widget.user,
-              profiles: widget.profiles,
-              activeProfile: widget.activeProfile,
-              profileLoadError: widget.profileLoadError,
-              onLogout: widget.onLogout,
-              onActivateProfile: widget.onActivateProfile,
-              onRefreshProfiles: widget.onRefreshProfiles,
-              onProfileSaved: () => Navigator.of(routeContext).pop(true),
-              bottomPadding: 0,
-              scale: scale,
+            child: buildPushedSettingPage(
+              context: routeContext,
+              args: SettingScreenArgs(
+                user: widget.user,
+                profiles: widget.profiles,
+                activeProfile: widget.activeProfile,
+                profileLoadError: widget.profileLoadError,
+                onLogout: widget.onLogout,
+                onActivateProfile: widget.onActivateProfile,
+                onRefreshProfiles: widget.onRefreshProfiles,
+                onProfileSaved: () => Navigator.of(routeContext).pop(true),
+                scale: scale,
+              ),
               initialView: SettingPageView.addProfile,
               initialEditingProfile: profile,
-              isPushedPage: true,
+              onProfileSaved: () => Navigator.of(routeContext).pop(true),
             ),
           ),
         ),

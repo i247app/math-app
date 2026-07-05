@@ -36,7 +36,7 @@ class _StudentHomeTabButton extends StatelessWidget {
                 label,
                 maxLines: 1,
                 style: TextStyle(
-                  color: selected ? Colors.white : _muted,
+                  color: selected ? Colors.white : homeMuted,
                   fontSize: FontSize.caption * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,

@@ -166,7 +166,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                     maintainState: true,
                     child: RefreshIndicator(
                       onRefresh: _refreshClassrooms,
-                      color: _teal,
+                      color: homeTeal,
                       child: ListView(
                         physics: const AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics(),
@@ -217,7 +217,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                                 context.getText(AppKeys.loading),
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.andika(
-                                  color: _muted,
+                                  color: homeMuted,
                                   fontSize: FontSize.caption * scale,
                                   fontWeight: FontWeight.w700,
                                 ),

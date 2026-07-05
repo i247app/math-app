@@ -17,7 +17,7 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
             children: [
               Expanded(
                 child: HomeImageAction(
-                  asset: _parentHomeAfterReviewBanner,
+                  asset: parentHomeAfterReviewBannerAsset,
                   height: 160,
                   alignment: Alignment.centerLeft,
                   onTap: widget.args.onOpenPracticeTab,
@@ -26,7 +26,7 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
               const SizedBox(width: 10),
               Expanded(
                 child: HomeImageAction(
-                  asset: _parentHomeClassroom,
+                  asset: parentHomeClassroomAsset,
                   height: 160,
                   onTap: _showClassroomMessage,
                 ),

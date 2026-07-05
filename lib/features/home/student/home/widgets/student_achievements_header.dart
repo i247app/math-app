@@ -19,7 +19,7 @@ class _StudentAchievementsHeader extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: _deepInk,
+                  color: homeDeepInk,
                   fontSize: FontSize.large * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
@@ -43,7 +43,7 @@ class _StudentAchievementsHeader extends StatelessWidget {
           child: Text(
             context.getText(AppKeys.viewAllUpper),
             style: TextStyle(
-              color: _teal,
+              color: homeTeal,
               fontSize: FontSize.caption * 0.85 * scale,
               fontWeight: FontWeight.w900,
               height: 1,

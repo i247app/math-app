@@ -27,7 +27,9 @@ class _ParentTeacherMessageItem extends StatelessWidget {
         children: [
           ClipOval(
             child: Image.asset(
-              index.isEven ? _homeTeacherAvatarOne : _homeTeacherAvatarTwo,
+              index.isEven
+                  ? homeTeacherAvatarOneAsset
+                  : homeTeacherAvatarTwoAsset,
               width: 46,
               height: 46,
               fit: BoxFit.cover,

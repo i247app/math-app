@@ -33,7 +33,7 @@ class _ParentPracticeTabBanner extends StatelessWidget {
               }
               return TweenAnimationBuilder<double>(
                 tween: Tween<double>(begin: 0, end: 1),
-                duration: _homeFadeInDuration,
+                duration: homeFadeInDuration,
                 curve: Curves.easeOut,
                 builder: (context, value, animatedChild) =>
                     Opacity(opacity: value, child: animatedChild),

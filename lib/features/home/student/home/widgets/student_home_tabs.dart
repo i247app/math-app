@@ -47,11 +47,11 @@ class _StudentHomeTabs extends StatelessWidget {
                   width: tabWidth,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: _teal,
+                      color: homeTeal,
                       borderRadius: BorderRadius.circular(20 * scale),
                       boxShadow: [
                         BoxShadow(
-                          color: _teal.withValues(alpha: 0.18),
+                          color: homeTeal.withValues(alpha: 0.18),
                           blurRadius: 12 * scale,
                           offset: Offset(0, 6 * scale),
                         ),

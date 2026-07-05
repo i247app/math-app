@@ -7,6 +7,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/utils/phone_number_validator.dart';
 import 'package:numi_flutter/features/auth/auth_cubit.dart';
 import 'package:numi_flutter/features/auth/auth_state.dart';
+import 'package:numi_flutter/features/auth/helpers/auth_error_helpers.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
 import 'package:numi_flutter/features/auth/presentation/login_screen.dart';
 import 'package:numi_flutter/features/auth/presentation/otp_screen.dart';
@@ -41,12 +42,7 @@ class OnboardingScreenSwitcher extends StatelessWidget {
       return false;
     }
 
-    final normalized = state.authError?.toLowerCase().trim();
-    if (normalized == null || normalized.isEmpty) {
-      return false;
-    }
-
-    return normalized.contains('username already exists');
+    return isSignupUsernameExistsError(state.authError);
   }
 
   @override
@@ -78,9 +74,9 @@ class OnboardingScreenSwitcher extends StatelessWidget {
         if (authError != null &&
             state.screen != AppScreen.otp &&
             !_isInlineSignupUsernameError(state)) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(authError)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(localizedAuthError(context, authError))),
+          );
         }
       },
       builder: (context, state) {
