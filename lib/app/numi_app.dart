@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,13 +9,23 @@ import '../core/localization/app_keys.dart';
 import '../core/localization/lingo_provider.dart';
 import '../core/localization/lingo_scope.dart';
 import '../core/theme/app_colors.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/auth/auth_flow.dart';
+import 'package:numi_flutter/features/auth/auth_state.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 
 class NumiApp extends StatefulWidget {
-  const NumiApp({super.key, this.authService});
+  const NumiApp({
+    super.key,
+    this.authService,
+    this.lingoProvider,
+    this.initialAuthState,
+    this.restoreSessionOnStart = false,
+  });
 
   final OtpAuthService? authService;
+  final LingoProvider? lingoProvider;
+  final AuthState? initialAuthState;
+  final bool restoreSessionOnStart;
 
   static void restart(BuildContext context) {
     final element = context
@@ -29,13 +41,16 @@ class NumiApp extends StatefulWidget {
 
 class _NumiAppState extends State<NumiApp> {
   late LingoProvider _lingoProvider;
-  late Future<void> _languageInit;
+  AuthState? _startupAuthState;
+  late bool _restoreSessionOnNextHome;
   int _restartSeed = 0;
 
   @override
   void initState() {
     super.initState();
-    _createLingoProvider();
+    _startupAuthState = widget.initialAuthState;
+    _restoreSessionOnNextHome = widget.restoreSessionOnStart;
+    _createLingoProvider(widget.lingoProvider);
   }
 
   @override
@@ -44,15 +59,27 @@ class _NumiAppState extends State<NumiApp> {
     super.dispose();
   }
 
-  void _createLingoProvider() {
-    _lingoProvider = LingoProvider();
-    _languageInit = _lingoProvider.initialize();
+  void _createLingoProvider([LingoProvider? provider]) {
+    _lingoProvider = provider ?? LingoProvider();
+    if (provider == null) {
+      unawaited(_initializeLingoProvider(_lingoProvider));
+    }
+  }
+
+  Future<void> _initializeLingoProvider(LingoProvider provider) async {
+    try {
+      await provider.initialize();
+    } catch (_) {
+      // Default Vietnamese strings are already loaded in memory.
+    }
   }
 
   void _restartApp() {
     final oldProvider = _lingoProvider;
     setState(() {
       _restartSeed++;
+      _startupAuthState = null;
+      _restoreSessionOnNextHome = true;
       _createLingoProvider();
     });
     oldProvider.dispose();
@@ -64,27 +91,22 @@ class _NumiAppState extends State<NumiApp> {
       restart: _restartApp,
       child: LingoScope(
         lingo: _lingoProvider,
-        child: FutureBuilder<void>(
-          future: _languageInit,
-          builder: (context, snapshot) {
-            return MaterialApp(
-              key: ValueKey(_restartSeed),
-              debugShowCheckedModeBanner: false,
-              title: context.getText(AppKeys.appName),
-              theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: AppColors.teal),
-                scaffoldBackgroundColor: AppColors.mintMist,
-                textTheme: GoogleFonts.andikaTextTheme(),
-                useMaterial3: true,
-              ),
-              navigatorObservers: [_KeyboardDismissNavigatorObserver()],
-              home: snapshot.connectionState == ConnectionState.done
-                  ? NumiHome(authService: widget.authService)
-                  : const Scaffold(
-                      body: Center(child: CircularProgressIndicator()),
-                    ),
-            );
-          },
+        child: MaterialApp(
+          key: ValueKey(_restartSeed),
+          debugShowCheckedModeBanner: false,
+          onGenerateTitle: (context) => context.getText(AppKeys.appName),
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.teal),
+            scaffoldBackgroundColor: AppColors.mintMist,
+            textTheme: GoogleFonts.andikaTextTheme(),
+            useMaterial3: true,
+          ),
+          navigatorObservers: [_KeyboardDismissNavigatorObserver()],
+          home: NumiHome(
+            authService: widget.authService,
+            initialAuthState: _startupAuthState,
+            restoreSessionOnStart: _restoreSessionOnNextHome,
+          ),
         ),
       ),
     );

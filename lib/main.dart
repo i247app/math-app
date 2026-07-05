@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'app/numi_app.dart';
-import 'core/config/api_config.dart';
-import 'core/network/api_metadata.dart';
+import 'app/startup_bootstrap.dart';
 
 export 'app/numi_app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await ApiConfig.load();
-  await AppApiMetadataProvider.instance.loadClientInfo();
-  runApp(const NumiApp());
+  final startup = await const StartupBootstrap().run();
+  runApp(
+    NumiApp(
+      lingoProvider: startup.lingoProvider,
+      authService: startup.authService,
+      initialAuthState: startup.initialAuthState,
+      restoreSessionOnStart: false,
+    ),
+  );
 }

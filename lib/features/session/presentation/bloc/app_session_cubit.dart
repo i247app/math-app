@@ -5,7 +5,8 @@ import 'package:numi_flutter/features/profile/services/active_profile_session.da
 import 'package:numi_flutter/features/session/presentation/bloc/app_session_state.dart';
 
 class AppSessionCubit extends Cubit<AppSessionState> {
-  AppSessionCubit() : super(const AppSessionState());
+  AppSessionCubit([AppSessionState? initialState])
+    : super(initialState ?? const AppSessionState());
 
   void sync({
     required LoginUser? user,

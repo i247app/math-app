@@ -24,6 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
     AuthProfileResolver? profileResolver,
     PasscodeService passcodeService = const SecurePasscodeService(),
+    AuthState? initialState,
   }) : _avatarPicker = avatarPicker,
        _authService = authService ?? OtpAuthApi(),
        _profileResolver =
@@ -33,7 +34,7 @@ class AuthCubit extends Cubit<AuthState> {
              activeProfileSession: activeProfileSession,
            ),
        _passcodeService = passcodeService,
-       super(const AuthState());
+       super(initialState ?? const AuthState());
 
   final AvatarPickerService _avatarPicker;
   final OtpAuthService _authService;

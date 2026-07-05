@@ -14,11 +14,19 @@ import 'package:numi_flutter/features/auth/auth_cubit.dart';
 import 'package:numi_flutter/features/auth/auth_state.dart';
 import 'package:numi_flutter/features/auth/widgets/app_background.dart';
 import 'package:numi_flutter/features/auth/widgets/onboarding_screen_switcher.dart';
+import 'package:numi_flutter/features/session/presentation/bloc/app_session_state.dart';
 
 class NumiHome extends StatefulWidget {
-  const NumiHome({super.key, this.authService});
+  const NumiHome({
+    super.key,
+    this.authService,
+    this.initialAuthState,
+    this.restoreSessionOnStart = true,
+  });
 
   final OtpAuthService? authService;
+  final AuthState? initialAuthState;
+  final bool restoreSessionOnStart;
 
   @override
   State<NumiHome> createState() => _NumiHomeState();
@@ -129,15 +137,24 @@ class _NumiHomeState extends State<NumiHome> {
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (_) => AppSessionCubit()),
+          BlocProvider(create: (_) => AppSessionCubit(_initialSessionState())),
           BlocProvider(
             create: (context) => ClassroomCubit(
               classroomService: context.read<ClassroomService>(),
             ),
           ),
           BlocProvider(
-            create: (_) =>
-                AuthCubit(authService: widget.authService)..restoreSession(),
+            create: (_) {
+              final cubit = AuthCubit(
+                authService: widget.authService,
+                initialState: widget.initialAuthState,
+              );
+              if (widget.restoreSessionOnStart &&
+                  widget.initialAuthState == null) {
+                cubit.restoreSession();
+              }
+              return cubit;
+            },
           ),
         ],
         child: BlocListener<AuthCubit, AuthState>(
@@ -200,6 +217,20 @@ class _NumiHomeState extends State<NumiHome> {
           ),
         ),
       ),
+    );
+  }
+
+  AppSessionState? _initialSessionState() {
+    final state = widget.initialAuthState;
+    if (state == null || state.loginUser == null) {
+      return null;
+    }
+
+    return AppSessionState(
+      user: state.loginUser,
+      profiles: state.profiles,
+      activeProfile: state.activeProfile,
+      profileLoadError: state.profileLoadError,
     );
   }
 }
