@@ -75,21 +75,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           bottom: false,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: SizedBox(
-                        width: constraints.maxWidth,
-                        height: constraints.maxHeight,
-                        child: WelcomeComposition(onStart: widget.onStart),
-                      ),
-                    ),
-                  ),
-                ),
+              return SizedBox(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight,
+                child: WelcomeComposition(onStart: widget.onStart),
               );
             },
           ),

@@ -28,8 +28,19 @@ class WelcomeComposition extends StatelessWidget {
         final scale = math.min(width / _designWidth, height / _designHeight);
         final contentWidth = math.min(width, _designWidth * scale);
         final compact = height < 720;
+        final bottomSafe = MediaQuery.paddingOf(context).bottom;
 
         double s(double value) => value * scale;
+        final buttonBottom = math.max(
+          bottomSafe + s(24),
+          compact ? s(30) : s(48),
+        );
+        final buttonHeight = s(58);
+        final bottomArtHeight = math.min(s(375), height * 0.5);
+        final mascotSize = math.min(
+          s(compact ? 236 : 284),
+          math.max(s(176), height - buttonBottom - buttonHeight - s(236)),
+        );
 
         return Stack(
           clipBehavior: Clip.hardEdge,
@@ -41,61 +52,70 @@ class WelcomeComposition extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              height: s(375),
+              height: bottomArtHeight,
               child: IgnorePointer(
                 child: _WelcomeBottomArt(
-                  scale: scale,
+                  scale: bottomArtHeight / 375,
                   wavesAsset: _wavesAsset,
                   booksAsset: _booksAsset,
                 ),
               ),
             ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: buttonBottom,
+              child: Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: s(230),
+                  height: buttonHeight,
+                  child: WelcomeStartButton(
+                    onStart: onStart,
+                    scale: scale,
+                    labelKey: AppKeys.start,
+                    showArrow: false,
+                  ),
+                ),
+              ),
+            ),
             Align(
               alignment: Alignment.topCenter,
-              child: SizedBox(
-                width: contentWidth,
-                height: height,
-                child: Column(
-                  children: [
-                    SizedBox(height: compact ? s(44) : s(70)),
-                    SizedBox(
-                      width: s(compact ? 252 : 284),
-                      height: s(compact ? 252 : 284),
-                      child: Image.asset(_mascotAsset, fit: BoxFit.contain),
-                    ),
-                    SizedBox(height: compact ? s(4) : s(2)),
-                    SizedBox(
-                      width: s(211),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.center,
-                        child: NumiBrandText(fontSize: s(40)),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: contentWidth),
+                child: SizedBox(
+                  width: contentWidth,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: compact ? s(28) : s(58)),
+                      SizedBox(
+                        width: mascotSize,
+                        height: mascotSize,
+                        child: Image.asset(_mascotAsset, fit: BoxFit.contain),
                       ),
-                    ),
-                    SizedBox(height: s(8)),
-                    _WelcomeTagline(scale: scale),
-                    SizedBox(height: s(11)),
-                    Container(
-                      width: s(48),
-                      height: s(6),
-                      decoration: BoxDecoration(
-                        color: WelcomeStyle.taglineCoral,
-                        borderRadius: BorderRadius.circular(999),
+                      SizedBox(height: compact ? s(4) : s(2)),
+                      SizedBox(
+                        width: s(211),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.center,
+                          child: NumiBrandText(fontSize: s(40)),
+                        ),
                       ),
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                      width: s(230),
-                      height: s(58),
-                      child: WelcomeStartButton(
-                        onStart: onStart,
-                        scale: scale,
-                        labelKey: AppKeys.start,
-                        showArrow: false,
+                      SizedBox(height: s(8)),
+                      _WelcomeTagline(scale: scale),
+                      SizedBox(height: s(11)),
+                      Container(
+                        width: s(48),
+                        height: s(6),
+                        decoration: BoxDecoration(
+                          color: WelcomeStyle.taglineCoral,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: compact ? s(36) : s(54)),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

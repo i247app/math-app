@@ -40,8 +40,16 @@ class WelcomeDetailsComposition extends StatelessWidget {
         final canvasWidth = _designWidth * scale;
         final canvasLeft = (width - canvasWidth) / 2;
         final topPadding = math.max(0.0, (height - _designHeight * scale) / 2);
+        final bottomSafe = MediaQuery.paddingOf(context).bottom;
 
         double s(double value) => value * scale;
+        final controlsHeight = s(42);
+        final controlsBottom = math.max(bottomSafe + s(22), s(30));
+        final gridGap = s(12);
+        final gridHeight = s(132) * 2 + gridGap;
+        final gridBottom = controlsBottom + controlsHeight + s(35);
+        final logoTop = math.max(topPadding + s(18), s(14));
+        final heroTop = math.max(topPadding + s(78), s(68));
 
         return MediaQuery(
           data: MediaQuery.of(
@@ -68,65 +76,46 @@ class WelcomeDetailsComposition extends StatelessWidget {
               ),
               Positioned(
                 left: canvasLeft + s(-128),
-                top: topPadding + s(78),
+                top: heroTop,
                 width: s(540),
                 height: s(360),
                 child: IgnorePointer(
                   child: Image.asset(_heroAsset, fit: BoxFit.contain),
                 ),
               ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  width: canvasWidth,
-                  height: height,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: topPadding),
-                    child: Column(
-                      children: [
-                        SizedBox(height: s(18)),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: s(16)),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: SizedBox(
-                              width: s(156),
-                              height: s(32),
-                              child: _BrandLogo(onTap: onBack),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: s(338)),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: s(16)),
-                          child: _FeatureGrid(scale: scale),
-                        ),
-                        SizedBox(height: s(39)),
-                        Padding(
-                          padding: EdgeInsets.only(left: s(24), right: s(15)),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: s(56),
-                                height: s(8),
-                                child: const _PageIndicator(),
-                              ),
-                              const Spacer(),
-                              SizedBox(
-                                width: s(143),
-                                height: s(42),
-                                child: WelcomeStartButton(
-                                  onStart: onStart,
-                                  scale: scale,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: s(55)),
-                      ],
+              Positioned(
+                left: canvasLeft + s(16),
+                top: logoTop,
+                width: s(156),
+                height: s(32),
+                child: _BrandLogo(onTap: onBack),
+              ),
+              Positioned(
+                left: canvasLeft + s(16),
+                bottom: gridBottom,
+                width: canvasWidth - s(32),
+                height: gridHeight,
+                child: _FeatureGrid(scale: scale),
+              ),
+              Positioned(
+                left: canvasLeft + s(24),
+                bottom: controlsBottom,
+                width: canvasWidth - s(39),
+                height: controlsHeight,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: s(56),
+                      height: s(8),
+                      child: const _PageIndicator(),
                     ),
-                  ),
+                    const Spacer(),
+                    SizedBox(
+                      width: s(143),
+                      height: controlsHeight,
+                      child: WelcomeStartButton(onStart: onStart, scale: scale),
+                    ),
+                  ],
                 ),
               ),
             ],

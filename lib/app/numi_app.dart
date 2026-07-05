@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../core/extension/localization_extension.dart';
 import '../core/localization/app_keys.dart';
 import '../core/localization/lingo_provider.dart';
 import '../core/localization/lingo_scope.dart';
@@ -94,7 +93,7 @@ class _NumiAppState extends State<NumiApp> {
         child: MaterialApp(
           key: ValueKey(_restartSeed),
           debugShowCheckedModeBanner: false,
-          onGenerateTitle: (context) => context.getText(AppKeys.appName),
+          title: _lingoProvider.lookup(AppKeys.appName),
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: AppColors.teal),
             scaffoldBackgroundColor: AppColors.mintMist,
