@@ -88,30 +88,37 @@ class WelcomeComposition extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(height: compact ? s(28) : s(58)),
+                      SizedBox(height: compact ? s(14) : s(29)),
                       SizedBox(
                         width: mascotSize,
                         height: mascotSize,
                         child: Image.asset(_mascotAsset, fit: BoxFit.contain),
                       ),
                       SizedBox(height: compact ? s(4) : s(2)),
-                      SizedBox(
-                        width: s(211),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.center,
-                          child: NumiBrandText(fontSize: s(40)),
-                        ),
-                      ),
-                      SizedBox(height: s(8)),
-                      _WelcomeTagline(scale: scale),
-                      SizedBox(height: s(11)),
-                      Container(
-                        width: s(48),
-                        height: s(6),
-                        decoration: BoxDecoration(
-                          color: WelcomeStyle.taglineCoral,
-                          borderRadius: BorderRadius.circular(999),
+                      Transform.translate(
+                        offset: Offset(0, -s(22)),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              width: s(211),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.center,
+                                child: NumiBrandText(fontSize: s(40)),
+                              ),
+                            ),
+                            SizedBox(height: s(6)),
+                            _WelcomeTagline(scale: scale),
+                            SizedBox(height: s(11)),
+                            Container(
+                              width: s(48),
+                              height: s(6),
+                              decoration: BoxDecoration(
+                                color: WelcomeStyle.taglineCoral,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
