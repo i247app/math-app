@@ -105,13 +105,11 @@ class SettingsMenuPanel extends StatelessWidget {
             iconColor: const Color(0xFF327F84),
             iconBackground: const Color(0xFFE5F7F8),
             title: context.getText(AppKeys.passcodeMenuTitle),
-            subtitle: isLoadingPasscode
-                ? context.getText(AppKeys.loading)
-                : context.getText(
-                    hasPasscode
-                        ? AppKeys.passcodeMenuSubtitleManage
-                        : AppKeys.passcodeMenuSubtitleSet,
-                  ),
+            subtitle: context.getText(
+              hasPasscode
+                  ? AppKeys.passcodeMenuSubtitleManage
+                  : AppKeys.passcodeMenuSubtitleSet,
+            ),
             scale: scale,
             onTap: onPasscodeTap,
           ),

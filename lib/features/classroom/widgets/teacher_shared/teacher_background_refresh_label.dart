@@ -7,17 +7,6 @@ class TeacherBackgroundRefreshLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(top: 14 * scale),
-      child: Text(
-        context.getText(AppKeys.loading),
-        textAlign: TextAlign.center,
-        style: GoogleFonts.andika(
-          color: teacherMuted,
-          fontSize: FontSize.caption * scale,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }

@@ -244,10 +244,6 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                           AppKeys.studentNoHomeworkMessage,
                         ),
                       )
-                    else if (visibleExercises.isEmpty && _isLoading)
-                      StudentHomeworkMessage(
-                        message: context.getText(AppKeys.loading),
-                      )
                     else if (visibleExercises.isEmpty)
                       StudentHomeworkMessage(
                         message: context.getText(

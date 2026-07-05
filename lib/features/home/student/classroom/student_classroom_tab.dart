@@ -210,19 +210,6 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                                 );
                               },
                             ),
-                          if (_isLoading && _classrooms.isNotEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(top: 12 * scale),
-                              child: Text(
-                                context.getText(AppKeys.loading),
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.andika(
-                                  color: homeMuted,
-                                  fontSize: FontSize.caption * scale,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
                           SizedBox(height: 30 * scale),
                           const _StudentJoinAnotherClassroomTitle(),
                           SizedBox(height: 14 * scale),
