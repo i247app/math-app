@@ -186,7 +186,6 @@ part 'student/shared/widgets/student_home_sections_loading.dart';
 part 'student/shared/widgets/student_inline_error_panel.dart';
 part 'student/shared/widgets/student_section_header.dart';
 part 'student/shared/widgets/student_state_card.dart';
-part 'widgets/home_assessment_result_card.dart';
 part 'widgets/home_role_dashboard.dart';
 
 enum _HomeTabDestination {

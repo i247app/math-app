@@ -54,8 +54,9 @@ extension _StudentCompletedAssessmentHomeView on _StudentHomeContentState {
             markOnEnd:
                 entry.$1 == 1 ||
                 entry.$1 == _completedAssessments.take(2).length - 1,
-            child: _HomeAssessmentResultCard(
+            child: _AssessmentResultListItemCard(
               quiz: entry.$2,
+              scale: widget.scale,
               onTap: () => _openStudentAssessmentResult(entry.$2),
             ),
           ),

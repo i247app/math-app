@@ -327,8 +327,8 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           child: Column(
             children: [
               for (final entry in entries) ...[
-                _ParentAssessmentTabCard(
-                  entry: entry,
+                _AssessmentResultListItemCard(
+                  quiz: entry.quiz,
                   scale: scale,
                   onTap: () => _openQuizReview(entry.quiz),
                 ),
