@@ -9,7 +9,6 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_action_button.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_back_button.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_input_row.dart';
-import 'package:numi_flutter/features/auth/widgets/passcode/passcode_skip_button.dart';
 
 enum PasscodeScreenMode { setup, unlock, verify }
 
@@ -200,192 +199,150 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
           backgroundColor: Colors.white,
+          resizeToAvoidBottomInset: false,
           body: LayoutBuilder(
             builder: (context, constraints) {
+              final height = MediaQuery.sizeOf(context).height;
+              final compact = height < 690;
+              final mascotSize = compact ? 156.0 : 184.0;
+              final topGap = compact ? 54.0 : 74.0;
+
               return SingleChildScrollView(
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 physics: const ClampingScrollPhysics(),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: SizedBox(
-                        width: constraints.maxWidth,
-                        height: constraints.maxHeight,
-                        child: Stack(
-                          clipBehavior: Clip.hardEdge,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 20,
+                        top: 22,
+                        width: 44,
+                        height: 44,
+                        child: PasscodeBackButton(
+                          iconAsset: _backIconAsset,
+                          onPressed: widget.onBack,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Positioned.fill(
-                              child: ColoredBox(color: Colors.white),
-                            ),
-                            Align(
-                              alignment: Alignment.topCenter,
-                              child: SizedBox(
-                                width: constraints.maxWidth,
-                                height: constraints.maxHeight,
-                                child: Stack(
-                                  clipBehavior: Clip.hardEdge,
-                                  children: [
-                                    Positioned(
-                                      left: 20,
-                                      top: 28,
-                                      width: 44,
-                                      height: 44,
-                                      child: PasscodeBackButton(
-                                        iconAsset: _backIconAsset,
-                                        onPressed: widget.onBack,
+                            SizedBox(height: topGap),
+                            SizedBox(
+                              width: mascotSize,
+                              height: mascotSize,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.10,
                                       ),
+                                      blurRadius: 24,
+                                      offset: const Offset(0, 16),
                                     ),
-                                    Positioned(
-                                      left: 0,
-                                      right: 0,
-                                      top: 90,
-                                      height: 198,
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 220,
-                                          height: 198,
-                                          child: DecoratedBox(
-                                            decoration: BoxDecoration(
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withValues(alpha: 0.15),
-                                                  blurRadius: 25,
-                                                  offset: const Offset(0, 25),
-                                                ),
-                                              ],
-                                            ),
-                                            child: ClipRect(
-                                              child: Image.asset(
-                                                _mascotAsset,
-                                                width: 220,
-                                                height: 198,
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 0,
-                                      right: 0,
-                                      top: 279,
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 280,
-                                          child: Text(
-                                            context.getText(_titleKey),
-                                            textAlign: TextAlign.center,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.andika(
-                                              color: const Color(0xFF001741),
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.w700,
-                                              height: 36 / 30,
-                                              letterSpacing: 0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 0,
-                                      right: 0,
-                                      top: 411,
-                                      child: AnimatedBuilder(
-                                        animation: _shakeController,
-                                        builder: (context, child) {
-                                          final offset =
-                                              math.sin(
-                                                _shakeController.value *
-                                                    math.pi *
-                                                    6,
-                                              ) *
-                                              9 *
-                                              (1 - _shakeController.value);
-                                          return Transform.translate(
-                                            offset: Offset(offset, 0),
-                                            child: child,
-                                          );
-                                        },
-                                        child: PasscodeInputRow(
-                                          controllers: _controllers,
-                                          focusNodes: _focusNodes,
-                                          hasError: errorText != null,
-                                          onChanged: _updateDigit,
-                                          onEmptyBackspace:
-                                              _handleEmptyBackspace,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 34,
-                                      right: 34,
-                                      top: 491,
-                                      child: AnimatedSwitcher(
-                                        duration: const Duration(
-                                          milliseconds: 180,
-                                        ),
-                                        child: errorText == null
-                                            ? const SizedBox(height: 24)
-                                            : Text(
-                                                errorText,
-                                                key: ValueKey(errorText),
-                                                textAlign: TextAlign.center,
-                                                style: GoogleFonts.andika(
-                                                  color: const Color(
-                                                    0xFFD9534F,
-                                                  ),
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w800,
-                                                  height: 1.25,
-                                                  letterSpacing: 0,
-                                                ),
-                                              ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 34,
-                                      right: 34,
-                                      top: 542,
-                                      height: 58,
-                                      child: PasscodeActionButton(
-                                        label: context.getText(
-                                          _primaryLabelKey,
-                                        ),
-                                        onPressed: isFull && !widget.isBusy
-                                            ? _handleSubmit
-                                            : null,
-                                        isBusy: widget.isBusy,
-                                      ),
-                                    ),
-                                    if (widget.onSkip != null)
-                                      Positioned(
-                                        left: 0,
-                                        right: 0,
-                                        top: 626,
-                                        child: PasscodeSkipButton(
-                                          label: context.getText(
-                                            AppKeys.passcodeSkip,
-                                          ),
-                                          onPressed: widget.isBusy
-                                              ? null
-                                              : widget.onSkip,
-                                        ),
-                                      ),
                                   ],
+                                ),
+                                child: Image.asset(
+                                  _mascotAsset,
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
+                            SizedBox(height: compact ? 2 : 4),
+                            Text(
+                              _titleText(context),
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.andika(
+                                color: const Color(0xFF202124),
+                                fontSize: 36,
+                                fontWeight: FontWeight.w800,
+                                height: 1.05,
+                                letterSpacing: 0,
+                              ),
+                            ),
+                            SizedBox(height: compact ? 46 : 54),
+                            AnimatedBuilder(
+                              animation: _shakeController,
+                              builder: (context, child) {
+                                final offset =
+                                    math.sin(
+                                      _shakeController.value * math.pi * 6,
+                                    ) *
+                                    9 *
+                                    (1 - _shakeController.value);
+                                return Transform.translate(
+                                  offset: Offset(offset, 0),
+                                  child: child,
+                                );
+                              },
+                              child: PasscodeInputRow(
+                                controllers: _controllers,
+                                focusNodes: _focusNodes,
+                                hasError: errorText != null,
+                                onChanged: _updateDigit,
+                                onEmptyBackspace: _handleEmptyBackspace,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(minHeight: 26),
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 180),
+                                child: errorText == null
+                                    ? Text(
+                                        context.getText(_subtitleKey),
+                                        key: ValueKey(_subtitleKey),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.andika(
+                                          color: const Color(0xFF202124),
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400,
+                                          height: 1.25,
+                                          letterSpacing: 0,
+                                        ),
+                                      )
+                                    : Text(
+                                        errorText,
+                                        key: ValueKey(errorText),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.andika(
+                                          color: const Color(0xFFD9534F),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w800,
+                                          height: 1.25,
+                                          letterSpacing: 0,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            SizedBox(height: compact ? 30 : 36),
+                            SizedBox(
+                              width: 230,
+                              height: 58,
+                              child: PasscodeActionButton(
+                                label: context.getText(_primaryLabelKey),
+                                onPressed: isFull && !widget.isBusy
+                                    ? _handleSubmit
+                                    : null,
+                                isBusy: widget.isBusy,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            _PasscodeTextAction(
+                              label: context.getText(_secondaryLabelKey),
+                              onPressed: widget.isBusy
+                                  ? null
+                                  : _secondaryAction,
+                            ),
+                            SizedBox(height: compact ? 28 : 44),
                           ],
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               );
@@ -396,13 +353,34 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     );
   }
 
-  String get _titleKey {
-    if (_isConfirmingSetup) {
-      return AppKeys.confirmPasscodeTitle;
+  VoidCallback? get _secondaryAction {
+    if (widget.mode == PasscodeScreenMode.unlock) {
+      return widget.onBack;
     }
+    return widget.onSkip;
+  }
+
+  String get _secondaryLabelKey {
+    if (widget.mode == PasscodeScreenMode.unlock) {
+      return AppKeys.passcodeLoginWithPhone;
+    }
+    return AppKeys.passcodeSkip;
+  }
+
+  String _titleText(BuildContext context) {
+    if (widget.mode == PasscodeScreenMode.unlock) {
+      return 'PIN';
+    }
+    return context.getText(_titleKey);
+  }
+
+  String get _titleKey {
     final explicit = widget.titleKey;
     if (explicit != null) {
       return explicit;
+    }
+    if (_isConfirmingSetup) {
+      return AppKeys.confirmPasscodeTitle;
     }
     return switch (widget.mode) {
       PasscodeScreenMode.setup => AppKeys.createPasscodeTitle,
@@ -418,7 +396,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     }
     return switch (widget.mode) {
       PasscodeScreenMode.setup => AppKeys.passcodeContinue,
-      PasscodeScreenMode.unlock => AppKeys.passcodeUnlock,
+      PasscodeScreenMode.unlock => AppKeys.passcodeLogin,
       PasscodeScreenMode.verify => AppKeys.passcodeContinue,
     };
   }
@@ -432,5 +410,41 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       PasscodeScreenMode.unlock => AppKeys.unlockPasscodeSubtitle,
       PasscodeScreenMode.verify => AppKeys.verifyPasscodeSubtitle,
     };
+  }
+}
+
+class _PasscodeTextAction extends StatelessWidget {
+  const _PasscodeTextAction({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = onPressed == null
+        ? const Color(0xFF001741).withValues(alpha: 0.45)
+        : const Color(0xFF001741);
+
+    return Center(
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 18),
+          child: Text(
+            label,
+            style: GoogleFonts.andika(
+              color: color,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 20 / 16,
+              decoration: TextDecoration.underline,
+              decorationColor: color,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

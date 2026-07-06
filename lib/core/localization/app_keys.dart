@@ -360,6 +360,8 @@ class AppKeys {
   static const enterCurrentPasscodeTitle = 'enter_current_passcode_title';
   static const passcodeContinue = 'passcode_continue';
   static const passcodeUnlock = 'passcode_unlock';
+  static const passcodeLogin = 'passcode_login';
+  static const passcodeLoginWithPhone = 'passcode_login_with_phone';
   static const passcodeSkip = 'passcode_skip';
   static const passcodeRemove = 'passcode_remove';
   static const passcodeSetUp = 'passcode_set_up';
