@@ -121,6 +121,7 @@ part 'parent/room/widgets/parent_room_section_title.dart';
 part 'parent/room/widgets/parent_room_shortcut_tile.dart';
 part 'parent/room/widgets/parent_room_skeleton_block.dart';
 part 'parent/room/widgets/parent_room_skeleton_line.dart';
+part 'parent/room/widgets/parent_room_select_student_card.dart';
 part 'parent/room/widgets/parent_room_state_card.dart';
 part 'parent/room/widgets/parent_room_status_icon.dart';
 part 'parent/room/widgets/parent_room_task_header.dart';

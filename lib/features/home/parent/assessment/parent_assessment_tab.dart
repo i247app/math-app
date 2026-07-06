@@ -263,6 +263,8 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     required bool shouldShowFullSkeleton,
     required double scale,
   }) {
+    final shouldShowProgressChart = _entries.length > 1;
+
     if (shouldShowFullSkeleton) {
       return [_ParentAssessmentFullSkeleton(scale: scale)];
     }
@@ -282,21 +284,23 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       _ParentPracticeTabBanner(onTap: _openAssessment, scale: scale),
       SizedBox(height: 13 * scale),
       _ParentAssessmentSearchField(controller: _searchController, scale: scale),
-      SizedBox(height: 20 * scale),
-      Text(
-        context.getText(AppKeys.parentLearningProgress),
-        style: TextStyle(
-          color: const Color(0xFF17252B),
-          fontSize: FontSize.large * scale,
-          fontWeight: FontWeight.w900,
-          height: 1.1,
+      if (shouldShowProgressChart) ...[
+        SizedBox(height: 20 * scale),
+        Text(
+          context.getText(AppKeys.parentLearningProgress),
+          style: TextStyle(
+            color: const Color(0xFF17252B),
+            fontSize: FontSize.large * scale,
+            fontWeight: FontWeight.w900,
+            height: 1.1,
+          ),
         ),
-      ),
-      SizedBox(height: 8 * scale),
-      _ParentAssessmentProgressChart(
-        entries: _entries.take(5).toList().reversed.toList(),
-        scale: scale,
-      ),
+        SizedBox(height: 8 * scale),
+        _ParentAssessmentProgressChart(
+          entries: _entries.take(5).toList().reversed.toList(),
+          scale: scale,
+        ),
+      ],
       SizedBox(height: 16 * scale),
       if (_errorMessage != null && _entries.isEmpty)
         _initialFadeIn(

@@ -256,12 +256,9 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     if (entries.isEmpty) {
       return _roomFadeIn(
         markOnEnd: true,
-        child: _ParentRoomStateCard(
-          key: const ValueKey('room-empty'),
-          icon: Icons.meeting_room_outlined,
-          title: context.getText(AppKeys.parentNoClassroom),
-          message: context.getText(AppKeys.parentJoinRoomSubtitle),
-          onTap: _loadLayout,
+        child: _ParentRoomSelectStudentCard(
+          onChooseProfile: widget.args.onOpenProfileMenu,
+          onCreateProfile: _openCreateStudentProfile,
         ),
       );
     }
@@ -379,5 +376,37 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ),
       ),
     );
+  }
+
+  Future<void> _openCreateStudentProfile() async {
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => Material(
+          color: Colors.white,
+          child: SafeArea(
+            child: SettingTab.page(
+              user: widget.args.user,
+              profiles: widget.args.profiles,
+              activeProfile: widget.args.activeProfile,
+              profileLoadError: null,
+              onLogout: () {},
+              onActivateProfile: widget.args.onActivateProfile,
+              onRefreshProfiles: widget.args.onRefreshProfiles,
+              onProfileSaved: widget.args.onProfileSaved,
+              bottomPadding: 0,
+              scale: widget.args.scale,
+              initialView: SettingPageView.profile,
+              isPushedPage: true,
+              openAddProfileOnStart: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await widget.args.onRefreshProfiles();
+    if (mounted) {
+      await _loadLayout(forceRefresh: true);
+    }
   }
 }
