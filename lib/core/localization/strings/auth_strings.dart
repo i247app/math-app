@@ -55,6 +55,8 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.authPhoneCheckFailed: 'Không thể kiểm tra số điện thoại.',
     AppKeys.signupOtpFailed: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
     AppKeys.loginOtpFailed: 'Không thể gửi OTP. Vui lòng thử lại.',
+    AppKeys.pinLoginFailed:
+        'Không thể đăng nhập bằng PIN. Vui lòng đăng nhập bằng số điện thoại.',
     AppKeys.invalidOtp: 'Mã OTP không đúng. Vui lòng thử lại.',
     AppKeys.missingOtpUser: 'Response OTP thiếu thông tin user.',
     AppKeys.verifyOtpFailed: 'Không thể xác thực OTP. Vui lòng thử lại.',
@@ -117,6 +119,8 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.authPhoneCheckFailed: 'Could not check this phone number.',
     AppKeys.signupOtpFailed: 'Could not send signup OTP. Please try again.',
     AppKeys.loginOtpFailed: 'Could not send OTP. Please try again.',
+    AppKeys.pinLoginFailed:
+        'Could not log in with PIN. Please log in with your phone number.',
     AppKeys.invalidOtp: 'The OTP is incorrect. Please try again.',
     AppKeys.missingOtpUser: 'OTP response is missing user information.',
     AppKeys.verifyOtpFailed: 'Could not verify OTP. Please try again.',

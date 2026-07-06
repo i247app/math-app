@@ -852,12 +852,10 @@ class AuthCubit extends Cubit<AuthState> {
 
       emit(
         state.copyWith(
-          screen: AppScreen.otp,
+          screen: AppScreen.login,
           isPasscodeBusy: false,
           phoneNumber: phone,
-          isSendingOtp: true,
-          otpFlow: OtpFlow.login,
-          clearAuthError: true,
+          authError: AppStrings.current(AppKeys.pinLoginFailed),
           clearDevOtp: true,
           clearOtpExpiry: true,
           clearOtpError: true,
@@ -866,7 +864,7 @@ class AuthCubit extends Cubit<AuthState> {
           passcodeLoginRequiresOtp: false,
         ),
       );
-      await _sendLoginOtp(phone);
+      unawaited(checkPinLoginAvailability());
     } on OtpAuthException catch (error) {
       emit(
         state.copyWith(

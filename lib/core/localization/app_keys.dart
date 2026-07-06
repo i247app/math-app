@@ -705,6 +705,7 @@ class AppKeys {
   static const authPhoneCheckFailed = 'auth_phone_check_failed';
   static const signupOtpFailed = 'signup_otp_failed';
   static const loginOtpFailed = 'login_otp_failed';
+  static const pinLoginFailed = 'pin_login_failed';
   static const invalidOtp = 'invalid_otp';
   static const missingOtpUser = 'missing_otp_user';
   static const verifyOtpFailed = 'verify_otp_failed';
