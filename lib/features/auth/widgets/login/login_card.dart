@@ -104,7 +104,7 @@ class LoginCard extends StatelessWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           child: phoneErrorText == null
-              ? SizedBox(height: canLoginWithPin ? 18 : 24)
+              ? const SizedBox(height: 24)
               : Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 16),
                   child: Text(
@@ -125,20 +125,20 @@ class LoginCard extends StatelessWidget {
               : null,
           isBusy: canSendOtp && (isCheckingAuthPhone || isSendingOtp),
         ),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 180),
-          child: canLoginWithPin
-              ? Padding(
-                  key: const ValueKey('login-with-pin'),
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Center(
+        SizedBox(
+          height: 76,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: canLoginWithPin
+                ? Center(
+                    key: const ValueKey('login-with-pin'),
                     child: InkWell(
                       onTap: onLoginWithPin,
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
-                          vertical: 6,
+                          vertical: 18,
                         ),
                         child: Text(
                           context.getText(AppKeys.loginWithPin),
@@ -153,9 +153,9 @@ class LoginCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-                )
-              : const SizedBox.shrink(key: ValueKey('no-pin-login')),
+                  )
+                : const SizedBox.shrink(key: ValueKey('no-pin-login')),
+          ),
         ),
       ],
     );

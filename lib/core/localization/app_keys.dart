@@ -44,6 +44,8 @@ class AppKeys {
   static const signup = 'signup';
   static const login = 'login';
   static const loginWithPin = 'login_with_pin';
+  static const authSwitchToSignupPrompt = 'auth_switch_to_signup_prompt';
+  static const authSwitchToLoginPrompt = 'auth_switch_to_login_prompt';
   static const otpWithin30Seconds = 'otp_within_30_seconds';
   static const otpTitle = 'otp_title';
   static const otpSentMessage = 'otp_sent_message';

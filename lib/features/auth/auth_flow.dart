@@ -188,7 +188,8 @@ class _NumiHomeState extends State<NumiHome> {
                 child: Scaffold(
                   backgroundColor: usePlainAuthBackground ? Colors.white : null,
                   resizeToAvoidBottomInset:
-                      scaffoldState.screen != AppScreen.home,
+                      scaffoldState.screen != AppScreen.home &&
+                      scaffoldState.screen != AppScreen.login,
                   body: usePlainAuthBackground
                       ? ColoredBox(
                           color: Colors.white,

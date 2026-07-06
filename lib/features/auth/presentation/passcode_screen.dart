@@ -296,27 +296,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                     Positioned(
                                       left: 0,
                                       right: 0,
-                                      top: 333,
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 294,
-                                          child: Text(
-                                            context.getText(_subtitleKey),
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.andika(
-                                              color: const Color(0xFF001741),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w400,
-                                              height: 24.75 / 18,
-                                              letterSpacing: 0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 0,
-                                      right: 0,
                                       top: 411,
                                       child: AnimatedBuilder(
                                         animation: _shakeController,

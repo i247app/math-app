@@ -74,6 +74,27 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
+  void switchAuthEntryMode(AuthEntryMode mode) {
+    if (state.authEntryMode == mode) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        authEntryMode: mode,
+        clearAuthError: true,
+        clearOtpError: true,
+        clearDevOtp: true,
+        clearOtpExpiry: true,
+        clearPinLogin: mode == AuthEntryMode.signup,
+      ),
+    );
+
+    if (mode == AuthEntryMode.login) {
+      unawaited(checkPinLoginAvailability());
+    }
+  }
+
   Future<void> _openLoginFromWelcome() async {
     if (state.isCheckingPinLogin) {
       return;

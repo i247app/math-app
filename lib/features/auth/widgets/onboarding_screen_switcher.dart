@@ -85,9 +85,9 @@ class OnboardingScreenSwitcher extends StatelessWidget {
         final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
         final lookupMatchesPhone = state.checkedPhone == normalizedPhone.phone;
         final blocksPhoneAction =
-            !isSignupEntry &&
             lookupMatchesPhone &&
-            state.phoneLookupErrorStatus == 4006;
+            ((isSignupEntry && state.phoneExists == true) ||
+                (!isSignupEntry && state.phoneLookupErrorStatus == 4006));
         final phoneComplete = normalizedPhone.isValid && !blocksPhoneAction;
         final phoneInputErrorKey =
             normalizedPhone.errorKey == AppKeys.phoneTooShort
@@ -140,11 +140,15 @@ class OnboardingScreenSwitcher extends StatelessWidget {
                   onBack: cubit.openWelcome,
                   onSendOtp: () => sendOtp(cubit, state.phoneRegion),
                   actionLabel: actionLabel,
+                  isSignupEntry: isSignupEntry,
                   isSendingOtp: state.isSendingOtp,
                   isCheckingAuthPhone: state.isCheckingAuthPhone,
                   canSendOtp: phoneComplete,
                   canLoginWithPin: state.canLoginWithPin,
                   onLoginWithPin: cubit.openPinLogin,
+                  onSwitchEntryMode: () => cubit.switchAuthEntryMode(
+                    isSignupEntry ? AuthEntryMode.login : AuthEntryMode.signup,
+                  ),
                   onPhoneChanged: (value) =>
                       handlePhoneInputChanged(cubit, state.phoneRegion, value),
                   phoneErrorText: phoneErrorText,
@@ -221,6 +225,10 @@ String? _phoneLookupErrorText({
 
   if (isSignupEntry && phoneExists == true) {
     return context.getText(AppKeys.signupPhoneAlreadyRegistered);
+  }
+
+  if (isSignupEntry && phoneExists == false) {
+    return null;
   }
 
   if (!isSignupEntry && phoneExists == false) {
