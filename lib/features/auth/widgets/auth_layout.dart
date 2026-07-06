@@ -3,19 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/auth/widgets/passcode/passcode_back_button.dart';
-import 'package:numi_flutter/shared/widgets/common_widgets.dart';
+import 'package:numi_flutter/shared/widgets/auth_back_button.dart';
 
-enum AuthAnchoredBackStyle { circle, passcode }
-
-class AuthAnchoredLayout extends StatelessWidget {
-  const AuthAnchoredLayout({
+class AuthLayout extends StatelessWidget {
+  const AuthLayout({
     super.key,
     required this.onBack,
     required this.bodyBuilder,
     this.title,
-    this.backStyle = AuthAnchoredBackStyle.circle,
-    this.backLeft = 0,
+    this.backLeft = 20,
     this.backTop = 22,
     this.horizontalPadding,
     this.maxWidth = 430,
@@ -42,7 +38,6 @@ class AuthAnchoredLayout extends StatelessWidget {
   final VoidCallback onBack;
   final Widget Function(BuildContext context, bool compact) bodyBuilder;
   final String? title;
-  final AuthAnchoredBackStyle backStyle;
   final double backLeft;
   final double backTop;
   final double? horizontalPadding;
@@ -98,24 +93,23 @@ class AuthAnchoredLayout extends StatelessWidget {
                 child: Center(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: maxWidth),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: sidePadding),
-                      child: SizedBox(
-                        height: layoutHeight,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: backLeft,
-                              top: backTop,
-                              width: 44,
-                              height: 44,
-                              child: _AuthBackButton(
-                                style: backStyle,
-                                iconAsset: backIconAsset,
-                                onPressed: onBack,
-                              ),
+                    child: SizedBox(
+                      height: layoutHeight,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: backLeft,
+                            top: backTop,
+                            child: AuthBackButton(
+                              iconAsset: backIconAsset,
+                              onPressed: onBack,
                             ),
-                            Column(
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: sidePadding,
+                            ),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 SizedBox(height: topGap),
@@ -150,8 +144,8 @@ class AuthAnchoredLayout extends StatelessWidget {
                                   bodyBuilder(context, compact),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -162,32 +156,6 @@ class AuthAnchoredLayout extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _AuthBackButton extends StatelessWidget {
-  const _AuthBackButton({
-    required this.style,
-    required this.iconAsset,
-    required this.onPressed,
-  });
-
-  final AuthAnchoredBackStyle style;
-  final String iconAsset;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return switch (style) {
-      AuthAnchoredBackStyle.passcode => PasscodeBackButton(
-        iconAsset: iconAsset,
-        onPressed: onPressed,
-      ),
-      AuthAnchoredBackStyle.circle => CircleIconButton(
-        icon: Icons.arrow_back_rounded,
-        onPressed: onPressed,
-      ),
-    };
   }
 }
 

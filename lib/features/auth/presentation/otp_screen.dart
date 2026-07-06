@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/features/auth/widgets/auth_anchored_layout.dart';
+import 'package:numi_flutter/features/auth/widgets/auth_layout.dart';
 import 'package:numi_flutter/features/auth/widgets/otp/otp_card.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -222,7 +222,7 @@ class _OtpScreenState extends State<OtpScreen>
   Widget build(BuildContext context) {
     final otpError = hideOtpError ? null : widget.otpError;
 
-    return AuthAnchoredLayout(
+    return AuthLayout(
       onBack: widget.onBack,
       title: 'OTP',
       compactBodyGap: 34,

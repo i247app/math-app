@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
-import 'package:numi_flutter/features/auth/widgets/auth_anchored_layout.dart';
+import 'package:numi_flutter/features/auth/widgets/auth_layout.dart';
 import 'package:numi_flutter/features/auth/widgets/login/login_card.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -45,7 +45,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AuthAnchoredLayout(
+    return AuthLayout(
       onBack: onBack,
       fillRemainingBody: true,
       compactBodyGap: 32,

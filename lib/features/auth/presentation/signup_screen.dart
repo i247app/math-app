@@ -13,6 +13,7 @@ import 'package:numi_flutter/features/auth/widgets/signup/signup_gender_choice.d
 import 'package:numi_flutter/features/auth/widgets/signup/signup_gender_radio_group.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_role_card.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_text_field.dart';
+import 'package:numi_flutter/shared/widgets/auth_back_button.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -389,14 +390,7 @@ class _SignupHeroBanner extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            left: 0,
-            top: 0,
-            child: CircleIconButton(
-              icon: Icons.arrow_back_rounded,
-              onPressed: onBack,
-            ),
-          ),
+          Positioned(left: 0, top: 0, child: AuthBackButton(onPressed: onBack)),
           Positioned(
             left: 0,
             top: 76,

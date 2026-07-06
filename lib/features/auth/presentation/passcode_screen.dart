@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/auth/widgets/auth_anchored_layout.dart';
+import 'package:numi_flutter/features/auth/widgets/auth_layout.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_action_button.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_input_row.dart';
 
@@ -193,11 +193,9 @@ class _PasscodeScreenState extends State<PasscodeScreen>
           widget.onBack();
         }
       },
-      child: AuthAnchoredLayout(
+      child: AuthLayout(
         onBack: widget.onBack,
         title: _titleText(context),
-        backStyle: AuthAnchoredBackStyle.passcode,
-        backLeft: 20,
         horizontalPadding: 0,
         compactBodyGap: 46,
         regularBodyGap: 54,
