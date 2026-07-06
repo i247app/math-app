@@ -45,12 +45,14 @@ class LoginScreen extends StatelessWidget {
   final ValueChanged<String> onPhoneChanged;
   final String? phoneErrorText;
 
+  static const _mascotAsset = 'assets/images/pin_figma_mascot.png';
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
-    final compact = height < 760;
-    final mascotSize = width < 370 ? 160.0 : 200.0;
+    final compact = height < 690;
+    final mascotSize = compact ? 156.0 : 184.0;
+    final topGap = compact ? 54.0 : 74.0;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -64,61 +66,70 @@ class LoginScreen extends StatelessWidget {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: SizedBox(
                 height: math.max(constraints.maxHeight, compact ? 610 : 690),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
                   children: [
-                    const SizedBox(height: 28),
-                    CircleIconButton(
-                      icon: Icons.arrow_back_rounded,
-                      onPressed: onBack,
+                    Positioned(
+                      left: 0,
+                      top: 22,
+                      width: 44,
+                      height: 44,
+                      child: CircleIconButton(
+                        icon: Icons.arrow_back_rounded,
+                        onPressed: onBack,
+                      ),
                     ),
-                    SizedBox(height: compact ? 12 : 24),
-                    Center(
-                      child: Container(
-                        width: mascotSize,
-                        height: mascotSize,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 30,
-                              offset: const Offset(0, 15),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: topGap),
+                        Center(
+                          child: Container(
+                            width: mascotSize,
+                            height: mascotSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 15),
+                                ),
+                              ],
                             ),
-                          ],
+                            child: Image.asset(
+                              _mascotAsset,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
                         ),
-                        child: Image.asset(
-                          'assets/images/numi-mascot.png',
-                          fit: BoxFit.contain,
+                        const SizedBox(height: 32),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: LoginCard(
+                            controller: controller,
+                            region: region,
+                            onRegionChanged: onRegionChanged,
+                            onSendOtp: onSendOtp,
+                            actionLabel: actionLabel,
+                            isSendingOtp: isSendingOtp,
+                            isCheckingAuthPhone: isCheckingAuthPhone,
+                            canSendOtp: canSendOtp,
+                            canLoginWithPin: canLoginWithPin,
+                            onLoginWithPin: onLoginWithPin,
+                            onPhoneChanged: onPhoneChanged,
+                            phoneErrorText: phoneErrorText,
+                          ),
                         ),
-                      ),
+                        const Spacer(),
+                        Center(
+                          child: _AuthEntrySwitchPrompt(
+                            isSignupEntry: isSignupEntry,
+                            onSwitch: onSwitchEntryMode,
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                      ],
                     ),
-                    const SizedBox(height: 32),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: LoginCard(
-                        controller: controller,
-                        region: region,
-                        onRegionChanged: onRegionChanged,
-                        onSendOtp: onSendOtp,
-                        actionLabel: actionLabel,
-                        isSendingOtp: isSendingOtp,
-                        isCheckingAuthPhone: isCheckingAuthPhone,
-                        canSendOtp: canSendOtp,
-                        canLoginWithPin: canLoginWithPin,
-                        onLoginWithPin: onLoginWithPin,
-                        onPhoneChanged: onPhoneChanged,
-                        phoneErrorText: phoneErrorText,
-                      ),
-                    ),
-                    const Spacer(),
-                    Center(
-                      child: _AuthEntrySwitchPrompt(
-                        isSignupEntry: isSignupEntry,
-                        onSwitch: onSwitchEntryMode,
-                      ),
-                    ),
-                    const SizedBox(height: 28),
                   ],
                 ),
               ),

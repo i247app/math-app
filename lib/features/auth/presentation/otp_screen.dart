@@ -3,9 +3,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/features/auth/widgets/otp/otp_card.dart';
-import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -41,6 +41,7 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen>
     with SingleTickerProviderStateMixin {
   static const otpLength = 4;
+  static const _mascotAsset = 'assets/images/pin_figma_mascot.png';
 
   late final List<TextEditingController> controllers;
   late final List<FocusNode> focusNodes;
@@ -222,9 +223,9 @@ class _OtpScreenState extends State<OtpScreen>
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
-    final compact = height < 760;
-    final mascotSize = width < 370 ? 132.0 : 156.0;
+    final compact = height < 690;
+    final mascotSize = compact ? 156.0 : 184.0;
+    final topGap = compact ? 54.0 : 74.0;
     final otpError = hideOtpError ? null : widget.otpError;
 
     return GestureDetector(
@@ -232,75 +233,103 @@ class _OtpScreenState extends State<OtpScreen>
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: ScreenFrame(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 28),
-              CircleIconButton(
-                icon: Icons.arrow_back_rounded,
-                onPressed: widget.onBack,
-              ),
-              SizedBox(height: compact ? 20 : 36),
-              // Mascot
-              Center(
-                child: Container(
-                  width: mascotSize,
-                  height: mascotSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
-                        blurRadius: 24,
-                        offset: const Offset(0, 12),
+        resizeToAvoidBottomInset: false,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return ScreenFrame(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SizedBox(
+                height: constraints.maxHeight,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: 0,
+                      top: 22,
+                      width: 44,
+                      height: 44,
+                      child: CircleIconButton(
+                        icon: Icons.arrow_back_rounded,
+                        onPressed: widget.onBack,
                       ),
-                    ],
-                  ),
-                  child: Image.asset(
-                    'assets/images/numi-mascot.png',
-                    fit: BoxFit.contain,
-                  ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: topGap),
+                        Center(
+                          child: Container(
+                            width: mascotSize,
+                            height: mascotSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 12),
+                                ),
+                              ],
+                            ),
+                            child: Image.asset(
+                              _mascotAsset,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: compact ? 2 : 4),
+                        Center(
+                          child: Text(
+                            'OTP',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.andika(
+                              color: const Color(0xFF202124),
+                              fontSize: 36,
+                              fontWeight: FontWeight.w800,
+                              height: 1.05,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: compact ? 34 : 46),
+                        AnimatedBuilder(
+                          animation: errorShakeController,
+                          builder: (context, child) {
+                            final offset =
+                                math.sin(
+                                  errorShakeController.value * math.pi * 6,
+                                ) *
+                                9 *
+                                (1 - errorShakeController.value);
+                            return Transform.translate(
+                              offset: Offset(offset, 0),
+                              child: child,
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: OtpCard(
+                              controllers: controllers,
+                              focusNodes: focusNodes,
+                              autoFocusCode: widget.autoFocusCode,
+                              onChanged: updateDigit,
+                              onEmptyBackspace: handleEmptyBackspace,
+                              onConfirm: handleConfirm,
+                              onResend: handleResend,
+                              isVerifyingOtp: widget.isVerifyingOtp,
+                              resendCountdown: resendCountdown,
+                              devOtpCode: widget.devOtpCode,
+                              errorText: otpError,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 48),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: compact ? 14 : 20),
-              // Title
-              const Center(child: NumiBrandText(fontSize: 40)),
-              SizedBox(height: compact ? 34 : 54),
-              // OTP Card
-              AnimatedBuilder(
-                animation: errorShakeController,
-                builder: (context, child) {
-                  final offset =
-                      math.sin(errorShakeController.value * math.pi * 6) *
-                      9 *
-                      (1 - errorShakeController.value);
-                  return Transform.translate(
-                    offset: Offset(offset, 0),
-                    child: child,
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: OtpCard(
-                    controllers: controllers,
-                    focusNodes: focusNodes,
-                    autoFocusCode: widget.autoFocusCode,
-                    onChanged: updateDigit,
-                    onEmptyBackspace: handleEmptyBackspace,
-                    onConfirm: handleConfirm,
-                    onResend: handleResend,
-                    isVerifyingOtp: widget.isVerifyingOtp,
-                    resendCountdown: resendCountdown,
-                    devOtpCode: widget.devOtpCode,
-                    errorText: otpError,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 48),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
