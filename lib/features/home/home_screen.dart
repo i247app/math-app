@@ -73,6 +73,8 @@ part 'parent/assessment/widgets/parent_assessment_progress_chart.dart';
 part 'parent/assessment/widgets/parent_assessment_score_badge.dart';
 part 'parent/assessment/widgets/parent_assessment_search_field.dart';
 part 'parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
+part 'parent/assessment/widgets/parent_assessment_empty_poster.dart';
+part 'parent/assessment/widgets/parent_assessment_full_skeleton.dart';
 part 'parent/assessment/widgets/parent_assessment_state_card.dart';
 part 'parent/assessment/widgets/parent_assessment_tab_card.dart';
 part 'parent/assessment/widgets/parent_practice_tab_banner.dart';
