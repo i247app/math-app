@@ -54,7 +54,6 @@ class _ParentAssessmentTabCard extends StatelessWidget {
               _ParentAssessmentScoreBadge(
                 percentage: percent,
                 color: scoreStyle.color,
-                label: scoreStyle.label,
                 scale: scale,
               ),
               SizedBox(width: 12 * scale),

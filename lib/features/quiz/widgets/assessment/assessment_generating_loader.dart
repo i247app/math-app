@@ -17,6 +17,12 @@ class AssessmentGeneratingLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return QuizWaveLoader(
       scale: scale,
+      leading: Image.asset(
+        'assets/images/numi-mascot.png',
+        width: 176 * scale,
+        height: 150 * scale,
+        fit: BoxFit.contain,
+      ),
       message: message,
       letterStyle: TextStyle(
         color: AssessmentStyle.teal,

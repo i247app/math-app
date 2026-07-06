@@ -10,6 +10,8 @@ class QuizWaveLoader extends StatefulWidget {
     this.message,
     this.messageStyle,
     this.messageHorizontalPadding = 32,
+    this.leading,
+    this.leadingSpacing = 22,
   });
 
   final double scale;
@@ -17,6 +19,8 @@ class QuizWaveLoader extends StatefulWidget {
   final String? message;
   final TextStyle? messageStyle;
   final double messageHorizontalPadding;
+  final Widget? leading;
+  final double leadingSpacing;
 
   @override
   State<QuizWaveLoader> createState() => _QuizWaveLoaderState();
@@ -52,6 +56,10 @@ class _QuizWaveLoaderState extends State<QuizWaveLoader>
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (widget.leading != null) ...[
+                widget.leading!,
+                SizedBox(height: widget.leadingSpacing * widget.scale),
+              ],
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(letters.length, (index) {
