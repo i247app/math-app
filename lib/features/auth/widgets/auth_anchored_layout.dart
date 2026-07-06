@@ -1,0 +1,229 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi_flutter/features/auth/widgets/passcode/passcode_back_button.dart';
+import 'package:numi_flutter/shared/widgets/common_widgets.dart';
+
+enum AuthAnchoredBackStyle { circle, passcode }
+
+class AuthAnchoredLayout extends StatelessWidget {
+  const AuthAnchoredLayout({
+    super.key,
+    required this.onBack,
+    required this.bodyBuilder,
+    this.title,
+    this.backStyle = AuthAnchoredBackStyle.circle,
+    this.backLeft = 0,
+    this.backTop = 22,
+    this.horizontalPadding,
+    this.maxWidth = 430,
+    this.minCompactHeight = 610,
+    this.minRegularHeight = 690,
+    this.compactBreakpoint = 690,
+    this.compactTopGap = 54,
+    this.regularTopGap = 74,
+    this.compactMascotSize = 156,
+    this.regularMascotSize = 184,
+    this.compactTitleGap = 2,
+    this.regularTitleGap = 4,
+    this.compactBodyGap = 34,
+    this.regularBodyGap = 46,
+    this.fillRemainingBody = false,
+    this.mascotShape = BoxShape.circle,
+    this.mascotShadowAlpha = 0.08,
+    this.mascotShadowBlur = 24,
+    this.mascotShadowOffset = const Offset(0, 12),
+    this.backIconAsset = 'assets/images/pin_figma_back.svg',
+    this.mascotAsset = 'assets/images/pin_figma_mascot.png',
+  });
+
+  final VoidCallback onBack;
+  final Widget Function(BuildContext context, bool compact) bodyBuilder;
+  final String? title;
+  final AuthAnchoredBackStyle backStyle;
+  final double backLeft;
+  final double backTop;
+  final double? horizontalPadding;
+  final double maxWidth;
+  final double minCompactHeight;
+  final double minRegularHeight;
+  final double compactBreakpoint;
+  final double compactTopGap;
+  final double regularTopGap;
+  final double compactMascotSize;
+  final double regularMascotSize;
+  final double compactTitleGap;
+  final double regularTitleGap;
+  final double compactBodyGap;
+  final double regularBodyGap;
+  final bool fillRemainingBody;
+  final BoxShape mascotShape;
+  final double mascotShadowAlpha;
+  final double mascotShadowBlur;
+  final Offset mascotShadowOffset;
+  final String backIconAsset;
+  final String mascotAsset;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final media = MediaQuery.of(context);
+            final height = media.size.height;
+            final compact = height < compactBreakpoint;
+            final fallbackPadding = media.size.width < 370 ? 24.0 : 32.0;
+            final sidePadding = horizontalPadding ?? fallbackPadding;
+            final minHeight = compact ? minCompactHeight : minRegularHeight;
+            final layoutHeight = math.max(constraints.maxHeight, minHeight);
+            final mascotSize = compact ? compactMascotSize : regularMascotSize;
+            final topGap = compact ? compactTopGap : regularTopGap;
+            final titleGap = compact ? compactTitleGap : regularTitleGap;
+            final bodyGap = compact ? compactBodyGap : regularBodyGap;
+
+            return SizedBox(
+              width: double.infinity,
+              height: constraints.maxHeight,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                physics: const ClampingScrollPhysics(),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxWidth),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: sidePadding),
+                      child: SizedBox(
+                        height: layoutHeight,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: backLeft,
+                              top: backTop,
+                              width: 44,
+                              height: 44,
+                              child: _AuthBackButton(
+                                style: backStyle,
+                                iconAsset: backIconAsset,
+                                onPressed: onBack,
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SizedBox(height: topGap),
+                                Center(
+                                  child: _AuthMascot(
+                                    asset: mascotAsset,
+                                    size: mascotSize,
+                                    shape: mascotShape,
+                                    shadowAlpha: mascotShadowAlpha,
+                                    shadowBlur: mascotShadowBlur,
+                                    shadowOffset: mascotShadowOffset,
+                                  ),
+                                ),
+                                if (title != null) ...[
+                                  SizedBox(height: titleGap),
+                                  Text(
+                                    title!,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.andika(
+                                      color: const Color(0xFF202124),
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.05,
+                                      letterSpacing: 0,
+                                    ),
+                                  ),
+                                ],
+                                SizedBox(height: bodyGap),
+                                if (fillRemainingBody)
+                                  Expanded(child: bodyBuilder(context, compact))
+                                else
+                                  bodyBuilder(context, compact),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthBackButton extends StatelessWidget {
+  const _AuthBackButton({
+    required this.style,
+    required this.iconAsset,
+    required this.onPressed,
+  });
+
+  final AuthAnchoredBackStyle style;
+  final String iconAsset;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (style) {
+      AuthAnchoredBackStyle.passcode => PasscodeBackButton(
+        iconAsset: iconAsset,
+        onPressed: onPressed,
+      ),
+      AuthAnchoredBackStyle.circle => CircleIconButton(
+        icon: Icons.arrow_back_rounded,
+        onPressed: onPressed,
+      ),
+    };
+  }
+}
+
+class _AuthMascot extends StatelessWidget {
+  const _AuthMascot({
+    required this.asset,
+    required this.size,
+    required this.shape,
+    required this.shadowAlpha,
+    required this.shadowBlur,
+    required this.shadowOffset,
+  });
+
+  final String asset;
+  final double size;
+  final BoxShape shape;
+  final double shadowAlpha;
+  final double shadowBlur;
+  final Offset shadowOffset;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: shape,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: shadowAlpha),
+            blurRadius: shadowBlur,
+            offset: shadowOffset,
+          ),
+        ],
+      ),
+      child: Image.asset(asset, fit: BoxFit.contain),
+    );
+  }
+}

@@ -1,13 +1,11 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
+import 'package:numi_flutter/features/auth/widgets/auth_anchored_layout.dart';
 import 'package:numi_flutter/features/auth/widgets/login/login_card.dart';
-import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({
@@ -45,97 +43,44 @@ class LoginScreen extends StatelessWidget {
   final ValueChanged<String> onPhoneChanged;
   final String? phoneErrorText;
 
-  static const _mascotAsset = 'assets/images/pin_figma_mascot.png';
-
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-    final compact = height < 690;
-    final mascotSize = compact ? 156.0 : 184.0;
-    final topGap = compact ? 54.0 : 74.0;
-
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        resizeToAvoidBottomInset: false,
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return ScreenFrame(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: SizedBox(
-                height: math.max(constraints.maxHeight, compact ? 610 : 690),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 0,
-                      top: 22,
-                      width: 44,
-                      height: 44,
-                      child: CircleIconButton(
-                        icon: Icons.arrow_back_rounded,
-                        onPressed: onBack,
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(height: topGap),
-                        Center(
-                          child: Container(
-                            width: mascotSize,
-                            height: mascotSize,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.08),
-                                  blurRadius: 30,
-                                  offset: const Offset(0, 15),
-                                ),
-                              ],
-                            ),
-                            child: Image.asset(
-                              _mascotAsset,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: LoginCard(
-                            controller: controller,
-                            region: region,
-                            onRegionChanged: onRegionChanged,
-                            onSendOtp: onSendOtp,
-                            actionLabel: actionLabel,
-                            isSendingOtp: isSendingOtp,
-                            isCheckingAuthPhone: isCheckingAuthPhone,
-                            canSendOtp: canSendOtp,
-                            canLoginWithPin: canLoginWithPin,
-                            onLoginWithPin: onLoginWithPin,
-                            onPhoneChanged: onPhoneChanged,
-                            phoneErrorText: phoneErrorText,
-                          ),
-                        ),
-                        const Spacer(),
-                        Center(
-                          child: _AuthEntrySwitchPrompt(
-                            isSignupEntry: isSignupEntry,
-                            onSwitch: onSwitchEntryMode,
-                          ),
-                        ),
-                        const SizedBox(height: 28),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+    return AuthAnchoredLayout(
+      onBack: onBack,
+      fillRemainingBody: true,
+      compactBodyGap: 32,
+      regularBodyGap: 32,
+      mascotShadowBlur: 30,
+      mascotShadowOffset: const Offset(0, 15),
+      bodyBuilder: (context, compact) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: LoginCard(
+              controller: controller,
+              region: region,
+              onRegionChanged: onRegionChanged,
+              onSendOtp: onSendOtp,
+              actionLabel: actionLabel,
+              isSendingOtp: isSendingOtp,
+              isCheckingAuthPhone: isCheckingAuthPhone,
+              canSendOtp: canSendOtp,
+              canLoginWithPin: canLoginWithPin,
+              onLoginWithPin: onLoginWithPin,
+              onPhoneChanged: onPhoneChanged,
+              phoneErrorText: phoneErrorText,
+            ),
+          ),
+          const Spacer(),
+          Center(
+            child: _AuthEntrySwitchPrompt(
+              isSignupEntry: isSignupEntry,
+              onSwitch: onSwitchEntryMode,
+            ),
+          ),
+          const SizedBox(height: 28),
+        ],
       ),
     );
   }

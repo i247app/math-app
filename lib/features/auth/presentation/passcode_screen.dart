@@ -6,8 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/auth/widgets/auth_anchored_layout.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_action_button.dart';
-import 'package:numi_flutter/features/auth/widgets/passcode/passcode_back_button.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_input_row.dart';
 
 enum PasscodeScreenMode { setup, unlock, verify }
@@ -51,7 +51,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   String? _localError;
   int _lastErrorId = 0;
 
-  static const _mascotAsset = 'assets/images/pin_figma_mascot.png';
   static const _backIconAsset = 'assets/images/pin_figma_back.svg';
 
   bool get _isConfirmingSetup =>
@@ -194,161 +193,97 @@ class _PasscodeScreenState extends State<PasscodeScreen>
           widget.onBack();
         }
       },
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          resizeToAvoidBottomInset: false,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              final height = MediaQuery.sizeOf(context).height;
-              final compact = height < 690;
-              final mascotSize = compact ? 156.0 : 184.0;
-              final topGap = compact ? 54.0 : 74.0;
-
-              return SingleChildScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                physics: const ClampingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 20,
-                        top: 22,
-                        width: 44,
-                        height: 44,
-                        child: PasscodeBackButton(
-                          iconAsset: _backIconAsset,
-                          onPressed: widget.onBack,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 28),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(height: topGap),
-                            SizedBox(
-                              width: mascotSize,
-                              height: mascotSize,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.10,
-                                      ),
-                                      blurRadius: 24,
-                                      offset: const Offset(0, 16),
-                                    ),
-                                  ],
-                                ),
-                                child: Image.asset(
-                                  _mascotAsset,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: compact ? 2 : 4),
-                            Text(
-                              _titleText(context),
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.andika(
-                                color: const Color(0xFF202124),
-                                fontSize: 36,
-                                fontWeight: FontWeight.w800,
-                                height: 1.05,
-                                letterSpacing: 0,
-                              ),
-                            ),
-                            SizedBox(height: compact ? 46 : 54),
-                            AnimatedBuilder(
-                              animation: _shakeController,
-                              builder: (context, child) {
-                                final offset =
-                                    math.sin(
-                                      _shakeController.value * math.pi * 6,
-                                    ) *
-                                    9 *
-                                    (1 - _shakeController.value);
-                                return Transform.translate(
-                                  offset: Offset(offset, 0),
-                                  child: child,
-                                );
-                              },
-                              child: PasscodeInputRow(
-                                controllers: _controllers,
-                                focusNodes: _focusNodes,
-                                hasError: errorText != null,
-                                onChanged: _updateDigit,
-                                onEmptyBackspace: _handleEmptyBackspace,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            ConstrainedBox(
-                              constraints: const BoxConstraints(minHeight: 26),
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 180),
-                                child: errorText == null
-                                    ? Text(
-                                        context.getText(_subtitleKey),
-                                        key: ValueKey(_subtitleKey),
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.andika(
-                                          color: const Color(0xFF202124),
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w400,
-                                          height: 1.25,
-                                          letterSpacing: 0,
-                                        ),
-                                      )
-                                    : Text(
-                                        errorText,
-                                        key: ValueKey(errorText),
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.andika(
-                                          color: const Color(0xFFD9534F),
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.25,
-                                          letterSpacing: 0,
-                                        ),
-                                      ),
-                              ),
-                            ),
-                            SizedBox(height: compact ? 30 : 36),
-                            SizedBox(
-                              width: 230,
-                              height: 58,
-                              child: PasscodeActionButton(
-                                label: context.getText(_primaryLabelKey),
-                                onPressed: isFull && !widget.isBusy
-                                    ? _handleSubmit
-                                    : null,
-                                isBusy: widget.isBusy,
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            _PasscodeTextAction(
-                              label: context.getText(_secondaryLabelKey),
-                              onPressed: widget.isBusy
-                                  ? null
-                                  : _secondaryAction,
-                            ),
-                            SizedBox(height: compact ? 28 : 44),
-                          ],
-                        ),
-                      ),
-                    ],
+      child: AuthAnchoredLayout(
+        onBack: widget.onBack,
+        title: _titleText(context),
+        backStyle: AuthAnchoredBackStyle.passcode,
+        backLeft: 20,
+        horizontalPadding: 0,
+        compactBodyGap: 46,
+        regularBodyGap: 54,
+        mascotShape: BoxShape.rectangle,
+        mascotShadowAlpha: 0.10,
+        mascotShadowBlur: 24,
+        mascotShadowOffset: const Offset(0, 16),
+        backIconAsset: _backIconAsset,
+        bodyBuilder: (context, compact) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                AnimatedBuilder(
+                  animation: _shakeController,
+                  builder: (context, child) {
+                    final offset =
+                        math.sin(_shakeController.value * math.pi * 6) *
+                        9 *
+                        (1 - _shakeController.value);
+                    return Transform.translate(
+                      offset: Offset(offset, 0),
+                      child: child,
+                    );
+                  },
+                  child: PasscodeInputRow(
+                    controllers: _controllers,
+                    focusNodes: _focusNodes,
+                    hasError: errorText != null,
+                    onChanged: _updateDigit,
+                    onEmptyBackspace: _handleEmptyBackspace,
                   ),
                 ),
-              );
-            },
-          ),
-        ),
+                const SizedBox(height: 16),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 26),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    child: errorText == null
+                        ? Text(
+                            context.getText(_subtitleKey),
+                            key: ValueKey(_subtitleKey),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.andika(
+                              color: const Color(0xFF202124),
+                              fontSize: 17,
+                              fontWeight: FontWeight.w400,
+                              height: 1.25,
+                              letterSpacing: 0,
+                            ),
+                          )
+                        : Text(
+                            errorText,
+                            key: ValueKey(errorText),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.andika(
+                              color: const Color(0xFFD9534F),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              height: 1.25,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                  ),
+                ),
+                SizedBox(height: compact ? 30 : 36),
+                SizedBox(
+                  width: 230,
+                  height: 58,
+                  child: PasscodeActionButton(
+                    label: context.getText(_primaryLabelKey),
+                    onPressed: isFull && !widget.isBusy ? _handleSubmit : null,
+                    isBusy: widget.isBusy,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _PasscodeTextAction(
+                  label: context.getText(_secondaryLabelKey),
+                  onPressed: widget.isBusy ? null : _secondaryAction,
+                ),
+                SizedBox(height: compact ? 28 : 44),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
