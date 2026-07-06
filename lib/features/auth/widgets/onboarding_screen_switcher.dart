@@ -82,154 +82,305 @@ class OnboardingScreenSwitcher extends StatelessWidget {
       builder: (context, state) {
         final cubit = context.read<AuthCubit>();
         final normalizedPhone = normalizedPhoneInput(state.phoneRegion);
+        final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
         final lookupMatchesPhone = state.checkedPhone == normalizedPhone.phone;
         final blocksPhoneAction =
-            lookupMatchesPhone && state.phoneLookupErrorStatus == 4006;
-        final phoneComplete = normalizedPhone.isValid && !blocksPhoneAction;
-        final showsSignupAction =
+            !isSignupEntry &&
             lookupMatchesPhone &&
-            state.phoneExists == false &&
-            !blocksPhoneAction;
-        final lookupErrorText = lookupMatchesPhone && !showsSignupAction
-            ? state.phoneLookupError
-            : null;
+            state.phoneLookupErrorStatus == 4006;
+        final phoneComplete = normalizedPhone.isValid && !blocksPhoneAction;
         final phoneInputErrorKey =
             normalizedPhone.errorKey == AppKeys.phoneTooShort
             ? null
             : normalizedPhone.errorKey;
-        final phoneErrorText = phoneHasInput
-            ? (phoneInputErrorKey != null
-                  ? context.getText(phoneInputErrorKey)
-                  : lookupErrorText)
-            : null;
+        final phoneErrorText = !phoneHasInput
+            ? null
+            : phoneInputErrorKey != null
+            ? context.getText(phoneInputErrorKey)
+            : _phoneLookupErrorText(
+                context: context,
+                isSignupEntry: isSignupEntry,
+                lookupMatchesPhone: lookupMatchesPhone,
+                phoneExists: state.phoneExists,
+                phoneLookupError: state.phoneLookupError,
+              );
+        final actionLabel = context.getText(
+          isSignupEntry ? AppKeys.signup : AppKeys.login,
+        );
         final useSafeArea =
             !state.isRestoringSession &&
             state.screen != AppScreen.welcome &&
             state.screen != AppScreen.welcomeDetails &&
             state.screen != AppScreen.home;
+        final screenChild = state.isRestoringSession
+            ? LoadingScreen(
+                key: const ValueKey('session-loading'),
+                message: context.getText(AppKeys.restoringSession),
+              )
+            : switch (state.screen) {
+                AppScreen.welcome => WelcomeScreen(
+                  key: const ValueKey('welcome'),
+                  onStart: cubit.openWelcomeDetails,
+                  onLogin: cubit.openLoginFromWelcome,
+                ),
+                AppScreen.welcomeDetails => WelcomeDetailsScreen(
+                  key: const ValueKey('welcome-details'),
+                  onStart: cubit.openSignupEntry,
+                  onBack: cubit.openWelcome,
+                ),
+                AppScreen.login => LoginScreen(
+                  key: const ValueKey('login'),
+                  controller: phoneController,
+                  region: state.phoneRegion,
+                  onRegionChanged: (region) {
+                    clearLoginPhoneInput();
+                    cubit.clearPhoneLookup();
+                    cubit.selectPhoneRegion(region);
+                  },
+                  onBack: cubit.openWelcome,
+                  onSendOtp: () => sendOtp(cubit, state.phoneRegion),
+                  actionLabel: actionLabel,
+                  isSendingOtp: state.isSendingOtp,
+                  isCheckingAuthPhone: state.isCheckingAuthPhone,
+                  canSendOtp: phoneComplete,
+                  canLoginWithPin: state.canLoginWithPin,
+                  onLoginWithPin: cubit.openPinLogin,
+                  onPhoneChanged: (value) =>
+                      handlePhoneInputChanged(cubit, state.phoneRegion, value),
+                  phoneErrorText: phoneErrorText,
+                ),
+                AppScreen.otp => OtpScreen(
+                  key: const ValueKey('otp'),
+                  onBack: cubit.openLogin,
+                  onConfirm: cubit.verifyLoginOtp,
+                  onResend: cubit.resendLoginOtp,
+                  isVerifyingOtp: state.isVerifyingOtp || state.isSendingOtp,
+                  resendSeconds: state.otpExpiresIn ?? 0,
+                  resendResetId: state.otpPreviewId,
+                  autoFocusCode: state.otpFlow == OtpFlow.signup,
+                  devOtpCode: state.devOtpCode,
+                  otpError: state.otpError,
+                  otpErrorId: state.otpErrorId,
+                ),
+                AppScreen.signup => SignupScreen(
+                  key: const ValueKey('signup'),
+                  onBack: cubit.cancelSignupToLogin,
+                  isSigningUp: state.isSigningUp,
+                  onContinue: (name, email, role) {
+                    HapticFeedback.mediumImpact();
+                    cubit.submitSignup(name: name, email: email, role: role);
+                  },
+                ),
+                AppScreen.passcode => PasscodeScreen(
+                  key: ValueKey('passcode-${state.passcodeFlow.name}'),
+                  mode: state.passcodeFlow == PasscodeFlow.setup
+                      ? PasscodeScreenMode.setup
+                      : PasscodeScreenMode.unlock,
+                  onBack: cubit.cancelPasscodeUnlock,
+                  onSubmit: (passcode) async {
+                    await cubit.submitPasscode(passcode);
+                    return null;
+                  },
+                  onSkip: state.passcodeCanSkip
+                      ? cubit.skipPasscodeSetup
+                      : null,
+                  isBusy: state.isPasscodeBusy,
+                  errorText: state.passcodeError,
+                  errorId: state.passcodeErrorId,
+                ),
+                AppScreen.home => const SessionHomeScreen(
+                  key: ValueKey('home'),
+                ),
+              };
 
         return SafeArea(
           top: useSafeArea,
           bottom: useSafeArea && state.screen != AppScreen.home,
           left: useSafeArea,
           right: useSafeArea,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 340),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            layoutBuilder: (currentChild, previousChildren) {
-              final isEnteringLogin =
-                  currentChild?.key == const ValueKey('login');
-              return Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  if (!isEnteringLogin) ...previousChildren,
-                  ?currentChild,
-                ],
-              );
-            },
-            transitionBuilder: (child, animation) {
-              final slide = Tween<Offset>(
-                begin: const Offset(0.045, 0),
-                end: Offset.zero,
-              ).animate(animation);
-
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(position: slide, child: child),
-              );
-            },
-            child: state.isRestoringSession
-                ? LoadingScreen(
-                    key: const ValueKey('session-loading'),
-                    message: context.getText(AppKeys.restoringSession),
-                  )
-                : switch (state.screen) {
-                    AppScreen.welcome => WelcomeScreen(
-                      key: const ValueKey('welcome'),
-                      onStart: cubit.openWelcomeDetails,
-                      onLogin: cubit.openLogin,
-                    ),
-                    AppScreen.welcomeDetails => WelcomeDetailsScreen(
-                      key: const ValueKey('welcome-details'),
-                      onStart: cubit.openLogin,
-                      onBack: cubit.openWelcome,
-                    ),
-                    AppScreen.login => LoginScreen(
-                      key: const ValueKey('login'),
-                      controller: phoneController,
-                      region: state.phoneRegion,
-                      onRegionChanged: (region) {
-                        clearLoginPhoneInput();
-                        cubit.clearPhoneLookup();
-                        cubit.selectPhoneRegion(region);
-                      },
-                      onBack: cubit.openWelcome,
-                      onSendOtp: () => sendOtp(cubit, state.phoneRegion),
-                      isSendingOtp: state.isSendingOtp,
-                      isCheckingAuthPhone: state.isCheckingAuthPhone,
-                      canSendOtp: phoneComplete,
-                      phoneExists: state.phoneExists,
-                      canLoginWithPin: state.canLoginWithPin,
-                      onLoginWithPin: cubit.openPinLogin,
-                      onPhoneChanged: (value) => handlePhoneInputChanged(
-                        cubit,
-                        state.phoneRegion,
-                        value,
-                      ),
-                      phoneErrorText: phoneErrorText,
-                    ),
-                    AppScreen.otp => OtpScreen(
-                      key: const ValueKey('otp'),
-                      onBack: cubit.openLogin,
-                      onConfirm: cubit.verifyLoginOtp,
-                      onResend: cubit.resendLoginOtp,
-                      isVerifyingOtp:
-                          state.isVerifyingOtp || state.isSendingOtp,
-                      resendSeconds: state.otpExpiresIn ?? 0,
-                      resendResetId: state.otpPreviewId,
-                      autoFocusCode: state.otpFlow == OtpFlow.signup,
-                      devOtpCode: state.devOtpCode,
-                      otpError: state.otpError,
-                      otpErrorId: state.otpErrorId,
-                    ),
-                    AppScreen.signup => SignupScreen(
-                      key: const ValueKey('signup'),
-                      onBack: cubit.cancelSignupToLogin,
-                      isSigningUp: state.isSigningUp,
-                      onContinue: (name, email, role) {
-                        HapticFeedback.mediumImpact();
-                        cubit.submitSignup(
-                          name: name,
-                          email: email,
-                          role: role,
-                        );
-                      },
-                    ),
-                    AppScreen.passcode => PasscodeScreen(
-                      key: ValueKey('passcode-${state.passcodeFlow.name}'),
-                      mode: state.passcodeFlow == PasscodeFlow.setup
-                          ? PasscodeScreenMode.setup
-                          : PasscodeScreenMode.unlock,
-                      onBack: cubit.cancelPasscodeUnlock,
-                      onSubmit: (passcode) async {
-                        await cubit.submitPasscode(passcode);
-                        return null;
-                      },
-                      onSkip: state.passcodeCanSkip
-                          ? cubit.skipPasscodeSetup
-                          : null,
-                      isBusy: state.isPasscodeBusy,
-                      errorText: state.passcodeError,
-                      errorId: state.passcodeErrorId,
-                    ),
-                    AppScreen.home => const SessionHomeScreen(
-                      key: ValueKey('home'),
-                    ),
-                  },
+          child: _OnboardingSlideSwitcher(
+            screen: state.isRestoringSession ? null : state.screen,
+            child: screenChild,
           ),
         );
       },
     );
+  }
+}
+
+String? _phoneLookupErrorText({
+  required BuildContext context,
+  required bool isSignupEntry,
+  required bool lookupMatchesPhone,
+  required bool? phoneExists,
+  required String? phoneLookupError,
+}) {
+  if (!lookupMatchesPhone) {
+    return null;
+  }
+
+  if (isSignupEntry && phoneExists == true) {
+    return context.getText(AppKeys.signupPhoneAlreadyRegistered);
+  }
+
+  if (!isSignupEntry && phoneExists == false) {
+    return phoneLookupError ?? context.getText(AppKeys.loginPhoneNotRegistered);
+  }
+
+  return phoneLookupError;
+}
+
+class _OnboardingSlideSwitcher extends StatefulWidget {
+  const _OnboardingSlideSwitcher({required this.screen, required this.child});
+
+  final AppScreen? screen;
+  final Widget child;
+
+  @override
+  State<_OnboardingSlideSwitcher> createState() =>
+      _OnboardingSlideSwitcherState();
+}
+
+class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late Widget _currentChild;
+  Widget? _previousChild;
+  int _direction = 1;
+  bool _usesPageSlide = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentChild = widget.child;
+    _controller =
+        AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 430),
+          value: 1,
+        )..addStatusListener((status) {
+          if (status == AnimationStatus.completed && _previousChild != null) {
+            setState(() => _previousChild = null);
+          }
+        });
+  }
+
+  @override
+  void didUpdateWidget(covariant _OnboardingSlideSwitcher oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.child.key == _currentChild.key) {
+      _currentChild = widget.child;
+      return;
+    }
+
+    setState(() {
+      _previousChild = _currentChild;
+      _currentChild = widget.child;
+      _direction = _transitionDirection(
+        from: oldWidget.screen,
+        to: widget.screen,
+      );
+      _usesPageSlide = _shouldUsePageSlide(
+        from: oldWidget.screen,
+        to: widget.screen,
+      );
+    });
+
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _previousChild = null;
+      _controller.value = 1;
+      return;
+    }
+
+    _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final animation = CurvedAnimation(
+            parent: _controller,
+            curve: Curves.easeOutCubic,
+          );
+
+          return AnimatedBuilder(
+            animation: animation,
+            builder: (context, child) {
+              final value = animation.value;
+              return Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  if (_previousChild != null)
+                    Transform.translate(
+                      offset: _usesPageSlide
+                          ? Offset(-_direction * width * value, 0)
+                          : Offset.zero,
+                      child: FadeTransition(
+                        opacity: _usesPageSlide
+                            ? const AlwaysStoppedAnimation(1)
+                            : ReverseAnimation(animation),
+                        child: _previousChild,
+                      ),
+                    ),
+                  Transform.translate(
+                    offset: _usesPageSlide
+                        ? Offset(_direction * width * (1 - value), 0)
+                        : Offset.zero,
+                    child: FadeTransition(
+                      opacity: _usesPageSlide
+                          ? const AlwaysStoppedAnimation(1)
+                          : animation,
+                      child: _currentChild,
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  static int _transitionDirection({AppScreen? from, AppScreen? to}) {
+    if (from == null || to == null) {
+      return 1;
+    }
+    return _screenRank(to) >= _screenRank(from) ? 1 : -1;
+  }
+
+  static bool _shouldUsePageSlide({AppScreen? from, AppScreen? to}) {
+    if (from == null || to == null) {
+      return false;
+    }
+
+    final fromWelcomeFlow =
+        from == AppScreen.welcome || from == AppScreen.welcomeDetails;
+    final toWelcomeFlow =
+        to == AppScreen.welcome || to == AppScreen.welcomeDetails;
+
+    return (fromWelcomeFlow && to == AppScreen.login) ||
+        (from == AppScreen.login && toWelcomeFlow);
+  }
+
+  static int _screenRank(AppScreen screen) {
+    return switch (screen) {
+      AppScreen.welcome => 0,
+      AppScreen.welcomeDetails => 1,
+      AppScreen.login => 2,
+      AppScreen.otp => 3,
+      AppScreen.signup => 4,
+      AppScreen.passcode => 5,
+      AppScreen.home => 6,
+    };
   }
 }

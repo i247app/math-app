@@ -16,13 +16,13 @@ class LoginScreen extends StatelessWidget {
     required this.onRegionChanged,
     required this.onBack,
     required this.onSendOtp,
+    required this.actionLabel,
     required this.isSendingOtp,
     required this.isCheckingAuthPhone,
     required this.canSendOtp,
     required this.canLoginWithPin,
     required this.onLoginWithPin,
     required this.onPhoneChanged,
-    this.phoneExists,
     this.phoneErrorText,
   });
 
@@ -31,13 +31,13 @@ class LoginScreen extends StatelessWidget {
   final ValueChanged<PhoneRegion> onRegionChanged;
   final VoidCallback onBack;
   final VoidCallback onSendOtp;
+  final String actionLabel;
   final bool isSendingOtp;
   final bool isCheckingAuthPhone;
   final bool canSendOtp;
   final bool canLoginWithPin;
   final VoidCallback onLoginWithPin;
   final ValueChanged<String> onPhoneChanged;
-  final bool? phoneExists;
   final String? phoneErrorText;
 
   @override
@@ -84,24 +84,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: compact ? 16 : 24),
-              // Title
-              const Center(child: NumiBrandText(fontSize: 40)),
-              const SizedBox(height: 16),
-              // Subtitle
-              Center(
-                child: Text(
-                  context.getText(AppKeys.phoneLoginSubtitle),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.andika(
-                    color: const Color(0xFF1B1B1B),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    height: 1.4,
-                  ),
-                ),
-              ),
-              SizedBox(height: compact ? 32 : 48),
+              const SizedBox(height: 32),
               // Input & Actions
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -110,13 +93,13 @@ class LoginScreen extends StatelessWidget {
                   region: region,
                   onRegionChanged: onRegionChanged,
                   onSendOtp: onSendOtp,
+                  actionLabel: actionLabel,
                   isSendingOtp: isSendingOtp,
                   isCheckingAuthPhone: isCheckingAuthPhone,
                   canSendOtp: canSendOtp,
                   canLoginWithPin: canLoginWithPin,
                   onLoginWithPin: onLoginWithPin,
                   onPhoneChanged: onPhoneChanged,
-                  phoneExists: phoneExists,
                   phoneErrorText: phoneErrorText,
                 ),
               ),

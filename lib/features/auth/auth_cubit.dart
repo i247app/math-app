@@ -46,9 +46,103 @@ class AuthCubit extends Cubit<AuthState> {
   void openWelcomeDetails() =>
       emit(state.copyWith(screen: AppScreen.welcomeDetails));
 
-  void openLogin() {
-    emit(state.copyWith(screen: AppScreen.login, clearOtpError: true));
+  void openLogin({AuthEntryMode? mode}) {
+    emit(
+      state.copyWith(
+        screen: AppScreen.login,
+        authEntryMode: mode ?? state.authEntryMode,
+        clearOtpError: true,
+      ),
+    );
     unawaited(checkPinLoginAvailability());
+  }
+
+  void openLoginFromWelcome() {
+    unawaited(_openLoginFromWelcome());
+  }
+
+  void openSignupEntry() {
+    emit(
+      state.copyWith(
+        screen: AppScreen.login,
+        authEntryMode: AuthEntryMode.signup,
+        clearAuthError: true,
+        clearOtpError: true,
+        clearPhoneLookup: true,
+        clearPinLogin: true,
+      ),
+    );
+  }
+
+  Future<void> _openLoginFromWelcome() async {
+    if (state.isCheckingPinLogin) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        authEntryMode: AuthEntryMode.login,
+        isCheckingPinLogin: true,
+        clearAuthError: true,
+        clearOtpError: true,
+        clearPhoneLookup: true,
+        clearPinLogin: true,
+      ),
+    );
+
+    try {
+      final rememberedAccount = await _passcodeService.lastPasscodeAccount();
+      if (isClosed) {
+        return;
+      }
+
+      if (rememberedAccount != null) {
+        final pinUser = LoginUser(
+          id: rememberedAccount.userId,
+          phone: rememberedAccount.phone,
+        );
+        emit(
+          state.copyWith(
+            screen: AppScreen.passcode,
+            isCheckingPinLogin: false,
+            pendingLoginUser: pinUser,
+            pendingProfiles: const <StudentProfile>[],
+            clearPendingActiveProfile: true,
+            clearPendingProfileLoadError: true,
+            passcodeFlow: PasscodeFlow.unlock,
+            passcodeCanSkip: false,
+            passcodeLoginRequiresOtp: true,
+            canLoginWithPin: true,
+            pinLoginUser: pinUser,
+            clearPasscodeError: true,
+          ),
+        );
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          screen: AppScreen.login,
+          isCheckingPinLogin: false,
+          authEntryMode: AuthEntryMode.login,
+          clearPinLogin: true,
+          clearPasscodeError: true,
+        ),
+      );
+    } catch (_) {
+      if (isClosed) {
+        return;
+      }
+      emit(
+        state.copyWith(
+          screen: AppScreen.login,
+          isCheckingPinLogin: false,
+          authEntryMode: AuthEntryMode.login,
+          clearPinLogin: true,
+          clearPasscodeError: true,
+        ),
+      );
+    }
   }
 
   void openOtp() =>
@@ -340,12 +434,28 @@ class AuthCubit extends Cubit<AuthState> {
       return;
     }
 
-    if (state.checkedPhone == phone &&
+    final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
+    if (!isSignupEntry &&
+        state.checkedPhone == phone &&
         _blocksLoginActions(state.phoneLookupErrorStatus)) {
+      emit(
+        state.copyWith(
+          authError: AppStrings.current(AppKeys.loginPhoneNotRegistered),
+        ),
+      );
       return;
     }
 
-    if (state.phoneExists == false && state.checkedPhone == phone) {
+    if (isSignupEntry) {
+      if (state.phoneExists == true && state.checkedPhone == phone) {
+        emit(
+          state.copyWith(
+            authError: AppStrings.current(AppKeys.signupPhoneAlreadyRegistered),
+          ),
+        );
+        return;
+      }
+
       emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
 
       try {
@@ -375,6 +485,15 @@ class AuthCubit extends Cubit<AuthState> {
           isSendingOtp: false,
         );
       }
+      return;
+    }
+
+    if (state.phoneExists == false && state.checkedPhone == phone) {
+      emit(
+        state.copyWith(
+          authError: AppStrings.current(AppKeys.loginPhoneNotRegistered),
+        ),
+      );
       return;
     }
 

@@ -53,6 +53,10 @@ const authStrings = <String, Map<String, String>>{
         'Nhập email để theo dõi kết quả kiểm tra và hành\ntrình học tập của bé',
     AppKeys.phoneNumber: 'Số Điện Thoại',
     AppKeys.authPhoneCheckFailed: 'Không thể kiểm tra số điện thoại.',
+    AppKeys.loginPhoneNotRegistered:
+        'Số điện thoại này chưa có tài khoản. Vui lòng đăng ký.',
+    AppKeys.signupPhoneAlreadyRegistered:
+        'Số điện thoại này đã có tài khoản. Vui lòng đăng nhập.',
     AppKeys.signupOtpFailed: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
     AppKeys.loginOtpFailed: 'Không thể gửi OTP. Vui lòng thử lại.',
     AppKeys.pinLoginFailed:
@@ -117,6 +121,10 @@ const authStrings = <String, Map<String, String>>{
         "Enter an email to follow your child's assessment results\nand learning journey",
     AppKeys.phoneNumber: 'Phone Number',
     AppKeys.authPhoneCheckFailed: 'Could not check this phone number.',
+    AppKeys.loginPhoneNotRegistered:
+        'This phone number does not have an account. Please sign up.',
+    AppKeys.signupPhoneAlreadyRegistered:
+        'This phone number already has an account. Please log in.',
     AppKeys.signupOtpFailed: 'Could not send signup OTP. Please try again.',
     AppKeys.loginOtpFailed: 'Could not send OTP. Please try again.',
     AppKeys.pinLoginFailed:

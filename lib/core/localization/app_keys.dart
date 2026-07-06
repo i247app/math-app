@@ -703,6 +703,8 @@ class AppKeys {
   static const assessmentUpper = 'assessment_upper';
   static const practiceUpper = 'practice_upper';
   static const authPhoneCheckFailed = 'auth_phone_check_failed';
+  static const loginPhoneNotRegistered = 'login_phone_not_registered';
+  static const signupPhoneAlreadyRegistered = 'signup_phone_already_registered';
   static const signupOtpFailed = 'signup_otp_failed';
   static const loginOtpFailed = 'login_otp_failed';
   static const pinLoginFailed = 'pin_login_failed';

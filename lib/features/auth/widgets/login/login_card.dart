@@ -8,7 +8,6 @@ import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/core/utils/phone_input_formatter.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
 import 'package:numi_flutter/features/auth/widgets/login/login_action_button.dart';
-import 'package:numi_flutter/features/auth/widgets/login/login_checking_dots.dart';
 import 'package:numi_flutter/features/auth/widgets/login/phone_region_menu.dart';
 
 class LoginCard extends StatelessWidget {
@@ -18,13 +17,13 @@ class LoginCard extends StatelessWidget {
     required this.region,
     required this.onRegionChanged,
     required this.onSendOtp,
+    required this.actionLabel,
     required this.isSendingOtp,
     required this.isCheckingAuthPhone,
     required this.canSendOtp,
     required this.canLoginWithPin,
     required this.onLoginWithPin,
     required this.onPhoneChanged,
-    this.phoneExists,
     this.phoneErrorText,
   });
 
@@ -32,13 +31,13 @@ class LoginCard extends StatelessWidget {
   final PhoneRegion region;
   final ValueChanged<PhoneRegion> onRegionChanged;
   final VoidCallback onSendOtp;
+  final String actionLabel;
   final bool isSendingOtp;
   final bool isCheckingAuthPhone;
   final bool canSendOtp;
   final bool canLoginWithPin;
   final VoidCallback onLoginWithPin;
   final ValueChanged<String> onPhoneChanged;
-  final bool? phoneExists;
   final String? phoneErrorText;
 
   @override
@@ -119,6 +118,13 @@ class LoginCard extends StatelessWidget {
                   ),
                 ),
         ),
+        LoginActionButton(
+          label: actionLabel,
+          onPressed: canSendOtp && !isCheckingAuthPhone && !isSendingOtp
+              ? onSendOtp
+              : null,
+          isBusy: canSendOtp && (isCheckingAuthPhone || isSendingOtp),
+        ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           child: canLoginWithPin
@@ -150,22 +156,6 @@ class LoginCard extends StatelessWidget {
                   ),
                 )
               : const SizedBox.shrink(key: ValueKey('no-pin-login')),
-        ),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 220),
-          child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
-              ? const LoginCheckingDots(key: ValueKey('checking-phone'))
-              : (canSendOtp)
-              ? LoginActionButton(
-                  label: phoneExists == false
-                      ? context.getText(AppKeys.signup)
-                      : context.getText(AppKeys.login),
-                  onPressed: onSendOtp,
-                )
-              : const SizedBox(
-                  key: ValueKey('send-otp-placeholder'),
-                  height: 56,
-                ),
         ),
       ],
     );
