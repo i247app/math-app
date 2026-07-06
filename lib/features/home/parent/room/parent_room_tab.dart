@@ -187,9 +187,11 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         parent?.expiredExercises ?? const <HomeLayoutPendingExercise>[];
     final completions =
         parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[];
+    final isEmptyRoomState =
+        !_isLoading && _errorMessage == null && entries.isEmpty;
 
     return ColoredBox(
-      color: const Color(0xFFF8FAFA),
+      color: isEmptyRoomState ? Colors.white : const Color(0xFFF8FAFA),
       child: Column(
         children: [
           HomeTabHeader(
@@ -201,26 +203,43 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             child: RefreshIndicator(
               color: const Color(0xFF339395),
               onRefresh: () => _loadLayout(forceRefresh: true),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                padding: EdgeInsets.fromLTRB(
-                  14 * scale,
-                  24 * scale,
-                  14 * scale,
-                  widget.args.bottomPadding + 24 * scale,
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
-                  child: _roomContent(
-                    context,
-                    entries: entries,
-                    pendingExercises: pendingExercises,
-                    expiredExercises: expiredExercises,
-                    completions: completions,
-                  ),
-                ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final contentPadding = isEmptyRoomState
+                      ? EdgeInsets.only(bottom: widget.args.bottomPadding)
+                      : EdgeInsets.fromLTRB(
+                          14 * scale,
+                          24 * scale,
+                          14 * scale,
+                          widget.args.bottomPadding + 24 * scale,
+                        );
+                  final minHeight = isEmptyRoomState
+                      ? math.max(
+                          0.0,
+                          constraints.maxHeight - widget.args.bottomPadding,
+                        )
+                      : 0.0;
+
+                  return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: contentPadding,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: minHeight),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        child: _roomContent(
+                          context,
+                          entries: entries,
+                          pendingExercises: pendingExercises,
+                          expiredExercises: expiredExercises,
+                          completions: completions,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),

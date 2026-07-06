@@ -14,19 +14,8 @@ class _ParentRoomSelectStudentCard extends StatelessWidget {
     return Container(
       key: const ValueKey('room-select-student'),
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(25, 30, 25, 24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.94),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: const Color(0xFFE9EEF2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.fromLTRB(27, 54, 27, 28),
+      color: Colors.white,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
