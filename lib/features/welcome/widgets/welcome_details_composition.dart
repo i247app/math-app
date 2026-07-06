@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
@@ -147,8 +148,8 @@ class _FeatureGrid extends StatelessWidget {
               child: const _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._assessmentAsset,
                 imageSize: 54,
-                title: 'Đánh giá năng lực',
-                subtitle: 'Hiểu đúng trình độ của con',
+                title: 'Học Toán',
+                subtitle: 'Đến lớp 5',
               ),
             ),
             SizedBox(width: gap),
@@ -158,8 +159,8 @@ class _FeatureGrid extends StatelessWidget {
               child: const _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._teacherAsset,
                 imageSize: 54,
-                title: 'Hỗ trợ giáo viên',
-                subtitle: 'Quản lý lớp học dễ dàng',
+                title: 'Đánh Giá',
+                subtitle: 'Đánh giá năng lực',
               ),
             ),
           ],
@@ -173,8 +174,8 @@ class _FeatureGrid extends StatelessWidget {
               child: const _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._progressAsset,
                 imageSize: 54,
-                title: 'Theo dõi tiến độ',
-                subtitle: 'Bám sát sự tiến bộ của con',
+                title: 'Phụ Huynh/GV',
+                subtitle: 'Theo dõi tiến độ',
               ),
             ),
             SizedBox(width: gap),
@@ -184,8 +185,8 @@ class _FeatureGrid extends StatelessWidget {
               child: const _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._gameAsset,
                 imageSize: 54,
-                title: 'Học qua game',
-                subtitle: 'Học mà chơi - Chơi mà giỏi',
+                title: 'Game Toán',
+                subtitle: 'Chơi và học',
               ),
             ),
           ],
@@ -271,9 +272,9 @@ class _FeatureCard extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.fromLTRB(
               12 * scale,
-              18 * scale,
+              14 * scale,
               12 * scale,
-              12 * scale,
+              10 * scale,
             ),
             child: Column(
               children: [
@@ -283,7 +284,7 @@ class _FeatureCard extends StatelessWidget {
                   height: imageSize * scale,
                   fit: BoxFit.contain,
                 ),
-                SizedBox(height: 12 * scale),
+                SizedBox(height: 8 * scale),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -291,14 +292,14 @@ class _FeatureCard extends StatelessWidget {
                     maxLines: 1,
                     style: GoogleFonts.nunito(
                       color: WelcomeStyle.cardTitle,
-                      fontSize: 15 * scale,
+                      fontSize: FontSize.normal,
                       fontWeight: FontWeight.w800,
                       height: 1.15,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: 5 * scale),
+                SizedBox(height: 4 * scale),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -306,7 +307,7 @@ class _FeatureCard extends StatelessWidget {
                     maxLines: 1,
                     style: GoogleFonts.nunito(
                       color: WelcomeStyle.cardSubtitle,
-                      fontSize: 10.5 * scale,
+                      fontSize: FontSize.small,
                       fontWeight: FontWeight.w500,
                       height: 1.2,
                     ),
