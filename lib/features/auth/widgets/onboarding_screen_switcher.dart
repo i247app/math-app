@@ -255,7 +255,7 @@ class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
   late Widget _currentChild;
   Widget? _previousChild;
   int _direction = 1;
-  bool _usesPageSlide = true;
+  _AuthScreenTransition _transition = _AuthScreenTransition.fade;
 
   @override
   void initState() {
@@ -288,10 +288,7 @@ class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
         from: oldWidget.screen,
         to: widget.screen,
       );
-      _usesPageSlide = _shouldUsePageSlide(
-        from: oldWidget.screen,
-        to: widget.screen,
-      );
+      _transition = _transitionFor(from: oldWidget.screen, to: widget.screen);
     });
 
     if (MediaQuery.disableAnimationsOf(context)) {
@@ -324,30 +321,43 @@ class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
             animation: animation,
             builder: (context, child) {
               final value = animation.value;
+              final usesPageSlide =
+                  _transition == _AuthScreenTransition.pageSlide;
+              final usesFadeScale =
+                  _transition == _AuthScreenTransition.fadeScale;
+              final currentScale = usesFadeScale ? 0.98 + (0.02 * value) : 1.0;
+              final previousScale = usesFadeScale ? 1.0 - (0.01 * value) : 1.0;
+
               return Stack(
                 alignment: Alignment.topCenter,
                 children: [
                   if (_previousChild != null)
                     Transform.translate(
-                      offset: _usesPageSlide
+                      offset: usesPageSlide
                           ? Offset(-_direction * width * value, 0)
                           : Offset.zero,
-                      child: FadeTransition(
-                        opacity: _usesPageSlide
-                            ? const AlwaysStoppedAnimation(1)
-                            : ReverseAnimation(animation),
-                        child: _previousChild,
+                      child: Transform.scale(
+                        scale: previousScale,
+                        child: FadeTransition(
+                          opacity: usesPageSlide
+                              ? const AlwaysStoppedAnimation(1)
+                              : ReverseAnimation(animation),
+                          child: _previousChild,
+                        ),
                       ),
                     ),
                   Transform.translate(
-                    offset: _usesPageSlide
+                    offset: usesPageSlide
                         ? Offset(_direction * width * (1 - value), 0)
                         : Offset.zero,
-                    child: FadeTransition(
-                      opacity: _usesPageSlide
-                          ? const AlwaysStoppedAnimation(1)
-                          : animation,
-                      child: _currentChild,
+                    child: Transform.scale(
+                      scale: currentScale,
+                      child: FadeTransition(
+                        opacity: usesPageSlide
+                            ? const AlwaysStoppedAnimation(1)
+                            : animation,
+                        child: _currentChild,
+                      ),
                     ),
                   ),
                 ],
@@ -366,9 +376,12 @@ class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
     return _screenRank(to) >= _screenRank(from) ? 1 : -1;
   }
 
-  static bool _shouldUsePageSlide({AppScreen? from, AppScreen? to}) {
+  static _AuthScreenTransition _transitionFor({
+    AppScreen? from,
+    AppScreen? to,
+  }) {
     if (from == null || to == null) {
-      return false;
+      return _AuthScreenTransition.fade;
     }
 
     final fromWelcomeFlow =
@@ -376,8 +389,18 @@ class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
     final toWelcomeFlow =
         to == AppScreen.welcome || to == AppScreen.welcomeDetails;
 
-    return (fromWelcomeFlow && to == AppScreen.login) ||
-        (from == AppScreen.login && toWelcomeFlow);
+    if ((fromWelcomeFlow && toWelcomeFlow) ||
+        (fromWelcomeFlow && to == AppScreen.login) ||
+        (from == AppScreen.login && toWelcomeFlow)) {
+      return _AuthScreenTransition.pageSlide;
+    }
+
+    if ((from == AppScreen.login && to == AppScreen.passcode) ||
+        (from == AppScreen.passcode && to == AppScreen.login)) {
+      return _AuthScreenTransition.fadeScale;
+    }
+
+    return _AuthScreenTransition.fade;
   }
 
   static int _screenRank(AppScreen screen) {
@@ -392,3 +415,5 @@ class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
     };
   }
 }
+
+enum _AuthScreenTransition { fade, pageSlide, fadeScale }
