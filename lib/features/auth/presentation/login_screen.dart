@@ -6,6 +6,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
 import 'package:numi_flutter/features/auth/widgets/auth_layout.dart';
 import 'package:numi_flutter/features/auth/widgets/login/login_card.dart';
+import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({
@@ -47,6 +48,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AuthLayout(
       onBack: onBack,
+      titleWidget: const NumiBrandText(fontSize: 36),
       fillRemainingBody: true,
       horizontalPadding: 0,
       compactBodyGap: 32,

@@ -11,6 +11,7 @@ class AuthLayout extends StatelessWidget {
     required this.onBack,
     required this.bodyBuilder,
     this.title,
+    this.titleWidget,
     this.backLeft = 20,
     this.backTop = 22,
     this.horizontalPadding,
@@ -38,6 +39,7 @@ class AuthLayout extends StatelessWidget {
   final VoidCallback onBack;
   final Widget Function(BuildContext context, bool compact) bodyBuilder;
   final String? title;
+  final Widget? titleWidget;
   final double backLeft;
   final double backTop;
   final double? horizontalPadding;
@@ -123,18 +125,22 @@ class AuthLayout extends StatelessWidget {
                                     shadowOffset: mascotShadowOffset,
                                   ),
                                 ),
-                                if (title != null) ...[
+                                if (titleWidget != null || title != null) ...[
                                   SizedBox(height: titleGap),
-                                  Text(
-                                    title!,
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.andika(
-                                      color: const Color(0xFF202124),
-                                      fontSize: 36,
-                                      fontWeight: FontWeight.w800,
-                                      height: 1.05,
-                                      letterSpacing: 0,
-                                    ),
+                                  Center(
+                                    child:
+                                        titleWidget ??
+                                        Text(
+                                          title!,
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.andika(
+                                            color: const Color(0xFF202124),
+                                            fontSize: 36,
+                                            fontWeight: FontWeight.w800,
+                                            height: 1.05,
+                                            letterSpacing: 0,
+                                          ),
+                                        ),
                                   ),
                                 ],
                                 SizedBox(height: bodyGap),
