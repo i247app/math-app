@@ -48,6 +48,7 @@ class LoginScreen extends StatelessWidget {
     return AuthLayout(
       onBack: onBack,
       fillRemainingBody: true,
+      horizontalPadding: 0,
       compactBodyGap: 32,
       regularBodyGap: 32,
       mascotShadowBlur: 30,
@@ -56,7 +57,7 @@ class LoginScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 28),
             child: LoginCard(
               controller: controller,
               region: region,

@@ -117,26 +117,6 @@ class OtpCard extends StatelessWidget {
                   ),
                 ),
         ),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: SizedBox(
-              height: 22,
-              child: resendCountdown > 0
-                  ? Text(
-                      context.formatText(AppKeys.resendOtpAfter, {
-                        'seconds': resendCountdown,
-                      }),
-                      style: GoogleFonts.andika(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF339395),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ),
-        ),
         const SizedBox(height: 24),
         OtpActionButton(
           label: isVerifyingOtp
@@ -152,7 +132,66 @@ class OtpCard extends StatelessWidget {
               ? onConfirm
               : null,
         ),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 24,
+          child: resendCountdown > 0
+              ? _OtpCountdownText(
+                  text: context.formatText(AppKeys.resendOtpAfter, {
+                    'seconds': resendCountdown,
+                  }),
+                )
+              : const SizedBox.shrink(),
+        ),
       ],
+    );
+  }
+}
+
+class _OtpCountdownText extends StatelessWidget {
+  const _OtpCountdownText({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final baseStyle = GoogleFonts.andika(
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      height: 1.25,
+      color: const Color(0xFF202124),
+      letterSpacing: 0,
+    );
+    final numberStyle = baseStyle.copyWith(
+      color: const Color(0xFF339395),
+      fontWeight: FontWeight.w800,
+    );
+
+    final spans = <TextSpan>[];
+    var cursor = 0;
+    for (final match in RegExp(r'\d+').allMatches(text)) {
+      if (match.start > cursor) {
+        spans.add(TextSpan(text: text.substring(cursor, match.start)));
+      }
+      spans.add(
+        TextSpan(
+          text: text.substring(match.start, match.end),
+          style: numberStyle,
+        ),
+      );
+      cursor = match.end;
+    }
+    if (cursor < text.length) {
+      spans.add(TextSpan(text: text.substring(cursor)));
+    }
+
+    return Center(
+      child: Text.rich(
+        TextSpan(style: baseStyle, children: spans),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }
