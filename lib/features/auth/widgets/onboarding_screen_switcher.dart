@@ -137,7 +137,7 @@ class OnboardingScreenSwitcher extends StatelessWidget {
                     cubit.clearPhoneLookup();
                     cubit.selectPhoneRegion(region);
                   },
-                  onBack: cubit.openWelcome,
+                  onBack: cubit.openWelcomeDetails,
                   onSendOtp: () => sendOtp(cubit, state.phoneRegion),
                   actionLabel: actionLabel,
                   isSignupEntry: isSignupEntry,
