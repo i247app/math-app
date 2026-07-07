@@ -50,8 +50,8 @@ class LoginScreen extends StatelessWidget {
       onBack: onBack,
       titleWidget: const NumiBrandText(fontSize: 36),
       fillRemainingBody: true,
-      horizontalPadding: 0,
       compactBodyGap: 46,
+      horizontalPadding: 0,
       regularBodyGap: 54,
       mascotShadowBlur: 30,
       mascotShadowOffset: const Offset(0, 15),
@@ -59,7 +59,7 @@ class LoginScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
+            padding: const EdgeInsets.symmetric(horizontal: 38),
             child: LoginCard(
               controller: controller,
               region: region,
