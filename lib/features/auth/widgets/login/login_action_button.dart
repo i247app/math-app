@@ -19,6 +19,7 @@ class LoginActionButton extends StatelessWidget {
     return AuthActionButton(
       label: label,
       onPressed: onPressed,
+      layout: AuthActionButtonLayout.compact,
       isBusy: isBusy,
       uppercase: true,
     );

@@ -225,26 +225,27 @@ class _OtpScreenState extends State<OtpScreen>
     return AuthLayout(
       onBack: widget.onBack,
       title: 'OTP',
+      horizontalPadding: 0,
       compactBodyGap: 34,
       regularBodyGap: 46,
       bodyBuilder: (context, compact) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AnimatedBuilder(
-              animation: errorShakeController,
-              builder: (context, child) {
-                final offset =
-                    math.sin(errorShakeController.value * math.pi * 6) *
-                    9 *
-                    (1 - errorShakeController.value);
-                return Transform.translate(
-                  offset: Offset(offset, 0),
-                  child: child,
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AnimatedBuilder(
+                animation: errorShakeController,
+                builder: (context, child) {
+                  final offset =
+                      math.sin(errorShakeController.value * math.pi * 6) *
+                      9 *
+                      (1 - errorShakeController.value);
+                  return Transform.translate(
+                    offset: Offset(offset, 0),
+                    child: child,
+                  );
+                },
                 child: OtpCard(
                   controllers: controllers,
                   focusNodes: focusNodes,
@@ -259,9 +260,9 @@ class _OtpScreenState extends State<OtpScreen>
                   errorText: otpError,
                 ),
               ),
-            ),
-            const SizedBox(height: 48),
-          ],
+              const SizedBox(height: 48),
+            ],
+          ),
         );
       },
     );

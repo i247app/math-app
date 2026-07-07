@@ -45,37 +45,28 @@ class OtpCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final gap = constraints.maxWidth < 290 ? 10.0 : 12.0;
-            final availableBoxWidth = (constraints.maxWidth - gap * 3) / 4;
-            final boxWidth = availableBoxWidth.clamp(58.0, 64.0);
-            final boxHeight = boxWidth * 1.18;
-
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(4, (index) {
-                return Padding(
-                  padding: EdgeInsets.only(left: index == 0 ? 0 : gap),
-                  child: SizedBox(
-                    width: boxWidth,
-                    height: boxHeight,
-                    child: OtpDigitBox(
-                      controller: controllers[index],
-                      focusNode: focusNodes[index],
-                      autofocus: autoFocusCode && index == 0,
-                      textInputAction: index == 3
-                          ? TextInputAction.done
-                          : TextInputAction.next,
-                      onChanged: (value) => onChanged(index, value),
-                      onEmptyBackspace: () => onEmptyBackspace(index),
-                      hasError: hasError,
-                    ),
-                  ),
-                );
-              }),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(4, (index) {
+            return Padding(
+              padding: EdgeInsets.only(left: index == 0 ? 0 : 12),
+              child: SizedBox(
+                width: 64,
+                height: 70,
+                child: OtpDigitBox(
+                  controller: controllers[index],
+                  focusNode: focusNodes[index],
+                  autofocus: autoFocusCode && index == 0,
+                  textInputAction: index == 3
+                      ? TextInputAction.done
+                      : TextInputAction.next,
+                  onChanged: (value) => onChanged(index, value),
+                  onEmptyBackspace: () => onEmptyBackspace(index),
+                  hasError: hasError,
+                ),
+              ),
             );
-          },
+          }),
         ),
         if (otpCode != null && otpCode.isNotEmpty)
           Padding(
