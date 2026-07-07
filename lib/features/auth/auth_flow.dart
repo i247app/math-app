@@ -192,28 +192,25 @@ class _NumiHomeState extends State<NumiHome> {
                       scaffoldState.screen != AppScreen.login &&
                       scaffoldState.screen != AppScreen.otp &&
                       scaffoldState.screen != AppScreen.passcode,
-                  body: usePlainAuthBackground
-                      ? ColoredBox(
-                          color: Colors.white,
-                          child: OnboardingScreenSwitcher(
-                            phoneController: phoneController,
-                            phoneHasInput: _phoneHasInput,
-                            clearLoginPhoneInput: clearLoginPhoneInput,
-                            normalizedPhoneInput: _normalizedPhoneInput,
-                            handlePhoneInputChanged: handlePhoneInputChanged,
-                            sendOtp: sendOtp,
-                          ),
-                        )
-                      : AppBackground(
-                          child: OnboardingScreenSwitcher(
-                            phoneController: phoneController,
-                            phoneHasInput: _phoneHasInput,
-                            clearLoginPhoneInput: clearLoginPhoneInput,
-                            normalizedPhoneInput: _normalizedPhoneInput,
-                            handlePhoneInputChanged: handlePhoneInputChanged,
-                            sendOtp: sendOtp,
-                          ),
+                  body: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: usePlainAuthBackground
+                            ? const ColoredBox(color: Colors.white)
+                            : const AppBackground(child: SizedBox.shrink()),
+                      ),
+                      Positioned.fill(
+                        child: OnboardingScreenSwitcher(
+                          phoneController: phoneController,
+                          phoneHasInput: _phoneHasInput,
+                          clearLoginPhoneInput: clearLoginPhoneInput,
+                          normalizedPhoneInput: _normalizedPhoneInput,
+                          handlePhoneInputChanged: handlePhoneInputChanged,
+                          sendOtp: sendOtp,
                         ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
