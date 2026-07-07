@@ -51,8 +51,8 @@ class LoginScreen extends StatelessWidget {
       titleWidget: const NumiBrandText(fontSize: 36),
       fillRemainingBody: true,
       horizontalPadding: 0,
-      compactBodyGap: 32,
-      regularBodyGap: 32,
+      compactBodyGap: 46,
+      regularBodyGap: 54,
       mascotShadowBlur: 30,
       mascotShadowOffset: const Offset(0, 15),
       bodyBuilder: (context, compact) => Column(
