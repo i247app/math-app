@@ -1,7 +1,7 @@
 name: numi_flutter
 description: NUMI mobile onboarding and phone verification app.
 publish_to: "none"
-version: 1.0.0+2
+version: 0.1.0+2
 
 environment:
   sdk: ">=3.8.0 <4.0.0"
