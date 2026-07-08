@@ -47,6 +47,7 @@ class NotificationService {
       );
 
   static bool _initialized = false;
+  static String? _latestToken;
   static final StreamController<RemoteMessage> _messageController =
       StreamController<RemoteMessage>.broadcast();
   static final StreamController<String> _tokenController =
@@ -60,6 +61,15 @@ class NotificationService {
   static Stream<RemoteMessage> get messages => _messageController.stream;
 
   static Stream<String> get tokens => _tokenController.stream;
+
+  /// Most recent FCM token, or null if none fetched yet. Lets a late subscriber
+  /// seed itself, since [tokens] is a broadcast stream that does not replay.
+  static String? get latestToken => _latestToken;
+
+  static void _emitToken(String token) {
+    _latestToken = token;
+    _tokenController.add(token);
+  }
 
   static Stream<NotificationResponse> get localNotificationResponses =>
       _localResponseController.stream;
@@ -87,7 +97,7 @@ class NotificationService {
     await _requestPermission();
     await _initializeLocalNotifications();
     await _requestLocalNotificationPermission();
-    await _disableFirebaseForegroundPresentation();
+    await _enableIosForegroundPresentation();
     await _loadInitialToken();
     _listenForTokenRefresh();
     _listenForForegroundMessages();
@@ -192,12 +202,19 @@ class NotificationService {
     }
   }
 
-  Future<void> _disableFirebaseForegroundPresentation() async {
+  /// Lets iOS/macOS present incoming remote notifications while the app is
+  /// foreground. firebase_messaging owns the notification-center delegate, so
+  /// this setting governs foreground display of ALL notifications on Apple
+  /// platforms — including any local notification we show. We therefore let iOS
+  /// present the remote notification natively here and skip the local copy on
+  /// iOS (see [_listenForForegroundMessages]) to avoid a duplicate banner.
+  /// No-op on Android, which never auto-displays foreground messages.
+  Future<void> _enableIosForegroundPresentation() async {
     try {
       await _firebaseMessaging.setForegroundNotificationPresentationOptions(
-        alert: false,
-        badge: false,
-        sound: false,
+        alert: true,
+        badge: true,
+        sound: true,
       );
     } catch (error, stackTrace) {
       _logNotificationError('foreground presentation', error, stackTrace);
@@ -212,7 +229,7 @@ class NotificationService {
         return;
       }
 
-      _tokenController.add(token);
+      _emitToken(token);
       debugPrint('[Notification] FCM token: $token');
     } catch (error, stackTrace) {
       _logNotificationError('token load', error, stackTrace);
@@ -222,7 +239,7 @@ class NotificationService {
   void _listenForTokenRefresh() {
     _firebaseMessaging.onTokenRefresh.listen(
       (token) {
-        _tokenController.add(token);
+        _emitToken(token);
         debugPrint('[Notification] FCM token refreshed: $token');
       },
       onError: (Object error, StackTrace stackTrace) {
@@ -236,7 +253,13 @@ class NotificationService {
       (message) {
         _messageController.add(message);
         logRemoteMessage(message, source: 'foreground');
-        unawaited(_showForegroundNotification(message));
+        // Android does not display notification messages while foregrounded, so
+        // surface them with a local notification. iOS/macOS present the remote
+        // notification natively (see [_enableIosForegroundPresentation]); a
+        // local copy there would double the banner.
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          unawaited(_showForegroundNotification(message));
+        }
       },
       onError: (Object error, StackTrace stackTrace) {
         _logNotificationError('foreground message', error, stackTrace);

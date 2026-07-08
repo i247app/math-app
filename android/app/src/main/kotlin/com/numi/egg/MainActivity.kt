@@ -1,4 +1,4 @@
-package com.example.numi_flutter
+package com.numi.egg
 
 import android.app.Activity
 import android.content.Intent

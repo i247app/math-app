@@ -99,6 +99,9 @@ android/key.properties
 android/keystore
 android/app/google-services.json
 
+# FlutterFire CLI config (regenerate with `flutterfire configure`)
+firebase.json
+
 # Android Studio build artifacts
 /android/app/debug
 /android/app/profile
