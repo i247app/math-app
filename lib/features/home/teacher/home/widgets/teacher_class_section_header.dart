@@ -36,7 +36,7 @@ class _TeacherClassSectionHeader extends StatelessWidget {
               child: Text(
                 context.getText(AppKeys.viewAllUpper),
                 style: GoogleFonts.andika(
-                  color: teacherInk,
+                  color: AppColors.textInkDark,
                   fontSize: FontSize.small * scale,
                   fontWeight: FontWeight.w800,
                   decoration: TextDecoration.underline,

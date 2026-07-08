@@ -57,33 +57,34 @@ class HomeLayout {
 
   factory HomeLayout.fromJson(Map<String, dynamic> json) {
     final rooms = _listFromJson(json['rooms'], HomeLayoutClassroom.fromJson);
-    final subProfiles =
-        _listFromJson(json['sub_profiles'], StudentProfile.fromJson);
+    final subProfiles = _listFromJson(
+      json['sub_profiles'],
+      StudentProfile.fromJson,
+    );
     final tasks = _listFromJson(json['tasks'], HomeLayoutTask.fromJson);
     final parent = _objectFromJson(json['parent'], ParentHomeLayout.fromJson);
-    final student =
-        _objectFromJson(json['student'], StudentHomeLayout.fromJson);
-    final teacher =
-        _objectFromJson(json['teacher'], TeacherHomeLayout.fromJson);
+    final student = _objectFromJson(
+      json['student'],
+      StudentHomeLayout.fromJson,
+    );
+    final teacher = _objectFromJson(
+      json['teacher'],
+      TeacherHomeLayout.fromJson,
+    );
     return HomeLayout(
       role: _stringFromJson(json['role']),
       profile: _objectFromJson(json['profile'], StudentProfile.fromJson),
-      parent: parent ??
+      parent:
+          parent ??
           _parentLayoutFromModernFields(
             subProfiles: subProfiles,
             rooms: rooms,
             tasks: tasks,
           ),
-      student: student ??
-          _studentLayoutFromModernFields(
-            rooms: rooms,
-            tasks: tasks,
-          ),
-      teacher: teacher ??
-          _teacherLayoutFromModernFields(
-            rooms: rooms,
-            tasks: tasks,
-          ),
+      student:
+          student ?? _studentLayoutFromModernFields(rooms: rooms, tasks: tasks),
+      teacher:
+          teacher ?? _teacherLayoutFromModernFields(rooms: rooms, tasks: tasks),
       rooms: rooms,
       subProfiles: subProfiles,
       tasks: tasks,
@@ -515,23 +516,27 @@ List<HomeLayoutPendingExercise> _pendingExercisesFromTasks(
 List<HomeLayoutRecentCompletion> _recentCompletionsFromTasks(
   List<HomeLayoutTask> tasks,
 ) {
-  return tasks.where((task) => task.isCompleted).map((task) {
-    final submission = task.submission;
-    return HomeLayoutRecentCompletion(
-      child: task.child,
-      classroom: task.classroom,
-      classroomExerciseId: task.exercise?.stableId,
-      classroomExerciseSubmissionId: submission?.classroomExerciseSubmissionId,
-      classroomId: task.classroom?.stableId ?? task.exercise?.classroomId,
-      correctNumber: submission?.correctNumber,
-      exercise: task.exercise,
-      gradedDt: submission?.gradedDt,
-      scorePercentage: submission?.scorePercentage,
-      submissionStatus: submission?.submissionStatus,
-      submittedDt: submission?.submittedDt,
-      totalQuestions: submission?.totalQuestions,
-    );
-  }).toList(growable: false);
+  return tasks
+      .where((task) => task.isCompleted)
+      .map((task) {
+        final submission = task.submission;
+        return HomeLayoutRecentCompletion(
+          child: task.child,
+          classroom: task.classroom,
+          classroomExerciseId: task.exercise?.stableId,
+          classroomExerciseSubmissionId:
+              submission?.classroomExerciseSubmissionId,
+          classroomId: task.classroom?.stableId ?? task.exercise?.classroomId,
+          correctNumber: submission?.correctNumber,
+          exercise: task.exercise,
+          gradedDt: submission?.gradedDt,
+          scorePercentage: submission?.scorePercentage,
+          submissionStatus: submission?.submissionStatus,
+          submittedDt: submission?.submittedDt,
+          totalQuestions: submission?.totalQuestions,
+        );
+      })
+      .toList(growable: false);
 }
 
 Object? _nestedValue(Object? value, String key) {

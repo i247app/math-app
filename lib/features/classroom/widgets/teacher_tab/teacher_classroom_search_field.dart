@@ -28,7 +28,7 @@ class _TeacherClassroomSearchField extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(width: 16 * scale),
-          Icon(Icons.search, color: teacherBlue, size: 24 * scale),
+          Icon(Icons.search, color: AppColors.navy900, size: 24 * scale),
           SizedBox(width: 12 * scale),
           Expanded(
             child: TextField(
@@ -36,14 +36,14 @@ class _TeacherClassroomSearchField extends StatelessWidget {
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
               style: GoogleFonts.andika(
-                color: teacherInk,
+                color: AppColors.textInkDark,
                 fontSize: FontSize.normal * scale,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
                 hintText: context.getText(AppKeys.teacherSearchClassroomHint),
                 hintStyle: GoogleFonts.andika(
-                  color: teacherMuted.withValues(alpha: 0.6),
+                  color: AppColors.textCoolMuted.withValues(alpha: 0.6),
                   fontSize: FontSize.normal * scale,
                   fontWeight: FontWeight.w500,
                 ),
@@ -53,7 +53,7 @@ class _TeacherClassroomSearchField extends StatelessWidget {
               ),
             ),
           ),
-          Icon(Icons.tune, color: teacherBlue, size: 24 * scale),
+          Icon(Icons.tune, color: AppColors.navy900, size: 24 * scale),
           SizedBox(width: 16 * scale),
         ],
       ),

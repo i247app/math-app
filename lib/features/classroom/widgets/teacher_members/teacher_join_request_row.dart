@@ -29,7 +29,7 @@ class _TeacherJoinRequestRow extends StatelessWidget {
             nameFontSize: 16 * scale,
             statusFontSize: 12 * scale,
             nameColor: const Color(0xFF1E3A5F),
-            statusColor: teacherMuted,
+            statusColor: AppColors.textCoolMuted,
           ),
         ),
         SizedBox(width: 10 * scale),
@@ -41,7 +41,7 @@ class _TeacherJoinRequestRow extends StatelessWidget {
                 width: 18 * scale,
                 height: 18 * scale,
                 child: const CircularProgressIndicator(
-                  color: teacherTeal,
+                  color: AppColors.teal520,
                   strokeWidth: 2,
                 ),
               ),

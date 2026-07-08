@@ -26,7 +26,7 @@ class _CreateHomeworkClassMeta extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: teacherBlue,
+              color: AppColors.navy900,
               fontSize: 14,
               fontWeight: FontWeight.w400,
               height: 20 / 14,

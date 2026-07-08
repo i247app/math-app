@@ -57,7 +57,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                     style: GoogleFonts.andika(
                       color: selectedLabel == null
                           ? const Color(0x806B7280)
-                          : teacherInk,
+                          : AppColors.textInkDark,
                       fontSize: FontSize.normal * scale,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
@@ -67,8 +67,8 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                 Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: canSelect
-                      ? teacherTeal
-                      : teacherMuted.withValues(alpha: 0.45),
+                      ? AppColors.teal520
+                      : AppColors.textCoolMuted.withValues(alpha: 0.45),
                   size: 22 * scale,
                 ),
               ],
@@ -125,7 +125,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.andika(
-                    color: teacherTeal,
+                    color: AppColors.teal520,
                     fontSize: FontSize.xxxl * scale,
                     fontWeight: FontWeight.w700,
                     height: 1.15,
@@ -152,7 +152,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.andika(
-                              color: teacherInk,
+                              color: AppColors.textInkDark,
                               fontSize: FontSize.normal * scale,
                               fontWeight: isSelected
                                   ? FontWeight.w800
@@ -162,7 +162,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                           trailing: isSelected
                               ? Icon(
                                   Icons.check_circle_rounded,
-                                  color: teacherTeal,
+                                  color: AppColors.teal520,
                                   size: 22 * scale,
                                 )
                               : null,

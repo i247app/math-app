@@ -67,7 +67,7 @@ class _TeacherClassCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
-                      color: teacherBlue.withValues(alpha: 0.60),
+                      color: AppColors.navy900.withValues(alpha: 0.60),
                       fontSize: FontSize.caption * 0.85 * scale,
                       fontWeight: FontWeight.w800,
                       height: 1.2,
@@ -80,7 +80,7 @@ class _TeacherClassCard extends StatelessWidget {
                   width: 69 * scale,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: teacherDeepTeal,
+                    color: AppColors.teal450,
                     borderRadius: BorderRadius.circular(5 * scale),
                   ),
                   child: Text(

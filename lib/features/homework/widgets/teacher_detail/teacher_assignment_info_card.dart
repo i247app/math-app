@@ -69,7 +69,7 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: teacherBlue,
+                  color: AppColors.navy900,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   height: 36 / 18,

@@ -27,7 +27,7 @@ class _TeacherStudyFilterChip extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 18 * scale),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? teacherDeepTeal : Colors.white,
+            color: selected ? AppColors.teal450 : Colors.white,
             borderRadius: BorderRadius.circular(999),
             border: selected
                 ? null

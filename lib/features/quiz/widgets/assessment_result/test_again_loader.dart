@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
 
 class AssessmentTestAgainLoader extends StatelessWidget {
@@ -17,14 +17,14 @@ class AssessmentTestAgainLoader extends StatelessWidget {
       scale: scale,
       message: context.getText(AppKeys.generatingNewQuiz),
       letterStyle: GoogleFonts.andika(
-        color: AssessmentResultStyle.teal,
+        color: AppColors.teal700,
         fontSize: 40 * scale,
         fontWeight: FontWeight.w800,
         height: 1,
         letterSpacing: 3 * scale,
       ),
       messageStyle: GoogleFonts.andika(
-        color: AssessmentResultStyle.muted,
+        color: AppColors.textSubtle,
         fontSize: 16 * scale,
         fontWeight: FontWeight.w800,
         height: 1.35,

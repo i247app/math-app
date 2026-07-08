@@ -18,7 +18,7 @@ class TeacherEmptyAssignmentsPanel extends StatelessWidget {
         message,
         textAlign: TextAlign.center,
         style: GoogleFonts.andika(
-          color: teacherMuted,
+          color: AppColors.textCoolMuted,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),

@@ -37,7 +37,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
           ? const SizedBox(
               height: 108,
               child: Center(
-                child: CircularProgressIndicator(color: teacherTeal),
+                child: CircularProgressIndicator(color: AppColors.teal520),
               ),
             )
           : Row(
@@ -66,7 +66,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: teacherBlue,
+                          color: AppColors.navy900,
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                           height: 20 / 14,
@@ -85,7 +85,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: teacherInk,
+                          color: AppColors.textInkDark,
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           height: 32 / 20,

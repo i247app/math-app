@@ -1,3 +1,4 @@
+import 'package:numi_flutter/features/settings/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,7 +27,6 @@ import 'package:numi_flutter/features/settings/cache/settings_profile_options_ca
 import 'package:numi_flutter/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
 import 'package:numi_flutter/features/settings/presentation/setting_account_screen.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/account_details_panel.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_form_panel.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list_panel.dart';

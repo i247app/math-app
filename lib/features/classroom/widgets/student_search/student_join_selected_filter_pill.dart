@@ -1,6 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 
 class StudentJoinSelectedFilterPill extends StatelessWidget {
   const StudentJoinSelectedFilterPill({
@@ -19,7 +18,7 @@ class StudentJoinSelectedFilterPill extends StatelessWidget {
       height: 30,
       padding: const EdgeInsets.only(left: 12, right: 8),
       decoration: BoxDecoration(
-        color: studentJoinTeal,
+        color: AppColors.teal520,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(

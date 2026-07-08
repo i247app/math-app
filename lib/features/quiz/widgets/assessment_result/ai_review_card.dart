@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment_result/ai_review_text.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class AssessmentAiReviewCard extends StatelessWidget {
   const AssessmentAiReviewCard({
@@ -24,11 +24,11 @@ class AssessmentAiReviewCard extends StatelessWidget {
       padding: EdgeInsets.all(20 * scale),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AssessmentResultStyle.cardBorder),
+        border: Border.all(color: AppColors.borderNeutral),
         borderRadius: BorderRadius.circular(32 * scale),
         boxShadow: [
           BoxShadow(
-            color: AssessmentResultStyle.ink.withValues(alpha: 0.05),
+            color: AppColors.textPrimary.withValues(alpha: 0.05),
             blurRadius: 2 * scale,
             offset: Offset(0, 1 * scale),
           ),
@@ -43,7 +43,7 @@ class AssessmentAiReviewCard extends StatelessWidget {
               width: 96 * scale,
               height: 96 * scale,
               decoration: const BoxDecoration(
-                color: AssessmentResultStyle.aiAccent,
+                color: AppColors.aiAccentSurface,
                 shape: BoxShape.circle,
               ),
             ),
@@ -59,7 +59,7 @@ class AssessmentAiReviewCard extends StatelessWidget {
                   color: Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AssessmentResultStyle.mascotBorder,
+                    color: AppColors.mascotBorder,
                     width: 2 * scale,
                   ),
                 ),
@@ -89,7 +89,7 @@ class AssessmentAiReviewCard extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.andika(
-                                color: AssessmentResultStyle.ink,
+                                color: AppColors.textPrimary,
                                 fontSize: 14 * scale,
                                 fontWeight: FontWeight.w800,
                                 height: 20 / 14,
@@ -100,7 +100,7 @@ class AssessmentAiReviewCard extends StatelessWidget {
                           SizedBox(width: 4 * scale),
                           Icon(
                             Icons.auto_awesome_rounded,
-                            color: AssessmentResultStyle.teal,
+                            color: AppColors.teal700,
                             size: 15 * scale,
                           ),
                         ],

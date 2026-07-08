@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentClassTopBar extends StatelessWidget {
   const StudentClassTopBar({
@@ -40,7 +40,7 @@ class StudentClassTopBar extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.andika(
-                color: studentClassTeal,
+                color: AppColors.teal500,
                 fontSize: 25,
                 fontWeight: FontWeight.w700,
                 height: 34 / 25,

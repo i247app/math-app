@@ -1,3 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/settings/settings_constants.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,7 +9,6 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_language.dart';
 import 'package:numi_flutter/core/localization/lingo_scope.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/language/language_header.dart';
 import 'package:numi_flutter/features/settings/widgets/language/language_option_card.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
@@ -73,8 +74,10 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     final currentLanguage = LingoScope.of(context).language;
     final media = MediaQuery.of(context);
     final width = math.min(media.size.width, 430.0);
-    final scale =
-        math.min(width / _designWidth, media.size.height / _designHeight);
+    final scale = math.min(
+      width / _designWidth,
+      media.size.height / _designHeight,
+    );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
@@ -83,7 +86,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         child: Stack(
           children: [
             Scaffold(
-              backgroundColor: settingsLanguageBackground,
+              backgroundColor: AppColors.appBackground,
               body: SafeArea(
                 child: Center(
                   child: SizedBox(
@@ -99,8 +102,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                             children: [
                               LanguageOptionCard(
                                 flag: '🇻🇳',
-                                title:
-                                    context.getText(AppKeys.languageVietnamese),
+                                title: context.getText(
+                                  AppKeys.languageVietnamese,
+                                ),
                                 selected: currentLanguage == AppLanguage.vi,
                                 scale: scale,
                                 onTap: () => _changeLanguage(AppLanguage.vi),

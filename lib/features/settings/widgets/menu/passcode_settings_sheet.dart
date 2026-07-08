@@ -1,14 +1,11 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/settings_action_card.dart';
 
-enum PasscodeSettingsAction {
-  change,
-  remove,
-}
+enum PasscodeSettingsAction { change, remove }
 
 class PasscodeSettingsSheet extends StatelessWidget {
   const PasscodeSettingsSheet({
@@ -55,7 +52,7 @@ class PasscodeSettingsSheet extends StatelessWidget {
             SizedBox(height: 12 * scale),
             SettingsActionCard(
               icon: Icons.lock_open_rounded,
-              iconColor: settingsOrange,
+              iconColor: AppColors.orange500,
               iconBackground: const Color(0xFFFFEAEA),
               title: context.getText(AppKeys.passcodeRemove),
               subtitle: context.getText(AppKeys.passcodeRemove),

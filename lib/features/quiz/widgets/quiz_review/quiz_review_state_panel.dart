@@ -22,11 +22,11 @@ class _QuizReviewStatePanel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (isLoading)
-                const CircularProgressIndicator(color: quizReviewNavy)
+                const CircularProgressIndicator(color: AppColors.navy)
               else ...[
                 const Icon(
                   Icons.quiz_outlined,
-                  color: quizReviewNavy,
+                  color: AppColors.navy,
                   size: 42,
                 ),
                 const SizedBox(height: 14),
@@ -34,7 +34,7 @@ class _QuizReviewStatePanel extends StatelessWidget {
                   message ?? context.getText(AppKeys.quizDetailErrorTitle),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: quizReviewDeepInk,
+                    color: AppColors.textInk,
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                   ),

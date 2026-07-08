@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentClassSectionTitle extends StatelessWidget {
   const StudentClassSectionTitle(this.text, {super.key});
@@ -15,7 +15,7 @@ class StudentClassSectionTitle extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: GoogleFonts.andika(
-        color: studentClassInk,
+        color: AppColors.textNavy,
         fontSize: 18,
         fontWeight: FontWeight.w700,
         height: 1.5,

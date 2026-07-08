@@ -31,7 +31,7 @@ class _TeacherClassroomHeader extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: teacherTeal,
+                color: AppColors.teal520,
                 fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w700,
               ),

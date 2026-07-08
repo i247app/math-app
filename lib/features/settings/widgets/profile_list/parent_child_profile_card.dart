@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,7 +8,6 @@ import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/managed_profile_role_pill.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/parent_icon_button.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/parent_profile_code_line.dart';
@@ -36,9 +36,12 @@ class ParentChildProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(16 * scale);
-    final borderColor =
-        isActive ? const Color(0xFF008080) : const Color(0xFFE5E7EB);
-    final textColor = isActive ? settingsDeepInk : const Color(0xFF6B7280);
+    final borderColor = isActive
+        ? const Color(0xFF008080)
+        : const Color(0xFFE5E7EB);
+    final textColor = isActive
+        ? AppColors.textPrimary
+        : const Color(0xFF6B7280);
 
     return Material(
       color: Colors.white,

@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'dart:async';
 import 'dart:ui';
 
@@ -15,7 +16,6 @@ import 'package:numi_flutter/core/network/program_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
-import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/profile/profile_api.dart';
@@ -209,7 +209,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
             ),
             Expanded(
               child: RefreshIndicator(
-                color: teacherTeal,
+                color: AppColors.teal520,
                 onRefresh: () => _loadExercises(forceRefresh: true),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
@@ -240,7 +240,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                           padding: EdgeInsets.only(top: 40),
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: teacherTeal,
+                              color: AppColors.teal520,
                             ),
                           ),
                         )

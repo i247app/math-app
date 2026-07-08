@@ -34,8 +34,9 @@ class ParentProfileCodeLine extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color:
-                  isActive ? const Color(0xFF604950) : const Color(0xFF6B7280),
+              color: isActive
+                  ? const Color(0xFF604950)
+                  : const Color(0xFF6B7280),
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w700,
               height: 1,
@@ -43,10 +44,7 @@ class ParentProfileCodeLine extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8 * scale),
-        ParentCodeActionButton(
-          profileCode: profileCode,
-          scale: scale,
-        ),
+        ParentCodeActionButton(profileCode: profileCode, scale: scale),
       ],
     );
   }

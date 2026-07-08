@@ -16,7 +16,7 @@ class TeacherHeroCard extends StatelessWidget {
         18 * scale,
       ),
       decoration: BoxDecoration(
-        color: teacherHero,
+        color: AppColors.teal400,
         borderRadius: BorderRadius.circular(24 * scale),
         boxShadow: [
           BoxShadow(

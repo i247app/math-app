@@ -16,7 +16,7 @@ class _TeacherHomeworkSectionHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: teacherBlue,
+              color: AppColors.navy900,
               fontSize: 20,
               fontWeight: FontWeight.w800,
               height: 28 / 20,

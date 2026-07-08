@@ -36,7 +36,7 @@ class SecureAuthTokenStore implements AuthTokenStore {
 /// skipped.
 class CachedAuthTokenStore implements AuthTokenStore {
   CachedAuthTokenStore({AuthTokenStore? persistentStore})
-      : _persistentStore = persistentStore ?? const SecureAuthTokenStore();
+    : _persistentStore = persistentStore ?? const SecureAuthTokenStore();
 
   static final CachedAuthTokenStore instance = CachedAuthTokenStore();
 

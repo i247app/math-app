@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +9,6 @@ import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/managed_profile_role_pill.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/parent_icon_button.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/parent_profile_avatar.dart';
@@ -44,8 +44,10 @@ class ParentInfoCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16 * scale),
-          border:
-              Border.all(color: const Color(0xFF008080), width: 1.3 * scale),
+          border: Border.all(
+            color: const Color(0xFF008080),
+            width: 1.3 * scale,
+          ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -67,7 +69,7 @@ class ParentInfoCard extends StatelessWidget {
                               _displayParentName(context, profile, user),
                               softWrap: true,
                               style: GoogleFonts.andika(
-                                color: settingsDeepInk,
+                                color: AppColors.textPrimary,
                                 fontSize: FontSize.large * scale,
                                 fontWeight: FontWeight.w900,
                                 height: 1.1,

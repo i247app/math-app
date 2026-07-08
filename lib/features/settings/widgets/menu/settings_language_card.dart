@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,7 +7,6 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_language.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/language_bottom_sheet.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/language_pill.dart';
 
@@ -87,7 +87,7 @@ class SettingsLanguageCard extends StatelessWidget {
                 child: Text(
                   context.getText(AppKeys.language),
                   style: GoogleFonts.andika(
-                    color: settingsDeepInk,
+                    color: AppColors.textPrimary,
                     fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w700,
                     height: 1,
@@ -95,10 +95,7 @@ class SettingsLanguageCard extends StatelessWidget {
                   ),
                 ),
               ),
-              LanguagePill(
-                currentLanguage: currentLanguage,
-                scale: scale,
-              ),
+              LanguagePill(currentLanguage: currentLanguage, scale: scale),
             ],
           ),
         ),

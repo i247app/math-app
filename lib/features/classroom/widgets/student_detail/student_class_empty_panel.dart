@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentClassEmptyPanel extends StatelessWidget {
   const StudentClassEmptyPanel({super.key, required this.message});
@@ -24,7 +24,7 @@ class StudentClassEmptyPanel extends StatelessWidget {
         message,
         textAlign: TextAlign.center,
         style: GoogleFonts.andika(
-          color: studentClassMuted,
+          color: AppColors.textMuted,
           fontSize: 14,
           fontWeight: FontWeight.w500,
           height: 20 / 14,

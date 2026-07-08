@@ -1,8 +1,9 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 
 class StudentJoinClassActionState {
   const StudentJoinClassActionState({
@@ -66,7 +67,7 @@ class StudentJoinClassActionState {
         return const StudentJoinClassActionState(
           labelKey: AppKeys.studentClassRelationshipNone,
           iconPath: studentJoinEnterIcon,
-          buttonColor: studentJoinDeepTeal,
+          buttonColor: AppColors.tealActive,
           badgeColor: Color(0xFFFFDBD1),
           badgeTextColor: Color(0xFF3B0900),
           canRequest: true,

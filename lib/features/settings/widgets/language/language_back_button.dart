@@ -1,7 +1,6 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class LanguageBackButton extends StatelessWidget {
   const LanguageBackButton({super.key, required this.scale});
@@ -29,7 +28,7 @@ class LanguageBackButton extends StatelessWidget {
           height: size,
           child: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: settingsLanguageNavy,
+            color: AppColors.navy,
             size: 26 * scale,
           ),
         ),

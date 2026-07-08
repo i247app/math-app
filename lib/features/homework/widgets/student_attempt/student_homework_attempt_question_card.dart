@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkAttemptQuestionCard extends StatelessWidget {
   const StudentHomeworkAttemptQuestionCard({
@@ -30,7 +30,7 @@ class StudentHomeworkAttemptQuestionCard extends StatelessWidget {
         question,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: homeworkAttemptInk,
+          color: AppColors.textPrimary,
           fontSize: 36 * scale,
           fontWeight: FontWeight.w900,
           height: 1.16,

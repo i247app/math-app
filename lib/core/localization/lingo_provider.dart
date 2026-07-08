@@ -10,8 +10,8 @@ class LingoProvider extends ChangeNotifier {
   LingoProvider({
     FlutterSecureStorage storage = const FlutterSecureStorage(),
     Locale? deviceLocale,
-  })  : _storage = storage,
-        _deviceLocale = deviceLocale;
+  }) : _storage = storage,
+       _deviceLocale = deviceLocale;
 
   static const _storageKey = 'app_language';
 
@@ -32,7 +32,8 @@ class LingoProvider extends ChangeNotifier {
     final savedCode = await _storage.read(key: _storageKey);
     final resolved = savedCode == null || savedCode.trim().isEmpty
         ? AppLanguage.fromDevice(
-            _deviceLocale ?? PlatformDispatcher.instance.locale)
+            _deviceLocale ?? PlatformDispatcher.instance.locale,
+          )
         : AppLanguage.fromCode(savedCode);
     _setLanguage(resolved);
     _isInitialized = true;

@@ -21,7 +21,7 @@ class _TeacherTopBar extends StatelessWidget {
         18 * scale,
         14 * scale,
       ),
-      decoration: const BoxDecoration(color: teacherMint),
+      decoration: const BoxDecoration(color: AppColors.teacherMint),
       child: Row(
         children: [
           TeacherAvatar(profile: profile, size: 48 * scale),
@@ -35,7 +35,7 @@ class _TeacherTopBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: teacherBlue.withValues(alpha: 0.60),
+                    color: AppColors.navy900.withValues(alpha: 0.60),
                     fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.6,
@@ -47,7 +47,7 @@ class _TeacherTopBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: teacherBlue,
+                    color: AppColors.navy900,
                     fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.1,
@@ -73,7 +73,7 @@ class _TeacherTopBar extends StatelessWidget {
             ),
             child: Icon(
               Icons.notifications_none_rounded,
-              color: teacherBlue,
+              color: AppColors.navy900,
               size: 22 * scale,
             ),
           ),

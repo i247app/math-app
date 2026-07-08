@@ -50,7 +50,7 @@ class _TeacherQuestionCard extends StatelessWidget {
               Text(
                 prompt,
                 style: GoogleFonts.andika(
-                  color: teacherInk,
+                  color: AppColors.textInkDark,
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   height: 24 / 14,

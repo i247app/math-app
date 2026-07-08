@@ -1,8 +1,8 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_field_shell.dart';
 
 class AddProfileTextField extends StatelessWidget {
@@ -32,7 +32,7 @@ class AddProfileTextField extends StatelessWidget {
         textInputAction: TextInputAction.next,
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         style: GoogleFonts.andika(
-          color: settingsDeepInk,
+          color: AppColors.textPrimary,
           fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w800,
           height: 1,

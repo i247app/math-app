@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentClassCategoryTile extends StatelessWidget {
   const StudentClassCategoryTile({
@@ -64,7 +64,7 @@ class StudentClassCategoryTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: studentClassInk,
+                  color: AppColors.textNavy,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   height: 20 / 16,
@@ -76,7 +76,7 @@ class StudentClassCategoryTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: studentClassMuted,
+                  color: AppColors.textMuted,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   height: 16 / 12,

@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_helpers.dart';
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_status_badge.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkAssignmentCard extends StatelessWidget {
   const StudentHomeworkAssignmentCard({
@@ -56,7 +56,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
-                        color: studentHomeworkMuted,
+                        color: AppColors.textMuted,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         height: 16 / 12,
@@ -73,7 +73,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: studentHomeworkInk,
+                  color: AppColors.textNavy,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   height: 28 / 18,
@@ -87,7 +87,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: studentHomeworkMuted,
+                    color: AppColors.textMuted,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     height: 20 / 14,
@@ -118,7 +118,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: studentHomeworkMuted,
+                          color: AppColors.textMuted,
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                           height: 24 / 16,

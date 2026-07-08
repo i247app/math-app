@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
@@ -5,7 +6,6 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/parent_profile_manage_panel.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/profile_add_button.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/profile_card.dart';
@@ -50,7 +50,7 @@ class ProfilePlaceholderPanel extends StatelessWidget {
         height: 360 * scale,
         child: Center(
           child: CircularProgressIndicator(
-            color: settingsTeal,
+            color: AppColors.tealIcon,
             strokeWidth: 3 * scale,
           ),
         ),
@@ -113,7 +113,7 @@ class ProfilePlaceholderPanel extends StatelessWidget {
             profile: sortedProfiles[index],
             isActive:
                 ActiveProfileSession.profileStableId(sortedProfiles[index]) ==
-                    activeProfileId,
+                activeProfileId,
             scale: scale,
             onSelect: () => onSelect(sortedProfiles[index]),
             onEdit: () => onEdit(sortedProfiles[index]),
@@ -172,8 +172,9 @@ class ProfilePlaceholderPanel extends StatelessWidget {
 
   List<StudentProfile> get _studentProfiles {
     return profiles
-        .where((profile) =>
-            ProfileRole.fromProfile(profile) == ProfileRole.student)
+        .where(
+          (profile) => ProfileRole.fromProfile(profile) == ProfileRole.student,
+        )
         .toList(growable: false);
   }
 }

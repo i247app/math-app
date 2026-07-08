@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_helpers.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkCloseButton extends StatelessWidget {
   const StudentHomeworkCloseButton({super.key, required this.scale});
@@ -24,7 +24,7 @@ class StudentHomeworkCloseButton extends StatelessWidget {
             width: 180 * scale,
             height: 57 * scale,
             decoration: BoxDecoration(
-              color: homeworkResultHeaderTeal,
+              color: AppColors.teal500,
               borderRadius: BorderRadius.circular(20 * scale),
               boxShadow: [
                 BoxShadow(

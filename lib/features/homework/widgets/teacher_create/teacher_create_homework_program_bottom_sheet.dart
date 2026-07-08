@@ -46,7 +46,7 @@ class _CreateHomeworkProgramBottomSheet extends StatelessWidget {
             Text(
               context.getText(AppKeys.teacherAssignmentProgramLabel),
               style: GoogleFonts.andika(
-                color: teacherTeal,
+                color: AppColors.teal520,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 height: 1.15,
@@ -73,7 +73,7 @@ class _CreateHomeworkProgramBottomSheet extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: teacherInk,
+                          color: AppColors.textInkDark,
                           fontSize: 16,
                           fontWeight: isSelected
                               ? FontWeight.w800
@@ -83,7 +83,7 @@ class _CreateHomeworkProgramBottomSheet extends StatelessWidget {
                       trailing: isSelected
                           ? const Icon(
                               Icons.check_circle_rounded,
-                              color: teacherTeal,
+                              color: AppColors.teal520,
                               size: 22,
                             )
                           : null,

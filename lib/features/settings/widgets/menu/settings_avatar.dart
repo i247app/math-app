@@ -1,10 +1,10 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class SettingsAvatar extends StatelessWidget {
   const SettingsAvatar({
@@ -62,9 +62,9 @@ class SettingsAvatar extends StatelessWidget {
               button: true,
               label: context.getText(AppKeys.profileMenuTitle),
               child: Material(
-                color: settingsTeal,
+                color: AppColors.tealIcon,
                 elevation: 5,
-                shadowColor: settingsTeal.withValues(alpha: 0.22),
+                shadowColor: AppColors.tealIcon.withValues(alpha: 0.22),
                 shape: CircleBorder(
                   side: BorderSide(color: Colors.white, width: 2.5 * scale),
                 ),

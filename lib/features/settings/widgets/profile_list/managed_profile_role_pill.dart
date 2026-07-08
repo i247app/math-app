@@ -18,8 +18,10 @@ class ManagedProfileRolePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-          EdgeInsets.symmetric(horizontal: 12 * scale, vertical: 5 * scale),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12 * scale,
+        vertical: 5 * scale,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFFFDEEE7),
         borderRadius: BorderRadius.circular(999),

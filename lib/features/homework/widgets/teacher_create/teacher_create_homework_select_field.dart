@@ -48,7 +48,7 @@ class _CreateHomeworkSelectField extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: teacherInk.withValues(alpha: 0.7),
+                    color: AppColors.textInkDark.withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),

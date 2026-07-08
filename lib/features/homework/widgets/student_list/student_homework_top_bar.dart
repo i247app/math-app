@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkTopBar extends StatelessWidget {
   const StudentHomeworkTopBar({
@@ -57,7 +57,7 @@ class StudentHomeworkTopBar extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: studentHomeworkTeal,
+                color: AppColors.teal500,
                 fontSize: 25,
                 fontWeight: FontWeight.w700,
                 height: 34 / 25,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentClassTeacherAvatarInitial extends StatelessWidget {
   const StudentClassTeacherAvatarInitial({super.key, required this.initial});
@@ -16,7 +16,7 @@ class StudentClassTeacherAvatarInitial extends StatelessWidget {
       child: Text(
         initial,
         style: GoogleFonts.andika(
-          color: studentClassPink,
+          color: AppColors.magenta,
           fontSize: 22,
           fontWeight: FontWeight.w700,
           height: 1,

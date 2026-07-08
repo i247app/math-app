@@ -16,13 +16,10 @@ abstract class SchoolService {
 }
 
 class SchoolApi implements SchoolService {
-  SchoolApi({
-    String? baseUrl,
-    NetworkApi? networkApi,
-  }) : _networkApi = networkApi ??
-            (baseUrl == null
-                ? NetworkApi.shared
-                : NetworkApi(baseUrl: baseUrl));
+  SchoolApi({String? baseUrl, NetworkApi? networkApi})
+    : _networkApi =
+          networkApi ??
+          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 

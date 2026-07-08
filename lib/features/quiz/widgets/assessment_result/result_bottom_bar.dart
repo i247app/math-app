@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_action_button.dart';
 
 class AssessmentResultBottomBar extends StatelessWidget {
@@ -24,7 +24,7 @@ class AssessmentResultBottomBar extends StatelessWidget {
       children: [
         AssessmentResultActionButton(
           label: context.getText(AppKeys.assessmentUpper),
-          background: AssessmentResultStyle.coral,
+          background: AppColors.resultCoral,
           scale: scale,
           onTap: onTest,
         ),
@@ -32,7 +32,7 @@ class AssessmentResultBottomBar extends StatelessWidget {
         AssessmentResultActionButton(
           label: context.getText(AppKeys.practiceUpper),
           icon: Icons.arrow_forward_rounded,
-          background: AssessmentResultStyle.headerTeal,
+          background: AppColors.teal500,
           scale: scale,
           onTap: onPractice,
         ),

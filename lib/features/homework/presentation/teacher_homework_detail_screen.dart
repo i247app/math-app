@@ -200,13 +200,13 @@ class _TeacherHomeworkDetailScreenState
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: teacherTeal,
+                                color: AppColors.teal520,
                               ),
                             )
                           : Text(
                               context.getText(AppKeys.save),
                               style: GoogleFonts.andika(
-                                color: teacherTeal,
+                                color: AppColors.teal520,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -216,7 +216,7 @@ class _TeacherHomeworkDetailScreenState
             ),
             Expanded(
               child: RefreshIndicator(
-                color: teacherTeal,
+                color: AppColors.teal520,
                 onRefresh: () => _loadDetail(forceRefresh: true),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
@@ -236,7 +236,7 @@ class _TeacherHomeworkDetailScreenState
                           padding: EdgeInsets.only(top: 80),
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: teacherTeal,
+                              color: AppColors.teal520,
                             ),
                           ),
                         )
@@ -262,7 +262,7 @@ class _TeacherHomeworkDetailScreenState
                               AppKeys.teacherAssignmentQuestionContent,
                             ),
                             style: GoogleFonts.andika(
-                              color: teacherBlue,
+                              color: AppColors.navy900,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               height: 32 / 18,

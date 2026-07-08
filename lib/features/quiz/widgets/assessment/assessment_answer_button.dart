@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class AssessmentAnswerButton extends StatelessWidget {
   const AssessmentAnswerButton({
@@ -20,9 +20,9 @@ class AssessmentAnswerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = selected
-        ? AssessmentStyle.teal
+        ? AppColors.teal700
         : Colors.black.withValues(alpha: 0);
-    final textColor = selected ? AssessmentStyle.teal : AssessmentStyle.ink;
+    final textColor = selected ? AppColors.teal700 : AppColors.textPrimary;
 
     return Material(
       color: Colors.transparent,
@@ -77,7 +77,7 @@ class AssessmentAnswerButton extends StatelessWidget {
                 padding: EdgeInsets.only(top: 4 * scale),
                 child: const DecoratedBox(
                   decoration: BoxDecoration(
-                    color: AssessmentStyle.teal,
+                    color: AppColors.teal700,
                     shape: BoxShape.circle,
                   ),
                 ),

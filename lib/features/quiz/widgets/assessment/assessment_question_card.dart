@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class AssessmentQuestionCard extends StatelessWidget {
   const AssessmentQuestionCard({
@@ -29,7 +29,7 @@ class AssessmentQuestionCard extends StatelessWidget {
           question,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AssessmentStyle.ink,
+            color: AppColors.textPrimary,
             fontSize: 72 * scale,
             fontWeight: FontWeight.w900,
             height: 1,

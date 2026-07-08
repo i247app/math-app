@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_helpers.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 class StudentHomeworkResultHeader extends StatelessWidget {
@@ -34,7 +34,7 @@ class StudentHomeworkResultHeader extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: QuizHeaderIconButton(
               icon: Icons.arrow_back_rounded,
-              color: homeworkResultHeaderTeal,
+              color: AppColors.teal500,
               scale: scale,
               size: 40,
               iconSize: 23,
@@ -48,7 +48,7 @@ class StudentHomeworkResultHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: homeworkResultHeaderTeal,
+              color: AppColors.teal500,
               fontSize: 25 * scale,
               fontWeight: FontWeight.w800,
               height: 34 / 25,

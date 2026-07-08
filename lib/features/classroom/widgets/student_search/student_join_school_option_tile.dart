@@ -1,6 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 
 class StudentJoinSchoolOptionTile extends StatelessWidget {
   const StudentJoinSchoolOptionTile({
@@ -32,7 +31,7 @@ class StudentJoinSchoolOptionTile extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: selected ? studentJoinTeal : studentJoinInk,
+                    color: selected ? AppColors.teal520 : AppColors.textInkDark,
                     fontSize: 15,
                     fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
                   ),
@@ -41,7 +40,7 @@ class StudentJoinSchoolOptionTile extends StatelessWidget {
               if (selected)
                 const Icon(
                   Icons.check_rounded,
-                  color: studentJoinTeal,
+                  color: AppColors.teal520,
                   size: 20,
                 ),
             ],

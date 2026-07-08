@@ -19,7 +19,7 @@ class _CreateHomeworkPublishSwitch extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: teacherInk,
+              color: AppColors.textInkDark,
               fontSize: 14,
               fontWeight: FontWeight.w700,
               height: 18 / 14,
@@ -35,7 +35,7 @@ class _CreateHomeworkPublishSwitch extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.andika(
-            color: teacherInk.withValues(alpha: 0.65),
+            color: AppColors.textInkDark.withValues(alpha: 0.65),
             fontSize: 12,
             fontWeight: FontWeight.w600,
             height: 16 / 12,
@@ -45,7 +45,7 @@ class _CreateHomeworkPublishSwitch extends StatelessWidget {
         Switch.adaptive(
           value: isPublished,
           activeThumbColor: Colors.white,
-          activeTrackColor: teacherTeal,
+          activeTrackColor: AppColors.teal520,
           inactiveThumbColor: Colors.white,
           inactiveTrackColor: const Color(0xFFC4C6D2),
           onChanged: onChanged,

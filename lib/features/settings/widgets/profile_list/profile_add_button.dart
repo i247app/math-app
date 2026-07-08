@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProfileAddButton extends StatelessWidget {
-  const ProfileAddButton({
-    super.key,
-    required this.scale,
-    required this.onTap,
-  });
+  const ProfileAddButton({super.key, required this.scale, required this.onTap});
 
   final double scale;
   final VoidCallback onTap;
@@ -23,11 +19,7 @@ class ProfileAddButton extends StatelessWidget {
         child: SizedBox(
           width: 48 * scale,
           height: 34 * scale,
-          child: Icon(
-            Icons.add_rounded,
-            color: Colors.white,
-            size: 24 * scale,
-          ),
+          child: Icon(Icons.add_rounded, color: Colors.white, size: 24 * scale),
         ),
       ),
     );

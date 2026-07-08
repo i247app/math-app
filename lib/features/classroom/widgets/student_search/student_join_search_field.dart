@@ -1,8 +1,9 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 
 class StudentJoinSearchField extends StatelessWidget {
   const StudentJoinSearchField({
@@ -26,7 +27,7 @@ class StudentJoinSearchField extends StatelessWidget {
       onSubmitted: onSubmitted,
       textInputAction: TextInputAction.search,
       style: const TextStyle(
-        color: studentJoinInk,
+        color: AppColors.textInkDark,
         fontSize: 16,
         fontWeight: FontWeight.w700,
         letterSpacing: 0,
@@ -85,7 +86,9 @@ class StudentJoinSearchField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(color: studentJoinTeal.withValues(alpha: 0.3)),
+          borderSide: BorderSide(
+            color: AppColors.teal520.withValues(alpha: 0.3),
+          ),
         ),
       ),
     );

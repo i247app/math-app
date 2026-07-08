@@ -1,7 +1,7 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({
@@ -25,7 +25,7 @@ class ProfileAvatar extends StatelessWidget {
       size: size,
       avatarKey: avatarKey,
       avatarUrl: avatarUrl,
-      borderColor: isActive ? settingsTeal : const Color(0xFFC8D0CC),
+      borderColor: isActive ? AppColors.tealIcon : const Color(0xFFC8D0CC),
       borderWidth: 4 * scale,
     );
   }

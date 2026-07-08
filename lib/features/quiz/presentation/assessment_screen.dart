@@ -16,7 +16,7 @@ import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_generat
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_header.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_progress_section.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_question_card.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 enum AiAssessmentResult { generationFailed }
 
@@ -174,7 +174,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           title: Text(
             context.getText(AppKeys.unansweredSubmitTitle),
             style: const TextStyle(
-              color: AssessmentStyle.ink,
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
@@ -182,7 +182,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           content: Text(
             context.getText(AppKeys.unansweredSubmitMessage),
             style: const TextStyle(
-              color: AssessmentStyle.muted,
+              color: AppColors.textSubtle,
               fontWeight: FontWeight.w700,
               letterSpacing: 0,
             ),
@@ -194,7 +194,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
               child: Text(
                 context.getText(AppKeys.stayUpper),
                 style: const TextStyle(
-                  color: AssessmentStyle.rust,
+                  color: AppColors.rust,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.8,
                 ),
@@ -202,7 +202,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             ),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: AssessmentStyle.teal,
+                backgroundColor: AppColors.teal700,
                 foregroundColor: const Color(0xFFBEFFF9),
               ),
               onPressed: () => Navigator.of(context).pop(true),
@@ -237,7 +237,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final isSubmittingQuiz = _controller.isSubmittingQuiz;
           final backgroundColor = isGeneratingQuestion
               ? Colors.white
-              : AssessmentStyle.mint;
+              : AppColors.gradeBackground;
 
           return Scaffold(
             backgroundColor: backgroundColor,

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class WelcomeLoginButton extends StatelessWidget {
   const WelcomeLoginButton({
@@ -39,7 +39,7 @@ class WelcomeLoginButton extends StatelessWidget {
               fontSize: 18 * scale,
               fontWeight: FontWeight.w500,
               height: 1.2,
-              decorationColor: WelcomeStyle.teal,
+              decorationColor: AppColors.welcomeTeal,
               decorationThickness: 1.6,
               decorationStyle: TextDecorationStyle.solid,
             ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class GradeLoadError extends StatelessWidget {
   const GradeLoadError({
@@ -28,7 +28,7 @@ class GradeLoadError extends StatelessWidget {
         children: [
           Icon(
             Icons.school_outlined,
-            color: GradeSelectionStyle.teal,
+            color: AppColors.teal700,
             size: 34 * scale,
           ),
           SizedBox(height: 12 * scale),
@@ -36,7 +36,7 @@ class GradeLoadError extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: GradeSelectionStyle.ink,
+              color: AppColors.textPrimary,
               fontSize: 14 * scale,
               fontWeight: FontWeight.w800,
               height: 1.3,
@@ -49,7 +49,7 @@ class GradeLoadError extends StatelessWidget {
             child: Text(
               context.getText(AppKeys.retryUpper),
               style: TextStyle(
-                color: GradeSelectionStyle.teal,
+                color: AppColors.teal700,
                 fontSize: 13 * scale,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.6,

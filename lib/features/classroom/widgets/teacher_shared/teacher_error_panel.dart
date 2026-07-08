@@ -27,7 +27,7 @@ class TeacherErrorPanel extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: teacherMuted,
+              color: AppColors.textCoolMuted,
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w600,
             ),

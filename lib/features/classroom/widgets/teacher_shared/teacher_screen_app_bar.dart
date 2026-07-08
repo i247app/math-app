@@ -51,7 +51,7 @@ class TeacherScreenAppBar extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: teacherTeal,
+              color: AppColors.teal520,
               fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w700,
               height: 1,

@@ -47,7 +47,7 @@ class _TeacherStudySearchField extends StatelessWidget {
                   FocusManager.instance.primaryFocus?.unfocus(),
               textInputAction: TextInputAction.search,
               style: GoogleFonts.andika(
-                color: teacherInk,
+                color: AppColors.textInkDark,
                 fontSize: FontSize.normal * scale,
                 fontWeight: FontWeight.w500,
               ),

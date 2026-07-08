@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class WelcomeStartButton extends StatelessWidget {
   const WelcomeStartButton({
@@ -23,7 +23,7 @@ class WelcomeStartButton extends StatelessWidget {
     final radius = BorderRadius.circular(20 * scale);
 
     return Material(
-      color: WelcomeStyle.coral,
+      color: AppColors.coral600,
       borderRadius: radius,
       child: InkWell(
         onTap: () {

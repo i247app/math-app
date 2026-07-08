@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class AssessmentAiReviewText extends StatelessWidget {
   const AssessmentAiReviewText({
@@ -21,7 +21,7 @@ class AssessmentAiReviewText extends StatelessWidget {
     final highlight = context.getText(AppKeys.defaultAiReviewHighlight);
     final highlightIndex = text.toLowerCase().indexOf(highlight);
     final bodyStyle = GoogleFonts.andika(
-      color: AssessmentResultStyle.muted,
+      color: AppColors.textSubtle,
       fontSize: 12 * scale,
       fontWeight: FontWeight.w400,
       height: 19.5 / 12,
@@ -50,7 +50,7 @@ class AssessmentAiReviewText extends StatelessWidget {
               highlightIndex + highlight.length,
             ),
             style: bodyStyle.copyWith(
-              color: AssessmentResultStyle.teal,
+              color: AppColors.teal700,
               fontWeight: FontWeight.w800,
             ),
           ),

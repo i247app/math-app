@@ -16,7 +16,7 @@ class _TeacherClassroomLoadingContent extends StatelessWidget {
             width: 90 * scale,
             height: 36 * scale,
             radius: 12 * scale,
-            color: teacherCoral.withValues(alpha: 0.18),
+            color: AppColors.coralTeacher.withValues(alpha: 0.18),
           ),
         ),
         SizedBox(height: 16 * scale),

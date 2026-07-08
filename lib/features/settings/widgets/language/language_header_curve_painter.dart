@@ -1,6 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class LanguageHeaderCurvePainter extends CustomPainter {
   const LanguageHeaderCurvePainter({required this.scale});
@@ -9,11 +8,11 @@ class LanguageHeaderCurvePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final backgroundPaint = Paint()..color = settingsLanguageBackground;
+    final backgroundPaint = Paint()..color = AppColors.appBackground;
     canvas.drawRect(Offset.zero & size, backgroundPaint);
 
     final linePaint = Paint()
-      ..color = settingsLanguageHeaderLine.withValues(alpha: 0.78)
+      ..color = AppColors.orangeMuted.withValues(alpha: 0.78)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.1 * scale;
 

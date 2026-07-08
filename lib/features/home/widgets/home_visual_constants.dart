@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
-const homeTeal = Color(0xFF006762);
-const homeMuted = Color(0xFF515F54);
-const homeDeepInk = Color(0xFF253228);
-const homeMintBackground = Color(0xFFEEF9FB);
+const homeTeal = AppColors.teal700;
+const homeMuted = AppColors.textSubtle;
+const homeDeepInk = AppColors.textPrimary;
+const homeMintBackground = AppColors.appBackground;
 
 const studentHomeBellAsset = 'assets/images/student_home_bell.svg';
 const studentHomeNavHomeAsset = 'assets/images/student_home_nav_home.svg';

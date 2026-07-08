@@ -35,7 +35,7 @@ class _CreateHomeworkClassSelector extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: teacherInk,
+                    color: AppColors.textInkDark,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     height: 24 / 16,
@@ -48,7 +48,7 @@ class _CreateHomeworkClassSelector extends StatelessWidget {
                   height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: teacherTeal,
+                    color: AppColors.teal520,
                   ),
                 )
               else

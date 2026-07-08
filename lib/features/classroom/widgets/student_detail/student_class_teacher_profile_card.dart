@@ -5,7 +5,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_message_button.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_teacher_avatar.dart';
 
@@ -48,7 +48,7 @@ class StudentClassTeacherProfileCard extends StatelessWidget {
           ? const SizedBox(
               height: 56,
               child: Center(
-                child: CircularProgressIndicator(color: studentClassTeal),
+                child: CircularProgressIndicator(color: AppColors.teal500),
               ),
             )
           : Row(
@@ -85,7 +85,7 @@ class StudentClassTeacherProfileCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: studentClassMuted,
+                          color: AppColors.textMuted,
                           fontSize: 10,
                           fontWeight: FontWeight.w400,
                           height: 1.5,
@@ -97,7 +97,7 @@ class StudentClassTeacherProfileCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: studentClassInk,
+                          color: AppColors.textNavy,
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
                           height: 1.5,

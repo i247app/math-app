@@ -17,7 +17,7 @@ class _CreateHomeworkSubmitButton extends StatelessWidget {
       child: FilledButton(
         onPressed: isLoading ? null : onTap,
         style: FilledButton.styleFrom(
-          backgroundColor: teacherTeal,
+          backgroundColor: AppColors.teal520,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),

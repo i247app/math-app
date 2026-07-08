@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 
 class StudentJoinStateCard extends StatelessWidget {
   const StudentJoinStateCard({
@@ -45,7 +44,7 @@ class StudentJoinStateCard extends StatelessWidget {
             title ?? context.getText(titleKey!),
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: studentJoinBlue,
+              color: AppColors.textNavy,
               fontSize: 16,
               fontWeight: FontWeight.w900,
             ),
@@ -68,8 +67,8 @@ class StudentJoinStateCard extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text(context.getText(actionLabelKey!)),
               style: OutlinedButton.styleFrom(
-                foregroundColor: studentJoinDeepTeal,
-                side: const BorderSide(color: studentJoinDeepTeal),
+                foregroundColor: AppColors.tealActive,
+                side: const BorderSide(color: AppColors.tealActive),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
                 ),

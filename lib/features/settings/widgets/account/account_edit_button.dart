@@ -1,6 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class AccountEditButton extends StatelessWidget {
   const AccountEditButton({
@@ -31,11 +30,11 @@ class AccountEditButton extends StatelessWidget {
             height: 36 * scale,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10 * scale),
-              border: Border.all(color: settingsTeal, width: 1.2),
+              border: Border.all(color: AppColors.tealIcon, width: 1.2),
             ),
             child: Icon(
               Icons.edit_rounded,
-              color: settingsTeal,
+              color: AppColors.tealIcon,
               size: 19 * scale,
             ),
           ),

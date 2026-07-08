@@ -50,7 +50,7 @@ class _TeacherAssignmentCard extends StatelessWidget {
                     Text(
                       dateParts.day,
                       style: GoogleFonts.andika(
-                        color: teacherBlue,
+                        color: AppColors.navy900,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                         height: 1.05,
@@ -81,7 +81,7 @@ class _TeacherAssignmentCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: teacherBlue,
+                          color: AppColors.navy900,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           height: 17.5 / 14,

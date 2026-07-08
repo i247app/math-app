@@ -7,7 +7,7 @@ class _QuizReviewQuestionStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isCorrect ? quizReviewTeal : quizReviewRed;
+    final color = isCorrect ? AppColors.teal600 : AppColors.red;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

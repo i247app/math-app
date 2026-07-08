@@ -1,6 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 
 class StudentJoinGradeChip extends StatelessWidget {
   const StudentJoinGradeChip({
@@ -33,7 +32,7 @@ class StudentJoinGradeChip extends StatelessWidget {
           child: Ink(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: selected ? studentJoinTeal : const Color(0xFFE0E3E6),
+              color: selected ? AppColors.teal520 : const Color(0xFFE0E3E6),
               borderRadius: BorderRadius.circular(999),
             ),
             child: Row(
@@ -47,7 +46,7 @@ class StudentJoinGradeChip extends StatelessWidget {
                       label,
                       maxLines: 1,
                       style: TextStyle(
-                        color: selected ? Colors.white : studentJoinMuted,
+                        color: selected ? Colors.white : AppColors.textMuted,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         height: 1,

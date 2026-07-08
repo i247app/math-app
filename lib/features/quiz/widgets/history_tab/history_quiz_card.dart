@@ -37,7 +37,7 @@ class _HistoryQuizCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: radius,
-            border: Border.all(color: historyCardBorder, width: 1.3 * scale),
+            border: Border.all(color: AppColors.borderWarm, width: 1.3 * scale),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.07),
@@ -70,7 +70,7 @@ class _HistoryQuizCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: historyDeepInk,
+                        color: AppColors.textInk,
                         fontSize: FontSize.normal * scale,
                         fontWeight: FontWeight.w800,
                         height: 1.28,
@@ -84,7 +84,7 @@ class _HistoryQuizCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: historyMuted,
+                          color: AppColors.textWarmMuted,
                           fontSize: FontSize.small * scale,
                           fontWeight: FontWeight.w500,
                           height: 1.22,
@@ -97,7 +97,7 @@ class _HistoryQuizCard extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: historyNavy,
+                color: AppColors.navyDark,
                 size: 26 * scale,
               ),
             ],

@@ -77,7 +77,7 @@ class _TeacherClassDetailMemberManagementCard extends StatelessWidget {
                         maxLines: requestCount > 0 ? 2 : 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: teacherMuted,
+                          color: AppColors.textCoolMuted,
                           fontSize: 14 * scale,
                           fontWeight: FontWeight.w400,
                           height: 1.25,

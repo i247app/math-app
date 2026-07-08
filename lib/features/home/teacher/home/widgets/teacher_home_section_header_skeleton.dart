@@ -35,7 +35,7 @@ class _TeacherHomeSectionHeaderSkeletonState
             width: 42 * scale,
             height: 42 * scale,
             radius: 14 * scale,
-            color: teacherTeal.withValues(alpha: 0.16),
+            color: AppColors.teal520.withValues(alpha: 0.16),
           ),
           SizedBox(width: 12 * scale),
           Expanded(
@@ -50,7 +50,7 @@ class _TeacherHomeSectionHeaderSkeletonState
             width: 82 * scale,
             height: 22 * scale,
             radius: 11 * scale,
-            color: teacherTeal.withValues(alpha: 0.14),
+            color: AppColors.teal520.withValues(alpha: 0.14),
           ),
         ],
       ),

@@ -162,7 +162,7 @@ class _TeacherStudentInviteSearchSheetState
                           icon: const Icon(Icons.close_rounded),
                         ),
                   filled: true,
-                  fillColor: teacherPaleMint,
+                  fillColor: AppColors.teacherPaleMint,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 14,
@@ -177,7 +177,7 @@ class _TeacherStudentInviteSearchSheetState
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: teacherTeal),
+                    borderSide: const BorderSide(color: AppColors.teal520),
                   ),
                 ),
               ),
@@ -187,7 +187,7 @@ class _TeacherStudentInviteSearchSheetState
                   'count': selectedCount,
                 }),
                 style: GoogleFonts.andika(
-                  color: teacherMuted,
+                  color: AppColors.textCoolMuted,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),

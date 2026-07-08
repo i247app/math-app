@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
   const StudentHomeworkAttemptBottomActionButton({
@@ -45,7 +45,7 @@ class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
                 ? null
                 : [
                     BoxShadow(
-                      color: homeworkAttemptTeal.withValues(alpha: 0.20),
+                      color: AppColors.teal700.withValues(alpha: 0.20),
                       blurRadius: 6 * scale,
                       offset: Offset(0, 4 * scale),
                     ),

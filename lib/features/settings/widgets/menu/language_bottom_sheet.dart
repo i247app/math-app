@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_language.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/language_sheet_option.dart';
 
 class LanguageBottomSheet extends StatelessWidget {
@@ -74,7 +74,7 @@ class LanguageBottomSheet extends StatelessWidget {
                 Text(
                   context.getText(AppKeys.languageTitle),
                   style: GoogleFonts.andika(
-                    color: settingsDeepInk,
+                    color: AppColors.textPrimary,
                     fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -86,10 +86,12 @@ class LanguageBottomSheet extends StatelessWidget {
                   LanguageSheetOption(
                     flag: _flagFor(language),
                     label: switch (language) {
-                      AppLanguage.vi =>
-                        context.getText(AppKeys.languageVietnamese),
-                      AppLanguage.en =>
-                        context.getText(AppKeys.languageEnglish),
+                      AppLanguage.vi => context.getText(
+                        AppKeys.languageVietnamese,
+                      ),
+                      AppLanguage.en => context.getText(
+                        AppKeys.languageEnglish,
+                      ),
                     },
                     selected: language == currentLanguage,
                     scale: scale,

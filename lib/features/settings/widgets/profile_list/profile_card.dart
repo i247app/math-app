@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -6,7 +7,6 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/managed_profile_role_pill.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/profile_avatar.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/profile_icon_button.dart';
@@ -35,7 +35,7 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isActive ? settingsTeal : settingsMuted;
+    final accent = isActive ? AppColors.tealIcon : AppColors.textSubtle;
     final radius = BorderRadius.circular(18 * scale);
     final role = ProfileRole.fromProfile(profile);
     final isTeacher = role == ProfileRole.teacher;
@@ -58,7 +58,7 @@ class ProfileCard extends StatelessWidget {
             borderRadius: radius,
             border: Border.all(
               color: isActive
-                  ? settingsTeal
+                  ? AppColors.tealIcon
                   : const Color(0xFFC8D0CC).withValues(alpha: 0.92),
               width: isActive ? 1.6 * scale : 1.3 * scale,
             ),
@@ -91,7 +91,7 @@ class ProfileCard extends StatelessWidget {
                           settingsProfileName(context, profile),
                           softWrap: true,
                           style: GoogleFonts.andika(
-                            color: settingsDeepInk,
+                            color: AppColors.textPrimary,
                             fontSize: FontSize.large * scale,
                             fontWeight: FontWeight.w900,
                             height: 1,
@@ -99,10 +99,7 @@ class ProfileCard extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 5 * scale),
-                        ManagedProfileRolePill(
-                          role: role,
-                          scale: scale,
-                        ),
+                        ManagedProfileRolePill(role: role, scale: scale),
                         SizedBox(height: 9 * scale),
                         ProfileIdLine(
                           profile: profile,
@@ -118,8 +115,9 @@ class ProfileCard extends StatelessWidget {
               ),
               SizedBox(height: 14 * scale),
               ProfileInfoLine(
-                icon:
-                    isTeacher ? Icons.apartment_rounded : Icons.school_outlined,
+                icon: isTeacher
+                    ? Icons.apartment_rounded
+                    : Icons.school_outlined,
                 iconColor: accent,
                 label: isTeacher
                     ? context.getText(AppKeys.school)
@@ -145,7 +143,7 @@ class ProfileCard extends StatelessWidget {
                 children: [
                   ProfileIconButton(
                     icon: Icons.edit_rounded,
-                    foregroundColor: settingsTeal,
+                    foregroundColor: AppColors.tealIcon,
                     backgroundColor: const Color(0xFFECF6FA),
                     scale: scale,
                     onTap: onEdit,

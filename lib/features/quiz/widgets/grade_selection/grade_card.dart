@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_badge.dart';
 import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class GradeCard extends StatelessWidget {
   const GradeCard({
@@ -44,15 +44,13 @@ class GradeCard extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.92),
               borderRadius: BorderRadius.circular(28 * scale),
               border: Border.all(
-                color: isSelected
-                    ? GradeSelectionStyle.teal
-                    : Colors.transparent,
+                color: isSelected ? AppColors.teal700 : Colors.transparent,
                 width: 2 * scale,
               ),
               boxShadow: [
                 BoxShadow(
                   color: isSelected
-                      ? GradeSelectionStyle.teal.withValues(alpha: 0.16)
+                      ? AppColors.teal700.withValues(alpha: 0.16)
                       : Colors.black.withValues(alpha: 0.03),
                   blurRadius: isSelected ? 16 * scale : 10 * scale,
                   offset: Offset(0, isSelected ? 7 * scale : 4 * scale),
@@ -75,7 +73,7 @@ class GradeCard extends StatelessWidget {
                     option.label,
                     maxLines: 1,
                     style: TextStyle(
-                      color: GradeSelectionStyle.ink,
+                      color: AppColors.textPrimary,
                       fontSize: 17 * scale,
                       fontWeight: FontWeight.w900,
                       height: 1,

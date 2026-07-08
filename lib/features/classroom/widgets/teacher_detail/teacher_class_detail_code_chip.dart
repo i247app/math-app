@@ -18,7 +18,7 @@ class _TeacherClassDetailCodeChip extends StatelessWidget {
       constraints: BoxConstraints(minWidth: 114 * scale, maxWidth: 190 * scale),
       padding: EdgeInsets.symmetric(horizontal: 17 * scale),
       decoration: BoxDecoration(
-        color: teacherMint,
+        color: AppColors.teacherMint,
         borderRadius: BorderRadius.circular(8 * scale),
         border: Border.all(color: const Color(0xFFDBEAFE)),
       ),

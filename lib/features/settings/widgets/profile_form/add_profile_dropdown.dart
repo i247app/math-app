@@ -1,10 +1,10 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_field_shell.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_select_result.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_form/profile_form_keyboard.dart';
@@ -65,7 +65,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
                   style: GoogleFonts.andika(
                     color: selectedLabel == null
                         ? const Color(0xFFA8B1B2)
-                        : settingsDeepInk,
+                        : AppColors.textPrimary,
                     fontSize: FontSize.normal * scale,
                     fontWeight: selectedLabel == null
                         ? FontWeight.w800
@@ -76,7 +76,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
               ),
               Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: settingsTeal,
+                color: AppColors.tealIcon,
                 size: 24 * scale,
               ),
             ],
@@ -133,7 +133,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.andika(
-                    color: settingsTeal,
+                    color: AppColors.tealIcon,
                     fontSize: FontSize.xxxl * scale,
                     fontWeight: FontWeight.w900,
                     height: 1.15,
@@ -171,7 +171,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.andika(
-                              color: settingsDeepInk,
+                              color: AppColors.textPrimary,
                               fontSize: FontSize.normal * scale,
                               fontWeight: isSelected
                                   ? FontWeight.w900
@@ -182,7 +182,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
                           trailing: isSelected
                               ? Icon(
                                   Icons.check_circle_rounded,
-                                  color: settingsTeal,
+                                  color: AppColors.tealIcon,
                                   size: 22 * scale,
                                 )
                               : null,

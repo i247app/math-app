@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
 
 class GradeBadge extends StatelessWidget {
   const GradeBadge({
@@ -25,19 +24,19 @@ class GradeBadge extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: isSelected ? GradeSelectionStyle.teal : AppColors.aquaMist,
+        color: isSelected ? AppColors.teal700 : AppColors.aquaMist,
         shape: BoxShape.circle,
       ),
       child: option.number == null
           ? Icon(
               Icons.school_rounded,
-              color: isSelected ? Colors.white : GradeSelectionStyle.teal,
+              color: isSelected ? Colors.white : AppColors.teal700,
               size: 19 * scale,
             )
           : Text(
               option.number!,
               style: TextStyle(
-                color: isSelected ? Colors.white : GradeSelectionStyle.teal,
+                color: isSelected ? Colors.white : AppColors.teal700,
                 fontSize: 17 * scale,
                 fontWeight: FontWeight.w900,
                 height: 1,

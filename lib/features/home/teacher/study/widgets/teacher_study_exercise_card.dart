@@ -58,7 +58,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                         Text(
                           dateParts?.day ?? '--',
                           style: GoogleFonts.andika(
-                            color: teacherBlue,
+                            color: AppColors.navy900,
                             fontSize: FontSize.large * scale,
                             fontWeight: FontWeight.w800,
                             height: 1,
@@ -91,7 +91,7 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
-                            color: teacherBlue,
+                            color: AppColors.navy900,
                             fontSize: FontSize.normal * scale,
                             fontWeight: FontWeight.w700,
                             height: 1.25,

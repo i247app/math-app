@@ -35,7 +35,7 @@ class _TeacherClassSkeletonCard extends StatelessWidget {
             width: 69 * scale,
             height: 14 * scale,
             radius: 5 * scale,
-            color: teacherTeal.withValues(alpha: 0.20),
+            color: AppColors.teal520.withValues(alpha: 0.20),
           ),
         ],
       ),

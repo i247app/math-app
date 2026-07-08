@@ -2,14 +2,9 @@ import 'package:numi_flutter/features/auth/phone_region.dart';
 import '../localization/app_keys.dart';
 
 class PhoneValidationResult {
-  const PhoneValidationResult({
-    required this.phone,
-    required this.errorKey,
-  });
+  const PhoneValidationResult({required this.phone, required this.errorKey});
 
-  const PhoneValidationResult.empty()
-      : phone = null,
-        errorKey = null;
+  const PhoneValidationResult.empty() : phone = null, errorKey = null;
 
   final String? phone;
   final String? errorKey;

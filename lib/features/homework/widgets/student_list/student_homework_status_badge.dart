@@ -5,7 +5,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_helpers.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkStatusBadge extends StatelessWidget {
   const StudentHomeworkStatusBadge({super.key, required this.exercise});
@@ -25,7 +25,7 @@ class StudentHomeworkStatusBadge extends StatelessWidget {
         ? const Color(0xFF2E7D32)
         : overdue
         ? const Color(0xFFC2410C)
-        : studentHomeworkTeal;
+        : AppColors.teal500;
 
     return DecoratedBox(
       decoration: BoxDecoration(

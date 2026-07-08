@@ -56,13 +56,10 @@ abstract class ClassroomExerciseService {
 }
 
 class ClassroomExerciseApi implements ClassroomExerciseService {
-  ClassroomExerciseApi({
-    String? baseUrl,
-    NetworkApi? networkApi,
-  }) : _networkApi = networkApi ??
-            (baseUrl == null
-                ? NetworkApi.shared
-                : NetworkApi(baseUrl: baseUrl));
+  ClassroomExerciseApi({String? baseUrl, NetworkApi? networkApi})
+    : _networkApi =
+          networkApi ??
+          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 
@@ -81,8 +78,9 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
           classroomId: classroomId,
           profileId: profileId,
           search: search?.trim().isEmpty == true ? null : search?.trim(),
-          visibility:
-              visibility?.trim().isEmpty == true ? null : visibility?.trim(),
+          visibility: visibility?.trim().isEmpty == true
+              ? null
+              : visibility?.trim(),
           submissionStatus: submissionStatus?.trim().isEmpty == true
               ? null
               : submissionStatus?.trim(),

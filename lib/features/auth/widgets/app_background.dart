@@ -50,10 +50,7 @@ class _BackgroundRing extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.sandRing,
-          width: 38,
-        ),
+        border: Border.all(color: AppColors.sandRing, width: 38),
       ),
     );
   }

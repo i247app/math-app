@@ -5,7 +5,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_empty_panel.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_refresh_label.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_section_title.dart';
@@ -40,7 +40,7 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
             Text(
               context.getText(AppKeys.studentClassAll),
               style: GoogleFonts.andika(
-                color: studentClassPink,
+                color: AppColors.magenta,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 height: 1.5,
@@ -53,7 +53,7 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
           const SizedBox(
             height: 72,
             child: Center(
-              child: CircularProgressIndicator(color: studentClassTeal),
+              child: CircularProgressIndicator(color: AppColors.teal500),
             ),
           )
         else if (upcomingExercises.isEmpty)

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
   const StudentHomeworkAttemptAnswerButton({
@@ -20,9 +20,9 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = selected
-        ? homeworkAttemptTeal
+        ? AppColors.teal700
         : Colors.black.withValues(alpha: 0);
-    final textColor = selected ? homeworkAttemptTeal : homeworkAttemptInk;
+    final textColor = selected ? AppColors.teal700 : AppColors.textPrimary;
 
     return Material(
       color: Colors.transparent,

@@ -1,10 +1,10 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class SettingsSaveButton extends StatelessWidget {
   const SettingsSaveButton({
@@ -20,7 +20,9 @@ class SettingsSaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = enabled ? settingsTeal : const Color(0xFFBFC9CA);
+    final backgroundColor = enabled
+        ? AppColors.tealIcon
+        : const Color(0xFFBFC9CA);
     final foregroundColor = enabled ? Colors.white : const Color(0xFFF4F6F6);
 
     return Material(

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
 
 class AssessmentBottomBar extends StatelessWidget {
@@ -39,7 +39,7 @@ class AssessmentBottomBar extends StatelessWidget {
             24 * scale,
           ),
           decoration: BoxDecoration(
-            color: AssessmentStyle.mint.withValues(alpha: 0.90),
+            color: AppColors.gradeBackground.withValues(alpha: 0.90),
             border: Border(
               top: BorderSide(
                 color: const Color(0xFFCDE2CF).withValues(alpha: 0.30),
@@ -52,8 +52,8 @@ class AssessmentBottomBar extends StatelessWidget {
                 child: AssessmentBottomActionButton(
                   label: context.getText(AppKeys.previousQuestionUpper),
                   icon: Icons.arrow_back_rounded,
-                  background: AssessmentStyle.peach.withValues(alpha: 0.50),
-                  foreground: AssessmentStyle.rust,
+                  background: AppColors.peachStrong.withValues(alpha: 0.50),
+                  foreground: AppColors.rust,
                   scale: scale,
                   onTap: canGoBack && !isSubmitting ? onBack : null,
                 ),
@@ -75,7 +75,7 @@ class AssessmentBottomBar extends StatelessWidget {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [AssessmentStyle.teal, Color(0xFF73F1E7)],
+                    colors: [AppColors.teal700, Color(0xFF73F1E7)],
                   ),
                 ),
               ),

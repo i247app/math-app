@@ -7,7 +7,7 @@ import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_login_button.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class WelcomeComposition extends StatelessWidget {
   const WelcomeComposition({
@@ -55,7 +55,7 @@ class WelcomeComposition extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
           children: [
             const Positioned.fill(
-              child: ColoredBox(color: WelcomeStyle.background),
+              child: ColoredBox(color: AppColors.pageBackground),
             ),
             Positioned(
               left: 0,
@@ -139,7 +139,7 @@ class WelcomeComposition extends StatelessWidget {
                               width: s(48),
                               height: s(6),
                               decoration: BoxDecoration(
-                                color: WelcomeStyle.taglineCoral,
+                                color: AppColors.coral500,
                                 borderRadius: BorderRadius.circular(999),
                               ),
                             ),
@@ -176,7 +176,7 @@ class _WelcomeTagline extends StatelessWidget {
               style: TextStyle(
                 fontSize: FontSize.xxl,
                 fontWeight: FontWeight.w500,
-                color: WelcomeStyle.teal,
+                color: AppColors.welcomeTeal,
               ),
             ),
             Text(
@@ -184,7 +184,7 @@ class _WelcomeTagline extends StatelessWidget {
               style: TextStyle(
                 fontSize: FontSize.xxl,
                 fontWeight: FontWeight.w500,
-                color: WelcomeStyle.taglineCoral,
+                color: AppColors.coral500,
               ),
             ),
           ],
@@ -194,7 +194,7 @@ class _WelcomeTagline extends StatelessWidget {
           style: TextStyle(
             fontSize: FontSize.xxl,
             fontWeight: FontWeight.w500,
-            color: WelcomeStyle.teal,
+            color: AppColors.welcomeTeal,
           ),
         ),
       ],

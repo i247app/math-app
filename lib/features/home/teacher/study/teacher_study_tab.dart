@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -17,7 +18,6 @@ import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
-import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
 import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/homework/presentation/teacher_homework_screen.dart';
@@ -408,7 +408,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
           ),
           Expanded(
             child: RefreshIndicator(
-              color: teacherTeal,
+              color: AppColors.teal520,
               onRefresh: _refreshClassrooms,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(

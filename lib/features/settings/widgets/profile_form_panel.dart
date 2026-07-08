@@ -1,3 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/settings/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,7 +9,6 @@ import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/program_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/account/settings_cancel_button.dart';
 import 'package:numi_flutter/features/settings/widgets/account/settings_save_button.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_avatar.dart';
@@ -83,8 +84,9 @@ class AddProfilePanel extends StatelessWidget {
     final error = errorMessage?.trim();
     final isTeacherProfile = role == 'TEACHER';
     final isParentProfile = role == 'PARENT';
-    final idTypeOptions =
-        isTeacherProfile ? teacherIdTypeOptions : studentIdTypeOptions;
+    final idTypeOptions = isTeacherProfile
+        ? teacherIdTypeOptions
+        : studentIdTypeOptions;
     final selectedIdTypeOption = _firstIdTypeOption(
       idTypeOptions,
       selectedIdType,
@@ -107,8 +109,8 @@ class AddProfilePanel extends StatelessWidget {
           hintText: isTeacherProfile
               ? context.getText(AppKeys.profileTeacherNameHint)
               : isParentProfile
-                  ? context.getText(AppKeys.parentProfileNameHint)
-                  : context.getText(AppKeys.studentNameHint),
+              ? context.getText(AppKeys.parentProfileNameHint)
+              : context.getText(AppKeys.studentNameHint),
           scale: scale,
         ),
         if (isParentProfile) ...[
@@ -136,7 +138,7 @@ class AddProfilePanel extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 58 * scale),
               child: Center(
                 child: CircularProgressIndicator(
-                  color: settingsTeal,
+                  color: AppColors.tealIcon,
                   strokeWidth: 3 * scale,
                 ),
               ),
@@ -208,7 +210,7 @@ class AddProfilePanel extends StatelessWidget {
             error,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: settingsOrange,
+              color: AppColors.orange500,
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w800,
               height: 1.25,
@@ -223,7 +225,7 @@ class AddProfilePanel extends StatelessWidget {
                 child: Text(
                   context.getText(AppKeys.reloadOptions),
                   style: GoogleFonts.andika(
-                    color: settingsTeal,
+                    color: AppColors.tealIcon,
                     fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0,

@@ -29,7 +29,7 @@ class _TeacherClassroomListCard extends StatelessWidget {
           border: Border.all(color: const Color(0xFFE9EEF2)),
           boxShadow: [
             BoxShadow(
-              color: teacherBlue.withValues(alpha: 0.035),
+              color: AppColors.navy900.withValues(alpha: 0.035),
               blurRadius: 18 * scale,
               offset: Offset(0, 5 * scale),
             ),
@@ -62,7 +62,7 @@ class _TeacherClassroomListCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
-                            color: teacherBlue,
+                            color: AppColors.navy900,
                             fontSize: 21 * scale,
                             fontWeight: FontWeight.w800,
                             height: 1.05,

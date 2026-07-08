@@ -8,7 +8,7 @@ class TeacherHomeworkAddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: teacherCoral,
+      color: AppColors.coralTeacher,
       borderRadius: BorderRadius.circular(12),
       elevation: 0,
       child: InkWell(

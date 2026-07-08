@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentClassErrorCard extends StatelessWidget {
   const StudentClassErrorCard({
@@ -33,7 +33,7 @@ class StudentClassErrorCard extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: studentClassInk,
+              color: AppColors.textNavy,
               fontSize: 14,
               fontWeight: FontWeight.w700,
               height: 1.25,
@@ -43,7 +43,7 @@ class StudentClassErrorCard extends StatelessWidget {
           FilledButton(
             onPressed: onRetry,
             style: FilledButton.styleFrom(
-              backgroundColor: studentClassTeal,
+              backgroundColor: AppColors.teal500,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

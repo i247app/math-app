@@ -1,3 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -13,7 +15,6 @@ import 'package:numi_flutter/features/classroom/cache/student_class_search_filte
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_search_helpers.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_class_card.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_filter_panel.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_retry_banner.dart';
@@ -457,7 +458,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
         Text(
           context.getText(AppKeys.studentSearchResults),
           style: const TextStyle(
-            color: studentJoinBlue,
+            color: AppColors.textNavy,
             fontSize: 16,
             fontWeight: FontWeight.w900,
             height: 2,
@@ -512,7 +513,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
         if (_isSearching) ...[
           const LinearProgressIndicator(
             minHeight: 3,
-            color: studentJoinTeal,
+            color: AppColors.teal520,
             backgroundColor: Color(0xFFDDEDEA),
           ),
           const SizedBox(height: 10),

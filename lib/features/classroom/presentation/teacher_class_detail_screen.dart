@@ -111,7 +111,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
       selector: (state) => state.detail(widget.profileId, widget.classroomId),
       builder: (context, detailState) {
         return Scaffold(
-          backgroundColor: teacherPaleMint,
+          backgroundColor: AppColors.teacherPaleMint,
           body: SafeArea(
             bottom: false,
             child: LayoutBuilder(
@@ -133,7 +133,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                     ),
                     Expanded(
                       child: RefreshIndicator(
-                        color: teacherTeal,
+                        color: AppColors.teal520,
                         onRefresh: () => _loadDetail(forceRefresh: true),
                         child: SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(

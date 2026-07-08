@@ -17,7 +17,7 @@ import 'package:numi_flutter/features/homework/widgets/student_list/student_home
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_message.dart';
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_refresh_label.dart';
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_search_field.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_top_bar.dart';
 
 class StudentHomeworkScreen extends StatefulWidget {
@@ -200,7 +200,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
       _activeFilter,
     );
     return Scaffold(
-      backgroundColor: studentHomeworkBg,
+      backgroundColor: AppColors.classBackground,
       body: SafeArea(
         bottom: false,
         child: Column(

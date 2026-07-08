@@ -20,7 +20,7 @@ import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_failure
 import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_grid.dart';
 import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_header.dart';
 import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class GradeSelectionScreen extends StatefulWidget {
   const GradeSelectionScreen({
@@ -189,7 +189,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: GradeSelectionStyle.mint,
+        backgroundColor: AppColors.gradeBackground,
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -227,7 +227,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color: GradeSelectionStyle.ink,
+                                  color: AppColors.textPrimary,
                                   fontSize: s(31),
                                   fontWeight: FontWeight.w900,
                                   height: 1.08,

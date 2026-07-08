@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkAttemptProgressSection extends StatelessWidget {
   const StudentHomeworkAttemptProgressSection({
@@ -34,7 +34,7 @@ class StudentHomeworkAttemptProgressSection extends StatelessWidget {
             'total': totalQuestions,
           }),
           style: TextStyle(
-            color: homeworkAttemptMuted,
+            color: AppColors.textSubtle,
             fontSize: 16 * scale,
             fontWeight: FontWeight.w900,
             height: 1.5,
@@ -56,7 +56,7 @@ class StudentHomeworkAttemptProgressSection extends StatelessWidget {
               return Container(
                 padding: EdgeInsets.all(inset),
                 decoration: BoxDecoration(
-                  color: homeworkAttemptPeach,
+                  color: AppColors.peachStrong,
                   borderRadius: BorderRadius.circular(999),
                   boxShadow: [
                     BoxShadow(
@@ -74,7 +74,7 @@ class StudentHomeworkAttemptProgressSection extends StatelessWidget {
                   width: fillWidth,
                   height: double.infinity,
                   decoration: BoxDecoration(
-                    color: homeworkAttemptProgress,
+                    color: AppColors.assessmentProgress,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: DecoratedBox(

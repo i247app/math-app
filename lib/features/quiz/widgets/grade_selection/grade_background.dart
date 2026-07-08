@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class GradeBackground extends StatelessWidget {
   const GradeBackground({super.key});
@@ -13,9 +13,9 @@ class GradeBackground extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            GradeSelectionStyle.mint,
+            AppColors.gradeBackground,
             Color(0xFFD8EBD8),
-            GradeSelectionStyle.mint,
+            AppColors.gradeBackground,
           ],
           stops: [0, 0.80, 1],
         ),

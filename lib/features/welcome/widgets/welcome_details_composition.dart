@@ -7,7 +7,7 @@ import 'package:numi_flutter/core/theme/font_size.dart';
 
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class WelcomeDetailsComposition extends StatelessWidget {
   const WelcomeDetailsComposition({
@@ -66,8 +66,8 @@ class WelcomeDetailsComposition extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        WelcomeStyle.backgroundTop,
-                        WelcomeStyle.background,
+                        AppColors.pageBackgroundTop,
+                        AppColors.pageBackground,
                         Colors.white,
                       ],
                       stops: [0, 0.42, 1],
@@ -226,8 +226,8 @@ class _BrandLogo extends StatelessWidget {
                 SizedBox(width: 8 * scale),
                 NumiBrandText(
                   fontSize: 20 * scale,
-                  firstColor: WelcomeStyle.deepTeal,
-                  secondColor: WelcomeStyle.taglineCoral,
+                  firstColor: AppColors.welcomeDeepTeal,
+                  secondColor: AppColors.coral500,
                 ),
               ],
             ),
@@ -291,7 +291,7 @@ class _FeatureCard extends StatelessWidget {
                     title,
                     maxLines: 1,
                     style: GoogleFonts.nunito(
-                      color: WelcomeStyle.cardTitle,
+                      color: AppColors.welcomeTitle,
                       fontSize: FontSize.normal,
                       fontWeight: FontWeight.w800,
                       height: 1.15,
@@ -306,7 +306,7 @@ class _FeatureCard extends StatelessWidget {
                     subtitle,
                     maxLines: 1,
                     style: GoogleFonts.nunito(
-                      color: WelcomeStyle.cardSubtitle,
+                      color: AppColors.textSlate,
                       fontSize: FontSize.small,
                       fontWeight: FontWeight.w500,
                       height: 1.2,
@@ -336,18 +336,18 @@ class _PageIndicator extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _IndicatorDot(color: WelcomeStyle.inactiveDot, size: dotSize),
+            _IndicatorDot(color: AppColors.inactiveDot, size: dotSize),
             SizedBox(width: 8 * scale),
             Container(
               width: 24 * scale,
               height: dotSize,
               decoration: BoxDecoration(
-                color: WelcomeStyle.coral,
+                color: AppColors.coral600,
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
             SizedBox(width: 8 * scale),
-            _IndicatorDot(color: WelcomeStyle.inactiveDot, size: dotSize),
+            _IndicatorDot(color: AppColors.inactiveDot, size: dotSize),
           ],
         );
       },

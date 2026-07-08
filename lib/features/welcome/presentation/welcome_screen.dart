@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:numi_flutter/features/welcome/widgets/welcome_composition.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({
@@ -75,7 +75,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: ColoredBox(
-        color: WelcomeStyle.background,
+        color: AppColors.pageBackground,
         child: SafeArea(
           bottom: false,
           child: LayoutBuilder(

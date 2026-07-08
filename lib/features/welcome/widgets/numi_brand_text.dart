@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class NumiBrandText extends StatelessWidget {
   const NumiBrandText({
     super.key,
     required this.fontSize,
-    this.firstColor = WelcomeStyle.teal,
-    this.secondColor = WelcomeStyle.coral,
+    this.firstColor = AppColors.welcomeTeal,
+    this.secondColor = AppColors.coral600,
   });
 
   final double fontSize;

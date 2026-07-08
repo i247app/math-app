@@ -174,8 +174,10 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
       return;
     }
     final now = DateTime.now();
-    final dt =
-        (now.difference(_lastTick).inMicroseconds / 1000000).clamp(0.0, 0.08);
+    final dt = (now.difference(_lastTick).inMicroseconds / 1000000).clamp(
+      0.0,
+      0.08,
+    );
     _lastTick = now;
     var shouldFinishWave = false;
     setState(() {
@@ -213,9 +215,11 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
         _spawnClock >= spawnInterval &&
         _meteors.length < 8) {
       _spawnClock = 0;
-      final activeQuestions =
-          _meteors.where((meteor) => meteor.hasQuestion).length;
-      final spawnQuestion = activeQuestions == 0 ||
+      final activeQuestions = _meteors
+          .where((meteor) => meteor.hasQuestion)
+          .length;
+      final spawnQuestion =
+          activeQuestions == 0 ||
           (activeQuestions < 2 &&
               (_plainSpawnedSinceQuestion >= 2 || _random.nextDouble() < 0.42));
       _spawnMeteor(withQuestion: spawnQuestion);
@@ -253,10 +257,11 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     }
     final selectedQuestion = withQuestion
         ? question ??
-            _config.questions[_random.nextInt(_config.questions.length)]
+              _config.questions[_random.nextInt(_config.questions.length)]
         : null;
-    final activeQuestionsBefore =
-        _meteors.where((meteor) => meteor.hasQuestion).length;
+    final activeQuestionsBefore = _meteors
+        .where((meteor) => meteor.hasQuestion)
+        .length;
     final lane = 0.12 + _random.nextDouble() * 0.76;
     _meteors.add(
       _MeteorEntity(
@@ -292,10 +297,7 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     return answers[_random.nextInt(answers.length)];
   }
 
-  void _registerMathAmmo(
-    String answer, {
-    required bool prioritizeNext,
-  }) {
+  void _registerMathAmmo(String answer, {required bool prioritizeNext}) {
     if (_currentAmmo == answer) {
       if (!prioritizeNext) {
         _ammoQueue.add(answer);
@@ -326,7 +328,8 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
       if (target == null) {
         _startEmptyShot();
       } else {
-        final correct = !target.hasQuestion ||
+        final correct =
+            !target.hasQuestion ||
             target.question!.correctAnswer == _currentAmmo;
         HapticFeedback.lightImpact();
         setState(() {
@@ -374,8 +377,9 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
         });
         unawaited(_playEffect(correct));
         if (_bossParts.every((part) => !part.alive)) {
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => _finishMission(true));
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _finishMission(true),
+          );
         }
       }
     }
@@ -401,25 +405,28 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
   }
 
   _MeteorEntity? _nearestMeteorInLane() {
-    final candidates = _meteors
-        .where(
-          (meteor) =>
-              meteor.y < _shipPosition.dy &&
-              (meteor.x - _shipPosition.dx).abs() < 0.115,
-        )
-        .toList()
-      ..sort((a, b) => b.y.compareTo(a.y));
+    final candidates =
+        _meteors
+            .where(
+              (meteor) =>
+                  meteor.y < _shipPosition.dy &&
+                  (meteor.x - _shipPosition.dx).abs() < 0.115,
+            )
+            .toList()
+          ..sort((a, b) => b.y.compareTo(a.y));
     return candidates.isEmpty ? null : candidates.first;
   }
 
   _BossPartEntity? _nearestBossPartInLane() {
-    final candidates = _bossParts
-        .where(
-          (part) =>
-              part.alive && (part.position.dx - _shipPosition.dx).abs() < 0.12,
-        )
-        .toList()
-      ..sort((a, b) => b.position.dy.compareTo(a.position.dy));
+    final candidates =
+        _bossParts
+            .where(
+              (part) =>
+                  part.alive &&
+                  (part.position.dx - _shipPosition.dx).abs() < 0.12,
+            )
+            .toList()
+          ..sort((a, b) => b.position.dy.compareTo(a.position.dy));
     return candidates.isEmpty ? null : candidates.first;
   }
 
@@ -461,8 +468,8 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     final bonusArmor = _destroyed < 15
         ? 2
         : _destroyed < 22
-            ? 1
-            : 0;
+        ? 1
+        : 0;
     final partCount = 4 + bonusArmor;
     const positions = <Offset>[
       Offset(0.24, 0.25),
@@ -478,8 +485,9 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     _nextAmmo = _randomAmmo(excluding: _currentAmmo);
     _nextAmmoGuaranteed = false;
     for (var index = 0; index < partCount; index++) {
-      final question = _config.questions[
-          (index + _random.nextInt(_config.questions.length)) %
+      final question =
+          _config.questions[(index +
+                  _random.nextInt(_config.questions.length)) %
               _config.questions.length];
       _bossParts.add(
         _BossPartEntity(
@@ -489,10 +497,7 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
           isArmor: index >= 4,
         ),
       );
-      _registerMathAmmo(
-        question.correctAnswer,
-        prioritizeNext: index == 0,
-      );
+      _registerMathAmmo(question.correctAnswer, prioritizeNext: index == 0);
     }
     _reloadRemaining = 0;
   }
@@ -557,8 +562,9 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
     HapticFeedback.vibrate();
     unawaited(_playEffect(false));
     if (_shields == 0) {
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _finishMission(false));
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _finishMission(false),
+      );
     }
   }
 
@@ -602,7 +608,8 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
 
   Future<bool> _confirmExit() async {
     _paused = true;
-    final exit = await showDialog<bool>(
+    final exit =
+        await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: Text(context.getText(AppKeys.gamesSquadronExitTitle)),
@@ -682,9 +689,9 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
                       progress: _phase == _MissionPhase.wave
                           ? _spawned / _waveSize
                           : _bossParts.isEmpty
-                              ? 0
-                              : _bossParts.where((part) => part.alive).length /
-                                  _bossParts.length,
+                          ? 0
+                          : _bossParts.where((part) => part.alive).length /
+                                _bossParts.length,
                       accent: accent,
                       onBack: () async {
                         if (await _confirmExit() && context.mounted) {
@@ -804,9 +811,7 @@ class _GameArena extends StatelessWidget {
                 Positioned(
                   left: size.width * part.position.dx - 38,
                   top: size.height * part.position.dy - 23,
-                  child: _BossPartTarget(
-                    part: part,
-                  ),
+                  child: _BossPartTarget(part: part),
                 ),
             for (final meteor in meteors)
               Positioned(
@@ -837,8 +842,9 @@ class _GameArena extends StatelessWidget {
                 child: Container(
                   width: laserActive ? 60 : 38,
                   decoration: BoxDecoration(
-                    color: (laserActive ? _spaceRed : _spaceGold)
-                        .withValues(alpha: laserActive ? 0.42 : 0.12),
+                    color: (laserActive ? _spaceRed : _spaceGold).withValues(
+                      alpha: laserActive ? 0.42 : 0.12,
+                    ),
                     border: Border.symmetric(
                       vertical: BorderSide(
                         color: laserActive ? Colors.white : _spaceGold,
@@ -902,10 +908,7 @@ class _GameArena extends StatelessWidget {
 }
 
 class _EquationMeteor extends StatelessWidget {
-  const _EquationMeteor({
-    required this.meteor,
-    required this.size,
-  });
+  const _EquationMeteor({required this.meteor, required this.size});
 
   final _MeteorEntity meteor;
   final double size;
@@ -929,9 +932,10 @@ class _EquationMeteor extends StatelessWidget {
                   color: flash
                       ? _spaceRed
                       : question?.targetKind == MathSquadronTargetKind.crystal
-                          ? const Color(0xFF5741A5)
-                          : const Color(0xFF86513B),
-                  energyCore: question != null &&
+                      ? const Color(0xFF5741A5)
+                      : const Color(0xFF86513B),
+                  energyCore:
+                      question != null &&
                       question.targetKind != MathSquadronTargetKind.meteor,
                 ),
               ),
@@ -1107,10 +1111,9 @@ class _AmmoPanel extends StatelessWidget {
                 ),
                 if (nextAmmo != null)
                   Text(
-                    context.formatText(
-                      AppKeys.gamesSquadronNextAmmo,
-                      {'ammo': nextAmmo},
-                    ),
+                    context.formatText(AppKeys.gamesSquadronNextAmmo, {
+                      'ammo': nextAmmo,
+                    }),
                     style: const TextStyle(
                       color: Colors.white54,
                       fontSize: 10,
@@ -1218,17 +1221,16 @@ class _MissionHud extends StatelessWidget {
               children: [
                 Text(
                   phase == _MissionPhase.boss
-                      ? context.formatText(
-                          AppKeys.gamesSquadronBossLevel,
-                          {'level': level},
-                        )
-                      : context.formatText(
-                          AppKeys.gamesLevelLabel,
-                          {'level': level},
-                        ),
+                      ? context.formatText(AppKeys.gamesSquadronBossLevel, {
+                          'level': level,
+                        })
+                      : context.formatText(AppKeys.gamesLevelLabel, {
+                          'level': level,
+                        }),
                   style: TextStyle(
-                    color:
-                        phase == _MissionPhase.boss ? _spaceGold : Colors.white,
+                    color: phase == _MissionPhase.boss
+                        ? _spaceGold
+                        : Colors.white,
                     fontSize: 13,
                     fontWeight: FontWeight.w900,
                   ),
@@ -1313,49 +1315,52 @@ class _HudCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-        color: Colors.white10,
-        shape: const CircleBorder(),
-        child: InkWell(
-          onTap: onTap,
-          customBorder: const CircleBorder(),
-          child: SizedBox(
-            width: 40,
-            height: 40,
-            child: Icon(icon, color: Colors.white, size: 22),
-          ),
-        ),
-      );
+    color: Colors.white10,
+    shape: const CircleBorder(),
+    child: InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Icon(icon, color: Colors.white, size: 22),
+      ),
+    ),
+  );
 }
 
 class _HudChip extends StatelessWidget {
-  const _HudChip(
-      {required this.icon, required this.label, required this.color});
+  const _HudChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
   final IconData icon;
   final String label;
   final Color color;
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-        decoration: BoxDecoration(
-          color: Colors.white10,
-          borderRadius: BorderRadius.circular(12),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+    decoration: BoxDecoration(
+      color: Colors.white10,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      children: [
+        Icon(icon, color: color, size: 14),
+        const SizedBox(width: 3),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 11,
+            fontWeight: FontWeight.w900,
+          ),
         ),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: 14),
-            const SizedBox(width: 3),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
-        ),
-      );
+      ],
+    ),
+  );
 }
 
 class _MissionResultDialog extends StatelessWidget {
@@ -1384,10 +1389,10 @@ class _MissionResultDialog extends StatelessWidget {
     final stars = destroyed >= 24
         ? 3
         : destroyed >= 20
-            ? 2
-            : destroyed >= _minimumMathKills
-                ? 1
-                : 0;
+        ? 2
+        : destroyed >= _minimumMathKills
+        ? 1
+        : 0;
     final color = won ? _spaceCyan : _spaceRed;
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -1399,7 +1404,7 @@ class _MissionResultDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           border: Border.all(color: color, width: 2),
           boxShadow: [
-            BoxShadow(color: color.withValues(alpha: 0.28), blurRadius: 30)
+            BoxShadow(color: color.withValues(alpha: 0.28), blurRadius: 30),
           ],
         ),
         child: Column(
@@ -1408,8 +1413,8 @@ class _MissionResultDialog extends StatelessWidget {
             Icon(
               won
                   ? isBoss
-                      ? Icons.emoji_events_rounded
-                      : Icons.rocket_launch_rounded
+                        ? Icons.emoji_events_rounded
+                        : Icons.rocket_launch_rounded
                   : Icons.shield_outlined,
               color: won ? _spaceGold : _spaceRed,
               size: 58,
@@ -1418,8 +1423,8 @@ class _MissionResultDialog extends StatelessWidget {
               context.getText(
                 won
                     ? isBoss
-                        ? AppKeys.gamesSquadronBossDefeated
-                        : AppKeys.gamesSquadronComplete
+                          ? AppKeys.gamesSquadronBossDefeated
+                          : AppKeys.gamesSquadronComplete
                     : AppKeys.gamesSquadronTryAgain,
               ),
               textAlign: TextAlign.center,
@@ -1445,24 +1450,28 @@ class _MissionResultDialog extends StatelessWidget {
             Row(
               children: [
                 _ResultStat(
-                    icon: Icons.bolt_rounded,
-                    value: '$destroyed',
-                    color: _spaceGreen),
+                  icon: Icons.bolt_rounded,
+                  value: '$destroyed',
+                  color: _spaceGreen,
+                ),
                 const SizedBox(width: 7),
                 _ResultStat(
-                    icon: Icons.flight_takeoff_rounded,
-                    value: '$passed',
-                    color: _spaceCyan),
+                  icon: Icons.flight_takeoff_rounded,
+                  value: '$passed',
+                  color: _spaceCyan,
+                ),
                 const SizedBox(width: 7),
                 _ResultStat(
-                    icon: Icons.close_rounded,
-                    value: '$wrongShots',
-                    color: _spaceRed),
+                  icon: Icons.close_rounded,
+                  value: '$wrongShots',
+                  color: _spaceRed,
+                ),
                 const SizedBox(width: 7),
                 _ResultStat(
-                    icon: Icons.settings_rounded,
-                    value: '$bossPartsDestroyed',
-                    color: _spaceGold),
+                  icon: Icons.settings_rounded,
+                  value: '$bossPartsDestroyed',
+                  color: _spaceGold,
+                ),
               ],
             ),
             const SizedBox(height: 19),
@@ -1475,7 +1484,8 @@ class _MissionResultDialog extends StatelessWidget {
                   backgroundColor: _spaceCyan,
                   foregroundColor: _spaceTop,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(17)),
+                    borderRadius: BorderRadius.circular(17),
+                  ),
                 ),
                 child: Text(
                   context.getText(AppKeys.gamesFarmBackToMap),
@@ -1511,36 +1521,39 @@ class _MissionResultDialog extends StatelessWidget {
 }
 
 class _ResultStat extends StatelessWidget {
-  const _ResultStat(
-      {required this.icon, required this.value, required this.color});
+  const _ResultStat({
+    required this.icon,
+    required this.value,
+    required this.color,
+  });
   final IconData icon;
   final String value;
   final Color color;
 
   @override
   Widget build(BuildContext context) => Expanded(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 9),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(12),
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 18),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-          child: Column(
-            children: [
-              Icon(icon, color: color, size: 18),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 }
 
 class _MovingStarfieldPainter extends CustomPainter {
@@ -1584,7 +1597,8 @@ class _MeteorPainter extends CustomPainter {
     const bumps = [1.0, .82, .94, .78, 1.0, .86, .92, .8, .98, .84, .91, .79];
     for (var index = 0; index < bumps.length; index++) {
       final angle = index / bumps.length * math.pi * 2 - math.pi / 2;
-      final point = center +
+      final point =
+          center +
           Offset(math.cos(angle), math.sin(angle)) * radius * bumps[index];
       index == 0
           ? path.moveTo(point.dx, point.dy)
@@ -1748,7 +1762,7 @@ class _BossShipPainter extends CustomPainter {
         ..shader = LinearGradient(
           colors: [
             Color.lerp(accent, Colors.white, .18)!,
-            const Color(0xFF111735)
+            const Color(0xFF111735),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -1769,12 +1783,21 @@ class _BossShipPainter extends CustomPainter {
     );
     for (final x in [.13, .28, .72, .87]) {
       canvas.drawCircle(
-          Offset(w * x, h * .58), h * .055, Paint()..color = _spaceGold);
+        Offset(w * x, h * .58),
+        h * .055,
+        Paint()..color = _spaceGold,
+      );
     }
-    canvas.drawCircle(Offset(w * .5, h * .48), h * .16,
-        Paint()..color = accent.withValues(alpha: .28));
     canvas.drawCircle(
-        Offset(w * .5, h * .48), h * .08, Paint()..color = _spaceCyan);
+      Offset(w * .5, h * .48),
+      h * .16,
+      Paint()..color = accent.withValues(alpha: .28),
+    );
+    canvas.drawCircle(
+      Offset(w * .5, h * .48),
+      h * .08,
+      Paint()..color = _spaceCyan,
+    );
   }
 
   @override
@@ -1791,8 +1814,12 @@ class _MissilePainter extends CustomPainter {
     canvas.drawPath(
       Path()
         ..moveTo(cx, 0)
-        ..quadraticBezierTo(size.width * .88, size.height * .25,
-            size.width * .72, size.height * .78)
+        ..quadraticBezierTo(
+          size.width * .88,
+          size.height * .25,
+          size.width * .72,
+          size.height * .78,
+        )
         ..lineTo(cx, size.height * .9)
         ..lineTo(size.width * .28, size.height * .78)
         ..quadraticBezierTo(size.width * .12, size.height * .25, cx, 0)
@@ -1819,8 +1846,11 @@ class _MissilePainter extends CustomPainter {
 }
 
 class _LaserPainter extends CustomPainter {
-  const _LaserPainter(
-      {required this.from, required this.to, required this.correct});
+  const _LaserPainter({
+    required this.from,
+    required this.to,
+    required this.correct,
+  });
   final Offset from;
   final Offset to;
   final bool correct;
@@ -1829,23 +1859,26 @@ class _LaserPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final color = correct ? _spaceCyan : _spaceRed;
     canvas.drawLine(
-        from,
-        to,
-        Paint()
-          ..color = color.withValues(alpha: .35)
-          ..strokeWidth = 12);
+      from,
+      to,
+      Paint()
+        ..color = color.withValues(alpha: .35)
+        ..strokeWidth = 12,
+    );
     canvas.drawLine(
-        from,
-        to,
-        Paint()
-          ..color = color
-          ..strokeWidth = 4);
+      from,
+      to,
+      Paint()
+        ..color = color
+        ..strokeWidth = 4,
+    );
     canvas.drawLine(
-        from,
-        to,
-        Paint()
-          ..color = Colors.white
-          ..strokeWidth = 1.5);
+      from,
+      to,
+      Paint()
+        ..color = Colors.white
+        ..strokeWidth = 1.5,
+    );
   }
 
   @override

@@ -17,7 +17,7 @@ import 'package:numi_flutter/features/homework/widgets/student_attempt/student_h
 import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
 import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_progress_section.dart';
 import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_question_card.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_helpers.dart';
 import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
 
@@ -288,7 +288,7 @@ class _StudentHomeworkAttemptScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: homeworkAttemptMint,
+      backgroundColor: AppColors.gradeBackground,
       body: SafeArea(
         bottom: false,
         child: LayoutBuilder(
@@ -320,7 +320,7 @@ class _StudentHomeworkAttemptScreenState
                   child: ColoredBox(
                     color: _isLoading || _isSubmitting
                         ? Colors.white
-                        : homeworkAttemptMint,
+                        : AppColors.gradeBackground,
                   ),
                 ),
                 Positioned.fill(
@@ -345,14 +345,14 @@ class _StudentHomeworkAttemptScreenState
                             scale: s,
                             message: context.getText(AppKeys.submittingForYou),
                             letterStyle: TextStyle(
-                              color: homeworkAttemptTeal,
+                              color: AppColors.teal700,
                               fontSize: 40 * s,
                               fontWeight: FontWeight.w900,
                               height: 1,
                               letterSpacing: 3 * s,
                             ),
                             messageStyle: TextStyle(
-                              color: homeworkAttemptMuted,
+                              color: AppColors.textSubtle,
                               fontSize: 16 * s,
                               fontWeight: FontWeight.w800,
                               height: 1.35,
@@ -365,14 +365,14 @@ class _StudentHomeworkAttemptScreenState
                             scale: s,
                             message: context.getText(AppKeys.studentHomework),
                             letterStyle: TextStyle(
-                              color: homeworkAttemptTeal,
+                              color: AppColors.teal700,
                               fontSize: 40 * s,
                               fontWeight: FontWeight.w900,
                               height: 1,
                               letterSpacing: 3 * s,
                             ),
                             messageStyle: TextStyle(
-                              color: homeworkAttemptMuted,
+                              color: AppColors.textSubtle,
                               fontSize: 16 * s,
                               fontWeight: FontWeight.w800,
                               height: 1.35,

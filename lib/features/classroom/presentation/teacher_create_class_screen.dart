@@ -228,7 +228,9 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
 
   Widget _buildContent(double scale) {
     if (_isLoadingOptions) {
-      return const Center(child: CircularProgressIndicator(color: teacherTeal));
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.teal520),
+      );
     }
     final optionsError = _optionsError;
     if (optionsError != null) {

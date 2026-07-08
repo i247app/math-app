@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 class AssessmentHeader extends StatelessWidget {
@@ -23,7 +23,7 @@ class AssessmentHeader extends StatelessWidget {
           height: 80 * scale,
           padding: EdgeInsets.symmetric(horizontal: 24 * scale),
           decoration: BoxDecoration(
-            color: AssessmentStyle.mint.withValues(alpha: 0.84),
+            color: AppColors.gradeBackground.withValues(alpha: 0.84),
             borderRadius: BorderRadius.vertical(
               bottom: Radius.circular(32 * scale),
             ),
@@ -39,7 +39,7 @@ class AssessmentHeader extends StatelessWidget {
             children: [
               QuizHeaderIconButton(
                 icon: Icons.close_rounded,
-                color: AssessmentStyle.teal,
+                color: AppColors.teal700,
                 scale: scale,
                 circle: true,
                 onTap: () => Navigator.of(context).maybePop(),
@@ -51,7 +51,7 @@ class AssessmentHeader extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: AssessmentStyle.teal,
+                    color: AppColors.teal700,
                     fontSize: 20 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -61,7 +61,7 @@ class AssessmentHeader extends StatelessWidget {
               ),
               QuizHeaderIconButton(
                 icon: Icons.help_outline_rounded,
-                color: AssessmentStyle.teal,
+                color: AppColors.teal700,
                 scale: scale,
                 circle: true,
                 onTap: HapticFeedback.selectionClick,

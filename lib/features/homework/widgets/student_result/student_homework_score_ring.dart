@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkScoreRing extends StatelessWidget {
   const StudentHomeworkScoreRing({
@@ -56,7 +56,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
-                border: Border.all(color: homeworkResultTeal, width: 9 * scale),
+                border: Border.all(color: AppColors.teal700, width: 9 * scale),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -68,7 +68,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                         TextSpan(
                           text: scoreValue,
                           style: GoogleFonts.andika(
-                            color: homeworkResultScoreGreen,
+                            color: AppColors.scoreGreen,
                             fontSize: 48 * scale,
                             fontWeight: FontWeight.w800,
                             height: 40 / 48,
@@ -92,7 +92,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                   Text(
                     context.getText(AppKeys.scoreUpper),
                     style: GoogleFonts.andika(
-                      color: homeworkResultMuted,
+                      color: AppColors.textSubtle,
                       fontSize: 10 * scale,
                       fontWeight: FontWeight.w800,
                       height: 15 / 10,

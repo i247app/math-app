@@ -16,8 +16,8 @@ class LingoScope extends InheritedNotifier<LingoProvider> {
   }
 
   static LingoProvider read(BuildContext context) {
-    final element =
-        context.getElementForInheritedWidgetOfExactType<LingoScope>();
+    final element = context
+        .getElementForInheritedWidgetOfExactType<LingoScope>();
     final scope = element?.widget as LingoScope?;
     assert(scope != null, 'No LingoScope found in context.');
     return scope!.notifier!;
