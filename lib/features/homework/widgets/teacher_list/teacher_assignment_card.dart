@@ -8,10 +8,11 @@ class _TeacherAssignmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final exerciseId = exercise.stableId?.toString() ?? '-';
     final dateParts = teacherExerciseDateParts(exercise.endDate);
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -20,12 +21,12 @@ class _TeacherAssignmentCard extends StatelessWidget {
           height: 82,
           padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFEFF6FF)),
+            border: Border.all(color: colors.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: colors.shadow,
                 blurRadius: 1,
                 offset: const Offset(0, 1),
               ),
@@ -50,7 +51,7 @@ class _TeacherAssignmentCard extends StatelessWidget {
                     Text(
                       dateParts.day,
                       style: GoogleFonts.andika(
-                        color: AppColors.navy900,
+                        color: colors.brandStrong,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                         height: 1.05,
@@ -59,7 +60,7 @@ class _TeacherAssignmentCard extends StatelessWidget {
                     Text(
                       dateParts.month,
                       style: GoogleFonts.andika(
-                        color: const Color(0xFF6B7280),
+                        color: colors.textSecondary,
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         height: 1.2,
@@ -81,7 +82,7 @@ class _TeacherAssignmentCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: AppColors.navy900,
+                          color: colors.textPrimary,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           height: 17.5 / 14,
@@ -95,7 +96,7 @@ class _TeacherAssignmentCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: const Color(0xFF6B7280),
+                          color: colors.textSecondary,
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                           height: 16 / 12,

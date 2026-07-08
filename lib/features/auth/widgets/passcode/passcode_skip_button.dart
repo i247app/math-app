@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+
 class PasscodeSkipButton extends StatelessWidget {
   const PasscodeSkipButton({
     super.key,
@@ -13,6 +15,11 @@ class PasscodeSkipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final textColor = onPressed == null
+        ? colors.textPrimary.withValues(alpha: 0.45)
+        : colors.textPrimary;
+
     return Center(
       child: InkWell(
         onTap: onPressed,
@@ -22,16 +29,12 @@ class PasscodeSkipButton extends StatelessWidget {
           child: Text(
             label,
             style: GoogleFonts.andika(
-              color: onPressed == null
-                  ? const Color(0xFF001741).withValues(alpha: 0.45)
-                  : const Color(0xFF001741),
+              color: textColor,
               fontSize: 16,
               fontWeight: FontWeight.w400,
               height: 20 / 16,
               decoration: TextDecoration.underline,
-              decorationColor: onPressed == null
-                  ? const Color(0xFF001741).withValues(alpha: 0.45)
-                  : const Color(0xFF001741),
+              decorationColor: textColor,
             ),
           ),
         ),

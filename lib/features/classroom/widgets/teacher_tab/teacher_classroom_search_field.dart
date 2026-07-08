@@ -11,24 +11,25 @@ class _TeacherClassroomSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 48 * scale,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.inputSurface,
         borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: const Color(0xFFE2E9EC)),
-        boxShadow: const [
+        border: Border.all(color: colors.border),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x05000000),
+            color: colors.shadow,
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         children: [
           SizedBox(width: 16 * scale),
-          Icon(Icons.search, color: AppColors.navy900, size: 24 * scale),
+          Icon(Icons.search, color: colors.brandStrong, size: 24 * scale),
           SizedBox(width: 12 * scale),
           Expanded(
             child: TextField(
@@ -36,14 +37,14 @@ class _TeacherClassroomSearchField extends StatelessWidget {
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
               style: GoogleFonts.andika(
-                color: AppColors.textInkDark,
+                color: colors.textPrimary,
                 fontSize: FontSize.normal * scale,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
                 hintText: context.getText(AppKeys.teacherSearchClassroomHint),
                 hintStyle: GoogleFonts.andika(
-                  color: AppColors.textCoolMuted.withValues(alpha: 0.6),
+                  color: colors.inputHint,
                   fontSize: FontSize.normal * scale,
                   fontWeight: FontWeight.w500,
                 ),
@@ -53,7 +54,7 @@ class _TeacherClassroomSearchField extends StatelessWidget {
               ),
             ),
           ),
-          Icon(Icons.tune, color: AppColors.navy900, size: 24 * scale),
+          Icon(Icons.tune, color: colors.brandStrong, size: 24 * scale),
           SizedBox(width: 16 * scale),
         ],
       ),

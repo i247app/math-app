@@ -6,6 +6,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
@@ -205,7 +206,7 @@ class _HistoryTabState extends State<HistoryTab> {
     final topInset = MediaQuery.paddingOf(context).top;
 
     return ColoredBox(
-      color: AppColors.appBackground,
+      color: context.themeColors.pageBackground,
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {

@@ -216,10 +216,11 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     final hasNoAssessments =
         !_isLoading && _errorMessage == null && _entries.isEmpty;
 
+    final colors = context.themeColors;
     return ColoredBox(
-      color: const Color(0xFFF1FBFA),
+      color: colors.pageBackground,
       child: RefreshIndicator(
-        color: const Color(0xFF339395),
+        color: colors.brandStrong,
         onRefresh: () => _loadAssessments(forceRefresh: true),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(

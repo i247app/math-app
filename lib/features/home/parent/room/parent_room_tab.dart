@@ -190,8 +190,9 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     final isEmptyRoomState =
         !_isLoading && _errorMessage == null && entries.isEmpty;
 
+    final colors = context.themeColors;
     return ColoredBox(
-      color: isEmptyRoomState ? Colors.white : const Color(0xFFF8FAFA),
+      color: isEmptyRoomState ? colors.surface : colors.pageBackground,
       child: Column(
         children: [
           HomeTabHeader(
@@ -402,7 +403,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => Material(
-          color: Colors.white,
+          color: context.themeColors.pageBackground,
           child: SafeArea(
             child: SettingTab.page(
               user: widget.args.user,

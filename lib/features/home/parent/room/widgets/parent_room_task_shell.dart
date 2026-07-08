@@ -17,10 +17,11 @@ class _ParentRoomTaskShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       elevation: compact ? 2.5 : 1.5,
-      shadowColor: Colors.black.withValues(alpha: compact ? 0.16 : 0.10),
+      shadowColor: colors.shadow.withValues(alpha: compact ? 0.95 : 0.70),
       borderRadius: BorderRadius.circular(14),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -28,7 +29,7 @@ class _ParentRoomTaskShell extends StatelessWidget {
         child: Container(
           constraints: BoxConstraints(minHeight: compact ? 101 : 103),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Stack(

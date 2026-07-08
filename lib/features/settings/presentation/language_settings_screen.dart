@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/settings/settings_constants.dart';
 import 'dart:math' as math;
 
@@ -79,14 +79,18 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
       media.size.height / _designHeight,
     );
 
+    final colors = context.themeColors;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: Theme.of(context).brightness == Brightness.dark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       child: PopScope(
         canPop: !_isChangingLanguage,
         child: Stack(
           children: [
             Scaffold(
-              backgroundColor: AppColors.appBackground,
+              backgroundColor: colors.pageBackground,
               body: SafeArea(
                 child: Center(
                   child: SizedBox(

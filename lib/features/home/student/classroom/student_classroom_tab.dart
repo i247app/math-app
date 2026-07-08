@@ -148,7 +148,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
     final topInset = MediaQuery.paddingOf(context).top;
 
     return ColoredBox(
-      color: Colors.white,
+      color: context.themeColors.pageBackground,
       child: Column(
         children: [
           HomeTabHeader(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class AppBackground extends StatelessWidget {
   const AppBackground({super.key, required this.child});
@@ -9,15 +9,17 @@ class AppBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Stack(
       children: [
-        const Positioned.fill(
+        Positioned.fill(
           child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [AppColors.aquaMist, AppColors.mintMist],
+                colors: [colors.authBackgroundStart, colors.authBackgroundEnd],
               ),
             ),
           ),
@@ -45,12 +47,14 @@ class _BackgroundRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.sandRing, width: 38),
+        border: Border.all(color: colors.authDecorRing, width: 38),
       ),
     );
   }
@@ -63,12 +67,14 @@ class _BackgroundCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.aquaSoft.withValues(alpha: 0.36),
+        color: colors.authDecorCircle,
       ),
     );
   }

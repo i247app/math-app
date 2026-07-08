@@ -17,15 +17,16 @@ class _ParentRoomShortcutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE9ECEF)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: colors.shadow,
             blurRadius: 12,
             offset: const Offset(0, 8),
           ),
@@ -48,8 +49,8 @@ class _ParentRoomShortcutTile extends StatelessWidget {
             title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF121B42),
+            style: TextStyle(
+              color: colors.textPrimary,
               fontSize: FontSize.normal,
               fontWeight: FontWeight.w900,
               height: 1.15,
@@ -60,8 +61,8 @@ class _ParentRoomShortcutTile extends StatelessWidget {
             subtitle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF6B7280),
+            style: TextStyle(
+              color: colors.textSecondary,
               fontSize: FontSize.small,
               fontWeight: FontWeight.w700,
             ),

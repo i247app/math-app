@@ -15,6 +15,7 @@ import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/helpers/profile_display_helpers.dart';
@@ -641,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen>
     final didSave = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (routeContext) => Material(
-          color: Colors.white,
+          color: routeContext.themeColors.pageBackground,
           child: SafeArea(
             child: buildPushedSettingPage(
               context: routeContext,

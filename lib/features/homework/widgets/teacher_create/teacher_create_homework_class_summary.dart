@@ -17,27 +17,26 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: const EdgeInsets.fromLTRB(21, 15, 25, 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: const Color(0xFFCCCCCC).withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colors.shadow,
             blurRadius: 10,
             offset: const Offset(3, 3),
           ),
         ],
       ),
       child: isLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 108,
               child: Center(
-                child: CircularProgressIndicator(color: AppColors.teal520),
+                child: CircularProgressIndicator(color: colors.brandStrong),
               ),
             )
           : Row(
@@ -66,7 +65,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: AppColors.navy900,
+                          color: colors.brandStrong,
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                           height: 20 / 14,
@@ -85,7 +84,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: AppColors.textInkDark,
+                          color: colors.textPrimary,
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           height: 32 / 20,

@@ -4,9 +4,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_helpers.dart';
 import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_status_badge.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkAssignmentCard extends StatelessWidget {
   const StudentHomeworkAssignmentCard({
@@ -20,8 +20,9 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: () {
@@ -32,14 +33,12 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFFC4C6D2).withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: colors.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: colors.shadow,
                 blurRadius: 1,
                 offset: const Offset(0, 1),
               ),
@@ -56,7 +55,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
-                        color: AppColors.textMuted,
+                        color: colors.textSecondary,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         height: 16 / 12,
@@ -73,7 +72,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: AppColors.textNavy,
+                  color: colors.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   height: 28 / 18,
@@ -87,7 +86,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: AppColors.textMuted,
+                    color: colors.textSecondary,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     height: 20 / 14,
@@ -100,7 +99,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     top: BorderSide(
-                      color: const Color(0xFFC4C6D2).withValues(alpha: 0.2),
+                      color: colors.border.withValues(alpha: 0.7),
                     ),
                   ),
                 ),
@@ -118,7 +117,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: AppColors.textMuted,
+                          color: colors.textSecondary,
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                           height: 24 / 16,

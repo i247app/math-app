@@ -3,11 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_login_button.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class WelcomeComposition extends StatelessWidget {
   const WelcomeComposition({
@@ -27,6 +27,8 @@ class WelcomeComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -54,9 +56,7 @@ class WelcomeComposition extends StatelessWidget {
         return Stack(
           clipBehavior: Clip.hardEdge,
           children: [
-            const Positioned.fill(
-              child: ColoredBox(color: AppColors.pageBackground),
-            ),
+            Positioned.fill(child: ColoredBox(color: colors.pageBackground)),
             Positioned(
               left: 0,
               right: 0,
@@ -139,7 +139,7 @@ class WelcomeComposition extends StatelessWidget {
                               width: s(48),
                               height: s(6),
                               decoration: BoxDecoration(
-                                color: AppColors.coral500,
+                                color: colors.accentStrong,
                                 borderRadius: BorderRadius.circular(999),
                               ),
                             ),
@@ -165,7 +165,9 @@ class _WelcomeTagline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    final colors = context.themeColors;
+
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
@@ -176,7 +178,7 @@ class _WelcomeTagline extends StatelessWidget {
               style: TextStyle(
                 fontSize: FontSize.xxl,
                 fontWeight: FontWeight.w500,
-                color: AppColors.welcomeTeal,
+                color: colors.brand,
               ),
             ),
             Text(
@@ -184,7 +186,7 @@ class _WelcomeTagline extends StatelessWidget {
               style: TextStyle(
                 fontSize: FontSize.xxl,
                 fontWeight: FontWeight.w500,
-                color: AppColors.coral500,
+                color: colors.accentStrong,
               ),
             ),
           ],
@@ -194,7 +196,7 @@ class _WelcomeTagline extends StatelessWidget {
           style: TextStyle(
             fontSize: FontSize.xxl,
             fontWeight: FontWeight.w500,
-            color: AppColors.welcomeTeal,
+            color: colors.brand,
           ),
         ),
       ],

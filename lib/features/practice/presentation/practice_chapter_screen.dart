@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/practice/practice_catalog.dart';
 
 part '../widgets/practice_chapter/learning_path_header.dart';
@@ -169,13 +170,13 @@ class _PracticeChapterScreenState extends State<PracticeChapterScreen>
 
     if (widget.embedded) {
       return ColoredBox(
-        color: _pathBackground,
+        color: context.themeColors.pageBackground,
         child: SafeArea(bottom: false, child: content),
       );
     }
 
     return Scaffold(
-      backgroundColor: _pathBackground,
+      backgroundColor: context.themeColors.pageBackground,
       body: SafeArea(bottom: false, child: content),
     );
   }

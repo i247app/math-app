@@ -23,6 +23,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedLabel = value == null ? null : displayText(value as T);
     final canSelect = items.isNotEmpty;
+    final colors = context.themeColors;
 
     return _TeacherFieldShell(
       label: label,
@@ -56,8 +57,8 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.andika(
                       color: selectedLabel == null
-                          ? const Color(0x806B7280)
-                          : AppColors.textInkDark,
+                          ? colors.inputHint
+                          : colors.textPrimary,
                       fontSize: FontSize.normal * scale,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
@@ -67,8 +68,8 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                 Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: canSelect
-                      ? AppColors.teal520
-                      : AppColors.textCoolMuted.withValues(alpha: 0.45),
+                      ? colors.brandStrong
+                      : colors.textSecondary.withValues(alpha: 0.45),
                   size: 22 * scale,
                 ),
               ],
@@ -85,6 +86,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) {
         final bottomInset = MediaQuery.paddingOf(context).bottom;
+        final colors = context.themeColors;
         return Container(
           padding: EdgeInsets.fromLTRB(
             20 * scale,
@@ -93,13 +95,13 @@ class _TeacherDropdownField<T> extends StatelessWidget {
             bottomInset + 18 * scale,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(28 * scale),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.10),
+                color: colors.shadow,
                 blurRadius: 24 * scale,
                 offset: Offset(0, -8 * scale),
               ),
@@ -117,7 +119,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                     height: 5 * scale,
                     margin: EdgeInsets.only(bottom: 14 * scale),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE2E9EC),
+                      color: colors.border,
                       borderRadius: BorderRadius.circular(999),
                     ),
                   ),
@@ -125,7 +127,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.andika(
-                    color: AppColors.teal520,
+                    color: colors.brandStrong,
                     fontSize: FontSize.xxxl * scale,
                     fontWeight: FontWeight.w700,
                     height: 1.15,
@@ -139,7 +141,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                     physics: const BouncingScrollPhysics(),
                     itemCount: items.length,
                     separatorBuilder: (_, _) =>
-                        const Divider(height: 1, color: Color(0xFFEFF4F5)),
+                        Divider(height: 1, color: colors.border),
                     itemBuilder: (context, index) {
                       final item = items[index];
                       final isSelected = identical(item, value);
@@ -152,7 +154,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.andika(
-                              color: AppColors.textInkDark,
+                              color: colors.textPrimary,
                               fontSize: FontSize.normal * scale,
                               fontWeight: isSelected
                                   ? FontWeight.w800
@@ -162,7 +164,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
                           trailing: isSelected
                               ? Icon(
                                   Icons.check_circle_rounded,
-                                  color: AppColors.teal520,
+                                  color: colors.brandStrong,
                                   size: 22 * scale,
                                 )
                               : null,

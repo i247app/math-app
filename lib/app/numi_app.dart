@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../core/localization/app_keys.dart';
 import '../core/localization/lingo_provider.dart';
 import '../core/localization/lingo_scope.dart';
-import '../core/theme/app_colors.dart';
+import '../core/theme/app_theme.dart';
+import '../core/theme/app_theme_controller.dart';
+import '../core/theme/app_theme_scope.dart';
 import 'package:numi_flutter/features/auth/auth_flow.dart';
 import 'package:numi_flutter/features/auth/auth_state.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
@@ -17,12 +18,14 @@ class NumiApp extends StatefulWidget {
     super.key,
     this.authService,
     this.lingoProvider,
+    this.themeController,
     this.initialAuthState,
     this.restoreSessionOnStart = false,
   });
 
   final OtpAuthService? authService;
   final LingoProvider? lingoProvider;
+  final AppThemeController? themeController;
   final AuthState? initialAuthState;
   final bool restoreSessionOnStart;
 
@@ -40,6 +43,7 @@ class NumiApp extends StatefulWidget {
 
 class _NumiAppState extends State<NumiApp> {
   late LingoProvider _lingoProvider;
+  late AppThemeController _themeController;
   AuthState? _startupAuthState;
   late bool _restoreSessionOnNextHome;
   int _restartSeed = 0;
@@ -50,11 +54,13 @@ class _NumiAppState extends State<NumiApp> {
     _startupAuthState = widget.initialAuthState;
     _restoreSessionOnNextHome = widget.restoreSessionOnStart;
     _createLingoProvider(widget.lingoProvider);
+    _createThemeController(widget.themeController);
   }
 
   @override
   void dispose() {
     _lingoProvider.dispose();
+    _themeController.dispose();
     super.dispose();
   }
 
@@ -73,40 +79,63 @@ class _NumiAppState extends State<NumiApp> {
     }
   }
 
+  void _createThemeController([AppThemeController? controller]) {
+    _themeController = controller ?? AppThemeController();
+    if (controller == null) {
+      unawaited(_initializeThemeController(_themeController));
+    }
+  }
+
+  Future<void> _initializeThemeController(AppThemeController controller) async {
+    try {
+      await controller.initialize();
+    } catch (_) {
+      // ThemeMode.system is already the in-memory default.
+    }
+  }
+
   void _restartApp() {
     final oldProvider = _lingoProvider;
+    final oldThemeController = _themeController;
     setState(() {
       _restartSeed++;
       _startupAuthState = null;
       _restoreSessionOnNextHome = true;
       _createLingoProvider();
+      _createThemeController();
     });
     oldProvider.dispose();
+    oldThemeController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return _NumiRestartScope(
       restart: _restartApp,
-      child: LingoScope(
-        lingo: _lingoProvider,
-        child: MaterialApp(
-          key: ValueKey(_restartSeed),
-          debugShowCheckedModeBanner: false,
-          title: _lingoProvider.lookup(AppKeys.appName),
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.teal),
-            scaffoldBackgroundColor: AppColors.mintMist,
-            textTheme: GoogleFonts.andikaTextTheme(),
-            useMaterial3: true,
-          ),
-          navigatorObservers: [_KeyboardDismissNavigatorObserver()],
-          home: NumiHome(
-            authService: widget.authService,
-            initialAuthState: _startupAuthState,
-            restoreSessionOnStart: _restoreSessionOnNextHome,
-          ),
-        ),
+      child: AnimatedBuilder(
+        animation: _themeController,
+        builder: (context, _) {
+          return LingoScope(
+            lingo: _lingoProvider,
+            child: AppThemeScope(
+              controller: _themeController,
+              child: MaterialApp(
+                key: ValueKey(_restartSeed),
+                debugShowCheckedModeBanner: false,
+                title: _lingoProvider.lookup(AppKeys.appName),
+                theme: AppTheme.light(),
+                darkTheme: AppTheme.dark(),
+                themeMode: _themeController.themeMode,
+                navigatorObservers: [_KeyboardDismissNavigatorObserver()],
+                home: NumiHome(
+                  authService: widget.authService,
+                  initialAuthState: _startupAuthState,
+                  restoreSessionOnStart: _restoreSessionOnNextHome,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

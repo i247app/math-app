@@ -15,13 +15,14 @@ class _ParentRoomDetailHero extends StatelessWidget {
             'grade': entry.classroom.gradeId,
           });
     final description = entry.classroom.description?.trim();
+    final colors = context.themeColors;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE4E8EA)),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,8 +48,8 @@ class _ParentRoomDetailHero extends StatelessWidget {
                   className,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF121B42),
+                  style: TextStyle(
+                    color: colors.textPrimary,
                     fontSize: FontSize.xxxl,
                     fontWeight: FontWeight.w900,
                   ),

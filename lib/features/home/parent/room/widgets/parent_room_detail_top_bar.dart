@@ -8,12 +8,15 @@ class _ParentRoomDetailTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 60,
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Color(0x0D000000), offset: Offset(0, 4))],
+      decoration: BoxDecoration(
+        color: colors.elevatedSurface,
+        boxShadow: [
+          BoxShadow(color: colors.shadow, offset: const Offset(0, 4)),
+        ],
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -25,10 +28,7 @@ class _ParentRoomDetailTopBar extends StatelessWidget {
                 FocusManager.instance.primaryFocus?.unfocus();
                 onBack();
               },
-              icon: const Icon(
-                Icons.arrow_back_rounded,
-                color: Color(0xFF339395),
-              ),
+              icon: Icon(Icons.arrow_back_rounded, color: colors.brandStrong),
             ),
           ),
           Padding(
@@ -39,7 +39,7 @@ class _ParentRoomDetailTopBar extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.andika(
-                color: const Color(0xFF339395),
+                color: colors.brandStrong,
                 fontSize: 25,
                 fontWeight: FontWeight.w700,
                 height: 34 / 25,

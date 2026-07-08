@@ -15,6 +15,7 @@ Future<void> main() async {
   runApp(
     NumiApp(
       lingoProvider: startup.lingoProvider,
+      themeController: startup.themeController,
       authService: startup.authService,
       initialAuthState: startup.initialAuthState,
       restoreSessionOnStart: false,

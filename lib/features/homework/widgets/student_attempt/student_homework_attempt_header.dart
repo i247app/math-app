@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 class StudentHomeworkAttemptHeader extends StatelessWidget {
@@ -15,6 +15,7 @@ class StudentHomeworkAttemptHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return ClipRRect(
       borderRadius: BorderRadius.vertical(bottom: Radius.circular(32 * scale)),
       child: BackdropFilter(
@@ -23,13 +24,13 @@ class StudentHomeworkAttemptHeader extends StatelessWidget {
           height: 80 * scale,
           padding: EdgeInsets.symmetric(horizontal: 24 * scale),
           decoration: BoxDecoration(
-            color: AppColors.gradeBackground.withValues(alpha: 0.84),
+            color: colors.elevatedSurface.withValues(alpha: 0.84),
             borderRadius: BorderRadius.vertical(
               bottom: Radius.circular(32 * scale),
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.textPrimary.withValues(alpha: 0.05),
+                color: colors.shadow,
                 blurRadius: 2 * scale,
                 offset: Offset(0, 1 * scale),
               ),
@@ -39,7 +40,7 @@ class StudentHomeworkAttemptHeader extends StatelessWidget {
             children: [
               QuizHeaderIconButton(
                 icon: Icons.close_rounded,
-                color: AppColors.teal700,
+                color: colors.brandStrong,
                 scale: scale,
                 circle: true,
                 onTap: () => Navigator.of(context).maybePop(),
@@ -51,7 +52,7 @@ class StudentHomeworkAttemptHeader extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: AppColors.teal700,
+                    color: colors.brandStrong,
                     fontSize: 20 * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -61,7 +62,7 @@ class StudentHomeworkAttemptHeader extends StatelessWidget {
               ),
               QuizHeaderIconButton(
                 icon: Icons.help_outline_rounded,
-                color: AppColors.teal700,
+                color: colors.brandStrong,
                 scale: scale,
                 circle: true,
                 onTap: HapticFeedback.selectionClick,

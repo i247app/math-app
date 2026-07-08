@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/shared/widgets/auth_back_button.dart';
 
 class AuthLayout extends StatelessWidget {
@@ -69,11 +70,13 @@ class AuthLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.pageBackground,
         resizeToAvoidBottomInset: false,
         body: LayoutBuilder(
           builder: (context, constraints) {
@@ -140,7 +143,7 @@ class AuthLayout extends StatelessWidget {
                                           title!,
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.andika(
-                                            color: const Color(0xFF202124),
+                                            color: colors.textPrimary,
                                             fontSize: 36,
                                             fontWeight: FontWeight.w800,
                                             height: 1.05,
@@ -194,6 +197,8 @@ class _AuthMascot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Container(
       width: size,
       height: size,
@@ -201,7 +206,7 @@ class _AuthMascot extends StatelessWidget {
         shape: shape,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: shadowAlpha),
+            color: colors.shadow.withValues(alpha: shadowAlpha),
             blurRadius: shadowBlur,
             offset: shadowOffset,
           ),

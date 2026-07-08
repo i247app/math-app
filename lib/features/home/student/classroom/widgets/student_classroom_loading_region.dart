@@ -24,8 +24,9 @@ class _StudentClassroomLoadingRegionState
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return ColoredBox(
-      color: Colors.white,
+      color: colors.pageBackground,
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
@@ -38,9 +39,9 @@ class _StudentClassroomLoadingRegionState
               final dx = start + (end - start) * _controller.value;
               return LinearGradient(
                 colors: [
-                  Colors.white.withValues(alpha: 0),
-                  Colors.white.withValues(alpha: 0.72),
-                  Colors.white.withValues(alpha: 0),
+                  colors.surface.withValues(alpha: 0),
+                  colors.surface.withValues(alpha: 0.72),
+                  colors.surface.withValues(alpha: 0),
                 ],
                 stops: const [0.28, 0.5, 0.72],
               ).createShader(Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height));

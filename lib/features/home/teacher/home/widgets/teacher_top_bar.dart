@@ -14,6 +14,7 @@ class _TeacherTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = displayTeacherName(profile);
+    final colors = context.themeColors;
     return Container(
       padding: EdgeInsets.fromLTRB(
         18 * scale,
@@ -21,7 +22,7 @@ class _TeacherTopBar extends StatelessWidget {
         18 * scale,
         14 * scale,
       ),
-      decoration: const BoxDecoration(color: AppColors.teacherMint),
+      decoration: BoxDecoration(color: colors.pageBackgroundTop),
       child: Row(
         children: [
           TeacherAvatar(profile: profile, size: 48 * scale),
@@ -35,7 +36,7 @@ class _TeacherTopBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: AppColors.navy900.withValues(alpha: 0.60),
+                    color: colors.textSecondary,
                     fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.6,
@@ -47,7 +48,7 @@ class _TeacherTopBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: AppColors.navy900,
+                    color: colors.textPrimary,
                     fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.1,
@@ -60,20 +61,20 @@ class _TeacherTopBar extends StatelessWidget {
             width: 40 * scale,
             height: 40 * scale,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colors.elevatedSurface,
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0x4DC4C6D2)),
-              boxShadow: const [
+              border: Border.all(color: colors.border),
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x0D000000),
+                  color: colors.shadow,
                   blurRadius: 2,
-                  offset: Offset(0, 1),
+                  offset: const Offset(0, 1),
                 ),
               ],
             ),
             child: Icon(
               Icons.notifications_none_rounded,
-              color: AppColors.navy900,
+              color: colors.brandStrong,
               size: 22 * scale,
             ),
           ),

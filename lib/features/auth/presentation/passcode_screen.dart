@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/auth/widgets/auth_layout.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_action_button.dart';
 import 'package:numi_flutter/features/auth/widgets/passcode/passcode_input_row.dart';
@@ -183,6 +184,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final isFull = _controllers.every((controller) => controller.text != '');
     final errorText = _localError ?? widget.errorText;
 
@@ -241,7 +243,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                             key: ValueKey(_subtitleKey),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.andika(
-                              color: const Color(0xFF202124),
+                              color: colors.textPrimary,
                               fontSize: 17,
                               fontWeight: FontWeight.w400,
                               height: 1.25,
@@ -253,7 +255,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                             key: ValueKey(errorText),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.andika(
-                              color: const Color(0xFFD9534F),
+                              color: colors.error,
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
                               height: 1.25,
@@ -354,9 +356,10 @@ class _PasscodeTextAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final color = onPressed == null
-        ? const Color(0xFF001741).withValues(alpha: 0.45)
-        : const Color(0xFF001741);
+        ? colors.textPrimary.withValues(alpha: 0.45)
+        : colors.textPrimary;
 
     return Center(
       child: InkWell(

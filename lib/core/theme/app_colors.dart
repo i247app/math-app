@@ -95,4 +95,16 @@ abstract final class AppColors {
   static const vietnamRed = Color(0xFFE72720);
   static const greenShadow = Color(0x3874B493);
   static const navy = Color(0xFF063A7B);
+
+  // Dark theme
+  static const darkPrimaryTeal = Color(0xFF2A8E8E);
+  static const darkActionOrange = Color(0xFFFF7843);
+  static const darkSecondaryBlue = Color(0xFF1F5A5A);
+  static const darkBackground = Color(0xFF121E1E);
+  static const darkSurface = Color(0xFF1C2A2A);
+  static const darkSurfaceHigh = Color(0xFF243333);
+  static const darkOnPrimary = Color(0xFFFFFFFF);
+  static const darkOnSurface = Color(0xFFE9F4F2);
+  static const darkOnSurfaceMuted = Color(0xFF9EB8B5);
+  static const darkOutline = Color(0xFF355151);
 }

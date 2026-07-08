@@ -1,4 +1,3 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/settings/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,10 +7,13 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_language.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_scope.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/settings_action_card.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/settings_avatar.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/settings_language_card.dart';
+import 'package:numi_flutter/features/settings/widgets/menu/settings_theme_switch_card.dart';
 
 class SettingsMenuPanel extends StatelessWidget {
   const SettingsMenuPanel({
@@ -51,6 +53,9 @@ class SettingsMenuPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final themeController = AppThemeScope.of(context);
+
     return Column(
       children: [
         SizedBox(height: 4 * scale),
@@ -68,7 +73,7 @@ class SettingsMenuPanel extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.andika(
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
             fontSize: FontSize.xxxl * scale,
             fontWeight: FontWeight.w700,
             height: 1.05,
@@ -125,9 +130,16 @@ class SettingsMenuPanel extends StatelessWidget {
         ),
         SizedBox(height: 12 * scale),
         _animatedAction(
+          child: SettingsThemeSwitchCard(
+            controller: themeController,
+            scale: scale,
+          ),
+        ),
+        SizedBox(height: 12 * scale),
+        _animatedAction(
           child: SettingsActionCard(
             icon: Icons.logout_rounded,
-            iconColor: AppColors.orange500,
+            iconColor: colors.accentStrong,
             iconBackground: const Color(0xFFFFEAEA),
             title: context.getText(AppKeys.logout),
             subtitle: context.getText(AppKeys.logoutSubtitle),

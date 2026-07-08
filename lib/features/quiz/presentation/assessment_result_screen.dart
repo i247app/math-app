@@ -8,6 +8,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/quiz/cache/quiz_cache.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment_result/ai_review_card.dart';
@@ -153,10 +154,15 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final overlayStyle = Theme.of(context).brightness == Brightness.dark
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: overlayStyle,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.pageBackground,
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -182,9 +188,11 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                       ? AssessmentTestAgainLoader(scale: scale)
                       : Stack(
                           children: [
-                            const Positioned.fill(
+                            Positioned.fill(
                               child: DecoratedBox(
-                                decoration: BoxDecoration(color: Colors.white),
+                                decoration: BoxDecoration(
+                                  color: colors.pageBackground,
+                                ),
                               ),
                             ),
                             Positioned(

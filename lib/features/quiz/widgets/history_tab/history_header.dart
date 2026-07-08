@@ -8,13 +8,14 @@ class _HistoryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: topInset + 60 * scale,
       padding: EdgeInsets.only(top: topInset),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         border: Border(
-          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
+          bottom: BorderSide(color: colors.border, width: 4 * scale),
         ),
       ),
       alignment: Alignment.center,
@@ -23,7 +24,7 @@ class _HistoryHeader extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
-          color: const Color(0xFF339395),
+          color: colors.brandStrong,
           fontSize: FontSize.xxxl,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,

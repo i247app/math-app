@@ -5,10 +5,10 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_error_card.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_learning_category_section.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_teacher_profile_card.dart';
@@ -99,9 +99,10 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
         final title =
             studentClassNonEmpty(classroom?.name) ??
             context.getText(AppKeys.studentClassDetailTitle);
+        final colors = context.themeColors;
 
         return Scaffold(
-          backgroundColor: AppColors.classBackground,
+          backgroundColor: colors.pageBackground,
           body: SafeArea(
             bottom: false,
             child: Column(
@@ -112,7 +113,7 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                 ),
                 Expanded(
                   child: RefreshIndicator(
-                    color: AppColors.teal500,
+                    color: colors.brandStrong,
                     onRefresh: _refresh,
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(

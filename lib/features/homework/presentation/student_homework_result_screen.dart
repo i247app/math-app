@@ -8,7 +8,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_close_button.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_header.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_summary.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_review_card.dart';
 import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_score_ring.dart';
@@ -23,10 +23,15 @@ class StudentHomeworkResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final overlayStyle = Theme.of(context).brightness == Brightness.dark
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: overlayStyle,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.pageBackground,
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -44,9 +49,11 @@ class StudentHomeworkResultScreen extends StatelessWidget {
                   height: height,
                   child: Stack(
                     children: [
-                      const Positioned.fill(
+                      Positioned.fill(
                         child: DecoratedBox(
-                          decoration: BoxDecoration(color: Colors.white),
+                          decoration: BoxDecoration(
+                            color: colors.pageBackground,
+                          ),
                         ),
                       ),
                       Positioned(
@@ -72,7 +79,7 @@ class StudentHomeworkResultScreen extends StatelessWidget {
                           context.getText(AppKeys.excellentResultTitle),
                           textAlign: TextAlign.center,
                           style: GoogleFonts.andika(
-                            color: AppColors.textPrimary,
+                            color: colors.textPrimary,
                             fontSize: 24 * scale,
                             fontWeight: FontWeight.w800,
                             height: 32 / 24,

@@ -108,6 +108,7 @@ class _TeacherStudentInviteSearchSheetState
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final selectedCount = _selectedProfileIds.length;
+    final colors = context.themeColors;
     return DraggableScrollableSheet(
       initialChildSize: 0.78,
       minChildSize: 0.45,
@@ -115,9 +116,9 @@ class _TeacherStudentInviteSearchSheetState
       builder: (context, scrollController) {
         return Container(
           padding: EdgeInsets.fromLTRB(20, 14, 20, 16 + bottomInset),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          decoration: BoxDecoration(
+            color: colors.elevatedSurface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -127,7 +128,7 @@ class _TeacherStudentInviteSearchSheetState
                   width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFDDE4E6),
+                    color: colors.border,
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
@@ -136,7 +137,7 @@ class _TeacherStudentInviteSearchSheetState
               Text(
                 context.getText(AppKeys.teacherSearchStudentTitle),
                 style: GoogleFonts.andika(
-                  color: const Color(0xFF1E3A5F),
+                  color: colors.textPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   height: 1.25,
@@ -162,22 +163,22 @@ class _TeacherStudentInviteSearchSheetState
                           icon: const Icon(Icons.close_rounded),
                         ),
                   filled: true,
-                  fillColor: AppColors.teacherPaleMint,
+                  fillColor: colors.inputSurface,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 14,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFDDE4E6)),
+                    borderSide: BorderSide(color: colors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFDDE4E6)),
+                    borderSide: BorderSide(color: colors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: AppColors.teal520),
+                    borderSide: BorderSide(color: colors.brandStrong),
                   ),
                 ),
               ),
@@ -187,7 +188,7 @@ class _TeacherStudentInviteSearchSheetState
                   'count': selectedCount,
                 }),
                 style: GoogleFonts.andika(
-                  color: AppColors.textCoolMuted,
+                  color: colors.textSecondary,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),

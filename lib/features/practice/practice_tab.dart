@@ -6,6 +6,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/chapter_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/practice/practice_api.dart';
@@ -43,7 +44,6 @@ part 'widgets/practice_tab/estimated_completed_lessons.dart';
 
 const _reviewInk = Color(0xFF14213D);
 const _reviewMuted = Color(0xFF77859A);
-const _reviewBackground = Color(0xFFEEF9FB);
 const _headerNavy = Color(0xFF063A7B);
 const _selectPink = Color(0xFFB72A7F);
 const _checkPink = Color(0xFFFF4081);
@@ -273,12 +273,13 @@ class _PracticeTabState extends State<PracticeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
 
     if (widget.isParentMode) {
       return ColoredBox(
-        color: _reviewBackground,
+        color: colors.pageBackground,
         child: PracticeChapterScreen(
           chapter: _parentPreviewChapter(context),
           embedded: true,
@@ -301,7 +302,7 @@ class _PracticeTabState extends State<PracticeTab> {
     final selectedCtaHeight = 68 * scale;
 
     return ColoredBox(
-      color: _reviewBackground,
+      color: colors.pageBackground,
       child: Stack(
         children: [
           SingleChildScrollView(
@@ -439,7 +440,7 @@ class _PracticeTabState extends State<PracticeTab> {
         padding: EdgeInsets.symmetric(vertical: 140 * scale),
         child: Center(
           child: CircularProgressIndicator(
-            color: _headerNavy,
+            color: context.themeColors.brandStrong,
             strokeWidth: 3 * scale,
           ),
         ),

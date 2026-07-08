@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class SignupRoleCard extends StatelessWidget {
   const SignupRoleCard({
@@ -19,10 +19,14 @@ class SignupRoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return SizedBox(
       height: 96,
       child: Material(
-        color: isSelected ? const Color(0xFFEAF9F6) : Colors.white,
+        color: isSelected
+            ? colors.brand.withValues(alpha: 0.12)
+            : colors.surface,
         borderRadius: BorderRadius.circular(18),
         child: InkWell(
           onTap: onTap,
@@ -34,14 +38,12 @@ class SignupRoleCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: isSelected
-                    ? const Color(0xFF078B83)
-                    : const Color(0xFFE8E8E8),
+                color: isSelected ? colors.brandStrong : colors.border,
                 width: isSelected ? 1.6 : 1.2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.07),
+                  color: colors.shadow.withValues(alpha: 0.07),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -68,8 +70,8 @@ class SignupRoleCard extends StatelessWidget {
                         maxLines: 1,
                         style: GoogleFonts.andika(
                           color: isSelected
-                              ? const Color(0xFF078B83)
-                              : AppColors.ink,
+                              ? colors.brandStrong
+                              : colors.textPrimary,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0,
@@ -86,9 +88,9 @@ class SignupRoleCard extends StatelessWidget {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF078B83),
+                        color: colors.brandStrong,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
+                        border: Border.all(color: colors.surface, width: 3),
                       ),
                       child: const Icon(
                         Icons.check_rounded,

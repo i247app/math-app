@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class GradeHeader extends StatelessWidget {
   const GradeHeader({super.key, required this.scale});
@@ -14,13 +14,14 @@ class GradeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           height: 70 * scale,
           padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-          color: AppColors.gradeBackground.withValues(alpha: 0.78),
+          color: colors.elevatedSurface.withValues(alpha: 0.78),
           alignment: Alignment.centerLeft,
           child: IconButton(
             onPressed: () {
@@ -30,7 +31,7 @@ class GradeHeader extends StatelessWidget {
             },
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: AppColors.teal700,
+              color: colors.brandStrong,
               size: 28 * scale,
             ),
             padding: EdgeInsets.zero,

@@ -3,11 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class WelcomeDetailsComposition extends StatelessWidget {
   const WelcomeDetailsComposition({
@@ -33,6 +33,8 @@ class WelcomeDetailsComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -59,16 +61,16 @@ class WelcomeDetailsComposition extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.hardEdge,
             children: [
-              const Positioned.fill(
+              Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        AppColors.pageBackgroundTop,
-                        AppColors.pageBackground,
-                        Colors.white,
+                        colors.pageBackgroundTop,
+                        colors.pageBackground,
+                        colors.surface,
                       ],
                       stops: [0, 0.42, 1],
                     ),
@@ -226,8 +228,8 @@ class _BrandLogo extends StatelessWidget {
                 SizedBox(width: 8 * scale),
                 NumiBrandText(
                   fontSize: 20 * scale,
-                  firstColor: AppColors.welcomeDeepTeal,
-                  secondColor: AppColors.coral500,
+                  firstColor: context.themeColors.brandStrong,
+                  secondColor: context.themeColors.accentStrong,
                 ),
               ],
             ),
@@ -253,17 +255,19 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final scale = constraints.maxWidth / 156;
 
         return DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(8 * scale),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF101828).withValues(alpha: 0.08),
+                color: colors.shadow.withValues(alpha: 0.08),
                 offset: Offset(0, 8 * scale),
                 blurRadius: 20 * scale,
               ),
@@ -291,7 +295,7 @@ class _FeatureCard extends StatelessWidget {
                     title,
                     maxLines: 1,
                     style: GoogleFonts.nunito(
-                      color: AppColors.welcomeTitle,
+                      color: colors.welcomeTitle,
                       fontSize: FontSize.normal,
                       fontWeight: FontWeight.w800,
                       height: 1.15,
@@ -306,7 +310,7 @@ class _FeatureCard extends StatelessWidget {
                     subtitle,
                     maxLines: 1,
                     style: GoogleFonts.nunito(
-                      color: AppColors.textSlate,
+                      color: colors.textSecondary,
                       fontSize: FontSize.small,
                       fontWeight: FontWeight.w500,
                       height: 1.2,
@@ -328,6 +332,8 @@ class _PageIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final scale = constraints.maxWidth / 56;
@@ -336,18 +342,18 @@ class _PageIndicator extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _IndicatorDot(color: AppColors.inactiveDot, size: dotSize),
+            _IndicatorDot(color: colors.welcomeInactiveDot, size: dotSize),
             SizedBox(width: 8 * scale),
             Container(
               width: 24 * scale,
               height: dotSize,
               decoration: BoxDecoration(
-                color: AppColors.coral600,
+                color: colors.accent,
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
             SizedBox(width: 8 * scale),
-            _IndicatorDot(color: AppColors.inactiveDot, size: dotSize),
+            _IndicatorDot(color: colors.welcomeInactiveDot, size: dotSize),
           ],
         );
       },

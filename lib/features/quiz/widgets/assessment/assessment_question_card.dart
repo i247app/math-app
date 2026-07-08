@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class AssessmentQuestionCard extends StatelessWidget {
   const AssessmentQuestionCard({
@@ -14,14 +14,15 @@ class AssessmentQuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 356 * scale,
       alignment: Alignment.center,
       padding: EdgeInsets.symmetric(horizontal: 26 * scale),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(32 * scale),
-        border: Border.all(color: const Color(0xFFDCCACA)),
+        border: Border.all(color: colors.border),
       ),
       child: FittedBox(
         fit: BoxFit.scaleDown,
@@ -29,7 +30,7 @@ class AssessmentQuestionCard extends StatelessWidget {
           question,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
             fontSize: 72 * scale,
             fontWeight: FontWeight.w900,
             height: 1,

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
@@ -34,6 +35,7 @@ class HomeBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final items = switch (activeRole) {
       ProfileRole.teacher => [
         HomeNavItemData(
@@ -131,7 +133,7 @@ class HomeBottomNavigation extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: colors.shadow.withValues(alpha: 0.04),
             blurRadius: 30 * scale,
             offset: Offset(0, -8 * scale),
           ),
@@ -150,7 +152,7 @@ class HomeBottomNavigation extends StatelessWidget {
               bottomInset + 12 * scale,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.92),
+              color: colors.elevatedSurface.withValues(alpha: 0.92),
               borderRadius: radius,
             ),
             child: Row(
@@ -191,15 +193,20 @@ class HomeAnimatedNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const activeColor = Color(0xFF38898B);
-    final inactiveColor = const Color(0xFF515F54).withValues(alpha: 0.68);
+    final colors = context.themeColors;
+    final activeColor = colors.brandStrong;
+    final inactiveColor = colors.textSecondary.withValues(alpha: 0.68);
 
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 120),
       curve: Curves.easeOutCubic,
       tween: Tween<double>(end: active ? 1 : 0),
       builder: (context, value, child) {
-        final color = Color.lerp(inactiveColor, Colors.white, value)!;
+        final color = Color.lerp(
+          inactiveColor,
+          Theme.of(context).colorScheme.onPrimary,
+          value,
+        )!;
         return AnimatedScale(
           duration: const Duration(milliseconds: 120),
           curve: Curves.easeOutCubic,
@@ -225,12 +232,12 @@ class HomeAnimatedNavItem extends StatelessWidget {
                     boxShadow: active && !teacherStyle
                         ? [
                             BoxShadow(
-                              color: homeTeal.withValues(alpha: 0.20),
+                              color: colors.brand.withValues(alpha: 0.20),
                               blurRadius: 15 * scale,
                               offset: Offset(0, 10 * scale),
                             ),
                             BoxShadow(
-                              color: homeTeal.withValues(alpha: 0.20),
+                              color: colors.brand.withValues(alpha: 0.20),
                               blurRadius: 6 * scale,
                               offset: Offset(0, 4 * scale),
                             ),

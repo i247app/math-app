@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class SignupTextField extends StatelessWidget {
   const SignupTextField({
@@ -23,6 +23,8 @@ class SignupTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,15 +40,15 @@ class SignupTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: GoogleFonts.andika(
-                color: const Color(0xFF7E9088),
+                color: colors.inputHint,
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
               ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: colors.inputSurface,
               prefixIcon: prefixIcon == null
                   ? null
-                  : Icon(prefixIcon, color: const Color(0xFFA5B0B1), size: 22),
+                  : Icon(prefixIcon, color: colors.inputHint, size: 22),
               prefixIconConstraints: prefixIcon == null
                   ? null
                   : const BoxConstraints(minWidth: 46, minHeight: 53),
@@ -56,28 +58,19 @@ class SignupTextField extends StatelessWidget {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(
-                  color: Color(0xFFE7E7E7),
-                  width: 1.5,
-                ),
+                borderSide: BorderSide(color: colors.border, width: 1.5),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(
-                  color: Color(0xFFE7E7E7),
-                  width: 1.5,
-                ),
+                borderSide: BorderSide(color: colors.border, width: 1.5),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(
-                  color: Color(0xFF339395),
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: colors.brandStrong, width: 2),
               ),
             ),
             style: GoogleFonts.andika(
-              color: AppColors.ink,
+              color: colors.textPrimary,
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
@@ -90,7 +83,7 @@ class SignupTextField extends StatelessWidget {
             child: Text(
               errorText!,
               style: GoogleFonts.andika(
-                color: const Color(0xFFE74657),
+                color: colors.error,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+
 class AuthBackButton extends StatelessWidget {
   const AuthBackButton({
     super.key,
@@ -15,17 +17,17 @@ class AuthBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return SizedBox.square(
       dimension: size,
       child: Material(
-        color: Colors.white.withValues(alpha: 0.8),
-        shadowColor: Colors.black.withValues(alpha: 0.08),
+        color: colors.authBackSurface,
+        shadowColor: colors.shadow,
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(999),
-          side: BorderSide(
-            color: const Color(0xFFA2B1A3).withValues(alpha: 0.1),
-          ),
+          side: BorderSide(color: colors.authBackBorder),
         ),
         child: InkWell(
           onTap: () {
@@ -34,7 +36,15 @@ class AuthBackButton extends StatelessWidget {
           },
           borderRadius: BorderRadius.circular(999),
           child: Center(
-            child: SvgPicture.asset(iconAsset, width: 16, height: 16),
+            child: SvgPicture.asset(
+              iconAsset,
+              width: 16,
+              height: 16,
+              colorFilter: ColorFilter.mode(
+                colors.brandStrong,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
         ),
       ),

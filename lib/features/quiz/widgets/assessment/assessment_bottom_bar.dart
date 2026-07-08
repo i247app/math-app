@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
 
 class AssessmentBottomBar extends StatelessWidget {
@@ -27,6 +28,7 @@ class AssessmentBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -39,11 +41,9 @@ class AssessmentBottomBar extends StatelessWidget {
             24 * scale,
           ),
           decoration: BoxDecoration(
-            color: AppColors.gradeBackground.withValues(alpha: 0.90),
+            color: colors.elevatedSurface.withValues(alpha: 0.90),
             border: Border(
-              top: BorderSide(
-                color: const Color(0xFFCDE2CF).withValues(alpha: 0.30),
-              ),
+              top: BorderSide(color: colors.border.withValues(alpha: 0.50)),
             ),
           ),
           child: Row(

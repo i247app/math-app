@@ -179,8 +179,9 @@ class _TeacherHomeworkDetailScreenState
     final exercise = _exercise;
     final questions =
         exercise?.questions ?? const <ClassroomExerciseQuestion>[];
+    final colors = context.themeColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FFFF),
+      backgroundColor: colors.pageBackground,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -195,18 +196,18 @@ class _TeacherHomeworkDetailScreenState
                   ? TextButton(
                       onPressed: _isSaving ? null : _saveVisibility,
                       child: _isSaving
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 18,
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppColors.teal520,
+                                color: colors.brandStrong,
                               ),
                             )
                           : Text(
                               context.getText(AppKeys.save),
                               style: GoogleFonts.andika(
-                                color: AppColors.teal520,
+                                color: colors.brandStrong,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -216,7 +217,7 @@ class _TeacherHomeworkDetailScreenState
             ),
             Expanded(
               child: RefreshIndicator(
-                color: AppColors.teal520,
+                color: colors.brandStrong,
                 onRefresh: () => _loadDetail(forceRefresh: true),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(

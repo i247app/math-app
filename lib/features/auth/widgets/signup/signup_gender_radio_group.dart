@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_gender_choice.dart';
 
 class SignupGenderRadioGroup extends StatelessWidget {
@@ -52,19 +52,21 @@ class _SignupGenderDisabledHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Container(
       height: 52,
       alignment: Alignment.centerLeft,
       padding: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.inputSurface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE7E7E7), width: 1.5),
+        border: Border.all(color: colors.border, width: 1.5),
       ),
       child: Text(
         hintText,
         style: GoogleFonts.andika(
-          color: const Color(0xFF7E9088),
+          color: colors.inputHint,
           fontSize: 15,
           fontWeight: FontWeight.w400,
           letterSpacing: 0,
@@ -87,11 +89,15 @@ class _SignupGenderRadioItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = const Color(0xFF339395);
+    final colors = context.themeColors;
+    final accentColor = colors.brandStrong;
+
     return SizedBox(
       height: 53,
       child: Material(
-        color: selected ? const Color(0xFFE8FAF8) : Colors.white,
+        color: selected
+            ? colors.brand.withValues(alpha: 0.12)
+            : colors.inputSurface,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
@@ -103,7 +109,7 @@ class _SignupGenderRadioItem extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: selected ? accentColor : const Color(0xFFE7E7E7),
+                color: selected ? accentColor : colors.border,
                 width: selected ? 2 : 1.5,
               ),
             ),
@@ -119,7 +125,7 @@ class _SignupGenderRadioItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
-                      color: selected ? accentColor : AppColors.ink,
+                      color: selected ? accentColor : colors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0,
@@ -142,7 +148,9 @@ class _SignupGenderRadioMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = const Color(0xFF339395);
+    final colors = context.themeColors;
+    final accentColor = colors.brandStrong;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
       width: 20,
@@ -150,7 +158,7 @@ class _SignupGenderRadioMark extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: accentColor, width: selected ? 6 : 2),
-        color: Colors.white,
+        color: colors.inputSurface,
       ),
     );
   }

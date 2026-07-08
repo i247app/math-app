@@ -1,4 +1,3 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -6,6 +5,7 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/managed_profile_role_pill.dart';
@@ -35,16 +35,13 @@ class ParentChildProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final radius = BorderRadius.circular(16 * scale);
-    final borderColor = isActive
-        ? const Color(0xFF008080)
-        : const Color(0xFFE5E7EB);
-    final textColor = isActive
-        ? AppColors.textPrimary
-        : const Color(0xFF6B7280);
+    final borderColor = isActive ? colors.brandStrong : colors.border;
+    final textColor = isActive ? colors.textPrimary : colors.textSecondary;
 
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: radius,
       child: InkWell(
         onTap: onSelect,
@@ -52,7 +49,7 @@ class ParentChildProfileCard extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(16 * scale),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: radius,
             border: Border.all(
               color: borderColor,
@@ -60,7 +57,7 @@ class ParentChildProfileCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF5E7775).withValues(alpha: 0.06),
+                color: colors.shadow,
                 blurRadius: 18 * scale,
                 offset: Offset(0, 8 * scale),
               ),
@@ -79,8 +76,8 @@ class ParentChildProfileCard extends StatelessWidget {
                         avatarKey: profile.avatarKey,
                         avatarUrl: profile.avatarUrl,
                         borderColor: isActive
-                            ? const Color(0xFF008080)
-                            : const Color(0xFFE5E7EB),
+                            ? colors.brandStrong
+                            : colors.border,
                         borderWidth: 3 * scale,
                       ),
                       SizedBox(width: 14 * scale),
@@ -141,7 +138,7 @@ class ParentChildProfileCard extends StatelessWidget {
                       ParentIconButton(
                         assetPath:
                             'assets/images/parent_profile_manage_edit.svg',
-                        backgroundColor: const Color(0xFFE6F5F5),
+                        backgroundColor: colors.brand.withValues(alpha: 0.12),
                         size: 42 * scale,
                         iconSize: 20 * scale,
                         onTap: onEdit,

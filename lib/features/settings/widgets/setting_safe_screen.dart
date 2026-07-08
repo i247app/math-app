@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+
 class SettingSafeScreen extends StatelessWidget {
   const SettingSafeScreen({super.key, required this.child});
 
@@ -8,7 +10,7 @@ class SettingSafeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: context.themeColors.pageBackground,
       child: SafeArea(child: child),
     );
   }

@@ -11,6 +11,7 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/classroom/cache/student_class_search_filter_cache.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_search_helpers.dart';
@@ -326,7 +327,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     final selectedSchoolIds = await showModalBottomSheet<Set<int>>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: context.themeColors.elevatedSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),

@@ -21,7 +21,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = _roomClassName(context, entry.classroom);
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFCFC),
+      backgroundColor: context.themeColors.pageBackground,
       body: SafeArea(
         bottom: false,
         child: Column(

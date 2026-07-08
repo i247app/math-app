@@ -1,4 +1,3 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_language.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/language_bottom_sheet.dart';
 import 'package:numi_flutter/features/settings/widgets/menu/language_pill.dart';
@@ -44,10 +44,11 @@ class SettingsLanguageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final radius = BorderRadius.circular(16 * scale);
 
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       elevation: 0,
       borderRadius: radius,
       child: InkWell(
@@ -57,11 +58,11 @@ class SettingsLanguageCard extends StatelessWidget {
           height: 72 * scale,
           padding: EdgeInsets.symmetric(horizontal: 16 * scale),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: radius,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
+                color: colors.shadow.withValues(alpha: 0.06),
                 blurRadius: 10 * scale,
                 offset: Offset(0, 3 * scale),
               ),
@@ -72,13 +73,13 @@ class SettingsLanguageCard extends StatelessWidget {
               Container(
                 width: 42 * scale,
                 height: 42 * scale,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEFF3F8),
+                decoration: BoxDecoration(
+                  color: colors.brand.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.language_rounded,
-                  color: const Color(0xFF5B7AA0),
+                  color: colors.brandStrong,
                   size: 22 * scale,
                 ),
               ),
@@ -87,7 +88,7 @@ class SettingsLanguageCard extends StatelessWidget {
                 child: Text(
                   context.getText(AppKeys.language),
                   style: GoogleFonts.andika(
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                     fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w700,
                     height: 1,

@@ -348,6 +348,10 @@ class AppKeys {
   static const passcodeMenuTitle = 'passcode_menu_title';
   static const passcodeMenuSubtitleSet = 'passcode_menu_subtitle_set';
   static const passcodeMenuSubtitleManage = 'passcode_menu_subtitle_manage';
+  static const appThemeMenuTitle = 'app_theme_menu_title';
+  static const appThemeMenuSubtitleSystem = 'app_theme_menu_subtitle_system';
+  static const appThemeMenuSubtitleLight = 'app_theme_menu_subtitle_light';
+  static const appThemeMenuSubtitleDark = 'app_theme_menu_subtitle_dark';
   static const createPasscodeTitle = 'create_passcode_title';
   static const confirmPasscodeTitle = 'confirm_passcode_title';
   static const unlockPasscodeTitle = 'unlock_passcode_title';

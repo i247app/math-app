@@ -684,7 +684,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => Material(
-          color: Colors.white,
+          color: context.themeColors.pageBackground,
           child: SafeArea(
             child: SettingTab.page(
               user: widget.user,
@@ -711,7 +711,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => Material(
-          color: Colors.white,
+          color: context.themeColors.pageBackground,
           child: SafeArea(
             child: SettingTab.page(
               user: widget.user,
@@ -770,7 +770,7 @@ class _StudentHomeContentState extends State<_StudentHomeContent> {
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF008080),
+                backgroundColor: context.themeColors.brandStrong,
               ),
               child: Text(context.getText(AppKeys.parentSwitchStudentAction)),
             ),

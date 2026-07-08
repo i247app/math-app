@@ -8,6 +8,7 @@ import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/features/quiz/controllers/quiz_review_controller.dart';
 import 'package:numi_flutter/features/quiz/quiz_api.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 part '../widgets/quiz_review/quiz_review_header.dart';
 part '../widgets/quiz_review/quiz_review_content.dart';
@@ -104,8 +105,10 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
+      backgroundColor: colors.pageBackground,
       body: SafeArea(
         bottom: false,
         child: Column(

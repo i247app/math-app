@@ -14,12 +14,13 @@ class TeacherErrorPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: EdgeInsets.all(20 * scale),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: const Color(0xFFE2E9EC)),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         children: [
@@ -27,7 +28,7 @@ class TeacherErrorPanel extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: AppColors.textCoolMuted,
+              color: colors.textSecondary,
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w600,
             ),
