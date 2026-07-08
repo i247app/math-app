@@ -33,7 +33,9 @@ class AuthLayout extends StatelessWidget {
     this.mascotShadowBlur = 24,
     this.mascotShadowOffset = const Offset(0, 12),
     this.backIconAsset = 'assets/images/pin_figma_back.svg',
-    this.mascotAsset = 'assets/images/pin_figma_mascot.png',
+    this.mascotAsset = 'assets/images/numi-mascot.png',
+    this.mascotAspectRatio = 759 / 698,
+    this.mascotVisualScale = 0.88,
   });
 
   final VoidCallback onBack;
@@ -62,6 +64,8 @@ class AuthLayout extends StatelessWidget {
   final Offset mascotShadowOffset;
   final String backIconAsset;
   final String mascotAsset;
+  final double mascotAspectRatio;
+  final double mascotVisualScale;
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +127,8 @@ class AuthLayout extends StatelessWidget {
                                     shadowAlpha: mascotShadowAlpha,
                                     shadowBlur: mascotShadowBlur,
                                     shadowOffset: mascotShadowOffset,
+                                    aspectRatio: mascotAspectRatio,
+                                    visualScale: mascotVisualScale,
                                   ),
                                 ),
                                 if (titleWidget != null || title != null) ...[
@@ -173,6 +179,8 @@ class _AuthMascot extends StatelessWidget {
     required this.shadowAlpha,
     required this.shadowBlur,
     required this.shadowOffset,
+    required this.aspectRatio,
+    required this.visualScale,
   });
 
   final String asset;
@@ -181,6 +189,8 @@ class _AuthMascot extends StatelessWidget {
   final double shadowAlpha;
   final double shadowBlur;
   final Offset shadowOffset;
+  final double aspectRatio;
+  final double visualScale;
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +207,13 @@ class _AuthMascot extends StatelessWidget {
           ),
         ],
       ),
-      child: Image.asset(asset, fit: BoxFit.contain),
+      child: Center(
+        child: SizedBox(
+          width: size * visualScale * aspectRatio,
+          height: size * visualScale,
+          child: Image.asset(asset, fit: BoxFit.contain),
+        ),
+      ),
     );
   }
 }

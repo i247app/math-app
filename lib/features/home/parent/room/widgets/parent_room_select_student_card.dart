@@ -40,7 +40,7 @@ class _ParentRoomSelectStudentCard extends StatelessWidget {
               Image.asset(
                 parentNoStudentMascotAsset,
                 width: 176,
-                height: 158,
+                height: 162,
                 fit: BoxFit.contain,
               ),
             ],

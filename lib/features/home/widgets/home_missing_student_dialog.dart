@@ -60,7 +60,7 @@ class HomeMissingStudentDialog extends StatelessWidget {
                     Image.asset(
                       parentNoStudentMascotAsset,
                       width: 220,
-                      height: 198,
+                      height: 202,
                       fit: BoxFit.contain,
                     ),
                   ],
