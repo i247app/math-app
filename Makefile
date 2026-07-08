@@ -42,7 +42,7 @@ clean:
 	rm -rf ios/Podfile.lock
 	rm -rf macos/Podfile.lock
 	@echo "cleaning ios files..."
-	rm -rf ios/Podfile.lock ios/Pods ios/.symlinks ios/Flutter/Flutter.framework
+	rm -rf ios/Pods ios/.symlinks ios/Flutter/Flutter.framework
 	@echo "cleaning ios done"
 
 build-release-android:
