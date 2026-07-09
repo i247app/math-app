@@ -68,9 +68,7 @@ class HomeRoleDashboard extends StatefulWidget {
 
 class HomeRoleDashboardState extends State<HomeRoleDashboard> {
   late final Set<int> _visitedTabs = <int>{widget.activeTab};
-  late final Set<int> _activatedTabs = <int>{widget.activeTab};
   final Map<int, int> _activationTicks = <int, int>{};
-  final Map<int, Widget> _builtTabs = <int, Widget>{};
   late int _lastProfileResetSignal = widget.profileResetSignal;
 
   @override
@@ -105,16 +103,11 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.activeTab != widget.activeTab) {
       _visitedTabs.add(widget.activeTab);
-      _activatedTabs.add(widget.activeTab);
       _activationTicks[widget.activeTab] =
           (_activationTicks[widget.activeTab] ?? 0) + 1;
-      // Do NOT remove from _builtTabs — Offstage + TickerMode preserves the
-      // widget tree so switching back to a tab is instant. Only activationTick
-      // is bumped so the newly-active tab can refresh its data if needed.
     } else if (oldWidget.selectionRevision != widget.selectionRevision) {
       _activationTicks[widget.activeTab] =
           (_activationTicks[widget.activeTab] ?? 0) + 1;
-      _builtTabs.remove(widget.activeTab);
     }
 
     if (widget.profileResetSignal != _lastProfileResetSignal) {
@@ -122,25 +115,7 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
       for (final tab in _activationTicks.keys.toList()) {
         _activationTicks[tab] = (_activationTicks[tab] ?? 0) + 1;
       }
-      _builtTabs.clear();
     }
-
-    if (_identityPropsChanged(oldWidget)) {
-      _builtTabs.clear();
-    }
-  }
-
-  bool _identityPropsChanged(HomeRoleDashboard old) {
-    return old.activeRole != widget.activeRole ||
-        ActiveProfileSession.profileStableId(old.activeProfile) !=
-            ActiveProfileSession.profileStableId(widget.activeProfile) ||
-        old.user != widget.user ||
-        old.profiles.length != widget.profiles.length ||
-        old.scale != widget.scale ||
-        old.bottomPadding != widget.bottomPadding ||
-        old.headerHeight != widget.headerHeight ||
-        old.openAddProfileRequestId != widget.openAddProfileRequestId ||
-        old.profileLoadError != widget.profileLoadError;
   }
 
   @override
@@ -156,7 +131,10 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
               offstage: tab != widget.activeTab,
               child: TickerMode(
                 enabled: tab == widget.activeTab,
-                child: _builtTabs[tab] ??= _buildTab(context, tab),
+                child: KeyedSubtree(
+                  key: ValueKey('home-dashboard-content-$tab'),
+                  child: _buildTab(context, tab),
+                ),
               ),
             ),
       ],

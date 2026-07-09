@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -50,111 +48,104 @@ class HomeHeaderBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final contentHeight = height - topInset;
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          height: height,
-          padding: EdgeInsets.fromLTRB(
-            horizontalPadding,
-            topInset + contentHeight * 0.10,
-            horizontalPadding,
-            contentHeight * 0.10,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.94),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Semantics(
-                  button: canSwitchProfile,
-                  child: InkWell(
-                    onTap: onProfileTap,
-                    borderRadius: BorderRadius.circular(16),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        HomeProfileAvatar(
-                          size: contentHeight * 0.58,
-                          avatarKey: profile?.avatarKey,
-                          avatarUrl: profile?.avatarUrl,
-                          showStatus: role != ProfileRole.parent,
-                          borderColor: role == ProfileRole.parent
-                              ? const Color(0xFFE7DAC8)
-                              : null,
-                        ),
-                        SizedBox(width: contentHeight * 0.14),
-                        Flexible(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                homeRoleLabel(context, role),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: FontSize.small,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.05,
-                                ),
+    return RepaintBoundary(
+      child: Container(
+        height: height,
+        padding: EdgeInsets.fromLTRB(
+          horizontalPadding,
+          topInset + contentHeight * 0.10,
+          horizontalPadding,
+          contentHeight * 0.10,
+        ),
+        decoration: const BoxDecoration(color: Colors.white),
+        child: Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                button: canSwitchProfile,
+                child: InkWell(
+                  onTap: onProfileTap,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      HomeProfileAvatar(
+                        size: contentHeight * 0.58,
+                        avatarKey: profile?.avatarKey,
+                        avatarUrl: profile?.avatarUrl,
+                        showStatus: role != ProfileRole.parent,
+                        borderColor: role == ProfileRole.parent
+                            ? const Color(0xFFE7DAC8)
+                            : null,
+                      ),
+                      SizedBox(width: contentHeight * 0.14),
+                      Flexible(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              homeRoleLabel(context, role),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black87,
+                                fontSize: FontSize.small,
+                                fontWeight: FontWeight.w400,
+                                height: 1.05,
                               ),
-                              const SizedBox(height: 2),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      role == ProfileRole.parent
-                                          ? name
-                                          : '$name👋',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: FontSize.small,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.05,
-                                      ),
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    role == ProfileRole.parent
+                                        ? name
+                                        : '$name👋',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: FontSize.small,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.05,
                                     ),
                                   ),
-                                  if (canSwitchProfile) ...[
-                                    SizedBox(width: contentHeight * 0.06),
-                                    AnimatedRotation(
-                                      turns: isProfileMenuOpen ? 0.5 : 0,
-                                      duration: const Duration(
-                                        milliseconds: 180,
-                                      ),
-                                      child: Icon(
-                                        Icons.keyboard_arrow_down_rounded,
-                                        size: contentHeight * 0.18,
-                                        color: const Color(0xFF8294B0),
-                                      ),
+                                ),
+                                if (canSwitchProfile) ...[
+                                  SizedBox(width: contentHeight * 0.06),
+                                  AnimatedRotation(
+                                    turns: isProfileMenuOpen ? 0.5 : 0,
+                                    duration: const Duration(milliseconds: 180),
+                                    child: Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      size: contentHeight * 0.18,
+                                      color: const Color(0xFF8294B0),
                                     ),
-                                  ],
+                                  ),
                                 ],
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              if (role == ProfileRole.parent) ...[
-                HomeParentFireBadge(
-                  count: parentStreakCount,
-                  height: contentHeight * 0.45,
-                ),
-                SizedBox(width: contentHeight * 0.12),
-              ],
-              HomeNotificationButton(size: contentHeight * 0.45),
+            ),
+            if (role == ProfileRole.parent) ...[
+              HomeParentFireBadge(
+                count: parentStreakCount,
+                height: contentHeight * 0.45,
+              ),
+              SizedBox(width: contentHeight * 0.12),
             ],
-          ),
+            HomeNotificationButton(size: contentHeight * 0.45),
+          ],
         ),
       ),
     );

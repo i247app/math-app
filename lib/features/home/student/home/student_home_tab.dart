@@ -133,7 +133,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
   void didUpdateWidget(covariant StudentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadHomeLayout(forceRefresh: true);
+      _loadHomeLayout();
       return;
     }
     if (!widget.isActive) {
@@ -202,7 +202,10 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
     });
 
     try {
-      final layout = await _homeLayoutService.getLayout(profileId: profileId);
+      final layout = await cache.loadLayout(
+        profileId: profileId,
+        loader: () => _homeLayoutService.getLayout(profileId: profileId),
+      );
       if (!mounted ||
           requestId != _homeLayoutRequestId ||
           ActiveProfileSession.profileStableId(widget.activeProfile) !=

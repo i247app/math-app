@@ -165,7 +165,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
   void didUpdateWidget(covariant TeacherHomeTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadClassrooms(forceRefresh: true);
+      _loadClassrooms();
       return;
     }
     if (!widget.isActive) {
@@ -230,7 +230,10 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     });
 
     try {
-      final layout = await _homeLayoutService.getLayout(profileId: profileId);
+      final layout = await cache.loadLayout(
+        profileId: profileId,
+        loader: () => _homeLayoutService.getLayout(profileId: profileId),
+      );
       if (!mounted ||
           _loadedProfileId != profileId ||
           _homeLayoutRequestId != requestId) {

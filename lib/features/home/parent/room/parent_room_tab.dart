@@ -57,7 +57,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
   void didUpdateWidget(covariant ParentRoomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.args.isActive && widget.args.isActive) {
-      _loadLayout(forceRefresh: true);
+      _loadLayout();
       return;
     }
     if (!widget.args.isActive) {
@@ -137,7 +137,10 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     });
 
     try {
-      final layout = await _homeLayoutService.getLayout(profileId: profileId);
+      final layout = await cache.loadLayout(
+        profileId: profileId,
+        loader: () => _homeLayoutService.getLayout(profileId: profileId),
+      );
       if (!mounted || requestId != _requestId) {
         return;
       }

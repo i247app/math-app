@@ -56,7 +56,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   void didUpdateWidget(covariant ParentAssessmentTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.args.isActive && widget.args.isActive) {
-      _loadAssessments(forceRefresh: true);
+      _loadAssessments();
       return;
     }
     if (!widget.args.isActive) {
@@ -95,9 +95,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     final cachedSnapshot = profileId == null
         ? null
         : cache.getParent(profileId);
-    if (!forceRefresh &&
-        cachedSnapshot != null &&
-        cachedSnapshot.completedAssessments.isNotEmpty) {
+    if (!forceRefresh && cachedSnapshot != null) {
       setState(() => _applyCachedAssessments(cachedSnapshot));
       if (!cachedSnapshot.isStale) {
         return;

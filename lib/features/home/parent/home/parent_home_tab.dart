@@ -86,7 +86,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return;
     }
     if (!oldWidget.args.isActive && widget.args.isActive) {
-      loadHome(forceRefresh: true);
+      loadHome();
       return;
     }
     if (!widget.args.isActive) {
@@ -159,7 +159,10 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     }
 
     try {
-      final layout = await _homeLayoutService.getLayout(profileId: profileId);
+      final layout = await cache.loadLayout(
+        profileId: profileId,
+        loader: () => _homeLayoutService.getLayout(profileId: profileId),
+      );
       if (!mounted || requestId != _childLoadRequestId) {
         return;
       }

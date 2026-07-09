@@ -1,6 +1,7 @@
 import 'package:numi/features/home/parent/cache/parent_home_snapshot.dart';
 import 'package:numi/features/home/student/cache/student_home_snapshot.dart';
 import 'package:numi/features/home/teacher/cache/teacher_home_snapshot.dart';
+import 'package:numi/features/home/home_api.dart';
 
 /// In-memory, per-session cache for home-screen data indexed by profile ID.
 ///
@@ -21,6 +22,31 @@ class HomeProfileCache {
   final Map<int, StudentHomeSnapshot> _student = {};
   final Map<int, ParentHomeSnapshot> _parent = {};
   final Map<int, TeacherHomeSnapshot> _teacher = {};
+  final Map<int, Future<HomeLayout>> _pendingLayouts = {};
+
+  /// Joins concurrent home-layout requests for the same profile.
+  ///
+  /// Home, room, and role dashboards can request the same endpoint during a
+  /// rapid tab switch. Sharing the in-flight request prevents a cold cache
+  /// from creating duplicate network work.
+  Future<HomeLayout> loadLayout({
+    required int profileId,
+    required Future<HomeLayout> Function() loader,
+  }) {
+    final pending = _pendingLayouts[profileId];
+    if (pending != null) {
+      return pending;
+    }
+
+    late final Future<HomeLayout> request;
+    request = loader().whenComplete(() {
+      if (identical(_pendingLayouts[profileId], request)) {
+        _pendingLayouts.remove(profileId);
+      }
+    });
+    _pendingLayouts[profileId] = request;
+    return request;
+  }
 
   // ── Student ─────────────────────────────────────────────────────────────────
 
@@ -53,6 +79,7 @@ class HomeProfileCache {
     _student.clear();
     _parent.clear();
     _teacher.clear();
+    _pendingLayouts.clear();
   }
 
   /// Removes cached data for a single profile across all roles.
@@ -60,5 +87,6 @@ class HomeProfileCache {
     _student.remove(profileId);
     _parent.remove(profileId);
     _teacher.remove(profileId);
+    _pendingLayouts.remove(profileId);
   }
 }
