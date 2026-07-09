@@ -50,6 +50,9 @@ config/env.dev.json
 *.keystore
 *.truststore
 
+# secret stuff
+keys/
+
 # Java
 *.class
 *.jar
