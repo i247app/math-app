@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/home/shared/widgets/home_horizontal_carousel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_recent_assignment_card.dart';
 
 class TeacherRecentAssignmentCarousel extends StatelessWidget {
@@ -16,26 +17,16 @@ class TeacherRecentAssignmentCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return HomeHorizontalCarousel<ClassroomExercise>(
+      items: assignments,
+      itemWidth: 178 * scale,
       height: 164 * scale,
-      child: ListView.separated(
-        clipBehavior: Clip.none,
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.zero,
-        itemCount: assignments.length,
-        separatorBuilder: (_, _) => SizedBox(width: 14 * scale),
-        itemBuilder: (context, index) {
-          final assignment = assignments[index];
-          return SizedBox(
-            width: 178 * scale,
-            child: TeacherRecentAssignmentCard(
-              scale: scale,
-              assignment: assignment,
-              onTap: () => onOpen(assignment),
-            ),
-          );
-        },
+      gap: 14 * scale,
+      physics: const BouncingScrollPhysics(),
+      itemBuilder: (context, assignment) => TeacherRecentAssignmentCard(
+        scale: scale,
+        assignment: assignment,
+        onTap: () => onOpen(assignment),
       ),
     );
   }

@@ -1,9 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class ParentAssessmentSkeletonPulse extends StatefulWidget {
-  const ParentAssessmentSkeletonPulse({required this.builder});
+  const ParentAssessmentSkeletonPulse({super.key, required this.builder});
 
   final Widget Function(BuildContext context, Color color) builder;
 

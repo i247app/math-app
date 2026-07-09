@@ -1,9 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class ParentRoomSkeletonLine extends StatelessWidget {
-  const ParentRoomSkeletonLine({required this.width});
+  const ParentRoomSkeletonLine({super.key, required this.width});
 
   final double width;
 

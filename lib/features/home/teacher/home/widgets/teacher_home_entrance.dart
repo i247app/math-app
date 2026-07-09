@@ -1,2 +1,1 @@
-// Replaced by ParentHomeEntrance
-export 'package:numi/features/home/parent/shared/widgets/parent_home_entrance.dart';
+export 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';

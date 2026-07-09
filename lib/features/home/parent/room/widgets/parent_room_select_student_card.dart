@@ -1,14 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
 
 class ParentRoomSelectStudentCard extends StatelessWidget {
-  const ParentRoomSelectStudentCard({
+  const ParentRoomSelectStudentCard({super.key,
     required this.onChooseProfile,
     required this.onCreateProfile,
   });

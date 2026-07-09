@@ -1,26 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
 
-class StudentClassroomSkeletonBlock extends StatelessWidget {
+class StudentClassroomSkeletonBlock extends HomeSkeletonBlock {
   const StudentClassroomSkeletonBlock({
     super.key,
-    this.width,
-    required this.height,
-    required this.radius,
-  });
-
-  final double? width;
-  final double height;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8EEF0),
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
-  }
+    super.width,
+    required super.height,
+    required super.radius,
+  }) : super(
+         color: const Color(0xFFE8EEF0),
+       );
 }

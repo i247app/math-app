@@ -1,11 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 class ParentRoomTaskShell extends StatelessWidget {
-  const ParentRoomTaskShell({
+  const ParentRoomTaskShell({super.key,
     required this.accent,
     required this.child,
     required this.onTap,

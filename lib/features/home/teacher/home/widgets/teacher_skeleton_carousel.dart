@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/features/home/shared/widgets/home_horizontal_carousel.dart';
 
 class TeacherSkeletonCarousel extends StatelessWidget {
   const TeacherSkeletonCarousel({
@@ -18,19 +19,13 @@ class TeacherSkeletonCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return HomeHorizontalCarousel<int>(
+      items: List<int>.generate(itemCount, (index) => index),
+      itemWidth: itemWidth,
       height: itemHeight,
-      child: ListView.separated(
-        clipBehavior: Clip.none,
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero,
-        itemCount: itemCount,
-        separatorBuilder: (_, _) => SizedBox(width: 16 * scale),
-        itemBuilder: (context, index) {
-          return SizedBox(width: itemWidth, child: builder(context));
-        },
-      ),
+      gap: 16 * scale,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, _) => builder(context),
     );
   }
 }

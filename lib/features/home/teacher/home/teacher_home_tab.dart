@@ -23,7 +23,7 @@ import 'package:numi/features/home/teacher/home/widgets/teacher_assignments_load
 import 'package:numi/features/home/teacher/home/widgets/teacher_class_carousel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_class_section_header.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_hero_card.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_home_entrance.dart';
+import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_home_hero_skeleton.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_home_section_header_skeleton.dart';
 import 'package:numi/features/home/shared/widgets/home_section_header.dart';
@@ -327,7 +327,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       return child;
     }
 
-    return ParentHomeEntrance(
+    return HomeEntranceAnimation(
       key: ValueKey<String>('teacher-home-entrance-$id'),
       order: order,
       onFinished: () => _markHomeEntrancePlayed(id),

@@ -1,7 +1,4 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/home_api.dart';
 import 'package:numi/features/home/widgets/home_profile_menu.dart';

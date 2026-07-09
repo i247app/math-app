@@ -1,9 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class ParentRoomSkeletonBlock extends StatelessWidget {
-  const ParentRoomSkeletonBlock({this.height});
+  const ParentRoomSkeletonBlock({super.key, this.height});
 
   final double? height;
 

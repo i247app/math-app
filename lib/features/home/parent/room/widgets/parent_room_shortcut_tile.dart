@@ -1,11 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentRoomShortcutTile extends StatelessWidget {
-  const ParentRoomShortcutTile({
+  const ParentRoomShortcutTile({super.key,
     required this.icon,
     required this.iconColor,
     required this.iconBg,

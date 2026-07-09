@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
@@ -18,7 +17,7 @@ import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi/features/settings/setting_tab.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_home_entrance.dart';
+import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/home/parent_home_child_dashboard.dart';
 import 'package:numi/features/home/parent/home/parent_home_completed_assessment.dart';
@@ -31,7 +30,7 @@ import 'package:numi/features/home/parent/home/widgets/parent_profile_dialog_act
 import 'package:numi/features/home/parent/home/widgets/parent_select_student_dialog.dart';
 
 class ParentHomeContent extends StatefulWidget {
-  const ParentHomeContent({required this.args});
+  const ParentHomeContent({super.key, required this.args});
 
   final HomeDashboardArgs args;
 
@@ -250,7 +249,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return child;
     }
 
-    return ParentHomeEntrance(
+    return HomeEntranceAnimation(
       order: order,
       onFinished: markOnEnd ? _markInitialAssessmentEntrancePlayed : null,
       child: child,
@@ -273,7 +272,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return child;
     }
 
-    return ParentHomeEntrance(
+    return HomeEntranceAnimation(
       order: order,
       onFinished: markOnEnd ? _markCompletedAssessmentEntrancePlayed : null,
       child: child,
@@ -296,7 +295,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return child;
     }
 
-    return ParentHomeEntrance(
+    return HomeEntranceAnimation(
       order: order,
       onFinished: markOnEnd ? _markChildOverviewEntrancePlayed : null,
       child: child,

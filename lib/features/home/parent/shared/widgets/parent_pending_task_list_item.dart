@@ -1,17 +1,13 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/features/home/home_api.dart';
 import 'package:numi/features/home/widgets/home_profile_menu.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_task_date_label.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_task_icon_box.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_task_meta_badges.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_task_title.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_task_list_item.dart';
 
 class ParentPendingTaskListItem extends StatelessWidget {
   const ParentPendingTaskListItem({
+    super.key,
     required this.pending,
     this.onTap,
     this.isExpired = false,
@@ -38,49 +34,18 @@ class ParentPendingTaskListItem extends StatelessWidget {
           )
         : roomPurposeListAccent(exercise?.purpose);
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Row(
-          children: [
-            ParentTaskIconBox(
-              icon: accent.icon,
-              asset: accent.asset,
-              color: accent.color,
-              backgroundColor: accent.background,
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: ParentTaskMetaBadges(
-                          childName: childName,
-                          classroomName: classroomName,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ParentTaskDateLabel(
-                        date: roomDateOnlyLabel(
-                          exercise?.endDate ?? exercise?.createDt,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  ParentTaskTitle(title: title),
-                ],
-              ),
-            ),
-          ],
-        ),
+    return ParentTaskListItem(
+      leading: ParentTaskIconBox(
+        icon: accent.icon,
+        asset: accent.asset,
+        color: accent.color,
+        backgroundColor: accent.background,
       ),
+      title: title,
+      childName: childName,
+      classroomName: classroomName,
+      dateLabel: roomDateOnlyLabel(exercise?.endDate ?? exercise?.createDt),
+      onTap: onTap,
     );
   }
 }

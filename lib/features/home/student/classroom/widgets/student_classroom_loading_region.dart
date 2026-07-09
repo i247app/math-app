@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_shimmer.dart';
 import 'package:numi/features/home/student/classroom/widgets/student_classroom_skeleton_block.dart';
 
 class StudentClassroomLoadingRegion extends StatefulWidget {
@@ -29,28 +30,8 @@ class _StudentClassroomLoadingRegionState
     final colors = context.themeColors;
     return ColoredBox(
       color: colors.pageBackground,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return ShaderMask(
-            blendMode: BlendMode.srcATop,
-            shaderCallback: (bounds) {
-              final shimmerWidth = bounds.width * 1.2;
-              final start = -shimmerWidth;
-              final end = bounds.width;
-              final dx = start + (end - start) * _controller.value;
-              return LinearGradient(
-                colors: [
-                  colors.surface.withValues(alpha: 0),
-                  colors.surface.withValues(alpha: 0.72),
-                  colors.surface.withValues(alpha: 0),
-                ],
-                stops: const [0.28, 0.5, 0.72],
-              ).createShader(Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height));
-            },
-            child: child,
-          );
-        },
+      child: HomeSkeletonShimmer(
+        controller: _controller,
         child: ListView(
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),

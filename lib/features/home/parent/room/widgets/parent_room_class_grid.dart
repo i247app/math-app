@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/features/home/parent/room/models/parent_room_entry.dart';
 import 'package:numi/features/home/parent/room/widgets/parent_room_class_card.dart';
 
 class ParentRoomClassGrid extends StatelessWidget {
-  const ParentRoomClassGrid({required this.entries, required this.onTap});
+  const ParentRoomClassGrid({super.key, required this.entries, required this.onTap});
 
   final List<ParentRoomEntry> entries;
   final ValueChanged<ParentRoomEntry> onTap;

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/home/widgets/home_game_preview_card.dart';
-import 'package:numi/features/home/widgets/home_math_squadron_preview_artwork.dart';
+import 'package:numi/features/home/shared/widgets/home_game_preview_row.dart';
 
 class StudentGameSuggestionsSection extends StatelessWidget {
   const StudentGameSuggestionsSection({super.key, required this.onViewAll});
@@ -54,23 +53,7 @@ class StudentGameSuggestionsSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        const Row(
-          children: [
-            Expanded(
-              child: HomeGamePreviewCard(
-                asset: 'assets/images/game_numi_farm_banner.png',
-                background: Color(0xFFDDF3EE),
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: HomeGamePreviewCard(
-                background: Color(0xFF111C4B),
-                child: HomeMathSquadronPreviewArtwork(),
-              ),
-            ),
-          ],
-        ),
+        const HomeGamePreviewRow(),
       ],
     );
   }

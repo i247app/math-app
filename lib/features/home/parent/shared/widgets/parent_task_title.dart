@@ -1,10 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentTaskTitle extends StatelessWidget {
-  const ParentTaskTitle({required this.title});
+  const ParentTaskTitle({super.key, required this.title});
 
   final String title;
 

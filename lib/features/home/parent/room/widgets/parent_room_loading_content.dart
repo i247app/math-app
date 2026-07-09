@@ -3,7 +3,7 @@ import 'package:numi/features/home/parent/room/widgets/parent_room_skeleton_bloc
 import 'package:numi/features/home/parent/room/widgets/parent_room_skeleton_line.dart';
 
 class ParentRoomLoadingContent extends StatelessWidget {
-  const ParentRoomLoadingContent();
+  const ParentRoomLoadingContent({super.key});
 
   @override
   Widget build(BuildContext context) {

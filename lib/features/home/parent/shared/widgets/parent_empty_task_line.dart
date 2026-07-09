@@ -1,11 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_task_icon_box.dart';
 
 class ParentEmptyTaskLine extends StatelessWidget {
-  const ParentEmptyTaskLine({required this.icon, required this.text});
+  const ParentEmptyTaskLine({super.key, required this.icon, required this.text});
 
   final IconData icon;
   final String text;

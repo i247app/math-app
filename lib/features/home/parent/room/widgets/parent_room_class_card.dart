@@ -1,14 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/widgets/home_profile_menu.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
 import 'package:numi/features/home/parent/room/models/parent_room_entry.dart';
 
 class ParentRoomClassCard extends StatelessWidget {
-  const ParentRoomClassCard({
+  const ParentRoomClassCard({super.key,
     required this.entry,
     required this.index,
     required this.onTap,

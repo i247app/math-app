@@ -1,11 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_task_meta_chip.dart';
 
 class ParentRoomTaskHeader extends StatelessWidget {
-  const ParentRoomTaskHeader({
+  const ParentRoomTaskHeader({super.key,
     required this.dateLabel,
     required this.childName,
     required this.classroomName,

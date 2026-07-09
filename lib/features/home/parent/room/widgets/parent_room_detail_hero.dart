@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -10,7 +8,7 @@ import 'package:numi/features/home/parent/room/models/parent_room_entry.dart';
 import 'package:numi/features/home/parent/room/widgets/parent_room_detail_meta.dart';
 
 class ParentRoomDetailHero extends StatelessWidget {
-  const ParentRoomDetailHero({required this.entry});
+  const ParentRoomDetailHero({super.key, required this.entry});
 
   final ParentRoomEntry entry;
 

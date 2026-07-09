@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
@@ -6,7 +5,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentAssessmentSearchField extends StatelessWidget {
-  const ParentAssessmentSearchField({
+  const ParentAssessmentSearchField({super.key,
     required this.controller,
     required this.scale,
   });

@@ -12,7 +12,7 @@ import 'package:numi/features/home/widgets/home_dashboard_args.dart';
 import 'package:numi/features/home/widgets/home_tab_header.dart';
 import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi/features/settings/setting_tab.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_home_entrance.dart';
+import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
 import 'package:numi/features/home/parent/room/models/parent_room_entry.dart';
@@ -89,7 +89,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       return child;
     }
 
-    return ParentHomeEntrance(
+    return HomeEntranceAnimation(
       order: order,
       onFinished: markOnEnd ? _markRoomEntrancePlayed : null,
       child: child,

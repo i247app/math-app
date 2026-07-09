@@ -1,10 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentRoomDetailMeta extends StatelessWidget {
-  const ParentRoomDetailMeta({required this.icon, required this.label});
+  const ParentRoomDetailMeta({super.key, required this.icon, required this.label});
 
   final IconData icon;
   final String label;

@@ -1,13 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentAssessmentStateCard extends StatelessWidget {
-  const ParentAssessmentStateCard({
+  const ParentAssessmentStateCard({super.key,
     required this.icon,
     required this.title,
     required this.message,

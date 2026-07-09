@@ -27,7 +27,7 @@ import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi/features/settings/setting_tab.dart';
 import 'package:numi/features/home/student/shared/widgets/student_home_sections_loading.dart';
 import 'package:numi/features/classroom/presentation/student_class_detail_screen.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_home_entrance.dart';
+import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
 import 'package:numi/features/home/widgets/home_initial_assessment_banner.dart';
 import 'package:numi/features/home/widgets/home_start_guide_card.dart';
@@ -40,7 +40,6 @@ import 'package:numi/features/homework/student_homework_open_guard.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_tab_card.dart';
 import 'package:numi/features/profile/grade_api.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
-import 'package:numi/features/home/student/home/widgets/student_classroom_overview_entrance.dart';
 
 class StudentHomeContent extends StatefulWidget {
   const StudentHomeContent({
@@ -314,7 +313,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
       return child;
     }
 
-    return ParentHomeEntrance(
+    return HomeEntranceAnimation(
       order: order,
       onFinished: markOnEnd ? _markStudentModeEntrancePlayed : null,
       child: child,
@@ -341,7 +340,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
       return child;
     }
 
-    return StudentClassroomOverviewEntrance(
+    return HomeEntranceAnimation(
       order: order,
       onFinished: markOnEnd
           ? _markStudentClassroomOverviewEntrancePlayed

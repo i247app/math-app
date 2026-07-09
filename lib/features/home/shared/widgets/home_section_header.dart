@@ -19,6 +19,8 @@ class HomeSectionHeader extends StatelessWidget {
     this.titleStyle,
     this.actionStyle,
     this.useHaptic = true,
+    this.bottom,
+    this.bottomSpacing,
   });
 
   final String title;
@@ -28,6 +30,8 @@ class HomeSectionHeader extends StatelessWidget {
   final TextStyle? titleStyle;
   final TextStyle? actionStyle;
   final bool useHaptic;
+  final Widget? bottom;
+  final double? bottomSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +66,7 @@ class HomeSectionHeader extends StatelessWidget {
           )
         : null;
 
-    return Row(
+    final header = Row(
       children: [
         Expanded(
           child: Text(
@@ -89,6 +93,20 @@ class HomeSectionHeader extends StatelessWidget {
               ),
             ),
         ],
+      ],
+    );
+
+    final bottomContent = bottom;
+    if (bottomContent == null) {
+      return header;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        header,
+        SizedBox(height: bottomSpacing ?? 8 * scale),
+        bottomContent,
       ],
     );
   }

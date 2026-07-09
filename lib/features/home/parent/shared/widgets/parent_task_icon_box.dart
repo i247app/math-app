@@ -1,10 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ParentTaskIconBox extends StatelessWidget {
-  const ParentTaskIconBox({
+  const ParentTaskIconBox({super.key,
     required this.icon,
     required this.color,
     required this.backgroundColor,

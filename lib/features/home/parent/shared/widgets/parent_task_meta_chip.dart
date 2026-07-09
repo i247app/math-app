@@ -1,10 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentTaskMetaChip extends StatelessWidget {
-  const ParentTaskMetaChip({
+  const ParentTaskMetaChip({super.key,
     required this.fontSize,
     required this.label,
     required this.color,

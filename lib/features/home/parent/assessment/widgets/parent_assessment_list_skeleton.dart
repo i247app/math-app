@@ -4,7 +4,7 @@ import 'package:numi/features/home/shared/widgets/home_skeleton_line.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 
 class ParentAssessmentListSkeleton extends StatelessWidget {
-  const ParentAssessmentListSkeleton({required this.scale});
+  const ParentAssessmentListSkeleton({super.key, required this.scale});
 
   final double scale;
 

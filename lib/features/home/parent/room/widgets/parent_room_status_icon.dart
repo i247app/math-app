@@ -1,9 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class ParentRoomStatusIcon extends StatelessWidget {
-  const ParentRoomStatusIcon({
+  const ParentRoomStatusIcon({super.key,
     required this.icon,
     required this.color,
     required this.backgroundColor,

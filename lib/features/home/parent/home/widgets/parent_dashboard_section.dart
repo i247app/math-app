@@ -1,13 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentDashboardSection extends StatelessWidget {
-  const ParentDashboardSection({
+  const ParentDashboardSection({super.key,
     required this.title,
     required this.child,
     this.onViewAll,

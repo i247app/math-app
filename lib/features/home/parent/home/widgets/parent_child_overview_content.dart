@@ -1,7 +1,4 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/home/home_api.dart';
@@ -18,7 +15,7 @@ import 'package:numi/features/home/parent/shared/widgets/parent_completed_task_l
 import 'package:numi/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
 
 class ParentChildOverviewContent extends StatelessWidget {
-  const ParentChildOverviewContent({
+  const ParentChildOverviewContent({super.key,
     required this.summaries,
     required this.pendingExercises,
     required this.completions,

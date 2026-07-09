@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ParentHomeRefreshLabel extends StatelessWidget {
-  const ParentHomeRefreshLabel();
+  const ParentHomeRefreshLabel({super.key});
 
   @override
   Widget build(BuildContext context) {

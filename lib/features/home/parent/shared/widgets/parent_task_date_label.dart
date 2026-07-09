@@ -1,10 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentTaskDateLabel extends StatelessWidget {
-  const ParentTaskDateLabel({required this.date});
+  const ParentTaskDateLabel({super.key, required this.date});
 
   final String date;
 

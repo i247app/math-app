@@ -5,6 +5,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi/features/home/shared/widgets/home_section_header.dart';
 
 class TeacherClassSectionHeader extends StatelessWidget {
   const TeacherClassSectionHeader({
@@ -22,42 +23,29 @@ class TeacherClassSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                context.getText(AppKeys.teacherYourClasses),
-                style: GoogleFonts.andika(
-                  color: Colors.black,
-                  fontSize: FontSize.large * scale,
-                  fontWeight: FontWeight.w800,
-                  height: 1.25,
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: onViewAll,
-              child: Text(
-                context.getText(AppKeys.viewAllUpper),
-                style: GoogleFonts.andika(
-                  color: AppColors.textInkDark,
-                  fontSize: FontSize.small * scale,
-                  fontWeight: FontWeight.w800,
-                  decoration: TextDecoration.underline,
-                  height: 1.25,
-                ),
-              ),
-            ),
-          ],
-        ),
-        if (hasClasses) ...[
-          SizedBox(height: 8 * scale),
-          TeacherSmallCoralAddButton(scale: scale, onTap: onAdd),
-        ],
-      ],
+    return HomeSectionHeader(
+      title: context.getText(AppKeys.teacherYourClasses),
+      actionLabel: context.getText(AppKeys.viewAllUpper),
+      onAction: onViewAll,
+      scale: scale,
+      useHaptic: false,
+      titleStyle: GoogleFonts.andika(
+        color: Colors.black,
+        fontSize: FontSize.large * scale,
+        fontWeight: FontWeight.w800,
+        height: 1.25,
+      ),
+      actionStyle: GoogleFonts.andika(
+        color: AppColors.textInkDark,
+        fontSize: FontSize.small * scale,
+        fontWeight: FontWeight.w800,
+        decoration: TextDecoration.underline,
+        height: 1.25,
+      ),
+      bottom: hasClasses
+          ? TeacherSmallCoralAddButton(scale: scale, onTap: onAdd)
+          : null,
+      bottomSpacing: 8 * scale,
     );
   }
 }

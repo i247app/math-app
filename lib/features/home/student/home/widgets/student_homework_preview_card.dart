@@ -6,6 +6,7 @@ import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/student/home/helpers/student_home_view_helpers.dart';
 import 'package:numi/features/home/student/home/widgets/student_homework_status_chip.dart';
+import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
 
 class StudentHomeworkPreviewCard extends StatelessWidget {
   const StudentHomeworkPreviewCard({
@@ -35,9 +36,7 @@ class StudentHomeworkPreviewCard extends StatelessWidget {
     final title = exercise == null
         ? context.getText(AppKeys.studentNoHomeworkTitle)
         : studentModeHomeworkTitle(exercise!);
-    final className = classroom.name?.trim().isNotEmpty == true
-        ? classroom.name!.trim()
-        : context.getText(AppKeys.teacherClassFallback);
+    final className = classroomDisplayName(context, classroom);
     final dueText = exercise == null
         ? context.getText(AppKeys.studentNoHomeworkMessage)
         : studentModeHomeworkDueDate(context, exercise!);

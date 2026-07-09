@@ -1,10 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentTaskScoreRing extends StatelessWidget {
-  const ParentTaskScoreRing({required this.score, required this.color});
+  const ParentTaskScoreRing({super.key, required this.score, required this.color});
 
   final int score;
   final Color color;

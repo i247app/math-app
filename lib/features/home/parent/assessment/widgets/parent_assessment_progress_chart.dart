@@ -1,11 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/features/home/parent/assessment/models/parent_assessment_entry.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_chart_painter.dart';
 
 class ParentAssessmentProgressChart extends StatelessWidget {
-  const ParentAssessmentProgressChart({
+  const ParentAssessmentProgressChart({super.key,
     required this.entries,
     required this.scale,
   });

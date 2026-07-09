@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
@@ -8,7 +6,7 @@ import 'package:numi/features/home/parent/home/widgets/parent_teacher_message_it
 import 'package:numi/features/home/parent/shared/widgets/parent_empty_task_line.dart';
 
 class ParentTeacherMessagesList extends StatelessWidget {
-  const ParentTeacherMessagesList({required this.summaries});
+  const ParentTeacherMessagesList({super.key, required this.summaries});
 
   final List<ParentChildSummary> summaries;
 

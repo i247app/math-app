@@ -3,6 +3,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
 
 class StudentClassSummaryCard extends StatelessWidget {
   const StudentClassSummaryCard({
@@ -16,12 +17,8 @@ class StudentClassSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final className = classroom.name?.trim().isNotEmpty == true
-        ? classroom.name!.trim()
-        : context.getText(AppKeys.teacherClassFallback);
-    final teacherName = classroom.teacherName?.trim().isNotEmpty == true
-        ? classroom.teacherName!.trim()
-        : context.getText(AppKeys.teacherFallback);
+    final className = classroomDisplayName(context, classroom);
+    final teacherName = classroomTeacherName(context, classroom);
 
     return Material(
       color: Colors.transparent,
