@@ -51,8 +51,8 @@ android {
         release {
             // Assign your new release configuration dynamically
             signingConfig = signingConfigs.getByName("release")
-            
-            minifyEnabled = true
+
+            isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
