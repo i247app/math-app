@@ -1,7 +1,12 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_shortcut_tile.dart';
 
-class _ParentRoomDetailShortcuts extends StatelessWidget {
-  const _ParentRoomDetailShortcuts({
+class ParentRoomDetailShortcuts extends StatelessWidget {
+  const ParentRoomDetailShortcuts({
     required this.pendingCount,
     required this.completedCount,
   });
@@ -20,7 +25,7 @@ class _ParentRoomDetailShortcuts extends StatelessWidget {
       childAspectRatio: 1.15,
       padding: EdgeInsets.zero,
       children: [
-        _ParentRoomShortcutTile(
+        ParentRoomShortcutTile(
           icon: Icons.assignment_outlined,
           iconColor: const Color(0xFF0A2B67),
           iconBg: const Color(0xFFEAF1FF),
@@ -30,7 +35,7 @@ class _ParentRoomDetailShortcuts extends StatelessWidget {
             {'count': pendingCount},
           ),
         ),
-        _ParentRoomShortcutTile(
+        ParentRoomShortcutTile(
           icon: Icons.pending_actions_rounded,
           iconColor: const Color(0xFFFF6B4A),
           iconBg: const Color(0xFFFFEFE8),
@@ -39,14 +44,14 @@ class _ParentRoomDetailShortcuts extends StatelessWidget {
               ? context.getText(AppKeys.incomplete)
               : context.getText(AppKeys.completedResultTitle),
         ),
-        _ParentRoomShortcutTile(
+        ParentRoomShortcutTile(
           icon: Icons.campaign_outlined,
           iconColor: const Color(0xFF3265E6),
           iconBg: const Color(0xFFEAF1FF),
           title: context.getText(AppKeys.navMembers),
           subtitle: context.getText(AppKeys.studentClassComingSoon),
         ),
-        _ParentRoomShortcutTile(
+        ParentRoomShortcutTile(
           icon: Icons.folder_outlined,
           iconColor: const Color(0xFFFF7A1A),
           iconBg: const Color(0xFFFFF0D8),

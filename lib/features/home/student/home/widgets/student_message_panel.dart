@@ -1,7 +1,11 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 
-class _StudentMessagePanel extends StatelessWidget {
-  const _StudentMessagePanel({
+class StudentMessagePanel extends StatelessWidget {
+  const StudentMessagePanel({
+    super.key,
     required this.scale,
     required this.icon,
     required this.title,

@@ -1,4 +1,17 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
+import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_status_icon.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_task_header.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_task_shell.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_meta_chip.dart';
 
 // ignore: unused_element
 class _ParentRoomPendingCard extends StatelessWidget {
@@ -19,31 +32,31 @@ class _ParentRoomPendingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final exercise = pending.exercise;
-    final title = _roomExerciseTitle(context, exercise);
+    final title = roomExerciseTitle(context, exercise);
     final childName = pending.child == null
         ? null
         : homeProfileDisplayName(context, pending.child!);
-    final classroomName = _roomClassName(context, pending.classroom);
-    final dateLabel = _roomExerciseCreatedDate(exercise);
-    final dueLabel = _roomExerciseDueLabel(context, exercise);
-    final purpose = _roomPurposeLabel(context, exercise?.purpose);
-    final dueSoon = _roomExerciseDueSoon(exercise);
+    final classroomName = roomClassName(context, pending.classroom);
+    final dateLabel = roomExerciseCreatedDate(exercise);
+    final dueLabel = roomExerciseDueLabel(context, exercise);
+    final purpose = roomPurposeLabel(context, exercise?.purpose);
+    final dueSoon = roomExerciseDueSoon(exercise);
     final accent = isExpired
         ? (color: const Color(0xFFB91C1C), badge: const Color(0xFFFFE2E2))
         : dueSoon
         ? (color: const Color(0xFFFF7A1A), badge: const Color(0xFFFFF0D8))
-        : _roomPurposeAccent(exercise?.purpose);
+        : roomPurposeAccent(exercise?.purpose);
     final statusLabel = isExpired
         ? context.getText(AppKeys.homeworkFailed)
         : dueSoon
         ? context.getText(AppKeys.homeworkDueSoon)
         : purpose;
 
-    return _ParentRoomTaskShell(
+    return ParentRoomTaskShell(
       accent: accent.color,
       compact: compact,
       onTap: onTap,
-      leading: _ParentRoomStatusIcon(
+      leading: ParentRoomStatusIcon(
         icon: isExpired
             ? Icons.warning_amber_rounded
             : dueSoon
@@ -55,7 +68,7 @@ class _ParentRoomPendingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ParentRoomTaskHeader(
+          ParentRoomTaskHeader(
             dateLabel: dateLabel,
             childName: childName,
             classroomName: classroomName,
@@ -76,7 +89,7 @@ class _ParentRoomPendingCard extends StatelessWidget {
                   ),
                 ),
               ),
-              _ParentTaskMetaChip(
+              ParentTaskMetaChip(
                 label: statusLabel,
                 color: accent.badge,
                 textColor: accent.color,

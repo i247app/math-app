@@ -1,7 +1,13 @@
-part of '../../../home_screen.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
 
-_ParentChildSummary? _parentPrimarySummary(
-  List<_ParentChildSummary> summaries,
+ParentChildSummary? parentPrimarySummary(
+  List<ParentChildSummary> summaries,
 ) {
   for (final summary in summaries) {
     if (summary.classroom != null) {
@@ -11,10 +17,10 @@ _ParentChildSummary? _parentPrimarySummary(
   return summaries.isEmpty ? null : summaries.first;
 }
 
-List<_ParentChildSummary> _summariesFromLayout(ParentHomeLayout? parent) {
+List<ParentChildSummary> summariesFromLayout(ParentHomeLayout? parent) {
   final children = parent?.children ?? const <StudentProfile>[];
   if (children.isEmpty) {
-    return const <_ParentChildSummary>[];
+    return const <ParentChildSummary>[];
   }
 
   return children
@@ -24,11 +30,11 @@ List<_ParentChildSummary> _summariesFromLayout(ParentHomeLayout? parent) {
           for (final completion
               in parent?.recentCompletions ??
                   const <HomeLayoutRecentCompletion>[])
-            if (_layoutChildId(completion.child) == childId)
-              _quizFromRecentCompletion(completion),
-        ]..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+            if (layoutChildId(completion.child) == childId)
+              quizFromRecentCompletion(completion),
+        ]..sort((a, b) => quizDate(b).compareTo(quizDate(a)));
 
-        return _ParentChildSummary(
+        return ParentChildSummary(
           profile: child,
           classroom: _classroomForLayoutChild(parent, child),
           assessments: assessments,
@@ -37,7 +43,7 @@ List<_ParentChildSummary> _summariesFromLayout(ParentHomeLayout? parent) {
       .toList(growable: false);
 }
 
-List<GeneratedQuiz> _quizzesFromLayoutQuizzes(List<HomeLayoutQuiz> quizzes) {
+List<GeneratedQuiz> quizzesFromLayoutQuizzes(List<HomeLayoutQuiz> quizzes) {
   return <GeneratedQuiz>[
     for (final quiz in quizzes)
       GeneratedQuiz(
@@ -58,7 +64,7 @@ List<GeneratedQuiz> _quizzesFromLayoutQuizzes(List<HomeLayoutQuiz> quizzes) {
         ),
         questions: const <QuizQuestion>[],
       ),
-  ]..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+  ]..sort((a, b) => quizDate(b).compareTo(quizDate(a)));
 }
 
 ClassroomModel? _classroomForLayoutChild(
@@ -81,7 +87,7 @@ ClassroomModel? _classroomForLayoutChild(
   }
 
   for (final completion in parent.recentCompletions) {
-    if (_layoutChildId(completion.child) == childId &&
+    if (layoutChildId(completion.child) == childId &&
         completion.classroom != null) {
       final classroomId =
           completion.classroomId ?? completion.exercise?.classroomId;
@@ -94,7 +100,7 @@ ClassroomModel? _classroomForLayoutChild(
   }
 
   for (final pending in parent.pendingExercises) {
-    if (_layoutChildId(pending.child) == childId && pending.classroom != null) {
+    if (layoutChildId(pending.child) == childId && pending.classroom != null) {
       final classroomId = pending.classroomId ?? pending.exercise?.classroomId;
       final matchingClassroom = _layoutClassroomById(parent, classroomId);
       if (matchingClassroom != null) {
@@ -105,7 +111,7 @@ ClassroomModel? _classroomForLayoutChild(
   }
 
   for (final expired in parent.expiredExercises) {
-    if (_layoutChildId(expired.child) == childId && expired.classroom != null) {
+    if (layoutChildId(expired.child) == childId && expired.classroom != null) {
       final classroomId = expired.classroomId ?? expired.exercise?.classroomId;
       final matchingClassroom = _layoutClassroomById(parent, classroomId);
       if (matchingClassroom != null) {
@@ -133,7 +139,7 @@ ClassroomModel? _layoutClassroomById(
   return null;
 }
 
-GeneratedQuiz _quizFromRecentCompletion(HomeLayoutRecentCompletion completion) {
+GeneratedQuiz quizFromRecentCompletion(HomeLayoutRecentCompletion completion) {
   final exercise = completion.exercise;
   final exerciseId =
       completion.classroomExerciseId ??
@@ -144,7 +150,7 @@ GeneratedQuiz _quizFromRecentCompletion(HomeLayoutRecentCompletion completion) {
   return GeneratedQuiz(
     id: exerciseId,
     quizId: exerciseId,
-    profileId: _layoutChildId(completion.child),
+    profileId: layoutChildId(completion.child),
     quizStatus: completion.submissionStatus,
     purpose: exercise?.purpose,
     type: exercise?.purpose,
@@ -162,6 +168,6 @@ GeneratedQuiz _quizFromRecentCompletion(HomeLayoutRecentCompletion completion) {
   );
 }
 
-int? _layoutChildId(StudentProfile? child) {
+int? layoutChildId(StudentProfile? child) {
   return child == null ? null : ActiveProfileSession.profileStableId(child);
 }

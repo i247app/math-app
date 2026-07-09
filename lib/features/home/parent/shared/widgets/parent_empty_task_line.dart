@@ -1,7 +1,11 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_icon_box.dart';
 
-class _ParentEmptyTaskLine extends StatelessWidget {
-  const _ParentEmptyTaskLine({required this.icon, required this.text});
+class ParentEmptyTaskLine extends StatelessWidget {
+  const ParentEmptyTaskLine({required this.icon, required this.text});
 
   final IconData icon;
   final String text;
@@ -10,7 +14,7 @@ class _ParentEmptyTaskLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _ParentTaskIconBox(
+        ParentTaskIconBox(
           icon: icon,
           color: const Color(0xFF339395),
           backgroundColor: const Color(0xFFEAF3F3),

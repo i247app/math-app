@@ -1,7 +1,12 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 
-class _StudentAchievementCard extends StatelessWidget {
-  const _StudentAchievementCard({required this.scale});
+class StudentAchievementCard extends StatelessWidget {
+  const StudentAchievementCard({super.key, required this.scale});
 
   final double scale;
 

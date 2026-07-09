@@ -1,7 +1,16 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/features/home/student/classroom/widgets/student_classroom_card.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_empty_panel.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_error_panel.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_join_classroom_button.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_loading_panel.dart';
+import 'package:numi_flutter/shared/widgets/circular_loading_card.dart';
 
-class _StudentClassroomPanel extends StatelessWidget {
-  const _StudentClassroomPanel({
+class StudentClassroomPanel extends StatelessWidget {
+  const StudentClassroomPanel({
     super.key,
     required this.scale,
     required this.classrooms,
@@ -25,18 +34,18 @@ class _StudentClassroomPanel extends StatelessWidget {
       children: [
         Align(
           alignment: Alignment.centerRight,
-          child: _StudentJoinClassroomButton(
+          child: StudentJoinClassroomButton(
             scale: scale,
             onTap: onJoinClassroom,
           ),
         ),
         SizedBox(height: 14 * scale),
         if (isLoading && classrooms.isEmpty)
-          _StudentLoadingPanel(scale: scale)
+          CircularLoadingCard(scale: scale)
         else if (error != null && classrooms.isEmpty)
-          _StudentErrorPanel(scale: scale, message: error!, onRetry: onRetry)
+          StudentErrorPanel(scale: scale, message: error!, onRetry: onRetry)
         else if (classrooms.isEmpty)
-          _StudentEmptyPanel(
+          StudentEmptyPanel(
             scale: scale,
             icon: Icons.groups_rounded,
             title: context.getText(AppKeys.studentNoClassroomsTitle),
@@ -47,7 +56,7 @@ class _StudentClassroomPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (var index = 0; index < classrooms.length; index++) ...[
-                _StudentClassroomCard(
+                StudentClassroomCard(
                   scale: scale,
                   classroom: classrooms[index],
                 ),

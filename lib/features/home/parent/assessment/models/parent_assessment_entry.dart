@@ -1,7 +1,7 @@
-part of '../../../home_screen.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
 
-class _ParentAssessmentEntry {
-  const _ParentAssessmentEntry({required this.quiz});
+class ParentAssessmentEntry {
+  const ParentAssessmentEntry({required this.quiz});
 
   final GeneratedQuiz quiz;
 }

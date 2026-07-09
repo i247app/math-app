@@ -1,7 +1,12 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
-class _ParentRoomDetailTopBar extends StatelessWidget {
-  const _ParentRoomDetailTopBar({required this.title, required this.onBack});
+class ParentRoomDetailTopBar extends StatelessWidget {
+  const ParentRoomDetailTopBar({required this.title, required this.onBack});
 
   final String title;
   final VoidCallback onBack;

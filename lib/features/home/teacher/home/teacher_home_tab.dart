@@ -1,49 +1,36 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
-import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_member_summary_text.dart';
 import 'package:numi_flutter/features/home/cache/home_profile_cache.dart';
 import 'package:numi_flutter/features/home/home_api.dart';
 import 'package:numi_flutter/features/home/teacher/cache/teacher_home_snapshot.dart';
-import 'package:numi_flutter/features/home/teacher/shared/widgets/class_thumb.dart';
-import 'package:numi_flutter/features/home/teacher/shared/widgets/teacher_skeleton_block.dart';
-import 'package:numi_flutter/features/home/teacher/shared/widgets/teacher_skeleton_card.dart';
-import 'package:numi_flutter/features/home/teacher/shared/widgets/teacher_skeleton_shimmer.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/homework/presentation/teacher_homework_screen.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 
-part 'helpers/teacher_home_helpers.dart';
-part 'widgets/teacher_assignment_skeleton_card.dart';
-part 'widgets/teacher_assignments_loading_panel.dart';
-part 'widgets/teacher_class_card.dart';
-part 'widgets/teacher_class_carousel.dart';
-part 'widgets/teacher_class_section_header.dart';
-part 'widgets/teacher_class_skeleton_card.dart';
-part 'widgets/teacher_hero_card.dart';
-part 'widgets/teacher_home_entrance.dart';
-part 'widgets/teacher_home_hero_skeleton.dart';
-part 'widgets/teacher_home_section_header_skeleton.dart';
-part 'widgets/teacher_home_section_header.dart';
-part 'widgets/teacher_loading_panel.dart';
-part 'widgets/teacher_no_class_panel.dart';
-part 'widgets/teacher_recent_assignment_card.dart';
-part 'widgets/teacher_recent_assignment_carousel.dart';
-part 'widgets/teacher_skeleton_carousel.dart';
-part 'widgets/teacher_top_bar.dart';
+import 'package:numi_flutter/features/home/teacher/home/helpers/teacher_home_helpers.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_assignments_loading_panel.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_class_carousel.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_class_section_header.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_hero_card.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_home_entrance.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_home_hero_skeleton.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_home_section_header_skeleton.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_section_header.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_loading_panel.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_no_class_panel.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_recent_assignment_carousel.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_top_bar.dart';
 
 class TeacherHomeTab extends StatefulWidget {
   const TeacherHomeTab({
@@ -268,7 +255,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
           ...layoutAssignments
         else
           ...?teacher?.assignedExercises,
-      ]..sort(_compareRecentAssignments);
+      ]..sort(compareRecentAssignments);
 
       setState(() {
         _layoutClassrooms = classrooms;
@@ -340,7 +327,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       return child;
     }
 
-    return _TeacherHomeEntrance(
+    return ParentHomeEntrance(
       key: ValueKey<String>('teacher-home-entrance-$id'),
       order: order,
       onFinished: () => _markHomeEntrancePlayed(id),
@@ -487,9 +474,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (_isInitialHomeLoading)
-          _TeacherHomeSectionHeaderSkeleton(scale: scale)
+          TeacherHomeSectionHeaderSkeleton(scale: scale)
         else
-          _TeacherClassSectionHeader(
+          TeacherClassSectionHeader(
             scale: scale,
             hasClasses: _classrooms.isNotEmpty,
             onAdd: _handleClassCreateAction,
@@ -497,7 +484,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
           ),
         SizedBox(height: 12 * scale),
         if (_isInitialHomeLoading)
-          _TeacherLoadingPanel(scale: scale)
+          TeacherLoadingPanel(scale: scale)
         else if (_error != null && _classrooms.isEmpty)
           TeacherErrorPanel(
             scale: scale,
@@ -507,7 +494,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         else if (_classrooms.isEmpty)
           Column(
             children: [
-              _TeacherNoClassPanel(
+              TeacherNoClassPanel(
                 scale: scale,
                 isProfileComplete: isProfileComplete,
                 onCreate: _handleClassCreateAction,
@@ -517,7 +504,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         else
           Column(
             children: [
-              _TeacherClassCarousel(
+              TeacherClassCarousel(
                 scale: scale,
                 classrooms: _classrooms,
                 onOpen: _openClassDetail,
@@ -533,16 +520,17 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (_isInitialAssignmentsLoading)
-          _TeacherHomeSectionHeaderSkeleton(scale: scale)
+          TeacherHomeSectionHeaderSkeleton(scale: scale)
         else
-          _TeacherHomeSectionHeader(
+          HomeSectionHeader(
             scale: scale,
             title: context.getText(AppKeys.teacherRecentlyAssigned),
-            onViewAll: widget.onOpenStudyTab,
+            actionLabel: context.getText(AppKeys.viewAllUpper),
+            onAction: widget.onOpenStudyTab,
           ),
         SizedBox(height: 12 * scale),
         if (_isInitialAssignmentsLoading)
-          _TeacherAssignmentsLoadingPanel(scale: scale)
+          TeacherAssignmentsLoadingPanel(scale: scale)
         else if (_recentAssignments.isEmpty)
           Column(
             children: [
@@ -552,7 +540,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
             ],
           )
         else ...[
-          _TeacherRecentAssignmentCarousel(
+          TeacherRecentAssignmentCarousel(
             scale: scale,
             assignments: _recentAssignments,
             onOpen: _openAssignmentDetail,
@@ -581,7 +569,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
             _homeEntrance(
               id: '$_teacherHomeProfileKey-top-bar',
               order: 0,
-              child: _TeacherTopBar(
+              child: TeacherTopBar(
                 profile: widget.activeProfile,
                 topPadding: MediaQuery.paddingOf(context).top,
                 scale: scale,
@@ -597,7 +585,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
                     id: _heroEntranceId,
                     order: 1,
                     child: _isInitialHomeLoading
-                        ? _TeacherHomeHeroSkeleton(scale: scale)
+                        ? TeacherHomeHeroSkeleton(scale: scale)
                         : TeacherHeroCard(scale: scale),
                   ),
                   SizedBox(height: 28 * scale),

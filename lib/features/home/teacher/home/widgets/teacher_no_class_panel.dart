@@ -1,7 +1,11 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
 
-class _TeacherNoClassPanel extends StatelessWidget {
-  const _TeacherNoClassPanel({
+class TeacherNoClassPanel extends StatelessWidget {
+  const TeacherNoClassPanel({
+    super.key,
     required this.scale,
     required this.isProfileComplete,
     required this.onCreate,

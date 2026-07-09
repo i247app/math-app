@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _ParentRoomSkeletonLine extends StatelessWidget {
-  const _ParentRoomSkeletonLine({required this.width});
+class ParentRoomSkeletonLine extends StatelessWidget {
+  const ParentRoomSkeletonLine({required this.width});
 
   final double width;
 

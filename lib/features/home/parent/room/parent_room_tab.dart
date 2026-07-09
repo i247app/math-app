@@ -1,4 +1,30 @@
-part of '../../home_screen.dart';
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/home/cache/home_profile_cache.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/parent/cache/parent_home_snapshot.dart';
+import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
+import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi_flutter/features/settings/setting_tab.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_home_entrance.dart';
+import 'package:numi_flutter/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi_flutter/features/home/parent/room/models/parent_room_entry.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_class_grid.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_detail_screen.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_list_section.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_loading.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_select_student_card.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_state_card.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_completed_task_list_item.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_empty_task_line.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
 
 class ParentRoomTab extends StatefulWidget {
   const ParentRoomTab({super.key, required this.args});
@@ -63,7 +89,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       return child;
     }
 
-    return _ParentHomeEntrance(
+    return ParentHomeEntrance(
       order: order,
       onFinished: markOnEnd ? _markRoomEntrancePlayed : null,
       child: child,
@@ -125,7 +151,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ParentHomeSnapshot(
           profileId: profileId,
           homeLayout: layout,
-          completedAssessments: _quizzesFromLayoutQuizzes(layout.quizzes),
+          completedAssessments: quizzesFromLayoutQuizzes(layout.quizzes),
           cachedAt: DateTime.now(),
         ),
       );
@@ -180,7 +206,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     final scale = widget.args.scale;
     final topInset = MediaQuery.paddingOf(context).top;
     final parent = _layout?.parent;
-    final entries = _roomEntries(parent);
+    final entries = roomEntries(parent);
     final pendingExercises =
         parent?.pendingExercises ?? const <HomeLayoutPendingExercise>[];
     final expiredExercises =
@@ -251,19 +277,19 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
 
   Widget _roomContent(
     BuildContext context, {
-    required List<_ParentRoomEntry> entries,
+    required List<ParentRoomEntry> entries,
     required List<HomeLayoutPendingExercise> pendingExercises,
     required List<HomeLayoutPendingExercise> expiredExercises,
     required List<HomeLayoutRecentCompletion> completions,
   }) {
     if (_isLoading && !_hasLoaded) {
-      return const _ParentRoomLoading(key: ValueKey('room-loading'));
+      return const ParentRoomLoading(key: ValueKey('room-loading'));
     }
 
     if (_errorMessage != null && entries.isEmpty) {
       return _roomFadeIn(
         markOnEnd: true,
-        child: _ParentRoomStateCard(
+        child: ParentRoomStateCard(
           key: const ValueKey('room-error'),
           icon: Icons.cloud_off_rounded,
           title: context.getText(AppKeys.historyLoadErrorTitle),
@@ -276,7 +302,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     if (entries.isEmpty) {
       return _roomFadeIn(
         markOnEnd: true,
-        child: _ParentRoomSelectStudentCard(
+        child: ParentRoomSelectStudentCard(
           onChooseProfile: widget.args.onOpenProfileMenu,
           onCreateProfile: _openCreateStudentProfile,
         ),
@@ -289,25 +315,25 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       children: [
         _roomFadeIn(
           order: 0,
-          child: _ParentRoomClassGrid(entries: entries, onTap: _openRoomDetail),
+          child: ParentRoomClassGrid(entries: entries, onTap: _openRoomDetail),
         ),
         const SizedBox(height: 18),
         _roomFadeIn(
           order: 1,
-          child: _ParentRoomListSection(
+          child: ParentRoomListSection(
             title: context.formatText(AppKeys.parentTasksCountTitle, {
               'count': pendingExercises.length + expiredExercises.length,
             }),
             onViewAll: widget.args.onOpenClassroomTab,
             child: pendingExercises.isEmpty && expiredExercises.isEmpty
-                ? _ParentEmptyTaskLine(
+                ? ParentEmptyTaskLine(
                     icon: Icons.assignment_turned_in_outlined,
                     text: context.getText(AppKeys.studentNoHomeworkTitle),
                   )
                 : Column(
                     children: [
                       for (final pending in pendingExercises.take(3)) ...[
-                        _ParentPendingTaskListItem(pending: pending),
+                        ParentPendingTaskListItem(pending: pending),
                         if (pending != pendingExercises.take(3).last ||
                             expiredExercises.isNotEmpty)
                           const Divider(
@@ -317,10 +343,10 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                           ),
                       ],
                       for (final expired in expiredExercises.take(3)) ...[
-                        _ParentPendingTaskListItem(
+                        ParentPendingTaskListItem(
                           pending: expired,
                           isExpired: true,
-                          onTap: () => _showExpiredExerciseMessage(context),
+                          onTap: () => showExpiredExerciseMessage(context),
                         ),
                         if (expired != expiredExercises.take(3).last)
                           const Divider(
@@ -337,18 +363,18 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         _roomFadeIn(
           order: 2,
           markOnEnd: true,
-          child: _ParentRoomListSection(
+          child: ParentRoomListSection(
             title: context.getText(AppKeys.assessmentResultTitle),
             onViewAll: widget.args.onOpenClassroomTab,
             child: completions.isEmpty
-                ? _ParentEmptyTaskLine(
+                ? ParentEmptyTaskLine(
                     icon: Icons.fact_check_outlined,
                     text: context.getText(AppKeys.noCompletedHomeworkTitle),
                   )
                 : Column(
                     children: [
                       for (final completion in completions.take(5)) ...[
-                        _ParentCompletedTaskListItem(
+                        ParentCompletedTaskListItem(
                           completion: completion,
                           onTap: () => _openCompletionResult(completion),
                         ),
@@ -368,7 +394,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
   }
 
   void _openCompletionResult(HomeLayoutRecentCompletion completion) {
-    final quiz = _quizFromRecentCompletion(completion);
+    final quiz = quizFromRecentCompletion(completion);
     final quizId = quiz.quizId ?? quiz.id;
     if (quizId == null || quizId <= 0) {
       return;
@@ -381,16 +407,16 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     );
   }
 
-  void _openRoomDetail(_ParentRoomEntry entry) {
+  void _openRoomDetail(ParentRoomEntry entry) {
     HapticFeedback.selectionClick();
     final parent = _layout?.parent;
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (_) => _ParentRoomDetailScreen(
+        builder: (_) => ParentRoomDetailScreen(
           entry: entry,
-          pendingExercises: _pendingForRoomEntry(parent, entry),
-          expiredExercises: _expiredForRoomEntry(parent, entry),
-          completions: _completionsForRoomEntry(parent, entry),
+          pendingExercises: pendingForRoomEntry(parent, entry),
+          expiredExercises: expiredForRoomEntry(parent, entry),
+          completions: completionsForRoomEntry(parent, entry),
           exerciseService: widget.args.assignmentService,
           onRefreshLayout: _loadLayout,
         ),

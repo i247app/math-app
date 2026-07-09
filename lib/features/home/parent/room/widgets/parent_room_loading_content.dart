@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_skeleton_block.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_skeleton_line.dart';
 
-class _ParentRoomLoadingContent extends StatelessWidget {
-  const _ParentRoomLoadingContent();
+class ParentRoomLoadingContent extends StatelessWidget {
+  const ParentRoomLoadingContent();
 
   @override
   Widget build(BuildContext context) {
@@ -17,20 +19,20 @@ class _ParentRoomLoadingContent extends StatelessWidget {
           childAspectRatio: 1.55,
           padding: EdgeInsets.zero,
           children: const [
-            _ParentRoomSkeletonBlock(),
-            _ParentRoomSkeletonBlock(),
+            ParentRoomSkeletonBlock(),
+            ParentRoomSkeletonBlock(),
           ],
         ),
         const SizedBox(height: 24),
-        const _ParentRoomSkeletonLine(width: 128),
+        const ParentRoomSkeletonLine(width: 128),
         const SizedBox(height: 14),
-        const _ParentRoomSkeletonBlock(height: 104),
+        const ParentRoomSkeletonBlock(height: 104),
         const SizedBox(height: 14),
-        const _ParentRoomSkeletonBlock(height: 104),
+        const ParentRoomSkeletonBlock(height: 104),
         const SizedBox(height: 14),
-        const _ParentRoomSkeletonLine(width: 92),
+        const ParentRoomSkeletonLine(width: 92),
         const SizedBox(height: 14),
-        const _ParentRoomSkeletonBlock(height: 104),
+        const ParentRoomSkeletonBlock(height: 104),
       ],
     );
   }

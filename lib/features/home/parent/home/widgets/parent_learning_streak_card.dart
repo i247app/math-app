@@ -1,7 +1,14 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_streak_day_state.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_streak_day.dart';
 
-class _ParentLearningStreakCard extends StatelessWidget {
-  const _ParentLearningStreakCard({required this.hasCompletedAssessment});
+class ParentLearningStreakCard extends StatelessWidget {
+  const ParentLearningStreakCard({required this.hasCompletedAssessment});
 
   final bool hasCompletedAssessment;
 
@@ -17,23 +24,23 @@ class _ParentLearningStreakCard extends StatelessWidget {
       context.getText(AppKeys.parentWeekdaySat),
     ];
     final states = hasCompletedAssessment
-        ? const <_ParentStreakDayState>[
-            _ParentStreakDayState.done,
-            _ParentStreakDayState.done,
-            _ParentStreakDayState.done,
-            _ParentStreakDayState.current,
-            _ParentStreakDayState.upcoming,
-            _ParentStreakDayState.upcoming,
-            _ParentStreakDayState.upcoming,
+        ? const <ParentStreakDayState>[
+            ParentStreakDayState.done,
+            ParentStreakDayState.done,
+            ParentStreakDayState.done,
+            ParentStreakDayState.current,
+            ParentStreakDayState.upcoming,
+            ParentStreakDayState.upcoming,
+            ParentStreakDayState.upcoming,
           ]
-        : const <_ParentStreakDayState>[
-            _ParentStreakDayState.current,
-            _ParentStreakDayState.upcoming,
-            _ParentStreakDayState.upcoming,
-            _ParentStreakDayState.upcoming,
-            _ParentStreakDayState.upcoming,
-            _ParentStreakDayState.upcoming,
-            _ParentStreakDayState.upcoming,
+        : const <ParentStreakDayState>[
+            ParentStreakDayState.current,
+            ParentStreakDayState.upcoming,
+            ParentStreakDayState.upcoming,
+            ParentStreakDayState.upcoming,
+            ParentStreakDayState.upcoming,
+            ParentStreakDayState.upcoming,
+            ParentStreakDayState.upcoming,
           ];
 
     return Container(
@@ -67,7 +74,7 @@ class _ParentLearningStreakCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(
               dayLabels.length,
-              (index) => _ParentStreakDay(
+              (index) => ParentStreakDay(
                 label: dayLabels[index],
                 state: states[index],
               ),

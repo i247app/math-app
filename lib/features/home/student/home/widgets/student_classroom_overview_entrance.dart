@@ -1,7 +1,8 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentClassroomOverviewEntrance extends StatefulWidget {
-  const _StudentClassroomOverviewEntrance({
+class StudentClassroomOverviewEntrance extends StatefulWidget {
+  const StudentClassroomOverviewEntrance({
+    super.key,
     required this.order,
     required this.child,
     this.onFinished,
@@ -12,12 +13,12 @@ class _StudentClassroomOverviewEntrance extends StatefulWidget {
   final VoidCallback? onFinished;
 
   @override
-  State<_StudentClassroomOverviewEntrance> createState() =>
+  State<StudentClassroomOverviewEntrance> createState() =>
       _StudentClassroomOverviewEntranceState();
 }
 
 class _StudentClassroomOverviewEntranceState
-    extends State<_StudentClassroomOverviewEntrance> {
+    extends State<StudentClassroomOverviewEntrance> {
   bool _isVisible = false;
   bool _hasNotifiedFinished = false;
 

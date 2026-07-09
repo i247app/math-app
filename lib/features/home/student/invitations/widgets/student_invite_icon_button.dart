@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _StudentInviteIconButton extends StatelessWidget {
-  const _StudentInviteIconButton({
+class StudentInviteIconButton extends StatelessWidget {
+  const StudentInviteIconButton({
+    super.key,
     required this.asset,
     required this.label,
     required this.onTap,

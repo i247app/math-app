@@ -1,7 +1,10 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_class_card.dart';
 
-class _TeacherClassCarousel extends StatelessWidget {
-  const _TeacherClassCarousel({
+class TeacherClassCarousel extends StatelessWidget {
+  const TeacherClassCarousel({
+    super.key,
     required this.scale,
     required this.classrooms,
     required this.onOpen,
@@ -26,7 +29,7 @@ class _TeacherClassCarousel extends StatelessWidget {
           final classroom = classrooms[index];
           return SizedBox(
             width: 166 * scale,
-            child: _TeacherClassCard(
+            child: TeacherClassCard(
               scale: scale,
               classroom: classroom,
               onTap: () => onOpen(classroom),

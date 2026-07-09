@@ -1,7 +1,10 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
-class _ParentRoomDetailMeta extends StatelessWidget {
-  const _ParentRoomDetailMeta({required this.icon, required this.label});
+class ParentRoomDetailMeta extends StatelessWidget {
+  const ParentRoomDetailMeta({required this.icon, required this.label});
 
   final IconData icon;
   final String label;

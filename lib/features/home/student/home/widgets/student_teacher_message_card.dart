@@ -1,9 +1,12 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_teacher_message_data.dart';
 
-class _StudentTeacherMessageCard extends StatelessWidget {
-  const _StudentTeacherMessageCard({required this.data});
+class StudentTeacherMessageCard extends StatelessWidget {
+  const StudentTeacherMessageCard({super.key, required this.data});
 
-  final _StudentTeacherMessageData data;
+  final StudentTeacherMessageData data;
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +119,7 @@ class _StudentTeacherMessageCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: data.accentColor,
                     borderRadius: BorderRadius.circular(999),

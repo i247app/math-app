@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
-class _StudentHomeworkStatusChip extends StatelessWidget {
-  const _StudentHomeworkStatusChip({
+class StudentHomeworkStatusChip extends StatelessWidget {
+  const StudentHomeworkStatusChip({
+    super.key,
     required this.label,
     required this.color,
     required this.textColor,

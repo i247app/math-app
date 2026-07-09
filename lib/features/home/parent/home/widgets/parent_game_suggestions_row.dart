@@ -1,7 +1,11 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/features/home/widgets/home_game_preview_card.dart';
+import 'package:numi_flutter/features/home/widgets/home_math_squadron_preview_artwork.dart';
 
-class _ParentGameSuggestionsRow extends StatelessWidget {
-  const _ParentGameSuggestionsRow();
+class ParentGameSuggestionsRow extends StatelessWidget {
+  const ParentGameSuggestionsRow();
 
   @override
   Widget build(BuildContext context) {

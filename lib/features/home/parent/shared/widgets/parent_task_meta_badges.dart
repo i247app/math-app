@@ -1,7 +1,11 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_meta_chip.dart';
 
-class _ParentTaskMetaBadges extends StatelessWidget {
-  const _ParentTaskMetaBadges({
+class ParentTaskMetaBadges extends StatelessWidget {
+  const ParentTaskMetaBadges({
     required this.childName,
     required this.classroomName,
   });
@@ -19,14 +23,14 @@ class _ParentTaskMetaBadges extends StatelessWidget {
       runSpacing: 4,
       children: [
         if (cleanChildName?.isNotEmpty == true)
-          _ParentTaskMetaChip(
+          ParentTaskMetaChip(
             label: cleanChildName!,
             color: const Color(0xFFEAF7F7),
             textColor: const Color(0xFF7F8FA0),
             fontSize: FontSize.xxs,
           ),
         if (cleanClassroom.isNotEmpty)
-          _ParentTaskMetaChip(
+          ParentTaskMetaChip(
             label: cleanClassroom,
             color: const Color(0xFFEAF7F7),
             textColor: const Color(0xFF7F8FA0),

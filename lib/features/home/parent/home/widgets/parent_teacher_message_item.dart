@@ -1,15 +1,24 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
 
-class _ParentTeacherMessageItem extends StatelessWidget {
-  const _ParentTeacherMessageItem({required this.summary, required this.index});
+class ParentTeacherMessageItem extends StatelessWidget {
+  const ParentTeacherMessageItem({required this.summary, required this.index});
 
-  final _ParentChildSummary summary;
+  final ParentChildSummary summary;
   final int index;
 
   @override
   Widget build(BuildContext context) {
     final childName = homeProfileDisplayName(context, summary.profile);
-    final className = _parentClassroomName(context, summary);
+    final className = parentClassroomName(context, summary);
     final teacherName = context.getText(
       index.isEven
           ? AppKeys.homeMessageTeacherOne

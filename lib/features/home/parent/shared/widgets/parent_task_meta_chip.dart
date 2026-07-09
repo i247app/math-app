@@ -1,7 +1,10 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
-class _ParentTaskMetaChip extends StatelessWidget {
-  const _ParentTaskMetaChip({
+class ParentTaskMetaChip extends StatelessWidget {
+  const ParentTaskMetaChip({
     required this.fontSize,
     required this.label,
     required this.color,

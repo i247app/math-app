@@ -1,7 +1,17 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
+import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_date_label.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_icon_box.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_meta_badges.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_title.dart';
 
-class _ParentPendingTaskListItem extends StatelessWidget {
-  const _ParentPendingTaskListItem({
+class ParentPendingTaskListItem extends StatelessWidget {
+  const ParentPendingTaskListItem({
     required this.pending,
     this.onTap,
     this.isExpired = false,
@@ -14,11 +24,11 @@ class _ParentPendingTaskListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final exercise = pending.exercise;
-    final title = _roomExerciseTitle(context, exercise);
+    final title = roomExerciseTitle(context, exercise);
     final childName = pending.child == null
         ? null
         : homeProfileDisplayName(context, pending.child!);
-    final classroomName = _roomClassName(context, pending.classroom);
+    final classroomName = roomClassName(context, pending.classroom);
     final accent = isExpired
         ? (
             color: const Color(0xFFFF7A1A),
@@ -26,7 +36,7 @@ class _ParentPendingTaskListItem extends StatelessWidget {
             icon: Icons.warning_amber_rounded,
             asset: null,
           )
-        : _roomPurposeListAccent(exercise?.purpose);
+        : roomPurposeListAccent(exercise?.purpose);
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
@@ -35,7 +45,7 @@ class _ParentPendingTaskListItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
           children: [
-            _ParentTaskIconBox(
+            ParentTaskIconBox(
               icon: accent.icon,
               asset: accent.asset,
               color: accent.color,
@@ -50,21 +60,21 @@ class _ParentPendingTaskListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: _ParentTaskMetaBadges(
+                        child: ParentTaskMetaBadges(
                           childName: childName,
                           classroomName: classroomName,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      _ParentTaskDateLabel(
-                        date: _roomDateOnlyLabel(
+                      ParentTaskDateLabel(
+                        date: roomDateOnlyLabel(
                           exercise?.endDate ?? exercise?.createDt,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 5),
-                  _ParentTaskTitle(title: title),
+                  ParentTaskTitle(title: title),
                 ],
               ),
             ),

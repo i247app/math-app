@@ -1,4 +1,30 @@
-part of '../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/home/cache/home_profile_cache.dart';
+import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/parent/cache/parent_home_snapshot.dart';
+import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/quiz/quiz_api.dart';
+import 'package:numi_flutter/features/quiz/presentation/grade_selection_screen.dart';
+import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_tab_card.dart';
+import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi_flutter/features/home/parent/assessment/models/parent_assessment_entry.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_progress_chart.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_search_field.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_empty_poster.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_full_skeleton.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_state_card.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_practice_tab_banner.dart';
 
 class ParentAssessmentTab extends StatefulWidget {
   const ParentAssessmentTab({super.key, required this.args});
@@ -12,7 +38,7 @@ class ParentAssessmentTab extends StatefulWidget {
 class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   final TextEditingController _searchController = TextEditingController();
 
-  List<_ParentAssessmentEntry> _entries = const <_ParentAssessmentEntry>[];
+  List<ParentAssessmentEntry> _entries = const <ParentAssessmentEntry>[];
   bool _isLoading = true;
   bool _hasPlayedInitialEntrance = false;
   String? _errorMessage;
@@ -84,19 +110,19 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       _errorMessage = null;
     });
 
-    final entries = <_ParentAssessmentEntry>[];
+    final entries = <ParentAssessmentEntry>[];
     var failed = false;
 
     if ((profileId != null && profileId > 0) ||
         (userId != null && userId > 0)) {
       try {
-        final quizzes = await _loadCompletedParentAssessments(
+        final quizzes = await loadCompletedParentAssessments(
           quizService: widget.args.quizService,
           profileId: profileId,
           userId: userId,
         );
         entries.addAll(
-          quizzes.map((quiz) => _ParentAssessmentEntry(quiz: quiz)),
+          quizzes.map((quiz) => ParentAssessmentEntry(quiz: quiz)),
         );
       } catch (_) {
         failed = true;
@@ -107,7 +133,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       return;
     }
 
-    entries.sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
+    entries.sort((a, b) => quizDate(b.quiz).compareTo(quizDate(a.quiz)));
     setState(() {
       if (!failed || entries.isNotEmpty || _entries.isEmpty) {
         _entries = entries;
@@ -137,14 +163,14 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   void _applyCachedAssessments(ParentHomeSnapshot snapshot) {
     _entries =
         snapshot.completedAssessments
-            .map((quiz) => _ParentAssessmentEntry(quiz: quiz))
+            .map((quiz) => ParentAssessmentEntry(quiz: quiz))
             .toList(growable: false)
-          ..sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
+          ..sort((a, b) => quizDate(b.quiz).compareTo(quizDate(a.quiz)));
     _isLoading = false;
     _errorMessage = null;
   }
 
-  List<_ParentAssessmentEntry> get _filteredEntries {
+  List<ParentAssessmentEntry> get _filteredEntries {
     final query = _searchController.text.trim().toLowerCase();
     if (query.isEmpty) {
       return _entries;
@@ -152,8 +178,8 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     return _entries
         .where((entry) {
           final searchable = <String>[
-            _homeQuizTitle(context, entry.quiz),
-            _homeQuizDateLabel(entry.quiz),
+            homeQuizTitle(context, entry.quiz),
+            homeQuizDateLabel(entry.quiz),
           ].join(' ').toLowerCase();
           return searchable.contains(query);
         })
@@ -259,7 +285,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   }
 
   List<Widget> _buildAssessmentChildren({
-    required List<_ParentAssessmentEntry> entries,
+    required List<ParentAssessmentEntry> entries,
     required bool hasNoAssessments,
     required bool shouldShowFullSkeleton,
     required double scale,
@@ -267,13 +293,13 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     final shouldShowProgressChart = _entries.length > 1;
 
     if (shouldShowFullSkeleton) {
-      return [_ParentAssessmentFullSkeleton(scale: scale)];
+      return [ParentAssessmentFullSkeleton(scale: scale)];
     }
 
     if (hasNoAssessments) {
       return [
         _initialFadeIn(
-          child: _ParentAssessmentEmptyPoster(
+          child: ParentAssessmentEmptyPoster(
             onTap: _openAssessment,
             scale: scale,
           ),
@@ -282,9 +308,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     }
 
     return [
-      _ParentPracticeTabBanner(onTap: _openAssessment, scale: scale),
+      ParentPracticeTabBanner(onTap: _openAssessment, scale: scale),
       SizedBox(height: 13 * scale),
-      _ParentAssessmentSearchField(controller: _searchController, scale: scale),
+      ParentAssessmentSearchField(controller: _searchController, scale: scale),
       if (shouldShowProgressChart) ...[
         SizedBox(height: 20 * scale),
         Text(
@@ -297,7 +323,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           ),
         ),
         SizedBox(height: 8 * scale),
-        _ParentAssessmentProgressChart(
+        ParentAssessmentProgressChart(
           entries: _entries.take(5).toList().reversed.toList(),
           scale: scale,
         ),
@@ -305,7 +331,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       SizedBox(height: 16 * scale),
       if (_errorMessage != null && _entries.isEmpty)
         _initialFadeIn(
-          child: _ParentAssessmentStateCard(
+          child: ParentAssessmentStateCard(
             icon: Icons.cloud_off_rounded,
             title: context.getText(AppKeys.historyLoadErrorTitle),
             message: _errorMessage!,
@@ -315,7 +341,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         )
       else if (entries.isEmpty)
         _initialFadeIn(
-          child: _ParentAssessmentStateCard(
+          child: ParentAssessmentStateCard(
             icon: Icons.assignment_turned_in_outlined,
             title: context.getText(AppKeys.noHistoryTitle),
             message: context.getText(AppKeys.noHistoryMessage),
@@ -328,7 +354,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           child: Column(
             children: [
               for (final entry in entries) ...[
-                _AssessmentResultListItemCard(
+                AssessmentResultListItemCard(
                   quiz: entry.quiz,
                   scale: scale,
                   onTap: () => _openQuizReview(entry.quiz),

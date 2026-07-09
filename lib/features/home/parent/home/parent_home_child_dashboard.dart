@@ -1,8 +1,14 @@
-part of '../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_child_dashboard_loading.dart';
+import 'package:numi_flutter/features/home/parent/home/parent_home_tab.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_child_overview_content.dart';
 
-extension _ParentHomeChildDashboardView on _ParentHomeContentState {
-  Widget _buildChildDashboard() {
-    final parent = _homeLayout?.parent;
+extension ParentHomeChildDashboardView on ParentHomeContentState {
+  Widget buildChildDashboard() {
+    final parent = homeLayout?.parent;
     final padding = EdgeInsets.fromLTRB(
       14 * widget.args.scale,
       widget.args.headerHeight + 10 * widget.args.scale,
@@ -21,30 +27,30 @@ extension _ParentHomeChildDashboardView on _ParentHomeContentState {
       ),
       child: RefreshIndicator(
         color: const Color(0xFF159A86),
-        onRefresh: _loadHome,
+        onRefresh: loadHome,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
           padding: padding,
-          child: _isLoading && !_hasLoadedHome
-              ? const _ParentChildDashboardLoading()
-              : _ParentChildOverviewContent(
-                  summaries: _childSummaries,
+          child: isLoading && !hasLoadedHome
+              ? const ParentChildDashboardLoading()
+              : ParentChildOverviewContent(
+                  summaries: childSummaries,
                   pendingExercises:
                       parent?.pendingExercises ??
                       const <HomeLayoutPendingExercise>[],
                   completions:
                       parent?.recentCompletions ??
                       const <HomeLayoutRecentCompletion>[],
-                  entranceBuilder: _childOverviewFadeIn,
-                  onCompletionTap: _openCompletionResult,
+                  entranceBuilder: childOverviewFadeIn,
+                  onCompletionTap: openCompletionResult,
                   onViewTasks: widget.args.onOpenClassroomTab,
                   onViewResults: widget.args.onOpenClassroomTab,
                   onViewMessages: widget.args.onOpenClassroomTab,
-                  isRefreshing: _isLoading && _hasLoadedHome,
-                  errorMessage: _errorMessage,
-                  onRetry: _loadHome,
+                  isRefreshing: isLoading && hasLoadedHome,
+                  errorMessage: errorMessage,
+                  onRetry: loadHome,
                 ),
         ),
       ),

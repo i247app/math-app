@@ -1,7 +1,8 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherSkeletonCarousel extends StatelessWidget {
-  const _TeacherSkeletonCarousel({
+class TeacherSkeletonCarousel extends StatelessWidget {
+  const TeacherSkeletonCarousel({
+    super.key,
     required this.scale,
     required this.itemWidth,
     required this.itemHeight,

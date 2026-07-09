@@ -1,7 +1,17 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
+import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_date_label.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_meta_badges.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_score_ring.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_title.dart';
 
-class _ParentCompletedTaskListItem extends StatelessWidget {
-  const _ParentCompletedTaskListItem({
+class ParentCompletedTaskListItem extends StatelessWidget {
+  const ParentCompletedTaskListItem({
     required this.completion,
     required this.onTap,
   });
@@ -24,7 +34,7 @@ class _ParentCompletedTaskListItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
           children: [
-            _ParentTaskScoreRing(score: score, color: color),
+            ParentTaskScoreRing(score: score, color: color),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -34,22 +44,22 @@ class _ParentCompletedTaskListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: _ParentTaskMetaBadges(
+                        child: ParentTaskMetaBadges(
                           childName: completion.child == null
                               ? null
                               : homeProfileDisplayName(
                                   context,
                                   completion.child!,
                                 ),
-                          classroomName: _roomClassName(
+                          classroomName: roomClassName(
                             context,
                             completion.classroom,
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      _ParentTaskDateLabel(
-                        date: _roomDateOnlyLabel(
+                      ParentTaskDateLabel(
+                        date: roomDateOnlyLabel(
                           completion.gradedDt ??
                               completion.submittedDt ??
                               completion.exercise?.createDt,
@@ -58,8 +68,8 @@ class _ParentCompletedTaskListItem extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 5),
-                  _ParentTaskTitle(
-                    title: _roomExerciseTitle(context, exercise),
+                  ParentTaskTitle(
+                    title: roomExerciseTitle(context, exercise),
                   ),
                 ],
               ),

@@ -1,17 +1,20 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_shimmer.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
 
-class _TeacherHomeSectionHeaderSkeleton extends StatefulWidget {
-  const _TeacherHomeSectionHeaderSkeleton({required this.scale});
+class TeacherHomeSectionHeaderSkeleton extends StatefulWidget {
+  const TeacherHomeSectionHeaderSkeleton({super.key, required this.scale});
 
   final double scale;
 
   @override
-  State<_TeacherHomeSectionHeaderSkeleton> createState() =>
+  State<TeacherHomeSectionHeaderSkeleton> createState() =>
       _TeacherHomeSectionHeaderSkeletonState();
 }
 
 class _TeacherHomeSectionHeaderSkeletonState
-    extends State<_TeacherHomeSectionHeaderSkeleton>
+    extends State<TeacherHomeSectionHeaderSkeleton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -27,11 +30,11 @@ class _TeacherHomeSectionHeaderSkeletonState
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
-    return TeacherSkeletonShimmer(
+    return HomeSkeletonShimmer(
       controller: _controller,
       child: Row(
         children: [
-          TeacherSkeletonBlock(
+          HomeSkeletonBlock(
             width: 42 * scale,
             height: 42 * scale,
             radius: 14 * scale,
@@ -39,14 +42,14 @@ class _TeacherHomeSectionHeaderSkeletonState
           ),
           SizedBox(width: 12 * scale),
           Expanded(
-            child: TeacherSkeletonBlock(
+            child: HomeSkeletonBlock(
               width: double.infinity,
               height: 22 * scale,
               radius: 10 * scale,
             ),
           ),
           SizedBox(width: 16 * scale),
-          TeacherSkeletonBlock(
+          HomeSkeletonBlock(
             width: 82 * scale,
             height: 22 * scale,
             radius: 11 * scale,

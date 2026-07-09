@@ -1,37 +1,40 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_card.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
 
-class _TeacherClassSkeletonCard extends StatelessWidget {
-  const _TeacherClassSkeletonCard({required this.scale});
+class TeacherClassSkeletonCard extends StatelessWidget {
+  const TeacherClassSkeletonCard({super.key, required this.scale});
 
   final double scale;
 
   @override
   Widget build(BuildContext context) {
-    return TeacherSkeletonCard(
+    return HomeSkeletonCard(
       scale: scale,
       padding: EdgeInsets.all(12 * scale),
       child: Column(
         children: [
-          TeacherSkeletonBlock(
+          HomeSkeletonBlock(
             width: 84 * scale,
             height: 56 * scale,
             radius: 16 * scale,
           ),
           SizedBox(height: 8 * scale),
-          TeacherSkeletonBlock(
+          HomeSkeletonBlock(
             width: 72 * scale,
             height: 16 * scale,
             radius: 8 * scale,
           ),
           SizedBox(height: 8 * scale),
           Divider(color: const Color(0x1AC4C6D2), height: 4 * scale),
-          TeacherSkeletonBlock(
+          HomeSkeletonBlock(
             width: 88 * scale,
             height: 12 * scale,
             radius: 8 * scale,
           ),
           SizedBox(height: 5 * scale),
-          TeacherSkeletonBlock(
+          HomeSkeletonBlock(
             width: 69 * scale,
             height: 14 * scale,
             radius: 5 * scale,

@@ -1,7 +1,10 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 
-class _ParentAssessmentScoreBadge extends StatelessWidget {
-  const _ParentAssessmentScoreBadge({
+class ParentAssessmentScoreBadge extends StatelessWidget {
+  const ParentAssessmentScoreBadge({
+    super.key,
     required this.percentage,
     required this.color,
     required this.scale,

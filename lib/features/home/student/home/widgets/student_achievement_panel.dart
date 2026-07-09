@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_achievement_card.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_achievements_header.dart';
 
-class _StudentAchievementPanel extends StatelessWidget {
-  const _StudentAchievementPanel({super.key, required this.scale});
+class StudentAchievementPanel extends StatelessWidget {
+  const StudentAchievementPanel({super.key, required this.scale});
 
   final double scale;
 
@@ -11,9 +13,9 @@ class _StudentAchievementPanel extends StatelessWidget {
       key: const ValueKey('achievement_panel_content'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _StudentAchievementsHeader(scale: scale),
+        StudentAchievementsHeader(scale: scale),
         SizedBox(height: 20 * scale),
-        _StudentAchievementCard(scale: scale),
+        StudentAchievementCard(scale: scale),
       ],
     );
   }

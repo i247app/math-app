@@ -1,7 +1,11 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
-class _ParentRoomTaskShell extends StatelessWidget {
-  const _ParentRoomTaskShell({
+class ParentRoomTaskShell extends StatelessWidget {
+  const ParentRoomTaskShell({
     required this.accent,
     required this.child,
     required this.onTap,

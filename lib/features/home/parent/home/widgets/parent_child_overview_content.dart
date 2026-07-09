@@ -1,7 +1,24 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi_flutter/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/parent/home/models/parent_home_entrance_builder.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_child_class_summary_card.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_dashboard_section.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_game_suggestions_row.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_home_error_card.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_home_refresh_label.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_completed_task_list_item.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
 
-class _ParentChildOverviewContent extends StatelessWidget {
-  const _ParentChildOverviewContent({
+class ParentChildOverviewContent extends StatelessWidget {
+  const ParentChildOverviewContent({
     required this.summaries,
     required this.pendingExercises,
     required this.completions,
@@ -15,10 +32,10 @@ class _ParentChildOverviewContent extends StatelessWidget {
     required this.onRetry,
   });
 
-  final List<_ParentChildSummary> summaries;
+  final List<ParentChildSummary> summaries;
   final List<HomeLayoutPendingExercise> pendingExercises;
   final List<HomeLayoutRecentCompletion> completions;
-  final _ParentHomeEntranceBuilder entranceBuilder;
+  final ParentHomeEntranceBuilder entranceBuilder;
   final ValueChanged<HomeLayoutRecentCompletion> onCompletionTap;
   final VoidCallback onViewTasks;
   final VoidCallback onViewResults;
@@ -29,7 +46,7 @@ class _ParentChildOverviewContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primarySummary = _parentPrimarySummary(summaries);
+    final primarySummary = parentPrimarySummary(summaries);
     final showGameSuggestions = pendingExercises.isEmpty || completions.isEmpty;
     final visiblePendingExercises = pendingExercises
         .take(2)
@@ -45,7 +62,7 @@ class _ParentChildOverviewContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _ParentChildClassSummaryCard(summary: primarySummary),
+                child: ParentChildClassSummaryCard(summary: primarySummary),
               ),
             ],
           ),
@@ -54,7 +71,7 @@ class _ParentChildOverviewContent extends StatelessWidget {
         if (pendingExercises.isNotEmpty) ...[
           entranceBuilder(
             order: 1,
-            child: _ParentDashboardSection(
+            child: ParentDashboardSection(
               title: context.getText(AppKeys.parentTasksTitle),
               onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
               child: Column(
@@ -64,7 +81,7 @@ class _ParentChildOverviewContent extends StatelessWidget {
                     index < visiblePendingExercises.length;
                     index++
                   ) ...[
-                    _ParentPendingTaskListItem(
+                    ParentPendingTaskListItem(
                       pending: visiblePendingExercises[index],
                     ),
                     if (index != visiblePendingExercises.length - 1)
@@ -83,7 +100,7 @@ class _ParentChildOverviewContent extends StatelessWidget {
         if (completions.isNotEmpty) ...[
           entranceBuilder(
             order: 2,
-            child: _ParentDashboardSection(
+            child: ParentDashboardSection(
               title: context.getText(AppKeys.assessmentResultTitle),
               onViewAll: completions.length > 2 ? onViewResults : null,
               child: Column(
@@ -93,7 +110,7 @@ class _ParentChildOverviewContent extends StatelessWidget {
                     index < visibleCompletions.length;
                     index++
                   ) ...[
-                    _ParentCompletedTaskListItem(
+                    ParentCompletedTaskListItem(
                       completion: visibleCompletions[index],
                       onTap: () => onCompletionTap(visibleCompletions[index]),
                     ),
@@ -113,10 +130,10 @@ class _ParentChildOverviewContent extends StatelessWidget {
         entranceBuilder(
           order: 3,
           markOnEnd: !showGameSuggestions,
-          child: _ParentDashboardSection(
+          child: ParentDashboardSection(
             title: context.getText(AppKeys.parentMessagesTitle),
             onViewAll: onViewMessages,
-            child: _ParentTeacherMessagesList(summaries: summaries),
+            child: ParentTeacherMessagesList(summaries: summaries),
           ),
         ),
         if (showGameSuggestions) ...[
@@ -124,16 +141,16 @@ class _ParentChildOverviewContent extends StatelessWidget {
           entranceBuilder(
             order: 4,
             markOnEnd: true,
-            child: const _ParentGameSuggestionsRow(),
+            child: const ParentGameSuggestionsRow(),
           ),
         ],
         if (isRefreshing) ...[
           const SizedBox(height: 8),
-          const _ParentHomeRefreshLabel(),
+          const ParentHomeRefreshLabel(),
         ],
         if (errorMessage != null) ...[
           const SizedBox(height: 10),
-          _ParentHomeErrorCard(message: errorMessage!, onRetry: onRetry),
+          ParentHomeErrorCard(message: errorMessage!, onRetry: onRetry),
         ],
       ],
     );

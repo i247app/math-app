@@ -1,7 +1,14 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 
-class _ParentRoomSelectStudentCard extends StatelessWidget {
-  const _ParentRoomSelectStudentCard({
+class ParentRoomSelectStudentCard extends StatelessWidget {
+  const ParentRoomSelectStudentCard({
     required this.onChooseProfile,
     required this.onCreateProfile,
   });

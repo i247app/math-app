@@ -1,6 +1,8 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
 
-({Color color, String label}) _parentAssessmentScoreStyle(
+({Color color, String label}) parentAssessmentScoreStyle(
   BuildContext context,
   int? percentage,
 ) {
@@ -35,7 +37,7 @@ part of '../../../home_screen.dart';
   );
 }
 
-({String dt, String tm}) _parentAssessmentDateParts(String? isoDate) {
+({String dt, String tm}) parentAssessmentDateParts(String? isoDate) {
   final parsed = DateTime.tryParse(isoDate ?? '')?.toLocal();
   if (parsed == null) {
     return (dt: '--/--/----', tm: '--:--');

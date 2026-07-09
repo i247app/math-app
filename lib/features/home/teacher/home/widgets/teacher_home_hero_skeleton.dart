@@ -1,7 +1,10 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_card.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
 
-class _TeacherHomeHeroSkeleton extends StatelessWidget {
-  const _TeacherHomeHeroSkeleton({required this.scale});
+class TeacherHomeHeroSkeleton extends StatelessWidget {
+  const TeacherHomeHeroSkeleton({super.key, required this.scale});
 
   final double scale;
 
@@ -9,7 +12,7 @@ class _TeacherHomeHeroSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 92 * scale,
-      child: TeacherSkeletonCard(
+      child: HomeSkeletonCard(
         scale: scale,
         padding: EdgeInsets.fromLTRB(
           14 * scale,
@@ -24,14 +27,14 @@ class _TeacherHomeHeroSkeleton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TeacherSkeletonBlock(
+                  HomeSkeletonBlock(
                     width: 148 * scale,
                     height: 20 * scale,
                     radius: 8 * scale,
                     color: AppColors.teal520.withValues(alpha: 0.18),
                   ),
                   SizedBox(height: 10 * scale),
-                  TeacherSkeletonBlock(
+                  HomeSkeletonBlock(
                     width: 218 * scale,
                     height: 15 * scale,
                     radius: 8 * scale,
@@ -39,7 +42,7 @@ class _TeacherHomeHeroSkeleton extends StatelessWidget {
                 ],
               ),
             ),
-            TeacherSkeletonBlock(
+            HomeSkeletonBlock(
               width: 64 * scale,
               height: 64 * scale,
               radius: 20 * scale,

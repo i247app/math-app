@@ -1,7 +1,13 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
-class _ParentDashboardSection extends StatelessWidget {
-  const _ParentDashboardSection({
+class ParentDashboardSection extends StatelessWidget {
+  const ParentDashboardSection({
     required this.title,
     required this.child,
     this.onViewAll,

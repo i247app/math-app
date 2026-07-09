@@ -1,13 +1,20 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
+import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi_flutter/features/home/parent/room/models/parent_room_entry.dart';
 
-class _ParentRoomClassCard extends StatelessWidget {
-  const _ParentRoomClassCard({
+class ParentRoomClassCard extends StatelessWidget {
+  const ParentRoomClassCard({
     required this.entry,
     required this.index,
     required this.onTap,
   });
 
-  final _ParentRoomEntry entry;
+  final ParentRoomEntry entry;
   final int index;
   final VoidCallback onTap;
 
@@ -15,8 +22,8 @@ class _ParentRoomClassCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isBlue = index.isOdd;
     final childName = homeProfileDisplayName(context, entry.child);
-    final className = _roomClassName(context, entry.classroom);
-    final teacherName = _roomTeacherName(context, entry);
+    final className = roomClassName(context, entry.classroom);
+    final teacherName = roomTeacherName(context, entry);
     final fg = isBlue ? const Color(0xFF006CB6) : const Color(0xFF276C6B);
     final bg = isBlue ? const Color(0xFFEAF3FA) : const Color(0xFFE7F6F5);
 

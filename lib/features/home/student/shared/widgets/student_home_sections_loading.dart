@@ -1,15 +1,16 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_shimmer.dart';
+import 'package:numi_flutter/features/home/student/classroom/widgets/student_classroom_skeleton_block.dart';
 
-class _StudentHomeSectionsLoading extends StatefulWidget {
-  const _StudentHomeSectionsLoading();
+class StudentHomeSectionsLoading extends StatefulWidget {
+  const StudentHomeSectionsLoading({super.key});
 
   @override
-  State<_StudentHomeSectionsLoading> createState() =>
+  State<StudentHomeSectionsLoading> createState() =>
       _StudentHomeSectionsLoadingState();
 }
 
-class _StudentHomeSectionsLoadingState
-    extends State<_StudentHomeSectionsLoading>
+class _StudentHomeSectionsLoadingState extends State<StudentHomeSectionsLoading>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -24,25 +25,8 @@ class _StudentHomeSectionsLoadingState
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) => ShaderMask(
-        blendMode: BlendMode.srcATop,
-        shaderCallback: (bounds) {
-          final shimmerWidth = bounds.width * 1.2;
-          final start = -shimmerWidth;
-          final dx = start + (bounds.width - start) * _controller.value;
-          return LinearGradient(
-            colors: [
-              Colors.white.withValues(alpha: 0),
-              Colors.white.withValues(alpha: 0.72),
-              Colors.white.withValues(alpha: 0),
-            ],
-            stops: const [0.28, 0.5, 0.72],
-          ).createShader(Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height));
-        },
-        child: child,
-      ),
+    return HomeSkeletonShimmer(
+      controller: _controller,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -57,13 +41,9 @@ class _StudentHomeSectionsLoadingState
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _StudentClassroomSkeletonBlock(
-                  width: 150,
-                  height: 15,
-                  radius: 7,
-                ),
+                StudentClassroomSkeletonBlock(width: 150, height: 15, radius: 7),
                 SizedBox(height: 12),
-                _StudentClassroomSkeletonBlock(height: 56, radius: 14),
+                StudentClassroomSkeletonBlock(height: 56, radius: 14),
               ],
             ),
           ),
@@ -72,23 +52,16 @@ class _StudentHomeSectionsLoadingState
             children: [
               for (var index = 0; index < 2; index++) ...[
                 const Expanded(
-                  child: _StudentClassroomSkeletonBlock(
-                    height: 138,
-                    radius: 18,
-                  ),
+                  child: StudentClassroomSkeletonBlock(height: 138, radius: 18),
                 ),
                 if (index == 0) const SizedBox(width: 10),
               ],
             ],
           ),
           const SizedBox(height: 20),
-          const _StudentClassroomSkeletonBlock(
-            width: 170,
-            height: 18,
-            radius: 8,
-          ),
+          const StudentClassroomSkeletonBlock(width: 170, height: 18, radius: 8),
           const SizedBox(height: 10),
-          const _StudentClassroomSkeletonBlock(height: 104, radius: 18),
+          const StudentClassroomSkeletonBlock(height: 104, radius: 18),
         ],
       ),
     );

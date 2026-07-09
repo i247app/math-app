@@ -1,20 +1,27 @@
-part of '../../home_screen.dart';
+import 'package:flutter/widgets.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/features/profile/models/profile_role.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/features/quiz/quiz_api.dart';
+import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
 
-bool _isCompletedAssessment(GeneratedQuiz quiz) {
+bool isCompletedAssessment(GeneratedQuiz quiz) {
   final purpose = (quiz.purpose ?? quiz.type ?? '').trim().toUpperCase();
   final status = quiz.quizStatus?.trim().toUpperCase();
   return purpose == quizPurposeAssessment &&
       (status == 'SUBMITTED' || quiz.grading?.scorePercentage != null);
 }
 
-Future<List<GeneratedQuiz>> _loadCompletedParentAssessments({
+Future<List<GeneratedQuiz>> loadCompletedParentAssessments({
   required QuizService quizService,
   required int? profileId,
   required int? userId,
 }) async {
   List<GeneratedQuiz> completed(List<GeneratedQuiz> quizzes) {
-    return quizzes.where(_isCompletedAssessment).toList(growable: false)
-      ..sort((a, b) => _quizDate(b).compareTo(_quizDate(a)));
+    return quizzes.where(isCompletedAssessment).toList(growable: false)
+      ..sort((a, b) => quizDate(b).compareTo(quizDate(a)));
   }
 
   Object? profileError;
@@ -50,13 +57,13 @@ Future<List<GeneratedQuiz>> _loadCompletedParentAssessments({
   return const <GeneratedQuiz>[];
 }
 
-DateTime _quizDate(GeneratedQuiz quiz) {
+DateTime quizDate(GeneratedQuiz quiz) {
   return DateTime.tryParse(quiz.modifyDt ?? quiz.createDt ?? '') ??
       DateTime.fromMillisecondsSinceEpoch(0);
 }
 
-String _homeQuizDateLabel(GeneratedQuiz quiz) {
-  final date = _quizDate(quiz).toLocal();
+String homeQuizDateLabel(GeneratedQuiz quiz) {
+  final date = quizDate(quiz).toLocal();
   if (date.millisecondsSinceEpoch == 0) {
     return '--/--/----';
   }
@@ -64,7 +71,7 @@ String _homeQuizDateLabel(GeneratedQuiz quiz) {
       '${date.month.toString().padLeft(2, '0')}/${date.year}';
 }
 
-String _homeQuizTitle(BuildContext context, GeneratedQuiz quiz) {
+String homeQuizTitle(BuildContext context, GeneratedQuiz quiz) {
   final title = quiz.title?.trim();
   if (title != null && title.isNotEmpty) {
     return title;
@@ -76,7 +83,7 @@ String _homeQuizTitle(BuildContext context, GeneratedQuiz quiz) {
   return context.getText(AppKeys.mathAssessment);
 }
 
-String? _homeQuizShortText(GeneratedQuiz quiz) {
+String? homeQuizShortText(GeneratedQuiz quiz) {
   final shortText = quiz.shortText?.trim();
   if (shortText == null || shortText.isEmpty) {
     return null;
@@ -84,7 +91,7 @@ String? _homeQuizShortText(GeneratedQuiz quiz) {
   return shortText;
 }
 
-List<StudentProfile> _studentProfiles(List<StudentProfile> profiles) {
+List<StudentProfile> studentProfiles(List<StudentProfile> profiles) {
   return profiles
       .where(
         (profile) => ProfileRole.fromProfile(profile) == ProfileRole.student,
@@ -92,7 +99,7 @@ List<StudentProfile> _studentProfiles(List<StudentProfile> profiles) {
       .toList(growable: false);
 }
 
-String _parentClassroomName(BuildContext context, _ParentChildSummary summary) {
+String parentClassroomName(BuildContext context, ParentChildSummary summary) {
   final name = summary.classroom?.name?.trim();
   if (name != null && name.isNotEmpty) {
     return name;

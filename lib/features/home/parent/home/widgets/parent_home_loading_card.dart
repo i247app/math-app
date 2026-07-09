@@ -1,13 +1,19 @@
-part of '../../../home_screen.dart';
+import 'dart:math' as math;
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_shimmer.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_line.dart';
 
-class _ParentHomeLoadingCard extends StatefulWidget {
-  const _ParentHomeLoadingCard();
+class ParentHomeLoadingCard extends StatefulWidget {
+  const ParentHomeLoadingCard();
 
   @override
-  State<_ParentHomeLoadingCard> createState() => _ParentHomeLoadingCardState();
+  State<ParentHomeLoadingCard> createState() => _ParentHomeLoadingCardState();
 }
 
-class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
+class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -33,12 +39,12 @@ class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
           pulseValue,
         )!;
 
-        return _ParentSkeletonShimmer(
-          progress: _controller.value,
+        return HomeSkeletonShimmer(
+          controller: _controller,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _ParentSkeletonBlock(
+              HomeSkeletonBlock(
                 height: 225,
                 radius: 30,
                 color: color,
@@ -47,13 +53,13 @@ class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _ParentSkeletonLine(width: 148, height: 30, color: color),
+                      HomeSkeletonLine(width: 148, height: 30, color: color),
                       const SizedBox(height: 14),
-                      _ParentSkeletonLine(width: 210, height: 34, color: color),
+                      HomeSkeletonLine(width: 210, height: 34, color: color),
                       const Spacer(),
-                      _ParentSkeletonLine(width: 132, height: 14, color: color),
+                      HomeSkeletonLine(width: 132, height: 14, color: color),
                       const SizedBox(height: 12),
-                      _ParentSkeletonBlock(
+                      HomeSkeletonBlock(
                         width: 150,
                         height: 44,
                         radius: 22,
@@ -67,7 +73,7 @@ class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
               Row(
                 children: [
                   Expanded(
-                    child: _ParentSkeletonBlock(
+                    child: HomeSkeletonBlock(
                       height: 160,
                       radius: 18,
                       color: color,
@@ -75,7 +81,7 @@ class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _ParentSkeletonBlock(
+                    child: HomeSkeletonBlock(
                       height: 160,
                       radius: 18,
                       color: color,
@@ -84,7 +90,7 @@ class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
                 ],
               ),
               const SizedBox(height: 12),
-              _ParentSkeletonBlock(
+              HomeSkeletonBlock(
                 height: 178,
                 radius: 17,
                 color: color,
@@ -95,7 +101,7 @@ class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
                       for (var index = 0; index < 3; index++) ...[
                         Row(
                           children: [
-                            _ParentSkeletonBlock(
+                            HomeSkeletonBlock(
                               width: 32,
                               height: 32,
                               radius: 10,
@@ -106,13 +112,13 @@ class _ParentHomeLoadingCardState extends State<_ParentHomeLoadingCard>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _ParentSkeletonLine(
+                                  HomeSkeletonLine(
                                     width: index == 0 ? 120 : 150,
                                     height: 14,
                                     color: color,
                                   ),
                                   const SizedBox(height: 7),
-                                  _ParentSkeletonLine(
+                                  HomeSkeletonLine(
                                     width: double.infinity,
                                     height: 10,
                                     color: color,
