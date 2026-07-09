@@ -41,7 +41,11 @@ class _StudentHomeSectionsLoadingState extends State<StudentHomeSectionsLoading>
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                StudentClassroomSkeletonBlock(width: 150, height: 15, radius: 7),
+                StudentClassroomSkeletonBlock(
+                  width: 150,
+                  height: 15,
+                  radius: 7,
+                ),
                 SizedBox(height: 12),
                 StudentClassroomSkeletonBlock(height: 56, radius: 14),
               ],
@@ -59,7 +63,11 @@ class _StudentHomeSectionsLoadingState extends State<StudentHomeSectionsLoading>
             ],
           ),
           const SizedBox(height: 20),
-          const StudentClassroomSkeletonBlock(width: 170, height: 18, radius: 8),
+          const StudentClassroomSkeletonBlock(
+            width: 170,
+            height: 18,
+            radius: 8,
+          ),
           const SizedBox(height: 10),
           const StudentClassroomSkeletonBlock(height: 104, radius: 18),
         ],

@@ -247,7 +247,7 @@ class _StudentHomeworkAttemptScreenState
       }
       if (error.status == 12706) {
         shouldResetSubmitting = false;
-        _returnFromNotOpenHomework();
+        await _returnFromNotOpenHomework();
       } else {
         setState(() {
           _errorMessage = error.message.trim().isEmpty
@@ -271,17 +271,12 @@ class _StudentHomeworkAttemptScreenState
     }
   }
 
-  void _returnFromNotOpenHomework() {
+  Future<void> _returnFromNotOpenHomework() async {
     final message = context.readText(AppKeys.studentHomeworkNotOpen);
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(milliseconds: 1800),
-        ),
-      );
+    await context.showErrorDialog(message);
+    if (!mounted) {
+      return;
+    }
     Navigator.of(context).maybePop();
   }
 

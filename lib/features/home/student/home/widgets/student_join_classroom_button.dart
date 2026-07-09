@@ -4,7 +4,11 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class StudentJoinClassroomButton extends StatelessWidget {
-  const StudentJoinClassroomButton({super.key, required this.scale, required this.onTap});
+  const StudentJoinClassroomButton({
+    super.key,
+    required this.scale,
+    required this.onTap,
+  });
 
   final double scale;
   final VoidCallback onTap;

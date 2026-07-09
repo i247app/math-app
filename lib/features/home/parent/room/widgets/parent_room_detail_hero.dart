@@ -79,10 +79,7 @@ class ParentRoomDetailHero extends StatelessWidget {
           ),
           if (description != null && description.isNotEmpty) ...[
             const SizedBox(height: 7),
-            ParentRoomDetailMeta(
-              icon: Icons.notes_rounded,
-              label: description,
-            ),
+            ParentRoomDetailMeta(icon: Icons.notes_rounded, label: description),
           ],
         ],
       ),

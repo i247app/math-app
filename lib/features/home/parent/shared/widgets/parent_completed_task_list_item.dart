@@ -68,9 +68,7 @@ class ParentCompletedTaskListItem extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 5),
-                  ParentTaskTitle(
-                    title: roomExerciseTitle(context, exercise),
-                  ),
+                  ParentTaskTitle(title: roomExerciseTitle(context, exercise)),
                 ],
               ),
             ),

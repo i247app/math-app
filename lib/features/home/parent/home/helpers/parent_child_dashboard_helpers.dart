@@ -6,9 +6,7 @@ import 'package:numi/features/home/home_api.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 
-ParentChildSummary? parentPrimarySummary(
-  List<ParentChildSummary> summaries,
-) {
+ParentChildSummary? parentPrimarySummary(List<ParentChildSummary> summaries) {
   for (final summary in summaries) {
     if (summary.classroom != null) {
       return summary;

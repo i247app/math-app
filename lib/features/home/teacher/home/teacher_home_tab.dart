@@ -414,7 +414,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       widget.activeProfile,
     );
     if (classroomId == null || profileId == null) {
-      _showSnack(context.readText(AppKeys.teacherClassOpenFailed));
+      _showError(context.readText(AppKeys.teacherClassOpenFailed));
       return;
     }
 
@@ -460,10 +460,8 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     );
   }
 
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+  void _showError(String message) {
+    context.showErrorDialog(message);
   }
 
   Widget _buildClassroomSection({

@@ -142,7 +142,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       }
       setState(() => _avatarPath = avatarPath);
     } catch (_) {
-      _showSnack(context.readText(AppKeys.imagePickFailed));
+      _showError(context.readText(AppKeys.imagePickFailed));
     }
   }
 
@@ -160,14 +160,14 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     final description = _descriptionController.text.trim();
 
     if (profileId == null) {
-      _showSnack(context.readText(AppKeys.teacherMissingProfileId));
+      _showError(context.readText(AppKeys.teacherMissingProfileId));
       return;
     }
     if (name.isEmpty ||
         gradeId == null ||
         programIds.isEmpty ||
         schoolId == null) {
-      _showSnack(context.readText(AppKeys.teacherClassMissingInfo));
+      _showError(context.readText(AppKeys.teacherClassMissingInfo));
       return;
     }
 
@@ -188,7 +188,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       context.read<ClassroomCubit>().invalidateOwned(profileId);
       Navigator.of(context).pop(TeacherCreateClassResult(classroom: classroom));
     } on ClassroomException catch (error) {
-      _showSnack(error.message);
+      _showError(error.message);
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
@@ -196,10 +196,8 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     }
   }
 
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+  void _showError(String message) {
+    context.showErrorDialog(message);
   }
 
   @override

@@ -12,21 +12,13 @@ bool studentHomeworkIsNotOpen(ClassroomExercise exercise) {
   return startDate.toLocal().isAfter(DateTime.now());
 }
 
-bool showStudentHomeworkNotOpenSnackIfNeeded(
+bool showStudentHomeworkNotOpenDialogIfNeeded(
   BuildContext context,
   ClassroomExercise exercise,
 ) {
   if (!studentHomeworkIsNotOpen(exercise)) {
     return false;
   }
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(context.getText(AppKeys.studentHomeworkNotOpen)),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(milliseconds: 1400),
-      ),
-    );
+  context.showErrorDialog(context.getText(AppKeys.studentHomeworkNotOpen));
   return true;
 }

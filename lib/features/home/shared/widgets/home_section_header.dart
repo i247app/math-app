@@ -31,7 +31,8 @@ class HomeSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveTitleStyle = titleStyle ??
+    final effectiveTitleStyle =
+        titleStyle ??
         TextStyle(
           color: const Color(0xFF001741),
           fontSize: FontSize.normal * scale,
@@ -40,7 +41,8 @@ class HomeSectionHeader extends StatelessWidget {
           letterSpacing: 0,
         );
 
-    final effectiveActionStyle = actionStyle ??
+    final effectiveActionStyle =
+        actionStyle ??
         TextStyle(
           color: const Color(0xFFBC3B14),
           fontSize: FontSize.small * scale,

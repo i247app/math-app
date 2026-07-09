@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class StudentClassroomMetaRow extends StatelessWidget {
-  const StudentClassroomMetaRow({super.key, required this.icon, required this.label});
+  const StudentClassroomMetaRow({
+    super.key,
+    required this.icon,
+    required this.label,
+  });
 
   final IconData icon;
   final String label;

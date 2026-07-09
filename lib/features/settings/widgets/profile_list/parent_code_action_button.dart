@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:numi/core/extension/localization_extension.dart';
-import 'package:numi/core/localization/app_keys.dart';
-
 class ParentCodeActionButton extends StatelessWidget {
   const ParentCodeActionButton({
     super.key,
@@ -20,10 +17,6 @@ class ParentCodeActionButton extends StatelessWidget {
     if (!context.mounted) {
       return;
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.getText(AppKeys.profileCodeCopied))),
-    );
   }
 
   @override

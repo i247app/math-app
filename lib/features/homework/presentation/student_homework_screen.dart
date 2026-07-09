@@ -140,37 +140,21 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
 
   Future<void> _openExercise(ClassroomExercise exercise) async {
     if (studentHomeworkIsSubmitted(exercise)) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              context.getText(AppKeys.studentHomeworkAlreadySubmitted),
-            ),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(milliseconds: 1400),
-          ),
-        );
+      context.showErrorDialog(
+        context.getText(AppKeys.studentHomeworkAlreadySubmitted),
+      );
       return;
     }
 
-    if (showStudentHomeworkNotOpenSnackIfNeeded(context, exercise)) {
+    if (showStudentHomeworkNotOpenDialogIfNeeded(context, exercise)) {
       return;
     }
 
     final exerciseId = exercise.stableId;
     if (exerciseId == null) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              context.getText(AppKeys.studentHomeworkMissingExercise),
-            ),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(milliseconds: 1400),
-          ),
-        );
+      context.showErrorDialog(
+        context.getText(AppKeys.studentHomeworkMissingExercise),
+      );
       return;
     }
 

@@ -112,25 +112,12 @@ class _TeacherCreateHomeworkScreenState
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              context.getText(
-                teacherExerciseCopy(widget.purpose).createdMessageKey,
-              ),
-            ),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(milliseconds: 1400),
-          ),
-        );
       Navigator.of(context).pop(true);
     } on ClassroomExerciseException catch (error) {
       if (!mounted) {
         return;
       }
-      _showSnack(
+      _showError(
         error.message.trim().isEmpty
             ? context.readText(
                 teacherExerciseCopy(widget.purpose).createFailedKey,
@@ -154,23 +141,23 @@ class _TeacherCreateHomeworkScreenState
   bool _validateCreateHomeworkForm() {
     final now = DateTime.now();
     if (_selectedProgramId == null) {
-      _showSnack(context.readText(AppKeys.teacherAssignmentProgramRequired));
+      _showError(context.readText(AppKeys.teacherAssignmentProgramRequired));
       return false;
     }
     if (_startDate == null) {
-      _showSnack(context.readText(AppKeys.teacherAssignmentStartDateRequired));
+      _showError(context.readText(AppKeys.teacherAssignmentStartDateRequired));
       return false;
     }
     if (_endDate == null) {
-      _showSnack(context.readText(AppKeys.teacherAssignmentEndDateRequired));
+      _showError(context.readText(AppKeys.teacherAssignmentEndDateRequired));
       return false;
     }
     if (!_startDate!.isAfter(now) || !_endDate!.isAfter(now)) {
-      _showSnack(context.readText(AppKeys.teacherAssignmentFutureDateRequired));
+      _showError(context.readText(AppKeys.teacherAssignmentFutureDateRequired));
       return false;
     }
     if (!_endDate!.isAfter(_startDate!)) {
-      _showSnack(context.readText(AppKeys.teacherAssignmentEndAfterStart));
+      _showError(context.readText(AppKeys.teacherAssignmentEndAfterStart));
       return false;
     }
     return true;
@@ -205,7 +192,7 @@ class _TeacherCreateHomeworkScreenState
       if (!mounted) {
         return;
       }
-      _showSnack(error.message);
+      _showError(error.message);
     } finally {
       if (mounted) {
         setState(() => _isLoadingClassrooms = false);
@@ -238,7 +225,7 @@ class _TeacherCreateHomeworkScreenState
       });
     } on ClassroomException catch (error) {
       if (mounted) {
-        _showSnack(error.message);
+        _showError(error.message);
       }
     } finally {
       if (mounted) {
@@ -289,7 +276,7 @@ class _TeacherCreateHomeworkScreenState
     }
     if (!mounted || _classrooms.isEmpty) {
       if (mounted) {
-        _showSnack(context.readText(AppKeys.teacherNoOptions));
+        _showError(context.readText(AppKeys.teacherNoOptions));
       }
       return;
     }
@@ -324,7 +311,7 @@ class _TeacherCreateHomeworkScreenState
       _programs,
     );
     if (options.isEmpty) {
-      _showSnack(context.readText(AppKeys.teacherNoOptions));
+      _showError(context.readText(AppKeys.teacherNoOptions));
       return;
     }
 
@@ -390,15 +377,15 @@ class _TeacherCreateHomeworkScreenState
       pickedTime.minute,
     );
     if (!selected.isAfter(now)) {
-      _showSnack(context.readText(AppKeys.teacherAssignmentFutureDateRequired));
+      _showError(context.readText(AppKeys.teacherAssignmentFutureDateRequired));
       return;
     }
     if (isStart && _endDate != null && !selected.isBefore(_endDate!)) {
-      _showSnack(context.readText(AppKeys.teacherAssignmentEndAfterStart));
+      _showError(context.readText(AppKeys.teacherAssignmentEndAfterStart));
       return;
     }
     if (!isStart && _startDate != null && !selected.isAfter(_startDate!)) {
-      _showSnack(context.readText(AppKeys.teacherAssignmentEndAfterStart));
+      _showError(context.readText(AppKeys.teacherAssignmentEndAfterStart));
       return;
     }
 
@@ -411,16 +398,8 @@ class _TeacherCreateHomeworkScreenState
     });
   }
 
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(milliseconds: 1400),
-        ),
-      );
+  void _showError(String message) {
+    context.showErrorDialog(message);
   }
 
   @override

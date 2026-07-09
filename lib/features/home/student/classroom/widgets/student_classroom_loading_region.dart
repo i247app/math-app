@@ -107,11 +107,17 @@ class _ClassroomSearchSkeleton extends StatelessWidget {
           SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: StudentClassroomSkeletonBlock(height: 30, radius: 15)),
+              Expanded(
+                child: StudentClassroomSkeletonBlock(height: 30, radius: 15),
+              ),
               SizedBox(width: 8),
-              Expanded(child: StudentClassroomSkeletonBlock(height: 30, radius: 15)),
+              Expanded(
+                child: StudentClassroomSkeletonBlock(height: 30, radius: 15),
+              ),
               SizedBox(width: 8),
-              Expanded(child: StudentClassroomSkeletonBlock(height: 30, radius: 15)),
+              Expanded(
+                child: StudentClassroomSkeletonBlock(height: 30, radius: 15),
+              ),
             ],
           ),
         ],

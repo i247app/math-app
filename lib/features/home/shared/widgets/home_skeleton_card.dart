@@ -62,10 +62,7 @@ class _HomeSkeletonCardState extends State<HomeSkeletonCard>
             ),
           ],
         ),
-        child: Padding(
-          padding: widget.padding,
-          child: widget.child,
-        ),
+        child: Padding(padding: widget.padding, child: widget.child),
       ),
     );
   }

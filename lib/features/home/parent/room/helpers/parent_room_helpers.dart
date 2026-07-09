@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
@@ -322,10 +321,7 @@ String roomExerciseCreatedDate(ClassroomExercise? exercise) {
   return roomDateLabel(exercise?.createDt ?? exercise?.startDate);
 }
 
-String roomExerciseDueLabel(
-  BuildContext context,
-  ClassroomExercise? exercise,
-) {
+String roomExerciseDueLabel(BuildContext context, ClassroomExercise? exercise) {
   final date = roomDateLabel(exercise?.endDate);
   if (date == '--/--/----') {
     return context.getText(AppKeys.teacherAssignmentDueLabel);
@@ -363,26 +359,10 @@ String roomDateLabel(String? value) {
 
 void showExpiredExerciseMessage(BuildContext context) {
   HapticFeedback.selectionClick();
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(context.getText(AppKeys.homeworkExpiredCannotSubmit)),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(milliseconds: 1600),
-      ),
-    );
+  context.showErrorDialog(context.getText(AppKeys.homeworkExpiredCannotSubmit));
 }
 
 void parentRoomShowComingSoon(BuildContext context) {
   HapticFeedback.selectionClick();
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(context.getText(AppKeys.studentClassComingSoon)),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(milliseconds: 1400),
-      ),
-    );
+  context.showInfoDialog(context.getText(AppKeys.studentClassComingSoon));
 }

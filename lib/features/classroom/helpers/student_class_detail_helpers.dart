@@ -103,15 +103,7 @@ String? studentClassDateTimeLabel(String? value) {
 
 void showStudentClassComingSoon(BuildContext context) {
   HapticFeedback.selectionClick();
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(context.getText(AppKeys.studentClassComingSoon)),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(milliseconds: 1400),
-      ),
-    );
+  context.showInfoDialog(context.getText(AppKeys.studentClassComingSoon));
 }
 
 String _twoDigits(int value) => value.toString().padLeft(2, '0');

@@ -366,26 +366,18 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     final relationship = classroom.relationshipStatus;
     if (relationship != ClassroomRelationship.none) {
       HapticFeedback.selectionClick();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            relationship == ClassroomRelationship.member
-                ? context.readText(AppKeys.studentAlreadyJoinedClass)
-                : context.readText(AppKeys.studentClassJoinRequestPending),
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
+      context.showInfoDialog(
+        relationship == ClassroomRelationship.member
+            ? context.readText(AppKeys.studentAlreadyJoinedClass)
+            : context.readText(AppKeys.studentClassJoinRequestPending),
       );
       return;
     }
 
     final code = classroomCode(classroom);
     if (code == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.readText(AppKeys.studentClassMissingCode)),
-          behavior: SnackBarBehavior.floating,
-        ),
+      context.showErrorDialog(
+        context.readText(AppKeys.studentClassMissingCode),
       );
       return;
     }
@@ -400,12 +392,6 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.readText(AppKeys.studentJoinClassSuccess)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
       widget.onJoinRequested?.call();
       context.read<ClassroomCubit>().invalidateJoined(widget.profileId);
       await _search(null, true);
@@ -413,15 +399,10 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error is ClassroomException
-                ? error.message
-                : context.readText(AppKeys.studentJoinClassFailed),
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
+      context.showErrorDialog(
+        error is ClassroomException
+            ? error.message
+            : context.readText(AppKeys.studentJoinClassFailed),
       );
     } finally {
       if (mounted) {

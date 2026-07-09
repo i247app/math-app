@@ -80,17 +80,17 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
 
   void _openHomeworkAttempt(BuildContext context, ClassroomExercise exercise) {
     if (studentClassHomeworkIsSubmitted(exercise)) {
-      _showSnack(context, AppKeys.studentHomeworkAlreadySubmitted);
+      _showError(context, AppKeys.studentHomeworkAlreadySubmitted);
       return;
     }
 
-    if (showStudentHomeworkNotOpenSnackIfNeeded(context, exercise)) {
+    if (showStudentHomeworkNotOpenDialogIfNeeded(context, exercise)) {
       return;
     }
 
     final exerciseId = exercise.stableId;
     if (exerciseId == null) {
-      _showSnack(context, AppKeys.studentHomeworkMissingExercise);
+      _showError(context, AppKeys.studentHomeworkMissingExercise);
       return;
     }
 
@@ -105,15 +105,7 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
     );
   }
 
-  void _showSnack(BuildContext context, String messageKey) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(context.getText(messageKey)),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(milliseconds: 1400),
-        ),
-      );
+  void _showError(BuildContext context, String messageKey) {
+    context.showErrorDialog(context.getText(messageKey));
   }
 }

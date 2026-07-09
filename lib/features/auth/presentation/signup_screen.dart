@@ -158,9 +158,7 @@ class _SignupScreenState extends State<SignupScreen> {
           previous.avatarError != current.avatarError &&
           current.avatarError != null,
       listener: (context, state) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(state.avatarError!)));
+        context.showErrorDialog(state.avatarError!);
       },
       builder: (context, state) {
         final localUsernameErrorText = username.isNotEmpty && !isUsernameValid

@@ -25,10 +25,6 @@ class ProfileIdLine extends StatelessWidget {
     if (!context.mounted) {
       return;
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.getText(AppKeys.profileCodeCopied))),
-    );
   }
 
   @override

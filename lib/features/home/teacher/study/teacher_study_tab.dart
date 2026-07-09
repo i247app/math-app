@@ -312,7 +312,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     final classroom = _createClassroomSelection;
     final classroomId = classroom?.stableId;
     if (profileId == null || classroom == null || classroomId == null) {
-      _showSnack(context.readText(AppKeys.teacherNoOptions));
+      _showError(context.readText(AppKeys.teacherNoOptions));
       return;
     }
 
@@ -379,12 +379,8 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     );
   }
 
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
-      );
+  void _showError(String message) {
+    context.showErrorDialog(message);
   }
 
   @override

@@ -133,12 +133,12 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
   Future<void> _saveEditing() async {
     final userId = _user?.id;
     if (userId == null || userId <= 0) {
-      _showMessage(context.readText(AppKeys.missingAccount));
+      _showError(context.readText(AppKeys.missingAccount));
       return;
     }
     final name = _usernameController.text.trim();
     if (name.isEmpty) {
-      _showMessage(context.readText(AppKeys.accountNameRequired));
+      _showError(context.readText(AppKeys.accountNameRequired));
       return;
     }
 
@@ -168,19 +168,18 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
         _didSave = true;
       });
       FocusScope.of(context).unfocus();
-      _showMessage(context.readText(AppKeys.accountUpdated));
     } on OtpAuthException catch (error) {
       if (!mounted) {
         return;
       }
       setState(() => _isSaving = false);
-      _showMessage(error.message);
+      _showError(error.message);
     } catch (_) {
       if (!mounted) {
         return;
       }
       setState(() => _isSaving = false);
-      _showMessage(context.readText(AppKeys.accountUpdateFailed));
+      _showError(context.readText(AppKeys.accountUpdateFailed));
     }
   }
 
@@ -206,14 +205,12 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
         return;
       }
       setState(() => _isPickingAvatar = false);
-      _showMessage(context.readText(AppKeys.imagePickFailed));
+      _showError(context.readText(AppKeys.imagePickFailed));
     }
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+  void _showError(String message) {
+    context.showErrorDialog(message);
   }
 
   void _close() {

@@ -152,21 +152,13 @@ class _TeacherHomeworkDetailScreenState
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              error.message.trim().isEmpty
-                  ? context.readText(
-                      teacherExerciseCopy(_effectivePurpose).createFailedKey,
-                    )
-                  : error.message,
-            ),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(milliseconds: 1400),
-          ),
-        );
+      context.showErrorDialog(
+        error.message.trim().isEmpty
+            ? context.readText(
+                teacherExerciseCopy(_effectivePurpose).createFailedKey,
+              )
+            : error.message,
+      );
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);

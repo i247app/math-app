@@ -395,13 +395,9 @@ class _HomeScreenState extends State<HomeScreen>
                                 onActivateProfile: widget.onActivateProfile,
                                 onError: (_) {
                                   if (!mounted) return;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        context.readText(
-                                          AppKeys.profileUpdateFailed,
-                                        ),
-                                      ),
+                                  context.showErrorDialog(
+                                    context.readText(
+                                      AppKeys.profileUpdateFailed,
                                     ),
                                   );
                                 },

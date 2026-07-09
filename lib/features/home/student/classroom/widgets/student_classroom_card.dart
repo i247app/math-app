@@ -7,7 +7,11 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
 
 class StudentClassroomCard extends StatelessWidget {
-  const StudentClassroomCard({super.key, required this.scale, required this.classroom});
+  const StudentClassroomCard({
+    super.key,
+    required this.scale,
+    required this.classroom,
+  });
 
   final double scale;
   final ClassroomModel classroom;

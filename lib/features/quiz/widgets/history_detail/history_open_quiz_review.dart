@@ -3,9 +3,7 @@ part of '../../history_tab.dart';
 void _historyOpenQuizReview(BuildContext context, GeneratedQuiz quiz) {
   final quizId = quiz.quizId ?? quiz.id;
   if (quizId == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.readText(AppKeys.missingQuizId))),
-    );
+    context.showErrorDialog(context.readText(AppKeys.missingQuizId));
     return;
   }
 

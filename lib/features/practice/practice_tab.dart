@@ -423,9 +423,7 @@ class _PracticeTabState extends State<PracticeTab> {
     });
 
     if (result == AiAssessmentResult.generationFailed) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.createQuestionFailed))),
-      );
+      context.showErrorDialog(context.readText(AppKeys.createQuestionFailed));
     }
   }
 

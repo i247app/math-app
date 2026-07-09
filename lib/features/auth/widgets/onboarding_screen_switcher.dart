@@ -74,9 +74,7 @@ class OnboardingScreenSwitcher extends StatelessWidget {
         if (authError != null &&
             state.screen != AppScreen.otp &&
             !_isInlineSignupUsernameError(state)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(localizedAuthError(context, authError))),
-          );
+          context.showErrorDialog(localizedAuthError(context, authError));
         }
       },
       builder: (context, state) {

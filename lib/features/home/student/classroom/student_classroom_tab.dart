@@ -127,12 +127,7 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
     );
     final classroomId = classroom.stableId;
     if (profileId == null || profileId <= 0 || classroomId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.readText(AppKeys.teacherClassOpenFailed)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      context.showErrorDialog(context.readText(AppKeys.teacherClassOpenFailed));
       return;
     }
 
@@ -249,9 +244,7 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
                   ),
                 ),
                 if (isInitialLoading)
-                  const Positioned.fill(
-                    child: StudentClassroomLoadingRegion(),
-                  ),
+                  const Positioned.fill(child: StudentClassroomLoadingRegion()),
               ],
             ),
           ),

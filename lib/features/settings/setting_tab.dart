@@ -469,7 +469,6 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
     setState(() => _hasPasscode = true);
-    _showSettingsSnack(AppKeys.passcodeSet);
   }
 
   Future<void> _changePasscode(int userId) async {
@@ -509,7 +508,6 @@ class _SettingTabState extends State<SettingTab> {
       return;
     }
     setState(() => _hasPasscode = true);
-    _showSettingsSnack(AppKeys.passcodeChanged);
   }
 
   Future<void> _removePasscode(int userId) async {
@@ -528,9 +526,8 @@ class _SettingTabState extends State<SettingTab> {
         return;
       }
       setState(() => _hasPasscode = false);
-      _showSettingsSnack(AppKeys.passcodeRemoved);
     } catch (_) {
-      _showSettingsSnack(AppKeys.passcodeRemoveFailed);
+      _showError(AppKeys.passcodeRemoveFailed);
     }
   }
 
@@ -568,13 +565,11 @@ class _SettingTabState extends State<SettingTab> {
     return verified == true;
   }
 
-  void _showSettingsSnack(String messageKey) {
+  void _showError(String messageKey) {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(context.getText(messageKey))));
+    context.showErrorDialog(context.getText(messageKey));
   }
 
   Future<void> _pushView(
@@ -867,17 +862,13 @@ class _SettingTabState extends State<SettingTab> {
     final user = _effectiveUser;
     final userId = user?.id;
     if (userId == null || userId <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.missingAccount))),
-      );
+      context.showErrorDialog(context.readText(AppKeys.missingAccount));
       return;
     }
 
     final name = _usernameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.accountNameRequired))),
-      );
+      context.showErrorDialog(context.readText(AppKeys.accountNameRequired));
       return;
     }
 
@@ -908,27 +899,20 @@ class _SettingTabState extends State<SettingTab> {
         _isSavingAccount = false;
       });
       FocusScope.of(context).unfocus();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.accountUpdated))),
-      );
     } on OtpAuthException catch (error) {
       if (!mounted) {
         return;
       }
 
       setState(() => _isSavingAccount = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error.message)));
+      context.showErrorDialog(error.message);
     } catch (_) {
       if (!mounted) {
         return;
       }
 
       setState(() => _isSavingAccount = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.accountUpdateFailed))),
-      );
+      context.showErrorDialog(context.readText(AppKeys.accountUpdateFailed));
     }
   }
 
@@ -977,9 +961,7 @@ class _SettingTabState extends State<SettingTab> {
       }
 
       setState(() => _isPickingAccountAvatar = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.imagePickFailed))),
-      );
+      context.showErrorDialog(context.readText(AppKeys.imagePickFailed));
     }
   }
 
@@ -1425,9 +1407,7 @@ class _SettingTabState extends State<SettingTab> {
   Future<void> _confirmDeleteProfile(StudentProfile profile) async {
     final profileId = profile.profileId;
     if (profileId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.missingProfileId))),
-      );
+      context.showErrorDialog(context.readText(AppKeys.missingProfileId));
       return;
     }
 
@@ -1497,9 +1477,7 @@ class _SettingTabState extends State<SettingTab> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.profileUpdateFailed))),
-      );
+      context.showErrorDialog(context.readText(AppKeys.profileUpdateFailed));
     } finally {
       if (mounted) {
         setState(() {
@@ -1520,9 +1498,6 @@ class _SettingTabState extends State<SettingTab> {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.profileDeleted))),
-      );
       if (deletedActiveProfile) {
         final userId = widget.user?.id;
         if (userId != null && userId > 0) {
@@ -1539,17 +1514,13 @@ class _SettingTabState extends State<SettingTab> {
         return;
       }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error.message)));
+      context.showErrorDialog(error.message);
     } catch (_) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.readText(AppKeys.profileDeleteFailed))),
-      );
+      context.showErrorDialog(context.readText(AppKeys.profileDeleteFailed));
     } finally {
       if (mounted) {
         setState(() => _isDeletingProfile = false);

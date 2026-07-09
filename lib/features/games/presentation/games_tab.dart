@@ -223,18 +223,11 @@ class _GamesTabState extends State<GamesTab> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            context.formatText(AppKeys.gamesLevelComingSoon, {
-              'level': lesson.number,
-            }),
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    context.showInfoDialog(
+      context.formatText(AppKeys.gamesLevelComingSoon, {
+        'level': lesson.number,
+      }),
+    );
   }
 
   @override

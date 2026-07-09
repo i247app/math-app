@@ -104,33 +104,12 @@ class _StudentInvitationListScreenState
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              context.readText(
-                accept
-                    ? AppKeys.studentInvitationAcceptSuccess
-                    : AppKeys.studentInvitationRejectSuccess,
-              ),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
       await _loadInvitations();
     } on ClassroomException catch (error) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(error.message),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      context.showErrorDialog(error.message);
     } finally {
       if (mounted) {
         setState(() => _processingClassroomIds.remove(classroomId));

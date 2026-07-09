@@ -2,15 +2,7 @@ part of '../../presentation/teacher_homework_screen.dart';
 
 void showTeacherHomeworkSoon(BuildContext context) {
   HapticFeedback.selectionClick();
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(context.getText(AppKeys.teacherCreateAssignmentSoon)),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(milliseconds: 1400),
-      ),
-    );
+  context.showInfoDialog(context.getText(AppKeys.teacherCreateAssignmentSoon));
 }
 
 String teacherExerciseTitle(BuildContext context, ClassroomExercise? exercise) {

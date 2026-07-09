@@ -189,13 +189,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
       widget.activeProfile,
     );
     if (classroomId == null || profileId == null) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(context.readText(AppKeys.teacherClassOpenFailed)),
-          ),
-        );
+      context.showErrorDialog(context.readText(AppKeys.teacherClassOpenFailed));
       return;
     }
 

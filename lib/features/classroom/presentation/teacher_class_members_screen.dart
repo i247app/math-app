@@ -50,7 +50,6 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
       return;
     }
     final cubit = context.read<ClassroomCubit>();
-    final messenger = ScaffoldMessenger.of(context);
     setState(() => _processingProfileIds.add(targetProfileId));
     try {
       if (approve) {
@@ -81,14 +80,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
       if (!mounted) {
         return;
       }
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(error.message, style: GoogleFonts.andika()),
-            duration: const Duration(milliseconds: 1600),
-          ),
-        );
+      context.showErrorDialog(error.message);
     } finally {
       if (mounted) {
         setState(() => _processingProfileIds.remove(targetProfileId));
@@ -145,7 +137,6 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
 
   Future<void> _openStudentSearchSheet(BuildContext context) async {
     final cubit = context.read<ClassroomCubit>();
-    final messenger = ScaffoldMessenger.of(context);
     final selected = await showModalBottomSheet<List<StudentProfile>>(
       context: context,
       isScrollControlled: true,
@@ -165,9 +156,6 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
     if (targetProfileIds.isEmpty) {
       return;
     }
-    final successText = context.formatText(AppKeys.teacherInviteRequestQueued, {
-      'count': targetProfileIds.length,
-    });
     setState(() => _isSendingInvites = true);
     try {
       await _classroomService.sendInvitations(
@@ -184,29 +172,11 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
         classroomId: widget.classroomId,
         forceRefresh: true,
       );
-      if (!mounted) {
-        return;
-      }
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(successText, style: GoogleFonts.andika()),
-            duration: const Duration(milliseconds: 1400),
-          ),
-        );
     } on ClassroomException catch (error) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(error.message, style: GoogleFonts.andika()),
-            duration: const Duration(milliseconds: 1600),
-          ),
-        );
+      context.showErrorDialog(error.message);
     } finally {
       if (mounted) {
         setState(() => _isSendingInvites = false);
