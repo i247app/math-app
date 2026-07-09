@@ -40,6 +40,7 @@ class AddProfileTextField extends StatelessWidget {
         ),
         decoration: InputDecoration(
           hintText: hintText,
+          filled: false,
           hintStyle: GoogleFonts.andika(
             color: const Color(0xFFA8B1B2),
             fontSize: FontSize.small * scale,
@@ -48,6 +49,11 @@ class AddProfileTextField extends StatelessWidget {
           ),
           isCollapsed: true,
           border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
           contentPadding: EdgeInsets.zero,
         ),
       ),
