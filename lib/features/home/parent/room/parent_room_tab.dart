@@ -9,7 +9,7 @@ import 'package:numi/features/home/cache/home_profile_cache.dart';
 import 'package:numi/features/home/home_api.dart';
 import 'package:numi/features/home/parent/cache/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_dashboard_args.dart';
-import 'package:numi/features/home/widgets/home_tab_header.dart';
+import 'package:numi/features/home/shell/widgets/home_tab_header.dart';
 import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi/features/settings/setting_tab.dart';
 import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
