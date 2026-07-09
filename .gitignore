@@ -10,9 +10,11 @@ QWEN.md
 go.work
 go.work.sum
 
-# env file
-.env*
-!.env.*example
+# env / config files
+# commit: config/env.dev.json, config/env.example.json
+# ignore: config/env.prod.json (contains real secrets)
+config/env.prod.json
+config/env.dev.json
 
 # Custom End Here
 

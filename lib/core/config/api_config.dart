@@ -1,52 +1,17 @@
-import 'package:flutter/services.dart';
-
+/// Application configuration loaded at compile-time via `--dart-define` or
+/// `--dart-define-from-file`. Values are injected by the build system and
+/// **never** bundled as plain-text assets, making them harder to extract from
+/// a release binary.
+///
+/// Usage:
+///   flutter run --dart-define-from-file=config/env.dev.json
+///   flutter build apk --dart-define-from-file=config/env.prod.json
 abstract final class ApiConfig {
-  static Map<String, String> _values = const {};
-
-  static String get baseUrl => _values['API_BASE_URL'] ?? '';
-
-  static Future<void> load() async {
-    try {
-      final content = await rootBundle.loadString('.env');
-      _values = _parse(content);
-    } catch (_) {
-      _values = const {};
-    }
-  }
-
-  static Map<String, String> _parse(String content) {
-    final values = <String, String>{};
-
-    for (final rawLine in content.split('\n')) {
-      final line = rawLine.trim();
-      if (line.isEmpty || line.startsWith('#')) {
-        continue;
-      }
-
-      final separatorIndex = line.indexOf('=');
-      if (separatorIndex <= 0) {
-        continue;
-      }
-
-      final key = line.substring(0, separatorIndex).trim();
-      final value = line.substring(separatorIndex + 1).trim();
-      values[key] = _stripQuotes(value);
-    }
-
-    return values;
-  }
-
-  static String _stripQuotes(String value) {
-    if (value.length < 2) {
-      return value;
-    }
-
-    final first = value[0];
-    final last = value[value.length - 1];
-    if ((first == '"' && last == '"') || (first == "'" && last == "'")) {
-      return value.substring(1, value.length - 1);
-    }
-
-    return value;
-  }
+  /// The base URL for all API requests.
+  ///
+  /// Set via: `--dart-define=API_BASE_URL=https://api.example.com`
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://x21.i247.com/go',
+  );
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:numi_flutter/core/config/api_config.dart';
 import 'package:numi_flutter/core/localization/lingo_provider.dart';
 import 'package:numi_flutter/core/network/api_metadata.dart';
 import 'package:numi_flutter/core/theme/app_theme_controller.dart';
@@ -44,7 +43,6 @@ class StartupBootstrap {
   final PasscodeService _passcodeService;
 
   Future<StartupBootstrapResult> run() async {
-    await ApiConfig.load();
     await AppApiMetadataProvider.instance.loadClientInfo();
 
     final lingoProvider = LingoProvider();
