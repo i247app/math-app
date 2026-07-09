@@ -57,7 +57,7 @@ class StartupBootstrap {
     try {
       await themeController.initialize();
     } catch (_) {
-      // ThemeMode.system is a safe fallback if storage cannot be read.
+      // Light theme is the startup fallback while dark theme is experimental.
     }
 
     final authService = _authService ?? OtpAuthApi();

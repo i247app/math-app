@@ -90,7 +90,7 @@ class _NumiAppState extends State<NumiApp> {
     try {
       await controller.initialize();
     } catch (_) {
-      // ThemeMode.system is already the in-memory default.
+      // Light theme is already the in-memory default.
     }
   }
 
