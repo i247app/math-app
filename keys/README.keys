@@ -1,0 +1,4 @@
+# generate-upload-keystore:
+# 100,000 days => 273 years expire
+# keytool -genkey -v -keystore numi-keystore.jks -keyalg RSA -keysize 2048 -validity 100000 -alias numi -dname "CN=numi, OU=numi, O=numi, L=Unknown, ST=Unknown, C=Unknown"
+# pass: Noway!23
