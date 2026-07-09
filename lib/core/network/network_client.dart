@@ -375,6 +375,17 @@ class NetworkApi {
     }
   }
 
+  Future<void> pingNotifications() async {
+    final responseJson = await _networkClient.postJson(
+      '/notifications/ping',
+      const <String, dynamic>{},
+    );
+    final mstatus = responseJson['mstatus'];
+    if (mstatus is int && mstatus != 200) {
+      throw NetworkException(_apiErrorMessage(responseJson), status: mstatus);
+    }
+  }
+
   Future<SubmitQuizResponse> submitQuiz(SubmitQuizRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/quizzes/submit',
