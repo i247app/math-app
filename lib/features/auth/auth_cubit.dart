@@ -46,7 +46,6 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthProfileResolver _profileResolver;
   final PasscodeService _passcodeService;
   final NotificationPingService _notificationPingService;
-  int? _lastNotificationPingUserId;
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
@@ -210,7 +209,6 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> logout() async {
     await _authService.logout();
-    _lastNotificationPingUserId = null;
     if (!isClosed) {
       emit(
         state.copyWith(
@@ -1049,9 +1047,9 @@ class AuthCubit extends Cubit<AuthState> {
     bool? isSigningUp,
   }) async {
     await _rememberAuthenticatedAccount(user);
-    _pingNotificationsAfterAuth(user);
     final hasPasscode = await _passcodeService.hasPasscode(user.id);
     if (hasPasscode) {
+      _pingNotificationsAfterAuth(user);
       emit(
         state.copyWith(
           screen: AppScreen.home,
@@ -1200,11 +1198,10 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void _pingNotificationsAfterAuth(LoginUser user) {
-    if (user.id <= 0 || _lastNotificationPingUserId == user.id) {
+    if (user.id <= 0) {
       return;
     }
 
-    _lastNotificationPingUserId = user.id;
     unawaited(_notificationPingService.ping());
   }
 

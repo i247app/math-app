@@ -21,9 +21,9 @@ class ApiNotificationPingService implements NotificationPingService {
   @override
   Future<void> ping() async {
     try {
-      final latestToken = NotificationService.latestToken;
-      if (latestToken != null) {
-        await _metadataProvider.updateDevicePushToken(latestToken);
+      final pushToken = await NotificationService.currentToken();
+      if (pushToken != null) {
+        await _metadataProvider.updateDevicePushToken(pushToken);
       }
 
       await _networkApi.pingNotifications();

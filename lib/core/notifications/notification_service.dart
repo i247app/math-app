@@ -66,6 +66,32 @@ class NotificationService {
   /// seed itself, since [tokens] is a broadcast stream that does not replay.
   static String? get latestToken => _latestToken;
 
+  static Future<String?> currentToken() async {
+    final cachedToken = _latestToken?.trim();
+    if (cachedToken != null && cachedToken.isNotEmpty) {
+      return cachedToken;
+    }
+
+    try {
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp();
+      }
+
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token == null || token.isEmpty) {
+        debugPrint('[Notification] FCM token is not available yet.');
+        return null;
+      }
+
+      _emitToken(token);
+      debugPrint('[Notification] FCM token: $token');
+      return token;
+    } catch (error, stackTrace) {
+      _logNotificationError('token load', error, stackTrace);
+      return null;
+    }
+  }
+
   static void _emitToken(String token) {
     _latestToken = token;
     _tokenController.add(token);
@@ -222,18 +248,7 @@ class NotificationService {
   }
 
   Future<void> _loadInitialToken() async {
-    try {
-      final token = await _firebaseMessaging.getToken();
-      if (token == null || token.isEmpty) {
-        debugPrint('[Notification] FCM token is not available yet.');
-        return;
-      }
-
-      _emitToken(token);
-      debugPrint('[Notification] FCM token: $token');
-    } catch (error, stackTrace) {
-      _logNotificationError('token load', error, stackTrace);
-    }
+    await currentToken();
   }
 
   void _listenForTokenRefresh() {
