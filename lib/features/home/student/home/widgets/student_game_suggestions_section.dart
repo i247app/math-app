@@ -1,7 +1,12 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_game_preview_card.dart';
+import 'package:numi_flutter/features/home/widgets/home_math_squadron_preview_artwork.dart';
 
-class _StudentGameSuggestionsSection extends StatelessWidget {
-  const _StudentGameSuggestionsSection({required this.onViewAll});
+class StudentGameSuggestionsSection extends StatelessWidget {
+  const StudentGameSuggestionsSection({super.key, required this.onViewAll});
 
   final VoidCallback onViewAll;
 

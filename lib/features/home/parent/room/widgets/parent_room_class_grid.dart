@@ -1,10 +1,14 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/features/home/parent/room/models/parent_room_entry.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_class_card.dart';
 
-class _ParentRoomClassGrid extends StatelessWidget {
-  const _ParentRoomClassGrid({required this.entries, required this.onTap});
+class ParentRoomClassGrid extends StatelessWidget {
+  const ParentRoomClassGrid({required this.entries, required this.onTap});
 
-  final List<_ParentRoomEntry> entries;
-  final ValueChanged<_ParentRoomEntry> onTap;
+  final List<ParentRoomEntry> entries;
+  final ValueChanged<ParentRoomEntry> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +17,7 @@ class _ParentRoomClassGrid extends StatelessWidget {
       return SizedBox(
         width: double.infinity,
         height: 101,
-        child: _ParentRoomClassCard(
+        child: ParentRoomClassCard(
           entry: entry,
           index: 0,
           onTap: () => onTap(entry),
@@ -34,7 +38,7 @@ class _ParentRoomClassGrid extends StatelessWidget {
       itemCount: entries.length,
       itemBuilder: (context, index) {
         final entry = entries[index];
-        return _ParentRoomClassCard(
+        return ParentRoomClassCard(
           entry: entry,
           index: index,
           onTap: () => onTap(entry),

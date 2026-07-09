@@ -1,8 +1,14 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_section_header.dart';
+import 'package:numi_flutter/features/home/student/invitations/widgets/student_invitation_card.dart';
+import 'package:numi_flutter/features/home/student/invitations/widgets/student_join_class_cta.dart';
 
-// ignore: unused_element
-class _StudentInvitationsSection extends StatelessWidget {
-  const _StudentInvitationsSection({
+class StudentInvitationsSection extends StatelessWidget {
+  const StudentInvitationsSection({
+    super.key,
     required this.invitations,
     required this.processingClassroomIds,
     required this.showJoinClassroom,
@@ -45,7 +51,7 @@ class _StudentInvitationsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (showInvitationPreview) ...[
-            _StudentSectionHeader(
+            HomeSectionHeader(
               title: context.getText(AppKeys.studentClassInvitations),
               actionLabel: context.formatText(
                 AppKeys.studentViewAllInvitations,
@@ -54,7 +60,7 @@ class _StudentInvitationsSection extends StatelessWidget {
               onAction: onViewAll,
             ),
             const SizedBox(height: 10),
-            _StudentInvitationCard(
+            StudentInvitationCard(
               invitation: invitation,
               isProcessing: processingClassroomIds.contains(
                 invitation.stableClassroomId,
@@ -65,7 +71,7 @@ class _StudentInvitationsSection extends StatelessWidget {
             ),
             const SizedBox(height: 6),
           ],
-          if (showJoinClassroom) _StudentJoinClassCta(onTap: onJoinClassroom),
+          if (showJoinClassroom) StudentJoinClassCta(onTap: onJoinClassroom),
         ],
       ),
     );

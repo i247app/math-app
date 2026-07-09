@@ -1,7 +1,8 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _ParentHomeEntrance extends StatefulWidget {
-  const _ParentHomeEntrance({
+class ParentHomeEntrance extends StatefulWidget {
+  const ParentHomeEntrance({
+    super.key,
     required this.order,
     required this.child,
     this.onFinished,
@@ -12,10 +13,10 @@ class _ParentHomeEntrance extends StatefulWidget {
   final VoidCallback? onFinished;
 
   @override
-  State<_ParentHomeEntrance> createState() => _ParentHomeEntranceState();
+  State<ParentHomeEntrance> createState() => _ParentHomeEntranceState();
 }
 
-class _ParentHomeEntranceState extends State<_ParentHomeEntrance> {
+class _ParentHomeEntranceState extends State<ParentHomeEntrance> {
   bool _isVisible = false;
   bool _hasNotifiedFinished = false;
 

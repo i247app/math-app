@@ -1,7 +1,13 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 
-class _ParentAssessmentEmptyPoster extends StatelessWidget {
-  const _ParentAssessmentEmptyPoster({
+class ParentAssessmentEmptyPoster extends StatelessWidget {
+  const ParentAssessmentEmptyPoster({
     required this.onTap,
     required this.scale,
   });
@@ -40,9 +46,9 @@ class _ParentAssessmentEmptyPoster extends StatelessWidget {
                   return child;
                 }
                 if (frame == null) {
-                  return _ParentAssessmentSkeletonPulse(
+                  return ParentAssessmentSkeletonPulse(
                     builder: (context, color) =>
-                        _ParentSkeletonBlock(radius: 24 * scale, color: color),
+                        HomeSkeletonBlock(radius: 24 * scale, color: color),
                   );
                 }
                 return TweenAnimationBuilder<double>(

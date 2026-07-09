@@ -1,12 +1,17 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi_flutter/features/home/parent/assessment/models/parent_assessment_entry.dart';
 
-class _ParentAssessmentChartPainter extends CustomPainter {
-  const _ParentAssessmentChartPainter({
+class ParentAssessmentChartPainter extends CustomPainter {
+  const ParentAssessmentChartPainter({
     required this.entries,
     required this.scale,
   });
 
-  final List<_ParentAssessmentEntry> entries;
+  final List<ParentAssessmentEntry> entries;
   final double scale;
 
   @override
@@ -93,7 +98,7 @@ class _ParentAssessmentChartPainter extends CustomPainter {
         fontSize: FontSize.caption * 0.5 * scale,
         fontWeight: FontWeight.w800,
       );
-      final date = _quizDate(entries[index].quiz).toLocal();
+      final date = quizDate(entries[index].quiz).toLocal();
       final label = date.millisecondsSinceEpoch == 0
           ? '--/--'
           : '${date.day.toString().padLeft(2, '0')}/'
@@ -132,7 +137,7 @@ class _ParentAssessmentChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ParentAssessmentChartPainter oldDelegate) {
+  bool shouldRepaint(covariant ParentAssessmentChartPainter oldDelegate) {
     return oldDelegate.entries != entries || oldDelegate.scale != scale;
   }
 }

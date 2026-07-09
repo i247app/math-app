@@ -1,7 +1,25 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi_flutter/features/homework/homework_api.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi_flutter/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi_flutter/features/home/parent/room/models/parent_room_entry.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_detail_hero.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_detail_shortcuts.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_detail_top_bar.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_list_section.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_completed_task_list_item.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_empty_task_line.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
 
-class _ParentRoomDetailScreen extends StatelessWidget {
-  const _ParentRoomDetailScreen({
+class ParentRoomDetailScreen extends StatelessWidget {
+  const ParentRoomDetailScreen({
     required this.entry,
     required this.pendingExercises,
     required this.expiredExercises,
@@ -10,7 +28,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
     required this.onRefreshLayout,
   });
 
-  final _ParentRoomEntry entry;
+  final ParentRoomEntry entry;
   final List<HomeLayoutPendingExercise> pendingExercises;
   final List<HomeLayoutPendingExercise> expiredExercises;
   final List<HomeLayoutRecentCompletion> completions;
@@ -19,14 +37,14 @@ class _ParentRoomDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = _roomClassName(context, entry.classroom);
+    final title = roomClassName(context, entry.classroom);
     return Scaffold(
       backgroundColor: context.themeColors.pageBackground,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            _ParentRoomDetailTopBar(
+            ParentRoomDetailTopBar(
               title: title,
               onBack: () => Navigator.of(context).maybePop(),
             ),
@@ -42,23 +60,23 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _ParentRoomDetailHero(entry: entry),
+                    ParentRoomDetailHero(entry: entry),
                     const SizedBox(height: 18),
-                    _ParentRoomDetailShortcuts(
+                    ParentRoomDetailShortcuts(
                       pendingCount:
                           pendingExercises.length + expiredExercises.length,
                       completedCount: completions.length,
                     ),
                     const SizedBox(height: 26),
-                    _ParentRoomListSection(
+                    ParentRoomListSection(
                       title: context.formatText(AppKeys.parentTasksCountTitle, {
                         'count':
                             pendingExercises.length + expiredExercises.length,
                       }),
-                      onViewAll: () => _parentRoomShowComingSoon(context),
+                      onViewAll: () => parentRoomShowComingSoon(context),
                       child:
                           pendingExercises.isEmpty && expiredExercises.isEmpty
-                          ? _ParentEmptyTaskLine(
+                          ? ParentEmptyTaskLine(
                               icon: Icons.assignment_turned_in_outlined,
                               text: context.getText(
                                 AppKeys.studentNoHomeworkTitle,
@@ -67,7 +85,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                           : Column(
                               children: [
                                 for (final pending in pendingExercises) ...[
-                                  _ParentPendingTaskListItem(pending: pending),
+                                  ParentPendingTaskListItem(pending: pending),
                                   if (pending != pendingExercises.last ||
                                       expiredExercises.isNotEmpty)
                                     const Divider(
@@ -77,11 +95,11 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                                     ),
                                 ],
                                 for (final expired in expiredExercises) ...[
-                                  _ParentPendingTaskListItem(
+                                  ParentPendingTaskListItem(
                                     pending: expired,
                                     isExpired: true,
                                     onTap: () =>
-                                        _showExpiredExerciseMessage(context),
+                                        showExpiredExerciseMessage(context),
                                   ),
                                   if (expired != expiredExercises.last)
                                     const Divider(
@@ -94,11 +112,11 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                             ),
                     ),
                     const SizedBox(height: 14),
-                    _ParentRoomListSection(
+                    ParentRoomListSection(
                       title: context.getText(AppKeys.assessmentResultTitle),
-                      onViewAll: () => _parentRoomShowComingSoon(context),
+                      onViewAll: () => parentRoomShowComingSoon(context),
                       child: completions.isEmpty
-                          ? _ParentEmptyTaskLine(
+                          ? ParentEmptyTaskLine(
                               icon: Icons.fact_check_outlined,
                               text: context.getText(
                                 AppKeys.noCompletedHomeworkTitle,
@@ -107,7 +125,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
                           : Column(
                               children: [
                                 for (final completion in completions) ...[
-                                  _ParentCompletedTaskListItem(
+                                  ParentCompletedTaskListItem(
                                     completion: completion,
                                     onTap: () => _openCompletionResult(
                                       context,
@@ -139,7 +157,7 @@ class _ParentRoomDetailScreen extends StatelessWidget {
     BuildContext context,
     HomeLayoutRecentCompletion completion,
   ) {
-    final quiz = _quizFromRecentCompletion(completion);
+    final quiz = quizFromRecentCompletion(completion);
     final quizId = quiz.quizId ?? quiz.id;
     if (quizId == null || quizId <= 0) {
       return;

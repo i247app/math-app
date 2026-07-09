@@ -1,7 +1,14 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/parent/assessment/helpers/parent_assessment_helpers.dart';
+import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_score_badge.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_meta_item.dart';
 
-class _AssessmentResultListItemCard extends StatelessWidget {
-  const _AssessmentResultListItemCard({
+class AssessmentResultListItemCard extends StatelessWidget {
+  const AssessmentResultListItemCard({
+    super.key,
     required this.quiz,
     required this.scale,
     required this.onTap,
@@ -14,9 +21,9 @@ class _AssessmentResultListItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final percent = quiz.grading?.scorePercentage;
-    final scoreStyle = _parentAssessmentScoreStyle(context, percent);
-    final dateParts = _parentAssessmentDateParts(quiz.createDt);
-    final shortText = _homeQuizShortText(quiz);
+    final scoreStyle = parentAssessmentScoreStyle(context, percent);
+    final dateParts = parentAssessmentDateParts(quiz.createDt);
+    final shortText = homeQuizShortText(quiz);
     final radius = BorderRadius.circular(24 * scale);
 
     return Material(
@@ -51,7 +58,7 @@ class _AssessmentResultListItemCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _ParentAssessmentScoreBadge(
+              ParentAssessmentScoreBadge(
                 percentage: percent,
                 color: scoreStyle.color,
                 scale: scale,
@@ -66,12 +73,12 @@ class _AssessmentResultListItemCard extends StatelessWidget {
                       spacing: 14 * scale,
                       runSpacing: 5 * scale,
                       children: [
-                        _ParentAssessmentMetaItem(
+                        ParentAssessmentMetaItem(
                           icon: Icons.calendar_month_outlined,
                           label: dateParts.dt,
                           scale: scale,
                         ),
-                        _ParentAssessmentMetaItem(
+                        ParentAssessmentMetaItem(
                           icon: Icons.schedule_rounded,
                           label: dateParts.tm,
                           scale: scale,
@@ -80,7 +87,7 @@ class _AssessmentResultListItemCard extends StatelessWidget {
                     ),
                     SizedBox(height: 7 * scale),
                     Text(
-                      _homeQuizTitle(context, quiz),
+                      homeQuizTitle(context, quiz),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

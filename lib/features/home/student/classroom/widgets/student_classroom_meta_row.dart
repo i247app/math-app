@@ -1,7 +1,8 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
-class _StudentClassroomMetaRow extends StatelessWidget {
-  const _StudentClassroomMetaRow({required this.icon, required this.label});
+class StudentClassroomMetaRow extends StatelessWidget {
+  const StudentClassroomMetaRow({super.key, required this.icon, required this.label});
 
   final IconData icon;
   final String label;

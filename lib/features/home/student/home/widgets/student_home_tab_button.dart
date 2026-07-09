@@ -1,7 +1,10 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 
-class _StudentHomeTabButton extends StatelessWidget {
-  const _StudentHomeTabButton({
+class StudentHomeTabButton extends StatelessWidget {
+  const StudentHomeTabButton({
+    super.key,
     required this.label,
     required this.selected,
     required this.scale,

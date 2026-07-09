@@ -1,7 +1,10 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
-class _ParentTaskTitle extends StatelessWidget {
-  const _ParentTaskTitle({required this.title});
+class ParentTaskTitle extends StatelessWidget {
+  const ParentTaskTitle({required this.title});
 
   final String title;
 

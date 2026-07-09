@@ -1,7 +1,8 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentClassroomSkeletonBlock extends StatelessWidget {
-  const _StudentClassroomSkeletonBlock({
+class StudentClassroomSkeletonBlock extends StatelessWidget {
+  const StudentClassroomSkeletonBlock({
+    super.key,
     this.width,
     required this.height,
     required this.radius,

@@ -1,4 +1,4 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
 
-typedef _ParentHomeEntranceBuilder =
+typedef ParentHomeEntranceBuilder =
     Widget Function({required Widget child, int order, bool markOnEnd});

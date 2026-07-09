@@ -1,15 +1,23 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
+import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
 
-class _ParentChildClassSummaryCard extends StatelessWidget {
-  const _ParentChildClassSummaryCard({required this.summary});
+class ParentChildClassSummaryCard extends StatelessWidget {
+  const ParentChildClassSummaryCard({required this.summary});
 
-  final _ParentChildSummary? summary;
+  final ParentChildSummary? summary;
 
   @override
   Widget build(BuildContext context) {
     final className = summary == null
         ? context.getText(AppKeys.parentNoClassroom)
-        : _parentClassroomName(context, summary!);
+        : parentClassroomName(context, summary!);
     final teacherName = summary?.classroom?.teacherName?.trim();
 
     return Container(

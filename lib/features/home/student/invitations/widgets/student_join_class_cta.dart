@@ -1,7 +1,12 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 
-class _StudentJoinClassCta extends StatelessWidget {
-  const _StudentJoinClassCta({required this.onTap});
+class StudentJoinClassCta extends StatelessWidget {
+  const StudentJoinClassCta({super.key, required this.onTap});
 
   final VoidCallback onTap;
 

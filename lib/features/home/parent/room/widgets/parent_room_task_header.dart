@@ -1,7 +1,11 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_meta_chip.dart';
 
-class _ParentRoomTaskHeader extends StatelessWidget {
-  const _ParentRoomTaskHeader({
+class ParentRoomTaskHeader extends StatelessWidget {
+  const ParentRoomTaskHeader({
     required this.dateLabel,
     required this.childName,
     required this.classroomName,
@@ -28,14 +32,14 @@ class _ParentRoomTaskHeader extends StatelessWidget {
           ),
         ),
         if (childName != null)
-          _ParentTaskMetaChip(
+          ParentTaskMetaChip(
             label: childName!,
             color: const Color(0xFFF2F4F6),
             textColor: const Color(0xFF4F5960),
             fontSize: FontSize.xxs,
           ),
         const SizedBox(width: 5),
-        _ParentTaskMetaChip(
+        ParentTaskMetaChip(
           label: classroomName,
           color: const Color(0xFFF2F4F6),
           textColor: const Color(0xFF4F5960),

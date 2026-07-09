@@ -1,23 +1,27 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_line.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_list_skeleton.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 
-class _ParentAssessmentFullSkeleton extends StatelessWidget {
-  const _ParentAssessmentFullSkeleton({required this.scale});
+class ParentAssessmentFullSkeleton extends StatelessWidget {
+  const ParentAssessmentFullSkeleton({required this.scale});
 
   final double scale;
 
   @override
   Widget build(BuildContext context) {
-    return _ParentAssessmentSkeletonPulse(
+    return ParentAssessmentSkeletonPulse(
       builder: (context, color) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ParentSkeletonBlock(
+          HomeSkeletonBlock(
             height: 111 * scale,
             radius: 10 * scale,
             color: color,
           ),
           SizedBox(height: 13 * scale),
-          _ParentSkeletonBlock(
+          HomeSkeletonBlock(
             height: 44 * scale,
             radius: 22 * scale,
             color: color,
@@ -25,7 +29,7 @@ class _ParentAssessmentFullSkeleton extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 18 * scale),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: _ParentSkeletonLine(
+                child: HomeSkeletonLine(
                   width: 150 * scale,
                   height: 10 * scale,
                   color: color,
@@ -34,13 +38,13 @@ class _ParentAssessmentFullSkeleton extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20 * scale),
-          _ParentSkeletonLine(
+          HomeSkeletonLine(
             width: 178 * scale,
             height: 18 * scale,
             color: color,
           ),
           SizedBox(height: 8 * scale),
-          _ParentSkeletonBlock(
+          HomeSkeletonBlock(
             height: 124 * scale,
             radius: 10 * scale,
             color: color,
@@ -58,7 +62,7 @@ class _ParentAssessmentFullSkeleton extends StatelessWidget {
                     Expanded(
                       child: Align(
                         alignment: Alignment.bottomCenter,
-                        child: _ParentSkeletonBlock(
+                        child: HomeSkeletonBlock(
                           width: 28 * scale,
                           height: (34 + index * 13) * scale,
                           radius: 14 * scale,
@@ -73,7 +77,7 @@ class _ParentAssessmentFullSkeleton extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16 * scale),
-          _ParentAssessmentListSkeleton(scale: scale),
+          ParentAssessmentListSkeleton(scale: scale),
         ],
       ),
     );

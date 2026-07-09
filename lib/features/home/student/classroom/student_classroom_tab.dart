@@ -1,7 +1,29 @@
-part of '../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
+import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
+import 'package:numi_flutter/features/classroom/classroom_api.dart';
+import 'package:numi_flutter/features/classroom/presentation/student_class_detail_screen.dart';
+import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_class_search_content.dart';
+import 'package:numi_flutter/features/home/student/shared/widgets/student_inline_error_panel.dart';
+import 'package:numi_flutter/features/home/student/shared/widgets/student_state_card.dart';
+import 'package:numi_flutter/features/home/student/classroom/widgets/student_classroom_tab_card.dart';
+import 'package:numi_flutter/features/home/student/classroom/widgets/student_join_another_classroom_title.dart';
+import 'package:numi_flutter/features/home/student/classroom/widgets/student_classroom_loading_region.dart';
 
-class _StudentClassroomTab extends StatefulWidget {
-  const _StudentClassroomTab({
+class StudentClassroomTab extends StatefulWidget {
+  const StudentClassroomTab({
+    super.key,
     required this.bottomPadding,
     required this.scale,
     required this.user,
@@ -20,10 +42,10 @@ class _StudentClassroomTab extends StatefulWidget {
   final int activeRefreshTick;
 
   @override
-  State<_StudentClassroomTab> createState() => _StudentClassroomTabState();
+  State<StudentClassroomTab> createState() => _StudentClassroomTabState();
 }
 
-class _StudentClassroomTabState extends State<_StudentClassroomTab> {
+class _StudentClassroomTabState extends State<StudentClassroomTab> {
   late final ClassroomService _classroomService = widget.classroomService;
 
   int? get _profileId =>
@@ -62,7 +84,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
   }
 
   @override
-  void didUpdateWidget(covariant _StudentClassroomTab oldWidget) {
+  void didUpdateWidget(covariant StudentClassroomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
       _loadClassrooms(forceRefresh: true);
@@ -179,12 +201,12 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                         ),
                         children: [
                           if (_error != null && _classrooms.isEmpty)
-                            _StudentInlineErrorPanel(
+                            StudentInlineErrorPanel(
                               message: _error!,
                               onRetry: _refreshClassrooms,
                             )
                           else if (_classrooms.isEmpty)
-                            const _StudentStateCard(
+                            const StudentStateCard(
                               titleKey: AppKeys.studentNoClassroomsTitle,
                               messageKey: AppKeys.studentNoClassroomsMessage,
                             )
@@ -200,7 +222,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                                     for (final classroom in _classrooms)
                                       SizedBox(
                                         width: cardWidth,
-                                        child: _StudentClassroomTabCard(
+                                        child: StudentClassroomTabCard(
                                           classroom: classroom,
                                           onTap: () =>
                                               _openClassDetail(classroom),
@@ -211,7 +233,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                               },
                             ),
                           SizedBox(height: 30 * scale),
-                          const _StudentJoinAnotherClassroomTitle(),
+                          const StudentJoinAnotherClassroomTitle(),
                           SizedBox(height: 14 * scale),
                           if (canLoadContent)
                             StudentClassSearchContent(
@@ -228,7 +250,7 @@ class _StudentClassroomTabState extends State<_StudentClassroomTab> {
                 ),
                 if (isInitialLoading)
                   const Positioned.fill(
-                    child: _StudentClassroomLoadingRegion(),
+                    child: StudentClassroomLoadingRegion(),
                   ),
               ],
             ),

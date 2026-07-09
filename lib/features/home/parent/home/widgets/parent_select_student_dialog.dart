@@ -1,7 +1,14 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_profile_dialog_action.dart';
 
-class _ParentSelectStudentDialog extends StatelessWidget {
-  const _ParentSelectStudentDialog();
+class ParentSelectStudentDialog extends StatelessWidget {
+  const ParentSelectStudentDialog();
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +94,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                   child: FilledButton(
                     onPressed: () => Navigator.of(
                       context,
-                    ).pop(_ParentProfileDialogAction.choose),
+                    ).pop(ParentProfileDialogAction.choose),
                     style: FilledButton.styleFrom(
                       backgroundColor: const Color(0xFFAA2A6C),
                       shape: RoundedRectangleBorder(
@@ -112,7 +119,7 @@ class _ParentSelectStudentDialog extends StatelessWidget {
                   child: TextButton(
                     onPressed: () => Navigator.of(
                       context,
-                    ).pop(_ParentProfileDialogAction.create),
+                    ).pop(ParentProfileDialogAction.create),
                     style: TextButton.styleFrom(
                       foregroundColor: const Color(0xFFAA2A6C),
                       shape: RoundedRectangleBorder(

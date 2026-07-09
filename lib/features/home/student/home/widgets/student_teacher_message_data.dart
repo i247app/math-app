@@ -1,7 +1,7 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _StudentTeacherMessageData {
-  const _StudentTeacherMessageData({
+class StudentTeacherMessageData {
+  const StudentTeacherMessageData({
     required this.avatarAsset,
     required this.teacherKey,
     required this.classKey,

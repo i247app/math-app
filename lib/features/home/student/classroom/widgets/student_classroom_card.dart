@@ -1,7 +1,13 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 
-class _StudentClassroomCard extends StatelessWidget {
-  const _StudentClassroomCard({required this.scale, required this.classroom});
+class StudentClassroomCard extends StatelessWidget {
+  const StudentClassroomCard({super.key, required this.scale, required this.classroom});
 
   final double scale;
   final ClassroomModel classroom;

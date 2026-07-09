@@ -1,7 +1,16 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/home/student/invitations/widgets/student_invite_button.dart';
+import 'package:numi_flutter/features/home/student/invitations/widgets/student_invite_icon_button.dart';
 
-class _StudentInvitationCard extends StatelessWidget {
-  const _StudentInvitationCard({
+class StudentInvitationCard extends StatelessWidget {
+  const StudentInvitationCard({
+    super.key,
     required this.invitation,
     required this.isProcessing,
     this.compactActions = false,
@@ -110,7 +119,7 @@ class _StudentInvitationCard extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _StudentInviteButton(
+                        child: StudentInviteButton(
                           label: context.getText(AppKeys.accept),
                           color: const Color(0xFF38898C),
                           onTap: onAccept,
@@ -118,7 +127,7 @@ class _StudentInvitationCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _StudentInviteButton(
+                        child: StudentInviteButton(
                           label: context.getText(AppKeys.reject),
                           color: const Color(0xFFF37850),
                           onTap: onReject,
@@ -185,13 +194,13 @@ class _StudentInvitationCard extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _StudentInviteIconButton(
+              StudentInviteIconButton(
                 asset: studentParentHomeAcceptIconAsset,
                 label: context.getText(AppKeys.accept),
                 onTap: onAccept,
               ),
               const SizedBox(width: 8),
-              _StudentInviteIconButton(
+              StudentInviteIconButton(
                 asset: studentParentHomeRejectIconAsset,
                 label: context.getText(AppKeys.reject),
                 onTap: onReject,

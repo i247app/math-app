@@ -17,7 +17,7 @@ class AppThemeController extends ChangeNotifier {
   final FlutterSecureStorage _storage;
   final PlatformDispatcher _platformDispatcher;
 
-  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.light;
   bool _isInitialized = false;
 
   ThemeMode get themeMode => _themeMode;
@@ -57,7 +57,7 @@ class AppThemeController extends ChangeNotifier {
     return switch (value?.trim().toLowerCase()) {
       _darkValue => ThemeMode.dark,
       _lightValue => ThemeMode.light,
-      _ => ThemeMode.system,
+      _ => ThemeMode.light,
     };
   }
 

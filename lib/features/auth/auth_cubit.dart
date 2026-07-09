@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/localization/app_strings.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/notifications/notification_ping_service.dart';
 import 'package:numi_flutter/features/auth/models/auth_profile_resolution.dart';
 import 'package:numi_flutter/features/profile/services/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
@@ -24,6 +25,7 @@ class AuthCubit extends Cubit<AuthState> {
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
     AuthProfileResolver? profileResolver,
     PasscodeService passcodeService = const SecurePasscodeService(),
+    NotificationPingService? notificationPingService,
     AuthState? initialState,
   }) : _avatarPicker = avatarPicker,
        _authService = authService ?? OtpAuthApi(),
@@ -34,12 +36,16 @@ class AuthCubit extends Cubit<AuthState> {
              activeProfileSession: activeProfileSession,
            ),
        _passcodeService = passcodeService,
+       _notificationPingService =
+           notificationPingService ??
+           _defaultNotificationPingService(authService ?? OtpAuthApi()),
        super(initialState ?? const AuthState());
 
   final AvatarPickerService _avatarPicker;
   final OtpAuthService _authService;
   final AuthProfileResolver _profileResolver;
   final PasscodeService _passcodeService;
+  final NotificationPingService _notificationPingService;
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
@@ -969,6 +975,7 @@ class AuthCubit extends Cubit<AuthState> {
       final user = result.user ?? pinUser;
       if (_canSkipLoginOtp(result)) {
         final profileResolution = await _profileResolver.resolveForUser(user);
+        _pingNotificationsAfterAuth(user);
         await _rememberAuthenticatedAccount(user);
         emit(
           state.copyWith(
@@ -1042,6 +1049,7 @@ class AuthCubit extends Cubit<AuthState> {
     await _rememberAuthenticatedAccount(user);
     final hasPasscode = await _passcodeService.hasPasscode(user.id);
     if (hasPasscode) {
+      _pingNotificationsAfterAuth(user);
       emit(
         state.copyWith(
           screen: AppScreen.home,
@@ -1091,6 +1099,7 @@ class AuthCubit extends Cubit<AuthState> {
     AuthProfileResolution profileResolution,
   ) async {
     await _rememberAuthenticatedAccount(user);
+    _pingNotificationsAfterAuth(user);
     emit(
       state.copyWith(
         screen: AppScreen.home,
@@ -1125,6 +1134,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     await _rememberAuthenticatedAccount(user);
+    _pingNotificationsAfterAuth(user);
     if (isClosed) {
       return;
     }
@@ -1185,6 +1195,22 @@ class AuthCubit extends Cubit<AuthState> {
         clearProfileLoadError: profileResolution.errorMessage == null,
       ),
     );
+  }
+
+  void _pingNotificationsAfterAuth(LoginUser user) {
+    if (user.id <= 0) {
+      return;
+    }
+
+    unawaited(_notificationPingService.ping());
+  }
+
+  static NotificationPingService _defaultNotificationPingService(
+    OtpAuthService authService,
+  ) {
+    return authService is OtpAuthApi
+        ? ApiNotificationPingService()
+        : const NoopNotificationPingService();
   }
 
   Future<void> activateProfile(StudentProfile profile) async {

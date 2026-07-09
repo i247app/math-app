@@ -1,7 +1,10 @@
-part of '../../../home_screen.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
 
-class _ParentRoomEntry {
-  const _ParentRoomEntry({required this.layoutClassroom, required this.child});
+class ParentRoomEntry {
+  const ParentRoomEntry({required this.layoutClassroom, required this.child});
 
   final HomeLayoutClassroom layoutClassroom;
   final StudentProfile child;

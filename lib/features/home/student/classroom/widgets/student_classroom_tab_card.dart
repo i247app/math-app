@@ -1,7 +1,13 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/student/classroom/widgets/student_classroom_meta_row.dart';
 
-class _StudentClassroomTabCard extends StatelessWidget {
-  const _StudentClassroomTabCard({
+class StudentClassroomTabCard extends StatelessWidget {
+  const StudentClassroomTabCard({
+    super.key,
     required this.classroom,
     required this.onTap,
   });
@@ -53,12 +59,12 @@ class _StudentClassroomTabCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              _StudentClassroomMetaRow(
+              StudentClassroomMetaRow(
                 icon: Icons.person_rounded,
                 label: teacher,
               ),
               const SizedBox(height: 7),
-              _StudentClassroomMetaRow(
+              StudentClassroomMetaRow(
                 icon: Icons.groups_rounded,
                 label: context.formatText(AppKeys.teacherStudentCount, {
                   'count': classroom.displayStudentCount,

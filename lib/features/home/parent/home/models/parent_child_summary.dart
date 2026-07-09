@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
 
-class _ParentChildSummary {
-  const _ParentChildSummary({
+class ParentChildSummary {
+  const ParentChildSummary({
     required this.profile,
     this.classroom,
     this.assessments = const <GeneratedQuiz>[],

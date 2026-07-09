@@ -1,4 +1,11 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/profile/models/profile_role.dart';
+import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/student/home/student_home_tab.dart';
+import 'package:numi_flutter/features/home/student/classroom/student_classroom_tab.dart';
+import 'package:numi_flutter/features/practice/practice_tab.dart';
+import 'package:numi_flutter/features/quiz/history_tab.dart';
 
 class StudentDashboard extends StatelessWidget {
   const StudentDashboard({super.key, required this.args});
@@ -8,7 +15,7 @@ class StudentDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (args.activeTab == 0) {
-      return _StudentHomeContent(
+      return StudentHomeContent(
         padding: EdgeInsets.fromLTRB(
           14 * args.scale,
           args.headerHeight,
@@ -37,7 +44,7 @@ class StudentDashboard extends StatelessWidget {
     }
 
     if (args.activeTab == 1) {
-      return _StudentClassroomTab(
+      return StudentClassroomTab(
         bottomPadding: args.bottomPadding,
         scale: args.scale,
         user: args.user,

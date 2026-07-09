@@ -1,23 +1,29 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/home/student/home/models/student_home_panel.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_home_tab_button.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 
 // ignore: unused_element
-class _StudentHomeTabs extends StatelessWidget {
-  const _StudentHomeTabs({
+class StudentHomeTabs extends StatelessWidget {
+  const StudentHomeTabs({
+    super.key,
     required this.activePanel,
     required this.scale,
     required this.onChanged,
   });
 
-  final _StudentHomePanel activePanel;
+  final StudentHomePanel activePanel;
   final double scale;
-  final ValueChanged<_StudentHomePanel> onChanged;
+  final ValueChanged<StudentHomePanel> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final tabs = <(_StudentHomePanel, String)>[
-      (_StudentHomePanel.homework, context.getText(AppKeys.studentHomework)),
-      (_StudentHomePanel.classroom, context.getText(AppKeys.studentClassroom)),
-      (_StudentHomePanel.achievement, context.getText(AppKeys.yourAchievement)),
+    final tabs = <(StudentHomePanel, String)>[
+      (StudentHomePanel.homework, context.getText(AppKeys.studentHomework)),
+      (StudentHomePanel.classroom, context.getText(AppKeys.studentClassroom)),
+      (StudentHomePanel.achievement, context.getText(AppKeys.yourAchievement)),
     ];
     final activeIndex = tabs.indexWhere((tab) => tab.$1 == activePanel);
 
@@ -63,7 +69,7 @@ class _StudentHomeTabs extends StatelessWidget {
                   children: [
                     for (final tab in tabs)
                       Expanded(
-                        child: _StudentHomeTabButton(
+                        child: StudentHomeTabButton(
                           label: tab.$2,
                           selected: tab.$1 == activePanel,
                           scale: scale,

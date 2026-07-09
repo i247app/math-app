@@ -1,12 +1,16 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/features/home/parent/assessment/models/parent_assessment_entry.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_chart_painter.dart';
 
-class _ParentAssessmentProgressChart extends StatelessWidget {
-  const _ParentAssessmentProgressChart({
+class ParentAssessmentProgressChart extends StatelessWidget {
+  const ParentAssessmentProgressChart({
     required this.entries,
     required this.scale,
   });
 
-  final List<_ParentAssessmentEntry> entries;
+  final List<ParentAssessmentEntry> entries;
   final double scale;
 
   @override
@@ -20,7 +24,7 @@ class _ParentAssessmentProgressChart extends StatelessWidget {
       ),
       padding: EdgeInsets.fromLTRB(5 * scale, 7 * scale, 7 * scale, 4 * scale),
       child: CustomPaint(
-        painter: _ParentAssessmentChartPainter(entries: entries, scale: scale),
+        painter: ParentAssessmentChartPainter(entries: entries, scale: scale),
         child: const SizedBox.expand(),
       ),
     );

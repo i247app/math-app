@@ -1,7 +1,11 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_message_panel.dart';
 
-class _StudentErrorPanel extends StatelessWidget {
-  const _StudentErrorPanel({
+class StudentErrorPanel extends StatelessWidget {
+  const StudentErrorPanel({
+    super.key,
     required this.scale,
     required this.message,
     required this.onRetry,
@@ -13,7 +17,7 @@ class _StudentErrorPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _StudentMessagePanel(
+    return StudentMessagePanel(
       scale: scale,
       icon: Icons.wifi_off_rounded,
       title: message,

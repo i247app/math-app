@@ -1,7 +1,15 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/student/home/helpers/student_home_view_helpers.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_homework_status_chip.dart';
 
-class _StudentHomeworkPreviewCard extends StatelessWidget {
-  const _StudentHomeworkPreviewCard({
+class StudentHomeworkPreviewCard extends StatelessWidget {
+  const StudentHomeworkPreviewCard({
+    super.key,
     required this.exercise,
     required this.classroom,
     required this.index,
@@ -26,13 +34,13 @@ class _StudentHomeworkPreviewCard extends StatelessWidget {
         : const Color(0xFF32868A);
     final title = exercise == null
         ? context.getText(AppKeys.studentNoHomeworkTitle)
-        : _studentModeHomeworkTitle(exercise!);
+        : studentModeHomeworkTitle(exercise!);
     final className = classroom.name?.trim().isNotEmpty == true
         ? classroom.name!.trim()
         : context.getText(AppKeys.teacherClassFallback);
     final dueText = exercise == null
         ? context.getText(AppKeys.studentNoHomeworkMessage)
-        : _studentModeHomeworkDueDate(context, exercise!);
+        : studentModeHomeworkDueDate(context, exercise!);
 
     return Container(
       height: 88,
@@ -73,7 +81,7 @@ class _StudentHomeworkPreviewCard extends StatelessWidget {
                             child: Text(
                               exercise == null
                                   ? ''
-                                  : _studentModeHomeworkCreatedDate(exercise!),
+                                  : studentModeHomeworkCreatedDate(exercise!),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -83,7 +91,7 @@ class _StudentHomeworkPreviewCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          _StudentHomeworkStatusChip(
+                          StudentHomeworkStatusChip(
                             label: className,
                             color: const Color(0xFFF2F4F6),
                             textColor: const Color(0xFF4F5960),
@@ -106,9 +114,9 @@ class _StudentHomeworkPreviewCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          _StudentHomeworkStatusChip(
+                          StudentHomeworkStatusChip(
                             label: exercise?.purpose?.trim().isNotEmpty == true
-                                ? _studentModePurposeLabel(exercise!.purpose!)
+                                ? studentModePurposeLabel(exercise!.purpose!)
                                 : context.getText(AppKeys.studentHomework),
                             color: badgeColor,
                             textColor: badgeTextColor,

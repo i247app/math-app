@@ -1,15 +1,17 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_line.dart';
 
-class _ParentChildDashboardLoading extends StatefulWidget {
-  const _ParentChildDashboardLoading();
+class ParentChildDashboardLoading extends StatefulWidget {
+  const ParentChildDashboardLoading({super.key});
 
   @override
-  State<_ParentChildDashboardLoading> createState() =>
+  State<ParentChildDashboardLoading> createState() =>
       _ParentChildDashboardLoadingState();
 }
 
 class _ParentChildDashboardLoadingState
-    extends State<_ParentChildDashboardLoading>
+    extends State<ParentChildDashboardLoading>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -38,7 +40,7 @@ class _ParentChildDashboardLoadingState
               children: [
                 for (var index = 0; index < 2; index++) ...[
                   Expanded(
-                    child: _ParentSkeletonBlock(
+                    child: HomeSkeletonBlock(
                       height: 121,
                       radius: 18,
                       color: color,
@@ -49,19 +51,19 @@ class _ParentChildDashboardLoadingState
                         ),
                         child: Column(
                           children: [
-                            _ParentSkeletonLine(
+                            HomeSkeletonLine(
                               width: 70,
                               height: 12,
                               color: color,
                             ),
                             const SizedBox(height: 12),
-                            _ParentSkeletonLine(
+                            HomeSkeletonLine(
                               width: 88,
                               height: 28,
                               color: color,
                             ),
                             const SizedBox(height: 12),
-                            _ParentSkeletonLine(
+                            HomeSkeletonLine(
                               width: 96,
                               height: 10,
                               color: color,
@@ -77,7 +79,7 @@ class _ParentChildDashboardLoadingState
             ),
             const SizedBox(height: 14),
             for (var index = 0; index < 2; index++) ...[
-              _ParentSkeletonBlock(
+              HomeSkeletonBlock(
                 height: 98,
                 radius: 18,
                 color: color,
@@ -85,7 +87,7 @@ class _ParentChildDashboardLoadingState
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   child: Row(
                     children: [
-                      _ParentSkeletonBlock(
+                      HomeSkeletonBlock(
                         width: 50,
                         height: 50,
                         radius: 25,
@@ -97,19 +99,19 @@ class _ParentChildDashboardLoadingState
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _ParentSkeletonLine(
+                            HomeSkeletonLine(
                               width: 94,
                               height: 10,
                               color: color,
                             ),
                             const SizedBox(height: 10),
-                            _ParentSkeletonLine(
+                            HomeSkeletonLine(
                               width: double.infinity,
                               height: 16,
                               color: color,
                             ),
                             const SizedBox(height: 8),
-                            _ParentSkeletonLine(
+                            HomeSkeletonLine(
                               width: 120,
                               height: 10,
                               color: color,
@@ -124,7 +126,7 @@ class _ParentChildDashboardLoadingState
               const SizedBox(height: 10),
             ],
             for (var index = 0; index < 2; index++) ...[
-              _ParentSkeletonBlock(
+              HomeSkeletonBlock(
                 height: 190,
                 radius: 22,
                 color: color,
@@ -134,7 +136,7 @@ class _ParentChildDashboardLoadingState
                     children: [
                       Row(
                         children: [
-                          _ParentSkeletonBlock(
+                          HomeSkeletonBlock(
                             width: 48,
                             height: 48,
                             radius: 13,
@@ -145,13 +147,13 @@ class _ParentChildDashboardLoadingState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _ParentSkeletonLine(
+                                HomeSkeletonLine(
                                   width: 135,
                                   height: 15,
                                   color: color,
                                 ),
                                 const SizedBox(height: 8),
-                                _ParentSkeletonLine(
+                                HomeSkeletonLine(
                                   width: 70,
                                   height: 9,
                                   color: color,
@@ -163,7 +165,7 @@ class _ParentChildDashboardLoadingState
                       ),
                       const SizedBox(height: 12),
                       Expanded(
-                        child: _ParentSkeletonBlock(radius: 13, color: color),
+                        child: HomeSkeletonBlock(radius: 13, color: color),
                       ),
                     ],
                   ),

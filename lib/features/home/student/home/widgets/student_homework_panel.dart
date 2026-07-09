@@ -1,13 +1,16 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_empty_panel.dart';
 
-class _StudentHomeworkPanel extends StatelessWidget {
-  const _StudentHomeworkPanel({super.key, required this.scale});
+class StudentHomeworkPanel extends StatelessWidget {
+  const StudentHomeworkPanel({super.key, required this.scale});
 
   final double scale;
 
   @override
   Widget build(BuildContext context) {
-    return _StudentEmptyPanel(
+    return StudentEmptyPanel(
       scale: scale,
       icon: Icons.assignment_rounded,
       title: context.getText(AppKeys.studentNoHomeworkTitle),

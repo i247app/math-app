@@ -1,11 +1,14 @@
-part of '../../../home_screen.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:flutter/material.dart';
 
-DateTime _studentModeDate(String? value) {
+DateTime studentModeDate(String? value) {
   return DateTime.tryParse(value?.trim() ?? '')?.toLocal() ??
       DateTime.fromMillisecondsSinceEpoch(0);
 }
 
-String _studentModeHomeworkTitle(ClassroomExercise exercise) {
+String studentModeHomeworkTitle(ClassroomExercise exercise) {
   final title = exercise.title?.trim();
   if (title != null && title.isNotEmpty) {
     return title;
@@ -15,11 +18,11 @@ String _studentModeHomeworkTitle(ClassroomExercise exercise) {
       : 'Bài Tập Ôn Luyện';
 }
 
-String _studentModeHomeworkCreatedDate(ClassroomExercise exercise) {
+String studentModeHomeworkCreatedDate(ClassroomExercise exercise) {
   return _studentModeDateLabel(exercise.createDt ?? exercise.startDate) ?? '';
 }
 
-String _studentModeHomeworkDueDate(
+String studentModeHomeworkDueDate(
   BuildContext context,
   ClassroomExercise exercise,
 ) {
@@ -41,7 +44,7 @@ String? _studentModeDateLabel(String? value) {
       '${twoDigits(local.day)}/${twoDigits(local.month)}/${local.year}';
 }
 
-String _studentModePurposeLabel(String purpose) {
+String studentModePurposeLabel(String purpose) {
   final normalized = purpose.trim().toUpperCase();
   if (normalized == classroomExercisePurposeQuiz ||
       normalized == classroomExercisePurposeExam) {

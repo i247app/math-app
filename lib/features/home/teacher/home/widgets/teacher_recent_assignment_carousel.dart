@@ -1,7 +1,10 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_recent_assignment_card.dart';
 
-class _TeacherRecentAssignmentCarousel extends StatelessWidget {
-  const _TeacherRecentAssignmentCarousel({
+class TeacherRecentAssignmentCarousel extends StatelessWidget {
+  const TeacherRecentAssignmentCarousel({
+    super.key,
     required this.scale,
     required this.assignments,
     required this.onOpen,
@@ -26,7 +29,7 @@ class _TeacherRecentAssignmentCarousel extends StatelessWidget {
           final assignment = assignments[index];
           return SizedBox(
             width: 178 * scale,
-            child: _TeacherRecentAssignmentCard(
+            child: TeacherRecentAssignmentCard(
               scale: scale,
               assignment: assignment,
               onTap: () => onOpen(assignment),

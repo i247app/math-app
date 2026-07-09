@@ -1,7 +1,16 @@
-part of '../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi_flutter/features/classroom/classroom_api.dart';
+import 'package:numi_flutter/features/home/student/shared/widgets/student_inline_error_panel.dart';
+import 'package:numi_flutter/features/home/student/shared/widgets/student_state_card.dart';
+import 'package:numi_flutter/features/home/student/invitations/widgets/student_invitation_card.dart';
 
-class _StudentInvitationListScreen extends StatefulWidget {
-  const _StudentInvitationListScreen({
+class StudentInvitationListScreen extends StatefulWidget {
+  const StudentInvitationListScreen({
+    super.key,
     required this.profileId,
     required this.classroomService,
     required this.initialInvitations,
@@ -12,12 +21,12 @@ class _StudentInvitationListScreen extends StatefulWidget {
   final List<ClassroomInvitation> initialInvitations;
 
   @override
-  State<_StudentInvitationListScreen> createState() =>
+  State<StudentInvitationListScreen> createState() =>
       _StudentInvitationListScreenState();
 }
 
 class _StudentInvitationListScreenState
-    extends State<_StudentInvitationListScreen> {
+    extends State<StudentInvitationListScreen> {
   List<ClassroomInvitation> _invitations = const <ClassroomInvitation>[];
   final Set<int> _processingClassroomIds = <int>{};
   bool _isLoading = false;
@@ -82,6 +91,7 @@ class _StudentInvitationListScreenState
           inviteeProfileId: widget.profileId,
           inviterProfileId: inviterProfileId,
           classroomId: classroomId,
+          // Note: classroomId is an int.
         );
         _acceptedInvitation = true;
       } else {
@@ -179,18 +189,18 @@ class _StudentInvitationListScreenState
                     ),
                   )
                 else if (_error != null && _invitations.isEmpty)
-                  _StudentInlineErrorPanel(
+                  StudentInlineErrorPanel(
                     message: _error!,
                     onRetry: _loadInvitations,
                   )
                 else if (_invitations.isEmpty)
-                  const _StudentStateCard(
+                  const StudentStateCard(
                     titleKey: AppKeys.studentNoInvitationsTitle,
                     messageKey: AppKeys.studentNoInvitationsMessage,
                   )
                 else
                   for (var index = 0; index < _invitations.length; index++) ...[
-                    _StudentInvitationCard(
+                    StudentInvitationCard(
                       invitation: _invitations[index],
                       isProcessing: _processingClassroomIds.contains(
                         _invitations[index].stableClassroomId,

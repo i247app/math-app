@@ -1,7 +1,16 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi_flutter/features/home/teacher/shared/widgets/class_thumb.dart';
+import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_member_summary_text.dart';
 
-class _TeacherClassCard extends StatelessWidget {
-  const _TeacherClassCard({
+class TeacherClassCard extends StatelessWidget {
+  const TeacherClassCard({
+    super.key,
     required this.scale,
     required this.classroom,
     required this.onTap,

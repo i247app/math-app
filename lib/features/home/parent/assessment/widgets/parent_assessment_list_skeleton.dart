@@ -1,17 +1,20 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_line.dart';
+import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 
-class _ParentAssessmentListSkeleton extends StatelessWidget {
-  const _ParentAssessmentListSkeleton({required this.scale});
+class ParentAssessmentListSkeleton extends StatelessWidget {
+  const ParentAssessmentListSkeleton({required this.scale});
 
   final double scale;
 
   @override
   Widget build(BuildContext context) {
-    return _ParentAssessmentSkeletonPulse(
+    return ParentAssessmentSkeletonPulse(
       builder: (context, color) => Column(
         children: [
           for (var index = 0; index < 3; index++) ...[
-            _ParentSkeletonBlock(
+            HomeSkeletonBlock(
               height: 116 * scale,
               radius: 24 * scale,
               color: color,
@@ -24,7 +27,7 @@ class _ParentAssessmentListSkeleton extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    _ParentSkeletonBlock(
+                    HomeSkeletonBlock(
                       width: 54 * scale,
                       height: 54 * scale,
                       radius: 27 * scale,
@@ -36,19 +39,19 @@ class _ParentAssessmentListSkeleton extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _ParentSkeletonLine(
+                          HomeSkeletonLine(
                             width: 136 * scale,
                             height: 8 * scale,
                             color: color,
                           ),
                           SizedBox(height: 7 * scale),
-                          _ParentSkeletonLine(
+                          HomeSkeletonLine(
                             width: 176 * scale,
                             height: 13 * scale,
                             color: color,
                           ),
                           SizedBox(height: 6 * scale),
-                          _ParentSkeletonLine(
+                          HomeSkeletonLine(
                             width: 112 * scale,
                             height: 8 * scale,
                             color: color,

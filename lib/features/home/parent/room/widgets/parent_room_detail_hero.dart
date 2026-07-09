@@ -1,14 +1,23 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi_flutter/features/home/parent/room/models/parent_room_entry.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_detail_meta.dart';
 
-class _ParentRoomDetailHero extends StatelessWidget {
-  const _ParentRoomDetailHero({required this.entry});
+class ParentRoomDetailHero extends StatelessWidget {
+  const ParentRoomDetailHero({required this.entry});
 
-  final _ParentRoomEntry entry;
+  final ParentRoomEntry entry;
 
   @override
   Widget build(BuildContext context) {
-    final className = _roomClassName(context, entry.classroom);
-    final teacherName = _roomTeacherName(context, entry);
+    final className = roomClassName(context, entry.classroom);
+    final teacherName = roomTeacherName(context, entry);
     final grade = entry.classroom.gradeId == null
         ? context.getText(AppKeys.grade)
         : context.formatText(AppKeys.studentGradeFilter, {
@@ -56,21 +65,21 @@ class _ParentRoomDetailHero extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () => _parentRoomShowComingSoon(context),
+                onPressed: () => parentRoomShowComingSoon(context),
                 icon: const Icon(Icons.share_rounded),
               ),
             ],
           ),
           const SizedBox(height: 17),
-          _ParentRoomDetailMeta(icon: Icons.groups_2_outlined, label: grade),
+          ParentRoomDetailMeta(icon: Icons.groups_2_outlined, label: grade),
           const SizedBox(height: 7),
-          _ParentRoomDetailMeta(
+          ParentRoomDetailMeta(
             icon: Icons.workspace_premium_outlined,
             label: teacherName,
           ),
           if (description != null && description.isNotEmpty) ...[
             const SizedBox(height: 7),
-            _ParentRoomDetailMeta(
+            ParentRoomDetailMeta(
               icon: Icons.notes_rounded,
               label: description,
             ),

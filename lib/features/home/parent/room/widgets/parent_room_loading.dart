@@ -1,13 +1,15 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_shimmer.dart';
+import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_loading_content.dart';
 
-class _ParentRoomLoading extends StatefulWidget {
-  const _ParentRoomLoading({super.key});
+class ParentRoomLoading extends StatefulWidget {
+  const ParentRoomLoading({super.key});
 
   @override
-  State<_ParentRoomLoading> createState() => _ParentRoomLoadingState();
+  State<ParentRoomLoading> createState() => _ParentRoomLoadingState();
 }
 
-class _ParentRoomLoadingState extends State<_ParentRoomLoading>
+class _ParentRoomLoadingState extends State<ParentRoomLoading>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -22,14 +24,9 @@ class _ParentRoomLoadingState extends State<_ParentRoomLoading>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return _ParentSkeletonShimmer(
-          progress: _controller.value,
-          child: const _ParentRoomLoadingContent(),
-        );
-      },
+    return HomeSkeletonShimmer(
+      controller: _controller,
+      child: const ParentRoomLoadingContent(),
     );
   }
 }

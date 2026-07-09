@@ -1,7 +1,14 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
 
-class _StudentStateCard extends StatelessWidget {
-  const _StudentStateCard({required this.titleKey, required this.messageKey});
+class StudentStateCard extends StatelessWidget {
+  const StudentStateCard({
+    super.key,
+    required this.titleKey,
+    required this.messageKey,
+  });
 
   final String titleKey;
   final String messageKey;

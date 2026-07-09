@@ -1,7 +1,10 @@
-part of '../../../home_screen.dart';
+import 'dart:math' as math;
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _ParentDashedCirclePainter extends CustomPainter {
-  const _ParentDashedCirclePainter();
+class ParentDashedCirclePainter extends CustomPainter {
+  const ParentDashedCirclePainter();
 
   @override
   void paint(Canvas canvas, Size size) {

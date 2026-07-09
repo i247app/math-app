@@ -1,18 +1,20 @@
-part of '../teacher_home_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_skeleton_carousel.dart';
+import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_class_skeleton_card.dart';
 
-class _TeacherLoadingPanel extends StatelessWidget {
-  const _TeacherLoadingPanel({required this.scale});
+class TeacherLoadingPanel extends StatelessWidget {
+  const TeacherLoadingPanel({super.key, required this.scale});
 
   final double scale;
 
   @override
   Widget build(BuildContext context) {
-    return _TeacherSkeletonCarousel(
+    return TeacherSkeletonCarousel(
       scale: scale,
       itemWidth: 166 * scale,
       itemHeight: 176 * scale,
       itemCount: 2,
-      builder: (context) => _TeacherClassSkeletonCard(scale: scale),
+      builder: (context) => TeacherClassSkeletonCard(scale: scale),
     );
   }
 }

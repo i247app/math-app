@@ -1,17 +1,19 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _ParentAssessmentSkeletonPulse extends StatefulWidget {
-  const _ParentAssessmentSkeletonPulse({required this.builder});
+class ParentAssessmentSkeletonPulse extends StatefulWidget {
+  const ParentAssessmentSkeletonPulse({required this.builder});
 
   final Widget Function(BuildContext context, Color color) builder;
 
   @override
-  State<_ParentAssessmentSkeletonPulse> createState() =>
+  State<ParentAssessmentSkeletonPulse> createState() =>
       _ParentAssessmentSkeletonPulseState();
 }
 
 class _ParentAssessmentSkeletonPulseState
-    extends State<_ParentAssessmentSkeletonPulse>
+    extends State<ParentAssessmentSkeletonPulse>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,

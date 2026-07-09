@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/student/home/widgets/student_message_panel.dart';
 
-class _StudentEmptyPanel extends StatelessWidget {
-  const _StudentEmptyPanel({
+class StudentEmptyPanel extends StatelessWidget {
+  const StudentEmptyPanel({
+    super.key,
     required this.scale,
     required this.icon,
     required this.title,
@@ -15,7 +17,7 @@ class _StudentEmptyPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _StudentMessagePanel(
+    return StudentMessagePanel(
       scale: scale,
       icon: icon,
       title: title,

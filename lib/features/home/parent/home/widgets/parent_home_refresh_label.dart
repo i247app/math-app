@@ -1,7 +1,7 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
 
-class _ParentHomeRefreshLabel extends StatelessWidget {
-  const _ParentHomeRefreshLabel();
+class ParentHomeRefreshLabel extends StatelessWidget {
+  const ParentHomeRefreshLabel();
 
   @override
   Widget build(BuildContext context) {

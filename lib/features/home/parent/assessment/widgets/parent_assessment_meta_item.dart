@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
-class _ParentAssessmentMetaItem extends StatelessWidget {
-  const _ParentAssessmentMetaItem({
+class ParentAssessmentMetaItem extends StatelessWidget {
+  const ParentAssessmentMetaItem({
+    super.key,
     required this.icon,
     required this.label,
     required this.scale,

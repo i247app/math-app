@@ -1,22 +1,52 @@
-part of '../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/extension/localization_extension.dart';
+import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi_flutter/features/home/cache/home_profile_cache.dart';
+import 'package:numi_flutter/features/home/home_api.dart';
+import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/parent/cache/parent_home_snapshot.dart';
+import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi_flutter/features/home/widgets/home_missing_student_dialog.dart';
+import 'package:numi_flutter/features/quiz/quiz_api.dart';
+import 'package:numi_flutter/features/quiz/presentation/grade_selection_screen.dart';
+import 'package:numi_flutter/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi_flutter/features/settings/setting_tab.dart';
+import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi_flutter/features/home/parent/shared/widgets/parent_home_entrance.dart';
+import 'package:numi_flutter/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
+import 'package:numi_flutter/features/home/parent/home/parent_home_child_dashboard.dart';
+import 'package:numi_flutter/features/home/parent/home/parent_home_completed_assessment.dart';
+import 'package:numi_flutter/features/home/parent/home/parent_home_first_assessment.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_home_error_card.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_home_loading_card.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_home_refresh_label.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_learning_streak_card.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_profile_dialog_action.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_select_student_dialog.dart';
 
-class _ParentHomeContent extends StatefulWidget {
-  const _ParentHomeContent({required this.args});
+class ParentHomeContent extends StatefulWidget {
+  const ParentHomeContent({required this.args});
 
   final HomeDashboardArgs args;
 
   @override
-  State<_ParentHomeContent> createState() => _ParentHomeContentState();
+  State<ParentHomeContent> createState() => ParentHomeContentState();
 }
 
-class _ParentHomeContentState extends State<_ParentHomeContent> {
+class ParentHomeContentState extends State<ParentHomeContent> {
   late final HomeLayoutService _homeLayoutService = HomeLayoutApi();
-  bool _isLoading = true;
-  bool _hasLoadedHome = false;
-  String? _errorMessage;
-  HomeLayout? _homeLayout;
-  List<GeneratedQuiz> _completedAssessments = const <GeneratedQuiz>[];
-  List<_ParentChildSummary> _childSummaries = const <_ParentChildSummary>[];
+  bool isLoading = true;
+  bool hasLoadedHome = false;
+  String? errorMessage;
+  HomeLayout? homeLayout;
+  List<GeneratedQuiz> completedAssessments = const <GeneratedQuiz>[];
+  List<ParentChildSummary> childSummaries = const <ParentChildSummary>[];
   int _childLoadRequestId = 0;
   bool _hasPlayedInitialAssessmentEntrance = false;
   bool _hasPlayedCompletedAssessmentEntrance = false;
@@ -26,12 +56,12 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   void initState() {
     super.initState();
     if (widget.args.isActive) {
-      _loadHome();
+      loadHome();
     }
   }
 
   @override
-  void didUpdateWidget(covariant _ParentHomeContent oldWidget) {
+  void didUpdateWidget(covariant ParentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     final oldProfileId = ActiveProfileSession.profileStableId(
       oldWidget.args.activeProfile,
@@ -39,32 +69,32 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
     );
-    final oldChildIds = _studentProfiles(
+    final oldChildIds = studentProfiles(
       oldWidget.args.profiles,
     ).map(ActiveProfileSession.profileStableId).join(',');
-    final childIds = _studentProfiles(
+    final childIds = studentProfiles(
       widget.args.profiles,
     ).map(ActiveProfileSession.profileStableId).join(',');
     final shouldForceRefresh =
         oldWidget.args.user?.id != widget.args.user?.id ||
         oldChildIds != childIds;
     if (oldProfileId != profileId || shouldForceRefresh) {
-      _hasLoadedHome = false;
+      hasLoadedHome = false;
       _resetModeEntrances();
       if (widget.args.isActive) {
-        _loadHome(forceRefresh: shouldForceRefresh);
+        loadHome(forceRefresh: shouldForceRefresh);
       }
       return;
     }
     if (!oldWidget.args.isActive && widget.args.isActive) {
-      _loadHome(forceRefresh: true);
+      loadHome(forceRefresh: true);
       return;
     }
     if (!widget.args.isActive) {
       return;
     } else if (oldWidget.args.activeRefreshTick !=
         widget.args.activeRefreshTick) {
-      _loadHome(forceRefresh: true);
+      loadHome(forceRefresh: true);
     }
   }
 
@@ -75,15 +105,15 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
   }
 
   List<StudentProfile> get _children {
-    final layoutChildren = _homeLayout?.parent?.children;
+    final layoutChildren = homeLayout?.parent?.children;
     if (layoutChildren != null &&
-        (_hasLoadedHome || layoutChildren.isNotEmpty)) {
+        (hasLoadedHome || layoutChildren.isNotEmpty)) {
       return layoutChildren;
     }
-    return _studentProfiles(widget.args.profiles);
+    return studentProfiles(widget.args.profiles);
   }
 
-  Future<void> _loadHome({bool forceRefresh = false}) async {
+  Future<void> loadHome({bool forceRefresh = false}) async {
     final requestId = ++_childLoadRequestId;
     final profileId = ActiveProfileSession.profileStableId(
       widget.args.activeProfile,
@@ -93,12 +123,12 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         return;
       }
       setState(() {
-        _isLoading = false;
-        _hasLoadedHome = true;
-        _errorMessage = null;
-        _homeLayout = null;
-        _childSummaries = const <_ParentChildSummary>[];
-        _completedAssessments = const <GeneratedQuiz>[];
+        isLoading = false;
+        hasLoadedHome = true;
+        errorMessage = null;
+        homeLayout = null;
+        childSummaries = const <ParentChildSummary>[];
+        completedAssessments = const <GeneratedQuiz>[];
       });
       widget.args.onParentAssessmentStateChanged(false);
       return;
@@ -116,13 +146,13 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       }
     }
 
-    final hadRenderableContent = _hasLoadedHome;
+    final hadRenderableContent = hasLoadedHome;
     setState(() {
-      _isLoading = true;
-      _errorMessage = null;
+      isLoading = true;
+      errorMessage = null;
       if (!hadRenderableContent) {
-        _childSummaries = const <_ParentChildSummary>[];
-        _completedAssessments = const <GeneratedQuiz>[];
+        childSummaries = const <ParentChildSummary>[];
+        completedAssessments = const <GeneratedQuiz>[];
       }
     });
     if (!hadRenderableContent) {
@@ -135,15 +165,15 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         return;
       }
       final parent = layout.parent;
-      final summaries = _summariesFromLayout(parent);
-      final completedAssessments = _quizzesFromLayoutQuizzes(layout.quizzes);
+      final summaries = summariesFromLayout(parent);
+      final completedAssessments = quizzesFromLayoutQuizzes(layout.quizzes);
       setState(() {
-        _isLoading = false;
-        _hasLoadedHome = true;
-        _errorMessage = null;
-        _homeLayout = layout;
-        _childSummaries = summaries;
-        _completedAssessments = completedAssessments;
+        isLoading = false;
+        hasLoadedHome = true;
+        errorMessage = null;
+        homeLayout = layout;
+        childSummaries = summaries;
+        this.completedAssessments = completedAssessments;
       });
       cache.putParent(
         ParentHomeSnapshot(
@@ -162,18 +192,18 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       }
       if (hadRenderableContent) {
         setState(() {
-          _isLoading = false;
-          _errorMessage = error.message;
+          isLoading = false;
+          errorMessage = error.message;
         });
         return;
       }
       setState(() {
-        _isLoading = false;
-        _hasLoadedHome = true;
-        _errorMessage = error.message;
-        _homeLayout = null;
-        _childSummaries = const <_ParentChildSummary>[];
-        _completedAssessments = const <GeneratedQuiz>[];
+        isLoading = false;
+        hasLoadedHome = true;
+        errorMessage = error.message;
+        homeLayout = null;
+        childSummaries = const <ParentChildSummary>[];
+        completedAssessments = const <GeneratedQuiz>[];
       });
       widget.args.onParentAssessmentStateChanged(false);
     } catch (_) {
@@ -182,22 +212,20 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       }
       if (hadRenderableContent) {
         setState(() {
-          _isLoading = false;
-          _errorMessage = context.readText(
+          isLoading = false;
+          errorMessage = context.readText(
             AppKeys.parentChildDashboardLoadFailed,
           );
         });
         return;
       }
       setState(() {
-        _isLoading = false;
-        _hasLoadedHome = true;
-        _errorMessage = context.readText(
-          AppKeys.parentChildDashboardLoadFailed,
-        );
-        _homeLayout = null;
-        _childSummaries = const <_ParentChildSummary>[];
-        _completedAssessments = const <GeneratedQuiz>[];
+        isLoading = false;
+        hasLoadedHome = true;
+        errorMessage = context.readText(AppKeys.parentChildDashboardLoadFailed);
+        homeLayout = null;
+        childSummaries = const <ParentChildSummary>[];
+        completedAssessments = const <GeneratedQuiz>[];
       });
       widget.args.onParentAssessmentStateChanged(false);
     }
@@ -205,15 +233,15 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
   void _applySnapshot(ParentHomeSnapshot snapshot) {
     final parent = snapshot.homeLayout.parent;
-    _isLoading = false;
-    _hasLoadedHome = true;
-    _errorMessage = null;
-    _homeLayout = snapshot.homeLayout;
-    _childSummaries = _summariesFromLayout(parent);
-    _completedAssessments = snapshot.completedAssessments;
+    isLoading = false;
+    hasLoadedHome = true;
+    errorMessage = null;
+    homeLayout = snapshot.homeLayout;
+    childSummaries = summariesFromLayout(parent);
+    completedAssessments = snapshot.completedAssessments;
   }
 
-  Widget _initialAssessmentFadeIn({
+  Widget initialAssessmentFadeIn({
     required Widget child,
     int order = 0,
     bool markOnEnd = false,
@@ -222,7 +250,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       return child;
     }
 
-    return _ParentHomeEntrance(
+    return ParentHomeEntrance(
       order: order,
       onFinished: markOnEnd ? _markInitialAssessmentEntrancePlayed : null,
       child: child,
@@ -236,7 +264,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     setState(() => _hasPlayedInitialAssessmentEntrance = true);
   }
 
-  Widget _completedAssessmentFadeIn({
+  Widget completedAssessmentFadeIn({
     required Widget child,
     int order = 0,
     bool markOnEnd = false,
@@ -245,7 +273,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       return child;
     }
 
-    return _ParentHomeEntrance(
+    return ParentHomeEntrance(
       order: order,
       onFinished: markOnEnd ? _markCompletedAssessmentEntrancePlayed : null,
       child: child,
@@ -259,7 +287,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     setState(() => _hasPlayedCompletedAssessmentEntrance = true);
   }
 
-  Widget _childOverviewFadeIn({
+  Widget childOverviewFadeIn({
     required Widget child,
     int order = 0,
     bool markOnEnd = false,
@@ -268,7 +296,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       return child;
     }
 
-    return _ParentHomeEntrance(
+    return ParentHomeEntrance(
       order: order,
       onFinished: markOnEnd ? _markChildOverviewEntrancePlayed : null,
       child: child,
@@ -284,17 +312,17 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
   @override
   Widget build(BuildContext context) {
-    final hasJoinedClassroom = _childSummaries.any(
+    final hasJoinedClassroom = childSummaries.any(
       (summary) => summary.classroom != null,
     );
     final isInitialChildDashboardLoad =
-        _children.isNotEmpty && !_hasLoadedHome && _isLoading;
+        _children.isNotEmpty && !hasLoadedHome && isLoading;
     if (_children.isNotEmpty &&
         (hasJoinedClassroom || isInitialChildDashboardLoad)) {
-      return _buildChildDashboard();
+      return buildChildDashboard();
     }
 
-    final hasCompletedAssessment = _completedAssessments.isNotEmpty;
+    final hasCompletedAssessment = completedAssessments.isNotEmpty;
     final padding = EdgeInsets.fromLTRB(
       14 * widget.args.scale,
       widget.args.headerHeight,
@@ -304,7 +332,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
 
     return RefreshIndicator(
       color: const Color(0xFF159A86),
-      onRefresh: _loadHome,
+      onRefresh: loadHome,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
@@ -313,38 +341,38 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (!_isLoading && !hasCompletedAssessment)
-              _initialAssessmentFadeIn(
+            if (!isLoading && !hasCompletedAssessment)
+              initialAssessmentFadeIn(
                 order: 0,
-                child: _ParentLearningStreakCard(
+                child: ParentLearningStreakCard(
                   hasCompletedAssessment: hasCompletedAssessment,
                 ),
               )
-            else if (!_isLoading && hasCompletedAssessment)
-              _completedAssessmentFadeIn(
+            else if (!isLoading && hasCompletedAssessment)
+              completedAssessmentFadeIn(
                 order: 0,
-                child: _ParentLearningStreakCard(
+                child: ParentLearningStreakCard(
                   hasCompletedAssessment: hasCompletedAssessment,
                 ),
               )
             else
-              _ParentLearningStreakCard(
+              ParentLearningStreakCard(
                 hasCompletedAssessment: hasCompletedAssessment,
               ),
             const SizedBox(height: 12),
-            if (_isLoading && !_hasLoadedHome)
-              const _ParentHomeLoadingCard()
+            if (isLoading && !hasLoadedHome)
+              const ParentHomeLoadingCard()
             else if (hasCompletedAssessment)
-              _buildCompletedState()
+              buildCompletedState()
             else
-              _buildFirstAssessmentState(),
-            if (_isLoading && _hasLoadedHome) ...[
+              buildFirstAssessmentState(),
+            if (isLoading && hasLoadedHome) ...[
               const SizedBox(height: 8),
-              const _ParentHomeRefreshLabel(),
+              const ParentHomeRefreshLabel(),
             ],
-            if (_errorMessage != null) ...[
+            if (errorMessage != null) ...[
               const SizedBox(height: 10),
-              _ParentHomeErrorCard(message: _errorMessage!, onRetry: _loadHome),
+              ParentHomeErrorCard(message: errorMessage!, onRetry: loadHome),
             ],
           ],
         ),
@@ -352,7 +380,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     );
   }
 
-  Future<void> _openAssessment() async {
+  Future<void> openAssessment() async {
     HapticFeedback.lightImpact();
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -370,16 +398,16 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       ),
     );
     if (mounted) {
-      await _loadHome();
+      await loadHome();
     }
   }
 
-  void _openParentAssessmentResult(GeneratedQuiz quiz) {
+  void openParentAssessmentResult(GeneratedQuiz quiz) {
     _openQuizReview(quiz);
   }
 
-  void _openCompletionResult(HomeLayoutRecentCompletion completion) {
-    _openQuizReview(_quizFromRecentCompletion(completion));
+  void openCompletionResult(HomeLayoutRecentCompletion completion) {
+    _openQuizReview(quizFromRecentCompletion(completion));
   }
 
   void _openQuizReview(GeneratedQuiz quiz) {
@@ -395,7 +423,7 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
     );
   }
 
-  Future<void> _showClassroomMessage() async {
+  Future<void> showClassroomMessage() async {
     HapticFeedback.selectionClick();
     if (_children.isEmpty) {
       final shouldCreate = await showDialog<bool>(
@@ -409,19 +437,19 @@ class _ParentHomeContentState extends State<_ParentHomeContent> {
       return;
     }
 
-    final action = await showDialog<_ParentProfileDialogAction>(
+    final action = await showDialog<ParentProfileDialogAction>(
       context: context,
       barrierColor: const Color(0xFF001741).withValues(alpha: 0.48),
-      builder: (_) => const _ParentSelectStudentDialog(),
+      builder: (_) => const ParentSelectStudentDialog(),
     );
     if (!mounted) {
       return;
     }
     switch (action) {
-      case _ParentProfileDialogAction.choose:
+      case ParentProfileDialogAction.choose:
         widget.args.onOpenProfileMenu();
         return;
-      case _ParentProfileDialogAction.create:
+      case ParentProfileDialogAction.create:
         await _openCreateStudentProfile();
         return;
       case null:

@@ -1,7 +1,9 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _ParentRoomSkeletonBlock extends StatelessWidget {
-  const _ParentRoomSkeletonBlock({this.height});
+class ParentRoomSkeletonBlock extends StatelessWidget {
+  const ParentRoomSkeletonBlock({this.height});
 
   final double? height;
 

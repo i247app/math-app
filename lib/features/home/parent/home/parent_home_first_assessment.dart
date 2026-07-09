@@ -1,16 +1,21 @@
-part of '../../home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:numi_flutter/features/home/widgets/home_image_action.dart';
+import 'package:numi_flutter/features/home/widgets/home_initial_assessment_banner.dart';
+import 'package:numi_flutter/features/home/widgets/home_start_guide_card.dart';
+import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi_flutter/features/home/parent/home/parent_home_tab.dart';
 
-extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
-  Widget _buildFirstAssessmentState() {
+extension ParentHomeFirstAssessmentView on ParentHomeContentState {
+  Widget buildFirstAssessmentState() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _initialAssessmentFadeIn(
+        initialAssessmentFadeIn(
           order: 1,
-          child: HomeInitialAssessmentBanner(onTap: _openAssessment),
+          child: HomeInitialAssessmentBanner(onTap: openAssessment),
         ),
         const SizedBox(height: 8),
-        _initialAssessmentFadeIn(
+        initialAssessmentFadeIn(
           order: 2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,20 +33,20 @@ extension _ParentHomeFirstAssessmentView on _ParentHomeContentState {
                 child: HomeImageAction(
                   asset: parentHomeClassroomAsset,
                   height: 160,
-                  onTap: _showClassroomMessage,
+                  onTap: showClassroomMessage,
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
-        _initialAssessmentFadeIn(
+        initialAssessmentFadeIn(
           order: 3,
           markOnEnd: true,
           child: HomeStartGuideCard(
-            onAssessmentTap: _openAssessment,
+            onAssessmentTap: openAssessment,
             onRoadmapTap: widget.args.onOpenPracticeTab,
-            onClassroomTap: _showClassroomMessage,
+            onClassroomTap: showClassroomMessage,
           ),
         ),
       ],

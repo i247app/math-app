@@ -1,10 +1,15 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_dashed_circle_painter.dart';
+import 'package:numi_flutter/features/home/parent/home/widgets/parent_streak_day_state.dart';
 
-class _ParentStreakDay extends StatelessWidget {
-  const _ParentStreakDay({required this.label, required this.state});
+class ParentStreakDay extends StatelessWidget {
+  const ParentStreakDay({required this.label, required this.state});
 
   final String label;
-  final _ParentStreakDayState state;
+  final ParentStreakDayState state;
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +29,14 @@ class _ParentStreakDay extends StatelessWidget {
           width: 31,
           height: 31,
           child: switch (state) {
-            _ParentStreakDayState.done => const DecoratedBox(
+            ParentStreakDayState.done => const DecoratedBox(
               decoration: BoxDecoration(
                 color: Color(0xFF4FB465),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.check_rounded, color: Colors.white, size: 19),
             ),
-            _ParentStreakDayState.current => const DecoratedBox(
+            ParentStreakDayState.current => const DecoratedBox(
               decoration: BoxDecoration(
                 color: Color(0xFFFF5F19),
                 shape: BoxShape.circle,
@@ -42,8 +47,8 @@ class _ParentStreakDay extends StatelessWidget {
                 size: 21,
               ),
             ),
-            _ParentStreakDayState.upcoming => const CustomPaint(
-              painter: _ParentDashedCirclePainter(),
+            ParentStreakDayState.upcoming => const CustomPaint(
+              painter: ParentDashedCirclePainter(),
               child: Center(
                 child: Text(
                   '5',

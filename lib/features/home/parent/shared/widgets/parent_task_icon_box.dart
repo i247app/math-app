@@ -1,7 +1,10 @@
-part of '../../../home_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class _ParentTaskIconBox extends StatelessWidget {
-  const _ParentTaskIconBox({
+class ParentTaskIconBox extends StatelessWidget {
+  const ParentTaskIconBox({
     required this.icon,
     required this.color,
     required this.backgroundColor,
