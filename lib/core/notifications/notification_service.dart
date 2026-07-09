@@ -123,7 +123,7 @@ class NotificationService {
     await _requestPermission();
     await _initializeLocalNotifications();
     await _requestLocalNotificationPermission();
-    await _enableIosForegroundPresentation();
+    await _disableFirebaseForegroundPresentation();
     await _loadInitialToken();
     _listenForTokenRefresh();
     _listenForForegroundMessages();
@@ -228,19 +228,14 @@ class NotificationService {
     }
   }
 
-  /// Lets iOS/macOS present incoming remote notifications while the app is
-  /// foreground. firebase_messaging owns the notification-center delegate, so
-  /// this setting governs foreground display of ALL notifications on Apple
-  /// platforms — including any local notification we show. We therefore let iOS
-  /// present the remote notification natively here and skip the local copy on
-  /// iOS (see [_listenForForegroundMessages]) to avoid a duplicate banner.
-  /// No-op on Android, which never auto-displays foreground messages.
-  Future<void> _enableIosForegroundPresentation() async {
+  /// Avoids duplicate foreground banners on Apple platforms. Foreground FCM
+  /// messages are surfaced through flutter_local_notifications instead.
+  Future<void> _disableFirebaseForegroundPresentation() async {
     try {
       await _firebaseMessaging.setForegroundNotificationPresentationOptions(
-        alert: true,
-        badge: true,
-        sound: true,
+        alert: false,
+        badge: false,
+        sound: false,
       );
     } catch (error, stackTrace) {
       _logNotificationError('foreground presentation', error, stackTrace);
@@ -268,11 +263,10 @@ class NotificationService {
       (message) {
         _messageController.add(message);
         logRemoteMessage(message, source: 'foreground');
-        // Android does not display notification messages while foregrounded, so
-        // surface them with a local notification. iOS/macOS present the remote
-        // notification natively (see [_enableIosForegroundPresentation]); a
-        // local copy there would double the banner.
-        if (defaultTargetPlatform == TargetPlatform.android) {
+        // Foreground remote notifications are displayed through local
+        // notifications on mobile so Android and iOS use the same path.
+        if (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS) {
           unawaited(_showForegroundNotification(message));
         }
       },
