@@ -108,8 +108,9 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
       _activatedTabs.add(widget.activeTab);
       _activationTicks[widget.activeTab] =
           (_activationTicks[widget.activeTab] ?? 0) + 1;
-      _builtTabs.remove(oldWidget.activeTab);
-      _builtTabs.remove(widget.activeTab);
+      // Do NOT remove from _builtTabs — Offstage + TickerMode preserves the
+      // widget tree so switching back to a tab is instant. Only activationTick
+      // is bumped so the newly-active tab can refresh its data if needed.
     } else if (oldWidget.selectionRevision != widget.selectionRevision) {
       _activationTicks[widget.activeTab] =
           (_activationTicks[widget.activeTab] ?? 0) + 1;

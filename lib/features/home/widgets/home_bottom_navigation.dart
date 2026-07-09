@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -128,48 +126,43 @@ class HomeBottomNavigation extends StatelessWidget {
 
     final radius = BorderRadius.vertical(top: Radius.circular(48 * scale));
 
-    return DecoratedBox(
+    return Container(
+      height: height,
+      padding: EdgeInsets.fromLTRB(
+        20 * scale,
+        12 * scale,
+        20 * scale,
+        bottomInset + 12 * scale,
+      ),
       decoration: BoxDecoration(
+        color: colors.elevatedSurface,
         borderRadius: radius,
+        border: Border(
+          top: BorderSide(
+            color: colors.shadow.withValues(alpha: 0.08),
+            width: 0.5,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: colors.shadow.withValues(alpha: 0.04),
-            blurRadius: 30 * scale,
-            offset: Offset(0, -8 * scale),
+            color: colors.shadow.withValues(alpha: 0.06),
+            blurRadius: 20 * scale,
+            offset: Offset(0, -6 * scale),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            height: height,
-            padding: EdgeInsets.fromLTRB(
-              20 * scale,
-              12 * scale,
-              20 * scale,
-              bottomInset + 12 * scale,
+      child: Row(
+        children: List.generate(items.length, (index) {
+          return Expanded(
+            child: HomeAnimatedNavItem(
+              data: items[index],
+              active: activeIndex == index,
+              teacherStyle: activeRole == ProfileRole.teacher,
+              scale: scale,
+              onTap: () => onTabSelected(index),
             ),
-            decoration: BoxDecoration(
-              color: colors.elevatedSurface.withValues(alpha: 0.92),
-              borderRadius: radius,
-            ),
-            child: Row(
-              children: List.generate(items.length, (index) {
-                return Expanded(
-                  child: HomeAnimatedNavItem(
-                    data: items[index],
-                    active: activeIndex == index,
-                    teacherStyle: activeRole == ProfileRole.teacher,
-                    scale: scale,
-                    onTap: () => onTabSelected(index),
-                  ),
-                );
-              }),
-            ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
