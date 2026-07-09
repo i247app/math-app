@@ -1,23 +1,23 @@
 .PHONY: build project pods pub clean
 
-ENV ?= dev
-ENV_FILE = config/env.$(ENV).json
-DART_DEFINE = --dart-define-from-file=$(ENV_FILE)
+# ENV ?= dev
+# ENV_FILE = config/env.$(ENV).json
+# DART_DEFINE = --dart-define-from-file=$(ENV_FILE)
 
 run:
-	flutter run $(DART_DEFINE)
+	flutter run
 
 apk-debug: project
-	flutter build apk --debug $(DART_DEFINE)
+	flutter build apk --debug
 
 apk-release: project
-	flutter build apk --release $(DART_DEFINE)
+	flutter build apk --release
 
 release-android: project
-	flutter build appbundle --release $(DART_DEFINE)
+	flutter build appbundle --release
 
 release-ios: project
-	flutter build ios --release $(DART_DEFINE)
+	flutter build ios --release
 
 build: project
 
@@ -27,7 +27,7 @@ pods:
 	cd ios && pod install
 
 models:
-	dart run build_runner build --delete-conflicting-outputs
+	dart run build_runner build
 
 pub:
 	flutter pub upgrade
