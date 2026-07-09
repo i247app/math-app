@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/auth/widgets/otp/otp_action_button.dart';
 import 'package:numi_flutter/features/auth/widgets/otp/otp_digit_box.dart';
 
@@ -36,6 +37,7 @@ class OtpCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final hasError = errorText != null;
     final otpCode = devOtpCode?.trim();
     final isFull = controllers.every(
@@ -45,37 +47,28 @@ class OtpCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final gap = constraints.maxWidth < 290 ? 10.0 : 12.0;
-            final availableBoxWidth = (constraints.maxWidth - gap * 3) / 4;
-            final boxWidth = availableBoxWidth.clamp(58.0, 64.0);
-            final boxHeight = boxWidth * 1.18;
-
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(4, (index) {
-                return Padding(
-                  padding: EdgeInsets.only(left: index == 0 ? 0 : gap),
-                  child: SizedBox(
-                    width: boxWidth,
-                    height: boxHeight,
-                    child: OtpDigitBox(
-                      controller: controllers[index],
-                      focusNode: focusNodes[index],
-                      autofocus: autoFocusCode && index == 0,
-                      textInputAction: index == 3
-                          ? TextInputAction.done
-                          : TextInputAction.next,
-                      onChanged: (value) => onChanged(index, value),
-                      onEmptyBackspace: () => onEmptyBackspace(index),
-                      hasError: hasError,
-                    ),
-                  ),
-                );
-              }),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(4, (index) {
+            return Padding(
+              padding: EdgeInsets.only(left: index == 0 ? 0 : 12),
+              child: SizedBox(
+                width: 64,
+                height: 70,
+                child: OtpDigitBox(
+                  controller: controllers[index],
+                  focusNode: focusNodes[index],
+                  autofocus: autoFocusCode && index == 0,
+                  textInputAction: index == 3
+                      ? TextInputAction.done
+                      : TextInputAction.next,
+                  onChanged: (value) => onChanged(index, value),
+                  onEmptyBackspace: () => onEmptyBackspace(index),
+                  hasError: hasError,
+                ),
+              ),
             );
-          },
+          }),
         ),
         if (otpCode != null && otpCode.isNotEmpty)
           Padding(
@@ -86,7 +79,7 @@ class OtpCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.andika(
-                color: const Color(0xFF339395),
+                color: colors.brandStrong,
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 height: 1.25,
@@ -104,17 +97,17 @@ class OtpCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.error_outline_rounded,
-                        color: Color(0xFFD9534F),
+                        color: colors.error,
                         size: 18,
                       ),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
                           errorText!,
-                          style: const TextStyle(
-                            color: Color(0xFFD9534F),
+                          style: TextStyle(
+                            color: colors.error,
                             fontSize: 13,
                             height: 1.25,
                             fontWeight: FontWeight.w800,
@@ -125,26 +118,6 @@ class OtpCard extends StatelessWidget {
                     ],
                   ),
                 ),
-        ),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: SizedBox(
-              height: 22,
-              child: resendCountdown > 0
-                  ? Text(
-                      context.formatText(AppKeys.resendOtpAfter, {
-                        'seconds': resendCountdown,
-                      }),
-                      style: GoogleFonts.andika(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF339395),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ),
         ),
         const SizedBox(height: 24),
         OtpActionButton(
@@ -161,7 +134,67 @@ class OtpCard extends StatelessWidget {
               ? onConfirm
               : null,
         ),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 24,
+          child: resendCountdown > 0
+              ? _OtpCountdownText(
+                  text: context.formatText(AppKeys.resendOtpAfter, {
+                    'seconds': resendCountdown,
+                  }),
+                )
+              : const SizedBox.shrink(),
+        ),
       ],
+    );
+  }
+}
+
+class _OtpCountdownText extends StatelessWidget {
+  const _OtpCountdownText({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final baseStyle = GoogleFonts.andika(
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      height: 1.25,
+      color: colors.textPrimary,
+      letterSpacing: 0,
+    );
+    final numberStyle = baseStyle.copyWith(
+      color: colors.brandStrong,
+      fontWeight: FontWeight.w800,
+    );
+
+    final spans = <TextSpan>[];
+    var cursor = 0;
+    for (final match in RegExp(r'\d+').allMatches(text)) {
+      if (match.start > cursor) {
+        spans.add(TextSpan(text: text.substring(cursor, match.start)));
+      }
+      spans.add(
+        TextSpan(
+          text: text.substring(match.start, match.end),
+          style: numberStyle,
+        ),
+      );
+      cursor = match.end;
+    }
+    if (cursor < text.length) {
+      spans.add(TextSpan(text: text.substring(cursor)));
+    }
+
+    return Center(
+      child: Text.rich(
+        TextSpan(style: baseStyle, children: spans),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }

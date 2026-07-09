@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment_result/score_number.dart';
 import 'package:numi_flutter/shared/widgets/score_progress_ring.dart';
 
@@ -93,7 +93,7 @@ class AssessmentScoreRing extends StatelessWidget {
                   Text(
                     context.getText(AppKeys.scoreUpper),
                     style: GoogleFonts.andika(
-                      color: AssessmentResultStyle.muted,
+                      color: AppColors.textSubtle,
                       fontSize: 10 * scale,
                       fontWeight: FontWeight.w800,
                       height: 15 / 10,

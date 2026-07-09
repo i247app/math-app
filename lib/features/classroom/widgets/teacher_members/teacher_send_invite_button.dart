@@ -13,10 +13,10 @@ class _TeacherSendInviteButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: enabled ? onTap : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: teacherCoral,
+          backgroundColor: AppColors.coralTeacher,
           disabledBackgroundColor: const Color(0xFFE5E7EB),
           foregroundColor: Colors.white,
-          disabledForegroundColor: teacherMuted,
+          disabledForegroundColor: AppColors.textCoolMuted,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),

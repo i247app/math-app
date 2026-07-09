@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class OtpDigitBox extends StatelessWidget {
   const OtpDigitBox({
@@ -26,6 +26,8 @@ class OtpDigitBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Focus(
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent &&
@@ -39,20 +41,20 @@ class OtpDigitBox extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.inputSurface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: hasError ? const Color(0xFFD9534F) : const Color(0xFFF47B55),
+            color: hasError ? colors.error : colors.otpBorder,
             width: 2.3,
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFF47B55).withValues(alpha: 0.22),
+              color: colors.otpBorder.withValues(alpha: 0.22),
               blurRadius: 0,
               offset: const Offset(0, 5),
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: colors.shadow.withValues(alpha: 0.04),
               blurRadius: 14,
               offset: const Offset(0, 10),
             ),
@@ -76,7 +78,7 @@ class OtpDigitBox extends StatelessWidget {
               );
             },
             style: GoogleFonts.andika(
-              color: AppColors.ink,
+              color: colors.textPrimary,
               fontSize: 36,
               fontWeight: FontWeight.w600,
               letterSpacing: 0,
@@ -84,6 +86,12 @@ class OtpDigitBox extends StatelessWidget {
             decoration: const InputDecoration(
               counterText: '',
               border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              filled: false,
               isCollapsed: true,
               contentPadding: EdgeInsets.zero,
             ),

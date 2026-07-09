@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/auth/auth_cubit.dart';
 import 'package:numi_flutter/features/auth/auth_state.dart';
 import 'package:numi_flutter/features/auth/helpers/auth_error_helpers.dart';
@@ -13,6 +14,7 @@ import 'package:numi_flutter/features/auth/widgets/signup/signup_gender_choice.d
 import 'package:numi_flutter/features/auth/widgets/signup/signup_gender_radio_group.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_role_card.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_text_field.dart';
+import 'package:numi_flutter/shared/widgets/auth_back_button.dart';
 import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -174,7 +176,7 @@ class _SignupScreenState extends State<SignupScreen> {
           behavior: HitTestBehavior.translucent,
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: context.themeColors.pageBackground,
             resizeToAvoidBottomInset: false,
             body: SafeArea(
               child: Padding(
@@ -327,15 +329,17 @@ class _SignupSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: colors.shadow.withValues(alpha: 0.06),
             blurRadius: 18,
             offset: const Offset(0, 9),
           ),
@@ -359,6 +363,8 @@ class _SignupHeroBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return SizedBox(
       height: 122,
       child: Stack(
@@ -389,21 +395,14 @@ class _SignupHeroBanner extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            left: 0,
-            top: 0,
-            child: CircleIconButton(
-              icon: Icons.arrow_back_rounded,
-              onPressed: onBack,
-            ),
-          ),
+          Positioned(left: 0, top: 0, child: AuthBackButton(onPressed: onBack)),
           Positioned(
             left: 0,
             top: 76,
             child: Text(
               title,
               style: GoogleFonts.andika(
-                color: const Color(0xFF078B83),
+                color: colors.brandStrong,
                 fontSize: titleFontSize,
                 fontWeight: FontWeight.w700,
                 height: 1.05,

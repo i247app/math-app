@@ -28,7 +28,7 @@ class _TeacherHomeHeroSkeleton extends StatelessWidget {
                     width: 148 * scale,
                     height: 20 * scale,
                     radius: 8 * scale,
-                    color: teacherTeal.withValues(alpha: 0.18),
+                    color: AppColors.teal520.withValues(alpha: 0.18),
                   ),
                   SizedBox(height: 10 * scale),
                   TeacherSkeletonBlock(
@@ -43,7 +43,7 @@ class _TeacherHomeHeroSkeleton extends StatelessWidget {
               width: 64 * scale,
               height: 64 * scale,
               radius: 20 * scale,
-              color: teacherHero.withValues(alpha: 0.22),
+              color: AppColors.teal400.withValues(alpha: 0.22),
             ),
           ],
         ),

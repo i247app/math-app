@@ -5,19 +5,17 @@ class _TeacherHomeworkSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 49,
       padding: const EdgeInsets.fromLTRB(26, 0, 18, 0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.inputSurface,
         borderRadius: BorderRadius.circular(9999),
-        border: Border.all(
-          color: const Color(0xFFCCCCCC).withValues(alpha: 0.5),
-          width: 2,
-        ),
+        border: Border.all(color: colors.border, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colors.shadow,
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -37,7 +35,7 @@ class _TeacherHomeworkSearchField extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: const Color(0xFFDCBFC8),
+                color: colors.inputHint,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
                 height: 1,

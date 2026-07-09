@@ -7,6 +7,8 @@ enum AppScreen { welcome, welcomeDetails, login, otp, signup, passcode, home }
 
 enum OtpFlow { login, signup }
 
+enum AuthEntryMode { login, signup }
+
 enum PasscodeFlow { setup, unlock }
 
 class AuthState {
@@ -37,6 +39,7 @@ class AuthState {
     this.otpError,
     this.otpErrorId = 0,
     this.otpFlow = OtpFlow.login,
+    this.authEntryMode = AuthEntryMode.login,
     this.authError,
     this.loginUser,
     this.profiles = const <StudentProfile>[],
@@ -83,6 +86,7 @@ class AuthState {
   final String? otpError;
   final int otpErrorId;
   final OtpFlow otpFlow;
+  final AuthEntryMode authEntryMode;
   final String? authError;
   final LoginUser? loginUser;
   final List<StudentProfile> profiles;
@@ -136,6 +140,7 @@ class AuthState {
     String? otpError,
     int? otpErrorId,
     OtpFlow? otpFlow,
+    AuthEntryMode? authEntryMode,
     String? authError,
     LoginUser? loginUser,
     List<StudentProfile>? profiles,
@@ -211,6 +216,7 @@ class AuthState {
       otpError: clearOtpError ? null : otpError ?? this.otpError,
       otpErrorId: otpErrorId ?? this.otpErrorId,
       otpFlow: otpFlow ?? this.otpFlow,
+      authEntryMode: authEntryMode ?? this.authEntryMode,
       authError: clearAuthError ? null : authError ?? this.authError,
       loginUser: clearLoginUser ? null : loginUser ?? this.loginUser,
       profiles: clearProfiles

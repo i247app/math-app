@@ -19,11 +19,7 @@ class LoginSceneBackground extends StatelessWidget {
             top: 246,
             child: _Cloud(width: 128, opacity: 0.62),
           ),
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _LoginHillPainter(),
-            ),
-          ),
+          Positioned.fill(child: CustomPaint(painter: _LoginHillPainter())),
         ],
       ),
     );
@@ -31,10 +27,7 @@ class LoginSceneBackground extends StatelessWidget {
 }
 
 class _Cloud extends StatelessWidget {
-  const _Cloud({
-    required this.width,
-    required this.opacity,
-  });
+  const _Cloud({required this.width, required this.opacity});
 
   final double width;
   final double opacity;
@@ -91,8 +84,14 @@ class _CloudPainter extends CustomPainter {
         size.height * 0.86,
       )
       ..lineTo(size.width * 0.16, size.height * 0.86)
-      ..cubicTo(0, size.height * 0.86, 0, size.height * 0.72, size.width * 0.05,
-          size.height * 0.7)
+      ..cubicTo(
+        0,
+        size.height * 0.86,
+        0,
+        size.height * 0.72,
+        size.width * 0.05,
+        size.height * 0.7,
+      )
       ..close();
 
     canvas.drawPath(path.shift(const Offset(0, 14)), shadowPaint);

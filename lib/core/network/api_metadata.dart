@@ -69,6 +69,26 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
     return clientInfo;
   }
 
+  /// Stores the latest FCM push token so it rides on the existing metadata
+  /// pipeline (`buildMetadata` body fields + `X-Device-Push-Token` header).
+  ///
+  /// Empty or unchanged tokens are ignored to avoid rebuilding the cache for a
+  /// no-op. Safe to call before the first request — it loads the client info if
+  /// needed so the cached instance always exists afterwards.
+  Future<void> updateDevicePushToken(String token) async {
+    final trimmedToken = token.trim();
+    if (trimmedToken.isEmpty) {
+      return;
+    }
+
+    final clientInfo = await loadClientInfo();
+    if (clientInfo.devicePushToken == trimmedToken) {
+      return;
+    }
+
+    _cachedClientInfo = clientInfo.copyWith(devicePushToken: trimmedToken);
+  }
+
   Future<String> _deviceId(String? pluginDeviceId) async {
     final trimmedPluginDeviceId = pluginDeviceId?.trim();
     if (trimmedPluginDeviceId != null && trimmedPluginDeviceId.isNotEmpty) {
@@ -205,6 +225,30 @@ class AppClientInfo {
   final String buildNumber;
   final String packageName;
   final String devicePushToken;
+
+  AppClientInfo copyWith({
+    String? deviceId,
+    String? deviceName,
+    String? modelName,
+    String? platform,
+    String? systemVersion,
+    String? version,
+    String? buildNumber,
+    String? packageName,
+    String? devicePushToken,
+  }) {
+    return AppClientInfo(
+      deviceId: deviceId ?? this.deviceId,
+      deviceName: deviceName ?? this.deviceName,
+      modelName: modelName ?? this.modelName,
+      platform: platform ?? this.platform,
+      systemVersion: systemVersion ?? this.systemVersion,
+      version: version ?? this.version,
+      buildNumber: buildNumber ?? this.buildNumber,
+      packageName: packageName ?? this.packageName,
+      devicePushToken: devicePushToken ?? this.devicePushToken,
+    );
+  }
 
   String get appVersionLabel => 'Version: $version + $buildNumber';
 }

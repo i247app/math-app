@@ -204,8 +204,10 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.pageBackground,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -228,7 +230,11 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
 
   Widget _buildContent(double scale) {
     if (_isLoadingOptions) {
-      return const Center(child: CircularProgressIndicator(color: teacherTeal));
+      return Center(
+        child: CircularProgressIndicator(
+          color: context.themeColors.brandStrong,
+        ),
+      );
     }
     final optionsError = _optionsError;
     if (optionsError != null) {

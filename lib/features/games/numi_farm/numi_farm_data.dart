@@ -105,9 +105,9 @@ const numiFarmStages = <NumiFarmStageConfig>[
 ];
 
 NumiFarmStageConfig numiFarmStage(int stage) => numiFarmStages.firstWhere(
-      (config) => config.stage == stage,
-      orElse: () => numiFarmStages.first,
-    );
+  (config) => config.stage == stage,
+  orElse: () => numiFarmStages.first,
+);
 
 class NumiFarmCountRound {
   const NumiFarmCountRound({
@@ -121,8 +121,9 @@ class NumiFarmCountRound {
 
 List<NumiFarmCountRound> buildHarvestRounds(int stage) {
   final config = numiFarmStage(stage);
-  final targets =
-      stage == 1 ? const <int>[2, 4, 1, 5, 3] : const <int>[6, 8, 7, 10, 9, 5];
+  final targets = stage == 1
+      ? const <int>[2, 4, 1, 5, 3]
+      : const <int>[6, 8, 7, 10, 9, 5];
   return targets
       .map(
         (target) => NumiFarmCountRound(
@@ -154,57 +155,67 @@ class NumiFarmChoiceRound {
 List<NumiFarmChoiceRound> buildChoiceRounds(int stage) {
   return switch (stage) {
     3 => const <NumiFarmChoiceRound>[
-        NumiFarmChoiceRound(
-          left: 2,
-          right: 4,
-          answer: '<',
-          choices: ['<', '=', '>'],
-          kind: NumiFarmChoiceKind.comparison,
-        ),
-        NumiFarmChoiceRound(
-          left: 5,
-          right: 3,
-          answer: '>',
-          choices: ['=', '>', '<'],
-          kind: NumiFarmChoiceKind.comparison,
-        ),
-        NumiFarmChoiceRound(
-          left: 4,
-          right: 4,
-          answer: '=',
-          choices: ['>', '<', '='],
-          kind: NumiFarmChoiceKind.comparison,
-        ),
-        NumiFarmChoiceRound(
-          left: 7,
-          right: 9,
-          answer: '<',
-          choices: ['=', '<', '>'],
-          kind: NumiFarmChoiceKind.comparison,
-        ),
-        NumiFarmChoiceRound(
-          left: 10,
-          right: 6,
-          answer: '>',
-          choices: ['<', '>', '='],
-          kind: NumiFarmChoiceKind.comparison,
-        ),
-        NumiFarmChoiceRound(
-          left: 8,
-          right: 8,
-          answer: '=',
-          choices: ['=', '>', '<'],
-          kind: NumiFarmChoiceKind.comparison,
-        ),
-      ],
-    4 => _equationRounds(
-        const [(1, 2), (2, 3), (4, 1), (3, 3), (4, 5), (6, 4), (7, 2)],
-        addition: true,
+      NumiFarmChoiceRound(
+        left: 2,
+        right: 4,
+        answer: '<',
+        choices: ['<', '=', '>'],
+        kind: NumiFarmChoiceKind.comparison,
       ),
-    5 => _equationRounds(
-        const [(5, 1), (6, 2), (7, 3), (8, 5), (9, 4), (10, 6), (10, 3)],
-        addition: false,
+      NumiFarmChoiceRound(
+        left: 5,
+        right: 3,
+        answer: '>',
+        choices: ['=', '>', '<'],
+        kind: NumiFarmChoiceKind.comparison,
       ),
+      NumiFarmChoiceRound(
+        left: 4,
+        right: 4,
+        answer: '=',
+        choices: ['>', '<', '='],
+        kind: NumiFarmChoiceKind.comparison,
+      ),
+      NumiFarmChoiceRound(
+        left: 7,
+        right: 9,
+        answer: '<',
+        choices: ['=', '<', '>'],
+        kind: NumiFarmChoiceKind.comparison,
+      ),
+      NumiFarmChoiceRound(
+        left: 10,
+        right: 6,
+        answer: '>',
+        choices: ['<', '>', '='],
+        kind: NumiFarmChoiceKind.comparison,
+      ),
+      NumiFarmChoiceRound(
+        left: 8,
+        right: 8,
+        answer: '=',
+        choices: ['=', '>', '<'],
+        kind: NumiFarmChoiceKind.comparison,
+      ),
+    ],
+    4 => _equationRounds(const [
+      (1, 2),
+      (2, 3),
+      (4, 1),
+      (3, 3),
+      (4, 5),
+      (6, 4),
+      (7, 2),
+    ], addition: true),
+    5 => _equationRounds(const [
+      (5, 1),
+      (6, 2),
+      (7, 3),
+      (8, 5),
+      (9, 4),
+      (10, 6),
+      (10, 3),
+    ], addition: false),
     _ => const <NumiFarmChoiceRound>[],
   };
 }
@@ -213,24 +224,26 @@ List<NumiFarmChoiceRound> _equationRounds(
   List<(int, int)> values, {
   required bool addition,
 }) {
-  return values.map((pair) {
-    final answer = addition ? pair.$1 + pair.$2 : pair.$1 - pair.$2;
-    final lower = answer > 0 ? answer - 1 : answer + 2;
-    final upper = answer + 1;
-    final choices = <int>[lower, answer, upper]..sort();
-    final rotation = (pair.$1 + pair.$2) % choices.length;
-    final rotated = <int>[
-      ...choices.skip(rotation),
-      ...choices.take(rotation),
-    ];
-    return NumiFarmChoiceRound(
-      left: pair.$1,
-      right: pair.$2,
-      answer: '$answer',
-      choices: rotated.map((choice) => '$choice').toList(growable: false),
-      kind: addition
-          ? NumiFarmChoiceKind.addition
-          : NumiFarmChoiceKind.subtraction,
-    );
-  }).toList(growable: false);
+  return values
+      .map((pair) {
+        final answer = addition ? pair.$1 + pair.$2 : pair.$1 - pair.$2;
+        final lower = answer > 0 ? answer - 1 : answer + 2;
+        final upper = answer + 1;
+        final choices = <int>[lower, answer, upper]..sort();
+        final rotation = (pair.$1 + pair.$2) % choices.length;
+        final rotated = <int>[
+          ...choices.skip(rotation),
+          ...choices.take(rotation),
+        ];
+        return NumiFarmChoiceRound(
+          left: pair.$1,
+          right: pair.$2,
+          answer: '$answer',
+          choices: rotated.map((choice) => '$choice').toList(growable: false),
+          kind: addition
+              ? NumiFarmChoiceKind.addition
+              : NumiFarmChoiceKind.subtraction,
+        );
+      })
+      .toList(growable: false);
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_composition.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({
@@ -72,10 +72,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final overlayStyle = Theme.of(context).brightness == Brightness.dark
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: overlayStyle,
       child: ColoredBox(
-        color: WelcomeStyle.background,
+        color: colors.pageBackground,
         child: SafeArea(
           bottom: false,
           child: LayoutBuilder(

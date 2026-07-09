@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class StudentClassCategoryTile extends StatelessWidget {
   const StudentClassCategoryTile({
@@ -23,8 +23,9 @@ class StudentClassCategoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap ?? () => showStudentClassComingSoon(context),
@@ -32,14 +33,12 @@ class StudentClassCategoryTile extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFFC4C6D2).withValues(alpha: 0.05),
-            ),
+            border: Border.all(color: colors.border.withValues(alpha: 0.50)),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF001741).withValues(alpha: 0.04),
+                color: colors.shadow,
                 blurRadius: 12,
                 offset: const Offset(0, 8),
               ),
@@ -64,7 +63,7 @@ class StudentClassCategoryTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: studentClassInk,
+                  color: colors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   height: 20 / 16,
@@ -76,7 +75,7 @@ class StudentClassCategoryTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: studentClassMuted,
+                  color: colors.textSecondary,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   height: 16 / 12,

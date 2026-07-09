@@ -19,13 +19,13 @@ class _HistorySubmittedBadge extends StatelessWidget {
               color: const Color(0xFFE1F8F4),
               shape: BoxShape.circle,
               border: Border.all(
-                color: historyTeal.withValues(alpha: 0.26),
+                color: AppColors.teal700.withValues(alpha: 0.26),
                 width: 1.3 * scale,
               ),
             ),
             child: Icon(
               Icons.check_rounded,
-              color: historyTeal,
+              color: AppColors.teal700,
               size: 26 * scale,
             ),
           ),
@@ -36,7 +36,7 @@ class _HistorySubmittedBadge extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: historyTeal,
+              color: AppColors.teal700,
               fontSize: FontSize.caption * 0.77 * scale,
               fontWeight: FontWeight.w900,
               height: 1.05,

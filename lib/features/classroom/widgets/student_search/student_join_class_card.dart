@@ -1,3 +1,5 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -5,7 +7,6 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_search_helpers.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_class_action_state.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_class_badge.dart';
 
@@ -55,7 +56,7 @@ class StudentJoinClassCard extends StatelessWidget {
             width: 8,
             height: 87,
             decoration: const BoxDecoration(
-              color: studentJoinCoral,
+              color: AppColors.orange700,
               borderRadius: BorderRadius.horizontal(left: Radius.circular(12)),
             ),
           ),
@@ -89,7 +90,7 @@ class StudentJoinClassCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: studentJoinBlue,
+                            color: AppColors.textNavy,
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             height: 1.25,
@@ -102,7 +103,7 @@ class StudentJoinClassCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: studentJoinMuted,
+                            color: AppColors.textMuted,
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             height: 1.4,

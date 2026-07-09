@@ -19,7 +19,7 @@ class _QuizReviewNavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = filled ? Colors.white : quizReviewTeal;
+    final foreground = filled ? Colors.white : AppColors.teal600;
     final child = Center(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -43,7 +43,7 @@ class _QuizReviewNavButton extends StatelessWidget {
     return Opacity(
       opacity: enabled ? 1 : 0.45,
       child: Material(
-        color: filled ? quizReviewTeal : Colors.white,
+        color: filled ? AppColors.teal600 : Colors.white,
         borderRadius: BorderRadius.circular(9),
         child: InkWell(
           onTap: enabled ? onTap : null,
@@ -53,11 +53,11 @@ class _QuizReviewNavButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(9),
-              border: Border.all(color: quizReviewTeal, width: 1.2),
+              border: Border.all(color: AppColors.teal600, width: 1.2),
               boxShadow: filled
                   ? [
                       BoxShadow(
-                        color: quizReviewTeal.withValues(alpha: 0.24),
+                        color: AppColors.teal600.withValues(alpha: 0.24),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),

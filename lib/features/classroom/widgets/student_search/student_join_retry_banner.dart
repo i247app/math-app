@@ -1,8 +1,8 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 
 class StudentJoinRetryBanner extends StatelessWidget {
   const StudentJoinRetryBanner({
@@ -48,7 +48,7 @@ class StudentJoinRetryBanner extends StatelessWidget {
             tooltip: context.getText(AppKeys.studentRetry),
             icon: const Icon(
               Icons.refresh_rounded,
-              color: studentJoinDeepTeal,
+              color: AppColors.tealActive,
               size: 22,
             ),
           ),

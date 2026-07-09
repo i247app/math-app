@@ -5,8 +5,8 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/managed_profile_role_pill.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/profile_avatar.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/profile_icon_button.dart';
@@ -35,13 +35,14 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isActive ? settingsTeal : settingsMuted;
+    final colors = context.themeColors;
+    final accent = isActive ? colors.brandStrong : colors.textSecondary;
     final radius = BorderRadius.circular(18 * scale);
     final role = ProfileRole.fromProfile(profile);
     final isTeacher = role == ProfileRole.teacher;
 
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: radius,
       child: InkWell(
         onTap: onSelect,
@@ -54,17 +55,17 @@ class ProfileCard extends StatelessWidget {
             16 * scale,
           ),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.96),
+            color: colors.elevatedSurface.withValues(alpha: 0.96),
             borderRadius: radius,
             border: Border.all(
               color: isActive
-                  ? settingsTeal
-                  : const Color(0xFFC8D0CC).withValues(alpha: 0.92),
+                  ? colors.brandStrong
+                  : colors.border.withValues(alpha: 0.92),
               width: isActive ? 1.6 * scale : 1.3 * scale,
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF5E7775).withValues(alpha: 0.08),
+                color: colors.shadow,
                 blurRadius: 18 * scale,
                 offset: Offset(0, 8 * scale),
               ),
@@ -91,7 +92,7 @@ class ProfileCard extends StatelessWidget {
                           settingsProfileName(context, profile),
                           softWrap: true,
                           style: GoogleFonts.andika(
-                            color: settingsDeepInk,
+                            color: colors.textPrimary,
                             fontSize: FontSize.large * scale,
                             fontWeight: FontWeight.w900,
                             height: 1,
@@ -99,10 +100,7 @@ class ProfileCard extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 5 * scale),
-                        ManagedProfileRolePill(
-                          role: role,
-                          scale: scale,
-                        ),
+                        ManagedProfileRolePill(role: role, scale: scale),
                         SizedBox(height: 9 * scale),
                         ProfileIdLine(
                           profile: profile,
@@ -118,8 +116,9 @@ class ProfileCard extends StatelessWidget {
               ),
               SizedBox(height: 14 * scale),
               ProfileInfoLine(
-                icon:
-                    isTeacher ? Icons.apartment_rounded : Icons.school_outlined,
+                icon: isTeacher
+                    ? Icons.apartment_rounded
+                    : Icons.school_outlined,
                 iconColor: accent,
                 label: isTeacher
                     ? context.getText(AppKeys.school)
@@ -145,8 +144,8 @@ class ProfileCard extends StatelessWidget {
                 children: [
                   ProfileIconButton(
                     icon: Icons.edit_rounded,
-                    foregroundColor: settingsTeal,
-                    backgroundColor: const Color(0xFFECF6FA),
+                    foregroundColor: colors.brandStrong,
+                    backgroundColor: colors.brand.withValues(alpha: 0.12),
                     scale: scale,
                     onTap: onEdit,
                   ),

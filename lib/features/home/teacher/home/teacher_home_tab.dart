@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,11 +9,12 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
-import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
+import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_member_summary_text.dart';
 import 'package:numi_flutter/features/home/cache/home_profile_cache.dart';
 import 'package:numi_flutter/features/home/home_api.dart';
 import 'package:numi_flutter/features/home/teacher/cache/teacher_home_snapshot.dart';
@@ -566,7 +568,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
     final isProfileComplete = isTeacherProfileComplete(widget.activeProfile);
 
     return RefreshIndicator(
-      color: teacherTeal,
+      color: AppColors.teal520,
       onRefresh: _refreshClassrooms,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(

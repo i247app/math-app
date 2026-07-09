@@ -9,7 +9,9 @@ class _TeacherStudyLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(top: 36 * scale),
-      child: const Center(child: CircularProgressIndicator(color: teacherTeal)),
+      child: const Center(
+        child: CircularProgressIndicator(color: AppColors.teal520),
+      ),
     );
   }
 }

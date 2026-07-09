@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class GradeBackground extends StatelessWidget {
   const GradeBackground({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const DecoratedBox(
+    final colors = context.themeColors;
+    return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            GradeSelectionStyle.mint,
-            Color(0xFFD8EBD8),
-            GradeSelectionStyle.mint,
+            colors.pageBackgroundTop,
+            colors.pageBackground,
+            colors.pageBackgroundTop,
           ],
-          stops: [0, 0.80, 1],
+          stops: const [0, 0.80, 1],
         ),
       ),
     );

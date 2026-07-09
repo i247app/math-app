@@ -16,14 +16,16 @@ class TeacherScreenAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Container(
       height: 60 * scale,
       padding: EdgeInsets.symmetric(horizontal: 20 * scale),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         boxShadow: [
           BoxShadow(
-            color: const Color(0x0D000000),
+            color: colors.shadow.withValues(alpha: 0.05),
             blurRadius: 0,
             offset: Offset(0, 4 * scale),
           ),
@@ -51,7 +53,7 @@ class TeacherScreenAppBar extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: teacherTeal,
+              color: colors.brandStrong,
               fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w700,
               height: 1,

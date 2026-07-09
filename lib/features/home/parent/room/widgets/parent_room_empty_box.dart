@@ -14,16 +14,17 @@ class _ParentRoomEmptyBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE4E8EA)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: colors.shadow,
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -35,10 +36,10 @@ class _ParentRoomEmptyBox extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF3F3),
+              color: colors.brand.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF339395), size: 22),
+            child: Icon(icon, color: colors.brandStrong, size: 22),
           ),
           const SizedBox(width: 13),
           Expanded(
@@ -49,8 +50,8 @@ class _ParentRoomEmptyBox extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF121B42),
+                  style: TextStyle(
+                    color: colors.textPrimary,
                     fontSize: FontSize.normal,
                     fontWeight: FontWeight.w900,
                     height: 1.1,
@@ -61,8 +62,8 @@ class _ParentRoomEmptyBox extends StatelessWidget {
                   message,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                  style: TextStyle(
+                    color: colors.textSecondary,
                     fontSize: FontSize.small,
                     fontWeight: FontWeight.w600,
                     height: 1.25,

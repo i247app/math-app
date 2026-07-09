@@ -13,6 +13,7 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return ClipRRect(
       borderRadius: BorderRadius.circular(32),
       child: BackdropFilter(
@@ -20,14 +21,12 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.9),
+            color: colors.elevatedSurface.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(32),
-            border: Border.all(
-              color: const Color(0xFFC4C6D2).withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: colors.border.withValues(alpha: 0.7)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: colors.shadow,
                 blurRadius: 2,
                 offset: const Offset(0, 1),
               ),
@@ -50,7 +49,7 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
-                        color: const Color(0xFF444650),
+                        color: colors.textSecondary,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         height: 24 / 14,
@@ -69,7 +68,7 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: teacherBlue,
+                  color: colors.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   height: 36 / 18,
@@ -89,7 +88,7 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     top: BorderSide(
-                      color: const Color(0xFFC4C6D2).withValues(alpha: 0.3),
+                      color: colors.border.withValues(alpha: 0.7),
                     ),
                   ),
                 ),

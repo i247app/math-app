@@ -1,0 +1,367 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+@pragma('vm:entry-point')
+Future<void> numiFirebaseMessagingBackgroundHandler(
+  RemoteMessage message,
+) async {
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp();
+    }
+  } catch (error, stackTrace) {
+    _logNotificationError('background firebase init', error, stackTrace);
+    return;
+  }
+
+  NotificationService.logRemoteMessage(message, source: 'background');
+}
+
+@pragma('vm:entry-point')
+void numiLocalNotificationTapBackground(NotificationResponse response) {
+  debugPrint(
+    '[Notification] local background tap id=${response.id} '
+    'payload=${response.payload}',
+  );
+}
+
+class NotificationService {
+  NotificationService({
+    FirebaseMessaging? messaging,
+    FlutterLocalNotificationsPlugin? localNotifications,
+  }) : _messaging = messaging,
+       _localNotifications =
+           localNotifications ?? FlutterLocalNotificationsPlugin();
+
+  static const AndroidNotificationChannel _foregroundChannel =
+      AndroidNotificationChannel(
+        'numi_foreground_notifications',
+        'NUMI notifications',
+        description: 'Notifications shown while NUMI is open.',
+        importance: Importance.high,
+      );
+
+  static bool _initialized = false;
+  static String? _latestToken;
+  static final StreamController<RemoteMessage> _messageController =
+      StreamController<RemoteMessage>.broadcast();
+  static final StreamController<String> _tokenController =
+      StreamController<String>.broadcast();
+  static final StreamController<NotificationResponse> _localResponseController =
+      StreamController<NotificationResponse>.broadcast();
+
+  final FirebaseMessaging? _messaging;
+  final FlutterLocalNotificationsPlugin _localNotifications;
+
+  static Stream<RemoteMessage> get messages => _messageController.stream;
+
+  static Stream<String> get tokens => _tokenController.stream;
+
+  /// Most recent FCM token, or null if none fetched yet. Lets a late subscriber
+  /// seed itself, since [tokens] is a broadcast stream that does not replay.
+  static String? get latestToken => _latestToken;
+
+  static void _emitToken(String token) {
+    _latestToken = token;
+    _tokenController.add(token);
+  }
+
+  static Stream<NotificationResponse> get localNotificationResponses =>
+      _localResponseController.stream;
+
+  FirebaseMessaging get _firebaseMessaging =>
+      _messaging ?? FirebaseMessaging.instance;
+
+  Future<void> initialize() async {
+    if (_initialized) {
+      return;
+    }
+
+    final firebaseReady = await _initializeFirebase();
+    if (!firebaseReady) {
+      return;
+    }
+
+    _initialized = true;
+    if (!kIsWeb) {
+      FirebaseMessaging.onBackgroundMessage(
+        numiFirebaseMessagingBackgroundHandler,
+      );
+    }
+
+    await _requestPermission();
+    await _initializeLocalNotifications();
+    await _requestLocalNotificationPermission();
+    await _enableIosForegroundPresentation();
+    await _loadInitialToken();
+    _listenForTokenRefresh();
+    _listenForForegroundMessages();
+    _listenForOpenedMessages();
+    await _handleInitialMessage();
+  }
+
+  Future<bool> _initializeFirebase() async {
+    try {
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp();
+      }
+      return true;
+    } catch (error, stackTrace) {
+      _logNotificationError('firebase init', error, stackTrace);
+      return false;
+    }
+  }
+
+  Future<void> _initializeLocalNotifications() async {
+    try {
+      const androidSettings = AndroidInitializationSettings(
+        '@mipmap/ic_launcher',
+      );
+      const darwinSettings = DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+        defaultPresentAlert: true,
+        defaultPresentBadge: true,
+        defaultPresentSound: true,
+        defaultPresentBanner: true,
+        defaultPresentList: true,
+      );
+      const settings = InitializationSettings(
+        android: androidSettings,
+        iOS: darwinSettings,
+        macOS: darwinSettings,
+      );
+
+      await _localNotifications.initialize(
+        settings: settings,
+        onDidReceiveNotificationResponse: _handleLocalNotificationResponse,
+        onDidReceiveBackgroundNotificationResponse:
+            numiLocalNotificationTapBackground,
+      );
+
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.createNotificationChannel(_foregroundChannel);
+    } catch (error, stackTrace) {
+      _logNotificationError('local notification init', error, stackTrace);
+    }
+  }
+
+  Future<void> _requestLocalNotificationPermission() async {
+    try {
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.requestNotificationsPermission();
+
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
+
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+            MacOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
+    } catch (error, stackTrace) {
+      _logNotificationError(
+        'local notification permission request',
+        error,
+        stackTrace,
+      );
+    }
+  }
+
+  Future<void> _requestPermission() async {
+    try {
+      final settings = await _firebaseMessaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+      debugPrint(
+        '[Notification] permission: ${settings.authorizationStatus.name}',
+      );
+    } catch (error, stackTrace) {
+      _logNotificationError('permission request', error, stackTrace);
+    }
+  }
+
+  /// Lets iOS/macOS present incoming remote notifications while the app is
+  /// foreground. firebase_messaging owns the notification-center delegate, so
+  /// this setting governs foreground display of ALL notifications on Apple
+  /// platforms — including any local notification we show. We therefore let iOS
+  /// present the remote notification natively here and skip the local copy on
+  /// iOS (see [_listenForForegroundMessages]) to avoid a duplicate banner.
+  /// No-op on Android, which never auto-displays foreground messages.
+  Future<void> _enableIosForegroundPresentation() async {
+    try {
+      await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    } catch (error, stackTrace) {
+      _logNotificationError('foreground presentation', error, stackTrace);
+    }
+  }
+
+  Future<void> _loadInitialToken() async {
+    try {
+      final token = await _firebaseMessaging.getToken();
+      if (token == null || token.isEmpty) {
+        debugPrint('[Notification] FCM token is not available yet.');
+        return;
+      }
+
+      _emitToken(token);
+      debugPrint('[Notification] FCM token: $token');
+    } catch (error, stackTrace) {
+      _logNotificationError('token load', error, stackTrace);
+    }
+  }
+
+  void _listenForTokenRefresh() {
+    _firebaseMessaging.onTokenRefresh.listen(
+      (token) {
+        _emitToken(token);
+        debugPrint('[Notification] FCM token refreshed: $token');
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        _logNotificationError('token refresh', error, stackTrace);
+      },
+    );
+  }
+
+  void _listenForForegroundMessages() {
+    FirebaseMessaging.onMessage.listen(
+      (message) {
+        _messageController.add(message);
+        logRemoteMessage(message, source: 'foreground');
+        // Android does not display notification messages while foregrounded, so
+        // surface them with a local notification. iOS/macOS present the remote
+        // notification natively (see [_enableIosForegroundPresentation]); a
+        // local copy there would double the banner.
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          unawaited(_showForegroundNotification(message));
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        _logNotificationError('foreground message', error, stackTrace);
+      },
+    );
+  }
+
+  Future<void> _showForegroundNotification(RemoteMessage message) async {
+    final title = message.notification?.title ?? message.data['title'];
+    final body = message.notification?.body ?? message.data['body'];
+    if ((title == null || title.isEmpty) && (body == null || body.isEmpty)) {
+      return;
+    }
+
+    final androidDetails = AndroidNotificationDetails(
+      _foregroundChannel.id,
+      _foregroundChannel.name,
+      channelDescription: _foregroundChannel.description,
+      importance: Importance.high,
+      priority: Priority.high,
+      ticker: 'numi_notification',
+    );
+    const darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      presentBanner: true,
+      presentList: true,
+    );
+    final details = NotificationDetails(
+      android: androidDetails,
+      iOS: darwinDetails,
+      macOS: darwinDetails,
+    );
+
+    try {
+      await _localNotifications.show(
+        id: _notificationIdFor(message),
+        title: title,
+        body: body,
+        notificationDetails: details,
+        payload: jsonEncode(message.data),
+      );
+    } catch (error, stackTrace) {
+      _logNotificationError('foreground local notification', error, stackTrace);
+    }
+  }
+
+  int _notificationIdFor(RemoteMessage message) {
+    final source = message.messageId ?? DateTime.now().toIso8601String();
+    return source.hashCode & 0x7fffffff;
+  }
+
+  static void _handleLocalNotificationResponse(NotificationResponse response) {
+    _localResponseController.add(response);
+    debugPrint(
+      '[Notification] local tap id=${response.id} payload=${response.payload}',
+    );
+  }
+
+  void _listenForOpenedMessages() {
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (message) {
+        _messageController.add(message);
+        logRemoteMessage(message, source: 'opened');
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        _logNotificationError('opened message', error, stackTrace);
+      },
+    );
+  }
+
+  Future<void> _handleInitialMessage() async {
+    try {
+      final message = await _firebaseMessaging.getInitialMessage();
+      if (message == null) {
+        return;
+      }
+
+      _messageController.add(message);
+      logRemoteMessage(message, source: 'initial');
+    } catch (error, stackTrace) {
+      _logNotificationError('initial message', error, stackTrace);
+    }
+  }
+
+  static void logRemoteMessage(
+    RemoteMessage message, {
+    required String source,
+  }) {
+    final notification = message.notification;
+    debugPrint(
+      '[Notification] $source message id=${message.messageId} '
+      'title=${notification?.title} body=${notification?.body} '
+      'data=${message.data}',
+    );
+  }
+}
+
+void _logNotificationError(String action, Object error, StackTrace stackTrace) {
+  debugPrint('[Notification] $action failed: $error');
+  if (kDebugMode) {
+    debugPrintStack(stackTrace: stackTrace);
+  }
+}

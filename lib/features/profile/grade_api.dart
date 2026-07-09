@@ -18,13 +18,10 @@ abstract class GradeService {
 }
 
 class GradeApi implements GradeService {
-  GradeApi({
-    String? baseUrl,
-    NetworkApi? networkApi,
-  }) : _networkApi = networkApi ??
-            (baseUrl == null
-                ? NetworkApi.shared
-                : NetworkApi(baseUrl: baseUrl));
+  GradeApi({String? baseUrl, NetworkApi? networkApi})
+    : _networkApi =
+          networkApi ??
+          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
 
   final NetworkApi _networkApi;
 
@@ -36,9 +33,7 @@ class GradeApi implements GradeService {
 
     final GradeListResponse response;
     try {
-      response = await _networkApi.listGrades(
-        GradeListRequest(userId: userId),
-      );
+      response = await _networkApi.listGrades(GradeListRequest(userId: userId));
     } on NetworkException catch (error) {
       throw GradeException(error.message, status: error.status);
     }

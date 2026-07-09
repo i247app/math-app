@@ -15,6 +15,7 @@ import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/network/quiz_models.dart';
 import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/helpers/profile_display_helpers.dart';
@@ -73,6 +74,8 @@ part 'parent/assessment/widgets/parent_assessment_progress_chart.dart';
 part 'parent/assessment/widgets/parent_assessment_score_badge.dart';
 part 'parent/assessment/widgets/parent_assessment_search_field.dart';
 part 'parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
+part 'parent/assessment/widgets/parent_assessment_empty_poster.dart';
+part 'parent/assessment/widgets/parent_assessment_full_skeleton.dart';
 part 'parent/assessment/widgets/parent_assessment_state_card.dart';
 part 'parent/assessment/widgets/parent_assessment_tab_card.dart';
 part 'parent/assessment/widgets/parent_practice_tab_banner.dart';
@@ -119,6 +122,7 @@ part 'parent/room/widgets/parent_room_section_title.dart';
 part 'parent/room/widgets/parent_room_shortcut_tile.dart';
 part 'parent/room/widgets/parent_room_skeleton_block.dart';
 part 'parent/room/widgets/parent_room_skeleton_line.dart';
+part 'parent/room/widgets/parent_room_select_student_card.dart';
 part 'parent/room/widgets/parent_room_state_card.dart';
 part 'parent/room/widgets/parent_room_status_icon.dart';
 part 'parent/room/widgets/parent_room_task_header.dart';
@@ -183,7 +187,6 @@ part 'student/shared/widgets/student_home_sections_loading.dart';
 part 'student/shared/widgets/student_inline_error_panel.dart';
 part 'student/shared/widgets/student_section_header.dart';
 part 'student/shared/widgets/student_state_card.dart';
-part 'widgets/home_assessment_result_card.dart';
 part 'widgets/home_role_dashboard.dart';
 
 enum _HomeTabDestination {
@@ -639,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen>
     final didSave = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (routeContext) => Material(
-          color: Colors.white,
+          color: routeContext.themeColors.pageBackground,
           child: SafeArea(
             child: buildPushedSettingPage(
               context: routeContext,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 
 class HomeTabHeader extends StatelessWidget {
@@ -17,14 +18,15 @@ class HomeTabHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final resolvedTopInset = topInset ?? MediaQuery.paddingOf(context).top;
     return Container(
       height: resolvedTopInset + 60 * scale,
       padding: EdgeInsets.only(top: resolvedTopInset),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         border: Border(
-          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
+          bottom: BorderSide(color: colors.border, width: 4 * scale),
         ),
       ),
       alignment: Alignment.center,
@@ -33,7 +35,7 @@ class HomeTabHeader extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: GoogleFonts.andika(
-          color: const Color(0xFF339395),
+          color: colors.brandStrong,
           fontSize: FontSize.xxxl,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,

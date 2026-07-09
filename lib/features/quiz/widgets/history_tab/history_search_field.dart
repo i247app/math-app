@@ -8,15 +8,16 @@ class _HistorySearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 42 * scale,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.inputSurface,
         borderRadius: BorderRadius.circular(30 * scale),
-        border: Border.all(color: historyCardBorder),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
+            color: colors.shadow,
             blurRadius: 10 * scale,
             offset: Offset(0, 3 * scale),
           ),
@@ -27,7 +28,7 @@ class _HistorySearchField extends StatelessWidget {
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         textInputAction: TextInputAction.search,
         style: TextStyle(
-          color: historyDeepInk,
+          color: colors.textPrimary,
           fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w800,
           letterSpacing: 0,
@@ -35,7 +36,7 @@ class _HistorySearchField extends StatelessWidget {
         decoration: InputDecoration(
           hintText: context.getText(AppKeys.searchHint),
           hintStyle: TextStyle(
-            color: const Color(0xFFD8C5CC),
+            color: colors.inputHint,
             fontSize: FontSize.normal * scale,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
@@ -44,7 +45,7 @@ class _HistorySearchField extends StatelessWidget {
             padding: EdgeInsets.only(left: 14 * scale, right: 6 * scale),
             child: Icon(
               Icons.search_rounded,
-              color: historyNavy,
+              color: colors.brandStrong,
               size: 22 * scale,
             ),
           ),
@@ -52,7 +53,7 @@ class _HistorySearchField extends StatelessWidget {
             onPressed: HapticFeedback.selectionClick,
             icon: Icon(
               Icons.tune_rounded,
-              color: historyNavy,
+              color: colors.brandStrong,
               size: 22 * scale,
             ),
           ),

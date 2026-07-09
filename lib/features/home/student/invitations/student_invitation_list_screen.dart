@@ -142,21 +142,27 @@ class _StudentInvitationListScreenState
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF6FAFB),
+        backgroundColor: context.themeColors.pageBackground,
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
+          backgroundColor: context.themeColors.elevatedSurface,
+          surfaceTintColor: context.themeColors.elevatedSurface,
           leading: IconButton(
             onPressed: _close,
-            icon: const Icon(Icons.arrow_back_rounded),
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: context.themeColors.brandStrong,
+            ),
           ),
-          title: Text(context.getText(AppKeys.studentClassInvitations)),
+          title: Text(
+            context.getText(AppKeys.studentClassInvitations),
+            style: TextStyle(color: context.themeColors.textPrimary),
+          ),
         ),
         body: SafeArea(
           top: false,
           child: RefreshIndicator(
             onRefresh: _loadInvitations,
-            color: homeTeal,
+            color: context.themeColors.brandStrong,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
@@ -164,10 +170,12 @@ class _StudentInvitationListScreenState
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
               children: [
                 if (_isLoading && _invitations.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 120),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 120),
                     child: Center(
-                      child: CircularProgressIndicator(color: homeTeal),
+                      child: CircularProgressIndicator(
+                        color: context.themeColors.brandStrong,
+                      ),
                     ),
                   )
                 else if (_error != null && _invitations.isEmpty)

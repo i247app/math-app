@@ -13,8 +13,9 @@ class _CreateHomeworkClassSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
-      color: Colors.white,
+      color: colors.inputSurface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: isLoading ? null : onTap,
@@ -23,9 +24,9 @@ class _CreateHomeworkClassSelector extends StatelessWidget {
           height: 56,
           padding: const EdgeInsets.fromLTRB(18, 10, 16, 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.inputSurface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFDDE4E6), width: 2),
+            border: Border.all(color: colors.border, width: 2),
           ),
           child: Row(
             children: [
@@ -35,7 +36,7 @@ class _CreateHomeworkClassSelector extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: teacherInk,
+                    color: colors.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     height: 24 / 16,
@@ -43,12 +44,12 @@ class _CreateHomeworkClassSelector extends StatelessWidget {
                 ),
               ),
               if (isLoading)
-                const SizedBox(
+                SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: teacherTeal,
+                    color: colors.brandStrong,
                   ),
                 )
               else

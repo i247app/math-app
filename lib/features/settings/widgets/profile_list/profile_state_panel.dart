@@ -1,8 +1,8 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class ProfileStatePanel extends StatelessWidget {
   const ProfileStatePanel({
@@ -37,13 +37,13 @@ class ProfileStatePanel extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: settingsTeal, size: 54 * scale),
+          Icon(icon, color: AppColors.tealIcon, size: 54 * scale),
           SizedBox(height: 18 * scale),
           Text(
             title,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: settingsDeepInk,
+              color: AppColors.textPrimary,
               fontSize: FontSize.xxxl * scale,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
@@ -54,7 +54,7 @@ class ProfileStatePanel extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: settingsMuted,
+              color: AppColors.textSubtle,
               fontSize: FontSize.small * scale,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -64,7 +64,7 @@ class ProfileStatePanel extends StatelessWidget {
           if (buttonLabel != null && onTap != null) ...[
             SizedBox(height: 20 * scale),
             Material(
-              color: settingsNavy,
+              color: AppColors.tealIcon,
               borderRadius: BorderRadius.circular(999),
               child: InkWell(
                 onTap: onTap,

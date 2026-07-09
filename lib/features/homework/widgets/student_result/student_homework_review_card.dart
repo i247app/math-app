@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class StudentHomeworkReviewCard extends StatelessWidget {
   const StudentHomeworkReviewCard({
@@ -17,17 +18,18 @@ class StudentHomeworkReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 161 * scale,
       clipBehavior: Clip.antiAlias,
       padding: EdgeInsets.all(20 * scale),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: homeworkResultCardBorder),
+        color: colors.elevatedSurface,
+        border: Border.all(color: colors.border),
         borderRadius: BorderRadius.circular(32 * scale),
         boxShadow: [
           BoxShadow(
-            color: homeworkResultInk.withValues(alpha: 0.05),
+            color: colors.shadow,
             blurRadius: 2 * scale,
             offset: Offset(0, 1 * scale),
           ),
@@ -42,7 +44,7 @@ class StudentHomeworkReviewCard extends StatelessWidget {
               width: 96 * scale,
               height: 96 * scale,
               decoration: const BoxDecoration(
-                color: homeworkResultAiAccent,
+                color: AppColors.aiAccentSurface,
                 shape: BoxShape.circle,
               ),
             ),
@@ -55,10 +57,10 @@ class StudentHomeworkReviewCard extends StatelessWidget {
                 height: 56 * scale,
                 padding: EdgeInsets.all(2 * scale),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colors.surface,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: homeworkResultMascotBorder,
+                    color: AppColors.mascotBorder,
                     width: 2 * scale,
                   ),
                 ),
@@ -88,7 +90,7 @@ class StudentHomeworkReviewCard extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.andika(
-                                color: homeworkResultInk,
+                                color: colors.textPrimary,
                                 fontSize: 14 * scale,
                                 fontWeight: FontWeight.w800,
                                 height: 20 / 14,
@@ -99,7 +101,7 @@ class StudentHomeworkReviewCard extends StatelessWidget {
                           SizedBox(width: 4 * scale),
                           Icon(
                             Icons.auto_awesome_rounded,
-                            color: homeworkResultTeal,
+                            color: colors.brandStrong,
                             size: 15 * scale,
                           ),
                         ],
@@ -110,7 +112,7 @@ class StudentHomeworkReviewCard extends StatelessWidget {
                         maxLines: 4,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: homeworkResultMuted,
+                          color: colors.textSecondary,
                           fontSize: 12 * scale,
                           fontWeight: FontWeight.w400,
                           height: 19.5 / 12,

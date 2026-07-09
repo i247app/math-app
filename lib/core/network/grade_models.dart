@@ -4,9 +4,7 @@ part 'grade_models.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class GradeListRequest {
-  const GradeListRequest({
-    required this.userId,
-  });
+  const GradeListRequest({required this.userId});
 
   final int userId;
 

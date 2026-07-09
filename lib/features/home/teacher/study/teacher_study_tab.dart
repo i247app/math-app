@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -11,13 +12,13 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
-import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
 import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/homework/presentation/teacher_homework_screen.dart';
@@ -399,7 +400,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     final scale = widget.scale;
     final visibleExercises = _exercises.take(10).toList(growable: false);
     return ColoredBox(
-      color: const Color(0xFFF9FFFF),
+      color: context.themeColors.pageBackground,
       child: Column(
         children: [
           HomeTabHeader(
@@ -408,7 +409,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
           ),
           Expanded(
             child: RefreshIndicator(
-              color: teacherTeal,
+              color: AppColors.teal520,
               onRefresh: _refreshClassrooms,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(

@@ -31,10 +31,7 @@ class LanguagePill extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20 * scale),
-        border: Border.all(
-          color: const Color(0xFF006762),
-          width: 1.5 * scale,
-        ),
+        border: Border.all(color: const Color(0xFF006762), width: 1.5 * scale),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

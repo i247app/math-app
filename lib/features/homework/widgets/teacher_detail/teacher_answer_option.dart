@@ -16,7 +16,9 @@ class _TeacherAnswerOption extends StatelessWidget {
     final letterBg = selected
         ? const Color(0xFFCDF4F4)
         : const Color(0xFFFFDBD1);
-    final letterColor = selected ? const Color(0xFF1E6467) : teacherCoral;
+    final letterColor = selected
+        ? const Color(0xFF1E6467)
+        : AppColors.coralTeacher;
 
     return Container(
       height: 50,
@@ -54,7 +56,7 @@ class _TeacherAnswerOption extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: teacherInk,
+                color: AppColors.textInkDark,
                 fontSize: 16,
                 fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
                 height: 24 / 16,

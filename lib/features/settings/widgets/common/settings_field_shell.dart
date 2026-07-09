@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+
 class SettingsFieldShell extends StatelessWidget {
   const SettingsFieldShell({
     super.key,
@@ -30,6 +32,7 @@ class SettingsFieldShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -51,9 +54,14 @@ class SettingsFieldShell extends StatelessWidget {
           height: height * scale,
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding * scale),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.inputSurface,
             borderRadius: BorderRadius.circular(borderRadius * scale),
-            border: Border.all(color: borderColor, width: borderWidth * scale),
+            border: Border.all(
+              color: borderColor == const Color(0xFFD8E4E7)
+                  ? colors.border
+                  : borderColor,
+              width: borderWidth * scale,
+            ),
           ),
           alignment: Alignment.center,
           child: child,

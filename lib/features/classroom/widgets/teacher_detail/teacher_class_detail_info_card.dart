@@ -71,7 +71,9 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                 ? SizedBox(
                     height: 164 * scale,
                     child: const Center(
-                      child: CircularProgressIndicator(color: teacherTeal),
+                      child: CircularProgressIndicator(
+                        color: AppColors.teal520,
+                      ),
                     ),
                   )
                 : Column(
@@ -109,7 +111,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: GoogleFonts.andika(
-                                          color: teacherInk,
+                                          color: AppColors.textInkDark,
                                           fontSize: 20 * scale,
                                           fontWeight: FontWeight.w700,
                                           height: 1.6,
@@ -217,7 +219,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                         height: 38 * scale,
                         padding: EdgeInsets.symmetric(horizontal: 21 * scale),
                         decoration: BoxDecoration(
-                          color: teacherMint,
+                          color: AppColors.teacherMint,
                           borderRadius: BorderRadius.circular(16 * scale),
                           border: Border.all(color: const Color(0xFFEFF6FF)),
                         ),
@@ -269,7 +271,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.andika(
-                                  color: teacherMuted,
+                                  color: AppColors.textCoolMuted,
                                   fontSize: 13 * scale,
                                   fontWeight: FontWeight.w700,
                                   height: 1.2,

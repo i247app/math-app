@@ -1,23 +1,25 @@
 .PHONY: build project pods pub clean
 
-# linux and macos based Makefile
+ENV ?= dev
+ENV_FILE = config/env.$(ENV).json
+DART_DEFINE = --dart-define-from-file=$(ENV_FILE)
+
+run:
+	flutter run $(DART_DEFINE)
 
 apk-debug: project
-	flutter build apk --debug
+	flutter build apk --debug $(DART_DEFINE)
 
 apk-release: project
-	flutter build apk --release
+	flutter build apk --release $(DART_DEFINE)
 
 release-android: project
-	flutter build appbundle --release
+	flutter build appbundle --release $(DART_DEFINE)
 
-release-ios:    project
-	flutter build ios --release 
+release-ios: project
+	flutter build ios --release $(DART_DEFINE)
 
 build: project
-#	@echo "prep release quickfix..."
-#	flutter build ios --config-only --release
-#	@echo "prep release quickfix done"
 
 project: clean pub models pods
 
@@ -42,11 +44,11 @@ clean:
 	rm -rf ios/Podfile.lock
 	rm -rf macos/Podfile.lock
 	@echo "cleaning ios files..."
-	rm -rf ios/Podfile.lock ios/Pods ios/.symlinks ios/Flutter/Flutter.framework
+	rm -rf ios/Pods ios/.symlinks ios/Flutter/Flutter.framework
 	@echo "cleaning ios done"
 
 build-release-android:
-	flutter build appbundle --release
+	flutter build appbundle --release $(DART_DEFINE)
 	open build/app/outputs/bundle/release/
 
 # generate-upload-keystore:

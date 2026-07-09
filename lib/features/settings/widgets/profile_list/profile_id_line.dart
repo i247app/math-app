@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,7 +7,6 @@ import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class ProfileIdLine extends StatelessWidget {
   const ProfileIdLine({
@@ -27,9 +27,7 @@ class ProfileIdLine extends StatelessWidget {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(context.getText(AppKeys.profileCodeCopied)),
-      ),
+      SnackBar(content: Text(context.getText(AppKeys.profileCodeCopied))),
     );
   }
 
@@ -40,7 +38,7 @@ class ProfileIdLine extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final color = isActive ? const Color(0xFF604950) : settingsMuted;
+    final color = isActive ? const Color(0xFF604950) : AppColors.textSubtle;
 
     return Row(
       children: [

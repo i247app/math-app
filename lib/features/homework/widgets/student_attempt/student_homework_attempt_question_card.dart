@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class StudentHomeworkAttemptQuestionCard extends StatelessWidget {
   const StudentHomeworkAttemptQuestionCard({
@@ -14,6 +14,7 @@ class StudentHomeworkAttemptQuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       constraints: BoxConstraints(minHeight: 260 * scale),
       alignment: Alignment.center,
@@ -22,15 +23,15 @@ class StudentHomeworkAttemptQuestionCard extends StatelessWidget {
         vertical: 28 * scale,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(32 * scale),
-        border: Border.all(color: const Color(0xFFDCCACA)),
+        border: Border.all(color: colors.border),
       ),
       child: Text(
         question,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: homeworkAttemptInk,
+          color: colors.textPrimary,
           fontSize: 36 * scale,
           fontWeight: FontWeight.w900,
           height: 1.16,

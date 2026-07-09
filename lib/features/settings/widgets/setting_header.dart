@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class SettingHeader extends StatelessWidget {
   const SettingHeader({
@@ -24,12 +24,14 @@ class SettingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Container(
       height: topInset + 60 * scale,
       decoration: BoxDecoration(
         color: backgroundColor,
         border: Border(
-          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
+          bottom: BorderSide(color: colors.border, width: 4 * scale),
         ),
       ),
       padding: EdgeInsets.fromLTRB(
@@ -56,7 +58,7 @@ class SettingHeader extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: const Color(0xFF339395),
+                color: colors.brandStrong,
                 fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0,
@@ -85,6 +87,8 @@ class _SettingHeaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
@@ -93,7 +97,7 @@ class _SettingHeaderButton extends StatelessWidget {
       child: SizedBox(
         width: 40 * scale,
         height: 40 * scale,
-        child: Icon(icon, color: settingsTeal, size: 22 * scale),
+        child: Icon(icon, color: colors.brandStrong, size: 22 * scale),
       ),
     );
   }

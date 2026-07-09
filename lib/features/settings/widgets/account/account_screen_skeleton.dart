@@ -40,9 +40,7 @@ class _AccountScreenSkeletonState extends State<AccountScreenSkeleton>
               Colors.white.withValues(alpha: 0),
             ],
             stops: const [0.28, 0.5, 0.72],
-          ).createShader(
-            Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height),
-          );
+          ).createShader(Rect.fromLTWH(dx, 0, shimmerWidth, bounds.height));
         },
         child: child,
       ),
@@ -64,10 +62,7 @@ class _AccountScreenSkeletonState extends State<AccountScreenSkeleton>
           ),
           SizedBox(height: 24 * scale),
           for (var index = 0; index < 3; index++) ...[
-            _AccountSkeletonBlock(
-              height: 68 * scale,
-              radius: 16 * scale,
-            ),
+            _AccountSkeletonBlock(height: 68 * scale, radius: 16 * scale),
             if (index < 2) SizedBox(height: 20 * scale),
           ],
         ],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class StudentClassTopBar extends StatelessWidget {
   const StudentClassTopBar({
@@ -16,14 +16,15 @@ class StudentClassTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 60,
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colors.shadow,
             blurRadius: 0,
             offset: const Offset(0, 4),
           ),
@@ -40,7 +41,7 @@ class StudentClassTopBar extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.andika(
-                color: studentClassTeal,
+                color: colors.brandStrong,
                 fontSize: 25,
                 fontWeight: FontWeight.w700,
                 height: 34 / 25,

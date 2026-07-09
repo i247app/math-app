@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
@@ -34,6 +33,7 @@ class HomeBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final items = switch (activeRole) {
       ProfileRole.teacher => [
         HomeNavItemData(
@@ -126,48 +126,43 @@ class HomeBottomNavigation extends StatelessWidget {
 
     final radius = BorderRadius.vertical(top: Radius.circular(48 * scale));
 
-    return DecoratedBox(
+    return Container(
+      height: height,
+      padding: EdgeInsets.fromLTRB(
+        20 * scale,
+        12 * scale,
+        20 * scale,
+        bottomInset + 12 * scale,
+      ),
       decoration: BoxDecoration(
+        color: colors.elevatedSurface,
         borderRadius: radius,
+        border: Border(
+          top: BorderSide(
+            color: colors.shadow.withValues(alpha: 0.08),
+            width: 0.5,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 30 * scale,
-            offset: Offset(0, -8 * scale),
+            color: colors.shadow.withValues(alpha: 0.06),
+            blurRadius: 20 * scale,
+            offset: Offset(0, -6 * scale),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            height: height,
-            padding: EdgeInsets.fromLTRB(
-              20 * scale,
-              12 * scale,
-              20 * scale,
-              bottomInset + 12 * scale,
+      child: Row(
+        children: List.generate(items.length, (index) {
+          return Expanded(
+            child: HomeAnimatedNavItem(
+              data: items[index],
+              active: activeIndex == index,
+              teacherStyle: activeRole == ProfileRole.teacher,
+              scale: scale,
+              onTap: () => onTabSelected(index),
             ),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.92),
-              borderRadius: radius,
-            ),
-            child: Row(
-              children: List.generate(items.length, (index) {
-                return Expanded(
-                  child: HomeAnimatedNavItem(
-                    data: items[index],
-                    active: activeIndex == index,
-                    teacherStyle: activeRole == ProfileRole.teacher,
-                    scale: scale,
-                    onTap: () => onTabSelected(index),
-                  ),
-                );
-              }),
-            ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
@@ -191,15 +186,20 @@ class HomeAnimatedNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const activeColor = Color(0xFF38898B);
-    final inactiveColor = const Color(0xFF515F54).withValues(alpha: 0.68);
+    final colors = context.themeColors;
+    final activeColor = colors.brandStrong;
+    final inactiveColor = colors.textSecondary.withValues(alpha: 0.68);
 
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 120),
       curve: Curves.easeOutCubic,
       tween: Tween<double>(end: active ? 1 : 0),
       builder: (context, value, child) {
-        final color = Color.lerp(inactiveColor, Colors.white, value)!;
+        final color = Color.lerp(
+          inactiveColor,
+          Theme.of(context).colorScheme.onPrimary,
+          value,
+        )!;
         return AnimatedScale(
           duration: const Duration(milliseconds: 120),
           curve: Curves.easeOutCubic,
@@ -225,12 +225,12 @@ class HomeAnimatedNavItem extends StatelessWidget {
                     boxShadow: active && !teacherStyle
                         ? [
                             BoxShadow(
-                              color: homeTeal.withValues(alpha: 0.20),
+                              color: colors.brand.withValues(alpha: 0.20),
                               blurRadius: 15 * scale,
                               offset: Offset(0, 10 * scale),
                             ),
                             BoxShadow(
-                              color: homeTeal.withValues(alpha: 0.20),
+                              color: colors.brand.withValues(alpha: 0.20),
                               blurRadius: 6 * scale,
                               offset: Offset(0, 4 * scale),
                             ),

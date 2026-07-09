@@ -4,11 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/utils/phone_input_formatter.dart';
 import 'package:numi_flutter/features/auth/phone_region.dart';
 import 'package:numi_flutter/features/auth/widgets/login/login_action_button.dart';
-import 'package:numi_flutter/features/auth/widgets/login/login_checking_dots.dart';
 import 'package:numi_flutter/features/auth/widgets/login/phone_region_menu.dart';
 
 class LoginCard extends StatelessWidget {
@@ -18,13 +17,13 @@ class LoginCard extends StatelessWidget {
     required this.region,
     required this.onRegionChanged,
     required this.onSendOtp,
+    required this.actionLabel,
     required this.isSendingOtp,
     required this.isCheckingAuthPhone,
     required this.canSendOtp,
     required this.canLoginWithPin,
     required this.onLoginWithPin,
     required this.onPhoneChanged,
-    this.phoneExists,
     this.phoneErrorText,
   });
 
@@ -32,17 +31,19 @@ class LoginCard extends StatelessWidget {
   final PhoneRegion region;
   final ValueChanged<PhoneRegion> onRegionChanged;
   final VoidCallback onSendOtp;
+  final String actionLabel;
   final bool isSendingOtp;
   final bool isCheckingAuthPhone;
   final bool canSendOtp;
   final bool canLoginWithPin;
   final VoidCallback onLoginWithPin;
   final ValueChanged<String> onPhoneChanged;
-  final bool? phoneExists;
   final String? phoneErrorText;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -50,20 +51,16 @@ class LoginCard extends StatelessWidget {
           height: 64,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.inputSurface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFB5BFC2), width: 1.5),
+            border: Border.all(color: colors.borderStrong, width: 1.5),
           ),
           child: Row(
             children: [
               PhoneRegionMenu(region: region, onChanged: onRegionChanged),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Container(
-                  width: 1,
-                  height: 24,
-                  color: const Color(0xFFE2E8F0),
-                ),
+                child: Container(width: 1, height: 24, color: colors.border),
               ),
               Expanded(
                 child: TextField(
@@ -84,15 +81,22 @@ class LoginCard extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: region.hint,
                     hintStyle: GoogleFonts.andika(
-                      color: const Color(0xFFB9C2C5),
+                      color: colors.inputHint,
                       fontWeight: FontWeight.w500,
                       fontSize: 18,
                     ),
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    filled: false,
                     isCollapsed: true,
+                    contentPadding: EdgeInsets.zero,
                   ),
                   style: GoogleFonts.andika(
-                    color: AppColors.ink,
+                    color: colors.textPrimary,
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0,
@@ -105,13 +109,13 @@ class LoginCard extends StatelessWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           child: phoneErrorText == null
-              ? SizedBox(height: canLoginWithPin ? 18 : 24)
+              ? const SizedBox(height: 24)
               : Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 16),
                   child: Text(
                     phoneErrorText!,
-                    style: const TextStyle(
-                      color: Color(0xFFD9534F),
+                    style: TextStyle(
+                      color: colors.error,
                       fontSize: 13,
                       height: 1.25,
                       fontWeight: FontWeight.w800,
@@ -119,53 +123,44 @@ class LoginCard extends StatelessWidget {
                   ),
                 ),
         ),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 180),
-          child: canLoginWithPin
-              ? Padding(
-                  key: const ValueKey('login-with-pin'),
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Center(
+        LoginActionButton(
+          label: actionLabel,
+          onPressed: canSendOtp && !isCheckingAuthPhone && !isSendingOtp
+              ? onSendOtp
+              : null,
+          isBusy: canSendOtp && (isCheckingAuthPhone || isSendingOtp),
+        ),
+        SizedBox(
+          height: 76,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: canLoginWithPin
+                ? Center(
+                    key: const ValueKey('login-with-pin'),
                     child: InkWell(
                       onTap: onLoginWithPin,
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
-                          vertical: 6,
+                          vertical: 18,
                         ),
                         child: Text(
                           context.getText(AppKeys.loginWithPin),
                           style: GoogleFonts.andika(
-                            color: const Color(0xFF001741),
+                            color: colors.textPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                             height: 20 / 16,
                             decoration: TextDecoration.underline,
-                            decorationColor: const Color(0xFF001741),
+                            decorationColor: colors.textPrimary,
                           ),
                         ),
                       ),
                     ),
-                  ),
-                )
-              : const SizedBox.shrink(key: ValueKey('no-pin-login')),
-        ),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 220),
-          child: canSendOtp && (isCheckingAuthPhone || isSendingOtp)
-              ? const LoginCheckingDots(key: ValueKey('checking-phone'))
-              : (canSendOtp)
-              ? LoginActionButton(
-                  label: phoneExists == false
-                      ? context.getText(AppKeys.signup)
-                      : context.getText(AppKeys.login),
-                  onPressed: onSendOtp,
-                )
-              : const SizedBox(
-                  key: ValueKey('send-otp-placeholder'),
-                  height: 56,
-                ),
+                  )
+                : const SizedBox.shrink(key: ValueKey('no-pin-login')),
+          ),
         ),
       ],
     );

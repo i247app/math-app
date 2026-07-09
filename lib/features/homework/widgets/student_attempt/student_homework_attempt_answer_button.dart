@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
 
 class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
   const StudentHomeworkAttemptAnswerButton({
@@ -19,10 +19,11 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final borderColor = selected
-        ? homeworkAttemptTeal
+        ? colors.brandStrong
         : Colors.black.withValues(alpha: 0);
-    final textColor = selected ? homeworkAttemptTeal : homeworkAttemptInk;
+    final textColor = selected ? colors.brandStrong : colors.textPrimary;
 
     return Material(
       color: Colors.transparent,
@@ -35,7 +36,7 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: EdgeInsets.symmetric(horizontal: 14 * scale),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(32 * scale),
             border: Border.all(color: borderColor, width: 2 * scale),
             boxShadow: selected
@@ -45,14 +46,14 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
                       spreadRadius: 4 * scale,
                     ),
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.10),
+                      color: colors.shadow,
                       blurRadius: 6 * scale,
                       offset: Offset(0, 4 * scale),
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: colors.shadow,
                       blurRadius: 2 * scale,
                       offset: Offset(0, 1 * scale),
                     ),

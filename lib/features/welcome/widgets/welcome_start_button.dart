@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class WelcomeStartButton extends StatelessWidget {
   const WelcomeStartButton({
@@ -20,10 +20,11 @@ class WelcomeStartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final radius = BorderRadius.circular(20 * scale);
 
     return Material(
-      color: WelcomeStyle.coral,
+      color: colors.accent,
       borderRadius: radius,
       child: InkWell(
         onTap: () {
@@ -37,7 +38,7 @@ class WelcomeStartButton extends StatelessWidget {
             Text(
               context.getText(labelKey),
               style: GoogleFonts.nunito(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSecondary,
                 fontSize: 18 * scale,
                 fontWeight: FontWeight.w900,
                 height: 1.2,

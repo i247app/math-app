@@ -35,8 +35,10 @@ class ParentCodeActionButton extends StatelessWidget {
         onTap: () => _copyProfileCode(context),
         borderRadius: BorderRadius.circular(8 * scale),
         child: Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: 8 * scale, vertical: 5 * scale),
+          padding: EdgeInsets.symmetric(
+            horizontal: 8 * scale,
+            vertical: 5 * scale,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/account/account_field_shell.dart';
 import 'package:numi_flutter/features/settings/widgets/account/plain_account_text_field.dart';
 
@@ -45,7 +44,7 @@ class AccountPhoneField extends StatelessWidget {
           Text(
             '+84',
             style: GoogleFonts.andika(
-              color: settingsDeepInk,
+              color: AppColors.textPrimary,
               fontSize: FontSize.large * scale,
               fontWeight: FontWeight.w900,
               height: 1,

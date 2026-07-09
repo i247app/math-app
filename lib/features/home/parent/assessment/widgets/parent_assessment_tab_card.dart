@@ -1,22 +1,22 @@
 part of '../../../home_screen.dart';
 
-class _ParentAssessmentTabCard extends StatelessWidget {
-  const _ParentAssessmentTabCard({
-    required this.entry,
+class _AssessmentResultListItemCard extends StatelessWidget {
+  const _AssessmentResultListItemCard({
+    required this.quiz,
     required this.scale,
     required this.onTap,
   });
 
-  final _ParentAssessmentEntry entry;
+  final GeneratedQuiz quiz;
   final double scale;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final percent = entry.quiz.grading?.scorePercentage;
+    final percent = quiz.grading?.scorePercentage;
     final scoreStyle = _parentAssessmentScoreStyle(context, percent);
-    final dateParts = _parentAssessmentDateParts(entry.quiz.createDt);
-    final shortText = _homeQuizShortText(entry.quiz);
+    final dateParts = _parentAssessmentDateParts(quiz.createDt);
+    final shortText = _homeQuizShortText(quiz);
     final radius = BorderRadius.circular(24 * scale);
 
     return Material(
@@ -54,7 +54,6 @@ class _ParentAssessmentTabCard extends StatelessWidget {
               _ParentAssessmentScoreBadge(
                 percentage: percent,
                 color: scoreStyle.color,
-                label: scoreStyle.label,
                 scale: scale,
               ),
               SizedBox(width: 12 * scale),
@@ -81,7 +80,7 @@ class _ParentAssessmentTabCard extends StatelessWidget {
                     ),
                     SizedBox(height: 7 * scale),
                     Text(
-                      _homeQuizTitle(context, entry.quiz),
+                      _homeQuizTitle(context, quiz),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

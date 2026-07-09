@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
 
 class AssessmentErrorState extends StatelessWidget {
@@ -29,12 +29,12 @@ class AssessmentErrorState extends StatelessWidget {
               width: 72 * scale,
               height: 72 * scale,
               decoration: BoxDecoration(
-                color: AssessmentStyle.peach.withValues(alpha: 0.58),
+                color: AppColors.peachStrong.withValues(alpha: 0.58),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.refresh_rounded,
-                color: AssessmentStyle.rust,
+                color: AppColors.rust,
                 size: 34 * scale,
               ),
             ),
@@ -43,7 +43,7 @@ class AssessmentErrorState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AssessmentStyle.muted,
+                color: AppColors.textSubtle,
                 fontSize: 15 * scale,
                 fontWeight: FontWeight.w800,
                 height: 1.35,
@@ -62,7 +62,7 @@ class AssessmentErrorState extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [AssessmentStyle.teal, Color(0xFF73F1E7)],
+                  colors: [AppColors.teal700, Color(0xFF73F1E7)],
                 ),
               ),
             ),

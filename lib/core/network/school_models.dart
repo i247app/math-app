@@ -4,12 +4,7 @@ part 'school_models.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class SchoolListRequest {
-  const SchoolListRequest({
-    this.page,
-    this.size,
-    this.skip,
-    this.takeAll,
-  });
+  const SchoolListRequest({this.page, this.size, this.skip, this.takeAll});
 
   final int? page;
   final int? size;

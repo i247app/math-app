@@ -14,7 +14,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
 
   List<_ParentAssessmentEntry> _entries = const <_ParentAssessmentEntry>[];
   bool _isLoading = true;
-  bool _hasCompletedInitialLoad = false;
   bool _hasPlayedInitialEntrance = false;
   String? _errorMessage;
   int _loadRequestId = 0;
@@ -114,7 +113,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         _entries = entries;
       }
       _isLoading = false;
-      _hasCompletedInitialLoad = true;
       _errorMessage = failed && _entries.isEmpty
           ? context.readText(AppKeys.parentQuizLoadFailed)
           : null;
@@ -143,7 +141,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
             .toList(growable: false)
           ..sort((a, b) => _quizDate(b.quiz).compareTo(_quizDate(a.quiz)));
     _isLoading = false;
-    _hasCompletedInitialLoad = true;
     _errorMessage = null;
   }
 
@@ -215,12 +212,15 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     final scale = widget.args.scale;
     final topInset = MediaQuery.paddingOf(context).top;
     final entries = _filteredEntries;
-    final isInitialLoading = _isLoading && !_hasCompletedInitialLoad;
+    final shouldShowFullSkeleton = _isLoading && _entries.isEmpty;
+    final hasNoAssessments =
+        !_isLoading && _errorMessage == null && _entries.isEmpty;
 
+    final colors = context.themeColors;
     return ColoredBox(
-      color: const Color(0xFFF1FBFA),
+      color: colors.pageBackground,
       child: RefreshIndicator(
-        color: const Color(0xFF339395),
+        color: colors.brandStrong,
         onRefresh: () => _loadAssessments(forceRefresh: true),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(
@@ -242,76 +242,103 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                 widget.args.bottomPadding + 20 * scale,
               ),
               sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  _ParentPracticeTabBanner(
-                    onTap: _openAssessment,
+                delegate: SliverChildListDelegate(
+                  _buildAssessmentChildren(
+                    entries: entries,
+                    hasNoAssessments: hasNoAssessments,
+                    shouldShowFullSkeleton: shouldShowFullSkeleton,
                     scale: scale,
                   ),
-                  SizedBox(height: 13 * scale),
-                  _ParentAssessmentSearchField(
-                    controller: _searchController,
-                    scale: scale,
-                  ),
-                  SizedBox(height: 20 * scale),
-                  Text(
-                    context.getText(AppKeys.parentLearningProgress),
-                    style: TextStyle(
-                      color: const Color(0xFF17252B),
-                      fontSize: FontSize.large * scale,
-                      fontWeight: FontWeight.w900,
-                      height: 1.1,
-                    ),
-                  ),
-                  SizedBox(height: 8 * scale),
-                  _ParentAssessmentProgressChart(
-                    entries: _entries.take(5).toList().reversed.toList(),
-                    scale: scale,
-                  ),
-                  SizedBox(height: 16 * scale),
-                  if (isInitialLoading)
-                    _ParentAssessmentListSkeleton(scale: scale)
-                  else if (_errorMessage != null && _entries.isEmpty)
-                    _initialFadeIn(
-                      child: _ParentAssessmentStateCard(
-                        icon: Icons.cloud_off_rounded,
-                        title: context.getText(AppKeys.historyLoadErrorTitle),
-                        message: _errorMessage!,
-                        onTap: _loadAssessments,
-                        scale: scale,
-                      ),
-                    )
-                  else if (entries.isEmpty)
-                    _initialFadeIn(
-                      child: _ParentAssessmentStateCard(
-                        icon: Icons.assignment_turned_in_outlined,
-                        title: context.getText(AppKeys.noHistoryTitle),
-                        message: context.getText(AppKeys.noHistoryMessage),
-                        onTap: _loadAssessments,
-                        scale: scale,
-                      ),
-                    )
-                  else
-                    _initialFadeIn(
-                      child: Column(
-                        children: [
-                          for (final entry in entries) ...[
-                            _ParentAssessmentTabCard(
-                              entry: entry,
-                              scale: scale,
-                              onTap: () => _openQuizReview(entry.quiz),
-                            ),
-                            SizedBox(height: 14 * scale),
-                          ],
-                        ],
-                      ),
-                    ),
-                ]),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> _buildAssessmentChildren({
+    required List<_ParentAssessmentEntry> entries,
+    required bool hasNoAssessments,
+    required bool shouldShowFullSkeleton,
+    required double scale,
+  }) {
+    final shouldShowProgressChart = _entries.length > 1;
+
+    if (shouldShowFullSkeleton) {
+      return [_ParentAssessmentFullSkeleton(scale: scale)];
+    }
+
+    if (hasNoAssessments) {
+      return [
+        _initialFadeIn(
+          child: _ParentAssessmentEmptyPoster(
+            onTap: _openAssessment,
+            scale: scale,
+          ),
+        ),
+      ];
+    }
+
+    return [
+      _ParentPracticeTabBanner(onTap: _openAssessment, scale: scale),
+      SizedBox(height: 13 * scale),
+      _ParentAssessmentSearchField(controller: _searchController, scale: scale),
+      if (shouldShowProgressChart) ...[
+        SizedBox(height: 20 * scale),
+        Text(
+          context.getText(AppKeys.parentLearningProgress),
+          style: TextStyle(
+            color: const Color(0xFF17252B),
+            fontSize: FontSize.large * scale,
+            fontWeight: FontWeight.w900,
+            height: 1.1,
+          ),
+        ),
+        SizedBox(height: 8 * scale),
+        _ParentAssessmentProgressChart(
+          entries: _entries.take(5).toList().reversed.toList(),
+          scale: scale,
+        ),
+      ],
+      SizedBox(height: 16 * scale),
+      if (_errorMessage != null && _entries.isEmpty)
+        _initialFadeIn(
+          child: _ParentAssessmentStateCard(
+            icon: Icons.cloud_off_rounded,
+            title: context.getText(AppKeys.historyLoadErrorTitle),
+            message: _errorMessage!,
+            onTap: _loadAssessments,
+            scale: scale,
+          ),
+        )
+      else if (entries.isEmpty)
+        _initialFadeIn(
+          child: _ParentAssessmentStateCard(
+            icon: Icons.assignment_turned_in_outlined,
+            title: context.getText(AppKeys.noHistoryTitle),
+            message: context.getText(AppKeys.noHistoryMessage),
+            onTap: _loadAssessments,
+            scale: scale,
+          ),
+        )
+      else
+        _initialFadeIn(
+          child: Column(
+            children: [
+              for (final entry in entries) ...[
+                _AssessmentResultListItemCard(
+                  quiz: entry.quiz,
+                  scale: scale,
+                  onTap: () => _openQuizReview(entry.quiz),
+                ),
+                SizedBox(height: 14 * scale),
+              ],
+            ],
+          ),
+        ),
+    ];
   }
 
   Widget _initialFadeIn({required Widget child}) {

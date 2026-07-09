@@ -97,8 +97,7 @@ class ClassroomJoinRequestActionRequest {
 
   factory ClassroomJoinRequestActionRequest.fromJson(
     Map<String, dynamic> json,
-  ) =>
-      _$ClassroomJoinRequestActionRequestFromJson(json);
+  ) => _$ClassroomJoinRequestActionRequestFromJson(json);
 
   Map<String, dynamic> toJson() =>
       _$ClassroomJoinRequestActionRequestToJson(this);
@@ -149,8 +148,7 @@ class ClassroomInvitationActionRequest {
 
   factory ClassroomInvitationActionRequest.fromJson(
     Map<String, dynamic> json,
-  ) =>
-      _$ClassroomInvitationActionRequestFromJson(json);
+  ) => _$ClassroomInvitationActionRequestFromJson(json);
 
   Map<String, dynamic> toJson() =>
       _$ClassroomInvitationActionRequestToJson(this);
@@ -206,7 +204,8 @@ class ClassroomListResponse {
 
   factory ClassroomListResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
-    final classroomsValue = json['classrooms'] ??
+    final classroomsValue =
+        json['classrooms'] ??
         json['classes'] ??
         json['items'] ??
         _nestedValue(data, 'classrooms') ??
@@ -214,12 +213,10 @@ class ClassroomListResponse {
         _nestedValue(data, 'items') ??
         data;
 
-    return _$ClassroomListResponseFromJson(
-      <String, dynamic>{
-        ...json,
-        'classrooms': classroomsValue,
-      },
-    );
+    return _$ClassroomListResponseFromJson(<String, dynamic>{
+      ...json,
+      'classrooms': classroomsValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomListResponseToJson(this);
@@ -280,7 +277,8 @@ class ClassroomMemberListResponse {
 
   factory ClassroomMemberListResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
-    final membersValue = json['members'] ??
+    final membersValue =
+        json['members'] ??
         json['students'] ??
         json['profiles'] ??
         json['items'] ??
@@ -294,12 +292,10 @@ class ClassroomMemberListResponse {
         _nestedValue(data, 'requests') ??
         data;
 
-    return _$ClassroomMemberListResponseFromJson(
-      <String, dynamic>{
-        ...json,
-        'members': membersValue,
-      },
-    );
+    return _$ClassroomMemberListResponseFromJson(<String, dynamic>{
+      ...json,
+      'members': membersValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomMemberListResponseToJson(this);
@@ -325,11 +321,10 @@ class ClassroomInvitationListResponse {
   final String? mmessage;
   final String? debug;
 
-  factory ClassroomInvitationListResponse.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory ClassroomInvitationListResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
-    final invitationsValue = json['invitations'] ??
+    final invitationsValue =
+        json['invitations'] ??
         json['classroom_invitations'] ??
         json['items'] ??
         json['classes'] ??
@@ -341,12 +336,10 @@ class ClassroomInvitationListResponse {
         _nestedValue(data, 'classrooms') ??
         data;
 
-    return _$ClassroomInvitationListResponseFromJson(
-      <String, dynamic>{
-        ...json,
-        'invitations': invitationsValue,
-      },
-    );
+    return _$ClassroomInvitationListResponseFromJson(<String, dynamic>{
+      ...json,
+      'invitations': invitationsValue,
+    });
   }
 
   Map<String, dynamic> toJson() =>
@@ -373,18 +366,17 @@ class ClassroomResponse {
 
   factory ClassroomResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
-    final classroomValue = json['classroom'] ??
+    final classroomValue =
+        json['classroom'] ??
         json['class'] ??
         _nestedValue(data, 'classroom') ??
         _nestedValue(data, 'class') ??
         data;
 
-    return _$ClassroomResponseFromJson(
-      <String, dynamic>{
-        ...json,
-        'classroom': classroomValue,
-      },
-    );
+    return _$ClassroomResponseFromJson(<String, dynamic>{
+      ...json,
+      'classroom': classroomValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomResponseToJson(this);
@@ -492,47 +484,52 @@ class ClassroomModel {
   final String? modifyDt;
 
   factory ClassroomModel.fromJson(Map<String, dynamic> json) {
-    final studentsValue = json['students'] ??
+    final studentsValue =
+        json['students'] ??
         json['members'] ??
         json['student_profiles'] ??
         _nestedValue(json['data'], 'students');
     final memberCountValue = json['member_count'] ?? json['members_count'];
-    final studentCountValue = json['student_count'] ??
+    final studentCountValue =
+        json['student_count'] ??
         json['students_count'] ??
         (studentsValue is List ? studentsValue.length : null);
-    final pendingRequestCountValue = json['pending_request_count'] ??
+    final pendingRequestCountValue =
+        json['pending_request_count'] ??
         json['pending_requests_count'] ??
         json['join_request_count'] ??
         json['join_requests_count'];
 
-    return _$ClassroomModelFromJson(
-      <String, dynamic>{
-        ...json,
-        'classroom_code': json['classroom_code'] ?? json['invite_code'],
-        'program_ids': json['program_ids'] ??
-            json['programIds'] ??
-            (json['program_id'] == null ? null : <Object?>[json['program_id']]),
-        'owner_profile_id': json['owner_profile_id'] ??
-            _nestedValue(json['owner'], 'profile_id') ??
-            _nestedValue(json['teacher'], 'profile_id'),
-        'owner': json['owner'] ?? json['teacher'],
-        'teacher_name': json['teacher_name'] ??
-            json['owner_name'] ??
-            _nestedValue(json['owner'], 'name') ??
-            _nestedValue(json['teacher'], 'name') ??
-            _nestedValue(json['profile'], 'name'),
-        'program_name': json['program_name'] ??
-            json['program_label'] ??
-            _nestedValue(json['program'], 'label') ??
-            _nestedValue(json['program'], 'name'),
-        'school_name':
-            json['school_name'] ?? _nestedValue(json['school'], 'name'),
-        'students': studentsValue,
-        'member_count': memberCountValue,
-        'student_count': studentCountValue,
-        'pending_request_count': pendingRequestCountValue,
-      },
-    );
+    return _$ClassroomModelFromJson(<String, dynamic>{
+      ...json,
+      'classroom_code': json['classroom_code'] ?? json['invite_code'],
+      'program_ids':
+          json['program_ids'] ??
+          json['programIds'] ??
+          (json['program_id'] == null ? null : <Object?>[json['program_id']]),
+      'owner_profile_id':
+          json['owner_profile_id'] ??
+          _nestedValue(json['owner'], 'profile_id') ??
+          _nestedValue(json['teacher'], 'profile_id'),
+      'owner': json['owner'] ?? json['teacher'],
+      'teacher_name':
+          json['teacher_name'] ??
+          json['owner_name'] ??
+          _nestedValue(json['owner'], 'name') ??
+          _nestedValue(json['teacher'], 'name') ??
+          _nestedValue(json['profile'], 'name'),
+      'program_name':
+          json['program_name'] ??
+          json['program_label'] ??
+          _nestedValue(json['program'], 'label') ??
+          _nestedValue(json['program'], 'name'),
+      'school_name':
+          json['school_name'] ?? _nestedValue(json['school'], 'name'),
+      'students': studentsValue,
+      'member_count': memberCountValue,
+      'student_count': studentCountValue,
+      'pending_request_count': pendingRequestCountValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomModelToJson(this);
@@ -573,23 +570,24 @@ class ClassroomOwner {
   final String? fileUrl;
 
   factory ClassroomOwner.fromJson(Map<String, dynamic> json) {
-    return _$ClassroomOwnerFromJson(
-      <String, dynamic>{
-        ...json,
-        'avatar_url': json['avatar_url'] ??
-            json['profile_avatar_url'] ??
-            _nestedValue(json['profile'], 'avatar_url') ??
-            _nestedValue(json['user'], 'avatar_url'),
-        'image_url': json['image_url'] ??
-            json['profile_image_url'] ??
-            _nestedValue(json['profile'], 'image_url') ??
-            _nestedValue(json['user'], 'image_url'),
-        'file_url': json['file_url'] ??
-            json['profile_file_url'] ??
-            _nestedValue(json['profile'], 'file_url') ??
-            _nestedValue(json['user'], 'file_url'),
-      },
-    );
+    return _$ClassroomOwnerFromJson(<String, dynamic>{
+      ...json,
+      'avatar_url':
+          json['avatar_url'] ??
+          json['profile_avatar_url'] ??
+          _nestedValue(json['profile'], 'avatar_url') ??
+          _nestedValue(json['user'], 'avatar_url'),
+      'image_url':
+          json['image_url'] ??
+          json['profile_image_url'] ??
+          _nestedValue(json['profile'], 'image_url') ??
+          _nestedValue(json['user'], 'image_url'),
+      'file_url':
+          json['file_url'] ??
+          json['profile_file_url'] ??
+          _nestedValue(json['profile'], 'file_url') ??
+          _nestedValue(json['user'], 'file_url'),
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomOwnerToJson(this);
@@ -625,7 +623,8 @@ class ClassroomStudent {
     final profile = json['profile'];
     final user = json['user'];
     final id = json['id'] ?? json['request_id'] ?? json['member_id'];
-    final profileId = json['profile_id'] ??
+    final profileId =
+        json['profile_id'] ??
         _nestedValue(requester, 'profile_id') ??
         _nestedValue(requester, 'id') ??
         _nestedValue(memberProfile, 'profile_id') ??
@@ -634,24 +633,28 @@ class ClassroomStudent {
         json['student_profile_id'] ??
         _nestedValue(profile, 'id') ??
         _nestedValue(profile, 'profile_id');
-    final name = json['name'] ??
+    final name =
+        json['name'] ??
         _nestedValue(requester, 'name') ??
         _nestedValue(memberProfile, 'name') ??
         json['profile_name'] ??
         json['student_name'] ??
         _nestedValue(profile, 'name') ??
         _nestedValue(user, 'name');
-    final avatarKey = json['avatar_key'] ??
+    final avatarKey =
+        json['avatar_key'] ??
         _nestedValue(requester, 'avatar_key') ??
         _nestedValue(memberProfile, 'avatar_key') ??
         _nestedValue(profile, 'avatar_key');
-    final avatarUrl = json['avatar_url'] ??
+    final avatarUrl =
+        json['avatar_url'] ??
         _nestedValue(requester, 'avatar_url') ??
         _nestedValue(memberProfile, 'avatar_url') ??
         json['profile_avatar_url'] ??
         _nestedValue(profile, 'avatar_url') ??
         _nestedValue(user, 'avatar_url');
-    final role = json['role'] ??
+    final role =
+        json['role'] ??
         json['member_role'] ??
         _nestedValue(requester, 'role') ??
         _nestedValue(memberProfile, 'role') ??
@@ -659,19 +662,17 @@ class ClassroomStudent {
     final status = json['status'] ?? json['member_status'];
     final joinedAt = json['joined_at'] ?? json['joined_dt'];
 
-    return _$ClassroomStudentFromJson(
-      <String, dynamic>{
-        ...json,
-        'id': id,
-        'profile_id': profileId,
-        'name': name,
-        'avatar_key': avatarKey,
-        'avatar_url': avatarUrl,
-        'role': role,
-        'status': status,
-        'joined_at': joinedAt,
-      },
-    );
+    return _$ClassroomStudentFromJson(<String, dynamic>{
+      ...json,
+      'id': id,
+      'profile_id': profileId,
+      'name': name,
+      'avatar_key': avatarKey,
+      'avatar_url': avatarUrl,
+      'role': role,
+      'status': status,
+      'joined_at': joinedAt,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomStudentToJson(this);
@@ -710,37 +711,36 @@ class ClassroomInvitation {
   factory ClassroomInvitation.fromJson(Map<String, dynamic> json) {
     final classroom = json['classroom'] ?? json['class'];
     final inviter = json['inviter'] ?? json['teacher'] ?? json['owner'];
-    final classroomId = json['classroom_id'] ??
+    final classroomId =
+        json['classroom_id'] ??
         _nestedValue(classroom, 'classroom_id') ??
         _nestedValue(classroom, 'id');
-    final inviterProfileId = json['inviter_profile_id'] ??
+    final inviterProfileId =
+        json['inviter_profile_id'] ??
         json['teacher_profile_id'] ??
         json['owner_profile_id'] ??
         _nestedValue(inviter, 'profile_id') ??
         _nestedValue(classroom, 'owner_profile_id');
-    final classroomValue = classroom ??
-        <String, dynamic>{
-          ...json,
-          'classroom_id': classroomId,
-        };
+    final classroomValue =
+        classroom ?? <String, dynamic>{...json, 'classroom_id': classroomId};
 
-    return _$ClassroomInvitationFromJson(
-      <String, dynamic>{
-        ...json,
-        'invitation_id': json['invitation_id'] ?? json['request_id'],
-        'classroom_id': classroomId,
-        'inviter_profile_id': inviterProfileId,
-        'inviter_name': json['inviter_name'] ??
-            json['teacher_name'] ??
-            _nestedValue(inviter, 'name') ??
-            _nestedValue(classroom, 'teacher_name'),
-        'created_at': json['created_at'] ??
-            json['created_dt'] ??
-            json['invited_dt'] ??
-            json['requested_dt'],
-        'classroom': classroomValue,
-      },
-    );
+    return _$ClassroomInvitationFromJson(<String, dynamic>{
+      ...json,
+      'invitation_id': json['invitation_id'] ?? json['request_id'],
+      'classroom_id': classroomId,
+      'inviter_profile_id': inviterProfileId,
+      'inviter_name':
+          json['inviter_name'] ??
+          json['teacher_name'] ??
+          _nestedValue(inviter, 'name') ??
+          _nestedValue(classroom, 'teacher_name'),
+      'created_at':
+          json['created_at'] ??
+          json['created_dt'] ??
+          json['invited_dt'] ??
+          json['requested_dt'],
+      'classroom': classroomValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ClassroomInvitationToJson(this);

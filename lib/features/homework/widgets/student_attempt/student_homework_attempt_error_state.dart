@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_bottom_action_button.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkAttemptErrorState extends StatelessWidget {
   const StudentHomeworkAttemptErrorState({
@@ -29,12 +29,12 @@ class StudentHomeworkAttemptErrorState extends StatelessWidget {
               width: 72 * scale,
               height: 72 * scale,
               decoration: BoxDecoration(
-                color: homeworkAttemptPeach.withValues(alpha: 0.58),
+                color: AppColors.peachStrong.withValues(alpha: 0.58),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.refresh_rounded,
-                color: homeworkAttemptRust,
+                color: AppColors.rust,
                 size: 34 * scale,
               ),
             ),
@@ -43,7 +43,7 @@ class StudentHomeworkAttemptErrorState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: homeworkAttemptMuted,
+                color: AppColors.textSubtle,
                 fontSize: 15 * scale,
                 fontWeight: FontWeight.w800,
                 height: 1.35,
@@ -62,7 +62,7 @@ class StudentHomeworkAttemptErrorState extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [homeworkAttemptTeal, Color(0xFF73F1E7)],
+                  colors: [AppColors.teal700, Color(0xFF73F1E7)],
                 ),
               ),
             ),

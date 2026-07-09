@@ -19,6 +19,8 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signup: 'Đăng ký',
     AppKeys.login: 'Đăng nhập',
     AppKeys.loginWithPin: 'Đăng nhập với PIN',
+    AppKeys.authSwitchToSignupPrompt: 'Chưa có tài khoản?',
+    AppKeys.authSwitchToLoginPrompt: 'Đã có tài khoản?',
     AppKeys.otpWithin30Seconds: 'Bạn sẽ nhận được mã trong vòng 30 giây',
     AppKeys.otpTitle: 'MÃ XÁC NHẬN',
     AppKeys.otpSentMessage: 'Mã OTP vừa gửi: {code}',
@@ -53,8 +55,14 @@ const authStrings = <String, Map<String, String>>{
         'Nhập email để theo dõi kết quả kiểm tra và hành\ntrình học tập của bé',
     AppKeys.phoneNumber: 'Số Điện Thoại',
     AppKeys.authPhoneCheckFailed: 'Không thể kiểm tra số điện thoại.',
+    AppKeys.loginPhoneNotRegistered:
+        'Số điện thoại này chưa có tài khoản. Vui lòng đăng ký.',
+    AppKeys.signupPhoneAlreadyRegistered:
+        'Số điện thoại này đã có tài khoản. Vui lòng đăng nhập.',
     AppKeys.signupOtpFailed: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
     AppKeys.loginOtpFailed: 'Không thể gửi OTP. Vui lòng thử lại.',
+    AppKeys.pinLoginFailed:
+        'Không thể đăng nhập bằng PIN. Vui lòng đăng nhập bằng số điện thoại.',
     AppKeys.invalidOtp: 'Mã OTP không đúng. Vui lòng thử lại.',
     AppKeys.missingOtpUser: 'Response OTP thiếu thông tin user.',
     AppKeys.verifyOtpFailed: 'Không thể xác thực OTP. Vui lòng thử lại.',
@@ -79,6 +87,8 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signup: 'Sign up',
     AppKeys.login: 'Log in',
     AppKeys.loginWithPin: 'Log in with PIN',
+    AppKeys.authSwitchToSignupPrompt: "Don't have an account?",
+    AppKeys.authSwitchToLoginPrompt: 'Already have an account?',
     AppKeys.otpWithin30Seconds: 'You will receive a code within 30 seconds',
     AppKeys.otpTitle: 'VERIFICATION CODE',
     AppKeys.otpSentMessage: 'OTP code sent: {code}',
@@ -115,8 +125,14 @@ const authStrings = <String, Map<String, String>>{
         "Enter an email to follow your child's assessment results\nand learning journey",
     AppKeys.phoneNumber: 'Phone Number',
     AppKeys.authPhoneCheckFailed: 'Could not check this phone number.',
+    AppKeys.loginPhoneNotRegistered:
+        'This phone number does not have an account. Please sign up.',
+    AppKeys.signupPhoneAlreadyRegistered:
+        'This phone number already has an account. Please log in.',
     AppKeys.signupOtpFailed: 'Could not send signup OTP. Please try again.',
     AppKeys.loginOtpFailed: 'Could not send OTP. Please try again.',
+    AppKeys.pinLoginFailed:
+        'Could not log in with PIN. Please log in with your phone number.',
     AppKeys.invalidOtp: 'The OTP is incorrect. Please try again.',
     AppKeys.missingOtpUser: 'OTP response is missing user information.',
     AppKeys.verifyOtpFailed: 'Could not verify OTP. Please try again.',

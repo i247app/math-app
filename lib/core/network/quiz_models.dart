@@ -54,10 +54,7 @@ class SubmitQuizRequest {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class SubmitQuizAnswer {
-  const SubmitQuizAnswer({
-    required this.questionNumber,
-    required this.label,
-  });
+  const SubmitQuizAnswer({required this.questionNumber, required this.label});
 
   final int questionNumber;
   final String label;
@@ -70,10 +67,7 @@ class SubmitQuizAnswer {
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class QuizListRequest {
-  const QuizListRequest({
-    this.userId,
-    this.profileId,
-  });
+  const QuizListRequest({this.userId, this.profileId});
 
   final int? userId;
   final int? profileId;
@@ -307,10 +301,7 @@ class QuizQuestion {
 
 @JsonSerializable()
 class QuizAnswer {
-  const QuizAnswer({
-    required this.content,
-    required this.label,
-  });
+  const QuizAnswer({required this.content, required this.label});
 
   final String content;
   final String label;

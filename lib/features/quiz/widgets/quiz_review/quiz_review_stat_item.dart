@@ -52,7 +52,7 @@ class _QuizReviewStatItem extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: quizReviewDeepInk,
+              color: AppColors.textInk,
               fontSize: 12,
               fontWeight: FontWeight.w700,
               height: 1,

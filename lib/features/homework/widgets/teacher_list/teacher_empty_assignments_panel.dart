@@ -7,18 +7,19 @@ class TeacherEmptyAssignmentsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E9EC)),
+        border: Border.all(color: colors.border),
       ),
       child: Text(
         message,
         textAlign: TextAlign.center,
         style: GoogleFonts.andika(
-          color: teacherMuted,
+          color: colors.textSecondary,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),

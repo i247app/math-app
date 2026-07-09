@@ -3,10 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi_flutter/core/theme/font_size.dart';
 
 import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
 import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_style.dart';
 
 class WelcomeDetailsComposition extends StatelessWidget {
   const WelcomeDetailsComposition({
@@ -32,6 +33,8 @@ class WelcomeDetailsComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -58,16 +61,16 @@ class WelcomeDetailsComposition extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.hardEdge,
             children: [
-              const Positioned.fill(
+              Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        WelcomeStyle.backgroundTop,
-                        WelcomeStyle.background,
-                        Colors.white,
+                        colors.pageBackgroundTop,
+                        colors.pageBackground,
+                        colors.surface,
                       ],
                       stops: [0, 0.42, 1],
                     ),
@@ -145,10 +148,10 @@ class _FeatureGrid extends StatelessWidget {
               width: cardWidth,
               height: cardHeight,
               child: const _FeatureCard(
-                imageAsset: WelcomeDetailsComposition._assessmentAsset,
+                imageAsset: WelcomeDetailsComposition._teacherAsset,
                 imageSize: 54,
-                title: 'Đánh giá năng lực',
-                subtitle: 'Hiểu đúng trình độ của con',
+                title: 'Đánh Giá',
+                subtitle: 'Đánh giá năng lực',
               ),
             ),
             SizedBox(width: gap),
@@ -156,10 +159,10 @@ class _FeatureGrid extends StatelessWidget {
               width: cardWidth,
               height: cardHeight,
               child: const _FeatureCard(
-                imageAsset: WelcomeDetailsComposition._teacherAsset,
+                imageAsset: WelcomeDetailsComposition._assessmentAsset,
                 imageSize: 54,
-                title: 'Hỗ trợ giáo viên',
-                subtitle: 'Quản lý lớp học dễ dàng',
+                title: 'Học Toán',
+                subtitle: 'Đến lớp 5',
               ),
             ),
           ],
@@ -173,8 +176,8 @@ class _FeatureGrid extends StatelessWidget {
               child: const _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._progressAsset,
                 imageSize: 54,
-                title: 'Theo dõi tiến độ',
-                subtitle: 'Bám sát sự tiến bộ của con',
+                title: 'Phụ Huynh/GV',
+                subtitle: 'Theo dõi tiến độ',
               ),
             ),
             SizedBox(width: gap),
@@ -184,8 +187,8 @@ class _FeatureGrid extends StatelessWidget {
               child: const _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._gameAsset,
                 imageSize: 54,
-                title: 'Học qua game',
-                subtitle: 'Học mà chơi - Chơi mà giỏi',
+                title: 'Game Toán',
+                subtitle: 'Chơi và học',
               ),
             ),
           ],
@@ -225,8 +228,8 @@ class _BrandLogo extends StatelessWidget {
                 SizedBox(width: 8 * scale),
                 NumiBrandText(
                   fontSize: 20 * scale,
-                  firstColor: WelcomeStyle.deepTeal,
-                  secondColor: WelcomeStyle.taglineCoral,
+                  firstColor: context.themeColors.brandStrong,
+                  secondColor: context.themeColors.accentStrong,
                 ),
               ],
             ),
@@ -252,17 +255,19 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final scale = constraints.maxWidth / 156;
 
         return DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(8 * scale),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF101828).withValues(alpha: 0.08),
+                color: colors.shadow.withValues(alpha: 0.08),
                 offset: Offset(0, 8 * scale),
                 blurRadius: 20 * scale,
               ),
@@ -271,9 +276,9 @@ class _FeatureCard extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.fromLTRB(
               12 * scale,
-              18 * scale,
+              14 * scale,
               12 * scale,
-              12 * scale,
+              10 * scale,
             ),
             child: Column(
               children: [
@@ -283,30 +288,30 @@ class _FeatureCard extends StatelessWidget {
                   height: imageSize * scale,
                   fit: BoxFit.contain,
                 ),
-                SizedBox(height: 12 * scale),
+                SizedBox(height: 8 * scale),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
                     title,
                     maxLines: 1,
                     style: GoogleFonts.nunito(
-                      color: WelcomeStyle.cardTitle,
-                      fontSize: 15 * scale,
+                      color: colors.welcomeTitle,
+                      fontSize: FontSize.normal,
                       fontWeight: FontWeight.w800,
                       height: 1.15,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: 5 * scale),
+                SizedBox(height: 4 * scale),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
                     subtitle,
                     maxLines: 1,
                     style: GoogleFonts.nunito(
-                      color: WelcomeStyle.cardSubtitle,
-                      fontSize: 10.5 * scale,
+                      color: colors.textSecondary,
+                      fontSize: FontSize.small,
                       fontWeight: FontWeight.w500,
                       height: 1.2,
                     ),
@@ -327,6 +332,8 @@ class _PageIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final scale = constraints.maxWidth / 56;
@@ -335,18 +342,18 @@ class _PageIndicator extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _IndicatorDot(color: WelcomeStyle.inactiveDot, size: dotSize),
+            _IndicatorDot(color: colors.welcomeInactiveDot, size: dotSize),
             SizedBox(width: 8 * scale),
             Container(
               width: 24 * scale,
               height: dotSize,
               decoration: BoxDecoration(
-                color: WelcomeStyle.coral,
+                color: colors.accent,
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
             SizedBox(width: 8 * scale),
-            _IndicatorDot(color: WelcomeStyle.inactiveDot, size: dotSize),
+            _IndicatorDot(color: colors.welcomeInactiveDot, size: dotSize),
           ],
         );
       },

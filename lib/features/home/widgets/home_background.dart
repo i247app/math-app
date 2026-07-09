@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+
 class HomeBackground extends StatelessWidget {
   const HomeBackground({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const DecoratedBox(
+    final colors = context.themeColors;
+
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.pageBackground,
         boxShadow: [
           BoxShadow(
-            color: Color(0x3300504B),
+            color: colors.shadow,
             blurRadius: 44,
-            offset: Offset(0, 28),
+            offset: const Offset(0, 28),
           ),
         ],
       ),

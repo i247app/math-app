@@ -25,7 +25,7 @@ class _TeacherSendingInviteOverlay extends StatelessWidget {
                 ],
               ),
               child: const Center(
-                child: CircularProgressIndicator(color: teacherTeal),
+                child: CircularProgressIndicator(color: AppColors.teal520),
               ),
             ),
           ),

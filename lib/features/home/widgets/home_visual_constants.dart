@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
-const homeTeal = Color(0xFF006762);
-const homeMuted = Color(0xFF515F54);
-const homeDeepInk = Color(0xFF253228);
-const homeMintBackground = Color(0xFFEEF9FB);
+const homeTeal = AppColors.teal700;
+const homeMuted = AppColors.textSubtle;
+const homeDeepInk = AppColors.textPrimary;
+const homeMintBackground = AppColors.appBackground;
 
 const studentHomeBellAsset = 'assets/images/student_home_bell.svg';
 const studentHomeNavHomeAsset = 'assets/images/student_home_nav_home.svg';
@@ -21,7 +21,9 @@ const parentHomeNavSettingsAsset = 'assets/images/setting_navbar_icon.svg';
 
 const homeInitialAssessmentBannerAsset =
     'assets/images/parent_home_mode1_assessment_banner.jpg';
-const parentNoStudentMascotAsset = 'assets/images/parent_no_student_mascot.png';
+const parentReviewEmptyAssessmentAsset =
+    'assets/images/parent_review_empty_assessment.png';
+const parentNoStudentMascotAsset = 'assets/images/numi-mascot.png';
 const studentHomeInviteAsset = 'assets/images/student_home_invite.svg';
 const parentHomeAfterReviewBannerAsset =
     'assets/images/parent_banner_after_review.jpg';

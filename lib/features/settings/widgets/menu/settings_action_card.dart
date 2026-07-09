@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class SettingsActionCard extends StatelessWidget {
   const SettingsActionCard({
@@ -28,10 +28,11 @@ class SettingsActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final radius = BorderRadius.circular(16 * scale);
 
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       elevation: 0,
       borderRadius: radius,
       child: InkWell(
@@ -41,11 +42,11 @@ class SettingsActionCard extends StatelessWidget {
           height: 72 * scale,
           padding: EdgeInsets.symmetric(horizontal: 16 * scale),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: radius,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
+                color: colors.shadow.withValues(alpha: 0.06),
                 blurRadius: 10 * scale,
                 offset: Offset(0, 3 * scale),
               ),
@@ -73,7 +74,9 @@ class SettingsActionCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
-                        color: isDestructive ? settingsOrange : settingsDeepInk,
+                        color: isDestructive
+                            ? colors.accentStrong
+                            : colors.textPrimary,
                         fontSize: FontSize.normal * scale,
                         fontWeight: FontWeight.w700,
                         height: 1,
@@ -86,7 +89,7 @@ class SettingsActionCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
-                        color: const Color(0xFF8A9BA8),
+                        color: colors.textMuted,
                         fontSize: FontSize.caption * scale,
                         fontWeight: FontWeight.w400,
                         height: 1,
@@ -98,7 +101,7 @@ class SettingsActionCard extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: const Color(0xFFB8C8D0),
+                color: colors.textMuted,
                 size: 26 * scale,
               ),
             ],

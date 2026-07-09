@@ -1,3 +1,4 @@
+import 'package:numi_flutter/features/settings/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,7 @@ import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
 import 'package:numi_flutter/core/network/program_models.dart';
 import 'package:numi_flutter/core/network/semester_models.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
 import 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
@@ -26,7 +28,6 @@ import 'package:numi_flutter/features/settings/cache/settings_profile_options_ca
 import 'package:numi_flutter/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi_flutter/features/settings/models/setting_screen_args.dart';
 import 'package:numi_flutter/features/settings/presentation/setting_account_screen.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/account_details_panel.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_form_panel.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list_panel.dart';
@@ -87,7 +88,7 @@ class _SettingsDepthRoute<T> extends PageRouteBuilder<T> {
             );
         if (isReversing) {
           return ColoredBox(
-            color: Colors.white,
+            color: context.themeColors.pageBackground,
             child: Transform.scale(
               scale: 1 + (0.14 * progress),
               alignment: Alignment.center,
@@ -97,7 +98,7 @@ class _SettingsDepthRoute<T> extends PageRouteBuilder<T> {
         }
 
         return ColoredBox(
-          color: Colors.white,
+          color: context.themeColors.pageBackground,
           child: Transform.scale(
             scale: 1 - (0.12 * progress),
             alignment: Alignment.center,
@@ -1602,7 +1603,7 @@ class _SettingTabState extends State<SettingTab> {
         : MediaQuery.paddingOf(context).top;
     final headerTitle = _titleForView(context, _view, _editingProfile);
     final canGoBack = widget._isPushedPage || _view != SettingPageView.settings;
-    const backgroundColor = Colors.white;
+    final backgroundColor = context.themeColors.pageBackground;
     final lingo = LingoScope.of(context);
 
     return PopScope(

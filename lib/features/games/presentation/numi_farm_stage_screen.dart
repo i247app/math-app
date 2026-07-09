@@ -87,10 +87,8 @@ int _starsForScore({required int correct, required int total}) {
 }
 
 class NumiFarmHarvestStageScreen extends StatefulWidget {
-  const NumiFarmHarvestStageScreen({
-    super.key,
-    required this.stage,
-  }) : assert(stage == 1 || stage == 2);
+  const NumiFarmHarvestStageScreen({super.key, required this.stage})
+    : assert(stage == 1 || stage == 2);
 
   final int stage;
 
@@ -101,8 +99,9 @@ class NumiFarmHarvestStageScreen extends StatefulWidget {
 
 class _NumiFarmHarvestStageScreenState extends State<NumiFarmHarvestStageScreen>
     with _FarmSessionMixin<NumiFarmHarvestStageScreen> {
-  late final List<NumiFarmCountRound> _rounds =
-      buildHarvestRounds(widget.stage);
+  late final List<NumiFarmCountRound> _rounds = buildHarvestRounds(
+    widget.stage,
+  );
   final Set<int> _pickedCarrots = <int>{};
   int _roundIndex = 0;
   int _correctAnswers = 0;
@@ -201,10 +200,7 @@ class _NumiFarmHarvestStageScreenState extends State<NumiFarmHarvestStageScreen>
   }
 
   int get _earnedStars {
-    return _starsForScore(
-      correct: _correctAnswers,
-      total: _rounds.length,
-    );
+    return _starsForScore(correct: _correctAnswers, total: _rounds.length);
   }
 
   @override
@@ -217,12 +213,7 @@ class _NumiFarmHarvestStageScreenState extends State<NumiFarmHarvestStageScreen>
           builder: (context, constraints) {
             final compact = constraints.maxHeight < 690;
             return Padding(
-              padding: EdgeInsets.fromLTRB(
-                18,
-                compact ? 10 : 16,
-                18,
-                14,
-              ),
+              padding: EdgeInsets.fromLTRB(18, compact ? 10 : 16, 18, 14),
               child: Column(
                 children: [
                   _FarmHeader(
@@ -301,10 +292,7 @@ class _FarmHeader extends StatelessWidget {
                 child: const SizedBox(
                   width: 46,
                   height: 46,
-                  child: Icon(
-                    Icons.arrow_back_rounded,
-                    color: _farmDeepGreen,
-                  ),
+                  child: Icon(Icons.arrow_back_rounded, color: _farmDeepGreen),
                 ),
               ),
             ),
@@ -434,21 +422,25 @@ class _FarmOrderCard extends StatelessWidget {
       ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
-        padding:
-            EdgeInsets.fromLTRB(14, compact ? 10 : 14, 18, compact ? 10 : 14),
+        padding: EdgeInsets.fromLTRB(
+          14,
+          compact ? 10 : 14,
+          18,
+          compact ? 10 : 14,
+        ),
         decoration: BoxDecoration(
           color: isSolved
               ? const Color(0xFFE7F7DF)
               : isWrong
-                  ? const Color(0xFFFFEEEE)
-                  : Colors.white,
+              ? const Color(0xFFFFEEEE)
+              : Colors.white,
           borderRadius: BorderRadius.circular(26),
           border: Border.all(
             color: isSolved
                 ? _farmLeaf.withValues(alpha: 0.45)
                 : isWrong
-                    ? const Color(0xFFE53935)
-                    : _farmGreen.withValues(alpha: 0.10),
+                ? const Color(0xFFE53935)
+                : _farmGreen.withValues(alpha: 0.10),
             width: isWrong ? 2 : 1,
           ),
           boxShadow: [
@@ -478,8 +470,8 @@ class _FarmOrderCard extends StatelessWidget {
                     isSolved
                         ? context.getText(AppKeys.gamesFarmCorrect)
                         : isWrong
-                            ? context.getText(AppKeys.gamesFarmIncorrect)
-                            : context.getText(AppKeys.gamesFarmOrderLabel),
+                        ? context.getText(AppKeys.gamesFarmIncorrect)
+                        : context.getText(AppKeys.gamesFarmOrderLabel),
                     style: TextStyle(
                       color: isSolved ? _farmDeepGreen : _farmMuted,
                       fontSize: 12,
@@ -672,10 +664,7 @@ class _CarrotIllustration extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.all(8),
-      child: CustomPaint(
-        painter: _CarrotPainter(),
-        child: SizedBox.expand(),
-      ),
+      child: CustomPaint(painter: _CarrotPainter(), child: SizedBox.expand()),
     );
   }
 }
@@ -806,8 +795,8 @@ class _FarmBottomBar extends StatelessWidget {
               disabledBackgroundColor: isSolved
                   ? _farmLeaf
                   : isWrong
-                      ? const Color(0xFFE53935)
-                      : _farmGreen.withValues(alpha: 0.16),
+                  ? const Color(0xFFE53935)
+                  : _farmGreen.withValues(alpha: 0.16),
               disabledForegroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -818,8 +807,8 @@ class _FarmBottomBar extends StatelessWidget {
               isSolved
                   ? context.getText(AppKeys.gamesFarmCorrect)
                   : isWrong
-                      ? context.getText(AppKeys.gamesFarmIncorrect)
-                      : context.getText(AppKeys.gamesFarmCheck),
+                  ? context.getText(AppKeys.gamesFarmIncorrect)
+                  : context.getText(AppKeys.gamesFarmCheck),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15,
@@ -834,10 +823,8 @@ class _FarmBottomBar extends StatelessWidget {
 }
 
 class NumiFarmChoiceStageScreen extends StatefulWidget {
-  const NumiFarmChoiceStageScreen({
-    super.key,
-    required this.stage,
-  }) : assert(stage >= 3 && stage <= 5);
+  const NumiFarmChoiceStageScreen({super.key, required this.stage})
+    : assert(stage >= 3 && stage <= 5);
 
   final int stage;
 
@@ -848,8 +835,9 @@ class NumiFarmChoiceStageScreen extends StatefulWidget {
 
 class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
     with _FarmSessionMixin<NumiFarmChoiceStageScreen> {
-  late final List<NumiFarmChoiceRound> _rounds =
-      buildChoiceRounds(widget.stage);
+  late final List<NumiFarmChoiceRound> _rounds = buildChoiceRounds(
+    widget.stage,
+  );
   int _roundIndex = 0;
   int _correctAnswers = 0;
   int _wrongAnswers = 0;
@@ -942,17 +930,14 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
   }
 
   int get _earnedStars {
-    return _starsForScore(
-      correct: _correctAnswers,
-      total: _rounds.length,
-    );
+    return _starsForScore(correct: _correctAnswers, total: _rounds.length);
   }
 
   String get _promptKey => switch (_round.kind) {
-        NumiFarmChoiceKind.comparison => AppKeys.gamesFarmComparePrompt,
-        NumiFarmChoiceKind.addition => AppKeys.gamesFarmAdditionPrompt,
-        NumiFarmChoiceKind.subtraction => AppKeys.gamesFarmSubtractionPrompt,
-      };
+    NumiFarmChoiceKind.comparison => AppKeys.gamesFarmComparePrompt,
+    NumiFarmChoiceKind.addition => AppKeys.gamesFarmAdditionPrompt,
+    NumiFarmChoiceKind.subtraction => AppKeys.gamesFarmSubtractionPrompt,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -985,10 +970,7 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
                   Expanded(
                     child: TweenAnimationBuilder<double>(
                       key: ValueKey(_feedbackTick),
-                      tween: Tween(
-                        begin: _feedbackTick == 0 ? 0 : 1,
-                        end: 0,
-                      ),
+                      tween: Tween(begin: _feedbackTick == 0 ? 0 : 1, end: 0),
                       duration: const Duration(milliseconds: 420),
                       builder: (context, value, child) => Transform.translate(
                         offset: Offset(
@@ -1020,8 +1002,8 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
                       disabledBackgroundColor: _isSolved
                           ? _farmLeaf
                           : _isWrong
-                              ? const Color(0xFFE53935)
-                              : _farmGreen.withValues(alpha: 0.16),
+                          ? const Color(0xFFE53935)
+                          : _farmGreen.withValues(alpha: 0.16),
                       disabledForegroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -1031,8 +1013,8 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
                       _isSolved
                           ? context.getText(AppKeys.gamesFarmCorrect)
                           : _isWrong
-                              ? context.getText(AppKeys.gamesFarmIncorrect)
-                              : context.getText(AppKeys.gamesFarmCheck),
+                          ? context.getText(AppKeys.gamesFarmIncorrect)
+                          : context.getText(AppKeys.gamesFarmCheck),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
@@ -1070,15 +1052,15 @@ class _FarmChoicePrompt extends StatelessWidget {
         color: isSolved
             ? const Color(0xFFE7F7DF)
             : isWrong
-                ? const Color(0xFFFFEEEE)
-                : Colors.white,
+            ? const Color(0xFFFFEEEE)
+            : Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: isSolved
               ? _farmLeaf.withValues(alpha: 0.45)
               : isWrong
-                  ? const Color(0xFFE53935)
-                  : _farmGreen.withValues(alpha: 0.10),
+              ? const Color(0xFFE53935)
+              : _farmGreen.withValues(alpha: 0.10),
           width: isWrong ? 2 : 1,
         ),
       ),
@@ -1099,8 +1081,8 @@ class _FarmChoicePrompt extends StatelessWidget {
                 isSolved
                     ? AppKeys.gamesFarmCorrect
                     : isWrong
-                        ? AppKeys.gamesFarmIncorrect
-                        : promptKey,
+                    ? AppKeys.gamesFarmIncorrect
+                    : promptKey,
               ),
               style: const TextStyle(
                 color: _farmInk,
@@ -1255,10 +1237,7 @@ class _ProduceBasket extends StatelessWidget {
             alignment: WrapAlignment.center,
             spacing: 3,
             runSpacing: 3,
-            children: List.generate(
-              count,
-              (_) => const _MiniProduce(),
-            ),
+            children: List.generate(count, (_) => const _MiniProduce()),
           ),
           const SizedBox(height: 8),
           Container(
@@ -1363,15 +1342,15 @@ class _FarmAnswerButton extends StatelessWidget {
     final background = isCorrect
         ? _farmLeaf
         : isWrong
-            ? const Color(0xFFFFEEEE)
-            : isSelected
-                ? _farmGreen
-                : Colors.white;
+        ? const Color(0xFFFFEEEE)
+        : isSelected
+        ? _farmGreen
+        : Colors.white;
     final foreground = isWrong
         ? const Color(0xFFD32F2F)
         : isCorrect || isSelected
-            ? Colors.white
-            : _farmInk;
+        ? Colors.white
+        : _farmInk;
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -1456,10 +1435,9 @@ class _FarmStageCompleteDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              context.formatText(
-                AppKeys.gamesFarmCompleteMessage,
-                {'stage': stage},
-              ),
+              context.formatText(AppKeys.gamesFarmCompleteMessage, {
+                'stage': stage,
+              }),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: _farmMuted,
@@ -1497,11 +1475,7 @@ class _FarmStageCompleteDialog extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.timer_outlined,
-                    color: _farmGreen,
-                    size: 20,
-                  ),
+                  const Icon(Icons.timer_outlined, color: _farmGreen, size: 20),
                   const SizedBox(width: 7),
                   Text(
                     '${context.getText(AppKeys.gamesFarmTime)} '

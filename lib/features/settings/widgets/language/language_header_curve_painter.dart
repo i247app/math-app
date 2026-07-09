@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/settings/settings_style.dart';
-
 class LanguageHeaderCurvePainter extends CustomPainter {
-  const LanguageHeaderCurvePainter({required this.scale});
+  const LanguageHeaderCurvePainter({
+    required this.scale,
+    required this.backgroundColor,
+    required this.lineColor,
+  });
 
   final double scale;
+  final Color backgroundColor;
+  final Color lineColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final backgroundPaint = Paint()..color = settingsLanguageBackground;
+    final backgroundPaint = Paint()..color = backgroundColor;
     canvas.drawRect(Offset.zero & size, backgroundPaint);
 
     final linePaint = Paint()
-      ..color = settingsLanguageHeaderLine.withValues(alpha: 0.78)
+      ..color = lineColor.withValues(alpha: 0.78)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.1 * scale;
 
@@ -30,6 +34,8 @@ class LanguageHeaderCurvePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant LanguageHeaderCurvePainter oldDelegate) {
-    return oldDelegate.scale != scale;
+    return oldDelegate.scale != scale ||
+        oldDelegate.backgroundColor != backgroundColor ||
+        oldDelegate.lineColor != lineColor;
   }
 }

@@ -7,12 +7,13 @@ class _TeacherClassroomHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: MediaQuery.paddingOf(context).top + 60 * scale,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         border: Border(
-          bottom: BorderSide(color: const Color(0xFFF2F2F2), width: 4 * scale),
+          bottom: BorderSide(color: colors.border, width: 4 * scale),
         ),
       ),
       padding: EdgeInsets.fromLTRB(
@@ -31,7 +32,7 @@ class _TeacherClassroomHeader extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: teacherTeal,
+                color: colors.brandStrong,
                 fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w700,
               ),

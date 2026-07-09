@@ -25,9 +25,10 @@ class _CreateHomeworkSelectField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final text = valueText ?? context.getText(valueKey!);
     return Material(
-      color: Colors.white,
+      color: colors.inputSurface,
       borderRadius: BorderRadius.circular(radius),
       child: InkWell(
         onTap: onTap,
@@ -36,9 +37,14 @@ class _CreateHomeworkSelectField extends StatelessWidget {
           height: 56,
           padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.inputSurface,
             borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: borderColor, width: borderWidth),
+            border: Border.all(
+              color: borderColor == const Color(0xFFDDE4E6)
+                  ? colors.border
+                  : borderColor,
+              width: borderWidth,
+            ),
           ),
           child: Row(
             children: [
@@ -48,7 +54,7 @@ class _CreateHomeworkSelectField extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: teacherInk.withValues(alpha: 0.7),
+                    color: colors.textPrimary.withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),

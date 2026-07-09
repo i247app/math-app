@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
 import 'package:numi_flutter/features/settings/helpers/settings_account_helpers.dart';
@@ -242,7 +243,7 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
                 title: context.getText(AppKeys.accountTitle),
                 canGoBack: true,
                 onBack: _close,
-                backgroundColor: Colors.white,
+                backgroundColor: context.themeColors.elevatedSurface,
                 scale: scale,
                 topInset: 0,
               ),

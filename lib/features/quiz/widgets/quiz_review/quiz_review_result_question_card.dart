@@ -13,16 +13,17 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final correctLabel = _quizReviewCorrectAnswerLabel(question);
     final isCorrect = selectedLabel != null && selectedLabel == correctLabel;
-    final accent = isCorrect ? quizReviewTeal : quizReviewRed;
+    final accent = isCorrect ? AppColors.teal600 : AppColors.red;
+    final colors = context.themeColors;
 
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(13),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colors.shadow,
             blurRadius: 14,
             offset: const Offset(0, 5),
           ),
@@ -44,9 +45,11 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
                         _QuizReviewQuestionBadge(
                           number: question.questionNumber,
                           color: isCorrect
-                              ? quizReviewTealSoft
+                              ? AppColors.aquaMist
                               : const Color(0xFFFFD9DC),
-                          textColor: isCorrect ? quizReviewTeal : quizReviewRed,
+                          textColor: isCorrect
+                              ? AppColors.teal600
+                              : AppColors.red,
                         ),
                         const Spacer(),
                         _QuizReviewQuestionStatus(isCorrect: isCorrect),
@@ -57,8 +60,8 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
                       question.questionName,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: quizReviewDeepInk,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 23,
                         fontWeight: FontWeight.w900,
                         height: 1.15,

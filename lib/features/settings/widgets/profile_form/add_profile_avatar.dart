@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -6,7 +7,6 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/profile/catalog/profile_avatar_catalog.dart';
 import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class AddProfileAvatar extends StatelessWidget {
   const AddProfileAvatar({
@@ -75,8 +75,9 @@ class AddProfileAvatar extends StatelessWidget {
                   child: Material(
                     color: const Color(0xFFFFD8D8),
                     elevation: 5,
-                    shadowColor:
-                        const Color(0xFFE83434).withValues(alpha: 0.16),
+                    shadowColor: const Color(
+                      0xFFE83434,
+                    ).withValues(alpha: 0.16),
                     shape: const CircleBorder(),
                     child: InkWell(
                       customBorder: const CircleBorder(),
@@ -97,9 +98,9 @@ class AddProfileAvatar extends StatelessWidget {
                 right: 10 * scale,
                 bottom: 18 * scale,
                 child: Material(
-                  color: settingsTeal,
+                  color: AppColors.tealIcon,
                   elevation: 5,
-                  shadowColor: settingsTeal.withValues(alpha: 0.24),
+                  shadowColor: AppColors.tealIcon.withValues(alpha: 0.24),
                   shape: const CircleBorder(),
                   child: InkWell(
                     customBorder: const CircleBorder(),
@@ -175,7 +176,7 @@ class AddProfileAvatar extends StatelessWidget {
                   Text(
                     context.getText(AppKeys.chooseAvatar),
                     style: GoogleFonts.andika(
-                      color: settingsTeal,
+                      color: AppColors.tealIcon,
                       fontSize: FontSize.xxxl * scale,
                       fontWeight: FontWeight.w900,
                       height: 1.15,
@@ -209,7 +210,7 @@ class AddProfileAvatar extends StatelessWidget {
                                   size: 82 * scale,
                                   avatarKey: option.key,
                                   borderColor: isSelected
-                                      ? settingsTeal
+                                      ? AppColors.tealIcon
                                       : Colors.transparent,
                                   borderWidth: 4 * scale,
                                 ),
@@ -219,7 +220,7 @@ class AddProfileAvatar extends StatelessWidget {
                                     bottom: 4 * scale,
                                     child: Icon(
                                       Icons.check_circle_rounded,
-                                      color: settingsTeal,
+                                      color: AppColors.tealIcon,
                                       size: 24 * scale,
                                     ),
                                   ),

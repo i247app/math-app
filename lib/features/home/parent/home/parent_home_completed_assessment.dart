@@ -54,8 +54,9 @@ extension _ParentHomeCompletedAssessmentView on _ParentHomeContentState {
             markOnEnd:
                 entry.$1 == 1 ||
                 entry.$1 == _completedAssessments.take(2).length - 1,
-            child: _HomeAssessmentResultCard(
+            child: _AssessmentResultListItemCard(
               quiz: entry.$2,
+              scale: widget.args.scale,
               onTap: () => _openParentAssessmentResult(entry.$2),
             ),
           ),

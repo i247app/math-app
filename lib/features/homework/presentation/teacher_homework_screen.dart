@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'dart:async';
 import 'dart:ui';
 
@@ -8,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/core/network/classroom_models.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
@@ -15,7 +17,6 @@ import 'package:numi_flutter/core/network/program_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
 import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
-import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_style.dart';
 import 'package:numi_flutter/features/homework/homework_api.dart';
 import 'package:numi_flutter/features/profile/grade_api.dart';
 import 'package:numi_flutter/features/profile/profile_api.dart';
@@ -194,8 +195,10 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FFFF),
+      backgroundColor: colors.pageBackground,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -209,7 +212,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
             ),
             Expanded(
               child: RefreshIndicator(
-                color: teacherTeal,
+                color: colors.brandStrong,
                 onRefresh: () => _loadExercises(forceRefresh: true),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
@@ -236,11 +239,11 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                       _TeacherHomeworkSectionHeader(purpose: widget.purpose),
                       const SizedBox(height: 17),
                       if (_isLoading && _exercises.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 40),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 40),
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: teacherTeal,
+                              color: colors.brandStrong,
                             ),
                           ),
                         )

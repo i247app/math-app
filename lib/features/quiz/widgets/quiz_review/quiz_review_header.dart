@@ -7,12 +7,13 @@ class _QuizReviewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Color(0xFFF2F2F2), width: 4)),
+      decoration: BoxDecoration(
+        color: colors.elevatedSurface,
+        border: Border(bottom: BorderSide(color: colors.border, width: 4)),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -24,9 +25,9 @@ class _QuizReviewHeader extends StatelessWidget {
                 FocusManager.instance.primaryFocus?.unfocus();
                 onBack();
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
-                color: Color(0xFF339395),
+                color: colors.brandStrong,
                 size: 28,
               ),
               tooltip: context.getText(AppKeys.back),
@@ -40,7 +41,7 @@ class _QuizReviewHeader extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.andika(
-                color: const Color(0xFF339395),
+                color: colors.brandStrong,
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0,

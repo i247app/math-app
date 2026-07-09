@@ -22,7 +22,9 @@ class _TeacherStudentSearchResultList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isSearching && profiles.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: teacherTeal));
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.teal520),
+      );
     }
     if (error != null) {
       return Center(
@@ -30,7 +32,7 @@ class _TeacherStudentSearchResultList extends StatelessWidget {
           context.getText(AppKeys.teacherSearchStudentFailed),
           textAlign: TextAlign.center,
           style: GoogleFonts.andika(
-            color: teacherMuted,
+            color: AppColors.textCoolMuted,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -43,7 +45,7 @@ class _TeacherStudentSearchResultList extends StatelessWidget {
           context.getText(AppKeys.teacherNoStudentResults),
           textAlign: TextAlign.center,
           style: GoogleFonts.andika(
-            color: teacherMuted,
+            color: AppColors.textCoolMuted,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),

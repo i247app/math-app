@@ -16,7 +16,7 @@ class _TeacherClassroomAddButton extends StatelessWidget {
           width: 90 * scale,
           height: 36 * scale,
           decoration: BoxDecoration(
-            color: teacherCoral,
+            color: AppColors.coralTeacher,
             borderRadius: BorderRadius.circular(12 * scale),
           ),
           child: Icon(Icons.add, color: Colors.white, size: 24 * scale),

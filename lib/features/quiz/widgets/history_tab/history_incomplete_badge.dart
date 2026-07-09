@@ -15,7 +15,7 @@ class _HistoryIncompleteBadge extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: historyOrange,
+          color: AppColors.orangeMuted,
           fontSize: FontSize.caption * 0.77 * scale,
           fontWeight: FontWeight.w900,
           height: 1.1,

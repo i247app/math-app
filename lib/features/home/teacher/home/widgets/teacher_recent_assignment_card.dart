@@ -58,7 +58,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                       Text(
                         dateParts.day,
                         style: GoogleFonts.andika(
-                          color: teacherBlue,
+                          color: AppColors.navy900,
                           fontSize: FontSize.large * scale,
                           fontWeight: FontWeight.w900,
                           height: 0.95,
@@ -67,7 +67,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                       Text(
                         dateParts.month,
                         style: GoogleFonts.andika(
-                          color: teacherMuted,
+                          color: AppColors.textCoolMuted,
                           fontSize: FontSize.caption * 0.7 * scale,
                           fontWeight: FontWeight.w800,
                           height: 1.15,
@@ -82,7 +82,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: teacherInk,
+                    color: AppColors.textInkDark,
                     fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w800,
                     height: 1.25,
@@ -95,7 +95,7 @@ class _TeacherRecentAssignmentCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: teacherMuted,
+                    color: AppColors.textCoolMuted,
                     fontSize: FontSize.caption * scale,
                     fontWeight: FontWeight.w600,
                     height: 1.2,

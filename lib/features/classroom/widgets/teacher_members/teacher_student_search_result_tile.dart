@@ -28,7 +28,7 @@ class _TeacherStudentSearchResultTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: selected ? teacherTeal : const Color(0xFFE5ECEF),
+              color: selected ? AppColors.teal520 : const Color(0xFFE5ECEF),
             ),
           ),
           child: Row(
@@ -61,7 +61,7 @@ class _TeacherStudentSearchResultTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
-                          color: teacherMuted,
+                          color: AppColors.textCoolMuted,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           height: 1.25,
@@ -73,7 +73,7 @@ class _TeacherStudentSearchResultTile extends StatelessWidget {
               const SizedBox(width: 10),
               Checkbox(
                 value: selected,
-                activeColor: teacherTeal,
+                activeColor: AppColors.teal520,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),

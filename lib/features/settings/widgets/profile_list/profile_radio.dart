@@ -1,13 +1,8 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/settings/settings_style.dart';
-
 class ProfileRadio extends StatelessWidget {
-  const ProfileRadio({
-    super.key,
-    required this.isActive,
-    required this.scale,
-  });
+  const ProfileRadio({super.key, required this.isActive, required this.scale});
 
   final bool isActive;
   final double scale;
@@ -20,12 +15,9 @@ class ProfileRadio extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: isActive ? settingsTeal : Colors.white,
+        color: isActive ? AppColors.tealIcon : Colors.white,
         shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.black,
-          width: 3 * scale,
-        ),
+        border: Border.all(color: Colors.black, width: 3 * scale),
       ),
     );
   }

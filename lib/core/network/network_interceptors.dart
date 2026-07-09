@@ -99,8 +99,7 @@ class NetworkLogInterceptor extends Interceptor {
       'access_token' ||
       'accesstoken' ||
       'refresh_token' ||
-      'refreshtoken' =>
-        true,
+      'refreshtoken' => true,
       _ => false,
     };
   }
@@ -128,10 +127,7 @@ class NetworkLogInterceptor extends Interceptor {
       };
     }).toList();
 
-    return _jsonOrString(<String, Object?>{
-      'fields': fields,
-      'files': files,
-    });
+    return _jsonOrString(<String, Object?>{'fields': fields, 'files': files});
   }
 
   static String _jsonOrString(Object? value) {
@@ -165,7 +161,7 @@ class DefaultHeadersInterceptor extends Interceptor {
 
 class MetadataInterceptor extends QueuedInterceptor {
   MetadataInterceptor({required ApiMetadataProvider metadataProvider})
-      : _metadataProvider = metadataProvider;
+    : _metadataProvider = metadataProvider;
 
   final ApiMetadataProvider _metadataProvider;
 
@@ -214,10 +210,7 @@ class MetadataInterceptor extends QueuedInterceptor {
       return;
     }
 
-    options.data = <String, dynamic>{
-      ...data,
-      'metadata': metadata,
-    };
+    options.data = <String, dynamic>{...data, 'metadata': metadata};
   }
 
   static void _injectMultipartMetadata(
@@ -238,7 +231,7 @@ class MetadataInterceptor extends QueuedInterceptor {
 
 class AuthTokenInterceptor extends QueuedInterceptor {
   AuthTokenInterceptor({required AuthTokenStore authTokenStore})
-      : _authTokenStore = authTokenStore;
+    : _authTokenStore = authTokenStore;
 
   static const _authTokenHeader = 'X-Auth-Token';
   static const _authorizationHeader = 'Authorization';
@@ -270,10 +263,7 @@ class AuthTokenInterceptor extends QueuedInterceptor {
   }
 
   @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     final response = err.response;
     if (response != null) {
       await _storeTokenFromHeaders(response.headers);
@@ -303,9 +293,9 @@ class AuthTokenInterceptor extends QueuedInterceptor {
 }
 
 class ClientInfoHeadersInterceptor extends QueuedInterceptor {
-  ClientInfoHeadersInterceptor(
-      {required AppApiMetadataProvider metadataProvider})
-      : _metadataProvider = metadataProvider;
+  ClientInfoHeadersInterceptor({
+    required AppApiMetadataProvider metadataProvider,
+  }) : _metadataProvider = metadataProvider;
 
   final AppApiMetadataProvider _metadataProvider;
 

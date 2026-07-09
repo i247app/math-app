@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class StudentHomeworkScoreRing extends StatelessWidget {
   const StudentHomeworkScoreRing({
@@ -17,6 +18,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final slashIndex = scoreText.indexOf('/');
     final scoreValue = slashIndex == -1
         ? scoreText
@@ -55,8 +57,8 @@ class StudentHomeworkScoreRing extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white,
-                border: Border.all(color: homeworkResultTeal, width: 9 * scale),
+                color: colors.elevatedSurface,
+                border: Border.all(color: colors.brandStrong, width: 9 * scale),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -68,7 +70,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                         TextSpan(
                           text: scoreValue,
                           style: GoogleFonts.andika(
-                            color: homeworkResultScoreGreen,
+                            color: AppColors.scoreGreen,
                             fontSize: 48 * scale,
                             fontWeight: FontWeight.w800,
                             height: 40 / 48,
@@ -78,7 +80,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                         TextSpan(
                           text: scoreTotal,
                           style: GoogleFonts.andika(
-                            color: Colors.black,
+                            color: colors.textPrimary,
                             fontSize: 36 * scale,
                             fontWeight: FontWeight.w800,
                             height: 40 / 36,
@@ -92,7 +94,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                   Text(
                     context.getText(AppKeys.scoreUpper),
                     style: GoogleFonts.andika(
-                      color: homeworkResultMuted,
+                      color: colors.textSecondary,
                       fontSize: 10 * scale,
                       fontWeight: FontWeight.w800,
                       height: 15 / 10,

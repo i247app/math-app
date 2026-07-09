@@ -44,6 +44,8 @@ class AppKeys {
   static const signup = 'signup';
   static const login = 'login';
   static const loginWithPin = 'login_with_pin';
+  static const authSwitchToSignupPrompt = 'auth_switch_to_signup_prompt';
+  static const authSwitchToLoginPrompt = 'auth_switch_to_login_prompt';
   static const otpWithin30Seconds = 'otp_within_30_seconds';
   static const otpTitle = 'otp_title';
   static const otpSentMessage = 'otp_sent_message';
@@ -346,6 +348,10 @@ class AppKeys {
   static const passcodeMenuTitle = 'passcode_menu_title';
   static const passcodeMenuSubtitleSet = 'passcode_menu_subtitle_set';
   static const passcodeMenuSubtitleManage = 'passcode_menu_subtitle_manage';
+  static const appThemeMenuTitle = 'app_theme_menu_title';
+  static const appThemeMenuSubtitleSystem = 'app_theme_menu_subtitle_system';
+  static const appThemeMenuSubtitleLight = 'app_theme_menu_subtitle_light';
+  static const appThemeMenuSubtitleDark = 'app_theme_menu_subtitle_dark';
   static const createPasscodeTitle = 'create_passcode_title';
   static const confirmPasscodeTitle = 'confirm_passcode_title';
   static const unlockPasscodeTitle = 'unlock_passcode_title';
@@ -358,6 +364,8 @@ class AppKeys {
   static const enterCurrentPasscodeTitle = 'enter_current_passcode_title';
   static const passcodeContinue = 'passcode_continue';
   static const passcodeUnlock = 'passcode_unlock';
+  static const passcodeLogin = 'passcode_login';
+  static const passcodeLoginWithPhone = 'passcode_login_with_phone';
   static const passcodeSkip = 'passcode_skip';
   static const passcodeRemove = 'passcode_remove';
   static const passcodeSetUp = 'passcode_set_up';
@@ -703,8 +711,11 @@ class AppKeys {
   static const assessmentUpper = 'assessment_upper';
   static const practiceUpper = 'practice_upper';
   static const authPhoneCheckFailed = 'auth_phone_check_failed';
+  static const loginPhoneNotRegistered = 'login_phone_not_registered';
+  static const signupPhoneAlreadyRegistered = 'signup_phone_already_registered';
   static const signupOtpFailed = 'signup_otp_failed';
   static const loginOtpFailed = 'login_otp_failed';
+  static const pinLoginFailed = 'pin_login_failed';
   static const invalidOtp = 'invalid_otp';
   static const missingOtpUser = 'missing_otp_user';
   static const verifyOtpFailed = 'verify_otp_failed';

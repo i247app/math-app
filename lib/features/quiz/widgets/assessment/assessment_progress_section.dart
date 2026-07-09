@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class AssessmentProgressSection extends StatelessWidget {
   const AssessmentProgressSection({
@@ -34,7 +34,7 @@ class AssessmentProgressSection extends StatelessWidget {
             'total': totalQuestions,
           }),
           style: TextStyle(
-            color: AssessmentStyle.muted,
+            color: AppColors.textSubtle,
             fontSize: 16 * scale,
             fontWeight: FontWeight.w900,
             height: 1.5,
@@ -56,7 +56,7 @@ class AssessmentProgressSection extends StatelessWidget {
               return Container(
                 padding: EdgeInsets.all(inset),
                 decoration: BoxDecoration(
-                  color: AssessmentStyle.peach,
+                  color: AppColors.peachStrong,
                   borderRadius: BorderRadius.circular(999),
                   boxShadow: [
                     BoxShadow(
@@ -74,7 +74,7 @@ class AssessmentProgressSection extends StatelessWidget {
                   width: fillWidth,
                   height: double.infinity,
                   decoration: BoxDecoration(
-                    color: AssessmentStyle.progress,
+                    color: AppColors.assessmentProgress,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: DecoratedBox(

@@ -19,17 +19,18 @@ class _TeacherClassroomListCard extends StatelessWidget {
     final memberCount = classroom.displayStudentCount;
     final classNumber = _teacherClassroomNumber(classroom);
     final numberPalette = _teacherClassroomNumberPalette(classroom);
+    final colors = context.themeColors;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.elevatedSurface,
           borderRadius: BorderRadius.circular(24 * scale),
-          border: Border.all(color: const Color(0xFFE9EEF2)),
+          border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
-              color: teacherBlue.withValues(alpha: 0.035),
+              color: colors.shadow,
               blurRadius: 18 * scale,
               offset: Offset(0, 5 * scale),
             ),
@@ -62,7 +63,7 @@ class _TeacherClassroomListCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
-                            color: teacherBlue,
+                            color: colors.textPrimary,
                             fontSize: 21 * scale,
                             fontWeight: FontWeight.w800,
                             height: 1.05,
@@ -74,7 +75,7 @@ class _TeacherClassroomListCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
-                            color: const Color(0xFF484B56),
+                            color: colors.textSecondary,
                             fontSize: 18 * scale,
                             fontWeight: FontWeight.w600,
                             height: 1.1,
@@ -91,7 +92,7 @@ class _TeacherClassroomListCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.person_outline_rounded,
-                  color: const Color(0xFF4B4E5A),
+                  color: colors.textSecondary,
                   size: 17 * scale,
                 ),
                 SizedBox(width: 7 * scale),
@@ -103,7 +104,7 @@ class _TeacherClassroomListCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.andika(
-                      color: const Color(0xFF4B4E5A),
+                      color: colors.textSecondary,
                       fontSize: 18 * scale,
                       fontWeight: FontWeight.w800,
                       height: 1.1,

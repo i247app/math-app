@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class StudentHomeworkSearchField extends StatelessWidget {
   const StudentHomeworkSearchField({
@@ -25,7 +25,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
       onSubmitted: onSubmitted,
       textInputAction: TextInputAction.search,
       style: GoogleFonts.andika(
-        color: studentHomeworkInk,
+        color: AppColors.textNavy,
         fontSize: 16,
         fontWeight: FontWeight.w500,
         height: 24 / 16,
@@ -66,7 +66,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
                 },
                 icon: const Icon(
                   Icons.close_rounded,
-                  color: studentHomeworkMuted,
+                  color: AppColors.textMuted,
                   size: 18,
                 ),
               ),
@@ -85,7 +85,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(
-            color: studentHomeworkTeal.withValues(alpha: 0.35),
+            color: AppColors.teal500.withValues(alpha: 0.35),
           ),
         ),
       ),

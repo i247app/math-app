@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class AssessmentAnswerButton extends StatelessWidget {
   const AssessmentAnswerButton({
@@ -19,10 +19,11 @@ class AssessmentAnswerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final borderColor = selected
-        ? AssessmentStyle.teal
+        ? colors.brandStrong
         : Colors.black.withValues(alpha: 0);
-    final textColor = selected ? AssessmentStyle.teal : AssessmentStyle.ink;
+    final textColor = selected ? colors.brandStrong : colors.textPrimary;
 
     return Material(
       color: Colors.transparent,
@@ -34,7 +35,7 @@ class AssessmentAnswerButton extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(32 * scale),
             border: Border.all(color: borderColor, width: 2 * scale),
             boxShadow: selected
@@ -44,14 +45,14 @@ class AssessmentAnswerButton extends StatelessWidget {
                       spreadRadius: 4 * scale,
                     ),
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.10),
+                      color: colors.shadow,
                       blurRadius: 6 * scale,
                       offset: Offset(0, 4 * scale),
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: colors.shadow,
                       blurRadius: 2 * scale,
                       offset: Offset(0, 1 * scale),
                     ),
@@ -75,9 +76,9 @@ class AssessmentAnswerButton extends StatelessWidget {
                 width: selected ? 8 * scale : 0,
                 height: selected ? 12 * scale : 0,
                 padding: EdgeInsets.only(top: 4 * scale),
-                child: const DecoratedBox(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: AssessmentStyle.teal,
+                    color: colors.brandStrong,
                     shape: BoxShape.circle,
                   ),
                 ),

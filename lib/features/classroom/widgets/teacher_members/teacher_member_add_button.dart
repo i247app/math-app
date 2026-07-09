@@ -20,7 +20,7 @@ class _TeacherMemberAddButton extends StatelessWidget {
         ],
       ),
       child: Material(
-        color: teacherCoral,
+        color: AppColors.coralTeacher,
         borderRadius: radius,
         clipBehavior: Clip.antiAlias,
         child: InkWell(

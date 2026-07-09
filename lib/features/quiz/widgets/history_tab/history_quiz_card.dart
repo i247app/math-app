@@ -19,9 +19,10 @@ class _HistoryQuizCard extends StatelessWidget {
     final dateParts = _historyDatePartsFromIso(quiz.createDt);
 
     final radius = BorderRadius.circular(24 * scale);
+    final colors = context.themeColors;
 
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: radius,
       child: InkWell(
         onTap: onTap,
@@ -35,12 +36,12 @@ class _HistoryQuizCard extends StatelessWidget {
             14 * scale,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: radius,
-            border: Border.all(color: historyCardBorder, width: 1.3 * scale),
+            border: Border.all(color: colors.border, width: 1.3 * scale),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.07),
+                color: colors.shadow,
                 blurRadius: 12 * scale,
                 offset: Offset(0, 4 * scale),
               ),
@@ -70,7 +71,7 @@ class _HistoryQuizCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: historyDeepInk,
+                        color: colors.textPrimary,
                         fontSize: FontSize.normal * scale,
                         fontWeight: FontWeight.w800,
                         height: 1.28,
@@ -84,7 +85,7 @@ class _HistoryQuizCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: historyMuted,
+                          color: colors.textSecondary,
                           fontSize: FontSize.small * scale,
                           fontWeight: FontWeight.w500,
                           height: 1.22,
@@ -97,7 +98,7 @@ class _HistoryQuizCard extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: historyNavy,
+                color: colors.brandStrong,
                 size: 26 * scale,
               ),
             ],

@@ -12,7 +12,7 @@ class TeacherAvatar extends StatelessWidget {
       size: size,
       avatarKey: profile?.avatarKey,
       avatarUrl: profile?.avatarUrl,
-      borderColor: teacherBlue.withValues(alpha: 0.10),
+      borderColor: AppColors.navy900.withValues(alpha: 0.10),
       borderWidth: 2,
     );
   }

@@ -187,9 +187,12 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         parent?.expiredExercises ?? const <HomeLayoutPendingExercise>[];
     final completions =
         parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[];
+    final isEmptyRoomState =
+        !_isLoading && _errorMessage == null && entries.isEmpty;
 
+    final colors = context.themeColors;
     return ColoredBox(
-      color: const Color(0xFFF8FAFA),
+      color: isEmptyRoomState ? colors.surface : colors.pageBackground,
       child: Column(
         children: [
           HomeTabHeader(
@@ -201,26 +204,43 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             child: RefreshIndicator(
               color: const Color(0xFF339395),
               onRefresh: () => _loadLayout(forceRefresh: true),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                padding: EdgeInsets.fromLTRB(
-                  14 * scale,
-                  24 * scale,
-                  14 * scale,
-                  widget.args.bottomPadding + 24 * scale,
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
-                  child: _roomContent(
-                    context,
-                    entries: entries,
-                    pendingExercises: pendingExercises,
-                    expiredExercises: expiredExercises,
-                    completions: completions,
-                  ),
-                ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final contentPadding = isEmptyRoomState
+                      ? EdgeInsets.only(bottom: widget.args.bottomPadding)
+                      : EdgeInsets.fromLTRB(
+                          14 * scale,
+                          24 * scale,
+                          14 * scale,
+                          widget.args.bottomPadding + 24 * scale,
+                        );
+                  final minHeight = isEmptyRoomState
+                      ? math.max(
+                          0.0,
+                          constraints.maxHeight - widget.args.bottomPadding,
+                        )
+                      : 0.0;
+
+                  return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: contentPadding,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: minHeight),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        child: _roomContent(
+                          context,
+                          entries: entries,
+                          pendingExercises: pendingExercises,
+                          expiredExercises: expiredExercises,
+                          completions: completions,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -256,12 +276,9 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     if (entries.isEmpty) {
       return _roomFadeIn(
         markOnEnd: true,
-        child: _ParentRoomStateCard(
-          key: const ValueKey('room-empty'),
-          icon: Icons.meeting_room_outlined,
-          title: context.getText(AppKeys.parentNoClassroom),
-          message: context.getText(AppKeys.parentJoinRoomSubtitle),
-          onTap: _loadLayout,
+        child: _ParentRoomSelectStudentCard(
+          onChooseProfile: widget.args.onOpenProfileMenu,
+          onCreateProfile: _openCreateStudentProfile,
         ),
       );
     }
@@ -379,5 +396,37 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ),
       ),
     );
+  }
+
+  Future<void> _openCreateStudentProfile() async {
+    HapticFeedback.selectionClick();
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => Material(
+          color: context.themeColors.pageBackground,
+          child: SafeArea(
+            child: SettingTab.page(
+              user: widget.args.user,
+              profiles: widget.args.profiles,
+              activeProfile: widget.args.activeProfile,
+              profileLoadError: null,
+              onLogout: () {},
+              onActivateProfile: widget.args.onActivateProfile,
+              onRefreshProfiles: widget.args.onRefreshProfiles,
+              onProfileSaved: widget.args.onProfileSaved,
+              bottomPadding: 0,
+              scale: widget.args.scale,
+              initialView: SettingPageView.profile,
+              isPushedPage: true,
+              openAddProfileOnStart: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await widget.args.onRefreshProfiles();
+    if (mounted) {
+      await _loadLayout(forceRefresh: true);
+    }
   }
 }

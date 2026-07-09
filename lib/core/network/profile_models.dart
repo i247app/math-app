@@ -8,10 +8,7 @@ part 'profile_models.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class ProfileListRequest {
-  const ProfileListRequest({
-    this.userId,
-    this.search,
-  });
+  const ProfileListRequest({this.userId, this.search});
 
   final int? userId;
   final String? search;
@@ -133,12 +130,10 @@ class ProfileListResponse {
     final profilesValue =
         json['profiles'] ?? _nestedValue(data, 'profiles') ?? json['profile'];
 
-    return _$ProfileListResponseFromJson(
-      <String, dynamic>{
-        ...json,
-        'profiles': profilesValue,
-      },
-    );
+    return _$ProfileListResponseFromJson(<String, dynamic>{
+      ...json,
+      'profiles': profilesValue,
+    });
   }
 
   Map<String, dynamic> toJson() => _$ProfileListResponseToJson(this);

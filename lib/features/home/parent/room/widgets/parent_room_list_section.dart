@@ -13,15 +13,16 @@ class _ParentRoomListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFF0F3F7)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.055),
+            color: colors.shadow,
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),
@@ -41,8 +42,8 @@ class _ParentRoomListSection extends StatelessWidget {
                         title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF1B3D91),
+                        style: TextStyle(
+                          color: colors.brandStrong,
                           fontSize: FontSize.large,
                           fontWeight: FontWeight.w900,
                         ),
@@ -54,7 +55,7 @@ class _ParentRoomListSection extends StatelessWidget {
               TextButton.icon(
                 onPressed: onViewAll,
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF2775FF),
+                  foregroundColor: colors.brandStrong,
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,

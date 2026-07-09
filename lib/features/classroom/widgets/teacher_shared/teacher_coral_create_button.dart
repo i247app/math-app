@@ -25,7 +25,7 @@ class TeacherCoralCreateButton extends StatelessWidget {
             width: 218 * scale,
             height: 65 * scale,
             decoration: BoxDecoration(
-              color: teacherCoral,
+              color: AppColors.coralTeacher,
               borderRadius: BorderRadius.circular(12 * scale),
               boxShadow: [
                 BoxShadow(

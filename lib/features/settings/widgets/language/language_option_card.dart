@@ -1,7 +1,7 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class LanguageOptionCard extends StatelessWidget {
   const LanguageOptionCard({
@@ -21,8 +21,7 @@ class LanguageOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor =
-        selected ? settingsLanguagePink : settingsLanguageCardBorder;
+    final borderColor = selected ? AppColors.pink : AppColors.borderWarm;
 
     return Material(
       color: Colors.white,
@@ -74,7 +73,7 @@ class LanguageOptionCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: settingsLanguageInk,
+                    color: AppColors.textPrimary,
                     fontSize: FontSize.large * scale,
                     fontWeight: FontWeight.w900,
                     height: 1,
@@ -87,12 +86,9 @@ class LanguageOptionCard extends StatelessWidget {
                 width: 34 * scale,
                 height: 34 * scale,
                 decoration: BoxDecoration(
-                  color: selected ? settingsLanguagePink : Colors.transparent,
+                  color: selected ? AppColors.pink : Colors.transparent,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: settingsLanguagePink,
-                    width: 2.4 * scale,
-                  ),
+                  border: Border.all(color: AppColors.pink, width: 2.4 * scale),
                 ),
                 child: selected
                     ? Icon(

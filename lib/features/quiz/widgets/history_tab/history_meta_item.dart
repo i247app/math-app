@@ -16,7 +16,7 @@ class _HistoryMetaItem extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: historyMuted, size: 18 * scale),
+        Icon(icon, color: AppColors.textWarmMuted, size: 18 * scale),
         SizedBox(width: 5 * scale),
         FittedBox(
           fit: BoxFit.scaleDown,
@@ -26,7 +26,7 @@ class _HistoryMetaItem extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: historyMuted,
+              color: AppColors.textWarmMuted,
               fontSize: FontSize.caption * scale,
               fontWeight: FontWeight.w800,
               letterSpacing: 0,

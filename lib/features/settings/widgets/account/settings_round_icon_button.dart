@@ -26,9 +26,7 @@ class SettingsRoundIconButton extends StatelessWidget {
       color: backgroundColor,
       elevation: 3,
       shadowColor: Colors.black.withValues(alpha: 0.10),
-      shape: CircleBorder(
-        side: BorderSide(color: borderColor, width: 1.2),
-      ),
+      shape: CircleBorder(side: BorderSide(color: borderColor, width: 1.2)),
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onTap,

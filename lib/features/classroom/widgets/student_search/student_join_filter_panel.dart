@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
@@ -5,7 +6,6 @@ import 'package:numi_flutter/core/localization/app_keys.dart';
 import 'package:numi_flutter/core/network/grade_models.dart';
 import 'package:numi_flutter/core/network/school_models.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_search_helpers.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_filter_label.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_grade_chip.dart';
 import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_retry_banner.dart';
@@ -119,7 +119,7 @@ class StudentJoinFilterPanel extends StatelessWidget {
               Text(
                 context.getText(AppKeys.noGrades),
                 style: const TextStyle(
-                  color: studentJoinMuted,
+                  color: AppColors.textMuted,
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),

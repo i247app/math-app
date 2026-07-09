@@ -1,8 +1,8 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 
 class LanguageSheetOption extends StatelessWidget {
   const LanguageSheetOption({
@@ -38,8 +38,9 @@ class LanguageSheetOption extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: radius,
             border: Border.all(
-              color:
-                  selected ? const Color(0xFFC1277D) : const Color(0xFFDCE6E3),
+              color: selected
+                  ? const Color(0xFFC1277D)
+                  : const Color(0xFFDCE6E3),
               width: selected ? 2 * scale : 1.2 * scale,
             ),
           ),
@@ -53,7 +54,7 @@ class LanguageSheetOption extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: settingsDeepInk,
+                    color: AppColors.textPrimary,
                     fontSize: FontSize.normal * scale,
                     fontWeight: FontWeight.w800,
                     height: 1,

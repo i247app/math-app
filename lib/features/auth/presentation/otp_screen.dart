@@ -4,9 +4,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi_flutter/features/auth/widgets/auth_layout.dart';
 import 'package:numi_flutter/features/auth/widgets/otp/otp_card.dart';
-import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
-import 'package:numi_flutter/shared/widgets/common_widgets.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({
@@ -221,54 +220,20 @@ class _OtpScreenState extends State<OtpScreen>
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
-    final compact = height < 760;
-    final mascotSize = width < 370 ? 132.0 : 156.0;
     final otpError = hideOtpError ? null : widget.otpError;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: ScreenFrame(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+    return AuthLayout(
+      onBack: widget.onBack,
+      title: 'OTP',
+      horizontalPadding: 0,
+      compactBodyGap: 34,
+      regularBodyGap: 46,
+      bodyBuilder: (context, compact) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 28),
-              CircleIconButton(
-                icon: Icons.arrow_back_rounded,
-                onPressed: widget.onBack,
-              ),
-              SizedBox(height: compact ? 20 : 36),
-              // Mascot
-              Center(
-                child: Container(
-                  width: mascotSize,
-                  height: mascotSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
-                        blurRadius: 24,
-                        offset: const Offset(0, 12),
-                      ),
-                    ],
-                  ),
-                  child: Image.asset(
-                    'assets/images/numi-mascot.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              SizedBox(height: compact ? 14 : 20),
-              // Title
-              const Center(child: NumiBrandText(fontSize: 40)),
-              SizedBox(height: compact ? 34 : 54),
-              // OTP Card
               AnimatedBuilder(
                 animation: errorShakeController,
                 builder: (context, child) {
@@ -281,28 +246,25 @@ class _OtpScreenState extends State<OtpScreen>
                     child: child,
                   );
                 },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: OtpCard(
-                    controllers: controllers,
-                    focusNodes: focusNodes,
-                    autoFocusCode: widget.autoFocusCode,
-                    onChanged: updateDigit,
-                    onEmptyBackspace: handleEmptyBackspace,
-                    onConfirm: handleConfirm,
-                    onResend: handleResend,
-                    isVerifyingOtp: widget.isVerifyingOtp,
-                    resendCountdown: resendCountdown,
-                    devOtpCode: widget.devOtpCode,
-                    errorText: otpError,
-                  ),
+                child: OtpCard(
+                  controllers: controllers,
+                  focusNodes: focusNodes,
+                  autoFocusCode: widget.autoFocusCode,
+                  onChanged: updateDigit,
+                  onEmptyBackspace: handleEmptyBackspace,
+                  onConfirm: handleConfirm,
+                  onResend: handleResend,
+                  isVerifyingOtp: widget.isVerifyingOtp,
+                  resendCountdown: resendCountdown,
+                  devOtpCode: widget.devOtpCode,
+                  errorText: otpError,
                 ),
               ),
               const SizedBox(height: 48),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

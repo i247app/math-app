@@ -41,7 +41,7 @@ class _TeacherAssignmentStat extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
-                  color: teacherInk,
+                  color: AppColors.textInkDark,
                   fontSize: valueFontSize,
                   fontWeight: FontWeight.w400,
                   height: 24 / valueFontSize,

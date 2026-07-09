@@ -53,7 +53,7 @@ class _TeacherClassAvatarPicker extends StatelessWidget {
                   width: 32 * scale,
                   height: 32 * scale,
                   decoration: BoxDecoration(
-                    color: teacherTeal,
+                    color: AppColors.teal520,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(

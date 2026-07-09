@@ -22,7 +22,7 @@ class _TeacherEmptyMemberText extends StatelessWidget {
         text,
         textAlign: TextAlign.center,
         style: GoogleFonts.andika(
-          color: teacherMuted,
+          color: AppColors.textCoolMuted,
           fontSize: 14 * scale,
           fontWeight: FontWeight.w600,
           height: 1.35,

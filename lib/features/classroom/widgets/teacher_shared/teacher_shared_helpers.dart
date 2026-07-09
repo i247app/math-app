@@ -28,7 +28,7 @@ InputDecoration _teacherInputDecoration({
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: radius,
-      borderSide: const BorderSide(color: teacherTeal, width: 2),
+      borderSide: const BorderSide(color: AppColors.teal520, width: 2),
     ),
     disabledBorder: OutlineInputBorder(
       borderRadius: radius,

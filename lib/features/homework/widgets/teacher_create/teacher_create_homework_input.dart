@@ -27,14 +27,14 @@ class _CreateHomeworkInput extends StatelessWidget {
         textAlignVertical: textAlignVertical,
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         style: GoogleFonts.andika(
-          color: teacherInk,
+          color: AppColors.textInkDark,
           fontSize: 14,
           fontWeight: FontWeight.w400,
         ),
         decoration: InputDecoration(
           hintText: context.getText(hintKey),
           hintStyle: GoogleFonts.andika(
-            color: teacherInk.withValues(alpha: 0.7),
+            color: AppColors.textInkDark.withValues(alpha: 0.7),
             fontSize: 14,
             fontWeight: FontWeight.w400,
           ),
@@ -50,7 +50,7 @@ class _CreateHomeworkInput extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(radius),
-            borderSide: const BorderSide(color: teacherTeal, width: 2),
+            borderSide: const BorderSide(color: AppColors.teal520, width: 2),
           ),
         ),
       ),

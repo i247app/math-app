@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
 
 class PillActionButton extends StatelessWidget {
   const PillActionButton({
@@ -35,7 +35,7 @@ class PillActionButton extends StatelessWidget {
               ? null
               : [
                   BoxShadow(
-                    color: GradeSelectionStyle.teal.withValues(alpha: 0.24),
+                    color: AppColors.teal700.withValues(alpha: 0.24),
                     blurRadius: 12 * scale,
                     offset: Offset(0, 8 * scale),
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/core/utils/phone_number_validator.dart';
 import 'package:numi_flutter/features/session/presentation/bloc/app_session_cubit.dart';
 import 'package:numi_flutter/features/classroom/classroom_api.dart';
@@ -178,39 +179,46 @@ class _NumiHomeState extends State<NumiHome> {
           child: BlocBuilder<AuthCubit, AuthState>(
             buildWhen: (previous, current) => previous.screen != current.screen,
             builder: (context, scaffoldState) {
+              final colors = context.themeColors;
+              final overlayStyle =
+                  Theme.of(context).brightness == Brightness.dark
+                  ? SystemUiOverlayStyle.light
+                  : SystemUiOverlayStyle.dark;
               final usePlainAuthBackground =
                   scaffoldState.screen == AppScreen.login ||
                   scaffoldState.screen == AppScreen.otp ||
                   scaffoldState.screen == AppScreen.passcode ||
                   scaffoldState.screen == AppScreen.signup;
               return AnnotatedRegion<SystemUiOverlayStyle>(
-                value: SystemUiOverlayStyle.dark,
+                value: overlayStyle,
                 child: Scaffold(
-                  backgroundColor: usePlainAuthBackground ? Colors.white : null,
+                  backgroundColor: usePlainAuthBackground
+                      ? colors.pageBackground
+                      : null,
                   resizeToAvoidBottomInset:
-                      scaffoldState.screen != AppScreen.home,
-                  body: usePlainAuthBackground
-                      ? ColoredBox(
-                          color: Colors.white,
-                          child: OnboardingScreenSwitcher(
-                            phoneController: phoneController,
-                            phoneHasInput: _phoneHasInput,
-                            clearLoginPhoneInput: clearLoginPhoneInput,
-                            normalizedPhoneInput: _normalizedPhoneInput,
-                            handlePhoneInputChanged: handlePhoneInputChanged,
-                            sendOtp: sendOtp,
-                          ),
-                        )
-                      : AppBackground(
-                          child: OnboardingScreenSwitcher(
-                            phoneController: phoneController,
-                            phoneHasInput: _phoneHasInput,
-                            clearLoginPhoneInput: clearLoginPhoneInput,
-                            normalizedPhoneInput: _normalizedPhoneInput,
-                            handlePhoneInputChanged: handlePhoneInputChanged,
-                            sendOtp: sendOtp,
-                          ),
+                      scaffoldState.screen != AppScreen.home &&
+                      scaffoldState.screen != AppScreen.login &&
+                      scaffoldState.screen != AppScreen.otp &&
+                      scaffoldState.screen != AppScreen.passcode,
+                  body: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: usePlainAuthBackground
+                            ? ColoredBox(color: colors.pageBackground)
+                            : const AppBackground(child: SizedBox.shrink()),
+                      ),
+                      Positioned.fill(
+                        child: OnboardingScreenSwitcher(
+                          phoneController: phoneController,
+                          phoneHasInput: _phoneHasInput,
+                          clearLoginPhoneInput: clearLoginPhoneInput,
+                          normalizedPhoneInput: _normalizedPhoneInput,
+                          handlePhoneInputChanged: handlePhoneInputChanged,
+                          sendOtp: sendOtp,
                         ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

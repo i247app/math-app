@@ -16,7 +16,7 @@ import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_generat
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_header.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_progress_section.dart';
 import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_question_card.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_style.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 enum AiAssessmentResult { generationFailed }
 
@@ -166,23 +166,24 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       context: context,
       barrierDismissible: true,
       builder: (context) {
+        final colors = context.themeColors;
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: colors.elevatedSurface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
           ),
           title: Text(
             context.getText(AppKeys.unansweredSubmitTitle),
-            style: const TextStyle(
-              color: AssessmentStyle.ink,
+            style: TextStyle(
+              color: colors.textPrimary,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
           ),
           content: Text(
             context.getText(AppKeys.unansweredSubmitMessage),
-            style: const TextStyle(
-              color: AssessmentStyle.muted,
+            style: TextStyle(
+              color: colors.textSecondary,
               fontWeight: FontWeight.w700,
               letterSpacing: 0,
             ),
@@ -193,8 +194,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 context.getText(AppKeys.stayUpper),
-                style: const TextStyle(
-                  color: AssessmentStyle.rust,
+                style: TextStyle(
+                  color: colors.accentStrong,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.8,
                 ),
@@ -202,8 +203,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             ),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: AssessmentStyle.teal,
-                foregroundColor: const Color(0xFFBEFFF9),
+                backgroundColor: colors.brandStrong,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
               ),
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
@@ -224,8 +225,13 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final overlayStyle = Theme.of(context).brightness == Brightness.dark
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: overlayStyle,
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
@@ -236,8 +242,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final isGeneratingQuestion = _controller.isGeneratingQuestion;
           final isSubmittingQuiz = _controller.isSubmittingQuiz;
           final backgroundColor = isGeneratingQuestion
-              ? Colors.white
-              : AssessmentStyle.mint;
+              ? colors.surface
+              : colors.pageBackground;
 
           return Scaffold(
             backgroundColor: backgroundColor,

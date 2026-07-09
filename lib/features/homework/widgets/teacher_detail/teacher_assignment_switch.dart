@@ -14,7 +14,7 @@ class _TeacherAssignmentSwitch extends StatelessWidget {
     return Switch.adaptive(
       value: visibility == 'PUBLIC',
       activeThumbColor: Colors.white,
-      activeTrackColor: teacherTeal,
+      activeTrackColor: AppColors.teal520,
       inactiveThumbColor: Colors.white,
       inactiveTrackColor: const Color(0xFFE87151),
       onChanged: (value) => onChanged(value ? 'PUBLIC' : 'PRIVATE'),

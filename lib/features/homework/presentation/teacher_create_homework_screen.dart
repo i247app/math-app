@@ -425,11 +425,13 @@ class _TeacherCreateHomeworkScreenState
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: _dismissKeyboard,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF9FFFF),
+        backgroundColor: colors.pageBackground,
         body: SafeArea(
           bottom: false,
           child: Column(

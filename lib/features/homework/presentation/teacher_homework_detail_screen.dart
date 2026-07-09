@@ -179,8 +179,9 @@ class _TeacherHomeworkDetailScreenState
     final exercise = _exercise;
     final questions =
         exercise?.questions ?? const <ClassroomExerciseQuestion>[];
+    final colors = context.themeColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FFFF),
+      backgroundColor: colors.pageBackground,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -195,18 +196,18 @@ class _TeacherHomeworkDetailScreenState
                   ? TextButton(
                       onPressed: _isSaving ? null : _saveVisibility,
                       child: _isSaving
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 18,
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: teacherTeal,
+                                color: colors.brandStrong,
                               ),
                             )
                           : Text(
                               context.getText(AppKeys.save),
                               style: GoogleFonts.andika(
-                                color: teacherTeal,
+                                color: colors.brandStrong,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -216,7 +217,7 @@ class _TeacherHomeworkDetailScreenState
             ),
             Expanded(
               child: RefreshIndicator(
-                color: teacherTeal,
+                color: colors.brandStrong,
                 onRefresh: () => _loadDetail(forceRefresh: true),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
@@ -236,7 +237,7 @@ class _TeacherHomeworkDetailScreenState
                           padding: EdgeInsets.only(top: 80),
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: teacherTeal,
+                              color: AppColors.teal520,
                             ),
                           ),
                         )
@@ -262,7 +263,7 @@ class _TeacherHomeworkDetailScreenState
                               AppKeys.teacherAssignmentQuestionContent,
                             ),
                             style: GoogleFonts.andika(
-                              color: teacherBlue,
+                              color: AppColors.navy900,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               height: 32 / 18,

@@ -1,7 +1,7 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_style.dart';
 
 class StudentJoinSchoolFilterField extends StatelessWidget {
   const StudentJoinSchoolFilterField({
@@ -41,7 +41,9 @@ class StudentJoinSchoolFilterField extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: selected ? studentJoinInk : studentJoinMuted,
+                    color: selected
+                        ? AppColors.textInkDark
+                        : AppColors.textMuted,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),

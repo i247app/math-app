@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
 import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/features/classroom/presentation/student_class_detail_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 
 class StudentClassUpcomingDeadlineTile extends StatelessWidget {
   const StudentClassUpcomingDeadlineTile({
@@ -18,8 +19,9 @@ class StudentClassUpcomingDeadlineTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -27,14 +29,12 @@ class StudentClassUpcomingDeadlineTile extends StatelessWidget {
         child: Ink(
           height: 72,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFFC4C6D2).withValues(alpha: 0.1),
-            ),
+            border: Border.all(color: colors.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: colors.shadow,
                 blurRadius: 2,
                 offset: const Offset(0, 1),
               ),
@@ -46,7 +46,7 @@ class StudentClassUpcomingDeadlineTile extends StatelessWidget {
                 width: 4,
                 height: double.infinity,
                 decoration: const BoxDecoration(
-                  color: studentClassPink,
+                  color: AppColors.magenta,
                   borderRadius: BorderRadius.horizontal(
                     left: Radius.circular(16),
                   ),
@@ -63,7 +63,7 @@ class StudentClassUpcomingDeadlineTile extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
-                        color: studentClassInk,
+                        color: colors.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         height: 1.5,
@@ -74,7 +74,7 @@ class StudentClassUpcomingDeadlineTile extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
-                        color: studentClassMuted,
+                        color: colors.textSecondary,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         height: 16 / 12,

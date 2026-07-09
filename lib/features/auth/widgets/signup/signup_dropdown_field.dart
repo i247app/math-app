@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/auth/widgets/signup/signup_gender_choice.dart';
 
 class SignupDropdownField extends StatelessWidget {
@@ -21,14 +21,15 @@ class SignupDropdownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final textStyle = GoogleFonts.andika(
-      color: AppColors.ink,
+      color: colors.textPrimary,
       fontSize: 16,
       fontWeight: FontWeight.w500,
       letterSpacing: 0,
     );
     final hintStyle = GoogleFonts.andika(
-      color: const Color(0xFF7E9088),
+      color: colors.inputHint,
       fontSize: 16,
       fontWeight: FontWeight.w400,
       letterSpacing: 0,
@@ -39,9 +40,9 @@ class SignupDropdownField extends StatelessWidget {
       child: DropdownButtonFormField<String>(
         initialValue: value,
         isExpanded: true,
-        icon: const Icon(
+        icon: Icon(
           Icons.keyboard_arrow_down_rounded,
-          color: Color(0xFF339395),
+          color: colors.brandStrong,
         ),
         hint: Text(hintText, style: hintStyle),
         disabledHint: Text(hintText, style: hintStyle),
@@ -57,23 +58,23 @@ class SignupDropdownField extends StatelessWidget {
         style: textStyle,
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: colors.inputSurface,
           contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+            borderSide: BorderSide(color: colors.border, width: 1.5),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+            borderSide: BorderSide(color: colors.border, width: 1.5),
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFE7E7E7), width: 1.5),
+            borderSide: BorderSide(color: colors.border, width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF339395), width: 2),
+            borderSide: BorderSide(color: colors.brandStrong, width: 2),
           ),
         ),
       ),

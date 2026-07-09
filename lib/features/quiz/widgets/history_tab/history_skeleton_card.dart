@@ -7,6 +7,7 @@ class _HistorySkeletonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 116 * scale,
       padding: EdgeInsets.fromLTRB(
@@ -16,9 +17,9 @@ class _HistorySkeletonCard extends StatelessWidget {
         14 * scale,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(24 * scale),
-        border: Border.all(color: historyCardBorder, width: 1.3 * scale),
+        border: Border.all(color: colors.border, width: 1.3 * scale),
       ),
       child: Row(
         children: [

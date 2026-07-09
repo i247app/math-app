@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+
 enum AuthActionButtonLayout { fullWidth, compact }
 
 class AuthActionButton extends StatelessWidget {
@@ -15,8 +17,6 @@ class AuthActionButton extends StatelessWidget {
 
   static const _compactWidth = 230.0;
   static const _height = 58.0;
-  static const _backgroundColor = Color(0xFF339395);
-  static const _disabledColor = Color(0xFFB5BFC2);
 
   final String label;
   final VoidCallback? onPressed;
@@ -26,6 +26,7 @@ class AuthActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final button = SizedBox(
       width: layout == AuthActionButtonLayout.fullWidth
           ? double.infinity
@@ -34,10 +35,10 @@ class AuthActionButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isBusy ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: _backgroundColor,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: _disabledColor,
-          disabledForegroundColor: Colors.white,
+          backgroundColor: colors.brandStrong,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          disabledBackgroundColor: colors.disabledBackground,
+          disabledForegroundColor: colors.disabledForeground,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -46,13 +47,13 @@ class AuthActionButton extends StatelessWidget {
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 160),
           child: isBusy
-              ? const SizedBox(
-                  key: ValueKey('busy'),
+              ? SizedBox(
+                  key: const ValueKey('busy'),
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.4,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 )
               : _AuthActionButtonLabel(

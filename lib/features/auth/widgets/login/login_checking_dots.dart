@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+
 class LoginCheckingDots extends StatefulWidget {
   const LoginCheckingDots({super.key});
 
@@ -28,6 +30,8 @@ class _LoginCheckingDotsState extends State<LoginCheckingDots>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return SizedBox(
       key: const ValueKey('checking-phone-dots'),
       height: 64,
@@ -49,7 +53,7 @@ class _LoginCheckingDotsState extends State<LoginCheckingDots>
                     height: 9,
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF798B8C).withValues(alpha: opacity),
+                      color: colors.textMuted.withValues(alpha: opacity),
                       shape: BoxShape.circle,
                     ),
                   ),

@@ -7,16 +7,20 @@ class LoginActionButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
+    this.isBusy = false,
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool isBusy;
 
   @override
   Widget build(BuildContext context) {
     return AuthActionButton(
       label: label,
       onPressed: onPressed,
+      layout: AuthActionButtonLayout.compact,
+      isBusy: isBusy,
       uppercase: true,
     );
   }

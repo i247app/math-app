@@ -13,14 +13,15 @@ class _TeacherClassDetailCodeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 27 * scale,
       constraints: BoxConstraints(minWidth: 114 * scale, maxWidth: 190 * scale),
       padding: EdgeInsets.symmetric(horizontal: 17 * scale),
       decoration: BoxDecoration(
-        color: teacherMint,
+        color: colors.brand.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8 * scale),
-        border: Border.all(color: const Color(0xFFDBEAFE)),
+        border: Border.all(color: colors.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -33,7 +34,7 @@ class _TeacherClassDetailCodeChip extends StatelessWidget {
                 code,
                 maxLines: 1,
                 style: GoogleFonts.andika(
-                  color: const Color(0xFF1E3A5F),
+                  color: colors.textPrimary,
                   fontSize: 15 * scale,
                   fontWeight: FontWeight.w700,
                   height: 1.8,

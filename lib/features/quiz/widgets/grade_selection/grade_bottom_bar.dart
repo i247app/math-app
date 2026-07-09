@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'package:numi_flutter/core/extension/localization_extension.dart';
 import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_selection_style.dart';
+import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi_flutter/core/theme/app_theme_colors.dart';
 import 'package:numi_flutter/features/quiz/widgets/grade_selection/pill_action_button.dart';
 
 class GradeBottomBar extends StatelessWidget {
@@ -21,6 +22,7 @@ class GradeBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
@@ -33,10 +35,10 @@ class GradeBottomBar extends StatelessWidget {
             10 * scale,
           ),
           decoration: BoxDecoration(
-            color: GradeSelectionStyle.mint.withValues(alpha: 0.90),
+            color: colors.elevatedSurface.withValues(alpha: 0.90),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: colors.shadow,
                 blurRadius: 22 * scale,
                 offset: Offset(0, -8 * scale),
               ),
@@ -48,8 +50,8 @@ class GradeBottomBar extends StatelessWidget {
                 flex: 9,
                 child: PillActionButton(
                   label: context.getText(AppKeys.skipUpper),
-                  background: GradeSelectionStyle.peach,
-                  foreground: GradeSelectionStyle.rust,
+                  background: AppColors.peachSoft,
+                  foreground: AppColors.rust,
                   scale: scale,
                   onPressed: onSkip,
                 ),
@@ -60,10 +62,10 @@ class GradeBottomBar extends StatelessWidget {
                 child: PillActionButton(
                   label: context.getText(AppKeys.continueUpper),
                   icon: Icons.arrow_forward_rounded,
-                  background: GradeSelectionStyle.teal,
+                  background: AppColors.teal700,
                   foreground: Colors.white,
                   gradient: const LinearGradient(
-                    colors: [GradeSelectionStyle.teal, Color(0xFF55E0D6)],
+                    colors: [AppColors.teal700, Color(0xFF55E0D6)],
                   ),
                   scale: scale,
                   onPressed: onContinue,

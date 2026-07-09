@@ -40,7 +40,7 @@ class _TeacherClassMembersContent extends StatelessWidget {
         ),
         Expanded(
           child: RefreshIndicator(
-            color: teacherTeal,
+            color: AppColors.teal520,
             onRefresh: onRefresh,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(
@@ -67,7 +67,9 @@ class _TeacherClassMembersContent extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(top: 80 * scale),
                       child: const Center(
-                        child: CircularProgressIndicator(color: teacherTeal),
+                        child: CircularProgressIndicator(
+                          color: AppColors.teal520,
+                        ),
                       ),
                     )
                   else if (error != null &&

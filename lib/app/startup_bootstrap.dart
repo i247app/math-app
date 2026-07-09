@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:numi_flutter/core/config/api_config.dart';
 import 'package:numi_flutter/core/localization/lingo_provider.dart';
 import 'package:numi_flutter/core/network/api_metadata.dart';
+import 'package:numi_flutter/core/theme/app_theme_controller.dart';
 import 'package:numi_flutter/features/auth/auth_state.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/auth/passcode_service.dart';
@@ -13,11 +13,13 @@ import 'package:numi_flutter/features/profile/services/active_profile_session.da
 class StartupBootstrapResult {
   const StartupBootstrapResult({
     required this.lingoProvider,
+    required this.themeController,
     required this.authService,
     required this.initialAuthState,
   });
 
   final LingoProvider lingoProvider;
+  final AppThemeController themeController;
   final OtpAuthService authService;
   final AuthState initialAuthState;
 }
@@ -41,7 +43,6 @@ class StartupBootstrap {
   final PasscodeService _passcodeService;
 
   Future<StartupBootstrapResult> run() async {
-    await ApiConfig.load();
     await AppApiMetadataProvider.instance.loadClientInfo();
 
     final lingoProvider = LingoProvider();
@@ -52,6 +53,13 @@ class StartupBootstrap {
       // can still render if secure storage or device locale access fails.
     }
 
+    final themeController = AppThemeController();
+    try {
+      await themeController.initialize();
+    } catch (_) {
+      // ThemeMode.system is a safe fallback if storage cannot be read.
+    }
+
     final authService = _authService ?? OtpAuthApi();
     final initialAuthState = await _restoreInitialAuthState(
       authService,
@@ -59,6 +67,7 @@ class StartupBootstrap {
 
     return StartupBootstrapResult(
       lingoProvider: lingoProvider,
+      themeController: themeController,
       authService: authService,
       initialAuthState: initialAuthState,
     );

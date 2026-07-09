@@ -1,3 +1,4 @@
+import 'package:numi_flutter/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,7 +8,6 @@ import 'package:numi_flutter/core/network/profile_models.dart';
 import 'package:numi_flutter/core/theme/font_size.dart';
 import 'package:numi_flutter/features/auth/otp_auth_api.dart';
 import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/settings/settings_style.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/parent_child_profile_card.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/parent_info_card.dart';
 import 'package:numi_flutter/features/settings/widgets/profile_list/profile_add_button.dart';
@@ -49,7 +49,7 @@ class ParentProfileManagePanel extends StatelessWidget {
         Text(
           context.getText(AppKeys.parentInfoTitle),
           style: GoogleFonts.andika(
-            color: settingsDeepInk,
+            color: AppColors.textPrimary,
             fontSize: FontSize.large * scale,
             fontWeight: FontWeight.w900,
             height: 1,
@@ -59,7 +59,8 @@ class ParentProfileManagePanel extends StatelessWidget {
         ParentInfoCard(
           profile: parentProfile,
           user: user,
-          isActive: ActiveProfileSession.profileStableId(parentProfile) ==
+          isActive:
+              ActiveProfileSession.profileStableId(parentProfile) ==
               activeProfileId,
           scale: scale,
           onSelect: () => onSelect(parentProfile),
@@ -75,7 +76,7 @@ class ParentProfileManagePanel extends StatelessWidget {
                   <String, Object?>{'count': children.length},
                 ),
                 style: GoogleFonts.andika(
-                  color: settingsDeepInk,
+                  color: AppColors.textPrimary,
                   fontSize: FontSize.large * scale,
                   fontWeight: FontWeight.w900,
                   height: 1,
@@ -91,8 +92,9 @@ class ParentProfileManagePanel extends StatelessWidget {
             icon: Icons.groups_2_outlined,
             title: context.getText(AppKeys.noProfileTitle),
             message: context.getText(AppKeys.noProfileMessage),
-            buttonLabel:
-                canAddProfile ? context.getText(AppKeys.addProfile) : null,
+            buttonLabel: canAddProfile
+                ? context.getText(AppKeys.addProfile)
+                : null,
             scale: scale,
             onTap: canAddProfile ? onAdd : null,
           )
@@ -102,7 +104,7 @@ class ParentProfileManagePanel extends StatelessWidget {
               profile: sortedChildren[index],
               isActive:
                   ActiveProfileSession.profileStableId(sortedChildren[index]) ==
-                      activeProfileId,
+                  activeProfileId,
               scale: scale,
               onSelect: () => onSelect(sortedChildren[index]),
               onEdit: () => onEdit(sortedChildren[index]),
