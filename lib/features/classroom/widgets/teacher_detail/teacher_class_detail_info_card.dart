@@ -147,7 +147,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                         transitionBuilder: (child, animation) {
                           return SizeTransition(
                             sizeFactor: animation,
-                            alignment: const AlignmentDirectional(-1, -1),
+                            axisAlignment: -1.0,
                             child: FadeTransition(
                               opacity: animation,
                               child: child,
