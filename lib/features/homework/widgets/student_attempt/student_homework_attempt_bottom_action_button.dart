@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
 class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
   const StudentHomeworkAttemptBottomActionButton({

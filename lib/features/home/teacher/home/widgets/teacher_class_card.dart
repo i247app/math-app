@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/features/home/teacher/shared/widgets/class_thumb.dart';
-import 'package:numi_flutter/features/classroom/widgets/teacher_shared/teacher_member_summary_text.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/home/teacher/shared/widgets/class_thumb.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_member_summary_text.dart';
 
 class TeacherClassCard extends StatelessWidget {
   const TeacherClassCard({

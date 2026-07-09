@@ -1,12 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
-import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
-import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/home/widgets/home_profile_menu.dart';
+import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 
 class ParentChildClassSummaryCard extends StatelessWidget {
   const ParentChildClassSummaryCard({required this.summary});

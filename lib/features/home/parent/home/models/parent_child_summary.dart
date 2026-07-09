@@ -1,6 +1,6 @@
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/quiz_models.dart';
 
 class ParentChildSummary {
   const ParentChildSummary({

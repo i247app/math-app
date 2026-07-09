@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/home/parent/assessment/helpers/parent_assessment_helpers.dart';
-import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
-import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_score_badge.dart';
-import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_meta_item.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/home/parent/assessment/helpers/parent_assessment_helpers.dart';
+import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_score_badge.dart';
+import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_meta_item.dart';
 
 class AssessmentResultListItemCard extends StatelessWidget {
   const AssessmentResultListItemCard({

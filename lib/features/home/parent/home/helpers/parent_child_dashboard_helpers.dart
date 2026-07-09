@@ -1,10 +1,10 @@
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/home/home_api.dart';
-import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
-import 'package:numi_flutter/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/home/home_api.dart';
+import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 
 ParentChildSummary? parentPrimarySummary(
   List<ParentChildSummary> summaries,

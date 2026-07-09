@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
-import 'package:numi_flutter/features/profile/services/active_profile_session.dart';
-import 'package:numi_flutter/features/session/presentation/bloc/app_session_state.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/profile/services/active_profile_session.dart';
+import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
 class AppSessionCubit extends Cubit<AppSessionState> {
   AppSessionCubit([AppSessionState? initialState])

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/settings/widgets/account/account_avatar.dart';
-import 'package:numi_flutter/features/settings/widgets/account/account_edit_button.dart';
-import 'package:numi_flutter/features/settings/widgets/account/account_phone_field.dart';
-import 'package:numi_flutter/features/settings/widgets/account/account_text_field.dart';
-import 'package:numi_flutter/features/settings/widgets/account/settings_cancel_button.dart';
-import 'package:numi_flutter/features/settings/widgets/account/settings_save_button.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/settings/widgets/account/account_avatar.dart';
+import 'package:numi/features/settings/widgets/account/account_edit_button.dart';
+import 'package:numi/features/settings/widgets/account/account_phone_field.dart';
+import 'package:numi/features/settings/widgets/account/account_text_field.dart';
+import 'package:numi/features/settings/widgets/account/settings_cancel_button.dart';
+import 'package:numi/features/settings/widgets/account/settings_save_button.dart';
 
 class AccountDetailsPanel extends StatelessWidget {
   const AccountDetailsPanel({

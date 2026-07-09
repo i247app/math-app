@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter_chip.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_filter.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_filter_chip.dart';
 
 class StudentHomeworkFilterTabs extends StatelessWidget {
   const StudentHomeworkFilterTabs({

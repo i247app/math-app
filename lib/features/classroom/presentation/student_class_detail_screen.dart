@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
-import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_error_card.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_learning_category_section.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_teacher_profile_card.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_top_bar.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_upcoming_deadline_section.dart';
-import 'package:numi_flutter/features/homework/homework_api.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
+import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
+import 'package:numi/features/classroom/presentation/bloc/classroom_state.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_error_card.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_learning_category_section.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_teacher_profile_card.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_top_bar.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_upcoming_deadline_section.dart';
+import 'package:numi/features/homework/homework_api.dart';
 
 class StudentClassDetailScreen extends StatefulWidget {
   const StudentClassDetailScreen({

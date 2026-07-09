@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_message_button.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_teacher_avatar.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_message_button.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_teacher_avatar.dart';
 
 class StudentClassTeacherProfileCard extends StatelessWidget {
   const StudentClassTeacherProfileCard({

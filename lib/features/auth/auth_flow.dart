@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/core/utils/phone_number_validator.dart';
-import 'package:numi_flutter/features/session/presentation/bloc/app_session_cubit.dart';
-import 'package:numi_flutter/features/classroom/classroom_api.dart';
-import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
-import 'package:numi_flutter/features/homework/homework_api.dart';
-import 'package:numi_flutter/features/profile/grade_api.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
-import 'package:numi_flutter/features/auth/phone_region.dart';
-import 'package:numi_flutter/features/auth/auth_cubit.dart';
-import 'package:numi_flutter/features/auth/auth_state.dart';
-import 'package:numi_flutter/features/auth/widgets/app_background.dart';
-import 'package:numi_flutter/features/auth/widgets/onboarding_screen_switcher.dart';
-import 'package:numi_flutter/features/session/presentation/bloc/app_session_state.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/utils/phone_number_validator.dart';
+import 'package:numi/features/session/presentation/bloc/app_session_cubit.dart';
+import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
+import 'package:numi/features/homework/homework_api.dart';
+import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/phone_region.dart';
+import 'package:numi/features/auth/auth_cubit.dart';
+import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/widgets/app_background.dart';
+import 'package:numi/features/auth/widgets/onboarding_screen_switcher.dart';
+import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
 class NumiHome extends StatefulWidget {
   const NumiHome({

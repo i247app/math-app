@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/auth/widgets/signup/signup_gender_choice.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/auth/widgets/signup/signup_gender_choice.dart';
 
 class SignupGenderRadioGroup extends StatelessWidget {
   const SignupGenderRadioGroup({

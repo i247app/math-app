@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_recent_assignment_card.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/home/teacher/home/widgets/teacher_recent_assignment_card.dart';
 
 class TeacherRecentAssignmentCarousel extends StatelessWidget {
   const TeacherRecentAssignmentCarousel({

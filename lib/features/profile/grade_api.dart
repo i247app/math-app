@@ -1,7 +1,7 @@
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
-import 'package:numi_flutter/core/network/network_client.dart';
-import 'package:numi_flutter/core/network/grade_models.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/network/network_client.dart';
+import 'package:numi/core/network/grade_models.dart';
 
 class GradeException implements Exception {
   const GradeException(this.message, {this.status});

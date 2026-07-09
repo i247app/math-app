@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class LoginCheckingDots extends StatefulWidget {
   const LoginCheckingDots({super.key});

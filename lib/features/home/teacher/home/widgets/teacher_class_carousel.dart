@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_class_card.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/home/teacher/home/widgets/teacher_class_card.dart';
 
 class TeacherClassCarousel extends StatelessWidget {
   const TeacherClassCarousel({

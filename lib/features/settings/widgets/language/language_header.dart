@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/widgets/language/language_back_button.dart';
-import 'package:numi_flutter/features/settings/widgets/language/language_header_curve_painter.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/settings/widgets/language/language_back_button.dart';
+import 'package:numi/features/settings/widgets/language/language_header_curve_painter.dart';
 
 class LanguageHeader extends StatelessWidget {
   const LanguageHeader({super.key, required this.scale});

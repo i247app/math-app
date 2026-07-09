@@ -152,7 +152,7 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
       debugPrint('AppApiMetadataProvider package info error: $error');
       return PackageInfo(
         appName: 'NUMI',
-        packageName: 'numi_flutter',
+        packageName: 'numi',
         version: 'unknown',
         buildNumber: 'unknown',
       );

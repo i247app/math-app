@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/features/home/teacher/shared/widgets/class_default_image.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/home/teacher/shared/widgets/class_default_image.dart';
 
 class ClassThumb extends StatelessWidget {
   const ClassThumb({super.key, required this.classroom, required this.scale});

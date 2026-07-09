@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'dart:async';
 import 'dart:ui';
 
@@ -7,20 +7,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/core/network/program_models.dart';
-import 'package:numi_flutter/core/network/school_models.dart';
-import 'package:numi_flutter/features/classroom/classroom_api.dart';
-import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
-import 'package:numi_flutter/features/homework/homework_api.dart';
-import 'package:numi_flutter/features/profile/grade_api.dart';
-import 'package:numi_flutter/features/profile/profile_api.dart';
-import 'package:numi_flutter/features/profile/school_api.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi/features/homework/homework_api.dart';
+import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/profile/profile_api.dart';
+import 'package:numi/features/profile/school_api.dart';
 
 part '../cache/teacher_homework_cache.dart';
 part 'teacher_homework_detail_screen.dart';

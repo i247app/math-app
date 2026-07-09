@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/home/widgets/home_math_squadron_laser.dart';
-import 'package:numi_flutter/features/home/widgets/home_math_squadron_target.dart';
+import 'package:numi/features/home/widgets/home_math_squadron_laser.dart';
+import 'package:numi/features/home/widgets/home_math_squadron_target.dart';
 
 class HomeMathSquadronPreviewArtwork extends StatelessWidget {
   const HomeMathSquadronPreviewArtwork({super.key});

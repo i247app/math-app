@@ -2,14 +2,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/home/home_api.dart';
-import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
-import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
-import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_task_header.dart';
-import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_task_shell.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_meta_chip.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_score_ring.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/home/home_api.dart';
+import 'package:numi/features/home/widgets/home_profile_menu.dart';
+import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi/features/home/parent/room/widgets/parent_room_task_header.dart';
+import 'package:numi/features/home/parent/room/widgets/parent_room_task_shell.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_task_meta_chip.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_task_score_ring.dart';
 
 // ignore: unused_element
 class _ParentRoomCompletionCard extends StatelessWidget {

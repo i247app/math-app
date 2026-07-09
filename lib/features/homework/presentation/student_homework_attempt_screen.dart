@@ -3,23 +3,23 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/features/homework/cache/student_homework_cache.dart';
-import 'package:numi_flutter/features/homework/homework_api.dart';
-import 'package:numi_flutter/features/homework/presentation/student_homework_result_screen.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_answer_grid.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_bottom_bar.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_error_state.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_header.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_progress_section.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_question_card.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_helpers.dart';
-import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/cache/student_homework_cache.dart';
+import 'package:numi/features/homework/homework_api.dart';
+import 'package:numi/features/homework/presentation/student_homework_result_screen.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_answer_grid.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_bottom_bar.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_error_state.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_header.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_progress_section.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_question_card.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/homework/widgets/student_result/student_homework_result_helpers.dart';
+import 'package:numi/features/quiz/widgets/shared/quiz_wave_loader.dart';
 
 class StudentHomeworkAttemptScreen extends StatefulWidget {
   const StudentHomeworkAttemptScreen({

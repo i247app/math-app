@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class ParentProfileInfoLine extends StatelessWidget {
   const ParentProfileInfoLine({

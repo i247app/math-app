@@ -4,22 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
-import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/quiz/cache/quiz_cache.dart';
-import 'package:numi_flutter/features/quiz/quiz_api.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/ai_review_card.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_review_text.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/exit_to_grade_selection.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_bottom_bar.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_header.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_level_for_score.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/score_out_of10.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/score_ring.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/test_again_loader.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/quiz/cache/quiz_cache.dart';
+import 'package:numi/features/quiz/quiz_api.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/ai_review_card.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/assessment_result_review_text.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/exit_to_grade_selection.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/result_bottom_bar.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/result_header.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/result_level_for_score.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/score_out_of10.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/score_ring.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/test_again_loader.dart';
 
 class AssessmentResultScreen extends StatefulWidget {
   const AssessmentResultScreen({

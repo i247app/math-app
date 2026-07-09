@@ -1,7 +1,7 @@
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
-import 'package:numi_flutter/core/network/auth_models.dart';
-import 'package:numi_flutter/core/network/network_client.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/network/auth_models.dart';
+import 'package:numi/core/network/network_client.dart';
 
 const loginOtpType = 'LOGIN_2FA';
 const registerOtpType = 'REGISTER';

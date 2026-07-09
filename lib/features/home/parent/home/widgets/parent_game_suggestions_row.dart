@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/features/home/widgets/home_game_preview_card.dart';
-import 'package:numi_flutter/features/home/widgets/home_math_squadron_preview_artwork.dart';
+import 'package:numi/features/home/widgets/home_game_preview_card.dart';
+import 'package:numi/features/home/widgets/home_math_squadron_preview_artwork.dart';
 
 class ParentGameSuggestionsRow extends StatelessWidget {
   const ParentGameSuggestionsRow();

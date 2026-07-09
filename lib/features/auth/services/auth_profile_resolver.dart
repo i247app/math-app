@@ -1,10 +1,10 @@
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/features/auth/models/auth_profile_resolution.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
-import 'package:numi_flutter/features/profile/profile_api.dart';
-import 'package:numi_flutter/features/profile/services/active_profile_session.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/auth/models/auth_profile_resolution.dart';
+import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/profile/profile_api.dart';
+import 'package:numi/features/profile/services/active_profile_session.dart';
 
 class AuthProfileResolver {
   const AuthProfileResolver({

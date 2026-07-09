@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/home/widgets/home_visual_constants.dart';
 
 class StudentHomeTabButton extends StatelessWidget {
   const StudentHomeTabButton({

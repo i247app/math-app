@@ -1,5 +1,5 @@
-import 'package:numi_flutter/core/network/chapter_models.dart';
-import 'package:numi_flutter/features/practice/practice_api.dart';
+import 'package:numi/core/network/chapter_models.dart';
+import 'package:numi/features/practice/practice_api.dart';
 
 class PracticeChapterCache {
   PracticeChapterCache._();

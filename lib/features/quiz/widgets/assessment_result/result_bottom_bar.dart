@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/result_action_button.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/result_action_button.dart';
 
 class AssessmentResultBottomBar extends StatelessWidget {
   const AssessmentResultBottomBar({

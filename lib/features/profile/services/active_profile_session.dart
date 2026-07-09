@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi/core/network/profile_models.dart';
 
 class ActiveProfileSession {
   const ActiveProfileSession({

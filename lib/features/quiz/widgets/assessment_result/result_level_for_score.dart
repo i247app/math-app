@@ -1,6 +1,6 @@
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment_result/assessment_result_level.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/quiz/widgets/assessment_result/assessment_result_level.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
 AssessmentResultLevel resultLevelForScore(int score) {
   if (score >= 9) {

@@ -1,19 +1,19 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/features/settings/settings_constants.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/settings/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/core/network/program_models.dart';
-import 'package:numi_flutter/core/network/school_models.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/widgets/account/settings_cancel_button.dart';
-import 'package:numi_flutter/features/settings/widgets/account/settings_save_button.dart';
-import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_avatar.dart';
-import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_dropdown.dart';
-import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_text_field.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/settings/widgets/account/settings_cancel_button.dart';
+import 'package:numi/features/settings/widgets/account/settings_save_button.dart';
+import 'package:numi/features/settings/widgets/profile_form/add_profile_avatar.dart';
+import 'package:numi/features/settings/widgets/profile_form/add_profile_dropdown.dart';
+import 'package:numi/features/settings/widgets/profile_form/add_profile_text_field.dart';
 
 class AddProfilePanel extends StatelessWidget {
   const AddProfilePanel({

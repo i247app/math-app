@@ -1,7 +1,7 @@
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/core/network/school_models.dart';
-import 'package:numi_flutter/features/profile/grade_api.dart';
-import 'package:numi_flutter/features/profile/school_api.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/profile/school_api.dart';
 
 class StudentClassSearchFilterOptions {
   const StudentClassSearchFilterOptions({

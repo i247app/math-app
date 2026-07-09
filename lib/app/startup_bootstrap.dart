@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:numi_flutter/core/localization/lingo_provider.dart';
-import 'package:numi_flutter/core/network/api_metadata.dart';
-import 'package:numi_flutter/core/theme/app_theme_controller.dart';
-import 'package:numi_flutter/features/auth/auth_state.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
-import 'package:numi_flutter/features/auth/passcode_service.dart';
-import 'package:numi_flutter/features/auth/services/auth_profile_resolver.dart';
-import 'package:numi_flutter/features/profile/profile_api.dart';
-import 'package:numi_flutter/features/profile/services/active_profile_session.dart';
+import 'package:numi/core/localization/lingo_provider.dart';
+import 'package:numi/core/network/api_metadata.dart';
+import 'package:numi/core/theme/app_theme_controller.dart';
+import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/passcode_service.dart';
+import 'package:numi/features/auth/services/auth_profile_resolver.dart';
+import 'package:numi/features/profile/profile_api.dart';
+import 'package:numi/features/profile/services/active_profile_session.dart';
 
 class StartupBootstrapResult {
   const StartupBootstrapResult({

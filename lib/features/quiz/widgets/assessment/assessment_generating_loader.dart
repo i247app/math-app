@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/features/quiz/widgets/shared/quiz_wave_loader.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/shared/quiz_wave_loader.dart';
 
 class AssessmentGeneratingLoader extends StatelessWidget {
   const AssessmentGeneratingLoader({

@@ -2,13 +2,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/features/home/home_api.dart';
-import 'package:numi_flutter/features/home/widgets/home_profile_menu.dart';
-import 'package:numi_flutter/features/home/parent/room/helpers/parent_room_helpers.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_date_label.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_meta_badges.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_score_ring.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_task_title.dart';
+import 'package:numi/features/home/home_api.dart';
+import 'package:numi/features/home/widgets/home_profile_menu.dart';
+import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_task_date_label.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_task_meta_badges.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_task_score_ring.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_task_title.dart';
 
 class ParentCompletedTaskListItem extends StatelessWidget {
   const ParentCompletedTaskListItem({

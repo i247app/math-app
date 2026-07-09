@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/classroom/classroom_api.dart';
-import 'package:numi_flutter/features/home/student/shared/widgets/student_inline_error_panel.dart';
-import 'package:numi_flutter/features/home/student/shared/widgets/student_state_card.dart';
-import 'package:numi_flutter/features/home/student/invitations/widgets/student_invitation_card.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/home/student/shared/widgets/student_inline_error_panel.dart';
+import 'package:numi/features/home/student/shared/widgets/student_state_card.dart';
+import 'package:numi/features/home/student/invitations/widgets/student_invitation_card.dart';
 
 class StudentInvitationListScreen extends StatefulWidget {
   const StudentInvitationListScreen({

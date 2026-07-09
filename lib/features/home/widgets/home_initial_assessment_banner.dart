@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/features/home/widgets/home_visual_constants.dart';
 
 class HomeInitialAssessmentBanner extends StatelessWidget {
   const HomeInitialAssessmentBanner({super.key, required this.onTap});

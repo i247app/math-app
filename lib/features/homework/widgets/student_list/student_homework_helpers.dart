@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_filter.dart';
 
 String studentHomeworkTitle(ClassroomExercise exercise) {
   final title = exercise.title?.trim();

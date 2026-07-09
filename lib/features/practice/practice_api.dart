@@ -1,5 +1,5 @@
-import 'package:numi_flutter/core/network/chapter_models.dart';
-import 'package:numi_flutter/core/network/network_client.dart';
+import 'package:numi/core/network/chapter_models.dart';
+import 'package:numi/core/network/network_client.dart';
 
 class PracticeException implements Exception {
   const PracticeException(this.message, {this.status});

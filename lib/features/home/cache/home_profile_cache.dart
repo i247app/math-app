@@ -1,6 +1,6 @@
-import 'package:numi_flutter/features/home/parent/cache/parent_home_snapshot.dart';
-import 'package:numi_flutter/features/home/student/cache/student_home_snapshot.dart';
-import 'package:numi_flutter/features/home/teacher/cache/teacher_home_snapshot.dart';
+import 'package:numi/features/home/parent/cache/parent_home_snapshot.dart';
+import 'package:numi/features/home/student/cache/student_home_snapshot.dart';
+import 'package:numi/features/home/teacher/cache/teacher_home_snapshot.dart';
 
 /// In-memory, per-session cache for home-screen data indexed by profile ID.
 ///

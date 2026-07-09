@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_teacher_avatar_initial.dart';
+import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_teacher_avatar_initial.dart';
 
 class StudentClassTeacherAvatar extends StatelessWidget {
   const StudentClassTeacherAvatar({

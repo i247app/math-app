@@ -1,10 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/features/home/home_api.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_child_dashboard_loading.dart';
-import 'package:numi_flutter/features/home/parent/home/parent_home_tab.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_child_overview_content.dart';
+import 'package:numi/features/home/home_api.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_child_dashboard_loading.dart';
+import 'package:numi/features/home/parent/home/parent_home_tab.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_child_overview_content.dart';
 
 extension ParentHomeChildDashboardView on ParentHomeContentState {
   Widget buildChildDashboard() {

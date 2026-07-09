@@ -1,7 +1,7 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({

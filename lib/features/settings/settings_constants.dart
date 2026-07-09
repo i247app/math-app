@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_keys.dart';
 
 const settingsMenuFadeInDuration = Duration(milliseconds: 900);
 const settingsLoadingDelay = Duration(milliseconds: 500);

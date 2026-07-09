@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
-import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_line.dart';
-import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_line.dart';
+import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 
 class ParentAssessmentListSkeleton extends StatelessWidget {
   const ParentAssessmentListSkeleton({required this.scale});

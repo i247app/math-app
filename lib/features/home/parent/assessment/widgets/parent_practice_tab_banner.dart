@@ -2,9 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
-import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
-import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
+import 'package:numi/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 
 class ParentPracticeTabBanner extends StatelessWidget {
   const ParentPracticeTabBanner({required this.onTap, required this.scale});

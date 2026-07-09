@@ -4,8 +4,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/features/auth/widgets/auth_layout.dart';
-import 'package:numi_flutter/features/auth/widgets/otp/otp_card.dart';
+import 'package:numi/features/auth/widgets/auth_layout.dart';
+import 'package:numi/features/auth/widgets/otp/otp_card.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({

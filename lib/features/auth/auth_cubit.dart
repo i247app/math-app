@@ -2,20 +2,20 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/core/notifications/notification_ping_service.dart';
-import 'package:numi_flutter/features/auth/models/auth_profile_resolution.dart';
-import 'package:numi_flutter/features/profile/services/active_profile_session.dart';
-import 'package:numi_flutter/features/profile/services/avatar_picker_service.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
-import 'package:numi_flutter/features/auth/passcode_service.dart';
-import 'package:numi_flutter/features/auth/services/auth_profile_resolver.dart';
-import 'package:numi_flutter/features/profile/profile_api.dart';
-import 'package:numi_flutter/features/auth/phone_region.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/notifications/notification_ping_service.dart';
+import 'package:numi/features/auth/models/auth_profile_resolution.dart';
+import 'package:numi/features/profile/services/active_profile_session.dart';
+import 'package:numi/features/profile/services/avatar_picker_service.dart';
+import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/passcode_service.dart';
+import 'package:numi/features/auth/services/auth_profile_resolver.dart';
+import 'package:numi/features/profile/profile_api.dart';
+import 'package:numi/features/auth/phone_region.dart';
 
-import 'package:numi_flutter/features/auth/auth_state.dart';
+import 'package:numi/features/auth/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit({

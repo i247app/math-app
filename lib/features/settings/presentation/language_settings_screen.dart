@@ -1,17 +1,17 @@
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/settings/settings_constants.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/settings/settings_constants.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_language.dart';
-import 'package:numi_flutter/core/localization/lingo_scope.dart';
-import 'package:numi_flutter/features/settings/widgets/language/language_header.dart';
-import 'package:numi_flutter/features/settings/widgets/language/language_option_card.dart';
-import 'package:numi_flutter/shared/widgets/common_widgets.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/localization/lingo_scope.dart';
+import 'package:numi/features/settings/widgets/language/language_header.dart';
+import 'package:numi/features/settings/widgets/language/language_option_card.dart';
+import 'package:numi/shared/widgets/common_widgets.dart';
 
 class LanguageSettingsScreen extends StatefulWidget {
   const LanguageSettingsScreen({super.key});

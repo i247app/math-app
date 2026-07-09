@@ -1,29 +1,29 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_class_search_assets.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/core/network/school_models.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/classroom/cache/student_class_search_filter_cache.dart';
-import 'package:numi_flutter/features/classroom/classroom_api.dart';
-import 'package:numi_flutter/features/classroom/helpers/student_class_search_helpers.dart';
-import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_class_card.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_filter_panel.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_retry_banner.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_search_field.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_school_filter_bottom_sheet.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_state_card.dart';
-import 'package:numi_flutter/features/profile/grade_api.dart';
-import 'package:numi_flutter/features/profile/school_api.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/cache/student_class_search_filter_cache.dart';
+import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/classroom/helpers/student_class_search_helpers.dart';
+import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
+import 'package:numi/features/classroom/widgets/student_search/student_join_class_card.dart';
+import 'package:numi/features/classroom/widgets/student_search/student_join_filter_panel.dart';
+import 'package:numi/features/classroom/widgets/student_search/student_join_retry_banner.dart';
+import 'package:numi/features/classroom/widgets/student_search/student_join_search_field.dart';
+import 'package:numi/features/classroom/widgets/student_search/student_join_school_filter_bottom_sheet.dart';
+import 'package:numi/features/classroom/widgets/student_search/student_join_state_card.dart';
+import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/profile/school_api.dart';
 
 class StudentClassSearchContent extends StatefulWidget {
   const StudentClassSearchContent({

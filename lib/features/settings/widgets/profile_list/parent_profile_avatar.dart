@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 
 class ParentProfileAvatar extends StatelessWidget {
   const ParentProfileAvatar({

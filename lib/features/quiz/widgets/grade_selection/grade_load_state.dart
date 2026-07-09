@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_skeleton_card.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_skeleton_card.dart';
 
 class GradeLoadState extends StatelessWidget {
   const GradeLoadState({super.key, required this.scale});

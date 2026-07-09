@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
 
 ({Color color, String label}) parentAssessmentScoreStyle(
   BuildContext context,

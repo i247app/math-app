@@ -1,6 +1,6 @@
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/profile_models.dart';
 
 class HomeLayoutResponse {
   const HomeLayoutResponse({

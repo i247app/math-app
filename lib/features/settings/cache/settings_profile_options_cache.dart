@@ -1,7 +1,7 @@
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/core/network/program_models.dart';
-import 'package:numi_flutter/core/network/school_models.dart';
-import 'package:numi_flutter/core/network/semester_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/core/network/semester_models.dart';
 
 const settingsProfileOptionsCacheTtl = Duration(minutes: 10);
 

@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/network/quiz_models.dart';
+import 'package:numi/core/network/quiz_models.dart';
 
 String historyQuizPurpose(GeneratedQuiz quiz) {
   final purpose = quiz.purpose?.trim();

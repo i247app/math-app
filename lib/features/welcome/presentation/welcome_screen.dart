@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_composition.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/welcome/widgets/welcome_composition.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({

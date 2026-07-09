@@ -4,23 +4,23 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_strings.dart';
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
-import 'package:numi_flutter/features/profile/grade_api.dart';
-import 'package:numi_flutter/features/quiz/ai_shake_service.dart';
-import 'package:numi_flutter/features/quiz/quiz_api.dart';
-import 'package:numi_flutter/features/quiz/presentation/assessment_screen.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/default_grade_label.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_background.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_bottom_bar.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_failure_notice.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_grid.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_header.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/quiz/ai_shake_service.dart';
+import 'package:numi/features/quiz/quiz_api.dart';
+import 'package:numi/features/quiz/presentation/assessment_screen.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/default_grade_label.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_background.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_bottom_bar.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_failure_notice.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_grid.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_header.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_option.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class GradeSelectionScreen extends StatefulWidget {
   const GradeSelectionScreen({

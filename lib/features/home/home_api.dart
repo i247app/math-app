@@ -1,7 +1,7 @@
-import 'package:numi_flutter/core/network/home_layout_models.dart';
-import 'package:numi_flutter/core/network/network_client.dart';
+import 'package:numi/core/network/home_layout_models.dart';
+import 'package:numi/core/network/network_client.dart';
 
-export 'package:numi_flutter/core/network/home_layout_models.dart';
+export 'package:numi/core/network/home_layout_models.dart';
 
 class HomeLayoutException implements Exception {
   const HomeLayoutException(this.message, {this.status});

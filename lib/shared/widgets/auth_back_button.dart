@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class AuthBackButton extends StatelessWidget {
   const AuthBackButton({

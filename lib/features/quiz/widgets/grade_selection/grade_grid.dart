@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_card.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_load_error.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_load_state.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_card.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_load_error.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_load_state.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_option.dart';
 
 class GradeGrid extends StatelessWidget {
   const GradeGrid({

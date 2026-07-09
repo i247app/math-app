@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/features/profile/models/profile_role.dart';
-import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/features/quiz/quiz_api.dart';
-import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/quiz_api.dart';
+import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 
 bool isCompletedAssessment(GeneratedQuiz quiz) {
   final purpose = (quiz.purpose ?? quiz.type ?? '').trim().toUpperCase();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/settings/widgets/account/account_field_shell.dart';
-import 'package:numi_flutter/features/settings/widgets/account/plain_account_text_field.dart';
+import 'package:numi/features/settings/widgets/account/account_field_shell.dart';
+import 'package:numi/features/settings/widgets/account/plain_account_text_field.dart';
 
 class AccountTextField extends StatelessWidget {
   const AccountTextField({

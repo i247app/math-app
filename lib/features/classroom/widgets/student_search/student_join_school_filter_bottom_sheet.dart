@@ -1,11 +1,11 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/school_models.dart';
-import 'package:numi_flutter/features/classroom/helpers/student_class_search_helpers.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_search/student_join_school_option_tile.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/classroom/helpers/student_class_search_helpers.dart';
+import 'package:numi/features/classroom/widgets/student_search/student_join_school_option_tile.dart';
 
 class StudentJoinSchoolFilterBottomSheet extends StatelessWidget {
   const StudentJoinSchoolFilterBottomSheet({

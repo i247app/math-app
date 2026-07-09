@@ -2,20 +2,20 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/home/home_api.dart';
-import 'package:numi_flutter/features/home/parent/home/models/parent_child_summary.dart';
-import 'package:numi_flutter/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
-import 'package:numi_flutter/features/home/parent/home/models/parent_home_entrance_builder.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_child_class_summary_card.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_dashboard_section.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_game_suggestions_row.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_home_error_card.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_home_refresh_label.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_completed_task_list_item.dart';
-import 'package:numi_flutter/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/home/home_api.dart';
+import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
+import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
+import 'package:numi/features/home/parent/home/models/parent_home_entrance_builder.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_child_class_summary_card.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_dashboard_section.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_game_suggestions_row.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_home_error_card.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_home_refresh_label.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_completed_task_list_item.dart';
+import 'package:numi/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
 
 class ParentChildOverviewContent extends StatelessWidget {
   const ParentChildOverviewContent({

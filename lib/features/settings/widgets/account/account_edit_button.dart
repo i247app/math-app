@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AccountEditButton extends StatelessWidget {

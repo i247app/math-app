@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/core/network/school_models.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/school_models.dart';
 
 List<SchoolModel> selectedStudentJoinSchools(
   List<SchoolModel> schools,

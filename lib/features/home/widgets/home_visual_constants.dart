@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
 const homeTeal = AppColors.teal700;
 const homeMuted = AppColors.textSubtle;

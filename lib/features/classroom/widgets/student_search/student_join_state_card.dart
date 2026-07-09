@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
 class StudentJoinStateCard extends StatelessWidget {
   const StudentJoinStateCard({

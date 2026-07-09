@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/network/profile_models.dart';
+import 'package:numi/core/network/profile_models.dart';
 
 enum ProfileRole {
   student,

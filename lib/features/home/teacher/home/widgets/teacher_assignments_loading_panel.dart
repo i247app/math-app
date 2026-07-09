@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_skeleton_carousel.dart';
-import 'package:numi_flutter/features/home/teacher/home/widgets/teacher_assignment_skeleton_card.dart';
+import 'package:numi/features/home/teacher/home/widgets/teacher_skeleton_carousel.dart';
+import 'package:numi/features/home/teacher/home/widgets/teacher_assignment_skeleton_card.dart';
 
 class TeacherAssignmentsLoadingPanel extends StatelessWidget {
   const TeacherAssignmentsLoadingPanel({super.key, required this.scale});

@@ -3,11 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
-import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
-import 'package:numi_flutter/features/welcome/widgets/welcome_start_button.dart';
+import 'package:numi/features/welcome/widgets/numi_brand_text.dart';
+import 'package:numi/features/welcome/widgets/welcome_start_button.dart';
 
 class WelcomeDetailsComposition extends StatelessWidget {
   const WelcomeDetailsComposition({

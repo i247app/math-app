@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/student/home/widgets/student_message_panel.dart';
+import 'package:numi/features/home/student/home/widgets/student_message_panel.dart';
 
 class StudentEmptyPanel extends StatelessWidget {
   const StudentEmptyPanel({

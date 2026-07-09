@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/widgets/home_image_action.dart';
-import 'package:numi_flutter/features/home/widgets/home_initial_assessment_banner.dart';
-import 'package:numi_flutter/features/home/widgets/home_start_guide_card.dart';
-import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
-import 'package:numi_flutter/features/home/parent/home/parent_home_tab.dart';
+import 'package:numi/features/home/widgets/home_image_action.dart';
+import 'package:numi/features/home/widgets/home_initial_assessment_banner.dart';
+import 'package:numi/features/home/widgets/home_start_guide_card.dart';
+import 'package:numi/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
 extension ParentHomeFirstAssessmentView on ParentHomeContentState {
   Widget buildFirstAssessmentState() {

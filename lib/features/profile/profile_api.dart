@@ -1,7 +1,7 @@
-import 'package:numi_flutter/core/network/network_client.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/core/network/program_models.dart';
-import 'package:numi_flutter/core/network/semester_models.dart';
+import 'package:numi/core/network/network_client.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/semester_models.dart';
 
 class ProfileException implements Exception {
   const ProfileException(this.message, {this.status});

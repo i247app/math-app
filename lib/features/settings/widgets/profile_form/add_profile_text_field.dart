@@ -1,9 +1,9 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/widgets/profile_form/add_profile_field_shell.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/settings/widgets/profile_form/add_profile_field_shell.dart';
 
 class AddProfileTextField extends StatelessWidget {
   const AddProfileTextField({

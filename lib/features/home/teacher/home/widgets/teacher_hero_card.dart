@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
 
 class TeacherHeroCard extends StatelessWidget {
   const TeacherHeroCard({super.key, required this.scale});

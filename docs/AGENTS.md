@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-This repository is a Flutter mobile app named `numi_flutter`. It implements the NUMI onboarding and phone verification flow for a math learning app. The active product surface is a guided onboarding sequence:
+This repository is a Flutter mobile app named `numi`. It implements the NUMI onboarding and phone verification flow for a math learning app. The active product surface is a guided onboarding sequence:
 
 1. Welcome screen
 2. Phone login screen
@@ -187,6 +187,6 @@ flutter create --platforms=ios,android .
 ## Known Gaps
 
 - The project currently has Android platform files checked in; iOS files are not present in this checkout.
-- The README run command says `cd numi_flutter`, but this repository root is already the Flutter project root.
+- The README run command says `cd numi`, but this repository root is already the Flutter project root.
 - The OTP resend label says "after 30 seconds", but there is no visible countdown enforcement in the current UI.
 - OTP verification is local and temporary. It does not call a backend OTP verification endpoint yet.

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/helpers/home_dashboard_helpers.dart';
-import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
-import 'package:numi_flutter/features/games/presentation/games_tab.dart';
-import 'package:numi_flutter/features/home/parent/assessment/parent_assessment_tab.dart';
-import 'package:numi_flutter/features/home/parent/home/parent_home_tab.dart';
-import 'package:numi_flutter/features/home/parent/room/parent_room_tab.dart';
+import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
+import 'package:numi/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi/features/games/presentation/games_tab.dart';
+import 'package:numi/features/home/parent/assessment/parent_assessment_tab.dart';
+import 'package:numi/features/home/parent/home/parent_home_tab.dart';
+import 'package:numi/features/home/parent/room/parent_room_tab.dart';
 
 class ParentDashboard extends StatelessWidget {
   const ParentDashboard({super.key, required this.args});

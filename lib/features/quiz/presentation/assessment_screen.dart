@@ -3,20 +3,20 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/features/quiz/controllers/assessment_controller.dart';
-import 'package:numi_flutter/features/quiz/quiz_api.dart';
-import 'package:numi_flutter/features/quiz/presentation/assessment_result_screen.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_answer_grid.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_bottom_bar.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_error_state.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_generating_loader.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_header.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_progress_section.dart';
-import 'package:numi_flutter/features/quiz/widgets/assessment/assessment_question_card.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/controllers/assessment_controller.dart';
+import 'package:numi/features/quiz/quiz_api.dart';
+import 'package:numi/features/quiz/presentation/assessment_result_screen.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_answer_grid.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_bar.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_error_state.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_generating_loader.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_header.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_progress_section.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_question_card.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 enum AiAssessmentResult { generationFailed }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/features/auth/phone_region.dart';
+import 'package:numi/features/auth/phone_region.dart';
 
 class PhoneInputFormatter extends TextInputFormatter {
   const PhoneInputFormatter(this.region);

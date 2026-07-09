@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
 class StudentHomeworkMessage extends StatelessWidget {
   const StudentHomeworkMessage({super.key, required this.message});

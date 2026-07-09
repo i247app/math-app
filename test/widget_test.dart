@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:numi_flutter/features/onboarding/data/avatar_picker.dart';
-import 'package:numi_flutter/features/onboarding/data/otp_auth_api.dart';
-import 'package:numi_flutter/features/onboarding/presentation/bloc/onboarding_cubit.dart';
-import 'package:numi_flutter/main.dart';
+import 'package:numi/features/onboarding/data/avatar_picker.dart';
+import 'package:numi/features/onboarding/data/otp_auth_api.dart';
+import 'package:numi/features/onboarding/presentation/bloc/onboarding_cubit.dart';
+import 'package:numi/main.dart';
 
 void main() {
   testWidgets('shows NUMI welcome screen', (WidgetTester tester) async {

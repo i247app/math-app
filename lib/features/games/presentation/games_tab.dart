@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/grade_models.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/games/math_squadron/math_squadron_data.dart';
-import 'package:numi_flutter/features/games/presentation/math_squadron_stage_screen.dart';
-import 'package:numi_flutter/features/games/presentation/numi_farm_stage_screen.dart';
-import 'package:numi_flutter/features/profile/grade_api.dart';
-import 'package:numi_flutter/features/practice/practice_catalog.dart';
-import 'package:numi_flutter/features/practice/presentation/practice_chapter_screen.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/games/math_squadron/math_squadron_data.dart';
+import 'package:numi/features/games/presentation/math_squadron_stage_screen.dart';
+import 'package:numi/features/games/presentation/numi_farm_stage_screen.dart';
+import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/practice/practice_catalog.dart';
+import 'package:numi/features/practice/presentation/practice_chapter_screen.dart';
 
 const _gamesTeal = Color(0xFF006762);
 const _gamesInk = Color(0xFF253228);

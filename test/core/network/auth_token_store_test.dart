@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi_flutter/core/network/auth_token_store.dart';
+import 'package:numi/core/network/auth_token_store.dart';
 
 void main() {
   group('CachedAuthTokenStore', () {

@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/features/classroom/classroom_api.dart';
-import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/classroom/presentation/bloc/classroom_state.dart';
 
 class ClassroomCubit extends Cubit<ClassroomState> {
   ClassroomCubit({required ClassroomService classroomService})

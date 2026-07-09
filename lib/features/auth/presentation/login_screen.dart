@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/auth/phone_region.dart';
-import 'package:numi_flutter/features/auth/widgets/auth_layout.dart';
-import 'package:numi_flutter/features/auth/widgets/login/login_card.dart';
-import 'package:numi_flutter/features/welcome/widgets/numi_brand_text.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/auth/phone_region.dart';
+import 'package:numi/features/auth/widgets/auth_layout.dart';
+import 'package:numi/features/auth/widgets/login/login_card.dart';
+import 'package:numi/features/welcome/widgets/numi_brand_text.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({

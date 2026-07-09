@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
 
 bool isSignupUsernameExistsError(String? message) {
   final normalized = message?.toLowerCase().trim();

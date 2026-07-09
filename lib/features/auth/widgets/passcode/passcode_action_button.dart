@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/auth/widgets/shared/auth_action_button.dart';
+import 'package:numi/features/auth/widgets/shared/auth_action_button.dart';
 
 class PasscodeActionButton extends StatelessWidget {
   const PasscodeActionButton({

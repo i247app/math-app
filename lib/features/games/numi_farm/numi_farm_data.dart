@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_keys.dart';
 
 enum NumiFarmSkill {
   countToFive,

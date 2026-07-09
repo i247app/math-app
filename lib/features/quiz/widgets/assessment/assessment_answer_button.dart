@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/network/quiz_models.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class AssessmentAnswerButton extends StatelessWidget {
   const AssessmentAnswerButton({

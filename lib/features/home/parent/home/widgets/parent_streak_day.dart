@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_dashed_circle_painter.dart';
-import 'package:numi_flutter/features/home/parent/home/widgets/parent_streak_day_state.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_dashed_circle_painter.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_streak_day_state.dart';
 
 class ParentStreakDay extends StatelessWidget {
   const ParentStreakDay({required this.label, required this.state});

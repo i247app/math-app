@@ -2,10 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/profile/helpers/profile_display_helpers.dart';
-import 'package:numi_flutter/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
+import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 
 class HomeProfileMenu extends StatelessWidget {
   const HomeProfileMenu({

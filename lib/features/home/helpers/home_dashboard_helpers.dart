@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/features/home/widgets/home_dashboard_args.dart';
-import 'package:numi_flutter/features/settings/setting_tab.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi/features/settings/setting_tab.dart';
 
 Widget dashboardSettings(HomeDashboardArgs args) {
   return SettingTab(

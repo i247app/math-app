@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/theme/font_size.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 /// A shared section header with a title on the left and an optional action
 /// button on the right.

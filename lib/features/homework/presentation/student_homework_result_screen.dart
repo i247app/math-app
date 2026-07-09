@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_close_button.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_header.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_result_summary.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_review_card.dart';
-import 'package:numi_flutter/features/homework/widgets/student_result/student_homework_score_ring.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/homework/widgets/student_result/student_homework_close_button.dart';
+import 'package:numi/features/homework/widgets/student_result/student_homework_result_header.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/homework/widgets/student_result/student_homework_result_summary.dart';
+import 'package:numi/features/homework/widgets/student_result/student_homework_review_card.dart';
+import 'package:numi/features/homework/widgets/student_result/student_homework_score_ring.dart';
 
 class StudentHomeworkResultScreen extends StatelessWidget {
   const StudentHomeworkResultScreen({super.key, required this.summary});

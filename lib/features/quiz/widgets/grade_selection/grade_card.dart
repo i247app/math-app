@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_badge.dart';
-import 'package:numi_flutter/features/quiz/widgets/grade_selection/grade_option.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_badge.dart';
+import 'package:numi/features/quiz/widgets/grade_selection/grade_option.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
 class GradeCard extends StatelessWidget {
   const GradeCard({

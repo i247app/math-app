@@ -1,5 +1,5 @@
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
 
 /// Snapshot of home-screen data for a single teacher profile.
 class TeacherHomeSnapshot {

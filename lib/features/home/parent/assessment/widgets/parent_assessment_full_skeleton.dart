@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
-import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_line.dart';
-import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_list_skeleton.dart';
-import 'package:numi_flutter/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_line.dart';
+import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_list_skeleton.dart';
+import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 
 class ParentAssessmentFullSkeleton extends StatelessWidget {
   const ParentAssessmentFullSkeleton({required this.scale});

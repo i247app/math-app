@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/home/student/home/models/student_home_panel.dart';
-import 'package:numi_flutter/features/home/student/home/widgets/student_home_tab_button.dart';
-import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/home/student/home/models/student_home_panel.dart';
+import 'package:numi/features/home/student/home/widgets/student_home_tab_button.dart';
+import 'package:numi/features/home/widgets/home_visual_constants.dart';
 
 // ignore: unused_element
 class StudentHomeTabs extends StatelessWidget {

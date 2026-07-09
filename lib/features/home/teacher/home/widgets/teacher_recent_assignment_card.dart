@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/features/homework/presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
 
 class TeacherRecentAssignmentCard extends StatelessWidget {
   const TeacherRecentAssignmentCard({

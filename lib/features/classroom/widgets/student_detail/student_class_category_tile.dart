@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class StudentClassCategoryTile extends StatelessWidget {
   const StudentClassCategoryTile({

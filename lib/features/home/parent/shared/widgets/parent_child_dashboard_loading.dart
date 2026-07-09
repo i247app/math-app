@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_block.dart';
-import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_line.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_line.dart';
 
 class ParentChildDashboardLoading extends StatefulWidget {
   const ParentChildDashboardLoading({super.key});

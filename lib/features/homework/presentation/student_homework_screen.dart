@@ -3,22 +3,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/features/homework/cache/student_homework_cache.dart';
-import 'package:numi_flutter/features/homework/homework_api.dart';
-import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
-import 'package:numi_flutter/features/homework/student_homework_open_guard.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_assignment_card.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_filter_tabs.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_helpers.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_message.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_refresh_label.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_search_field.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/features/homework/widgets/student_list/student_homework_top_bar.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/cache/student_homework_cache.dart';
+import 'package:numi/features/homework/homework_api.dart';
+import 'package:numi/features/homework/presentation/student_homework_attempt_screen.dart';
+import 'package:numi/features/homework/student_homework_open_guard.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_assignment_card.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_filter.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_filter_tabs.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_helpers.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_message.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_refresh_label.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_search_field.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/homework/widgets/student_list/student_homework_top_bar.dart';
 
 class StudentHomeworkScreen extends StatefulWidget {
   const StudentHomeworkScreen({

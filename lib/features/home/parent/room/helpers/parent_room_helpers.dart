@@ -1,15 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/features/profile/active_profile_session.dart';
-import 'package:numi_flutter/features/home/home_api.dart';
-import 'package:numi_flutter/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
-import 'package:numi_flutter/features/home/parent/room/models/parent_room_entry.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/home/home_api.dart';
+import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
+import 'package:numi/features/home/parent/room/models/parent_room_entry.dart';
 
 List<ParentRoomEntry> roomEntries(ParentHomeLayout? parent) {
   if (parent == null) {

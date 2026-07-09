@@ -1,19 +1,19 @@
-import 'package:numi_flutter/features/settings/settings_constants.dart';
+import 'package:numi/features/settings/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/localization/app_language.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/core/theme/app_theme_scope.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/settings/widgets/menu/settings_action_card.dart';
-import 'package:numi_flutter/features/settings/widgets/menu/settings_avatar.dart';
-import 'package:numi_flutter/features/settings/widgets/menu/settings_language_card.dart';
-import 'package:numi_flutter/features/settings/widgets/menu/settings_theme_switch_card.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_theme_scope.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/features/settings/widgets/menu/settings_avatar.dart';
+import 'package:numi/features/settings/widgets/menu/settings_language_card.dart';
+import 'package:numi/features/settings/widgets/menu/settings_theme_switch_card.dart';
 
 class SettingsMenuPanel extends StatelessWidget {
   const SettingsMenuPanel({

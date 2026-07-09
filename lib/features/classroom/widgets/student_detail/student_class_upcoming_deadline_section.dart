@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi_flutter/core/theme/app_colors.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_empty_panel.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_refresh_label.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_section_title.dart';
-import 'package:numi_flutter/features/classroom/widgets/student_detail/student_class_upcoming_deadline_tile.dart';
-import 'package:numi_flutter/features/homework/presentation/student_homework_attempt_screen.dart';
-import 'package:numi_flutter/features/homework/student_homework_open_guard.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_empty_panel.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_refresh_label.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_section_title.dart';
+import 'package:numi/features/classroom/widgets/student_detail/student_class_upcoming_deadline_tile.dart';
+import 'package:numi/features/homework/presentation/student_homework_attempt_screen.dart';
+import 'package:numi/features/homework/student_homework_open_guard.dart';
 
 class StudentClassUpcomingDeadlineSection extends StatelessWidget {
   const StudentClassUpcomingDeadlineSection({

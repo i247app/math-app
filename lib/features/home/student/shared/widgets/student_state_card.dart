@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/home/widgets/home_visual_constants.dart';
 
 class StudentStateCard extends StatelessWidget {
   const StudentStateCard({

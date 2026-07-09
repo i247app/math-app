@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_answer_button.dart';
-import 'package:numi_flutter/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_answer_button.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
 
 class StudentHomeworkAttemptAnswerGrid extends StatelessWidget {
   const StudentHomeworkAttemptAnswerGrid({

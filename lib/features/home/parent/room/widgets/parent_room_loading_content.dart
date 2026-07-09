@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_skeleton_block.dart';
-import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_skeleton_line.dart';
+import 'package:numi/features/home/parent/room/widgets/parent_room_skeleton_block.dart';
+import 'package:numi/features/home/parent/room/widgets/parent_room_skeleton_line.dart';
 
 class ParentRoomLoadingContent extends StatelessWidget {
   const ParentRoomLoadingContent();

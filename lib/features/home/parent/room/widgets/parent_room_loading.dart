@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi_flutter/features/home/shared/widgets/home_skeleton_shimmer.dart';
-import 'package:numi_flutter/features/home/parent/room/widgets/parent_room_loading_content.dart';
+import 'package:numi/features/home/shared/widgets/home_skeleton_shimmer.dart';
+import 'package:numi/features/home/parent/room/widgets/parent_room_loading_content.dart';
 
 class ParentRoomLoading extends StatefulWidget {
   const ParentRoomLoading({super.key});

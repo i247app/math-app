@@ -5,9 +5,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/features/games/math_squadron/math_squadron_data.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/games/math_squadron/math_squadron_data.dart';
 
 const _spaceTop = Color(0xFF060D2D);
 const _spaceBottom = Color(0xFF111C52);

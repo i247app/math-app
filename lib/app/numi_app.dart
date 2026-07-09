@@ -9,9 +9,9 @@ import '../core/localization/lingo_scope.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/app_theme_controller.dart';
 import '../core/theme/app_theme_scope.dart';
-import 'package:numi_flutter/features/auth/auth_flow.dart';
-import 'package:numi_flutter/features/auth/auth_state.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/auth_flow.dart';
+import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/otp_auth_api.dart';
 
 class NumiApp extends StatefulWidget {
   const NumiApp({

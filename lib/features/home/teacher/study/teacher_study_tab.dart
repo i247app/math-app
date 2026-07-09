@@ -1,4 +1,4 @@
-import 'package:numi_flutter/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,22 +7,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/extension/localization_extension.dart';
-import 'package:numi_flutter/core/localization/app_keys.dart';
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/core/network/classroom_models.dart';
-import 'package:numi_flutter/core/network/profile_models.dart';
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/core/theme/font_size.dart';
-import 'package:numi_flutter/features/auth/otp_auth_api.dart';
-import 'package:numi_flutter/features/classroom/classroom_api.dart';
-import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_cubit.dart';
-import 'package:numi_flutter/features/classroom/presentation/bloc/classroom_state.dart';
-import 'package:numi_flutter/features/classroom/presentation/teacher_classroom_screens.dart';
-import 'package:numi_flutter/features/home/widgets/home_tab_header.dart';
-import 'package:numi_flutter/features/homework/homework_api.dart';
-import 'package:numi_flutter/features/homework/presentation/teacher_homework_screen.dart';
-import 'package:numi_flutter/features/profile/active_profile_session.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
+import 'package:numi/features/classroom/presentation/bloc/classroom_state.dart';
+import 'package:numi/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi/features/home/widgets/home_tab_header.dart';
+import 'package:numi/features/homework/homework_api.dart';
+import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
+import 'package:numi/features/profile/active_profile_session.dart';
 
 part 'helpers/teacher_study_helpers.dart';
 part 'models/teacher_study_date_parts.dart';

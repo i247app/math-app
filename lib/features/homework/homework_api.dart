@@ -1,5 +1,5 @@
-import 'package:numi_flutter/core/network/classroom_exercise_models.dart';
-import 'package:numi_flutter/core/network/network_client.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/network_client.dart';
 
 class ClassroomExerciseException implements Exception {
   const ClassroomExerciseException(this.message, {this.status});

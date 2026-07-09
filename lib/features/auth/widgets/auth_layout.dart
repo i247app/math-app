@@ -3,8 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi_flutter/core/theme/app_theme_colors.dart';
-import 'package:numi_flutter/shared/widgets/auth_back_button.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/shared/widgets/auth_back_button.dart';
 
 class AuthLayout extends StatelessWidget {
   const AuthLayout({
