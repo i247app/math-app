@@ -21,6 +21,7 @@ class WelcomeLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final loginColor = colors.accentStrong;
 
     return Center(
       child: InkWell(
@@ -37,11 +38,11 @@ class WelcomeLoginButton extends StatelessWidget {
           child: Text(
             context.getText(labelKey),
             style: GoogleFonts.nunito(
-              color: colors.brandStrong,
+              color: loginColor,
               fontSize: 18 * scale,
               fontWeight: FontWeight.w500,
               height: 1.2,
-              decorationColor: colors.brandStrong,
+              decorationColor: loginColor,
               decorationThickness: 1.6,
               decorationStyle: TextDecorationStyle.solid,
             ),
