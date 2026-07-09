@@ -249,7 +249,9 @@ class _HistoryTabState extends State<HistoryTab> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20 * scale),
                   child: _HistoryBody(
-                    isLoading: _controller.isLoading,
+                    isLoading: _selectedFilter == _HistoryFilter.homework
+                        ? _controller.isLoadingHomework
+                        : _controller.isLoadingAssessments,
                     errorMessage: selectedErrorMessage,
                     selectedFilter: _selectedFilter,
                     selectedItemsCount: selectedItemsCount,

@@ -29,7 +29,8 @@ class HistoryController extends ChangeNotifier {
 
   List<GeneratedQuiz> _assessmentQuizzes = const <GeneratedQuiz>[];
   List<ClassroomExercise> _homeworkExercises = const <ClassroomExercise>[];
-  bool _isLoading = true;
+  bool _isLoadingAssessments = true;
+  bool _isLoadingHomework = true;
   String? _assessmentErrorMessage;
   String? _homeworkErrorMessage;
   int _loadRequestId = 0;
@@ -37,7 +38,8 @@ class HistoryController extends ChangeNotifier {
 
   List<GeneratedQuiz> get assessmentQuizzes => _assessmentQuizzes;
   List<ClassroomExercise> get homeworkExercises => _homeworkExercises;
-  bool get isLoading => _isLoading;
+  bool get isLoadingAssessments => _isLoadingAssessments;
+  bool get isLoadingHomework => _isLoadingHomework;
   String? get assessmentErrorMessage => _assessmentErrorMessage;
   String? get homeworkErrorMessage => _homeworkErrorMessage;
 
@@ -48,7 +50,8 @@ class HistoryController extends ChangeNotifier {
     final requestId = ++_loadRequestId;
     if (profileId == null) {
       final message = AppStrings.current(AppKeys.noAccountForHistory);
-      _isLoading = false;
+      _isLoadingAssessments = false;
+      _isLoadingHomework = false;
       _assessmentErrorMessage = message;
       _homeworkErrorMessage = message;
       _assessmentQuizzes = const <GeneratedQuiz>[];
@@ -61,72 +64,105 @@ class HistoryController extends ChangeNotifier {
     final cachedHomework = QuizHistoryHomeworkCache.peekSubmittedHomework(
       profileId,
     );
-    final hasCachedData = cachedQuizzes != null || cachedHomework != null;
-    if (hasCachedData) {
-      if (cachedQuizzes != null) {
-        _assessmentQuizzes = _assessmentHistoryQuizzes(cachedQuizzes);
-        _assessmentErrorMessage = null;
-      }
-      if (cachedHomework != null) {
-        _homeworkExercises = _submittedHomework(cachedHomework);
-        _homeworkErrorMessage = null;
-      }
-      _isLoading = false;
-      _notifyIfAlive();
-    } else {
-      _isLoading = true;
+    final shouldRefreshAssessments =
+        forceRefresh || !QuizCache.isListFresh(profileId: profileId);
+    final shouldRefreshHomework =
+        forceRefresh || !QuizHistoryHomeworkCache.isFresh(profileId);
+
+    if (cachedQuizzes != null) {
+      _assessmentQuizzes = _assessmentHistoryQuizzes(cachedQuizzes);
       _assessmentErrorMessage = null;
+    } else {
+      _assessmentQuizzes = const <GeneratedQuiz>[];
+      _assessmentErrorMessage = null;
+    }
+    if (cachedHomework != null) {
+      _homeworkExercises = _submittedHomework(cachedHomework);
       _homeworkErrorMessage = null;
-      _notifyIfAlive();
+    } else {
+      _homeworkExercises = const <ClassroomExercise>[];
+      _homeworkErrorMessage = null;
     }
 
-    final shouldRefresh =
-        forceRefresh ||
-        !QuizCache.isListFresh(profileId: profileId) ||
-        !QuizHistoryHomeworkCache.isFresh(profileId);
-    if (!shouldRefresh) {
-      return;
-    }
-
-    var assessmentQuizzes = const <GeneratedQuiz>[];
-    var homeworkExercises = const <ClassroomExercise>[];
-    String? assessmentError;
-    String? homeworkError;
+    _isLoadingAssessments = cachedQuizzes == null && shouldRefreshAssessments;
+    _isLoadingHomework = cachedHomework == null && shouldRefreshHomework;
+    _notifyIfAlive();
 
     await Future.wait<void>([
-      QuizCache.loadList(
-            service: _quizService,
-            profileId: profileId,
-            forceRefresh: forceRefresh || cachedQuizzes != null,
-          )
-          .then((quizzes) {
-            assessmentQuizzes = _assessmentHistoryQuizzes(quizzes);
-          })
-          .catchError((Object error) {
-            assessmentError = _assessmentHistoryErrorMessage(error);
-          }),
-      _loadSubmittedHomework(
-            profileId,
-            forceRefresh: forceRefresh || cachedHomework != null,
-          )
-          .then((exercises) {
-            homeworkExercises = exercises;
-          })
-          .catchError((Object error) {
-            homeworkError = _homeworkHistoryErrorMessage(error);
-          }),
+      if (shouldRefreshAssessments)
+        _refreshAssessments(
+          requestId: requestId,
+          profileId: profileId,
+          forceRefresh: forceRefresh || cachedQuizzes != null,
+        ),
+      if (shouldRefreshHomework)
+        _refreshHomework(
+          requestId: requestId,
+          profileId: profileId,
+          forceRefresh: forceRefresh || cachedHomework != null,
+        ),
     ]);
-
-    if (_disposed || requestId != _loadRequestId) {
-      return;
-    }
-    _assessmentQuizzes = assessmentQuizzes;
-    _homeworkExercises = homeworkExercises;
-    _assessmentErrorMessage = assessmentError;
-    _homeworkErrorMessage = homeworkError;
-    _isLoading = false;
-    notifyListeners();
   }
+
+  Future<void> _refreshAssessments({
+    required int requestId,
+    required int profileId,
+    required bool forceRefresh,
+  }) async {
+    try {
+      final quizzes = await QuizCache.loadList(
+        service: _quizService,
+        profileId: profileId,
+        forceRefresh: forceRefresh,
+      );
+      if (!_isCurrentRequest(requestId)) {
+        return;
+      }
+      _assessmentQuizzes = _assessmentHistoryQuizzes(quizzes);
+      _assessmentErrorMessage = null;
+    } catch (error) {
+      if (!_isCurrentRequest(requestId)) {
+        return;
+      }
+      _assessmentErrorMessage = _assessmentHistoryErrorMessage(error);
+    } finally {
+      if (_isCurrentRequest(requestId)) {
+        _isLoadingAssessments = false;
+        _notifyIfAlive();
+      }
+    }
+  }
+
+  Future<void> _refreshHomework({
+    required int requestId,
+    required int profileId,
+    required bool forceRefresh,
+  }) async {
+    try {
+      final exercises = await _loadSubmittedHomework(
+        profileId,
+        forceRefresh: forceRefresh,
+      );
+      if (!_isCurrentRequest(requestId)) {
+        return;
+      }
+      _homeworkExercises = exercises;
+      _homeworkErrorMessage = null;
+    } catch (error) {
+      if (!_isCurrentRequest(requestId)) {
+        return;
+      }
+      _homeworkErrorMessage = _homeworkHistoryErrorMessage(error);
+    } finally {
+      if (_isCurrentRequest(requestId)) {
+        _isLoadingHomework = false;
+        _notifyIfAlive();
+      }
+    }
+  }
+
+  bool _isCurrentRequest(int requestId) =>
+      !_disposed && requestId == _loadRequestId;
 
   Future<List<ClassroomExercise>> _loadSubmittedHomework(
     int profileId, {
