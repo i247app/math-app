@@ -11,7 +11,7 @@ import 'package:numi/features/home/widgets/home_visual_constants.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 
-class HomeBottomNavigation extends StatelessWidget {
+class HomeBottomNavigation extends StatefulWidget {
   const HomeBottomNavigation({
     super.key,
     required this.height,
@@ -32,9 +32,44 @@ class HomeBottomNavigation extends StatelessWidget {
   final ValueChanged<int> onTabSelected;
 
   @override
+  State<HomeBottomNavigation> createState() => _HomeBottomNavigationState();
+}
+
+class _HomeBottomNavigationState extends State<HomeBottomNavigation> {
+  int? _pendingActiveIndex;
+
+  int get _activeIndex => _pendingActiveIndex ?? widget.activeIndex;
+
+  @override
+  void didUpdateWidget(covariant HomeBottomNavigation oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_pendingActiveIndex == widget.activeIndex ||
+        oldWidget.activeRole != widget.activeRole) {
+      _pendingActiveIndex = null;
+    }
+  }
+
+  void _selectTab(int index) {
+    if (index == _activeIndex) {
+      return;
+    }
+
+    // Paint the selected navigation item before the target tab has a chance
+    // to build or begin loading. This preserves instant touch feedback even
+    // when a tab's first frame is expensive.
+    setState(() => _pendingActiveIndex = index);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _pendingActiveIndex != index) {
+        return;
+      }
+      widget.onTabSelected(index);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final items = switch (activeRole) {
+    final items = switch (widget.activeRole) {
       ProfileRole.teacher => [
         HomeNavItemData(
           Icons.home_filled,
@@ -56,7 +91,11 @@ class HomeBottomNavigation extends StatelessWidget {
           context.getText(AppKeys.navMembers),
           null,
         ),
-        HomeNavItemData(null, context.getText(AppKeys.navSettings), user),
+        HomeNavItemData(
+          null,
+          context.getText(AppKeys.navSettings),
+          widget.user,
+        ),
       ],
       ProfileRole.student => [
         HomeNavItemData(
@@ -124,15 +163,17 @@ class HomeBottomNavigation extends StatelessWidget {
       ],
     };
 
-    final radius = BorderRadius.vertical(top: Radius.circular(48 * scale));
+    final radius = BorderRadius.vertical(
+      top: Radius.circular(48 * widget.scale),
+    );
 
     return Container(
-      height: height,
+      height: widget.height,
       padding: EdgeInsets.fromLTRB(
-        20 * scale,
-        12 * scale,
-        20 * scale,
-        bottomInset + 12 * scale,
+        20 * widget.scale,
+        12 * widget.scale,
+        20 * widget.scale,
+        widget.bottomInset + 12 * widget.scale,
       ),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
@@ -146,8 +187,8 @@ class HomeBottomNavigation extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: colors.shadow.withValues(alpha: 0.06),
-            blurRadius: 20 * scale,
-            offset: Offset(0, -6 * scale),
+            blurRadius: 20 * widget.scale,
+            offset: Offset(0, -6 * widget.scale),
           ),
         ],
       ),
@@ -156,10 +197,10 @@ class HomeBottomNavigation extends StatelessWidget {
           return Expanded(
             child: HomeAnimatedNavItem(
               data: items[index],
-              active: activeIndex == index,
-              teacherStyle: activeRole == ProfileRole.teacher,
-              scale: scale,
-              onTap: () => onTabSelected(index),
+              active: _activeIndex == index,
+              teacherStyle: widget.activeRole == ProfileRole.teacher,
+              scale: widget.scale,
+              onTap: () => _selectTab(index),
             ),
           );
         }),
@@ -189,86 +230,72 @@ class HomeAnimatedNavItem extends StatelessWidget {
     final colors = context.themeColors;
     final activeColor = colors.brandStrong;
     final inactiveColor = colors.textSecondary.withValues(alpha: 0.68);
+    final foregroundColor = active
+        ? Theme.of(context).colorScheme.onPrimary
+        : inactiveColor;
 
-    return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 120),
-      curve: Curves.easeOutCubic,
-      tween: Tween<double>(end: active ? 1 : 0),
-      builder: (context, value, child) {
-        final color = Color.lerp(
-          inactiveColor,
-          Theme.of(context).colorScheme.onPrimary,
-          value,
-        )!;
-        return AnimatedScale(
-          duration: const Duration(milliseconds: 120),
-          curve: Curves.easeOutCubic,
-          scale: active ? 1 : 0.98,
-          child: Semantics(
-            selected: active,
-            button: true,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(48 * scale),
-                child: Container(
-                  height: 60 * scale,
-                  margin: EdgeInsets.symmetric(horizontal: 2 * scale),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 4 * scale,
-                    vertical: 9 * scale,
-                  ),
-                  decoration: BoxDecoration(
-                    color: active ? activeColor : Colors.transparent,
-                    borderRadius: BorderRadius.circular(48 * scale),
-                    boxShadow: active && !teacherStyle
-                        ? [
-                            BoxShadow(
-                              color: colors.brand.withValues(alpha: 0.20),
-                              blurRadius: 15 * scale,
-                              offset: Offset(0, 10 * scale),
-                            ),
-                            BoxShadow(
-                              color: colors.brand.withValues(alpha: 0.20),
-                              blurRadius: 6 * scale,
-                              offset: Offset(0, 4 * scale),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox.square(
-                        dimension: 22 * scale,
-                        child: Center(child: _buildIcon(color)),
+    return Semantics(
+      selected: active,
+      button: true,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(48 * scale),
+          child: Container(
+            height: 60 * scale,
+            margin: EdgeInsets.symmetric(horizontal: 2 * scale),
+            padding: EdgeInsets.symmetric(
+              horizontal: 4 * scale,
+              vertical: 9 * scale,
+            ),
+            decoration: BoxDecoration(
+              color: active ? activeColor : Colors.transparent,
+              borderRadius: BorderRadius.circular(48 * scale),
+              boxShadow: active && !teacherStyle
+                  ? [
+                      BoxShadow(
+                        color: colors.brand.withValues(alpha: 0.20),
+                        blurRadius: 15 * scale,
+                        offset: Offset(0, 10 * scale),
                       ),
-                      SizedBox(height: 4 * scale),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          data.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.andika(
-                            color: color,
-                            fontSize: FontSize.caption * 0.77 * scale,
-                            fontWeight: FontWeight.w900,
-                            height: 1,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
+                      BoxShadow(
+                        color: colors.brand.withValues(alpha: 0.20),
+                        blurRadius: 6 * scale,
+                        offset: Offset(0, 4 * scale),
                       ),
-                    ],
+                    ]
+                  : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox.square(
+                  dimension: 22 * scale,
+                  child: Center(child: _buildIcon(foregroundColor)),
+                ),
+                SizedBox(height: 4 * scale),
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    data.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.andika(
+                      color: foregroundColor,
+                      fontSize: FontSize.caption * 0.77 * scale,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
