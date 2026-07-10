@@ -76,7 +76,7 @@ const settingsStrings = <String, Map<String, String>>{
     AppKeys.passcodeContinue: 'Continue',
     AppKeys.passcodeUnlock: 'Unlock',
     AppKeys.passcodeLogin: 'Log In',
-    AppKeys.passcodeLoginWithPhone: 'Log In With Phone',
+    AppKeys.passcodeLoginWithPhone: 'Log in with phone',
     AppKeys.passcodeSkip: 'Skip',
     AppKeys.passcodeRemove: 'Remove PIN',
     AppKeys.passcodeSetUp: 'Set Up PIN',
