@@ -44,6 +44,7 @@ class _OtpScreenState extends State<OtpScreen>
   late final List<TextEditingController> controllers;
   late final List<FocusNode> focusNodes;
   late final AnimationController errorShakeController;
+  late final ValueNotifier<int> digitRevision;
   Timer? resendTimer;
   int resendCountdown = 0;
   bool hideOtpError = false;
@@ -57,6 +58,7 @@ class _OtpScreenState extends State<OtpScreen>
       vsync: this,
       duration: const Duration(milliseconds: 380),
     );
+    digitRevision = ValueNotifier(0);
     startResendCountdown(widget.resendSeconds, notify: false);
     if (widget.autoFocusCode) {
       requestOtpFocus();
@@ -89,6 +91,7 @@ class _OtpScreenState extends State<OtpScreen>
   void dispose() {
     resendTimer?.cancel();
     errorShakeController.dispose();
+    digitRevision.dispose();
     for (final controller in controllers) {
       controller.dispose();
     }
@@ -160,11 +163,12 @@ class _OtpScreenState extends State<OtpScreen>
       if (index > 0) {
         focusNodes[index - 1].requestFocus();
       }
-      setState(() {});
+      _notifyDigitChanged();
       return;
     }
 
-    if (widget.otpError != null && !hideOtpError) {
+    final shouldHideError = widget.otpError != null && !hideOtpError;
+    if (shouldHideError) {
       hideOtpError = true;
     }
 
@@ -187,7 +191,11 @@ class _OtpScreenState extends State<OtpScreen>
       focusNodes.last.unfocus();
     }
 
-    setState(() {});
+    if (shouldHideError) {
+      setState(() {});
+    } else {
+      _notifyDigitChanged();
+    }
   }
 
   void handleEmptyBackspace(int index) {
@@ -197,8 +205,10 @@ class _OtpScreenState extends State<OtpScreen>
 
     controllers[index - 1].clear();
     focusNodes[index - 1].requestFocus();
-    setState(() {});
+    _notifyDigitChanged();
   }
+
+  void _notifyDigitChanged() => digitRevision.value++;
 
   void handleConfirm() {
     final otpCode = controllers.map((controller) => controller.text).join();
@@ -246,18 +256,21 @@ class _OtpScreenState extends State<OtpScreen>
                     child: child,
                   );
                 },
-                child: OtpCard(
-                  controllers: controllers,
-                  focusNodes: focusNodes,
-                  autoFocusCode: widget.autoFocusCode,
-                  onChanged: updateDigit,
-                  onEmptyBackspace: handleEmptyBackspace,
-                  onConfirm: handleConfirm,
-                  onResend: handleResend,
-                  isVerifyingOtp: widget.isVerifyingOtp,
-                  resendCountdown: resendCountdown,
-                  devOtpCode: widget.devOtpCode,
-                  errorText: otpError,
+                child: ValueListenableBuilder<int>(
+                  valueListenable: digitRevision,
+                  builder: (context, _, child) => OtpCard(
+                    controllers: controllers,
+                    focusNodes: focusNodes,
+                    autoFocusCode: widget.autoFocusCode,
+                    onChanged: updateDigit,
+                    onEmptyBackspace: handleEmptyBackspace,
+                    onConfirm: handleConfirm,
+                    onResend: handleResend,
+                    isVerifyingOtp: widget.isVerifyingOtp,
+                    resendCountdown: resendCountdown,
+                    devOtpCode: widget.devOtpCode,
+                    errorText: otpError,
+                  ),
                 ),
               ),
               const SizedBox(height: 48),

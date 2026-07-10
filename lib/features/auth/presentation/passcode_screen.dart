@@ -48,6 +48,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   late final List<TextEditingController> _controllers;
   late final List<FocusNode> _focusNodes;
   late final AnimationController _shakeController;
+  late final ValueNotifier<int> _digitRevision;
   String? _firstPasscode;
   String? _localError;
   int _lastErrorId = 0;
@@ -69,6 +70,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 380),
     );
+    _digitRevision = ValueNotifier(0);
     _lastErrorId = widget.errorId;
   }
 
@@ -84,6 +86,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   @override
   void dispose() {
     _shakeController.dispose();
+    _digitRevision.dispose();
     for (final controller in _controllers) {
       controller.dispose();
     }
@@ -100,7 +103,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       if (index > 0) {
         _focusNodes[index - 1].requestFocus();
       }
-      setState(() => _localError = null);
+      _clearLocalErrorOrNotify();
       return;
     }
 
@@ -121,7 +124,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     } else {
       _focusNodes.last.unfocus();
     }
-    setState(() => _localError = null);
+    _clearLocalErrorOrNotify();
   }
 
   void _handleEmptyBackspace(int index) {
@@ -130,7 +133,15 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     }
     _controllers[index - 1].clear();
     _focusNodes[index - 1].requestFocus();
-    setState(() => _localError = null);
+    _clearLocalErrorOrNotify();
+  }
+
+  void _clearLocalErrorOrNotify() {
+    if (_localError != null) {
+      setState(() => _localError = null);
+      return;
+    }
+    _digitRevision.value++;
   }
 
   Future<void> _handleSubmit() async {
@@ -185,7 +196,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final isFull = _controllers.every((controller) => controller.text != '');
     final errorText = _localError ?? widget.errorText;
 
     return PopScope(
@@ -207,81 +217,91 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         mascotShadowOffset: const Offset(0, 16),
         backIconAsset: _backIconAsset,
         bodyBuilder: (context, compact) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                AnimatedBuilder(
-                  animation: _shakeController,
-                  builder: (context, child) {
-                    final offset =
-                        math.sin(_shakeController.value * math.pi * 6) *
-                        9 *
-                        (1 - _shakeController.value);
-                    return Transform.translate(
-                      offset: Offset(offset, 0),
-                      child: child,
-                    );
-                  },
-                  child: PasscodeInputRow(
-                    controllers: _controllers,
-                    focusNodes: _focusNodes,
-                    hasError: errorText != null,
-                    onChanged: _updateDigit,
-                    onEmptyBackspace: _handleEmptyBackspace,
-                  ),
+          return ValueListenableBuilder<int>(
+            valueListenable: _digitRevision,
+            builder: (context, _, child) {
+              final isFull = _controllers.every(
+                (controller) => controller.text.isNotEmpty,
+              );
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _shakeController,
+                      builder: (context, child) {
+                        final offset =
+                            math.sin(_shakeController.value * math.pi * 6) *
+                            9 *
+                            (1 - _shakeController.value);
+                        return Transform.translate(
+                          offset: Offset(offset, 0),
+                          child: child,
+                        );
+                      },
+                      child: PasscodeInputRow(
+                        controllers: _controllers,
+                        focusNodes: _focusNodes,
+                        hasError: errorText != null,
+                        onChanged: _updateDigit,
+                        onEmptyBackspace: _handleEmptyBackspace,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 26),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 180),
+                        child: errorText == null
+                            ? Text(
+                                context.getText(_subtitleKey),
+                                key: ValueKey(_subtitleKey),
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.andika(
+                                  color: colors.textPrimary,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.25,
+                                  letterSpacing: 0,
+                                ),
+                              )
+                            : Text(
+                                errorText,
+                                key: ValueKey(errorText),
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.andika(
+                                  color: colors.error,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.25,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                      ),
+                    ),
+                    SizedBox(height: compact ? 30 : 36),
+                    SizedBox(
+                      width: 230,
+                      height: 58,
+                      child: PasscodeActionButton(
+                        label: context.getText(_primaryLabelKey),
+                        onPressed: isFull && !widget.isBusy
+                            ? _handleSubmit
+                            : null,
+                        isBusy: widget.isBusy,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    _PasscodeTextAction(
+                      label: context.getText(_secondaryLabelKey),
+                      onPressed: widget.isBusy ? null : _secondaryAction,
+                    ),
+                    SizedBox(height: compact ? 28 : 44),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 26),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 180),
-                    child: errorText == null
-                        ? Text(
-                            context.getText(_subtitleKey),
-                            key: ValueKey(_subtitleKey),
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.andika(
-                              color: colors.textPrimary,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400,
-                              height: 1.25,
-                              letterSpacing: 0,
-                            ),
-                          )
-                        : Text(
-                            errorText,
-                            key: ValueKey(errorText),
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.andika(
-                              color: colors.error,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              height: 1.25,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                  ),
-                ),
-                SizedBox(height: compact ? 30 : 36),
-                SizedBox(
-                  width: 230,
-                  height: 58,
-                  child: PasscodeActionButton(
-                    label: context.getText(_primaryLabelKey),
-                    onPressed: isFull && !widget.isBusy ? _handleSubmit : null,
-                    isBusy: widget.isBusy,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                _PasscodeTextAction(
-                  label: context.getText(_secondaryLabelKey),
-                  onPressed: widget.isBusy ? null : _secondaryAction,
-                ),
-                SizedBox(height: compact ? 28 : 44),
-              ],
-            ),
+              );
+            },
           );
         },
       ),

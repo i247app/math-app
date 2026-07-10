@@ -75,15 +75,20 @@ class AuthLayout extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        backgroundColor: colors.pageBackground,
-        resizeToAvoidBottomInset: false,
-        body: LayoutBuilder(
+      // The owning auth flow provides the Scaffold and deliberately keeps the
+      // layout fixed while the keyboard is visible. Avoid another Scaffold here
+      // so keyboard inset changes do not have two layout owners to reconcile.
+      child: ColoredBox(
+        color: colors.pageBackground,
+        child: LayoutBuilder(
           builder: (context, constraints) {
-            final media = MediaQuery.of(context);
-            final height = media.size.height;
+            // Depend only on screen dimensions, not every MediaQuery property.
+            // In particular, opening the keyboard animates `viewInsets`; this
+            // layout intentionally does not move in response to that animation.
+            final size = MediaQuery.sizeOf(context);
+            final height = size.height;
             final compact = height < compactBreakpoint;
-            final fallbackPadding = media.size.width < 370 ? 24.0 : 32.0;
+            final fallbackPadding = size.width < 370 ? 24.0 : 32.0;
             final sidePadding = horizontalPadding ?? fallbackPadding;
             final minHeight = compact ? minCompactHeight : minRegularHeight;
             final layoutHeight = math.max(constraints.maxHeight, minHeight);
@@ -122,16 +127,18 @@ class AuthLayout extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 SizedBox(height: topGap),
-                                Center(
-                                  child: _AuthMascot(
-                                    asset: mascotAsset,
-                                    size: mascotSize,
-                                    shape: mascotShape,
-                                    shadowAlpha: mascotShadowAlpha,
-                                    shadowBlur: mascotShadowBlur,
-                                    shadowOffset: mascotShadowOffset,
-                                    aspectRatio: mascotAspectRatio,
-                                    visualScale: mascotVisualScale,
+                                RepaintBoundary(
+                                  child: Center(
+                                    child: _AuthMascot(
+                                      asset: mascotAsset,
+                                      size: mascotSize,
+                                      shape: mascotShape,
+                                      shadowAlpha: mascotShadowAlpha,
+                                      shadowBlur: mascotShadowBlur,
+                                      shadowOffset: mascotShadowOffset,
+                                      aspectRatio: mascotAspectRatio,
+                                      visualScale: mascotVisualScale,
+                                    ),
                                   ),
                                 ),
                                 if (titleWidget != null || title != null) ...[
