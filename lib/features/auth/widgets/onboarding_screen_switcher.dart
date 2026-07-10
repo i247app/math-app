@@ -194,6 +194,20 @@ class OnboardingScreenSwitcher extends StatelessWidget {
                   key: ValueKey('home'),
                 ),
               };
+        final transitionChild = KeyedSubtree(
+          key: ValueKey(
+            state.isRestoringSession
+                ? 'session-loading'
+                : 'auth-screen-${state.screen.name}',
+          ),
+          child: SafeArea(
+            top: useSafeArea,
+            bottom: useSafeArea && state.screen != AppScreen.home,
+            left: useSafeArea,
+            right: useSafeArea,
+            child: screenChild,
+          ),
+        );
 
         return Stack(
           fit: StackFit.expand,
@@ -204,15 +218,9 @@ class OnboardingScreenSwitcher extends StatelessWidget {
                 actionLabel: actionLabel,
                 isSignupEntry: isSignupEntry,
               ),
-            SafeArea(
-              top: useSafeArea,
-              bottom: useSafeArea && state.screen != AppScreen.home,
-              left: useSafeArea,
-              right: useSafeArea,
-              child: _OnboardingSlideSwitcher(
-                screen: state.isRestoringSession ? null : state.screen,
-                child: screenChild,
-              ),
+            _OnboardingSlideSwitcher(
+              screen: state.isRestoringSession ? null : state.screen,
+              child: transitionChild,
             ),
           ],
         );
