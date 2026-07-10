@@ -429,8 +429,9 @@ class NetworkApi {
   }
 
   Future<QuizDetailResponse> getQuizDetail(int quizId) async {
-    final responseJson = await _networkClient.getJson(
-      '/quizzes/${_encodePathId(quizId)}',
+    final responseJson = await _networkClient.postJson(
+      '/quizzes/detail',
+      <String, dynamic>{'quiz_id': quizId},
     );
     final quizResponse = QuizDetailResponse.fromJson(responseJson);
     if (quizResponse.mstatus != 200) {
@@ -445,6 +446,14 @@ class NetworkApi {
 
     return quizResponse;
   }
+
+  Future<Map<String, dynamic>> getGradeDetail(
+    int gradeId, {
+    String language = 'vi',
+  }) => _postDetailJson('/grades/detail', <String, dynamic>{
+    'grade_id': gradeId,
+    'language': language,
+  });
 
   Future<GradeListResponse> listGrades(GradeListRequest request) async {
     final responseJson = await _networkClient.postJson(
@@ -503,6 +512,14 @@ class NetworkApi {
     return profileResponse;
   }
 
+  Future<Map<String, dynamic>> getProfileDetail(
+    int profileId, {
+    String language = 'vi',
+  }) => _postDetailJson('/profiles/detail', <String, dynamic>{
+    'profile_id': profileId,
+    'language': language,
+  });
+
   Future<SchoolListResponse> listSchools(SchoolListRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/schools/list',
@@ -522,6 +539,11 @@ class NetworkApi {
     return schoolResponse;
   }
 
+  Future<Map<String, dynamic>> getSchoolDetail(int schoolId) => _postDetailJson(
+    '/schools/detail',
+    <String, dynamic>{'school_id': schoolId},
+  );
+
   Future<ProgramListResponse> listPrograms(ProgramListRequest request) async {
     final responseJson = await _networkClient.postJson(
       '/programs/list',
@@ -540,6 +562,14 @@ class NetworkApi {
 
     return programResponse;
   }
+
+  Future<Map<String, dynamic>> getProgramDetail(
+    int programId, {
+    String language = 'vi',
+  }) => _postDetailJson('/programs/detail', <String, dynamic>{
+    'program_id': programId,
+    'language': language,
+  });
 
   Future<SemesterListResponse> listSemesters(
     SemesterListRequest request,
@@ -561,6 +591,14 @@ class NetworkApi {
 
     return semesterResponse;
   }
+
+  Future<Map<String, dynamic>> getSemesterDetail(
+    int semesterId, {
+    String language = 'vi',
+  }) => _postDetailJson('/semesters/detail', <String, dynamic>{
+    'semester_id': semesterId,
+    'language': language,
+  });
 
   Future<CreateProfileResponse> createProfile(
     CreateProfileRequest request, {
@@ -858,9 +896,9 @@ class NetworkApi {
     required int classroomId,
     required int profileId,
   }) async {
-    final responseJson = await _networkClient.getJson(
-      '/classrooms/${_encodePathId(classroomId)}'
-      '?profile_id=${_encodeQueryId(profileId)}',
+    final responseJson = await _networkClient.postJson(
+      '/classrooms/detail',
+      <String, dynamic>{'classroom_id': classroomId, 'profile_id': profileId},
     );
     final classroomResponse = ClassroomResponse.fromJson(responseJson);
     if (classroomResponse.mstatus != 200) {
@@ -966,11 +1004,14 @@ class NetworkApi {
 
   Future<ClassroomExerciseResponse> getClassroomExerciseDetail({
     required int exerciseId,
-    required int profileId,
+    int? profileId,
   }) async {
-    final responseJson = await _networkClient.getJson(
-      '/classroom-exercises/${_encodePathId(exerciseId)}'
-      '?profile_id=${_encodeQueryId(profileId)}',
+    final responseJson = await _networkClient.postJson(
+      '/classroom-exercises/detail',
+      <String, dynamic>{
+        'classroom_exercise_id': exerciseId,
+        'profile_id': ?profileId,
+      },
     );
     final exerciseResponse = ClassroomExerciseResponse.fromJson(responseJson);
     if (exerciseResponse.mstatus != 200) {
@@ -984,6 +1025,32 @@ class NetworkApi {
     }
 
     return exerciseResponse;
+  }
+
+  Future<ClassroomExerciseSubmissionResponse>
+  getClassroomExerciseSubmissionDetail({
+    required int classroomExerciseSubmissionId,
+    int? profileId,
+  }) async {
+    final responseJson = await _networkClient
+        .postJson('/classroom-exercise/submissions/detail', <String, dynamic>{
+          'classroom_exercise_submission_id': classroomExerciseSubmissionId,
+          'profile_id': ?profileId,
+        });
+    final submissionResponse = ClassroomExerciseSubmissionResponse.fromJson(
+      responseJson,
+    );
+    if (submissionResponse.mstatus != 200) {
+      throw NetworkException(
+        submissionResponse.mmessage ??
+            submissionResponse.debug ??
+            submissionResponse.status ??
+            'Request failed.',
+        status: submissionResponse.mstatus,
+      );
+    }
+
+    return submissionResponse;
   }
 
   Future<ClassroomActionResponse> _classroomAction(
@@ -1010,6 +1077,9 @@ class NetworkApi {
     final userJson = _currentUserJson(responseJson);
     return AuthUser.fromJson(userJson);
   }
+
+  Future<Map<String, dynamic>> getUserDetail(int userId) =>
+      _postDetailJson('/users/detail', <String, dynamic>{'user_id': userId});
 
   Future<void> clearAuthToken() => _networkClient.clearAuthToken();
 
@@ -1039,6 +1109,18 @@ class NetworkApi {
     }
 
     await _networkClient.writeAuthToken(token);
+  }
+
+  Future<Map<String, dynamic>> _postDetailJson(
+    String path,
+    Map<String, dynamic> body,
+  ) async {
+    final responseJson = await _networkClient.postJson(path, body);
+    final mstatus = responseJson['mstatus'];
+    if (mstatus is int && mstatus != 200) {
+      throw NetworkException(_apiErrorMessage(responseJson), status: mstatus);
+    }
+    return responseJson;
   }
 
   static Map<String, dynamic> _currentUserJson(Map<String, dynamic> json) {
@@ -1082,8 +1164,4 @@ class NetworkApi {
 
     return 'Request failed.';
   }
-
-  static String _encodePathId(int id) => Uri.encodeComponent('$id');
-
-  static String _encodeQueryId(int id) => Uri.encodeQueryComponent('$id');
 }
