@@ -11,8 +11,8 @@ import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/profile/grade_api.dart';
 import 'package:numi/features/auth/otp_auth_api.dart';
 import 'package:numi/features/auth/phone_region.dart';
-import 'package:numi/features/auth/auth_cubit.dart';
-import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/auth_flow_cubit.dart';
+import 'package:numi/features/auth/auth_flow_state.dart';
 import 'package:numi/features/auth/widgets/app_background.dart';
 import 'package:numi/features/auth/widgets/onboarding_screen_switcher.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
@@ -21,12 +21,12 @@ class NumiHome extends StatefulWidget {
   const NumiHome({
     super.key,
     this.authService,
-    this.initialAuthState,
+    this.initialSession,
     this.restoreSessionOnStart = true,
   });
 
   final OtpAuthService? authService;
-  final AuthState? initialAuthState;
+  final AuthenticatedSession? initialSession;
   final bool restoreSessionOnStart;
 
   @override
@@ -86,7 +86,7 @@ class _NumiHomeState extends State<NumiHome> {
   }
 
   void handlePhoneInputChanged(
-    AuthCubit cubit,
+    AuthFlowCubit cubit,
     PhoneRegion region,
     String value,
   ) {
@@ -115,7 +115,7 @@ class _NumiHomeState extends State<NumiHome> {
     cubit.checkAuthPhone(normalized.phone!);
   }
 
-  void sendOtp(AuthCubit cubit, PhoneRegion region) {
+  void sendOtp(AuthFlowCubit cubit, PhoneRegion region) {
     final normalized = _normalizedPhoneInput(region);
     if (!normalized.isValid) {
       HapticFeedback.selectionClick();
@@ -138,45 +138,42 @@ class _NumiHomeState extends State<NumiHome> {
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (_) => AppSessionCubit(_initialSessionState())),
+          BlocProvider(
+            create: (_) =>
+                AppSessionCubit(initialSession: widget.initialSession),
+          ),
           BlocProvider(
             create: (context) => ClassroomCubit(
               classroomService: context.read<ClassroomService>(),
             ),
           ),
           BlocProvider(
-            create: (_) {
-              final cubit = AuthCubit(
+            create: (context) {
+              final sessionCubit = context.read<AppSessionCubit>();
+              final cubit = AuthFlowCubit(
                 authService: widget.authService,
-                initialState: widget.initialAuthState,
+                initialState: AuthFlowState(
+                  screen: widget.initialSession == null
+                      ? AppScreen.welcome
+                      : AppScreen.home,
+                ),
+                onAuthenticated: sessionCubit.authenticate,
+                onSessionCleared: sessionCubit.clear,
+                onSessionRestoreStarted: sessionCubit.beginRestore,
               );
               if (widget.restoreSessionOnStart &&
-                  widget.initialAuthState == null) {
+                  widget.initialSession == null) {
                 cubit.restoreSession();
               }
               return cubit;
             },
           ),
         ],
-        child: BlocListener<AuthCubit, AuthState>(
+        child: BlocListener<AppSessionCubit, AppSessionState>(
           listenWhen: (previous, current) =>
-              previous.loginUser != current.loginUser ||
-              previous.profiles != current.profiles ||
-              previous.activeProfile != current.activeProfile ||
-              previous.profileLoadError != current.profileLoadError,
-          listener: (context, state) {
-            final sessionCubit = context.read<AppSessionCubit>();
-            if (sessionCubit.state.user?.id != state.loginUser?.id) {
-              context.read<ClassroomCubit>().clear();
-            }
-            sessionCubit.sync(
-              user: state.loginUser,
-              profiles: state.profiles,
-              activeProfile: state.activeProfile,
-              profileLoadError: state.profileLoadError,
-            );
-          },
-          child: BlocBuilder<AuthCubit, AuthState>(
+              previous.user?.id != current.user?.id,
+          listener: (context, state) => context.read<ClassroomCubit>().clear(),
+          child: BlocBuilder<AuthFlowCubit, AuthFlowState>(
             buildWhen: (previous, current) => previous.screen != current.screen,
             builder: (context, scaffoldState) {
               final colors = context.themeColors;
@@ -225,20 +222,6 @@ class _NumiHomeState extends State<NumiHome> {
           ),
         ),
       ),
-    );
-  }
-
-  AppSessionState? _initialSessionState() {
-    final state = widget.initialAuthState;
-    if (state == null || state.loginUser == null) {
-      return null;
-    }
-
-    return AppSessionState(
-      user: state.loginUser,
-      profiles: state.profiles,
-      activeProfile: state.activeProfile,
-      profileLoadError: state.profileLoadError,
     );
   }
 }

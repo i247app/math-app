@@ -3,25 +3,25 @@ import 'dart:async';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/theme/app_theme_controller.dart';
-import 'package:numi/features/auth/auth_state.dart';
 import 'package:numi/features/auth/otp_auth_api.dart';
 import 'package:numi/features/auth/passcode_service.dart';
 import 'package:numi/features/auth/services/auth_profile_resolver.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/services/active_profile_session.dart';
+import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
 class StartupBootstrapResult {
   const StartupBootstrapResult({
     required this.lingoProvider,
     required this.themeController,
     required this.authService,
-    required this.initialAuthState,
+    required this.initialSession,
   });
 
   final LingoProvider lingoProvider;
   final AppThemeController themeController;
   final OtpAuthService authService;
-  final AuthState initialAuthState;
+  final AuthenticatedSession? initialSession;
 }
 
 class StartupBootstrap {
@@ -61,23 +61,25 @@ class StartupBootstrap {
     }
 
     final authService = _authService ?? OtpAuthApi();
-    final initialAuthState = await _restoreInitialAuthState(
+    final initialSession = await _restoreInitialSession(
       authService,
-    ).timeout(sessionTimeout, onTimeout: () => const AuthState());
+    ).timeout(sessionTimeout, onTimeout: () => null);
 
     return StartupBootstrapResult(
       lingoProvider: lingoProvider,
       themeController: themeController,
       authService: authService,
-      initialAuthState: initialAuthState,
+      initialSession: initialSession,
     );
   }
 
-  Future<AuthState> _restoreInitialAuthState(OtpAuthService authService) async {
+  Future<AuthenticatedSession?> _restoreInitialSession(
+    OtpAuthService authService,
+  ) async {
     try {
       final user = await authService.restoreSession();
       if (user == null) {
-        return const AuthState();
+        return null;
       }
 
       await _rememberAuthenticatedAccount(user);
@@ -86,15 +88,14 @@ class StartupBootstrap {
         activeProfileSession: _activeProfileSession,
       );
       final profileResolution = await profileResolver.resolveForUser(user);
-      return AuthState(
-        screen: AppScreen.home,
-        loginUser: user,
+      return AuthenticatedSession(
+        user: user,
         profiles: profileResolution.profiles,
         activeProfile: profileResolution.activeProfile,
         profileLoadError: profileResolution.errorMessage,
       );
     } catch (_) {
-      return const AuthState();
+      return null;
     }
   }
 

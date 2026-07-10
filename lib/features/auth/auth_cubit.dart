@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/localization/app_keys.dart';
@@ -14,11 +15,12 @@ import 'package:numi/features/auth/passcode_service.dart';
 import 'package:numi/features/auth/services/auth_profile_resolver.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/auth/phone_region.dart';
+import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
-import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/auth_flow_state.dart';
 
-class AuthCubit extends Cubit<AuthState> {
-  AuthCubit({
+class AuthFlowCubit extends Cubit<AuthFlowState> {
+  AuthFlowCubit({
     AvatarPickerService avatarPicker = const AvatarPickerService(),
     OtpAuthService? authService,
     ProfileService? profileService,
@@ -26,7 +28,10 @@ class AuthCubit extends Cubit<AuthState> {
     AuthProfileResolver? profileResolver,
     PasscodeService passcodeService = const SecurePasscodeService(),
     NotificationPingService? notificationPingService,
-    AuthState? initialState,
+    AuthFlowState? initialState,
+    required void Function(AuthenticatedSession session) onAuthenticated,
+    required VoidCallback onSessionCleared,
+    required VoidCallback onSessionRestoreStarted,
   }) : _avatarPicker = avatarPicker,
        _authService = authService ?? OtpAuthApi(),
        _profileResolver =
@@ -39,13 +44,19 @@ class AuthCubit extends Cubit<AuthState> {
        _notificationPingService =
            notificationPingService ??
            _defaultNotificationPingService(authService ?? OtpAuthApi()),
-       super(initialState ?? const AuthState());
+       _onAuthenticated = onAuthenticated,
+       _onSessionCleared = onSessionCleared,
+       _onSessionRestoreStarted = onSessionRestoreStarted,
+       super(initialState ?? const AuthFlowState());
 
   final AvatarPickerService _avatarPicker;
   final OtpAuthService _authService;
   final AuthProfileResolver _profileResolver;
   final PasscodeService _passcodeService;
   final NotificationPingService _notificationPingService;
+  final void Function(AuthenticatedSession session) _onAuthenticated;
+  final VoidCallback _onSessionCleared;
+  final VoidCallback _onSessionRestoreStarted;
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
@@ -195,8 +206,6 @@ class AuthCubit extends Cubit<AuthState> {
         clearOtpExpiry: true,
         clearOtpError: true,
         clearPhoneLookup: true,
-        clearLoginUser: true,
-        clearProfiles: true,
         clearPendingSession: true,
         clearAvatarPath: true,
         clearAvatarError: true,
@@ -205,20 +214,17 @@ class AuthCubit extends Cubit<AuthState> {
     unawaited(checkPinLoginAvailability());
   }
 
-  void openHome() => emit(state.copyWith(screen: AppScreen.home));
-
   Future<void> logout() async {
+    _onSessionCleared();
     await _authService.logout();
     if (!isClosed) {
       emit(
         state.copyWith(
           screen: AppScreen.login,
-          clearLoginUser: true,
           phoneNumber: null,
           checkedPhone: null,
           phoneExists: null,
           phoneLookupUser: null,
-          clearProfiles: true,
           clearAuthError: true,
           clearPendingSession: true,
           clearPasscodeError: true,
@@ -303,10 +309,11 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> restoreSession() async {
-    if (state.isRestoringSession || state.loginUser != null) {
+    if (state.isRestoringSession) {
       return;
     }
 
+    _onSessionRestoreStarted();
     emit(state.copyWith(isRestoringSession: true, clearAuthError: true));
 
     try {
@@ -315,16 +322,12 @@ class AuthCubit extends Cubit<AuthState> {
         return;
       }
 
-      final profileResolution = user == null
-          ? const AuthProfileResolution.empty()
-          : await _profileResolver.resolveForUser(user);
-
       if (user == null) {
+        _onSessionCleared();
         emit(
           state.copyWith(
             isRestoringSession: false,
             clearAuthError: true,
-            clearProfiles: true,
             clearPendingSession: true,
             clearPasscodeError: true,
           ),
@@ -332,9 +335,11 @@ class AuthCubit extends Cubit<AuthState> {
         return;
       }
 
+      final profileResolution = await _profileResolver.resolveForUser(user);
       await _emitAuthenticatedHome(user, profileResolution);
     } catch (_) {
       if (!isClosed) {
+        _onSessionCleared();
         emit(state.copyWith(isRestoringSession: false));
       }
     }
@@ -709,21 +714,12 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       if (otpFlow == OtpFlow.signup) {
-        final profileResolution = result.user == null
-            ? const AuthProfileResolution.empty()
-            : await _profileResolver.resolveForUser(result.user!);
         emit(
           state.copyWith(
             screen: AppScreen.signup,
             isVerifyingOtp: false,
-            loginUser: result.user,
-            profiles: profileResolution.profiles,
-            activeProfile: profileResolution.activeProfile,
-            profileLoadError: profileResolution.errorMessage,
             clearAuthError: true,
             clearOtpError: true,
-            clearActiveProfile: profileResolution.activeProfile == null,
-            clearProfileLoadError: profileResolution.errorMessage == null,
           ),
         );
         return;
@@ -977,18 +973,13 @@ class AuthCubit extends Cubit<AuthState> {
         final profileResolution = await _profileResolver.resolveForUser(user);
         _pingNotificationsAfterAuth(user);
         await _rememberAuthenticatedAccount(user);
+        _handoffAuthenticatedSession(user, profileResolution);
         emit(
           state.copyWith(
             screen: AppScreen.home,
             isPasscodeBusy: false,
-            loginUser: user,
-            profiles: profileResolution.profiles,
-            activeProfile: profileResolution.activeProfile,
-            profileLoadError: profileResolution.errorMessage,
             clearAuthError: true,
             clearOtpError: true,
-            clearActiveProfile: profileResolution.activeProfile == null,
-            clearProfileLoadError: profileResolution.errorMessage == null,
             clearPendingSession: true,
             clearPasscodeError: true,
             passcodeLoginRequiresOtp: false,
@@ -1050,20 +1041,15 @@ class AuthCubit extends Cubit<AuthState> {
     final hasPasscode = await _passcodeService.hasPasscode(user.id);
     if (hasPasscode) {
       _pingNotificationsAfterAuth(user);
+      _handoffAuthenticatedSession(user, profileResolution);
       emit(
         state.copyWith(
           screen: AppScreen.home,
           isSendingOtp: isSendingOtp,
           isVerifyingOtp: isVerifyingOtp,
           isSigningUp: isSigningUp,
-          loginUser: user,
-          profiles: profileResolution.profiles,
-          activeProfile: profileResolution.activeProfile,
-          profileLoadError: profileResolution.errorMessage,
           clearAuthError: true,
           clearOtpError: true,
-          clearActiveProfile: profileResolution.activeProfile == null,
-          clearProfileLoadError: profileResolution.errorMessage == null,
           clearPendingSession: true,
           clearPasscodeError: true,
           passcodeLoginRequiresOtp: false,
@@ -1100,17 +1086,12 @@ class AuthCubit extends Cubit<AuthState> {
   ) async {
     await _rememberAuthenticatedAccount(user);
     _pingNotificationsAfterAuth(user);
+    _handoffAuthenticatedSession(user, profileResolution);
     emit(
       state.copyWith(
         screen: AppScreen.home,
         isRestoringSession: false,
-        loginUser: user,
-        profiles: profileResolution.profiles,
-        activeProfile: profileResolution.activeProfile,
-        profileLoadError: profileResolution.errorMessage,
         clearAuthError: true,
-        clearActiveProfile: profileResolution.activeProfile == null,
-        clearProfileLoadError: profileResolution.errorMessage == null,
         clearPendingSession: true,
         clearPasscodeError: true,
         passcodeLoginRequiresOtp: false,
@@ -1138,20 +1119,39 @@ class AuthCubit extends Cubit<AuthState> {
     if (isClosed) {
       return;
     }
+    _handoffAuthenticatedSession(
+      user,
+      AuthProfileResolution(
+        profiles: state.pendingProfiles,
+        activeProfile: state.pendingActiveProfile,
+        errorMessage: state.pendingProfileLoadError,
+      ),
+    );
 
     emit(
       state.copyWith(
         screen: AppScreen.home,
         isPasscodeBusy: isPasscodeBusy ?? false,
-        loginUser: user,
-        profiles: state.pendingProfiles,
-        activeProfile: state.pendingActiveProfile,
-        profileLoadError: state.pendingProfileLoadError,
         clearPendingSession: true,
         clearPasscodeError: true,
         passcodeLoginRequiresOtp: false,
-        clearActiveProfile: state.pendingActiveProfile == null,
-        clearProfileLoadError: state.pendingProfileLoadError == null,
+      ),
+    );
+  }
+
+  void _handoffAuthenticatedSession(
+    LoginUser user,
+    AuthProfileResolution profileResolution,
+  ) {
+    if (isClosed) {
+      return;
+    }
+    _onAuthenticated(
+      AuthenticatedSession(
+        user: user,
+        profiles: profileResolution.profiles,
+        activeProfile: profileResolution.activeProfile,
+        profileLoadError: profileResolution.errorMessage,
       ),
     );
   }
@@ -1175,28 +1175,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> refreshProfiles() async {
-    final user = state.loginUser;
-    if (user == null) {
-      return;
-    }
-
-    final profileResolution = await _profileResolver.resolveForUser(user);
-    if (isClosed) {
-      return;
-    }
-
-    emit(
-      state.copyWith(
-        profiles: profileResolution.profiles,
-        activeProfile: profileResolution.activeProfile,
-        profileLoadError: profileResolution.errorMessage,
-        clearActiveProfile: profileResolution.activeProfile == null,
-        clearProfileLoadError: profileResolution.errorMessage == null,
-      ),
-    );
-  }
-
   void _pingNotificationsAfterAuth(LoginUser user) {
     if (user.id <= 0) {
       return;
@@ -1211,34 +1189,6 @@ class AuthCubit extends Cubit<AuthState> {
     return authService is OtpAuthApi
         ? ApiNotificationPingService()
         : const NoopNotificationPingService();
-  }
-
-  Future<void> activateProfile(StudentProfile profile) async {
-    final user = state.loginUser;
-    final profileId = ActiveProfileSession.profileStableId(profile);
-    if (user == null || user.id <= 0 || profileId == null) {
-      return;
-    }
-
-    await _profileResolver.rememberActiveProfile(user: user, profile: profile);
-    if (isClosed) {
-      return;
-    }
-
-    final profiles = <StudentProfile>[
-      for (final existingProfile in state.profiles)
-        if (ActiveProfileSession.profileStableId(existingProfile) != profileId)
-          existingProfile,
-      profile,
-    ];
-
-    emit(
-      state.copyWith(
-        profiles: profiles,
-        activeProfile: profile,
-        clearProfileLoadError: true,
-      ),
-    );
   }
 
   Future<void> pickAvatar() async {

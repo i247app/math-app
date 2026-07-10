@@ -1,84 +1,109 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/services/auth_profile_resolver.dart';
+import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/services/active_profile_session.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
+/// Owns authenticated account and profile state for the entire app session.
 class AppSessionCubit extends Cubit<AppSessionState> {
-  AppSessionCubit([AppSessionState? initialState])
-    : super(initialState ?? const AppSessionState());
+  AppSessionCubit({
+    AuthenticatedSession? initialSession,
+    AuthProfileResolver? profileResolver,
+  }) : _profileResolver =
+           profileResolver ??
+           AuthProfileResolver(
+             profileService: ProfileApi(),
+             activeProfileSession: const ActiveProfileSession(),
+           ),
+       super(
+         initialSession == null
+             ? const AppSessionState()
+             : AppSessionState(
+                 status: SessionStatus.authenticated,
+                 user: initialSession.user,
+                 profiles: initialSession.profiles,
+                 activeProfile: initialSession.activeProfile,
+                 profileLoadError: initialSession.profileLoadError,
+               ),
+       );
 
-  void sync({
-    required LoginUser? user,
-    required List<StudentProfile> profiles,
-    required StudentProfile? activeProfile,
-    required String? profileLoadError,
-  }) {
-    if (_sameUser(state.user, user) &&
-        _sameProfiles(state.profiles, profiles) &&
-        _sameProfile(state.activeProfile, activeProfile) &&
-        state.profileLoadError == profileLoadError) {
+  final AuthProfileResolver _profileResolver;
+
+  void beginRestore() {
+    if (state.isAuthenticated || state.status == SessionStatus.restoring) {
       return;
     }
+    emit(state.copyWith(status: SessionStatus.restoring));
+  }
 
+  void authenticate(AuthenticatedSession session) {
+    if (isClosed) {
+      return;
+    }
     emit(
       AppSessionState(
-        user: user,
-        profiles: profiles,
-        activeProfile: activeProfile,
-        profileLoadError: profileLoadError,
+        status: SessionStatus.authenticated,
+        user: session.user,
+        profiles: session.profiles,
+        activeProfile: session.activeProfile,
+        profileLoadError: session.profileLoadError,
       ),
     );
   }
 
-  static bool _sameUser(LoginUser? a, LoginUser? b) {
-    if (identical(a, b)) {
-      return true;
+  void clear() {
+    if (isClosed || state.status == SessionStatus.unauthenticated) {
+      return;
     }
-    if (a == null || b == null) {
-      return false;
-    }
-    return a.id == b.id &&
-        a.email == b.email &&
-        a.name == b.name &&
-        a.phone == b.phone &&
-        a.avatarUrl == b.avatarUrl &&
-        a.role == b.role;
+    emit(const AppSessionState());
   }
 
-  static bool _sameProfiles(List<StudentProfile> a, List<StudentProfile> b) {
-    if (identical(a, b)) {
-      return true;
+  Future<void> refreshProfiles() async {
+    final user = state.user;
+    if (user == null || user.id <= 0) {
+      return;
     }
-    if (a.length != b.length) {
-      return false;
+
+    final resolution = await _profileResolver.resolveForUser(user);
+    if (isClosed || state.user?.id != user.id) {
+      return;
     }
-    for (var index = 0; index < a.length; index++) {
-      if (!_sameProfile(a[index], b[index])) {
-        return false;
-      }
-    }
-    return true;
+    authenticate(
+      AuthenticatedSession(
+        user: user,
+        profiles: resolution.profiles,
+        activeProfile: resolution.activeProfile,
+        profileLoadError: resolution.errorMessage,
+      ),
+    );
   }
 
-  static bool _sameProfile(StudentProfile? a, StudentProfile? b) {
-    if (identical(a, b)) {
-      return true;
+  Future<void> activateProfile(StudentProfile profile) async {
+    final user = state.user;
+    final profileId = ActiveProfileSession.profileStableId(profile);
+    if (user == null || user.id <= 0 || profileId == null) {
+      return;
     }
-    if (a == null || b == null) {
-      return false;
+
+    await _profileResolver.rememberActiveProfile(user: user, profile: profile);
+    if (isClosed || state.user?.id != user.id) {
+      return;
     }
-    return ActiveProfileSession.profileStableId(a) ==
-            ActiveProfileSession.profileStableId(b) &&
-        a.profileCode == b.profileCode &&
-        a.name == b.name &&
-        a.avatarKey == b.avatarKey &&
-        a.avatarUrl == b.avatarUrl &&
-        a.gradeId == b.gradeId &&
-        a.programId == b.programId &&
-        a.semesterId == b.semesterId &&
-        a.isDefault == b.isDefault &&
-        a.role == b.role &&
-        a.profileStatus == b.profileStatus;
+
+    final profiles = <StudentProfile>[
+      for (final existing in state.profiles)
+        if (ActiveProfileSession.profileStableId(existing) != profileId)
+          existing,
+      profile,
+    ];
+    authenticate(
+      AuthenticatedSession(
+        user: user,
+        profiles: profiles,
+        activeProfile: profile,
+      ),
+    );
   }
 }

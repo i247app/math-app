@@ -25,7 +25,7 @@ Future<void> main() async {
       lingoProvider: startup.lingoProvider,
       themeController: startup.themeController,
       authService: startup.authService,
-      initialAuthState: startup.initialAuthState,
+      initialSession: startup.initialSession,
       restoreSessionOnStart: false,
     ),
   );

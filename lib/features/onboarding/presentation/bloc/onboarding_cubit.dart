@@ -1,8 +1,8 @@
-import 'package:numi/features/auth/auth_cubit.dart';
-import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/auth_flow_cubit.dart';
+import 'package:numi/features/auth/auth_flow_state.dart';
 
-export 'package:numi/features/auth/auth_cubit.dart';
-export 'package:numi/features/auth/auth_state.dart';
+export 'package:numi/features/auth/auth_flow_cubit.dart';
+export 'package:numi/features/auth/auth_flow_state.dart';
 
-typedef OnboardingCubit = AuthCubit;
-typedef OnboardingState = AuthState;
+typedef OnboardingCubit = AuthFlowCubit;
+typedef OnboardingState = AuthFlowState;

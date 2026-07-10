@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/utils/phone_number_validator.dart';
-import 'package:numi/features/auth/auth_cubit.dart';
-import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/auth_flow_cubit.dart';
+import 'package:numi/features/auth/auth_flow_state.dart';
 import 'package:numi/features/auth/helpers/auth_error_helpers.dart';
 import 'package:numi/features/auth/phone_region.dart';
 import 'package:numi/features/auth/presentation/login_screen.dart';
@@ -33,11 +33,11 @@ class OnboardingScreenSwitcher extends StatelessWidget {
   final bool phoneHasInput;
   final VoidCallback clearLoginPhoneInput;
   final PhoneValidationResult Function(PhoneRegion region) normalizedPhoneInput;
-  final void Function(AuthCubit cubit, PhoneRegion region, String value)
+  final void Function(AuthFlowCubit cubit, PhoneRegion region, String value)
   handlePhoneInputChanged;
-  final void Function(AuthCubit cubit, PhoneRegion region) sendOtp;
+  final void Function(AuthFlowCubit cubit, PhoneRegion region) sendOtp;
 
-  static bool _isInlineSignupUsernameError(AuthState state) {
+  static bool _isInlineSignupUsernameError(AuthFlowState state) {
     if (state.screen != AppScreen.signup) {
       return false;
     }
@@ -47,7 +47,7 @@ class OnboardingScreenSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthCubit, AuthState>(
+    return BlocConsumer<AuthFlowCubit, AuthFlowState>(
       buildWhen: (previous, current) {
         if (previous.screen == AppScreen.home &&
             current.screen == AppScreen.home) {
@@ -78,7 +78,7 @@ class OnboardingScreenSwitcher extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        final cubit = context.read<AuthCubit>();
+        final cubit = context.read<AuthFlowCubit>();
         final normalizedPhone = normalizedPhoneInput(state.phoneRegion);
         final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
         final lookupMatchesPhone = state.checkedPhone == normalizedPhone.phone;

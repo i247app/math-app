@@ -10,8 +10,8 @@ import '../core/theme/app_theme.dart';
 import '../core/theme/app_theme_controller.dart';
 import '../core/theme/app_theme_scope.dart';
 import 'package:numi/features/auth/auth_flow.dart';
-import 'package:numi/features/auth/auth_state.dart';
 import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
 class NumiApp extends StatefulWidget {
   const NumiApp({
@@ -19,14 +19,14 @@ class NumiApp extends StatefulWidget {
     this.authService,
     this.lingoProvider,
     this.themeController,
-    this.initialAuthState,
+    this.initialSession,
     this.restoreSessionOnStart = false,
   });
 
   final OtpAuthService? authService;
   final LingoProvider? lingoProvider;
   final AppThemeController? themeController;
-  final AuthState? initialAuthState;
+  final AuthenticatedSession? initialSession;
   final bool restoreSessionOnStart;
 
   static void restart(BuildContext context) {
@@ -44,14 +44,14 @@ class NumiApp extends StatefulWidget {
 class _NumiAppState extends State<NumiApp> {
   late LingoProvider _lingoProvider;
   late AppThemeController _themeController;
-  AuthState? _startupAuthState;
+  AuthenticatedSession? _startupSession;
   late bool _restoreSessionOnNextHome;
   int _restartSeed = 0;
 
   @override
   void initState() {
     super.initState();
-    _startupAuthState = widget.initialAuthState;
+    _startupSession = widget.initialSession;
     _restoreSessionOnNextHome = widget.restoreSessionOnStart;
     _createLingoProvider(widget.lingoProvider);
     _createThemeController(widget.themeController);
@@ -99,7 +99,7 @@ class _NumiAppState extends State<NumiApp> {
     final oldThemeController = _themeController;
     setState(() {
       _restartSeed++;
-      _startupAuthState = null;
+      _startupSession = null;
       _restoreSessionOnNextHome = true;
       _createLingoProvider();
       _createThemeController();
@@ -129,7 +129,7 @@ class _NumiAppState extends State<NumiApp> {
                 navigatorObservers: [_KeyboardDismissNavigatorObserver()],
                 home: NumiHome(
                   authService: widget.authService,
-                  initialAuthState: _startupAuthState,
+                  initialSession: _startupSession,
                   restoreSessionOnStart: _restoreSessionOnNextHome,
                 ),
               ),

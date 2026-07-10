@@ -1,7 +1,6 @@
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/features/auth/otp_auth_api.dart';
 import 'package:numi/features/auth/phone_region.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
 
 enum AppScreen { welcome, welcomeDetails, login, otp, signup, passcode, home }
 
@@ -11,8 +10,10 @@ enum AuthEntryMode { login, signup }
 
 enum PasscodeFlow { setup, unlock }
 
-class AuthState {
-  const AuthState({
+/// Transient state for authentication forms and passcode setup/unlock only.
+/// Authenticated account/profile state belongs to [AppSessionCubit].
+class AuthFlowState {
+  const AuthFlowState({
     this.screen = AppScreen.welcome,
     this.phoneRegion = PhoneRegion.vn,
     this.selectedGrade = '',
@@ -41,10 +42,6 @@ class AuthState {
     this.otpFlow = OtpFlow.login,
     this.authEntryMode = AuthEntryMode.login,
     this.authError,
-    this.loginUser,
-    this.profiles = const <StudentProfile>[],
-    this.activeProfile,
-    this.profileLoadError,
     this.passcodeFlow = PasscodeFlow.setup,
     this.passcodeCanSkip = false,
     this.isPasscodeBusy = false,
@@ -88,10 +85,6 @@ class AuthState {
   final OtpFlow otpFlow;
   final AuthEntryMode authEntryMode;
   final String? authError;
-  final LoginUser? loginUser;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
-  final String? profileLoadError;
   final PasscodeFlow passcodeFlow;
   final bool passcodeCanSkip;
   final bool isPasscodeBusy;
@@ -106,14 +99,7 @@ class AuthState {
   final StudentProfile? pendingActiveProfile;
   final String? pendingProfileLoadError;
 
-  ProfileRole get activeProfileRole {
-    if (activeProfile != null) {
-      return ProfileRole.fromProfile(activeProfile);
-    }
-    return ProfileRole.fromRole(loginUser?.role);
-  }
-
-  AuthState copyWith({
+  AuthFlowState copyWith({
     AppScreen? screen,
     PhoneRegion? phoneRegion,
     String? selectedGrade,
@@ -142,10 +128,6 @@ class AuthState {
     OtpFlow? otpFlow,
     AuthEntryMode? authEntryMode,
     String? authError,
-    LoginUser? loginUser,
-    List<StudentProfile>? profiles,
-    StudentProfile? activeProfile,
-    String? profileLoadError,
     PasscodeFlow? passcodeFlow,
     bool? passcodeCanSkip,
     bool? isPasscodeBusy,
@@ -170,10 +152,6 @@ class AuthState {
     bool clearPhoneLookupUser = false,
     bool clearPhoneLookupError = false,
     bool clearPhoneLookupErrorStatus = false,
-    bool clearLoginUser = false,
-    bool clearProfiles = false,
-    bool clearActiveProfile = false,
-    bool clearProfileLoadError = false,
     bool clearPasscodeError = false,
     bool clearPinLogin = false,
     bool clearPinLoginUser = false,
@@ -181,7 +159,7 @@ class AuthState {
     bool clearPendingActiveProfile = false,
     bool clearPendingProfileLoadError = false,
   }) {
-    return AuthState(
+    return AuthFlowState(
       screen: screen ?? this.screen,
       phoneRegion: phoneRegion ?? this.phoneRegion,
       selectedGrade: selectedGrade ?? this.selectedGrade,
@@ -218,16 +196,6 @@ class AuthState {
       otpFlow: otpFlow ?? this.otpFlow,
       authEntryMode: authEntryMode ?? this.authEntryMode,
       authError: clearAuthError ? null : authError ?? this.authError,
-      loginUser: clearLoginUser ? null : loginUser ?? this.loginUser,
-      profiles: clearProfiles
-          ? const <StudentProfile>[]
-          : profiles ?? this.profiles,
-      activeProfile: clearProfiles || clearActiveProfile
-          ? null
-          : activeProfile ?? this.activeProfile,
-      profileLoadError: clearProfiles || clearProfileLoadError
-          ? null
-          : profileLoadError ?? this.profileLoadError,
       passcodeFlow: passcodeFlow ?? this.passcodeFlow,
       passcodeCanSkip: passcodeCanSkip ?? this.passcodeCanSkip,
       isPasscodeBusy: isPasscodeBusy ?? this.isPasscodeBusy,
