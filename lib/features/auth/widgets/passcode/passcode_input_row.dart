@@ -31,7 +31,9 @@ class PasscodeInputRow extends StatelessWidget {
             child: PasscodeDigitBox(
               controller: controllers[index],
               focusNode: focusNodes[index],
-              autofocus: index == 0,
+              // PasscodeScreen requests focus after the first frame so the
+              // Android IME opens directly with its numeric configuration.
+              autofocus: false,
               textInputAction: index == 3
                   ? TextInputAction.done
                   : TextInputAction.next,

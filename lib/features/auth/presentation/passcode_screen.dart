@@ -72,6 +72,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     );
     _digitRevision = ValueNotifier(0);
     _lastErrorId = widget.errorId;
+    _requestPasscodeFocus();
   }
 
   @override
@@ -191,6 +192,14 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         }
       });
     }
+  }
+
+  void _requestPasscodeFocus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _focusNodes.first.requestFocus();
+      }
+    });
   }
 
   @override

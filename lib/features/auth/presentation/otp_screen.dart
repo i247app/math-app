@@ -261,7 +261,6 @@ class _OtpScreenState extends State<OtpScreen>
                   builder: (context, _, child) => OtpCard(
                     controllers: controllers,
                     focusNodes: focusNodes,
-                    autoFocusCode: widget.autoFocusCode,
                     onChanged: updateDigit,
                     onEmptyBackspace: handleEmptyBackspace,
                     onConfirm: handleConfirm,

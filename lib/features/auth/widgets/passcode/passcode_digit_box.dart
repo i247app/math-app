@@ -61,7 +61,10 @@ class PasscodeDigitBox extends StatelessWidget {
             autofocus: autofocus,
             textAlign: TextAlign.center,
             textAlignVertical: TextAlignVertical.center,
-            keyboardType: TextInputType.number,
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: false,
+              signed: false,
+            ),
             textInputAction: textInputAction,
             obscureText: true,
             obscuringCharacter: '•',
