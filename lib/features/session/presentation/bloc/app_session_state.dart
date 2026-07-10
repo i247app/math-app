@@ -21,6 +21,7 @@ class AuthenticatedSession {
 class AppSessionState {
   const AppSessionState({
     this.status = SessionStatus.unauthenticated,
+    this.sessionEpoch = 0,
     this.user,
     this.profiles = const <StudentProfile>[],
     this.activeProfile,
@@ -28,6 +29,7 @@ class AppSessionState {
   });
 
   final SessionStatus status;
+  final int sessionEpoch;
   final LoginUser? user;
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
@@ -44,6 +46,7 @@ class AppSessionState {
 
   AppSessionState copyWith({
     SessionStatus? status,
+    int? sessionEpoch,
     LoginUser? user,
     List<StudentProfile>? profiles,
     StudentProfile? activeProfile,
@@ -57,6 +60,7 @@ class AppSessionState {
         clearUser || nextStatus == SessionStatus.unauthenticated;
     return AppSessionState(
       status: nextStatus,
+      sessionEpoch: sessionEpoch ?? this.sessionEpoch,
       user: clearsSession ? null : user ?? this.user,
       profiles: clearsSession
           ? const <StudentProfile>[]

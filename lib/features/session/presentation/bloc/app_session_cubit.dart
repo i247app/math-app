@@ -11,7 +11,8 @@ class AppSessionCubit extends Cubit<AppSessionState> {
   AppSessionCubit({
     AuthenticatedSession? initialSession,
     AuthProfileResolver? profileResolver,
-  }) : _profileResolver =
+  }) : _sessionEpoch = initialSession == null ? 0 : 1,
+       _profileResolver =
            profileResolver ??
            AuthProfileResolver(
              profileService: ProfileApi(),
@@ -22,6 +23,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
              ? const AppSessionState()
              : AppSessionState(
                  status: SessionStatus.authenticated,
+                 sessionEpoch: 1,
                  user: initialSession.user,
                  profiles: initialSession.profiles,
                  activeProfile: initialSession.activeProfile,
@@ -30,6 +32,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
        );
 
   final AuthProfileResolver _profileResolver;
+  int _sessionEpoch;
 
   void beginRestore() {
     if (state.isAuthenticated || state.status == SessionStatus.restoring) {
@@ -42,9 +45,15 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     if (isClosed) {
       return;
     }
+    final startsNewSession =
+        !state.isAuthenticated || state.user?.id != session.user.id;
+    if (startsNewSession) {
+      _sessionEpoch++;
+    }
     emit(
       AppSessionState(
         status: SessionStatus.authenticated,
+        sessionEpoch: _sessionEpoch,
         user: session.user,
         profiles: session.profiles,
         activeProfile: session.activeProfile,
@@ -57,7 +66,8 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     if (isClosed || state.status == SessionStatus.unauthenticated) {
       return;
     }
-    emit(const AppSessionState());
+    _sessionEpoch++;
+    emit(AppSessionState(sessionEpoch: _sessionEpoch));
   }
 
   Future<void> refreshProfiles() async {

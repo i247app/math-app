@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/core/data/session_scoped_repository_registry.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/phone_number_validator.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_cubit.dart';
@@ -135,12 +136,24 @@ class _NumiHomeState extends State<NumiHome> {
         RepositoryProvider<ClassroomExerciseService>(
           create: (_) => ClassroomExerciseApi(),
         ),
+        RepositoryProvider<SessionScopedRepositoryRegistry>(
+          create: (_) => SessionScopedRepositoryRegistry(),
+          dispose: (registry) => registry.dispose(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (_) =>
-                AppSessionCubit(initialSession: widget.initialSession),
+            create: (context) {
+              final cubit = AppSessionCubit(
+                initialSession: widget.initialSession,
+              );
+              context.read<SessionScopedRepositoryRegistry>().updateSession(
+                isAuthenticated: cubit.state.isAuthenticated,
+                sessionEpoch: cubit.state.sessionEpoch,
+              );
+              return cubit;
+            },
           ),
           BlocProvider(
             create: (context) => ClassroomCubit(
@@ -171,8 +184,14 @@ class _NumiHomeState extends State<NumiHome> {
         ],
         child: BlocListener<AppSessionCubit, AppSessionState>(
           listenWhen: (previous, current) =>
-              previous.user?.id != current.user?.id,
-          listener: (context, state) => context.read<ClassroomCubit>().clear(),
+              previous.sessionEpoch != current.sessionEpoch,
+          listener: (context, state) {
+            context.read<SessionScopedRepositoryRegistry>().updateSession(
+              isAuthenticated: state.isAuthenticated,
+              sessionEpoch: state.sessionEpoch,
+            );
+            context.read<ClassroomCubit>().clear();
+          },
           child: BlocBuilder<AuthFlowCubit, AuthFlowState>(
             buildWhen: (previous, current) => previous.screen != current.screen,
             builder: (context, scaffoldState) {

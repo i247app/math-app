@@ -40,5 +40,23 @@ void main() {
         await cubit.close();
       },
     );
+
+    test(
+      'advances the session epoch across logout and the next login',
+      () async {
+        final cubit = AppSessionCubit();
+
+        cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 7)));
+        final firstEpoch = cubit.state.sessionEpoch;
+        cubit.clear();
+        final loggedOutEpoch = cubit.state.sessionEpoch;
+        cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 7)));
+
+        expect(firstEpoch, greaterThan(0));
+        expect(loggedOutEpoch, greaterThan(firstEpoch));
+        expect(cubit.state.sessionEpoch, greaterThan(loggedOutEpoch));
+        await cubit.close();
+      },
+    );
   });
 }
