@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/core/debug/home_tab_performance_monitor.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/grade_models.dart';
@@ -102,6 +103,8 @@ class _HomeScreenState extends State<HomeScreen>
   late final HomeProfileController _profileController = HomeProfileController(
     gradeService: widget._gradeService,
   );
+  final HomeTabPerformanceMonitor _tabPerformanceMonitor =
+      HomeTabPerformanceMonitor();
   bool _returnToPracticeAfterProfileSave = false;
   int _parentStreakCount = 1;
 
@@ -137,7 +140,8 @@ class _HomeScreenState extends State<HomeScreen>
     if (oldWidget.activeRole != widget.activeRole) {
       final oldTab = _homeCubitFor(oldWidget.activeRole).state.activeTab;
       final targetCubit = _homeCubitFor(widget.activeRole);
-      targetCubit.selectTab(
+      _selectTab(
+        targetCubit,
         _tabIndexAfterRoleChange(
           fromRole: oldWidget.activeRole,
           toRole: widget.activeRole,
@@ -223,6 +227,7 @@ class _HomeScreenState extends State<HomeScreen>
     _parentHomeCubit.close();
     _studentHomeCubit.close();
     _teacherHomeCubit.close();
+    _tabPerformanceMonitor.dispose();
     super.dispose();
   }
 
@@ -308,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen>
                             setState(() {
                               _returnToPracticeAfterProfileSave = true;
                             });
-                            homeCubit.selectTab(4);
+                            _selectTab(homeCubit, 4);
                           },
                           onProfileSaved: () {
                             if (!_returnToPracticeAfterProfileSave) {
@@ -317,17 +322,19 @@ class _HomeScreenState extends State<HomeScreen>
                             setState(() {
                               _returnToPracticeAfterProfileSave = false;
                             });
-                            homeCubit.selectTab(3);
+                            _selectTab(homeCubit, 3);
                           },
                           openAddProfileRequestId:
                               profileState.openAddProfileRequestId,
                           onCompleteTeacherProfile: _openTeacherProfileForm,
-                          onOpenClassroomTab: () => homeCubit.selectTab(
+                          onOpenClassroomTab: () => _selectTab(
+                            homeCubit,
                             widget.activeRole == ProfileRole.parent ? 2 : 1,
                           ),
                           onOpenPracticeTab: () {
                             HapticFeedback.lightImpact();
-                            homeCubit.selectTab(
+                            _selectTab(
+                              homeCubit,
                               widget.activeRole == ProfileRole.parent ? 3 : 2,
                             );
                           },
@@ -422,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 index == 0) {
                               _playParentHomeEntrance();
                             }
-                            homeCubit.selectTab(index);
+                            _selectTab(homeCubit, index);
                           },
                         ),
                       ),
@@ -445,6 +452,15 @@ class _HomeScreenState extends State<HomeScreen>
       ProfileRole.student => _studentHomeCubit,
       ProfileRole.teacher => _teacherHomeCubit,
     };
+  }
+
+  void _selectTab(HomeTabCubit cubit, int index) {
+    _tabPerformanceMonitor.beginTabSwitch(
+      role: widget.activeRole.name,
+      fromTab: cubit.state.activeTab,
+      toTab: index,
+    );
+    cubit.selectTab(index);
   }
 
   void _updateParentStreak(int nextCount) {

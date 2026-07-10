@@ -3,9 +3,80 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../debug/debug_request_metrics.dart';
 import '../localization/app_language.dart';
 import 'api_metadata.dart';
 import 'auth_token_store.dart';
+
+class DebugRequestMetricsInterceptor extends Interceptor {
+  DebugRequestMetricsInterceptor({DebugRequestMetrics? metrics})
+    : _metrics = metrics ?? DebugRequestMetrics.instance;
+
+  static const _requestNumberKey = 'debugRequestNumber';
+  static const _startedAtKey = 'debugRequestStartedAt';
+
+  final DebugRequestMetrics _metrics;
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final requestNumber = _metrics.recordStarted(
+      method: options.method,
+      path: options.uri.path,
+    );
+    options.extra[_requestNumberKey] = requestNumber;
+    options.extra[_startedAtKey] = DateTime.now();
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    _recordResponse(response);
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    _record(
+      options: err.requestOptions,
+      statusCode: err.response?.statusCode,
+      failed: true,
+    );
+    handler.next(err);
+  }
+
+  void _recordResponse(Response<dynamic> response) {
+    final statusCode = response.statusCode;
+    _record(
+      options: response.requestOptions,
+      statusCode: statusCode,
+      failed: statusCode == null || statusCode >= 400,
+    );
+  }
+
+  void _record({
+    required RequestOptions options,
+    required int? statusCode,
+    required bool failed,
+  }) {
+    final requestNumber = options.extra[_requestNumberKey];
+    final startedAt = options.extra[_startedAtKey];
+    if (requestNumber is! int || startedAt is! DateTime) {
+      return;
+    }
+
+    _metrics.recordCompleted(
+      requestNumber: requestNumber,
+      method: options.method,
+      path: options.uri.path,
+      elapsed: DateTime.now().difference(startedAt),
+      statusCode: statusCode,
+      failed: failed,
+    );
+  }
+}
 
 class NetworkLogInterceptor extends Interceptor {
   const NetworkLogInterceptor();

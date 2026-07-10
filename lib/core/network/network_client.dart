@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../config/api_config.dart';
 import '../localization/app_keys.dart';
@@ -54,6 +55,9 @@ class NetworkClient {
     _dio.interceptors.add(
       AuthTokenInterceptor(authTokenStore: _authTokenStore),
     );
+    if (kDebugMode) {
+      _dio.interceptors.add(DebugRequestMetricsInterceptor());
+    }
     _dio.interceptors.add(const NetworkLogInterceptor());
   }
 
