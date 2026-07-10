@@ -226,7 +226,7 @@ class _WelcomeBottomArt extends StatelessWidget {
           width: 470 * scale,
           height: 375 * scale,
           child: Opacity(
-            opacity: 0.7,
+            opacity: 0.90,
             child: Image.asset(
               wavesAsset,
               fit: BoxFit.cover,
