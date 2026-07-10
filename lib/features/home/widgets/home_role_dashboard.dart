@@ -103,11 +103,6 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.activeTab != widget.activeTab) {
       _visitedTabs.add(widget.activeTab);
-      _activationTicks[widget.activeTab] =
-          (_activationTicks[widget.activeTab] ?? 0) + 1;
-    } else if (oldWidget.selectionRevision != widget.selectionRevision) {
-      _activationTicks[widget.activeTab] =
-          (_activationTicks[widget.activeTab] ?? 0) + 1;
     }
 
     if (widget.profileResetSignal != _lastProfileResetSignal) {

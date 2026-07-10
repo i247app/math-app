@@ -87,7 +87,7 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
   void didUpdateWidget(covariant StudentClassroomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadClassrooms(forceRefresh: true);
+      _loadClassrooms();
       return;
     }
     if (!widget.isActive) {
