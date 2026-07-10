@@ -121,9 +121,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
                   final quiz = _controller.quiz;
                   if (quiz == null) {
                     return _controller.isLoading
-                        ? const _QuizReviewLoadingContent(
-                            showHeaderSkeleton: false,
-                          )
+                        ? const _QuizReviewLoadingContent()
                         : _QuizReviewStatePanel(
                             isLoading: false,
                             message: _controller.errorMessage,

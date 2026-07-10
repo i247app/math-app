@@ -52,8 +52,11 @@ class QuizReviewController extends ChangeNotifier {
       _seedSubmittedAnswers(cachedQuiz);
     }
 
-    final hasVisibleQuiz = _quiz != null;
-    _isLoading = !hasVisibleQuiz;
+    // A quiz from a list or navigation argument can contain only summary
+    // metadata.  Do not treat that as loaded detail: otherwise the empty
+    // questions state flashes while the detail request is still in flight.
+    final hasVisibleDetail = _quiz?.questions.isNotEmpty == true;
+    _isLoading = !hasVisibleDetail;
     _errorMessage = null;
     _notifyIfAlive();
 
@@ -68,7 +71,7 @@ class QuizReviewController extends ChangeNotifier {
       final quiz = await QuizCache.loadDetail(
         service: _quizService,
         quizId: quizId,
-        forceRefresh: forceRefresh || hasVisibleQuiz,
+        forceRefresh: forceRefresh || hasVisibleDetail,
       );
       if (_disposed || requestId != _loadRequestId) {
         return;

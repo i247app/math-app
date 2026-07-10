@@ -141,7 +141,11 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
         exerciseId: exerciseId,
         profileId: profileId,
       );
-      return response.exercise;
+      final exercise = response.exercise;
+      if (exercise == null) {
+        throw const ClassroomExerciseException('');
+      }
+      return exercise;
     } on NetworkException catch (error) {
       throw ClassroomExerciseException(error.message, status: error.status);
     }

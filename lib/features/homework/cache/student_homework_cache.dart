@@ -4,6 +4,8 @@ import 'package:numi/features/homework/homework_api.dart';
 class StudentHomeworkCache {
   StudentHomeworkCache._();
 
+  static const _emptyDetailRetryDelay = Duration(milliseconds: 450);
+
   static final Map<_StudentHomeworkListKey, List<ClassroomExercise>> _lists =
       <_StudentHomeworkListKey, List<ClassroomExercise>>{};
   static final Map<_StudentHomeworkListKey, Future<List<ClassroomExercise>>>
@@ -96,21 +98,48 @@ class StudentHomeworkCache {
       return pending;
     }
 
-    final request = service
-        .getExerciseDetail(exerciseId: exerciseId, profileId: profileId)
-        .then((exercise) {
-          if (exercise != null) {
-            seedDetail(
+    final request =
+        _loadDetailWithEmptyResponseRetry(
+              service: service,
+              exerciseId: exerciseId,
               profileId: profileId,
-              exercise: exercise,
-              hasFullDetail: true,
-            );
-          }
-          return exercise;
-        })
-        .whenComplete(() => _pendingDetails.remove(key));
+            )
+            .then((exercise) {
+              if (exercise != null) {
+                seedDetail(
+                  profileId: profileId,
+                  exercise: exercise,
+                  hasFullDetail: true,
+                );
+              }
+              return exercise;
+            })
+            .whenComplete(() => _pendingDetails.remove(key));
     _pendingDetails[key] = request;
     return request;
+  }
+
+  /// A newly created homework can be visible before question generation has
+  /// completed. Give the backend one brief extra attempt while the UI keeps
+  /// its loading skeleton visible.
+  static Future<ClassroomExercise?> _loadDetailWithEmptyResponseRetry({
+    required ClassroomExerciseService service,
+    required int exerciseId,
+    required int profileId,
+  }) async {
+    final exercise = await service.getExerciseDetail(
+      exerciseId: exerciseId,
+      profileId: profileId,
+    );
+    if (exercise?.questions.isNotEmpty == true) {
+      return exercise;
+    }
+
+    await Future<void>.delayed(_emptyDetailRetryDelay);
+    return service.getExerciseDetail(
+      exerciseId: exerciseId,
+      profileId: profileId,
+    );
   }
 
   static ClassroomExercise? peekFullDetail({

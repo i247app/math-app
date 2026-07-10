@@ -4,6 +4,8 @@ import 'package:numi/features/quiz/quiz_api.dart';
 class QuizCache {
   QuizCache._();
 
+  static const _emptyDetailRetryDelay = Duration(milliseconds: 450);
+
   static final Map<_QuizListKey, List<GeneratedQuiz>> _lists =
       <_QuizListKey, List<GeneratedQuiz>>{};
   static final Map<_QuizListKey, DateTime> _listLoadedAt =
@@ -85,8 +87,7 @@ class QuizCache {
     }
 
     late final Future<GeneratedQuiz> request;
-    request = service
-        .getQuizDetail(quizId)
+    request = _loadDetailWithEmptyResponseRetry(service, quizId)
         .then((quiz) {
           seedDetail(quiz, fallbackQuizId: quizId);
           return quiz;
@@ -98,6 +99,22 @@ class QuizCache {
         });
     _pendingDetails[quizId] = request;
     return request;
+  }
+
+  /// Quiz generation can finish just after its metadata has been exposed by
+  /// the list endpoint. Retry one empty detail response before showing an
+  /// actual empty-state UI to the learner.
+  static Future<GeneratedQuiz> _loadDetailWithEmptyResponseRetry(
+    QuizService service,
+    int quizId,
+  ) async {
+    final quiz = await service.getQuizDetail(quizId);
+    if (quiz.questions.isNotEmpty) {
+      return quiz;
+    }
+
+    await Future<void>.delayed(_emptyDetailRetryDelay);
+    return service.getQuizDetail(quizId);
   }
 
   static GeneratedQuiz? peekDetail(int quizId) {

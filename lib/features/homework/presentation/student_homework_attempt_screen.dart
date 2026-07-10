@@ -15,6 +15,7 @@ import 'package:numi/features/homework/widgets/student_attempt/student_homework_
 import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_error_state.dart';
 import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_header.dart';
 import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
+import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_loading_skeleton.dart';
 import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_progress_section.dart';
 import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_question_card.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -357,24 +358,9 @@ class _StudentHomeworkAttemptScreenState
                             ),
                           )
                         : _isLoading
-                        ? QuizWaveLoader(
+                        ? StudentHomeworkAttemptLoadingSkeleton(
                             key: const ValueKey('homework-loader'),
                             scale: s,
-                            message: context.getText(AppKeys.studentHomework),
-                            letterStyle: TextStyle(
-                              color: colors.brandStrong,
-                              fontSize: 40 * s,
-                              fontWeight: FontWeight.w900,
-                              height: 1,
-                              letterSpacing: 3 * s,
-                            ),
-                            messageStyle: TextStyle(
-                              color: colors.textSecondary,
-                              fontSize: 16 * s,
-                              fontWeight: FontWeight.w800,
-                              height: 1.35,
-                              letterSpacing: 0,
-                            ),
                           )
                         : SingleChildScrollView(
                             key: const ValueKey('homework-content'),
