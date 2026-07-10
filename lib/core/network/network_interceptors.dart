@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../debug/debug_request_metrics.dart';
-import '../localization/app_language.dart';
 import 'api_metadata.dart';
 import 'auth_token_store.dart';
 
@@ -81,6 +80,10 @@ class DebugRequestMetricsInterceptor extends Interceptor {
 class NetworkLogInterceptor extends Interceptor {
   const NetworkLogInterceptor();
 
+  // Temporary diagnostic switch. Set this back to false after verifying the
+  // JWT copied into request metadata.
+  static const _showSensitiveValuesInDebugLogs = true;
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     _log('*** Request ***');
@@ -123,6 +126,10 @@ class NetworkLogInterceptor extends Interceptor {
   }
 
   static String _formatHeaders(Map<String, dynamic> headers) {
+    if (kDebugMode && _showSensitiveValuesInDebugLogs) {
+      return _jsonOrString(headers);
+    }
+
     final redacted = <String, dynamic>{};
     for (final entry in headers.entries) {
       final key = entry.key;
@@ -141,6 +148,10 @@ class NetworkLogInterceptor extends Interceptor {
 
     if (data is FormData) {
       return _formatFormData(data);
+    }
+
+    if (kDebugMode && _showSensitiveValuesInDebugLogs) {
+      return _jsonOrString(data);
     }
 
     return _jsonOrString(_redactSensitiveData(data));
@@ -212,41 +223,29 @@ class NetworkLogInterceptor extends Interceptor {
   static void _log(String message) => debugPrint(message);
 }
 
-class DefaultHeadersInterceptor extends Interceptor {
-  const DefaultHeadersInterceptor();
-
-  @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    options.headers.putIfAbsent(Headers.acceptHeader, () => 'application/json');
-
-    if (options.data is! FormData) {
-      options.headers.putIfAbsent(
-        Headers.contentTypeHeader,
-        () => Headers.jsonContentType,
-      );
-    }
-
-    handler.next(options);
-  }
-}
-
 class MetadataInterceptor extends QueuedInterceptor {
-  MetadataInterceptor({required ApiMetadataProvider metadataProvider})
-    : _metadataProvider = metadataProvider;
+  MetadataInterceptor({
+    required ApiMetadataProvider metadataProvider,
+    required AuthTokenStore authTokenStore,
+  }) : _metadataProvider = metadataProvider,
+       _authTokenStore = authTokenStore;
 
   final ApiMetadataProvider _metadataProvider;
+  final AuthTokenStore _authTokenStore;
 
   @override
   void onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (!_shouldInjectMetadata(options)) {
+    if (options.extra['skipMetadata'] == true) {
       handler.next(options);
       return;
     }
 
     final metadata = await _metadataProvider.buildMetadata();
+    metadata['authorization'] = await _authorizationValue();
+    metadata['content_type'] = _contentType(options.data);
     final data = options.data;
     if (data is FormData) {
       _injectMultipartMetadata(data, metadata);
@@ -261,15 +260,13 @@ class MetadataInterceptor extends QueuedInterceptor {
     handler.next(options);
   }
 
-  static bool _shouldInjectMetadata(RequestOptions options) {
-    if (options.extra['skipMetadata'] == true) {
-      return false;
-    }
+  Future<String> _authorizationValue() async {
+    final token = (await _authTokenStore.readToken())?.trim();
+    return token == null || token.isEmpty ? '' : 'Bearer $token';
+  }
 
-    return switch (options.method.toUpperCase()) {
-      'POST' || 'PUT' || 'PATCH' || 'DELETE' => true,
-      _ => false,
-    };
+  static String _contentType(Object? data) {
+    return data is FormData ? 'multipart/form-data' : Headers.jsonContentType;
   }
 
   static void _injectJsonMetadata(
@@ -300,29 +297,16 @@ class MetadataInterceptor extends QueuedInterceptor {
   }
 }
 
-class AuthTokenInterceptor extends QueuedInterceptor {
-  AuthTokenInterceptor({required AuthTokenStore authTokenStore})
+/// Persists refreshed JWTs returned by the backend without adding any
+/// authentication request header. Request authentication lives in body
+/// metadata via [MetadataInterceptor].
+class AuthTokenResponseInterceptor extends QueuedInterceptor {
+  AuthTokenResponseInterceptor({required AuthTokenStore authTokenStore})
     : _authTokenStore = authTokenStore;
 
   static const _authTokenHeader = 'X-Auth-Token';
-  static const _authorizationHeader = 'Authorization';
 
   final AuthTokenStore _authTokenStore;
-
-  @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    if (!_hasHeader(options.headers, _authorizationHeader)) {
-      final token = (await _authTokenStore.readToken())?.trim();
-      if (token != null && token.isNotEmpty) {
-        options.headers[_authorizationHeader] = 'Bearer $token';
-      }
-    }
-
-    handler.next(options);
-  }
 
   @override
   void onResponse(
@@ -339,7 +323,6 @@ class AuthTokenInterceptor extends QueuedInterceptor {
     if (response != null) {
       await _storeTokenFromHeaders(response.headers);
     }
-
     handler.next(err);
   }
 
@@ -349,45 +332,11 @@ class AuthTokenInterceptor extends QueuedInterceptor {
         continue;
       }
 
-      final firstValue = entry.value.isEmpty ? null : entry.value.first;
-      final token = firstValue?.trim();
+      final token = entry.value.isEmpty ? null : entry.value.first.trim();
       if (token != null && token.isNotEmpty) {
         await _authTokenStore.writeToken(token);
       }
       return;
     }
-  }
-
-  static bool _hasHeader(Map<String, dynamic> headers, String name) {
-    return headers.keys.any((key) => key.toLowerCase() == name.toLowerCase());
-  }
-}
-
-class ClientInfoHeadersInterceptor extends QueuedInterceptor {
-  ClientInfoHeadersInterceptor({
-    required AppApiMetadataProvider metadataProvider,
-  }) : _metadataProvider = metadataProvider;
-
-  final AppApiMetadataProvider _metadataProvider;
-
-  @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    final clientInfo = await _metadataProvider.loadClientInfo();
-    if (clientInfo.deviceId.isNotEmpty) {
-      options.headers['X-Device-Uuid'] = clientInfo.deviceId;
-    }
-    if (clientInfo.deviceName.isNotEmpty) {
-      options.headers['X-Device-Name'] = Uri.encodeComponent(
-        clientInfo.deviceName,
-      );
-    }
-    if (clientInfo.devicePushToken.isNotEmpty) {
-      options.headers['X-Device-Push-Token'] = clientInfo.devicePushToken;
-    }
-    options.headers['Accept-Language'] = AppLanguageState.currentApiCode;
-    handler.next(options);
   }
 }

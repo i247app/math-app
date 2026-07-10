@@ -45,15 +45,14 @@ class NetworkClient {
       ..sendTimeout = const Duration(seconds: 15)
       ..responseType = ResponseType.json
       ..validateStatus = (_) => true;
-    _dio.interceptors.add(const DefaultHeadersInterceptor());
     _dio.interceptors.add(
-      MetadataInterceptor(metadataProvider: _metadataProvider),
+      MetadataInterceptor(
+        metadataProvider: _metadataProvider,
+        authTokenStore: _authTokenStore,
+      ),
     );
     _dio.interceptors.add(
-      ClientInfoHeadersInterceptor(metadataProvider: _metadataProvider),
-    );
-    _dio.interceptors.add(
-      AuthTokenInterceptor(authTokenStore: _authTokenStore),
+      AuthTokenResponseInterceptor(authTokenStore: _authTokenStore),
     );
     if (kDebugMode) {
       _dio.interceptors.add(DebugRequestMetricsInterceptor());
@@ -102,7 +101,7 @@ class NetworkClient {
 
     final Response<Object?> response;
     try {
-      response = await _dio.get<Object?>(path);
+      response = await _dio.get<Object?>(path, data: <String, dynamic>{});
     } on DioException catch (error) {
       throw NetworkException(
         _dioErrorMessage(error),

@@ -31,17 +31,18 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
   Future<Map<String, Object>> buildMetadata() async {
     final clientInfo = await loadClientInfo();
     return <String, Object>{
-      'device_id': clientInfo.deviceId,
+      'accept': '*/*',
+      'accept_language': AppLanguageState.current.lookupCode,
+      'app_version': clientInfo.version,
       'device_name': clientInfo.deviceName,
       'device_push_token': clientInfo.devicePushToken,
-      'push_token': clientInfo.devicePushToken,
+      'device_uuid': clientInfo.deviceId,
       'model_name': clientInfo.modelName,
       'platform': clientInfo.platform,
       'system_version': clientInfo.systemVersion,
       'timestamp': DateTime.now().toUtc().toIso8601String(),
       'version': clientInfo.version,
       'build': clientInfo.buildNumber,
-      'app_version': clientInfo.appVersionLabel,
       'language': AppLanguageState.currentApiCode,
       'ip_address': await _ipAddress(),
     };
@@ -69,8 +70,8 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
     return clientInfo;
   }
 
-  /// Stores the latest FCM push token so it rides on the existing metadata
-  /// pipeline (`buildMetadata` body fields + `X-Device-Push-Token` header).
+  /// Stores the latest FCM push token so it rides on the existing body
+  /// metadata pipeline.
   ///
   /// Empty or unchanged tokens are ignored to avoid rebuilding the cache for a
   /// no-op. Safe to call before the first request — it loads the client info if
@@ -249,8 +250,6 @@ class AppClientInfo {
       devicePushToken: devicePushToken ?? this.devicePushToken,
     );
   }
-
-  String get appVersionLabel => 'Version: $version + $buildNumber';
 }
 
 // Device metadata model
