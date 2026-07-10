@@ -8,6 +8,8 @@ class _HistoryBody extends StatelessWidget {
     required this.selectedItemsCount,
     required this.quizzes,
     required this.homeworkExercises,
+    required this.profileId,
+    required this.exerciseService,
     required this.onRetry,
     required this.scale,
   });
@@ -18,6 +20,8 @@ class _HistoryBody extends StatelessWidget {
   final int selectedItemsCount;
   final List<GeneratedQuiz> quizzes;
   final List<ClassroomExercise> homeworkExercises;
+  final int? profileId;
+  final ClassroomExerciseService exerciseService;
   final VoidCallback onRetry;
   final double scale;
 
@@ -54,7 +58,12 @@ class _HistoryBody extends StatelessWidget {
             _HistoryHomeworkCard(
               exercise: exercise,
               scale: scale,
-              onTap: () => _historyOpenHomeworkResult(context, exercise),
+              onTap: () => _historyOpenHomeworkResult(
+                context,
+                exercise,
+                profileId: profileId,
+                exerciseService: exerciseService,
+              ),
             ),
             SizedBox(height: 14 * scale),
           ],

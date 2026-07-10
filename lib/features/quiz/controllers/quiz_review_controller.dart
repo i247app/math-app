@@ -11,18 +11,23 @@ enum QuizReviewMode { retry, result }
 class QuizReviewController extends ChangeNotifier {
   QuizReviewController({
     required this.quizId,
-    required QuizService quizService,
+    required QuizDetailLoader loadDetail,
     GeneratedQuiz? initialQuiz,
-  }) : _quizService = quizService,
+    QuizReviewMode initialMode = QuizReviewMode.retry,
+    int? cacheId,
+  }) : _loadDetail = loadDetail,
+       _cacheId = cacheId ?? quizId,
        _quiz = initialQuiz {
+    _mode = initialMode;
     _seedSubmittedAnswers(initialQuiz);
     if (initialQuiz != null) {
-      QuizCache.seedDetail(initialQuiz, fallbackQuizId: quizId);
+      QuizCache.seedDetail(initialQuiz, fallbackQuizId: _cacheId);
     }
   }
 
   final int quizId;
-  final QuizService _quizService;
+  final QuizDetailLoader _loadDetail;
+  final int _cacheId;
 
   GeneratedQuiz? _quiz;
   bool _isLoading = true;
@@ -46,7 +51,7 @@ class QuizReviewController extends ChangeNotifier {
 
   Future<void> loadQuizDetail({bool forceRefresh = false}) async {
     final requestId = ++_loadRequestId;
-    final cachedQuiz = QuizCache.peekDetail(quizId);
+    final cachedQuiz = QuizCache.peekDetail(_cacheId);
     if (cachedQuiz != null && _quiz == null) {
       _quiz = cachedQuiz;
       _seedSubmittedAnswers(cachedQuiz);
@@ -60,7 +65,7 @@ class QuizReviewController extends ChangeNotifier {
     _errorMessage = null;
     _notifyIfAlive();
 
-    final shouldRefresh = forceRefresh || !QuizCache.isDetailFresh(quizId);
+    final shouldRefresh = forceRefresh || !QuizCache.isDetailFresh(_cacheId);
     if (!shouldRefresh) {
       _isLoading = false;
       _notifyIfAlive();
@@ -69,8 +74,9 @@ class QuizReviewController extends ChangeNotifier {
 
     try {
       final quiz = await QuizCache.loadDetail(
-        service: _quizService,
-        quizId: quizId,
+        loadDetail: _loadDetail,
+        quizId: _cacheId,
+        serviceQuizId: quizId,
         forceRefresh: forceRefresh || hasVisibleDetail,
       );
       if (_disposed || requestId != _loadRequestId) {

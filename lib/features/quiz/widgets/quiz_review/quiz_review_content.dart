@@ -5,6 +5,7 @@ class _QuizReviewContent extends StatelessWidget {
     required this.quiz,
     required this.selectedIndex,
     required this.mode,
+    required this.allowRetry,
     required this.isLoading,
     required this.errorMessage,
     required this.onRetry,
@@ -20,6 +21,7 @@ class _QuizReviewContent extends StatelessWidget {
   final GeneratedQuiz quiz;
   final int selectedIndex;
   final QuizReviewMode mode;
+  final bool allowRetry;
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback onRetry;
@@ -50,8 +52,10 @@ class _QuizReviewContent extends StatelessWidget {
             _QuizReviewInlineError(message: errorMessage!, onRetry: onRetry),
             const SizedBox(height: 10),
           ],
-          _QuizReviewModeTabs(selectedMode: mode, onSelected: onModeSelected),
-          const SizedBox(height: 12),
+          if (allowRetry) ...[
+            _QuizReviewModeTabs(selectedMode: mode, onSelected: onModeSelected),
+            const SizedBox(height: 12),
+          ],
           _QuizReviewStatsCard(quiz: quiz),
           const SizedBox(height: 11),
           if (isLoading && question == null)
@@ -62,7 +66,7 @@ class _QuizReviewContent extends StatelessWidget {
               message: context.getText(AppKeys.emptyQuizQuestions),
               onRetry: onRetry,
             )
-          else if (mode == QuizReviewMode.result)
+          else if (!allowRetry || mode == QuizReviewMode.result)
             _QuizReviewResultQuestionList(
               quiz: quiz,
               selectedAnswers: submittedAnswers,

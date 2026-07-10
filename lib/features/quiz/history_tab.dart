@@ -11,8 +11,7 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/otp_auth_api.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/homework/homework_api.dart';
-import 'package:numi/features/homework/presentation/student_homework_result_screen.dart';
-import 'package:numi/features/homework/widgets/student_result/student_homework_result_summary.dart';
+import 'package:numi/features/homework/presentation/homework_review_screen.dart';
 import 'package:numi/features/profile/active_profile_session.dart';
 import 'package:numi/features/quiz/controllers/history_controller.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
@@ -257,6 +256,10 @@ class _HistoryTabState extends State<HistoryTab> {
                     selectedItemsCount: selectedItemsCount,
                     quizzes: quizzes,
                     homeworkExercises: homeworkExercises,
+                    profileId: ActiveProfileSession.profileStableId(
+                      widget.activeProfile,
+                    ),
+                    exerciseService: widget.assignmentService,
                     onRetry: () => _loadHistory(forceRefresh: true),
                     scale: scale,
                   ),

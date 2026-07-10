@@ -1,6 +1,8 @@
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 
+typedef QuizDetailLoader = Future<GeneratedQuiz> Function(int detailId);
+
 class QuizCache {
   QuizCache._();
 
@@ -71,8 +73,9 @@ class QuizCache {
   }
 
   static Future<GeneratedQuiz> loadDetail({
-    required QuizService service,
+    required QuizDetailLoader loadDetail,
     required int quizId,
+    int? serviceQuizId,
     bool forceRefresh = false,
   }) {
     if (!forceRefresh) {
@@ -87,16 +90,17 @@ class QuizCache {
     }
 
     late final Future<GeneratedQuiz> request;
-    request = _loadDetailWithEmptyResponseRetry(service, quizId)
-        .then((quiz) {
-          seedDetail(quiz, fallbackQuizId: quizId);
-          return quiz;
-        })
-        .whenComplete(() {
-          if (identical(_pendingDetails[quizId], request)) {
-            _pendingDetails.remove(quizId);
-          }
-        });
+    request =
+        _loadDetailWithEmptyResponseRetry(loadDetail, serviceQuizId ?? quizId)
+            .then((quiz) {
+              seedDetail(quiz, fallbackQuizId: quizId);
+              return quiz;
+            })
+            .whenComplete(() {
+              if (identical(_pendingDetails[quizId], request)) {
+                _pendingDetails.remove(quizId);
+              }
+            });
     _pendingDetails[quizId] = request;
     return request;
   }
@@ -105,16 +109,16 @@ class QuizCache {
   /// the list endpoint. Retry one empty detail response before showing an
   /// actual empty-state UI to the learner.
   static Future<GeneratedQuiz> _loadDetailWithEmptyResponseRetry(
-    QuizService service,
+    QuizDetailLoader loadDetail,
     int quizId,
   ) async {
-    final quiz = await service.getQuizDetail(quizId);
+    final quiz = await loadDetail(quizId);
     if (quiz.questions.isNotEmpty) {
       return quiz;
     }
 
     await Future<void>.delayed(_emptyDetailRetryDelay);
-    return service.getQuizDetail(quizId);
+    return loadDetail(quizId);
   }
 
   static GeneratedQuiz? peekDetail(int quizId) {

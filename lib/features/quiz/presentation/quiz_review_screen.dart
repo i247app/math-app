@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/cache/quiz_cache.dart';
 import 'package:numi/features/quiz/controllers/quiz_review_controller.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 import 'package:numi/core/theme/app_colors.dart';
@@ -43,27 +44,44 @@ part '../widgets/quiz_review/quiz_review_computed_correct_count.dart';
 part '../widgets/quiz_review/quiz_review_time_label.dart';
 part '../widgets/quiz_review/quiz_review_question_font_size.dart';
 part '../widgets/quiz_review/quiz_review_two_digits.dart';
+part 'quiz_review_entry_screen.dart';
 
-class QuizReviewScreen extends StatefulWidget {
-  const QuizReviewScreen({super.key, required this.quizId, this.initialQuiz});
+/// Shared review-detail layout used by quiz and classroom-exercise entry
+/// screens. Source-specific screens provide the detail loader and data model.
+class ReviewDetailScreen extends StatefulWidget {
+  const ReviewDetailScreen({
+    super.key,
+    required this.detailId,
+    required this.detailLoader,
+    this.initialDetail,
+    this.allowRetry = true,
+    this.cacheId,
+  });
 
-  final int quizId;
-  final GeneratedQuiz? initialQuiz;
+  final int detailId;
+  final QuizDetailLoader detailLoader;
+  final GeneratedQuiz? initialDetail;
+  final bool allowRetry;
+  final int? cacheId;
 
   @override
-  State<QuizReviewScreen> createState() => _QuizReviewScreenState();
+  State<ReviewDetailScreen> createState() => _ReviewDetailScreenState();
 }
 
-class _QuizReviewScreenState extends State<QuizReviewScreen> {
+class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
   late final QuizReviewController _controller;
 
   @override
   void initState() {
     super.initState();
     _controller = QuizReviewController(
-      quizId: widget.quizId,
-      quizService: QuizApi(),
-      initialQuiz: widget.initialQuiz,
+      quizId: widget.detailId,
+      loadDetail: widget.detailLoader,
+      initialQuiz: widget.initialDetail,
+      initialMode: widget.allowRetry
+          ? QuizReviewMode.retry
+          : QuizReviewMode.result,
+      cacheId: widget.cacheId,
     );
     _controller.loadQuizDetail();
   }
@@ -134,6 +152,7 @@ class _QuizReviewScreenState extends State<QuizReviewScreen> {
                     quiz: quiz,
                     selectedIndex: _controller.selectedIndex,
                     mode: _controller.mode,
+                    allowRetry: widget.allowRetry,
                     isLoading: _controller.isLoading,
                     errorMessage: _controller.errorMessage,
                     onRetry: () =>
