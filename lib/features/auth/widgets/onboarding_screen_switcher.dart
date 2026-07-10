@@ -195,17 +195,85 @@ class OnboardingScreenSwitcher extends StatelessWidget {
                 ),
               };
 
-        return SafeArea(
-          top: useSafeArea,
-          bottom: useSafeArea && state.screen != AppScreen.home,
-          left: useSafeArea,
-          right: useSafeArea,
-          child: _OnboardingSlideSwitcher(
-            screen: state.isRestoringSession ? null : state.screen,
-            child: screenChild,
-          ),
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            if (!state.isRestoringSession && state.screen == AppScreen.welcome)
+              _LoginScreenWarmup(
+                region: state.phoneRegion,
+                actionLabel: actionLabel,
+                isSignupEntry: isSignupEntry,
+              ),
+            SafeArea(
+              top: useSafeArea,
+              bottom: useSafeArea && state.screen != AppScreen.home,
+              left: useSafeArea,
+              right: useSafeArea,
+              child: _OnboardingSlideSwitcher(
+                screen: state.isRestoringSession ? null : state.screen,
+                child: screenChild,
+              ),
+            ),
+          ],
         );
       },
+    );
+  }
+}
+
+/// Builds Login while the initial Welcome page is visible. This executes the
+/// Android debug/JIT path for its TextField and font styles before the user
+/// starts the horizontal transition, without rendering or exposing it.
+class _LoginScreenWarmup extends StatefulWidget {
+  const _LoginScreenWarmup({
+    required this.region,
+    required this.actionLabel,
+    required this.isSignupEntry,
+  });
+
+  final PhoneRegion region;
+  final String actionLabel;
+  final bool isSignupEntry;
+
+  @override
+  State<_LoginScreenWarmup> createState() => _LoginScreenWarmupState();
+}
+
+class _LoginScreenWarmupState extends State<_LoginScreenWarmup> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Offstage(
+      child: TickerMode(
+        enabled: false,
+        child: IgnorePointer(
+          child: ExcludeSemantics(
+            child: LoginScreen(
+              controller: _controller,
+              region: widget.region,
+              onRegionChanged: (_) {},
+              onBack: () {},
+              onSendOtp: () {},
+              actionLabel: widget.actionLabel,
+              isSignupEntry: widget.isSignupEntry,
+              isSendingOtp: false,
+              isCheckingAuthPhone: false,
+              canSendOtp: false,
+              canLoginWithPin: false,
+              onLoginWithPin: () {},
+              onSwitchEntryMode: () {},
+              onPhoneChanged: (_) {},
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

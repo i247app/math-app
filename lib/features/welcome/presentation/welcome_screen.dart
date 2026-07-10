@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/welcome/widgets/welcome_composition.dart';
@@ -67,6 +70,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     precacheImage(
       const AssetImage('${welcomeAssetPrefix}welcome_card_game_learning.png'),
       context,
+    );
+    // The first Welcome Details → Login transition used to decode this large
+    // image while the page slide was already running. Warm it here so the
+    // first transition is as smooth as subsequent ones.
+    precacheImage(
+      const AssetImage('assets/images/numi-mascot.png'),
+      context,
+    );
+    unawaited(
+      GoogleFonts.pendingFonts([
+        GoogleFonts.andika(fontWeight: FontWeight.w400),
+        GoogleFonts.andika(fontWeight: FontWeight.w500),
+        GoogleFonts.andika(fontWeight: FontWeight.w600),
+        GoogleFonts.andika(fontWeight: FontWeight.w800),
+      ]),
     );
   }
 
