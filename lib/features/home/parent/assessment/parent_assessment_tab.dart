@@ -42,13 +42,14 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   bool _hasPlayedInitialEntrance = false;
   String? _errorMessage;
   int _loadRequestId = 0;
+  bool _isActivationLoadScheduled = false;
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
     if (widget.args.isActive) {
-      _loadAssessments();
+      _scheduleActivationLoad();
     }
   }
 
@@ -56,7 +57,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   void didUpdateWidget(covariant ParentAssessmentTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.args.isActive && widget.args.isActive) {
-      _loadAssessments();
+      _scheduleActivationLoad();
       return;
     }
     if (!widget.args.isActive) {
@@ -79,6 +80,21 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   }
 
   void _onSearchChanged() => setState(() {});
+
+  void _scheduleActivationLoad() {
+    if (_isActivationLoadScheduled) {
+      return;
+    }
+
+    _isActivationLoadScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isActivationLoadScheduled = false;
+      if (!mounted || !widget.args.isActive) {
+        return;
+      }
+      _loadAssessments();
+    });
+  }
 
   String _profileSourceKey(HomeDashboardArgs args) {
     return '${args.user?.id}|'

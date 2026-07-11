@@ -1,4 +1,4 @@
-import 'dart:ui' show FrameTiming;
+import 'dart:ui' show FramePhase, FrameTiming;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -12,16 +12,22 @@ class HomeTabPerformanceMonitor {
   final void Function(String message) _log;
   _PendingTabSwitch? _pendingTabSwitch;
   bool _isListening = false;
+  int? _selectionFrameTimestampMicros;
 
   void beginTabSwitch({
     required String role,
     required int fromTab,
     required int toTab,
   }) {
-    if (!kDebugMode || fromTab == toTab) {
+    if ((!kDebugMode && !kProfileMode) || fromTab == toTab) {
       return;
     }
 
+    // A timings callback may contain frames that were already rendered before
+    // the callback reaches the framework. Keep the current frame's engine
+    // timestamp so we can select only the next frame caused by this switch.
+    _selectionFrameTimestampMicros =
+        WidgetsBinding.instance.currentSystemFrameTimeStamp.inMicroseconds;
     _pendingTabSwitch = _PendingTabSwitch(
       role: role,
       fromTab: fromTab,
@@ -41,14 +47,36 @@ class HomeTabPerformanceMonitor {
       return;
     }
 
-    final timing = timings.last;
+    final selectionFrameTimestampMicros = _selectionFrameTimestampMicros;
+    final targetFrame = timings.where((timing) {
+      if (selectionFrameTimestampMicros == null) {
+        return true;
+      }
+      return timing.timestampInMicroseconds(FramePhase.buildStart) >
+          selectionFrameTimestampMicros;
+    }).firstOrNull;
+    if (targetFrame == null) {
+      return;
+    }
+
+    final buildDelayMicros = selectionFrameTimestampMicros == null
+        ? 0
+        : targetFrame.timestampInMicroseconds(FramePhase.buildStart) -
+              selectionFrameTimestampMicros;
+    final rasterFinishDelayMicros = selectionFrameTimestampMicros == null
+        ? 0
+        : targetFrame.timestampInMicroseconds(FramePhase.rasterFinish) -
+              selectionFrameTimestampMicros;
     _log(
       '[Home tab] ${pendingTabSwitch.role} '
       '${pendingTabSwitch.fromTab} → ${pendingTabSwitch.toTab}: '
-      'build=${timing.buildDuration.inMilliseconds}ms, '
-      'raster=${timing.rasterDuration.inMilliseconds}ms',
+      'next build=${targetFrame.buildDuration.inMilliseconds}ms, '
+      'raster=${targetFrame.rasterDuration.inMilliseconds}ms, '
+      'selection→build=${buildDelayMicros ~/ 1000}ms, '
+      'selection→raster=${rasterFinishDelayMicros ~/ 1000}ms',
     );
     _pendingTabSwitch = null;
+    _selectionFrameTimestampMicros = null;
     WidgetsBinding.instance.removeTimingsCallback(_onFrameTimings);
     _isListening = false;
   }
@@ -59,6 +87,7 @@ class HomeTabPerformanceMonitor {
       _isListening = false;
     }
     _pendingTabSwitch = null;
+    _selectionFrameTimestampMicros = null;
   }
 }
 

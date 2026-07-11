@@ -69,6 +69,7 @@ class HomeRoleDashboard extends StatefulWidget {
 class HomeRoleDashboardState extends State<HomeRoleDashboard> {
   late final Set<int> _visitedTabs = <int>{widget.activeTab};
   final Map<int, int> _activationTicks = <int, int>{};
+  final Map<int, Widget> _tabChildren = <int, Widget>{};
   late int _lastProfileResetSignal = widget.profileResetSignal;
 
   @override
@@ -103,6 +104,11 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.activeTab != widget.activeTab) {
       _visitedTabs.add(widget.activeTab);
+      // Only the outgoing and incoming tabs need new [isActive] args. Keeping
+      // the other widget instances identical lets Flutter skip their build
+      // work while the Offstage wrappers change selection.
+      _tabChildren.remove(oldWidget.activeTab);
+      _tabChildren.remove(widget.activeTab);
     }
 
     if (widget.profileResetSignal != _lastProfileResetSignal) {
@@ -110,6 +116,16 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
       for (final tab in _activationTicks.keys.toList()) {
         _activationTicks[tab] = (_activationTicks[tab] ?? 0) + 1;
       }
+      _tabChildren.clear();
+      return;
+    }
+
+    if (_requiresAllTabsRebuild(oldWidget, widget)) {
+      _tabChildren.clear();
+    } else if (oldWidget.homeHeader != widget.homeHeader) {
+      // The header only belongs to the Home tab and can change when the
+      // profile menu opens or closes.
+      _tabChildren.remove(0);
     }
   }
 
@@ -128,7 +144,10 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
                 enabled: tab == widget.activeTab,
                 child: KeyedSubtree(
                   key: ValueKey('home-dashboard-content-$tab'),
-                  child: _buildTab(context, tab),
+                  child: _tabChildren.putIfAbsent(
+                    tab,
+                    () => _buildTab(context, tab),
+                  ),
                 ),
               ),
             ),
@@ -172,5 +191,19 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
       ProfileRole.student => StudentDashboard(args: args),
       ProfileRole.teacher => TeacherDashboard(args: args),
     };
+  }
+
+  static bool _requiresAllTabsRebuild(
+    HomeRoleDashboard previous,
+    HomeRoleDashboard current,
+  ) {
+    return previous.activeRole != current.activeRole ||
+        previous.user != current.user ||
+        previous.profiles != current.profiles ||
+        previous.activeProfile != current.activeProfile ||
+        previous.profileLoadError != current.profileLoadError ||
+        previous.initialGrades != current.initialGrades ||
+        previous.bottomPadding != current.bottomPadding ||
+        previous.scale != current.scale;
   }
 }

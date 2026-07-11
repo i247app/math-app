@@ -207,6 +207,7 @@ class _SettingTabState extends State<SettingTab> {
   bool _isLoadingPasscode = false;
   bool _hasPasscode = false;
   bool _hasPlayedSettingsMenuEntrance = false;
+  bool _isPasscodeStatusLoadScheduled = false;
   String? _profileLoadError;
   String? _profileOptionsError;
   String? _profileCreateError;
@@ -289,18 +290,14 @@ class _SettingTabState extends State<SettingTab> {
         }
       });
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && widget.isActive) {
-        _loadPasscodeStatus();
-      }
-    });
+    _schedulePasscodeStatusLoad();
   }
 
   @override
   void didUpdateWidget(covariant SettingTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadPasscodeStatus();
+      _schedulePasscodeStatusLoad();
     }
     if (oldWidget.openAddProfileRequestId != widget.openAddProfileRequestId) {
       _openAddProfile();
@@ -342,7 +339,7 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     if (oldWidget.user?.id != widget.user?.id) {
-      _loadPasscodeStatus();
+      _schedulePasscodeStatusLoad();
     }
   }
 
@@ -377,6 +374,21 @@ class _SettingTabState extends State<SettingTab> {
   int? get _effectiveUserId {
     final userId = _effectiveUser?.id;
     return userId != null && userId > 0 ? userId : null;
+  }
+
+  void _schedulePasscodeStatusLoad() {
+    if (_isPasscodeStatusLoadScheduled) {
+      return;
+    }
+
+    _isPasscodeStatusLoadScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isPasscodeStatusLoadScheduled = false;
+      if (!mounted || !widget.isActive) {
+        return;
+      }
+      _loadPasscodeStatus();
+    });
   }
 
   Future<void> _loadPasscodeStatus() async {

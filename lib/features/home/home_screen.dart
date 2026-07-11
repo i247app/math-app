@@ -277,22 +277,24 @@ class _HomeScreenState extends State<HomeScreen>
                   .toList(growable: false);
               final isMenuOpen = profileState.isMenuOpen;
               final homeHeader = showHeader
-                  ? HomeHeaderBar(
-                      height: headerHeight,
-                      topInset: topInset,
-                      horizontalPadding: s(14),
-                      name: studentName,
-                      profile: widget.activeProfile,
-                      role: widget.activeRole,
-                      canSwitchProfile: switchableProfiles.isNotEmpty,
-                      isProfileMenuOpen: isMenuOpen,
-                      parentStreakCount: _parentStreakCount,
-                      onProfileTap: switchableProfiles.isEmpty
-                          ? null
-                          : () {
-                              HapticFeedback.selectionClick();
-                              _profileController.toggleMenu();
-                            },
+                  ? RepaintBoundary(
+                      child: HomeHeaderBar(
+                        height: headerHeight,
+                        topInset: topInset,
+                        horizontalPadding: s(14),
+                        name: studentName,
+                        profile: widget.activeProfile,
+                        role: widget.activeRole,
+                        canSwitchProfile: switchableProfiles.isNotEmpty,
+                        isProfileMenuOpen: isMenuOpen,
+                        parentStreakCount: _parentStreakCount,
+                        onProfileTap: switchableProfiles.isEmpty
+                            ? null
+                            : () {
+                                HapticFeedback.selectionClick();
+                                _profileController.toggleMenu();
+                              },
+                      ),
                     )
                   : null;
               return Center(
@@ -302,7 +304,9 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      const Positioned.fill(child: HomeBackground()),
+                      const Positioned.fill(
+                        child: RepaintBoundary(child: HomeBackground()),
+                      ),
                       Positioned.fill(
                         child: HomeRoleDashboard(
                           // No ValueKey — profileResetSignal drives selective
@@ -412,21 +416,23 @@ class _HomeScreenState extends State<HomeScreen>
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        child: HomeBottomNavigation(
-                          height: navHeight,
-                          bottomInset: bottomInset,
-                          scale: scale,
-                          activeIndex: navigation.activeTab,
-                          activeRole: widget.activeRole,
-                          user: widget.user,
-                          onTabSelected: (index) {
-                            if (widget.activeRole == ProfileRole.parent &&
-                                index != navigation.activeTab &&
-                                index == 0) {
-                              _playParentHomeEntrance();
-                            }
-                            _selectTab(homeCubit, index);
-                          },
+                        child: RepaintBoundary(
+                          child: HomeBottomNavigation(
+                            height: navHeight,
+                            bottomInset: bottomInset,
+                            scale: scale,
+                            activeIndex: navigation.activeTab,
+                            activeRole: widget.activeRole,
+                            user: widget.user,
+                            onTabSelected: (index) {
+                              if (widget.activeRole == ProfileRole.parent &&
+                                  index != navigation.activeTab &&
+                                  index == 0) {
+                                _playParentHomeEntrance();
+                              }
+                              _selectTab(homeCubit, index);
+                            },
+                          ),
                         ),
                       ),
                       // LoadingScreen overlay removed — skeleton in content
