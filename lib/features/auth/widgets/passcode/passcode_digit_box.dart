@@ -54,47 +54,50 @@ class PasscodeDigitBox extends StatelessWidget {
             ),
           ],
         ),
-        child: Center(
-          child: TextField(
-            controller: controller,
-            focusNode: focusNode,
-            autofocus: autofocus,
-            textAlign: TextAlign.center,
-            textAlignVertical: TextAlignVertical.center,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: false,
-              signed: false,
-            ),
-            textInputAction: textInputAction,
-            obscureText: true,
-            obscuringCharacter: '•',
-            maxLength: 1,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            onChanged: onChanged,
-            onTap: () {
-              controller.selection = TextSelection(
-                baseOffset: 0,
-                extentOffset: controller.text.length,
-              );
-            },
-            style: GoogleFonts.andika(
-              color: colors.textPrimary,
-              fontSize: 34,
-              fontWeight: FontWeight.w700,
-              height: 1,
-              letterSpacing: 0,
-            ),
-            decoration: const InputDecoration(
-              counterText: '',
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              filled: false,
-              isCollapsed: true,
-              contentPadding: EdgeInsets.zero,
+        child: Material(
+          type: MaterialType.transparency,
+          child: Center(
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              autofocus: autofocus,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: false,
+                signed: false,
+              ),
+              textInputAction: textInputAction,
+              obscureText: true,
+              obscuringCharacter: '•',
+              maxLength: 1,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              onChanged: onChanged,
+              onTap: () {
+                controller.selection = TextSelection(
+                  baseOffset: 0,
+                  extentOffset: controller.text.length,
+                );
+              },
+              style: GoogleFonts.andika(
+                color: colors.textPrimary,
+                fontSize: 34,
+                fontWeight: FontWeight.w700,
+                height: 1,
+                letterSpacing: 0,
+              ),
+              decoration: const InputDecoration(
+                counterText: '',
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                filled: false,
+                isCollapsed: true,
+                contentPadding: EdgeInsets.zero,
+              ),
             ),
           ),
         ),

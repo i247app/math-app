@@ -63,6 +63,36 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   void openWelcomeDetails() =>
       emit(state.copyWith(screen: AppScreen.welcomeDetails));
 
+  /// Handles a platform Back gesture for the auth flow, whose screens are
+  /// state-driven rather than separate Navigator routes.
+  ///
+  /// Returns false at root screens so Android can perform its normal task
+  /// backgrounding behavior.
+  bool handleSystemBack() {
+    if (state.isRestoringSession) {
+      return false;
+    }
+
+    switch (state.screen) {
+      case AppScreen.welcomeDetails:
+        openWelcome();
+        return true;
+      case AppScreen.login:
+        openWelcomeDetails();
+        return true;
+      case AppScreen.otp:
+        openLogin();
+        return true;
+      case AppScreen.signup:
+        cancelSignupToLogin();
+        return true;
+      case AppScreen.welcome:
+      case AppScreen.passcode:
+      case AppScreen.home:
+        return false;
+    }
+  }
+
   void openLogin({AuthEntryMode? mode}) {
     emit(
       state.copyWith(

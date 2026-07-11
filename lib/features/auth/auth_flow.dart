@@ -196,6 +196,17 @@ class _NumiHomeState extends State<NumiHome> {
             buildWhen: (previous, current) => previous.screen != current.screen,
             builder: (context, scaffoldState) {
               final colors = context.themeColors;
+              final handlesSystemBack =
+                  !scaffoldState.isRestoringSession &&
+                  switch (scaffoldState.screen) {
+                    AppScreen.welcomeDetails ||
+                    AppScreen.login ||
+                    AppScreen.otp ||
+                    AppScreen.signup => true,
+                    AppScreen.welcome ||
+                    AppScreen.passcode ||
+                    AppScreen.home => false,
+                  };
               final overlayStyle =
                   Theme.of(context).brightness == Brightness.dark
                   ? SystemUiOverlayStyle.light
@@ -205,35 +216,43 @@ class _NumiHomeState extends State<NumiHome> {
                   scaffoldState.screen == AppScreen.otp ||
                   scaffoldState.screen == AppScreen.passcode ||
                   scaffoldState.screen == AppScreen.signup;
-              return AnnotatedRegion<SystemUiOverlayStyle>(
-                value: overlayStyle,
-                child: Scaffold(
-                  backgroundColor: usePlainAuthBackground
-                      ? colors.pageBackground
-                      : null,
-                  resizeToAvoidBottomInset:
-                      scaffoldState.screen != AppScreen.home &&
-                      scaffoldState.screen != AppScreen.login &&
-                      scaffoldState.screen != AppScreen.otp &&
-                      scaffoldState.screen != AppScreen.passcode,
-                  body: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: usePlainAuthBackground
-                            ? ColoredBox(color: colors.pageBackground)
-                            : const AppBackground(child: SizedBox.shrink()),
-                      ),
-                      Positioned.fill(
-                        child: OnboardingScreenSwitcher(
-                          phoneController: phoneController,
-                          phoneHasInput: _phoneHasInput,
-                          clearLoginPhoneInput: clearLoginPhoneInput,
-                          normalizedPhoneInput: _normalizedPhoneInput,
-                          handlePhoneInputChanged: handlePhoneInputChanged,
-                          sendOtp: sendOtp,
+              return PopScope(
+                canPop: !handlesSystemBack,
+                onPopInvokedWithResult: (didPop, result) {
+                  if (!didPop) {
+                    context.read<AuthFlowCubit>().handleSystemBack();
+                  }
+                },
+                child: AnnotatedRegion<SystemUiOverlayStyle>(
+                  value: overlayStyle,
+                  child: Scaffold(
+                    backgroundColor: usePlainAuthBackground
+                        ? colors.pageBackground
+                        : null,
+                    resizeToAvoidBottomInset:
+                        scaffoldState.screen != AppScreen.home &&
+                        scaffoldState.screen != AppScreen.login &&
+                        scaffoldState.screen != AppScreen.otp &&
+                        scaffoldState.screen != AppScreen.passcode,
+                    body: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: usePlainAuthBackground
+                              ? ColoredBox(color: colors.pageBackground)
+                              : const AppBackground(child: SizedBox.shrink()),
                         ),
-                      ),
-                    ],
+                        Positioned.fill(
+                          child: OnboardingScreenSwitcher(
+                            phoneController: phoneController,
+                            phoneHasInput: _phoneHasInput,
+                            clearLoginPhoneInput: clearLoginPhoneInput,
+                            normalizedPhoneInput: _normalizedPhoneInput,
+                            handlePhoneInputChanged: handlePhoneInputChanged,
+                            sendOtp: sendOtp,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

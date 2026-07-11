@@ -78,7 +78,7 @@ class AuthLayout extends StatelessWidget {
       // The owning auth flow provides the Scaffold and deliberately keeps the
       // layout fixed while the keyboard is visible. Avoid another Scaffold here
       // so keyboard inset changes do not have two layout owners to reconcile.
-      child: ColoredBox(
+      child: Material(
         color: colors.pageBackground,
         child: LayoutBuilder(
           builder: (context, constraints) {
