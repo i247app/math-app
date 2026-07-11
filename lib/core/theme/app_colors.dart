@@ -53,7 +53,7 @@ abstract final class AppColors {
   static const coral = Color(0xFFFF7C5D);
   static const coralLight = Color(0xFFFF8762);
   static const coralTeacher = Color(0xFFFB7651);
-  static const coral600 = Color(0xFFF97952);
+  static const coral600 = Color(0xFFFC6128);
   static const coral500 = Color(0xFFFF7043);
   static const coralTab = Color(0xFFFF704D);
   static const orange = Color(0xFFFF6A1A);
@@ -79,7 +79,7 @@ abstract final class AppColors {
   static const bookmark = Color(0xC2C1BAA6);
 
   // Welcome
-  static const welcomeTeal = Color(0xFF2C8B8D);
+  static const welcomeTeal = Color(0xFF058A95);
   static const welcomeDeepTeal = Color(0xFF138593);
   static const welcomeTitle = Color(0xFF203D68);
   static const inactiveDot = Color(0xFFD0D5DD);
