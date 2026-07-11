@@ -225,7 +225,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       child: Column(
         children: [
           HomeTabHeader(
-            title: context.getText(AppKeys.navRoom),
+            title: context.getText(AppKeys.parentRoomTitle),
             topInset: topInset,
             scale: scale,
           ),

@@ -25,7 +25,7 @@ class AppKeys {
   static const welcomeSubtitlePrefix = 'welcome_subtitle_prefix';
   static const welcomeSubtitle = 'welcome_subtitle';
   static const start = 'start';
-  static const welcomeLogin = 'login';
+  static const welcomeLogin = 'welcome_login';
 
   static const phoneLoginTitle = 'phone_login_title';
   static const phoneLoginBrandName = 'phone_login_brand_name';
@@ -115,6 +115,7 @@ class AppKeys {
   static const parentRoadmapSubtitle = 'parent_roadmap_subtitle';
   static const parentJoinRoomTitle = 'parent_join_room_title';
   static const parentJoinRoomSubtitle = 'parent_join_room_subtitle';
+  static const parentRoomTitle = 'parent_room_title';
   static const parentQuizLoadFailed = 'parent_quiz_load_failed';
   static const parentTryAgain = 'parent_try_again';
   static const parentNoClassroom = 'parent_no_classroom';
