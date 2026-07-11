@@ -35,7 +35,7 @@ class HomeDashboardArgs {
     required this.parentHomeEntrance,
     required this.activeRefreshTick,
     required this.bottomPadding,
-    required this.headerHeight,
+    this.homeHeader,
     required this.scale,
   });
 
@@ -64,13 +64,13 @@ class HomeDashboardArgs {
   final Animation<double> parentHomeEntrance;
   final int activeRefreshTick;
   final double bottomPadding;
-  final double headerHeight;
+  final Widget? homeHeader;
   final double scale;
 
   EdgeInsets get contentPadding => EdgeInsets.only(
     left: 24 * scale,
     right: 24 * scale,
-    top: headerHeight + (activeTab == 0 ? 0 : 24 * scale),
+    top: activeTab == 0 ? 0 : 24 * scale,
     bottom: bottomPadding,
   );
 }

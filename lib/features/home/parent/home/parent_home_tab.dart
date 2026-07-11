@@ -327,7 +327,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     final hasCompletedAssessment = completedAssessments.isNotEmpty;
     final padding = EdgeInsets.fromLTRB(
       14 * widget.args.scale,
-      widget.args.headerHeight,
+      0,
       14 * widget.args.scale,
       widget.args.bottomPadding,
     );
@@ -339,43 +339,54 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: padding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (!isLoading && !hasCompletedAssessment)
-              initialAssessmentFadeIn(
-                order: 0,
-                child: ParentLearningStreakCard(
-                  hasCompletedAssessment: hasCompletedAssessment,
-                ),
-              )
-            else if (!isLoading && hasCompletedAssessment)
-              completedAssessmentFadeIn(
-                order: 0,
-                child: ParentLearningStreakCard(
-                  hasCompletedAssessment: hasCompletedAssessment,
-                ),
-              )
-            else
-              ParentLearningStreakCard(
-                hasCompletedAssessment: hasCompletedAssessment,
+            if (widget.args.homeHeader != null) widget.args.homeHeader!,
+            Padding(
+              padding: padding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (!isLoading && !hasCompletedAssessment)
+                    initialAssessmentFadeIn(
+                      order: 0,
+                      child: ParentLearningStreakCard(
+                        hasCompletedAssessment: hasCompletedAssessment,
+                      ),
+                    )
+                  else if (!isLoading && hasCompletedAssessment)
+                    completedAssessmentFadeIn(
+                      order: 0,
+                      child: ParentLearningStreakCard(
+                        hasCompletedAssessment: hasCompletedAssessment,
+                      ),
+                    )
+                  else
+                    ParentLearningStreakCard(
+                      hasCompletedAssessment: hasCompletedAssessment,
+                    ),
+                  const SizedBox(height: 12),
+                  if (isLoading && !hasLoadedHome)
+                    const ParentHomeLoadingCard()
+                  else if (hasCompletedAssessment)
+                    buildCompletedState()
+                  else
+                    buildFirstAssessmentState(),
+                  if (isLoading && hasLoadedHome) ...[
+                    const SizedBox(height: 8),
+                    const ParentHomeRefreshLabel(),
+                  ],
+                  if (errorMessage != null) ...[
+                    const SizedBox(height: 10),
+                    ParentHomeErrorCard(
+                      message: errorMessage!,
+                      onRetry: loadHome,
+                    ),
+                  ],
+                ],
               ),
-            const SizedBox(height: 12),
-            if (isLoading && !hasLoadedHome)
-              const ParentHomeLoadingCard()
-            else if (hasCompletedAssessment)
-              buildCompletedState()
-            else
-              buildFirstAssessmentState(),
-            if (isLoading && hasLoadedHome) ...[
-              const SizedBox(height: 8),
-              const ParentHomeRefreshLabel(),
-            ],
-            if (errorMessage != null) ...[
-              const SizedBox(height: 10),
-              ParentHomeErrorCard(message: errorMessage!, onRetry: loadHome),
-            ],
+            ),
           ],
         ),
       ),

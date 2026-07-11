@@ -9,7 +9,7 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
     final parent = homeLayout?.parent;
     final padding = EdgeInsets.fromLTRB(
       14 * widget.args.scale,
-      widget.args.headerHeight + 10 * widget.args.scale,
+      10 * widget.args.scale,
       14 * widget.args.scale,
       widget.args.bottomPadding + 18 * widget.args.scale,
     );
@@ -30,26 +30,34 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
-          padding: padding,
-          child: isLoading && !hasLoadedHome
-              ? const ParentChildDashboardLoading()
-              : ParentChildOverviewContent(
-                  summaries: childSummaries,
-                  pendingExercises:
-                      parent?.pendingExercises ??
-                      const <HomeLayoutPendingExercise>[],
-                  completions:
-                      parent?.recentCompletions ??
-                      const <HomeLayoutRecentCompletion>[],
-                  entranceBuilder: childOverviewFadeIn,
-                  onCompletionTap: openCompletionResult,
-                  onViewTasks: widget.args.onOpenClassroomTab,
-                  onViewResults: widget.args.onOpenClassroomTab,
-                  onViewMessages: widget.args.onOpenClassroomTab,
-                  isRefreshing: isLoading && hasLoadedHome,
-                  errorMessage: errorMessage,
-                  onRetry: loadHome,
-                ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (widget.args.homeHeader != null) widget.args.homeHeader!,
+              Padding(
+                padding: padding,
+                child: isLoading && !hasLoadedHome
+                    ? const ParentChildDashboardLoading()
+                    : ParentChildOverviewContent(
+                        summaries: childSummaries,
+                        pendingExercises:
+                            parent?.pendingExercises ??
+                            const <HomeLayoutPendingExercise>[],
+                        completions:
+                            parent?.recentCompletions ??
+                            const <HomeLayoutRecentCompletion>[],
+                        entranceBuilder: childOverviewFadeIn,
+                        onCompletionTap: openCompletionResult,
+                        onViewTasks: widget.args.onOpenClassroomTab,
+                        onViewResults: widget.args.onOpenClassroomTab,
+                        onViewMessages: widget.args.onOpenClassroomTab,
+                        isRefreshing: isLoading && hasLoadedHome,
+                        errorMessage: errorMessage,
+                        onRetry: loadHome,
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

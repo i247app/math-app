@@ -276,6 +276,25 @@ class _HomeScreenState extends State<HomeScreen>
                   )
                   .toList(growable: false);
               final isMenuOpen = profileState.isMenuOpen;
+              final homeHeader = showHeader
+                  ? HomeHeaderBar(
+                      height: headerHeight,
+                      topInset: topInset,
+                      horizontalPadding: s(14),
+                      name: studentName,
+                      profile: widget.activeProfile,
+                      role: widget.activeRole,
+                      canSwitchProfile: switchableProfiles.isNotEmpty,
+                      isProfileMenuOpen: isMenuOpen,
+                      parentStreakCount: _parentStreakCount,
+                      onProfileTap: switchableProfiles.isEmpty
+                          ? null
+                          : () {
+                              HapticFeedback.selectionClick();
+                              _profileController.toggleMenu();
+                            },
+                    )
+                  : null;
               return Center(
                 child: SizedBox(
                   width: width,
@@ -350,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen>
                           },
                           parentHomeEntrance: _parentHomeEntranceController,
                           bottomPadding: navHeight + s(14),
-                          headerHeight: showHeader ? headerHeight : 0,
+                          homeHeader: homeHeader,
                           scale: scale,
                         ),
                       ),
@@ -359,29 +378,6 @@ class _HomeScreenState extends State<HomeScreen>
                           child: GestureDetector(
                             behavior: HitTestBehavior.translucent,
                             onTap: _profileController.closeMenu,
-                          ),
-                        ),
-                      if (showHeader)
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          top: 0,
-                          child: HomeHeaderBar(
-                            height: headerHeight,
-                            topInset: topInset,
-                            horizontalPadding: s(14),
-                            name: studentName,
-                            profile: widget.activeProfile,
-                            role: widget.activeRole,
-                            canSwitchProfile: switchableProfiles.isNotEmpty,
-                            isProfileMenuOpen: isMenuOpen,
-                            parentStreakCount: _parentStreakCount,
-                            onProfileTap: switchableProfiles.isEmpty
-                                ? null
-                                : () {
-                                    HapticFeedback.selectionClick();
-                                    _profileController.toggleMenu();
-                                  },
                           ),
                         ),
                       if (showHeader &&

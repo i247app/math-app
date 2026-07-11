@@ -18,7 +18,7 @@ class StudentDashboard extends StatelessWidget {
       return StudentHomeContent(
         padding: EdgeInsets.fromLTRB(
           14 * args.scale,
-          args.headerHeight,
+          0,
           14 * args.scale,
           args.bottomPadding,
         ),
@@ -40,6 +40,7 @@ class StudentDashboard extends StatelessWidget {
         onProfileSaved: args.onProfileSaved,
         parentHomeEntrance: args.parentHomeEntrance,
         activeRefreshTick: args.activeRefreshTick,
+        header: args.homeHeader,
       );
     }
 

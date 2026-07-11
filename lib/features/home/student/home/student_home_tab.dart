@@ -62,6 +62,7 @@ class StudentHomeContent extends StatefulWidget {
     required this.onActivateProfile,
     required this.onProfileSaved,
     required this.parentHomeEntrance,
+    this.header,
     this.activeRefreshTick = 0,
   });
 
@@ -83,6 +84,7 @@ class StudentHomeContent extends StatefulWidget {
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
   final Animation<double> parentHomeEntrance;
+  final Widget? header;
   final int activeRefreshTick;
 
   @override
@@ -369,15 +371,24 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: widget.padding,
-      child: widget.activeRole == ProfileRole.parent
-          ? _buildStudentInitialAssessmentState()
-          : isLoadingHomeSections
-          ? const StudentHomeSectionsLoading()
-          : hasClassroom
-          ? _buildStudentClassroomOverviewState()
-          : hasCompletedAssessment
-          ? _buildStudentCompletedAssessmentState()
-          : _buildStudentInitialAssessmentState(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (widget.header != null) widget.header!,
+          Padding(
+            padding: widget.padding,
+            child: widget.activeRole == ProfileRole.parent
+                ? _buildStudentInitialAssessmentState()
+                : isLoadingHomeSections
+                ? const StudentHomeSectionsLoading()
+                : hasClassroom
+                ? _buildStudentClassroomOverviewState()
+                : hasCompletedAssessment
+                ? _buildStudentCompletedAssessmentState()
+                : _buildStudentInitialAssessmentState(),
+          ),
+        ],
+      ),
     );
   }
 

@@ -29,7 +29,7 @@ class HomeRoleDashboard extends StatefulWidget {
     required this.parentHomeEntrance,
     required this.profileResetSignal,
     required this.bottomPadding,
-    required this.headerHeight,
+    this.homeHeader,
     required this.scale,
   });
 
@@ -59,7 +59,7 @@ class HomeRoleDashboard extends StatefulWidget {
   final Animation<double> parentHomeEntrance;
   final int profileResetSignal;
   final double bottomPadding;
-  final double headerHeight;
+  final Widget? homeHeader;
   final double scale;
 
   @override
@@ -163,7 +163,7 @@ class HomeRoleDashboardState extends State<HomeRoleDashboard> {
       parentHomeEntrance: widget.parentHomeEntrance,
       activeRefreshTick: _activationTicks[tab] ?? 0,
       bottomPadding: widget.bottomPadding,
-      headerHeight: tab == 0 ? widget.headerHeight : 0,
+      homeHeader: tab == 0 ? widget.homeHeader : null,
       scale: widget.scale,
     );
 
