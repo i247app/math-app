@@ -40,7 +40,7 @@ class WelcomeLoginButton extends StatelessWidget {
             style: GoogleFonts.nunito(
               color: loginColor,
               fontSize: 18 * scale,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w800,
               height: 1.2,
               decorationColor: loginColor,
               decorationThickness: 1.6,
