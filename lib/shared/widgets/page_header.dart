@@ -8,8 +8,8 @@ import 'package:numi/core/theme/font_size.dart';
 class PageHeader extends StatelessWidget {
   const PageHeader({
     super.key,
-    required this.title,
     required this.scale,
+    this.title,
     this.topInset,
     this.backgroundColor,
     this.leading,
@@ -20,7 +20,7 @@ class PageHeader extends StatelessWidget {
     this.titleFontSize = FontSize.xxxl,
   });
 
-  final String title;
+  final String? title;
   final double scale;
   final double? topInset;
   final Color? backgroundColor;
@@ -50,18 +50,20 @@ class PageHeader extends StatelessWidget {
         children: [
           SizedBox(width: scaledActionWidth, child: leading),
           Expanded(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.andika(
-                color: colors.brandStrong,
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0,
-              ),
-            ),
+            child: title == null
+                ? const SizedBox.shrink()
+                : Text(
+                    title!,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.andika(
+                      color: colors.brandStrong,
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                    ),
+                  ),
           ),
           SizedBox(width: scaledActionWidth, child: trailing),
         ],
