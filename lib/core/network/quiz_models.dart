@@ -135,7 +135,6 @@ class QuizListResponse {
 
   final int mstatus;
   final QuizPagination? pagination;
-  @JsonKey(defaultValue: <GeneratedQuiz>[])
   final List<GeneratedQuiz> quizzes;
   final String? status;
   final String? mmessage;
@@ -238,7 +237,6 @@ class GeneratedQuiz {
   final String? createDt;
   final String? modifyDt;
   final QuizGrading? grading;
-  @JsonKey(defaultValue: <SubmitQuizAnswer>[])
   final List<SubmitQuizAnswer> answers;
   @JsonKey(defaultValue: <QuizQuestion>[])
   final List<QuizQuestion> questions;
