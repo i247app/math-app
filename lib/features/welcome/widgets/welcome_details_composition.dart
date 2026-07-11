@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
@@ -147,22 +149,22 @@ class _FeatureGrid extends StatelessWidget {
             SizedBox(
               width: cardWidth,
               height: cardHeight,
-              child: const _FeatureCard(
+              child: _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._teacherAsset,
                 imageSize: 54,
-                title: 'Đánh Giá',
-                subtitle: 'Đánh giá năng lực',
+                title: context.getText(AppKeys.welcomeAssessmentTitle),
+                subtitle: context.getText(AppKeys.welcomeAssessmentSubtitle),
               ),
             ),
             SizedBox(width: gap),
             SizedBox(
               width: cardWidth,
               height: cardHeight,
-              child: const _FeatureCard(
+              child: _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._assessmentAsset,
                 imageSize: 54,
-                title: 'Học Toán',
-                subtitle: 'Đến lớp 5',
+                title: context.getText(AppKeys.welcomeLearnMathTitle),
+                subtitle: context.getText(AppKeys.welcomeLearnMathSubtitle),
               ),
             ),
           ],
@@ -173,22 +175,22 @@ class _FeatureGrid extends StatelessWidget {
             SizedBox(
               width: cardWidth,
               height: cardHeight,
-              child: const _FeatureCard(
+              child: _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._progressAsset,
                 imageSize: 54,
-                title: 'Phụ Huynh/GV',
-                subtitle: 'Theo dõi tiến độ',
+                title: context.getText(AppKeys.welcomeParentTeacherTitle),
+                subtitle: context.getText(AppKeys.welcomeParentTeacherSubtitle),
               ),
             ),
             SizedBox(width: gap),
             SizedBox(
               width: cardWidth,
               height: cardHeight,
-              child: const _FeatureCard(
+              child: _FeatureCard(
                 imageAsset: WelcomeDetailsComposition._gameAsset,
                 imageSize: 54,
-                title: 'Game Toán',
-                subtitle: 'Chơi và học',
+                title: context.getText(AppKeys.welcomeGamesTitle),
+                subtitle: context.getText(AppKeys.welcomeGamesSubtitle),
               ),
             ),
           ],

@@ -2,6 +2,7 @@ import '../app_keys.dart';
 
 const authStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.signingUp: 'Đang đăng ký...',
     AppKeys.phoneLoginTitle: 'Số điện thoại',
     AppKeys.phoneLoginBrandName: 'NUMINUMI',
     AppKeys.phoneLoginSubtitle:
@@ -70,6 +71,7 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupFailed: 'Không thể đăng ký. Vui lòng thử lại.',
   },
   'en': {
+    AppKeys.signingUp: 'Signing up...',
     AppKeys.phoneLoginTitle: 'Phone number',
     AppKeys.phoneLoginBrandName: 'NUMINUMI',
     AppKeys.phoneLoginSubtitle:

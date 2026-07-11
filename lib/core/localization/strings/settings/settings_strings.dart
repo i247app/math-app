@@ -2,6 +2,8 @@ import '../../app_keys.dart';
 
 const settingsStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.avatarUpper: 'ẢNH ĐẠI DIỆN',
+    AppKeys.chooseAvatar: 'Chọn ảnh đại diện',
     AppKeys.settingsTitle: 'Cài Đặt',
     AppKeys.accountTitle: 'Tài Khoản',
     AppKeys.accountMenuTitle: 'Tài Khoản',
@@ -50,6 +52,8 @@ const settingsStrings = <String, Map<String, String>>{
     AppKeys.switchingLanguage: 'Đang đổi ngôn ngữ...',
   },
   'en': {
+    AppKeys.avatarUpper: 'AVATAR',
+    AppKeys.chooseAvatar: 'Choose avatar',
     AppKeys.settingsTitle: 'Settings',
     AppKeys.accountTitle: 'Account',
     AppKeys.accountMenuTitle: 'Account',

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -174,7 +175,7 @@ class _WelcomeTagline extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Toán ',
+              context.getText(AppKeys.welcomeTaglineMath),
               style: TextStyle(
                 fontSize: FontSize.xxl,
                 fontWeight: FontWeight.w500,
@@ -192,7 +193,7 @@ class _WelcomeTagline extends StatelessWidget {
           ],
         ),
         Text(
-          'Học & Đánh giá',
+          context.getText(AppKeys.welcomeTaglineStudyAssessment),
           style: TextStyle(
             fontSize: FontSize.xxl,
             fontWeight: FontWeight.w500,

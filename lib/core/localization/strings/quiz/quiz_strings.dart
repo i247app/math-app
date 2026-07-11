@@ -2,6 +2,9 @@ import '../../app_keys.dart';
 
 const quizStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.generateTestFailed: 'Tạo test thất bại. Vui lòng thử lại sau.',
+    AppKeys.noGrades: 'Chưa có lớp học nào để hiển thị.',
+    AppKeys.completedResultTitle: 'Hoàn Thành',
     AppKeys.incomplete: 'Chưa xong',
     AppKeys.mathAssessment: 'Bài kiểm tra Toán',
     AppKeys.mathPractice: 'Bài luyện tập Toán',
@@ -56,6 +59,9 @@ const quizStrings = <String, Map<String, String>>{
     AppKeys.quizHasNoQuestions: 'Quiz không có câu hỏi.',
   },
   'en': {
+    AppKeys.generateTestFailed: 'Failed to create test. Please try later.',
+    AppKeys.noGrades: 'No grades to show.',
+    AppKeys.completedResultTitle: 'Completed',
     AppKeys.incomplete: 'Incomplete',
     AppKeys.mathAssessment: 'Math assessment',
     AppKeys.mathPractice: 'Math practice',

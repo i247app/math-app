@@ -2,6 +2,8 @@ import '../../app_keys.dart';
 
 const teacherHomeworkStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.teacherAssignmentDefaultChapter: 'Phép cộng',
+    AppKeys.teacherAssignmentDefaultLesson: 'Các số trong phạm vi 20',
     AppKeys.teacherAssignments: 'Bài Tập',
     AppKeys.teacherAssessments: 'Đánh Giá',
     AppKeys.teacherCreatedAssignments: 'Bài tập đã tạo',
@@ -71,6 +73,8 @@ const teacherHomeworkStrings = <String, Map<String, String>>{
     AppKeys.teacherAssessmentCreated: 'Đã tạo đánh giá.',
   },
   'en': {
+    AppKeys.teacherAssignmentDefaultChapter: 'Addition',
+    AppKeys.teacherAssignmentDefaultLesson: 'Numbers within 20',
     AppKeys.teacherAssignments: 'Assignments',
     AppKeys.teacherAssessments: 'Assessment',
     AppKeys.teacherCreatedAssignments: 'Created assignments',

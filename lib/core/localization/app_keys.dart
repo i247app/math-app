@@ -733,4 +733,24 @@ class AppKeys {
   static const apiBadCertificate = 'api_bad_certificate';
   static const apiRequestCanceled = 'api_request_canceled';
   static const apiConnectionFailed = 'api_connection_failed';
+  static const welcomeTaglineMath = 'welcome_tagline_math';
+  static const welcomeTaglineStudyAssessment =
+      'welcome_tagline_study_assessment';
+  static const welcomeAssessmentTitle = 'welcome_assessment_title';
+  static const welcomeAssessmentSubtitle = 'welcome_assessment_subtitle';
+  static const welcomeLearnMathTitle = 'welcome_learn_math_title';
+  static const welcomeLearnMathSubtitle = 'welcome_learn_math_subtitle';
+  static const welcomeParentTeacherTitle = 'welcome_parent_teacher_title';
+  static const welcomeParentTeacherSubtitle = 'welcome_parent_teacher_subtitle';
+  static const welcomeGamesTitle = 'welcome_games_title';
+  static const welcomeGamesSubtitle = 'welcome_games_subtitle';
+  static const studentHomeworkReviewLabel = 'student_homework_review_label';
+  static const studentHomeworkPurposeQuiz = 'student_homework_purpose_quiz';
+  static const studentHomeworkPurposeHomework =
+      'student_homework_purpose_homework';
+  static const teacherAssignmentDefaultChapter =
+      'teacher_assignment_default_chapter';
+  static const teacherAssignmentDefaultLesson =
+      'teacher_assignment_default_lesson';
+  static const practiceChapterTwoTitle = 'practice_chapter_two_title';
 }

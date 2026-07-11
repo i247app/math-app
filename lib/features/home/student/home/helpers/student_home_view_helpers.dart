@@ -1,5 +1,6 @@
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:flutter/material.dart';
 
@@ -13,9 +14,7 @@ String studentModeHomeworkTitle(ClassroomExercise exercise) {
   if (title != null && title.isNotEmpty) {
     return title;
   }
-  return exercise.purpose == classroomExercisePurposeQuiz
-      ? 'Bài Tập Ôn Luyện'
-      : 'Bài Tập Ôn Luyện';
+  return AppStrings.current(AppKeys.studentHomeworkReviewLabel);
 }
 
 String studentModeHomeworkCreatedDate(ClassroomExercise exercise) {
@@ -48,7 +47,7 @@ String studentModePurposeLabel(String purpose) {
   final normalized = purpose.trim().toUpperCase();
   if (normalized == classroomExercisePurposeQuiz ||
       normalized == classroomExercisePurposeExam) {
-    return 'Kiểm Tra';
+    return AppStrings.current(AppKeys.studentHomeworkPurposeQuiz);
   }
-  return 'Bài Tập';
+  return AppStrings.current(AppKeys.studentHomeworkPurposeHomework);
 }

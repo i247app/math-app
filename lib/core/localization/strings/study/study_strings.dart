@@ -2,6 +2,10 @@ import '../../app_keys.dart';
 
 const studyStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.noChapterTitle: 'Chưa có chương',
+    AppKeys.noChapterMessage: 'Chưa có lộ trình ôn tập cho hồ sơ này.',
+    AppKeys.startTest: 'Bắt đầu kiểm tra ({count})',
+    AppKeys.practiceChapterTwoTitle: 'PHÉP CỘNG, PHÉP TRỪ TRONG PHẠM VI 10',
     AppKeys.reviewTitle: 'Lộ trình học tập',
     AppKeys.exercises: 'Bài tập',
     AppKeys.days: 'Ngày',
@@ -55,6 +59,11 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.missingQuizIdShort: 'Thiếu quiz ID.',
   },
   'en': {
+    AppKeys.noChapterTitle: 'No chapters',
+    AppKeys.noChapterMessage:
+        'No review journey is available for this profile.',
+    AppKeys.startTest: 'Start test ({count})',
+    AppKeys.practiceChapterTwoTitle: 'ADDITION AND SUBTRACTION WITHIN 10',
     AppKeys.reviewTitle: 'Learning journey',
     AppKeys.exercises: 'Exercises',
     AppKeys.days: 'Days',

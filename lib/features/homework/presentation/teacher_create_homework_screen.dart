@@ -99,10 +99,13 @@ class _TeacherCreateHomeworkScreenState
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         numQuestions: 4,
-        chapterName: _trimOrDefault(_chapterController.text, 'Phép cộng'),
+        chapterName: _trimOrDefault(
+          _chapterController.text,
+          context.readText(AppKeys.teacherAssignmentDefaultChapter),
+        ),
         lessonName: _trimOrDefault(
           _lessonController.text,
-          'Các số trong phạm vi 20',
+          context.readText(AppKeys.teacherAssignmentDefaultLesson),
         ),
         visibility: _visibility,
         startDate: _exerciseApiDate(_startDate!),

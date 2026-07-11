@@ -68,7 +68,7 @@ PracticeChapter _parentPreviewChapter(BuildContext context) {
 
   return PracticeChapter(
     number: source.number,
-    title: source.title,
+    title: context.getText(AppKeys.practiceChapterTwoTitle),
     completedLessons: 2,
     icon: source.icon,
     lessons: List.generate(

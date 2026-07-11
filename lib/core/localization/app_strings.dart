@@ -2,6 +2,7 @@ import 'app_language.dart';
 import 'strings/auth_strings.dart';
 import 'strings/common_strings.dart';
 import 'strings/network_strings.dart';
+import 'strings/welcome/welcome_strings.dart';
 import 'strings/games_strings.dart';
 import 'strings/home/home_common_strings.dart';
 import 'strings/home/parent_home_strings.dart';
@@ -22,6 +23,7 @@ class AppStrings {
       ...authStrings['vi']!,
       ...commonStrings['vi']!,
       ...networkStrings['vi']!,
+      ...welcomeStrings['vi']!,
       ...gamesStrings['vi']!,
       ...homeCommonStrings['vi']!,
       ...parentHomeStrings['vi']!,
@@ -40,6 +42,7 @@ class AppStrings {
       ...authStrings['en']!,
       ...commonStrings['en']!,
       ...networkStrings['en']!,
+      ...welcomeStrings['en']!,
       ...gamesStrings['en']!,
       ...homeCommonStrings['en']!,
       ...parentHomeStrings['en']!,

@@ -2,6 +2,12 @@ import '../../app_keys.dart';
 
 const studentHomeStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.studentNoInvitationsTitle: 'Chưa có lời mời',
+    AppKeys.studentNoInvitationsMessage:
+        'Lời mời lớp học mới sẽ xuất hiện tại đây.',
+    AppKeys.studentHomeworkReviewLabel: 'Bài Tập Ôn Luyện',
+    AppKeys.studentHomeworkPurposeQuiz: 'Kiểm Tra',
+    AppKeys.studentHomeworkPurposeHomework: 'Bài Tập',
     AppKeys.student: 'HỌC SINH',
     AppKeys.yourAchievement: 'Thành tích của bạn',
     AppKeys.studentNoHomeworkTitle: 'Chưa có bài tập',
@@ -11,6 +17,12 @@ const studentHomeStrings = <String, Map<String, String>>{
         'Tham gia lớp để nhận bài tập và theo dõi tiến độ.',
   },
   'en': {
+    AppKeys.studentNoInvitationsTitle: 'No invitations yet',
+    AppKeys.studentNoInvitationsMessage:
+        'New class invitations will appear here.',
+    AppKeys.studentHomeworkReviewLabel: 'Practice Homework',
+    AppKeys.studentHomeworkPurposeQuiz: 'Assessment',
+    AppKeys.studentHomeworkPurposeHomework: 'Homework',
     AppKeys.student: 'STUDENT',
     AppKeys.yourAchievement: 'Your achievements',
     AppKeys.studentNoHomeworkTitle: 'No homework yet',

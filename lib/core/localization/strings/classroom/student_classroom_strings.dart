@@ -2,6 +2,15 @@ import '../../app_keys.dart';
 
 const studentClassroomStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.studentMissingProfileId: 'Hồ sơ học sinh thiếu profile_id.',
+    AppKeys.studentRetry: 'Thử lại',
+    AppKeys.studentNoClassSearchResults: 'Không tìm thấy lớp học',
+    AppKeys.studentNoClassSearchResultsMessage:
+        'Kiểm tra lại mã lớp hoặc tên lớp rồi thử lại.',
+    AppKeys.studentEnterClassCodeTitle: 'Nhập mã hoặc tên lớp',
+    AppKeys.studentEnterClassCodeMessage:
+        'Kết quả lớp học phù hợp sẽ hiển thị tại đây.',
+    AppKeys.studentAlreadyJoinedClass: 'Bạn đã tham gia lớp học này.',
     AppKeys.studentClassroom: 'Lớp học',
     AppKeys.studentJoinNewClassroom: 'Tham gia lớp mới',
     AppKeys.studentJoinAnotherClassroom: 'Tham gia lớp khác',
@@ -60,6 +69,15 @@ const studentClassroomStrings = <String, Map<String, String>>{
     AppKeys.studentClassComingSoon: 'Tính năng sẽ sớm có mặt.',
   },
   'en': {
+    AppKeys.studentMissingProfileId: 'Student profile is missing profile_id.',
+    AppKeys.studentRetry: 'Try again',
+    AppKeys.studentNoClassSearchResults: 'No classrooms found',
+    AppKeys.studentNoClassSearchResultsMessage:
+        'Check the class code or class name and try again.',
+    AppKeys.studentEnterClassCodeTitle: 'Enter a code or class name',
+    AppKeys.studentEnterClassCodeMessage:
+        'Matching classroom results will appear here.',
+    AppKeys.studentAlreadyJoinedClass: 'You have already joined this class.',
     AppKeys.studentClassroom: 'Classroom',
     AppKeys.studentJoinNewClassroom: 'Join new classroom',
     AppKeys.studentJoinAnotherClassroom: 'Join another classroom',
