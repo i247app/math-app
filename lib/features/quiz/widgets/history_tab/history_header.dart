@@ -8,23 +8,10 @@ class _HistoryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    return Container(
-      height: topInset + 60 * scale,
-      padding: EdgeInsets.only(top: topInset),
-      decoration: BoxDecoration(color: colors.elevatedSurface),
-      alignment: Alignment.center,
-      child: Text(
-        context.getText(AppKeys.historyTitle),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.andika(
-          color: colors.brandStrong,
-          fontSize: FontSize.xxxl,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0,
-        ),
-      ),
+    return PageHeader(
+      title: context.getText(AppKeys.historyTitle),
+      scale: scale,
+      topInset: topInset,
     );
   }
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/shared/widgets/page_header.dart';
 
 class SettingHeader extends StatelessWidget {
   const SettingHeader({
@@ -24,45 +22,22 @@ class SettingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.themeColors;
-
-    return Container(
-      height: topInset + 60 * scale,
-      decoration: BoxDecoration(color: backgroundColor),
-      padding: EdgeInsets.fromLTRB(
-        18 * scale,
-        topInset + 6 * scale,
-        18 * scale,
-        6 * scale,
-      ),
-      child: Row(
-        children: [
-          if (canGoBack)
-            _SettingHeaderButton(
+    return PageHeader(
+      title: title,
+      scale: scale,
+      topInset: topInset,
+      backgroundColor: backgroundColor,
+      actionWidth: 40,
+      horizontalPadding: 18,
+      verticalPadding: 6,
+      leading: canGoBack
+          ? _SettingHeaderButton(
               icon: Icons.arrow_back_rounded,
               outlined: false,
               onTap: onBack,
               scale: scale,
             )
-          else
-            SizedBox(width: 40 * scale),
-          Expanded(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.andika(
-                color: colors.brandStrong,
-                fontSize: FontSize.xxxl,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
-          SizedBox(width: 40 * scale),
-        ],
-      ),
+          : null,
     );
   }
 }

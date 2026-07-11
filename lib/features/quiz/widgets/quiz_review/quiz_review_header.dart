@@ -8,44 +8,24 @@ class _QuizReviewHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(color: colors.elevatedSurface),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                onBack();
-              },
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                color: colors.brandStrong,
-                size: 28,
-              ),
-              tooltip: context.getText(AppKeys.back),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 52),
-            child: Text(
-              context.getText(AppKeys.quizDetailTitle),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.andika(
-                color: colors.brandStrong,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
-        ],
+    return PageHeader(
+      title: context.getText(AppKeys.quizDetailTitle),
+      scale: 1,
+      topInset: 0,
+      actionWidth: 52,
+      horizontalPadding: 12,
+      titleFontSize: 24,
+      leading: IconButton(
+        onPressed: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          onBack();
+        },
+        icon: Icon(
+          Icons.arrow_back_rounded,
+          color: colors.brandStrong,
+          size: 28,
+        ),
+        tooltip: context.getText(AppKeys.back),
       ),
     );
   }

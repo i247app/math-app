@@ -21,7 +21,7 @@ import 'package:numi/features/quiz/widgets/history_tab/history_metadata_int.dart
 import 'package:numi/features/quiz/widgets/history_tab/history_quiz_purpose.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/shared/widgets/page_header.dart';
 
 part 'widgets/history_tab/history_header.dart';
 part 'widgets/history_tab/history_search_field.dart';

@@ -34,6 +34,7 @@ import 'package:numi/features/auth/otp_auth_api.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/school_api.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/shared/widgets/page_header.dart';
 
 part '../cache/teacher_classroom_lookup_cache.dart';
 part 'teacher_classroom_tab.dart';
