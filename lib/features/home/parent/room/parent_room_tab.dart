@@ -222,38 +222,42 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     final colors = context.themeColors;
     return ColoredBox(
       color: isEmptyRoomState ? colors.surface : colors.pageBackground,
-      child: Column(
-        children: [
-          HomeTabHeader(
-            title: context.getText(AppKeys.parentRoomTitle),
-            topInset: topInset,
-            scale: scale,
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              color: const Color(0xFF339395),
-              onRefresh: () => _loadLayout(forceRefresh: true),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final contentPadding = isEmptyRoomState
-                      ? EdgeInsets.only(bottom: widget.args.bottomPadding)
-                      : EdgeInsets.fromLTRB(
-                          14 * scale,
-                          24 * scale,
-                          14 * scale,
-                          widget.args.bottomPadding + 24 * scale,
-                        );
-                  final minHeight = isEmptyRoomState
-                      ? math.max(
-                          0.0,
-                          constraints.maxHeight - widget.args.bottomPadding,
-                        )
-                      : 0.0;
+      child: RefreshIndicator(
+        color: const Color(0xFF339395),
+        onRefresh: () => _loadLayout(forceRefresh: true),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final contentPadding = isEmptyRoomState
+                ? EdgeInsets.only(bottom: widget.args.bottomPadding)
+                : EdgeInsets.fromLTRB(
+                    14 * scale,
+                    24 * scale,
+                    14 * scale,
+                    widget.args.bottomPadding + 24 * scale,
+                  );
+            final minHeight = isEmptyRoomState
+                ? math.max(
+                    0.0,
+                    constraints.maxHeight -
+                        topInset -
+                        60 * scale -
+                        widget.args.bottomPadding,
+                  )
+                : 0.0;
 
-                  return SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  HomeTabHeader(
+                    title: context.getText(AppKeys.parentRoomTitle),
+                    topInset: topInset,
+                    scale: scale,
+                  ),
+                  Padding(
                     padding: contentPadding,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(minHeight: minHeight),
@@ -268,12 +272,12 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }

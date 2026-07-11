@@ -397,22 +397,23 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     final visibleExercises = _exercises.take(10).toList(growable: false);
     return ColoredBox(
       color: context.themeColors.pageBackground,
-      child: Column(
-        children: [
-          HomeTabHeader(
-            title: context.getText(AppKeys.teacherStudyTitle),
-            scale: scale,
+      child: RefreshIndicator(
+        color: AppColors.teal520,
+        onRefresh: _refreshClassrooms,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
-          Expanded(
-            child: RefreshIndicator(
-              color: AppColors.teal520,
-              onRefresh: _refreshClassrooms,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: EdgeInsets.zero,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              HomeTabHeader(
+                title: context.getText(AppKeys.teacherStudyTitle),
+                scale: scale,
+              ),
+              Padding(
                 padding: EdgeInsets.fromLTRB(
                   19 * scale,
                   18 * scale,
@@ -507,9 +508,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                   ],
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -23,12 +23,7 @@ class HomeTabHeader extends StatelessWidget {
     return Container(
       height: resolvedTopInset + 60 * scale,
       padding: EdgeInsets.only(top: resolvedTopInset),
-      decoration: BoxDecoration(
-        color: colors.elevatedSurface,
-        border: Border(
-          bottom: BorderSide(color: colors.border, width: 4 * scale),
-        ),
-      ),
+      decoration: BoxDecoration(color: colors.elevatedSurface),
       alignment: Alignment.center,
       child: Text(
         title,

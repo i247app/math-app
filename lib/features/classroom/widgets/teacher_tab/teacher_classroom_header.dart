@@ -10,12 +10,7 @@ class _TeacherClassroomHeader extends StatelessWidget {
     final colors = context.themeColors;
     return Container(
       height: MediaQuery.paddingOf(context).top + 60 * scale,
-      decoration: BoxDecoration(
-        color: colors.elevatedSurface,
-        border: Border(
-          bottom: BorderSide(color: colors.border, width: 4 * scale),
-        ),
-      ),
+      decoration: BoxDecoration(color: colors.elevatedSurface),
       padding: EdgeInsets.fromLTRB(
         18 * scale,
         MediaQuery.paddingOf(context).top + 6 * scale,

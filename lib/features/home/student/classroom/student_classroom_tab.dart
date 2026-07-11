@@ -168,11 +168,6 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
       color: context.themeColors.pageBackground,
       child: Column(
         children: [
-          HomeTabHeader(
-            title: context.getText(AppKeys.studentClassroom),
-            scale: scale,
-            topInset: topInset,
-          ),
           Expanded(
             child: Stack(
               fit: StackFit.expand,
@@ -188,56 +183,71 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
                         physics: const AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics(),
                         ),
-                        padding: EdgeInsets.fromLTRB(
-                          20 * scale,
-                          20 * scale,
-                          20 * scale,
-                          widget.bottomPadding,
-                        ),
+                        padding: EdgeInsets.zero,
                         children: [
-                          if (_error != null && _classrooms.isEmpty)
-                            StudentInlineErrorPanel(
-                              message: _error!,
-                              onRetry: _refreshClassrooms,
-                            )
-                          else if (_classrooms.isEmpty)
-                            const StudentStateCard(
-                              titleKey: AppKeys.studentNoClassroomsTitle,
-                              messageKey: AppKeys.studentNoClassroomsMessage,
-                            )
-                          else
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                final cardWidth =
-                                    (constraints.maxWidth - 10 * scale) / 2;
-                                return Wrap(
-                                  spacing: 10 * scale,
-                                  runSpacing: 12 * scale,
-                                  children: [
-                                    for (final classroom in _classrooms)
-                                      SizedBox(
-                                        width: cardWidth,
-                                        child: StudentClassroomTabCard(
-                                          classroom: classroom,
-                                          onTap: () =>
-                                              _openClassDetail(classroom),
-                                        ),
-                                      ),
-                                  ],
-                                );
-                              },
+                          HomeTabHeader(
+                            title: context.getText(AppKeys.studentClassroom),
+                            scale: scale,
+                            topInset: topInset,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              20 * scale,
+                              20 * scale,
+                              20 * scale,
+                              widget.bottomPadding,
                             ),
-                          SizedBox(height: 30 * scale),
-                          const StudentJoinAnotherClassroomTitle(),
-                          SizedBox(height: 14 * scale),
-                          if (canLoadContent)
-                            StudentClassSearchContent(
-                              profileId: profileId,
-                              userId: widget.user?.id,
-                              activeRefreshTick: widget.activeRefreshTick,
-                              classroomService: _classroomService,
-                              onJoinRequested: _refreshClassrooms,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (_error != null && _classrooms.isEmpty)
+                                  StudentInlineErrorPanel(
+                                    message: _error!,
+                                    onRetry: _refreshClassrooms,
+                                  )
+                                else if (_classrooms.isEmpty)
+                                  const StudentStateCard(
+                                    titleKey: AppKeys.studentNoClassroomsTitle,
+                                    messageKey:
+                                        AppKeys.studentNoClassroomsMessage,
+                                  )
+                                else
+                                  LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final cardWidth =
+                                          (constraints.maxWidth - 10 * scale) /
+                                          2;
+                                      return Wrap(
+                                        spacing: 10 * scale,
+                                        runSpacing: 12 * scale,
+                                        children: [
+                                          for (final classroom in _classrooms)
+                                            SizedBox(
+                                              width: cardWidth,
+                                              child: StudentClassroomTabCard(
+                                                classroom: classroom,
+                                                onTap: () =>
+                                                    _openClassDetail(classroom),
+                                              ),
+                                            ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                SizedBox(height: 30 * scale),
+                                const StudentJoinAnotherClassroomTitle(),
+                                SizedBox(height: 14 * scale),
+                                if (canLoadContent)
+                                  StudentClassSearchContent(
+                                    profileId: profileId,
+                                    userId: widget.user?.id,
+                                    activeRefreshTick: widget.activeRefreshTick,
+                                    classroomService: _classroomService,
+                                    onJoinRequested: _refreshClassrooms,
+                                  ),
+                              ],
                             ),
+                          ),
                         ],
                       ),
                     ),

@@ -224,14 +224,15 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
     final isInitialLoading =
         _isLoading && _classrooms.isEmpty && !_hasLoadedClassrooms;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _TeacherClassroomHeader(scale: scale),
-        Expanded(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _TeacherClassroomHeader(scale: scale),
+          Padding(
             padding: EdgeInsets.fromLTRB(
               22 * scale,
               28 * scale,
@@ -263,8 +264,8 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

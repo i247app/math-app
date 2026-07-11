@@ -12,12 +12,7 @@ class _HistoryHeader extends StatelessWidget {
     return Container(
       height: topInset + 60 * scale,
       padding: EdgeInsets.only(top: topInset),
-      decoration: BoxDecoration(
-        color: colors.elevatedSurface,
-        border: Border(
-          bottom: BorderSide(color: colors.border, width: 4 * scale),
-        ),
-      ),
+      decoration: BoxDecoration(color: colors.elevatedSurface),
       alignment: Alignment.center,
       child: Text(
         context.getText(AppKeys.historyTitle),

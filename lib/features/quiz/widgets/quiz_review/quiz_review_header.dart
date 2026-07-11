@@ -11,10 +11,7 @@ class _QuizReviewHeader extends StatelessWidget {
     return Container(
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: colors.elevatedSurface,
-        border: Border(bottom: BorderSide(color: colors.border, width: 4)),
-      ),
+      decoration: BoxDecoration(color: colors.elevatedSurface),
       child: Stack(
         alignment: Alignment.center,
         children: [

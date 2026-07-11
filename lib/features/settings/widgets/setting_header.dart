@@ -28,12 +28,7 @@ class SettingHeader extends StatelessWidget {
 
     return Container(
       height: topInset + 60 * scale,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        border: Border(
-          bottom: BorderSide(color: colors.border, width: 4 * scale),
-        ),
-      ),
+      decoration: BoxDecoration(color: backgroundColor),
       padding: EdgeInsets.fromLTRB(
         18 * scale,
         topInset + 6 * scale,
