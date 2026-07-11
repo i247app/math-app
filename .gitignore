@@ -169,7 +169,8 @@ app.*.symbols
 app.*.map.json
 
 .env
-*.env
+.env*
+!.env.*.example
 
 # AI files
 .cursor/
