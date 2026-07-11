@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/shared/widgets/auth_back_button.dart';
+import 'package:numi/features/auth/widgets/auth_app_bar.dart';
 
 class AuthLayout extends StatelessWidget {
   const AuthLayout({
@@ -112,11 +112,14 @@ class AuthLayout extends StatelessWidget {
                       child: Stack(
                         children: [
                           Positioned(
-                            left: backLeft,
-                            top: backTop,
-                            child: AuthBackButton(
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            child: AuthAppBar(
+                              onBack: onBack,
+                              left: backLeft,
+                              top: backTop,
                               iconAsset: backIconAsset,
-                              onPressed: onBack,
                             ),
                           ),
                           Padding(
