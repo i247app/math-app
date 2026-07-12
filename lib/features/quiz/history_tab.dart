@@ -49,7 +49,6 @@ part 'widgets/history_tab/history_quiz_title.dart';
 part 'widgets/history_tab/history_quiz_short_text.dart';
 part 'widgets/history_tab/history_homework_title.dart';
 part 'widgets/history_tab/history_homework_short_text.dart';
-part 'widgets/history_tab/history_homework_score_text.dart';
 part 'widgets/history_tab/history_homework_score_percentage.dart';
 part 'widgets/history_tab/history_score_colors.dart';
 part 'widgets/history_tab/history_date_parts_from_iso.dart';
