@@ -1,35 +1,25 @@
-class PhoneCheckResult {
-  const PhoneCheckResult({
-    required this.phone,
-    required this.exists,
-    this.userId,
-  });
+enum AuthOtpKind {
+  login(apiType: 'LOGIN_2FA', previewPurpose: 'login'),
+  signup(apiType: 'REGISTER', previewPurpose: 'register');
 
-  final String phone;
-  final bool exists;
-  final int? userId;
+  const AuthOtpKind({required this.apiType, required this.previewPurpose});
+
+  final String apiType;
+  final String previewPurpose;
 }
 
 class SendOtpResult {
   const SendOtpResult({
     required this.expiresIn,
-    this.requiredOtp = true,
-    this.user,
-    this.otpId,
     this.otpCode,
     this.purpose,
     this.expiresAt,
-    this.message,
   });
 
-  final bool requiredOtp;
-  final LoginUser? user;
-  final String? otpId;
   final String? otpCode;
   final String? purpose;
   final int expiresIn;
   final String? expiresAt;
-  final String? message;
 }
 
 class LoginUser {
@@ -59,10 +49,6 @@ class AuthPhoneLookupResult {
     required this.phone,
     required this.exists,
     this.user,
-    this.otpCode,
-    this.purpose,
-    this.expiresAt,
-    this.expiresIn,
     this.message,
     this.status,
     this.requiredOtp = true,
@@ -72,10 +58,6 @@ class AuthPhoneLookupResult {
   final String phone;
   final bool exists;
   final LoginUser? user;
-  final String? otpCode;
-  final String? purpose;
-  final String? expiresAt;
-  final int? expiresIn;
   final String? message;
   final int? status;
   final bool requiredOtp;

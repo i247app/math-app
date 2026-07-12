@@ -112,7 +112,7 @@ class _NumiHomeState extends State<NumiHome> {
     }
 
     _lastLookupPhone = normalized.phone;
-    cubit.checkAuthPhone(normalized.phone!);
+    cubit.lookupLoginPhone(normalized.phone!);
   }
 
   void sendOtp(AuthFlowCubit cubit, PhoneRegion region) {

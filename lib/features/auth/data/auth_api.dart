@@ -7,9 +7,6 @@ import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
 
-const loginOtpType = 'LOGIN_2FA';
-const registerOtpType = 'REGISTER';
-
 extension on AuthUser {
   LoginUser toLoginUser({String? fallbackPhone}) {
     return LoginUser(
@@ -26,15 +23,9 @@ extension on AuthUser {
 }
 
 abstract class AuthService {
-  Future<PhoneCheckResult> checkPhone(String phone);
-
-  Future<AuthPhoneLookupResult> checkAuthPhone(String phone);
-
-  Future<AuthPhoneLookupResult> loginByPhone(String phone);
+  Future<AuthPhoneLookupResult> lookupLoginPhone(String phone);
 
   Future<LoginUser?> restoreSession();
-
-  Future<LoginUser> loginWithPhone(String phone);
 
   Future<LoginUser> signupWithPhone({
     required String phone,
@@ -52,17 +43,18 @@ abstract class AuthService {
     String? avatarPath,
   });
 
-  Future<SendOtpResult> sendLoginOtp(String phone);
-
-  Future<SendOtpResult> sendRegisterOtp(String phone);
-
-  Future<VerifyOtpResult> verifyLoginOtp({
+  Future<SendOtpResult> sendOtp({
     required String phone,
-    required String otpCode,
-    String otpType = loginOtpType,
+    required AuthOtpKind kind,
   });
 
-  Future<void> clearOtpSession(String phone);
+  Future<VerifyOtpResult> verifyOtp({
+    required String phone,
+    required String otpCode,
+    required AuthOtpKind kind,
+  });
+
+  Future<void> clearPendingLogin(String phone);
 
   Future<void> logout();
 }
@@ -85,39 +77,19 @@ class AuthApi implements AuthService {
     try {
       final response = await _networkApi.loginResume();
       final user = response.user?.toLoginUser();
-      if (user == null) {
-        await _networkApi.clearAuthToken();
-        return null;
-      }
-      if (user.id <= 0) {
+      if (user == null || user.id <= 0) {
         await _networkApi.clearAuthToken();
         return null;
       }
       return user;
     } on NetworkException catch (error) {
-      if (isUnauthorizedHttpStatus(error.status)) {
-        await _networkApi.clearAuthToken();
-      }
+      await _clearAuthTokenIfUnauthorized(error);
       return null;
     }
   }
 
   @override
-  Future<PhoneCheckResult> checkPhone(String phone) async {
-    return PhoneCheckResult(
-      phone: phone,
-      exists: true,
-      userId: _loginUsers[phone]?.id,
-    );
-  }
-
-  @override
-  Future<AuthPhoneLookupResult> checkAuthPhone(String phone) async {
-    return loginByPhone(phone);
-  }
-
-  @override
-  Future<AuthPhoneLookupResult> loginByPhone(String phone) async {
+  Future<AuthPhoneLookupResult> lookupLoginPhone(String phone) async {
     final AuthResponse response;
     try {
       response = await _networkApi.login(LoginRequest(phone: phone));
@@ -151,59 +123,22 @@ class AuthApi implements AuthService {
   }
 
   @override
-  Future<SendOtpResult> sendLoginOtp(String phone) async {
-    final SendOtpResponse response;
-    try {
-      response = await _networkApi.sendOtp(
-        SendOtpRequest(otpType: loginOtpType, identifier: phone),
-      );
-    } on NetworkException catch (error) {
-      throw AuthException(error.message, status: error.status);
-    }
+  Future<SendOtpResult> sendOtp({
+    required String phone,
+    required AuthOtpKind kind,
+  }) async {
+    final response = await _request(
+      () => _networkApi.sendOtp(
+        SendOtpRequest(otpType: kind.apiType, identifier: phone),
+      ),
+    );
 
     return SendOtpResult(
       otpCode: response.otpCode,
-      purpose: 'login',
+      purpose: kind.previewPurpose,
       expiresAt: response.expiresAt,
       expiresIn: _expiresInFrom(response.expiresAt) ?? 0,
-      message: response.status,
     );
-  }
-
-  @override
-  Future<SendOtpResult> sendRegisterOtp(String phone) async {
-    final SendOtpResponse response;
-    try {
-      response = await _networkApi.sendOtp(
-        SendOtpRequest(otpType: registerOtpType, identifier: phone),
-      );
-    } on NetworkException catch (error) {
-      throw AuthException(error.message, status: error.status);
-    }
-
-    return SendOtpResult(
-      otpCode: response.otpCode,
-      purpose: 'register',
-      expiresAt: response.expiresAt,
-      expiresIn: _expiresInFrom(response.expiresAt) ?? 0,
-      message: response.status,
-    );
-  }
-
-  @override
-  Future<LoginUser> loginWithPhone(String phone) async {
-    final cachedUser = _loginUsers[phone];
-    if (cachedUser != null) {
-      return cachedUser;
-    }
-
-    final result = await loginByPhone(phone);
-    final user = result.user;
-    if (!result.exists || user == null) {
-      throw const AuthException('User not found', status: 202);
-    }
-
-    return user;
   }
 
   @override
@@ -214,15 +149,12 @@ class AuthApi implements AuthService {
     String? email,
     String? avatarPath,
   }) async {
-    final AuthResponse response;
-    try {
-      response = await _networkApi.signup(
+    final response = await _request(
+      () => _networkApi.signup(
         SignupRequest(phone: phone, name: name, email: email, role: role),
         avatarPath: avatarPath,
-      );
-    } on NetworkException catch (error) {
-      throw AuthException(error.message, status: error.status);
-    }
+      ),
+    );
 
     final user = _signupUserFromResponse(
       response,
@@ -242,9 +174,8 @@ class AuthApi implements AuthService {
     String? email,
     String? avatarPath,
   }) async {
-    final AuthResponse response;
-    try {
-      response = await _networkApi.updateUser(
+    final response = await _request(
+      () => _networkApi.updateUser(
         UpdateUserRequest(
           userId: userId,
           name: name,
@@ -252,10 +183,8 @@ class AuthApi implements AuthService {
           email: email,
         ),
         avatarPath: avatarPath,
-      );
-    } on NetworkException catch (error) {
-      throw AuthException(error.message, status: error.status);
-    }
+      ),
+    );
 
     final user =
         response.user?.toLoginUser(fallbackPhone: phone) ??
@@ -268,19 +197,20 @@ class AuthApi implements AuthService {
   }
 
   @override
-  Future<VerifyOtpResult> verifyLoginOtp({
+  Future<VerifyOtpResult> verifyOtp({
     required String phone,
     required String otpCode,
-    String otpType = loginOtpType,
+    required AuthOtpKind kind,
   }) async {
-    final VerifyOtpResponse response;
-    try {
-      response = await _networkApi.verifyOtp(
-        VerifyOtpRequest(otpType: otpType, identifier: phone, otpCode: otpCode),
-      );
-    } on NetworkException catch (error) {
-      throw AuthException(error.message, status: error.status);
-    }
+    final response = await _request(
+      () => _networkApi.verifyOtp(
+        VerifyOtpRequest(
+          otpType: kind.apiType,
+          identifier: phone,
+          otpCode: otpCode,
+        ),
+      ),
+    );
 
     final user =
         response.user?.toLoginUser(fallbackPhone: phone) ?? _loginUsers[phone];
@@ -298,7 +228,7 @@ class AuthApi implements AuthService {
   }
 
   @override
-  Future<void> clearOtpSession(String phone) async {
+  Future<void> clearPendingLogin(String phone) async {
     _loginUsers.remove(phone);
   }
 
@@ -341,11 +271,23 @@ class AuthApi implements AuthService {
     try {
       return (await _networkApi.getCurrentUser()).toLoginUser();
     } on NetworkException catch (error) {
-      if (isUnauthorizedHttpStatus(error.status)) {
-        await _networkApi.clearAuthToken();
-      }
+      await _clearAuthTokenIfUnauthorized(error);
 
       return null;
+    }
+  }
+
+  Future<T> _request<T>(Future<T> Function() request) async {
+    try {
+      return await request();
+    } on NetworkException catch (error) {
+      throw AuthException(error.message, status: error.status);
+    }
+  }
+
+  Future<void> _clearAuthTokenIfUnauthorized(NetworkException error) async {
+    if (isUnauthorizedHttpStatus(error.status)) {
+      await _networkApi.clearAuthToken();
     }
   }
 

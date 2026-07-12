@@ -224,7 +224,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   void cancelSignupToLogin() {
     final phone = state.phoneNumber?.trim();
     if (phone != null && phone.isNotEmpty) {
-      unawaited(_authService.clearOtpSession(phone));
+      unawaited(_authService.clearPendingLogin(phone));
     }
 
     emit(
@@ -412,7 +412,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     );
   }
 
-  Future<void> checkAuthPhone(String phone) async {
+  Future<void> lookupLoginPhone(String phone) async {
     if (state.isCheckingAuthPhone && state.checkedPhone == phone) {
       return;
     }
@@ -431,7 +431,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     );
 
     try {
-      final result = await _authService.checkAuthPhone(phone);
+      final result = await _authService.lookupLoginPhone(phone);
       if (state.checkedPhone != phone) {
         return;
       }
@@ -526,7 +526,10 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
 
       try {
-        final otp = await _authService.sendRegisterOtp(phone);
+        final otp = await _authService.sendOtp(
+          phone: phone,
+          kind: AuthOtpKind.signup,
+        );
         emit(
           state.copyWith(
             screen: AppScreen.otp,
@@ -567,7 +570,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     emit(state.copyWith(isSendingOtp: true, clearAuthError: true));
 
     try {
-      final result = await _authService.loginByPhone(phone);
+      final result = await _authService.lookupLoginPhone(phone);
       final user = result.user;
       if (!result.exists) {
         emit(
@@ -665,7 +668,10 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     );
 
     try {
-      final otp = await _authService.sendLoginOtp(phone);
+      final otp = await _authService.sendOtp(
+        phone: phone,
+        kind: AuthOtpKind.login,
+      );
       if (state.phoneNumber != phone) {
         return;
       }
@@ -716,7 +722,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
   }
 
-  Future<void> verifyLoginOtp(String otpCode) async {
+  Future<void> verifyOtp(String otpCode) async {
     final phone = state.phoneNumber;
     if (state.isVerifyingOtp || phone == null) {
       return;
@@ -732,10 +738,12 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
     try {
       final otpFlow = state.otpFlow;
-      final result = await _authService.verifyLoginOtp(
+      final result = await _authService.verifyOtp(
         phone: phone,
         otpCode: otpCode,
-        otpType: otpFlow == OtpFlow.signup ? registerOtpType : loginOtpType,
+        kind: otpFlow == OtpFlow.signup
+            ? AuthOtpKind.signup
+            : AuthOtpKind.login,
       );
 
       if (!result.isValid) {
@@ -994,7 +1002,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
 
     try {
-      final result = await _authService.loginByPhone(phone);
+      final result = await _authService.lookupLoginPhone(phone);
       final user = result.user ?? pinUser;
       if (_canSkipLoginOtp(result)) {
         final profileResolution = await _profileResolver.resolveForUserId(
