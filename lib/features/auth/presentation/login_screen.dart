@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/auth/phone_region.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/login/login_card.dart';
 import 'package:numi/features/welcome/widgets/numi_brand_text.dart';

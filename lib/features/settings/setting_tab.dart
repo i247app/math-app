@@ -17,7 +17,7 @@ import 'package:numi/features/profile/active_profile_session.dart';
 import 'package:numi/features/profile/services/avatar_picker_service.dart';
 import 'package:numi/features/profile/grade_api.dart';
 import 'package:numi/features/auth/otp_auth_api.dart';
-import 'package:numi/features/auth/passcode_service.dart';
+import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/school_api.dart';
 import 'package:numi/features/auth/presentation/passcode_screen.dart';

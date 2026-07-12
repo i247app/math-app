@@ -7,7 +7,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/auth_cubit.dart';
 import 'package:numi/features/auth/auth_state.dart';
-import 'package:numi/features/auth/helpers/auth_error_helpers.dart';
+import 'package:numi/features/auth/errors/auth_error_messages.dart';
 import 'package:numi/features/auth/widgets/signup/signup_action_button.dart';
 import 'package:numi/features/auth/widgets/signup/signup_field_label.dart';
 import 'package:numi/features/auth/widgets/signup/signup_gender_choice.dart';

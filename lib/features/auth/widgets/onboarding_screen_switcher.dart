@@ -4,11 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/utils/phone_number_validator.dart';
+import 'package:numi/core/utils/phone/phone_number_validator.dart';
 import 'package:numi/features/auth/auth_cubit.dart';
 import 'package:numi/features/auth/auth_state.dart';
-import 'package:numi/features/auth/helpers/auth_error_helpers.dart';
-import 'package:numi/features/auth/phone_region.dart';
+import 'package:numi/core/utils/phone/phone_region.dart';
+import 'package:numi/features/auth/errors/auth_error_messages.dart';
 import 'package:numi/features/auth/presentation/login_screen.dart';
 import 'package:numi/features/auth/presentation/otp_screen.dart';
 import 'package:numi/features/auth/presentation/passcode_screen.dart';

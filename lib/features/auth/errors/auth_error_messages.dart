@@ -8,7 +8,6 @@ bool isSignupUsernameExistsError(String? message) {
   if (normalized == null || normalized.isEmpty) {
     return false;
   }
-
   return normalized.contains('username already exists');
 }
 

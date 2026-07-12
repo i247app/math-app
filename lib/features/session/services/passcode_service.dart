@@ -18,20 +18,14 @@ class PasscodeLoginAccount {
 
 abstract class PasscodeService {
   Future<int?> lastPasscodeUserId();
-
   Future<PasscodeLoginAccount?> lastPasscodeAccount();
-
   Future<bool> hasPasscode(int userId);
-
   Future<void> rememberLoginAccount({
     required int userId,
     required String phone,
   });
-
   Future<void> setPasscode({required int userId, required String passcode});
-
   Future<bool> verifyPasscode({required int userId, required String passcode});
-
   Future<void> clearPasscode(int userId);
 }
 
@@ -53,11 +47,9 @@ class SecurePasscodeService implements PasscodeService {
     if (userId != null && userId > 0 && await hasPasscode(userId)) {
       return userId;
     }
-
     if (userId != null) {
       await _storage.delete(key: _lastUserIdKey);
     }
-
     return _findExistingPasscodeUserId();
   }
 
@@ -68,12 +60,10 @@ class SecurePasscodeService implements PasscodeService {
     if (userId == null || userId <= 0 || !await hasPasscode(userId)) {
       return null;
     }
-
     final phone = (await _storage.read(key: _phoneStorageKey(userId)))?.trim();
     if (phone == null || phone.isEmpty) {
       return null;
     }
-
     return PasscodeLoginAccount(userId: userId, phone: phone);
   }
 
@@ -82,9 +72,7 @@ class SecurePasscodeService implements PasscodeService {
     if (userId <= 0) {
       return false;
     }
-
-    final passcode = await _readPasscode(userId);
-    return passcode != null;
+    return await _readPasscode(userId) != null;
   }
 
   @override
@@ -96,7 +84,6 @@ class SecurePasscodeService implements PasscodeService {
     if (userId <= 0 || normalizedPhone.isEmpty) {
       throw const PasscodeException('Missing login account information.');
     }
-
     await _storage.write(key: _phoneStorageKey(userId), value: normalizedPhone);
     await _storage.write(key: _lastUserIdKey, value: '$userId');
   }
@@ -119,7 +106,6 @@ class SecurePasscodeService implements PasscodeService {
     if (userId <= 0 || passcode.length != 4) {
       return false;
     }
-
     final stored = await _readPasscode(userId);
     return stored == passcode;
   }
@@ -137,26 +123,20 @@ class SecurePasscodeService implements PasscodeService {
   }
 
   Future<String?> _readPasscode(int userId) async {
-    final value = await _storage.read(key: _storageKey(userId));
-    final passcode = value?.trim();
-    if (passcode == null || !RegExp(r'^\d{4}$').hasMatch(passcode)) {
-      return null;
-    }
-    return passcode;
+    final passcode = (await _storage.read(key: _storageKey(userId)))?.trim();
+    return passcode != null && RegExp(r'^\d{4}$').hasMatch(passcode)
+        ? passcode
+        : null;
   }
 
   Future<int?> _findExistingPasscodeUserId() async {
     final values = await _storage.readAll();
     for (final entry in values.entries) {
-      if (!entry.key.startsWith(_keyPrefix)) {
+      if (!entry.key.startsWith(_keyPrefix) ||
+          !RegExp(r'^\d{4}$').hasMatch(entry.value.trim())) {
         continue;
       }
-      final passcode = entry.value.trim();
-      if (!RegExp(r'^\d{4}$').hasMatch(passcode)) {
-        continue;
-      }
-      final userIdText = entry.key.substring(_keyPrefix.length);
-      final userId = int.tryParse(userIdText);
+      final userId = int.tryParse(entry.key.substring(_keyPrefix.length));
       if (userId == null || userId <= 0) {
         continue;
       }
@@ -176,6 +156,5 @@ class SecurePasscodeService implements PasscodeService {
   }
 
   static String _storageKey(int userId) => '$_keyPrefix$userId';
-
   static String _phoneStorageKey(int userId) => '$_phoneKeyPrefix$userId';
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-import 'package:numi/features/auth/phone_region.dart';
+import 'package:numi/core/utils/phone/phone_region.dart';
 
 class PhoneInputFormatter extends TextInputFormatter {
   const PhoneInputFormatter(this.region);
@@ -16,10 +16,7 @@ class PhoneInputFormatter extends TextInputFormatter {
     final clipped = digits.length > region.maxDigits
         ? digits.substring(0, region.maxDigits)
         : digits;
-    final text = switch (region) {
-      PhoneRegion.vn => _formatVietnamNumber(clipped),
-      PhoneRegion.us => _formatUsNumber(clipped),
-    };
+    final text = _formatInGroupsOfThree(clipped);
 
     return TextEditingValue(
       text: text,
@@ -27,24 +24,13 @@ class PhoneInputFormatter extends TextInputFormatter {
     );
   }
 
-  String _formatVietnamNumber(String digits) {
+  String _formatInGroupsOfThree(String digits) {
     final buffer = StringBuffer();
-    for (var i = 0; i < digits.length; i++) {
-      if (i == 3 || i == 6) {
+    for (var index = 0; index < digits.length; index++) {
+      if (index == 3 || index == 6) {
         buffer.write(' ');
       }
-      buffer.write(digits[i]);
-    }
-    return buffer.toString();
-  }
-
-  String _formatUsNumber(String digits) {
-    final buffer = StringBuffer();
-    for (var i = 0; i < digits.length; i++) {
-      if (i == 3 || i == 6) {
-        buffer.write(' ');
-      }
-      buffer.write(digits[i]);
+      buffer.write(digits[index]);
     }
     return buffer.toString();
   }

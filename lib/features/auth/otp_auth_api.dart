@@ -1,7 +1,9 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/errors/http_status.dart';
 import 'package:numi/core/network/auth_models.dart';
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/auth/errors/auth_status.dart';
 
 const loginOtpType = 'LOGIN_2FA';
 const registerOtpType = 'REGISTER';
@@ -193,7 +195,7 @@ class OtpAuthApi implements OtpAuthService {
       }
       return user;
     } on NetworkException catch (error) {
-      if (_isUnauthorized(error.status)) {
+      if (isUnauthorizedHttpStatus(error.status)) {
         await _networkApi.clearAuthToken();
       }
       return null;
@@ -220,7 +222,7 @@ class OtpAuthApi implements OtpAuthService {
     try {
       response = await _networkApi.login(LoginRequest(phone: phone));
     } on NetworkException catch (error) {
-      if (_isUserNotFoundStatus(error.status)) {
+      if (isAuthUserNotFoundStatus(error.status)) {
         _loginUsers.remove(phone);
         return AuthPhoneLookupResult(
           phone: phone,
@@ -439,7 +441,7 @@ class OtpAuthApi implements OtpAuthService {
     try {
       return (await _networkApi.getCurrentUser()).toLoginUser();
     } on NetworkException catch (error) {
-      if (_isUnauthorized(error.status)) {
+      if (isUnauthorizedHttpStatus(error.status)) {
         await _networkApi.clearAuthToken();
       }
 
@@ -452,9 +454,4 @@ class OtpAuthApi implements OtpAuthService {
     _loginUsers.clear();
     await _networkApi.clearAuthToken();
   }
-
-  static bool _isUnauthorized(int? status) => status == 401 || status == 403;
-
-  static bool _isUserNotFoundStatus(int? status) =>
-      status == 202 || status == 4006;
 }

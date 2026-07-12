@@ -7,15 +7,16 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/notifications/notification_ping_service.dart';
-import 'package:numi/features/auth/models/auth_profile_resolution.dart';
+import 'package:numi/core/utils/phone/phone_region.dart';
+import 'package:numi/features/auth/errors/auth_status.dart';
 import 'package:numi/features/profile/services/active_profile_session.dart';
 import 'package:numi/features/profile/services/avatar_picker_service.dart';
 import 'package:numi/features/auth/otp_auth_api.dart';
-import 'package:numi/features/auth/passcode_service.dart';
-import 'package:numi/features/auth/services/auth_profile_resolver.dart';
+import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/profile_api.dart';
-import 'package:numi/features/auth/phone_region.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
+import 'package:numi/features/session/models/profile_session_resolution.dart';
+import 'package:numi/features/session/services/profile_session_resolver.dart';
 
 import 'package:numi/features/auth/auth_state.dart';
 
@@ -25,7 +26,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     OtpAuthService? authService,
     ProfileService? profileService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
-    AuthProfileResolver? profileResolver,
+    ProfileSessionResolver? profileResolver,
     PasscodeService passcodeService = const SecurePasscodeService(),
     NotificationPingService? notificationPingService,
     AuthFlowState? initialState,
@@ -36,7 +37,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
        _authService = authService ?? OtpAuthApi(),
        _profileResolver =
            profileResolver ??
-           AuthProfileResolver(
+           ProfileSessionResolver(
              profileService: profileService ?? ProfileApi(),
              activeProfileSession: activeProfileSession,
            ),
@@ -51,7 +52,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
   final AvatarPickerService _avatarPicker;
   final OtpAuthService _authService;
-  final AuthProfileResolver _profileResolver;
+  final ProfileSessionResolver _profileResolver;
   final PasscodeService _passcodeService;
   final NotificationPingService _notificationPingService;
   final void Function(AuthenticatedSession session) _onAuthenticated;
@@ -365,7 +366,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         return;
       }
 
-      final profileResolution = await _profileResolver.resolveForUser(user);
+      final profileResolution = await _profileResolver.resolveForUserId(
+        user.id,
+      );
       await _emitAuthenticatedHome(user, profileResolution);
     } catch (_) {
       if (!isClosed) {
@@ -454,7 +457,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         return;
       }
 
-      if (_isUserNotFoundStatus(error.status)) {
+      if (isAuthUserNotFoundStatus(error.status)) {
         emit(
           state.copyWith(
             phoneNumber: phone,
@@ -499,7 +502,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
     if (!isSignupEntry &&
         state.checkedPhone == phone &&
-        _blocksLoginActions(state.phoneLookupErrorStatus)) {
+        blocksAuthLoginActions(state.phoneLookupErrorStatus)) {
       emit(
         state.copyWith(
           authError: AppStrings.current(AppKeys.loginPhoneNotRegistered),
@@ -591,7 +594,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       }
 
       if (_canSkipLoginOtp(result)) {
-        final profileResolution = await _profileResolver.resolveForUser(user);
+        final profileResolution = await _profileResolver.resolveForUserId(
+          user.id,
+        );
         await _emitHomeOrPasscodeSetup(
           user: user,
           profileResolution: profileResolution,
@@ -614,7 +619,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       );
       await _sendLoginOtp(phone);
     } on OtpAuthException catch (error) {
-      if (_isUserNotFoundStatus(error.status)) {
+      if (isAuthUserNotFoundStatus(error.status)) {
         emit(
           state.copyWith(
             screen: AppScreen.login,
@@ -767,8 +772,8 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         return;
       }
 
-      final profileResolution = await _profileResolver.resolveForUser(
-        result.user!,
+      final profileResolution = await _profileResolver.resolveForUserId(
+        result.user!.id,
       );
       await _emitHomeOrPasscodeSetup(
         user: result.user!,
@@ -776,7 +781,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         isVerifyingOtp: false,
       );
     } on OtpAuthException catch (error) {
-      if (_isOtpValidationError(error.status)) {
+      if (isOtpValidationStatus(error.status)) {
         emit(
           state.copyWith(
             isVerifyingOtp: false,
@@ -806,18 +811,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         ),
       );
     }
-  }
-
-  static bool _isOtpValidationError(int? status) {
-    return status == 400 || status == 422 || status == 4706;
-  }
-
-  static bool _isUserNotFoundStatus(int? status) {
-    return status == 202 || status == 4006;
-  }
-
-  static bool _blocksLoginActions(int? status) {
-    return status == 4006;
   }
 
   static bool _canSkipLoginOtp(AuthPhoneLookupResult result) {
@@ -864,7 +857,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         email: trimmedEmail?.isEmpty == true ? null : trimmedEmail,
         avatarPath: state.avatarPath,
       );
-      final profileResolution = await _profileResolver.resolveForUser(user);
+      final profileResolution = await _profileResolver.resolveForUserId(
+        user.id,
+      );
       await _emitHomeOrPasscodeSetup(
         user: user,
         profileResolution: profileResolution,
@@ -1000,7 +995,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       final result = await _authService.loginByPhone(phone);
       final user = result.user ?? pinUser;
       if (_canSkipLoginOtp(result)) {
-        final profileResolution = await _profileResolver.resolveForUser(user);
+        final profileResolution = await _profileResolver.resolveForUserId(
+          user.id,
+        );
         _pingNotificationsAfterAuth(user);
         await _rememberAuthenticatedAccount(user);
         _handoffAuthenticatedSession(user, profileResolution);
@@ -1062,7 +1059,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
   Future<void> _emitHomeOrPasscodeSetup({
     required LoginUser user,
-    required AuthProfileResolution profileResolution,
+    required ProfileSessionResolution profileResolution,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
@@ -1112,7 +1109,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
   Future<void> _emitAuthenticatedHome(
     LoginUser user,
-    AuthProfileResolution profileResolution,
+    ProfileSessionResolution profileResolution,
   ) async {
     await _rememberAuthenticatedAccount(user);
     _pingNotificationsAfterAuth(user);
@@ -1151,7 +1148,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
     _handoffAuthenticatedSession(
       user,
-      AuthProfileResolution(
+      ProfileSessionResolution(
         profiles: state.pendingProfiles,
         activeProfile: state.pendingActiveProfile,
         errorMessage: state.pendingProfileLoadError,
@@ -1171,7 +1168,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
   void _handoffAuthenticatedSession(
     LoginUser user,
-    AuthProfileResolution profileResolution,
+    ProfileSessionResolution profileResolution,
   ) {
     if (isClosed) {
       return;

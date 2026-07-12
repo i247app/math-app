@@ -1,13 +1,13 @@
 import 'package:numi/core/network/profile_models.dart';
 
-class AuthProfileResolution {
-  const AuthProfileResolution({
+class ProfileSessionResolution {
+  const ProfileSessionResolution({
     required this.profiles,
     required this.activeProfile,
     this.errorMessage,
   });
 
-  const AuthProfileResolution.empty()
+  const ProfileSessionResolution.empty()
     : profiles = const <StudentProfile>[],
       activeProfile = null,
       errorMessage = null;

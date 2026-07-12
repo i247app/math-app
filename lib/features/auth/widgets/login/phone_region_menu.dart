@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/auth/phone_region.dart';
 
 class PhoneRegionMenu extends StatelessWidget {
   const PhoneRegionMenu({

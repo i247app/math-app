@@ -1,13 +1,12 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/models/auth_profile_resolution.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/services/active_profile_session.dart';
+import 'package:numi/features/session/models/profile_session_resolution.dart';
 
-class AuthProfileResolver {
-  const AuthProfileResolver({
+class ProfileSessionResolver {
+  const ProfileSessionResolver({
     required ProfileService profileService,
     required ActiveProfileSession activeProfileSession,
   }) : _profileService = profileService,
@@ -16,10 +15,9 @@ class AuthProfileResolver {
   final ProfileService _profileService;
   final ActiveProfileSession _activeProfileSession;
 
-  Future<AuthProfileResolution> resolveForUser(LoginUser user) async {
-    final userId = user.id;
+  Future<ProfileSessionResolution> resolveForUserId(int userId) async {
     if (userId <= 0) {
-      return const AuthProfileResolution.empty();
+      return const ProfileSessionResolution.empty();
     }
 
     try {
@@ -39,18 +37,18 @@ class AuthProfileResolver {
       } else {
         await _activeProfileSession.clearActiveProfileId(userId);
       }
-      return AuthProfileResolution(
+      return ProfileSessionResolution(
         profiles: profiles,
         activeProfile: activeProfile,
       );
     } on ProfileException catch (error) {
-      return AuthProfileResolution(
+      return ProfileSessionResolution(
         profiles: const <StudentProfile>[],
         activeProfile: null,
         errorMessage: error.message,
       );
     } catch (_) {
-      return AuthProfileResolution(
+      return ProfileSessionResolution(
         profiles: const <StudentProfile>[],
         activeProfile: null,
         errorMessage: AppStrings.current(AppKeys.profileLoadFailed),
@@ -59,16 +57,15 @@ class AuthProfileResolver {
   }
 
   Future<void> rememberActiveProfile({
-    required LoginUser user,
+    required int userId,
     required StudentProfile profile,
   }) async {
     final profileId = ActiveProfileSession.profileStableId(profile);
-    if (user.id <= 0 || profileId == null) {
+    if (userId <= 0 || profileId == null) {
       return;
     }
-
     await _activeProfileSession.writeActiveProfileId(
-      userId: user.id,
+      userId: userId,
       profileId: profileId,
     );
   }

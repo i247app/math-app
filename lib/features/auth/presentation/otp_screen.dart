@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/otp/otp_card.dart';
+import 'package:numi/shared/widgets/numeric_code_input_controller.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({
@@ -41,19 +42,20 @@ class _OtpScreenState extends State<OtpScreen>
     with SingleTickerProviderStateMixin {
   static const otpLength = 4;
 
-  late final List<TextEditingController> controllers;
-  late final List<FocusNode> focusNodes;
+  late final NumericCodeInputController codeInput;
   late final AnimationController errorShakeController;
   late final ValueNotifier<int> digitRevision;
   Timer? resendTimer;
   int resendCountdown = 0;
   bool hideOtpError = false;
 
+  List<TextEditingController> get controllers => codeInput.controllers;
+  List<FocusNode> get focusNodes => codeInput.focusNodes;
+
   @override
   void initState() {
     super.initState();
-    controllers = List.generate(otpLength, (_) => TextEditingController());
-    focusNodes = List.generate(otpLength, (_) => FocusNode());
+    codeInput = NumericCodeInputController(length: otpLength);
     errorShakeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 380),
@@ -92,12 +94,7 @@ class _OtpScreenState extends State<OtpScreen>
     resendTimer?.cancel();
     errorShakeController.dispose();
     digitRevision.dispose();
-    for (final controller in controllers) {
-      controller.dispose();
-    }
-    for (final node in focusNodes) {
-      node.dispose();
-    }
+    codeInput.dispose();
     super.dispose();
   }
 
@@ -138,9 +135,7 @@ class _OtpScreenState extends State<OtpScreen>
 
   void showOtpError() {
     HapticFeedback.mediumImpact();
-    for (final controller in controllers) {
-      controller.clear();
-    }
+    codeInput.clear();
     setState(() {
       hideOtpError = false;
     });
@@ -151,18 +146,14 @@ class _OtpScreenState extends State<OtpScreen>
   void requestOtpFocus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        focusNodes.first.requestFocus();
+        codeInput.requestFocusFirst();
       }
     });
   }
 
   void updateDigit(int index, String value) {
-    final digits = value.replaceAll(RegExp(r'\D'), '');
-    if (digits.isEmpty) {
-      controllers[index].clear();
-      if (index > 0) {
-        focusNodes[index - 1].requestFocus();
-      }
+    if (value.replaceAll(RegExp(r'\D'), '').isEmpty) {
+      codeInput.updateDigit(index, value);
       _notifyDigitChanged();
       return;
     }
@@ -172,24 +163,7 @@ class _OtpScreenState extends State<OtpScreen>
       hideOtpError = true;
     }
 
-    var nextIndex = index;
-    for (final digit in digits.split('')) {
-      if (nextIndex >= controllers.length) {
-        break;
-      }
-
-      controllers[nextIndex].text = digit;
-      controllers[nextIndex].selection = const TextSelection.collapsed(
-        offset: 1,
-      );
-      nextIndex++;
-    }
-
-    if (nextIndex < focusNodes.length) {
-      focusNodes[nextIndex].requestFocus();
-    } else {
-      focusNodes.last.unfocus();
-    }
+    codeInput.updateDigit(index, value);
 
     if (shouldHideError) {
       setState(() {});
@@ -203,8 +177,7 @@ class _OtpScreenState extends State<OtpScreen>
       return;
     }
 
-    controllers[index - 1].clear();
-    focusNodes[index - 1].requestFocus();
+    codeInput.clearPreviousAndFocus(index);
     _notifyDigitChanged();
   }
 
