@@ -17,7 +17,7 @@ import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/auth/phone_region.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
-import 'package:numi/features/auth/auth_flow_state.dart';
+import 'package:numi/features/auth/auth_state.dart';
 
 class AuthFlowCubit extends Cubit<AuthFlowState> {
   AuthFlowCubit({

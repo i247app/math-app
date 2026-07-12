@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/auth/auth_flow_cubit.dart';
-import 'package:numi/features/auth/auth_flow_state.dart';
+import 'package:numi/features/auth/auth_cubit.dart';
+import 'package:numi/features/auth/auth_state.dart';
 import 'package:numi/features/auth/passcode_service.dart';
 
 class _FakePasscodeService implements PasscodeService {
