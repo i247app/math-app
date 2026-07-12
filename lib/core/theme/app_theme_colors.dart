@@ -31,10 +31,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     required this.passcodeShadow,
     required this.welcomeTitle,
     required this.welcomeInactiveDot,
-    required this.authBackgroundStart,
-    required this.authBackgroundEnd,
-    required this.authDecorRing,
-    required this.authDecorCircle,
   });
 
   final Color pageBackground;
@@ -63,10 +59,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
   final Color passcodeShadow;
   final Color welcomeTitle;
   final Color welcomeInactiveDot;
-  final Color authBackgroundStart;
-  final Color authBackgroundEnd;
-  final Color authDecorRing;
-  final Color authDecorCircle;
 
   static const light = AppThemeColors(
     pageBackground: AppColors.pageBackground,
@@ -95,10 +87,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     passcodeShadow: Color(0xFFDCBFC8),
     welcomeTitle: AppColors.welcomeTitle,
     welcomeInactiveDot: AppColors.inactiveDot,
-    authBackgroundStart: AppColors.aquaMist,
-    authBackgroundEnd: AppColors.mintMist,
-    authDecorRing: AppColors.sandRing,
-    authDecorCircle: Color(0x5C79D5CF),
   );
 
   static const dark = AppThemeColors(
@@ -128,10 +116,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     passcodeShadow: Color(0xFF0C1515),
     welcomeTitle: AppColors.darkOnSurface,
     welcomeInactiveDot: AppColors.darkOutline,
-    authBackgroundStart: AppColors.darkBackground,
-    authBackgroundEnd: AppColors.darkSurface,
-    authDecorRing: Color(0x66355151),
-    authDecorCircle: Color(0x661F5A5A),
   );
 
   @override
@@ -162,10 +146,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     Color? passcodeShadow,
     Color? welcomeTitle,
     Color? welcomeInactiveDot,
-    Color? authBackgroundStart,
-    Color? authBackgroundEnd,
-    Color? authDecorRing,
-    Color? authDecorCircle,
   }) {
     return AppThemeColors(
       pageBackground: pageBackground ?? this.pageBackground,
@@ -194,10 +174,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       passcodeShadow: passcodeShadow ?? this.passcodeShadow,
       welcomeTitle: welcomeTitle ?? this.welcomeTitle,
       welcomeInactiveDot: welcomeInactiveDot ?? this.welcomeInactiveDot,
-      authBackgroundStart: authBackgroundStart ?? this.authBackgroundStart,
-      authBackgroundEnd: authBackgroundEnd ?? this.authBackgroundEnd,
-      authDecorRing: authDecorRing ?? this.authDecorRing,
-      authDecorCircle: authDecorCircle ?? this.authDecorCircle,
     );
   }
 
@@ -250,18 +226,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
         other.welcomeInactiveDot,
         t,
       )!,
-      authBackgroundStart: Color.lerp(
-        authBackgroundStart,
-        other.authBackgroundStart,
-        t,
-      )!,
-      authBackgroundEnd: Color.lerp(
-        authBackgroundEnd,
-        other.authBackgroundEnd,
-        t,
-      )!,
-      authDecorRing: Color.lerp(authDecorRing, other.authDecorRing, t)!,
-      authDecorCircle: Color.lerp(authDecorCircle, other.authDecorCircle, t)!,
     );
   }
 }

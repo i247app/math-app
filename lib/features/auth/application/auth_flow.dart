@@ -14,7 +14,6 @@ import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
-import 'package:numi/features/auth/widgets/app_background.dart';
 import 'package:numi/features/auth/widgets/onboarding_screen_switcher.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
@@ -211,11 +210,6 @@ class _NumiHomeState extends State<NumiHome> {
                   Theme.of(context).brightness == Brightness.dark
                   ? SystemUiOverlayStyle.light
                   : SystemUiOverlayStyle.dark;
-              final usePlainAuthBackground =
-                  scaffoldState.screen == AppScreen.login ||
-                  scaffoldState.screen == AppScreen.otp ||
-                  scaffoldState.screen == AppScreen.passcode ||
-                  scaffoldState.screen == AppScreen.signup;
               return PopScope(
                 canPop: !handlesSystemBack,
                 onPopInvokedWithResult: (didPop, result) {
@@ -226,32 +220,19 @@ class _NumiHomeState extends State<NumiHome> {
                 child: AnnotatedRegion<SystemUiOverlayStyle>(
                   value: overlayStyle,
                   child: Scaffold(
-                    backgroundColor: usePlainAuthBackground
-                        ? colors.pageBackground
-                        : null,
+                    backgroundColor: colors.pageBackground,
                     resizeToAvoidBottomInset:
                         scaffoldState.screen != AppScreen.home &&
                         scaffoldState.screen != AppScreen.login &&
                         scaffoldState.screen != AppScreen.otp &&
                         scaffoldState.screen != AppScreen.passcode,
-                    body: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: usePlainAuthBackground
-                              ? ColoredBox(color: colors.pageBackground)
-                              : const AppBackground(child: SizedBox.shrink()),
-                        ),
-                        Positioned.fill(
-                          child: OnboardingScreenSwitcher(
-                            phoneController: phoneController,
-                            phoneHasInput: _phoneHasInput,
-                            clearLoginPhoneInput: clearLoginPhoneInput,
-                            normalizedPhoneInput: _normalizedPhoneInput,
-                            handlePhoneInputChanged: handlePhoneInputChanged,
-                            sendOtp: sendOtp,
-                          ),
-                        ),
-                      ],
+                    body: OnboardingScreenSwitcher(
+                      phoneController: phoneController,
+                      phoneHasInput: _phoneHasInput,
+                      clearLoginPhoneInput: clearLoginPhoneInput,
+                      normalizedPhoneInput: _normalizedPhoneInput,
+                      handlePhoneInputChanged: handlePhoneInputChanged,
+                      sendOtp: sendOtp,
                     ),
                   ),
                 ),

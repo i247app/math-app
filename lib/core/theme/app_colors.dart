@@ -40,7 +40,6 @@ abstract final class AppColors {
   static const teacherMint = Color(0xFFF4FFFE);
   static const teacherPaleMint = Color(0xFFF0FFFF);
   static const aquaMist = Color(0xFFBFECEF);
-  static const mintMist = Color(0xFFEFFAE8);
   static const aquaSoft = Color(0xFF79D5CF);
   static const softBlue = Color(0xFF87C7CD);
 
@@ -90,7 +89,6 @@ abstract final class AppColors {
   static const robotDark = Color(0xFF056E68);
   static const deepTeal = Color(0xFF075F5A);
   static const panelDark = Color(0xFF1F4A46);
-  static const sandRing = Color(0xBFD7D3C2);
   static const grayText = Color(0xFF7B8985);
   static const vietnamRed = Color(0xFFE72720);
   static const greenShadow = Color(0x3874B493);
