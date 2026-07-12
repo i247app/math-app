@@ -70,16 +70,23 @@ void main() {
       expect(cubit.handleSystemBack(), isTrue);
       expect(cubit.state.screen, AppScreen.welcome);
 
-      cubit.openOtp();
-      expect(cubit.handleSystemBack(), isTrue);
-      expect(cubit.state.screen, AppScreen.login);
-
-      expect(cubit.handleSystemBack(), isTrue);
-      expect(cubit.state.screen, AppScreen.welcomeDetails);
-
-      cubit.openWelcome();
-      expect(cubit.handleSystemBack(), isFalse);
       await cubit.close();
+      final otpCubit = AuthFlowCubit(
+        initialState: const AuthFlowState(screen: AppScreen.otp),
+        passcodeService: _FakePasscodeService(),
+        onAuthenticated: (_) {},
+        onSessionCleared: () {},
+        onSessionRestoreStarted: () {},
+      );
+      expect(otpCubit.handleSystemBack(), isTrue);
+      expect(otpCubit.state.screen, AppScreen.login);
+
+      expect(otpCubit.handleSystemBack(), isTrue);
+      expect(otpCubit.state.screen, AppScreen.welcomeDetails);
+
+      otpCubit.openWelcome();
+      expect(otpCubit.handleSystemBack(), isFalse);
+      await otpCubit.close();
     },
   );
 }

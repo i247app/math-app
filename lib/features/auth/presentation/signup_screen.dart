@@ -154,13 +154,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final genderChoices = _genderChoicesForRole(role);
     final nameLabelKey = _signupNameLabelKey(role, gender);
 
-    return BlocConsumer<AuthFlowCubit, AuthFlowState>(
-      listenWhen: (previous, current) =>
-          previous.avatarError != current.avatarError &&
-          current.avatarError != null,
-      listener: (context, state) {
-        context.showErrorDialog(state.avatarError!);
-      },
+    return BlocBuilder<AuthFlowCubit, AuthFlowState>(
       builder: (context, state) {
         final localUsernameErrorText = username.isNotEmpty && !isUsernameValid
             ? context.getText(AppKeys.signupNameInvalid)

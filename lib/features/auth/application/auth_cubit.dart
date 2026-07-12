@@ -10,7 +10,6 @@ import 'package:numi/core/notifications/notification_ping_service.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
 import 'package:numi/features/profile/services/active_profile_session.dart';
-import 'package:numi/features/profile/services/avatar_picker_service.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
@@ -24,7 +23,6 @@ import 'package:numi/features/auth/application/auth_state.dart';
 
 class AuthFlowCubit extends Cubit<AuthFlowState> {
   AuthFlowCubit({
-    AvatarPickerService avatarPicker = const AvatarPickerService(),
     AuthService? authService,
     ProfileService? profileService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
@@ -35,8 +33,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     required void Function(AuthenticatedSession session) onAuthenticated,
     required VoidCallback onSessionCleared,
     required VoidCallback onSessionRestoreStarted,
-  }) : _avatarPicker = avatarPicker,
-       _authService = authService ?? AuthApi(),
+  }) : _authService = authService ?? AuthApi(),
        _profileResolver =
            profileResolver ??
            ProfileSessionResolver(
@@ -52,7 +49,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
        _onSessionRestoreStarted = onSessionRestoreStarted,
        super(initialState ?? const AuthFlowState());
 
-  final AvatarPickerService _avatarPicker;
   final AuthService _authService;
   final ProfileSessionResolver _profileResolver;
   final PasscodeService _passcodeService;
@@ -216,11 +212,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
   }
 
-  void openOtp() =>
-      emit(state.copyWith(screen: AppScreen.otp, clearOtpError: true));
-
-  void openSignup() => emit(state.copyWith(screen: AppScreen.signup));
-
   void cancelSignupToLogin() {
     final phone = state.phoneNumber?.trim();
     if (phone != null && phone.isNotEmpty) {
@@ -240,8 +231,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         clearOtpError: true,
         clearPhoneLookup: true,
         clearPendingSession: true,
-        clearAvatarPath: true,
-        clearAvatarError: true,
       ),
     );
     unawaited(checkPinLoginAvailability());
@@ -382,14 +371,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
   void selectPhoneRegion(PhoneRegion region) {
     emit(state.copyWith(phoneRegion: region));
-  }
-
-  void selectGrade(String grade) {
-    emit(state.copyWith(selectedGrade: grade));
-  }
-
-  void selectCurriculum(String curriculum) {
-    emit(state.copyWith(selectedCurriculum: curriculum));
   }
 
   void clearPhoneLookup() {
@@ -865,7 +846,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         name: trimmedName,
         role: trimmedRole,
         email: trimmedEmail?.isEmpty == true ? null : trimmedEmail,
-        avatarPath: state.avatarPath,
       );
       final profileResolution = await _profileResolver.resolveForUserId(
         user.id,
@@ -1226,42 +1206,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     return authService is AuthApi
         ? ApiNotificationPingService()
         : const NoopNotificationPingService();
-  }
-
-  Future<void> pickAvatar() async {
-    if (state.isPickingAvatar) {
-      return;
-    }
-
-    emit(state.copyWith(isPickingAvatar: true, clearAvatarError: true));
-
-    try {
-      final path = await _avatarPicker.pickAvatarPath();
-      if (isClosed) {
-        return;
-      }
-
-      emit(
-        state.copyWith(
-          avatarPath: path,
-          isPickingAvatar: false,
-          clearAvatarError: true,
-        ),
-      );
-    } catch (_) {
-      if (!isClosed) {
-        emit(
-          state.copyWith(
-            isPickingAvatar: false,
-            avatarError: AppStrings.current(AppKeys.imagePickFailed),
-          ),
-        );
-      }
-    }
-  }
-
-  void clearAvatar() {
-    emit(state.copyWith(clearAvatarPath: true, clearAvatarError: true));
   }
 
   void _emitAuthError(

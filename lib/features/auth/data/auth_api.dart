@@ -32,7 +32,6 @@ abstract class AuthService {
     required String name,
     required String role,
     String? email,
-    String? avatarPath,
   });
 
   Future<LoginUser> updateUser({
@@ -147,12 +146,10 @@ class AuthApi implements AuthService {
     required String name,
     required String role,
     String? email,
-    String? avatarPath,
   }) async {
     final response = await _request(
       () => _networkApi.signup(
         SignupRequest(phone: phone, name: name, email: email, role: role),
-        avatarPath: avatarPath,
       ),
     );
 

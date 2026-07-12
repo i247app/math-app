@@ -16,11 +16,6 @@ class AuthFlowState {
   const AuthFlowState({
     this.screen = AppScreen.welcome,
     this.phoneRegion = PhoneRegion.vn,
-    this.selectedGrade = '',
-    this.selectedCurriculum = '',
-    this.avatarPath,
-    this.isPickingAvatar = false,
-    this.avatarError,
     this.isRestoringSession = false,
     this.phoneNumber,
     this.checkedPhone,
@@ -59,11 +54,6 @@ class AuthFlowState {
 
   final AppScreen screen;
   final PhoneRegion phoneRegion;
-  final String selectedGrade;
-  final String selectedCurriculum;
-  final String? avatarPath;
-  final bool isPickingAvatar;
-  final String? avatarError;
   final bool isRestoringSession;
   final String? phoneNumber;
   final String? checkedPhone;
@@ -102,11 +92,6 @@ class AuthFlowState {
   AuthFlowState copyWith({
     AppScreen? screen,
     PhoneRegion? phoneRegion,
-    String? selectedGrade,
-    String? selectedCurriculum,
-    String? avatarPath,
-    bool? isPickingAvatar,
-    String? avatarError,
     bool? isRestoringSession,
     String? phoneNumber,
     String? checkedPhone,
@@ -141,8 +126,6 @@ class AuthFlowState {
     List<StudentProfile>? pendingProfiles,
     StudentProfile? pendingActiveProfile,
     String? pendingProfileLoadError,
-    bool clearAvatarPath = false,
-    bool clearAvatarError = false,
     bool clearAuthError = false,
     bool clearDevOtp = false,
     bool clearOtpError = false,
@@ -162,11 +145,6 @@ class AuthFlowState {
     return AuthFlowState(
       screen: screen ?? this.screen,
       phoneRegion: phoneRegion ?? this.phoneRegion,
-      selectedGrade: selectedGrade ?? this.selectedGrade,
-      selectedCurriculum: selectedCurriculum ?? this.selectedCurriculum,
-      avatarPath: clearAvatarPath ? null : avatarPath ?? this.avatarPath,
-      isPickingAvatar: isPickingAvatar ?? this.isPickingAvatar,
-      avatarError: clearAvatarError ? null : avatarError ?? this.avatarError,
       isRestoringSession: isRestoringSession ?? this.isRestoringSession,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       checkedPhone: clearPhoneLookup ? null : checkedPhone ?? this.checkedPhone,
