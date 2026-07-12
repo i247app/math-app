@@ -16,7 +16,7 @@ import 'package:numi/features/auth/presentation/signup_screen.dart';
 import 'package:numi/features/auth/widgets/session_home_screen.dart';
 import 'package:numi/features/welcome/presentation/welcome_details_screen.dart';
 import 'package:numi/features/welcome/presentation/welcome_screen.dart';
-import 'package:numi/shared/widgets/common_widgets.dart';
+import 'package:numi/shared/widgets/loading_screen.dart';
 
 class OnboardingScreenSwitcher extends StatelessWidget {
   const OnboardingScreenSwitcher({

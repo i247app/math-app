@@ -21,7 +21,7 @@ import 'package:numi/features/auth/passcode_service.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/school_api.dart';
 import 'package:numi/features/auth/presentation/passcode_screen.dart';
-import 'package:numi/shared/widgets/common_widgets.dart';
+import 'package:numi/shared/widgets/loading_screen.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/settings/cache/settings_profile_options_cache.dart';

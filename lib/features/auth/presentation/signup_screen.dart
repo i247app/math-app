@@ -14,7 +14,7 @@ import 'package:numi/features/auth/widgets/signup/signup_gender_choice.dart';
 import 'package:numi/features/auth/widgets/signup/signup_gender_radio_group.dart';
 import 'package:numi/features/auth/widgets/signup/signup_role_card.dart';
 import 'package:numi/features/auth/widgets/signup/signup_text_field.dart';
-import 'package:numi/shared/widgets/common_widgets.dart';
+import 'package:numi/shared/widgets/screen_frame.dart';
 import 'package:numi/shared/widgets/auth_back_button.dart';
 import 'package:numi/shared/widgets/page_header.dart';
 

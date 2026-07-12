@@ -11,7 +11,7 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/settings/widgets/language/language_header.dart';
 import 'package:numi/features/settings/widgets/language/language_option_card.dart';
-import 'package:numi/shared/widgets/common_widgets.dart';
+import 'package:numi/shared/widgets/loading_screen.dart';
 
 class LanguageSettingsScreen extends StatefulWidget {
   const LanguageSettingsScreen({super.key});
