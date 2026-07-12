@@ -1,5 +1,5 @@
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 
 enum AppScreen { welcome, welcomeDetails, login, otp, signup, passcode, home }

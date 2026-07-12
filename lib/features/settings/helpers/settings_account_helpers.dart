@@ -1,4 +1,4 @@
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 
 String settingsFallbackUsername(LoginUser? user) {
   final name = user?.name?.trim();

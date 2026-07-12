@@ -14,7 +14,7 @@ import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_state.dart';

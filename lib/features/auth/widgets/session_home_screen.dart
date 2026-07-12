@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi/features/auth/auth_cubit.dart';
+import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/home/home_screen.dart';
 import 'package:numi/features/homework/homework_api.dart';

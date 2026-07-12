@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/theme/app_theme_controller.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/services/active_profile_session.dart';
@@ -20,14 +21,14 @@ class StartupBootstrapResult {
 
   final LingoProvider lingoProvider;
   final AppThemeController themeController;
-  final OtpAuthService authService;
+  final AuthService authService;
   final AuthenticatedSession? initialSession;
 }
 
 class StartupBootstrap {
   const StartupBootstrap({
     this.sessionTimeout = const Duration(seconds: 8),
-    OtpAuthService? authService,
+    AuthService? authService,
     ProfileService? profileService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
     PasscodeService passcodeService = const SecurePasscodeService(),
@@ -37,7 +38,7 @@ class StartupBootstrap {
        _passcodeService = passcodeService;
 
   final Duration sessionTimeout;
-  final OtpAuthService? _authService;
+  final AuthService? _authService;
   final ProfileService? _profileService;
   final ActiveProfileSession _activeProfileSession;
   final PasscodeService _passcodeService;
@@ -60,7 +61,7 @@ class StartupBootstrap {
       // Light theme is the startup fallback while dark theme is experimental.
     }
 
-    final authService = _authService ?? OtpAuthApi();
+    final authService = _authService ?? AuthApi();
     final initialSession = await _restoreInitialSession(
       authService,
     ).timeout(sessionTimeout, onTimeout: () => null);
@@ -74,7 +75,7 @@ class StartupBootstrap {
   }
 
   Future<AuthenticatedSession?> _restoreInitialSession(
-    OtpAuthService authService,
+    AuthService authService,
   ) async {
     try {
       final user = await authService.restoreSession();

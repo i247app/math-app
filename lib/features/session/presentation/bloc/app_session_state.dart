@@ -1,5 +1,5 @@
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 
 enum SessionStatus { unauthenticated, restoring, authenticated }

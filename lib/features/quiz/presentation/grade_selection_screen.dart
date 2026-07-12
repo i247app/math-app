@@ -8,7 +8,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/grade_api.dart';
 import 'package:numi/features/quiz/ai_shake_service.dart';
 import 'package:numi/features/quiz/quiz_api.dart';

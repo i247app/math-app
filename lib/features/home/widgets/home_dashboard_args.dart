@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/network/grade_models.dart';
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/profile/grade_api.dart';

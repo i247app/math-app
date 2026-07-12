@@ -10,10 +10,10 @@ import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
-import 'package:numi/features/auth/auth_cubit.dart';
-import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/application/auth_cubit.dart';
+import 'package:numi/features/auth/application/auth_state.dart';
 import 'package:numi/features/auth/widgets/app_background.dart';
 import 'package:numi/features/auth/widgets/onboarding_screen_switcher.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
@@ -26,7 +26,7 @@ class NumiHome extends StatefulWidget {
     this.restoreSessionOnStart = true,
   });
 
-  final OtpAuthService? authService;
+  final AuthService? authService;
   final AuthenticatedSession? initialSession;
   final bool restoreSessionOnStart;
 

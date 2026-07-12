@@ -16,7 +16,9 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/active_profile_session.dart';
 import 'package:numi/features/profile/services/avatar_picker_service.dart';
 import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_exception.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/school_api.dart';
@@ -176,7 +178,7 @@ class SettingTab extends StatefulWidget {
 
 class _SettingTabState extends State<SettingTab> {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
-  final OtpAuthService _authService = OtpAuthApi();
+  final AuthService _authService = AuthApi();
   final PasscodeService _passcodeService = const SecurePasscodeService();
   final ProfileService _profileService = ProfileApi();
   final GradeService _gradeService = GradeApi();
@@ -911,7 +913,7 @@ class _SettingTabState extends State<SettingTab> {
         _isSavingAccount = false;
       });
       FocusScope.of(context).unfocus();
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       if (!mounted) {
         return;
       }

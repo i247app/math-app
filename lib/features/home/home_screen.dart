@@ -30,7 +30,7 @@ import 'package:numi/features/home/shell/widgets/home_header_bar.dart';
 import 'package:numi/features/home/widgets/home_profile_menu.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
 import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 import 'package:numi/features/settings/helpers/setting_page_builders.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';

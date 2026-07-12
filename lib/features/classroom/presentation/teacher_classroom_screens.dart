@@ -30,7 +30,7 @@ import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_block
 import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_card.dart';
 import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
 import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/profile/school_api.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';

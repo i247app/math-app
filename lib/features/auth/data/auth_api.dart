@@ -3,94 +3,12 @@ import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/errors/http_status.dart';
 import 'package:numi/core/network/auth_models.dart';
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/auth/data/auth_exception.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
 
 const loginOtpType = 'LOGIN_2FA';
 const registerOtpType = 'REGISTER';
-
-class PhoneCheckResult {
-  const PhoneCheckResult({
-    required this.phone,
-    required this.exists,
-    this.userId,
-  });
-
-  final String phone;
-  final bool exists;
-  final int? userId;
-}
-
-class SendOtpResult {
-  const SendOtpResult({
-    required this.expiresIn,
-    this.requiredOtp = true,
-    this.user,
-    this.otpId,
-    this.otpCode,
-    this.purpose,
-    this.expiresAt,
-    this.message,
-  });
-
-  final bool requiredOtp;
-  final LoginUser? user;
-  final String? otpId;
-  final String? otpCode;
-  final String? purpose;
-  final int expiresIn;
-  final String? expiresAt;
-  final String? message;
-}
-
-class LoginUser {
-  const LoginUser({
-    required this.id,
-    this.email,
-    this.name,
-    this.phone,
-    this.avatarUrl,
-    this.role,
-    this.createDt,
-    this.modifyDt,
-  });
-
-  final int id;
-  final String? email;
-  final String? name;
-  final String? phone;
-  final String? avatarUrl;
-  final String? role;
-  final String? createDt;
-  final String? modifyDt;
-}
-
-class AuthPhoneLookupResult {
-  const AuthPhoneLookupResult({
-    required this.phone,
-    required this.exists,
-    this.user,
-    this.otpCode,
-    this.purpose,
-    this.expiresAt,
-    this.expiresIn,
-    this.message,
-    this.status,
-    this.requiredOtp = true,
-    this.isTrusted,
-  });
-
-  final String phone;
-  final bool exists;
-  final LoginUser? user;
-  final String? otpCode;
-  final String? purpose;
-  final String? expiresAt;
-  final int? expiresIn;
-  final String? message;
-  final int? status;
-  final bool requiredOtp;
-  final bool? isTrusted;
-}
 
 extension on AuthUser {
   LoginUser toLoginUser({String? fallbackPhone}) {
@@ -107,25 +25,7 @@ extension on AuthUser {
   }
 }
 
-class VerifyOtpResult {
-  const VerifyOtpResult({required this.isValid, this.message, this.user});
-
-  final bool isValid;
-  final String? message;
-  final LoginUser? user;
-}
-
-class OtpAuthException implements Exception {
-  const OtpAuthException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
-
-abstract class OtpAuthService {
+abstract class AuthService {
   Future<PhoneCheckResult> checkPhone(String phone);
 
   Future<AuthPhoneLookupResult> checkAuthPhone(String phone);
@@ -167,8 +67,8 @@ abstract class OtpAuthService {
   Future<void> logout();
 }
 
-class OtpAuthApi implements OtpAuthService {
-  OtpAuthApi({String? baseUrl, NetworkApi? networkApi})
+class AuthApi implements AuthService {
+  AuthApi({String? baseUrl, NetworkApi? networkApi})
     : _networkApi =
           networkApi ??
           (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
@@ -232,12 +132,12 @@ class OtpAuthApi implements OtpAuthService {
         );
       }
 
-      throw OtpAuthException(error.message, status: error.status);
+      throw AuthException(error.message, status: error.status);
     }
 
     final user = response.user?.toLoginUser(fallbackPhone: phone);
     if (user == null) {
-      throw OtpAuthException(AppStrings.current(AppKeys.missingOtpUser));
+      throw AuthException(AppStrings.current(AppKeys.missingOtpUser));
     }
 
     _loginUsers[phone] = user;
@@ -258,7 +158,7 @@ class OtpAuthApi implements OtpAuthService {
         SendOtpRequest(otpType: loginOtpType, identifier: phone),
       );
     } on NetworkException catch (error) {
-      throw OtpAuthException(error.message, status: error.status);
+      throw AuthException(error.message, status: error.status);
     }
 
     return SendOtpResult(
@@ -278,7 +178,7 @@ class OtpAuthApi implements OtpAuthService {
         SendOtpRequest(otpType: registerOtpType, identifier: phone),
       );
     } on NetworkException catch (error) {
-      throw OtpAuthException(error.message, status: error.status);
+      throw AuthException(error.message, status: error.status);
     }
 
     return SendOtpResult(
@@ -300,7 +200,7 @@ class OtpAuthApi implements OtpAuthService {
     final result = await loginByPhone(phone);
     final user = result.user;
     if (!result.exists || user == null) {
-      throw const OtpAuthException('User not found', status: 202);
+      throw const AuthException('User not found', status: 202);
     }
 
     return user;
@@ -321,7 +221,7 @@ class OtpAuthApi implements OtpAuthService {
         avatarPath: avatarPath,
       );
     } on NetworkException catch (error) {
-      throw OtpAuthException(error.message, status: error.status);
+      throw AuthException(error.message, status: error.status);
     }
 
     final user = _signupUserFromResponse(
@@ -354,7 +254,7 @@ class OtpAuthApi implements OtpAuthService {
         avatarPath: avatarPath,
       );
     } on NetworkException catch (error) {
-      throw OtpAuthException(error.message, status: error.status);
+      throw AuthException(error.message, status: error.status);
     }
 
     final user =
@@ -379,7 +279,7 @@ class OtpAuthApi implements OtpAuthService {
         VerifyOtpRequest(otpType: otpType, identifier: phone, otpCode: otpCode),
       );
     } on NetworkException catch (error) {
-      throw OtpAuthException(error.message, status: error.status);
+      throw AuthException(error.message, status: error.status);
     }
 
     final user =

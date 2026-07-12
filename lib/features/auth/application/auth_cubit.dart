@@ -11,19 +11,21 @@ import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
 import 'package:numi/features/profile/services/active_profile_session.dart';
 import 'package:numi/features/profile/services/avatar_picker_service.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_exception.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/profile_api.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
 
-import 'package:numi/features/auth/auth_state.dart';
+import 'package:numi/features/auth/application/auth_state.dart';
 
 class AuthFlowCubit extends Cubit<AuthFlowState> {
   AuthFlowCubit({
     AvatarPickerService avatarPicker = const AvatarPickerService(),
-    OtpAuthService? authService,
+    AuthService? authService,
     ProfileService? profileService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
     ProfileSessionResolver? profileResolver,
@@ -34,7 +36,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     required VoidCallback onSessionCleared,
     required VoidCallback onSessionRestoreStarted,
   }) : _avatarPicker = avatarPicker,
-       _authService = authService ?? OtpAuthApi(),
+       _authService = authService ?? AuthApi(),
        _profileResolver =
            profileResolver ??
            ProfileSessionResolver(
@@ -44,14 +46,14 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
        _passcodeService = passcodeService,
        _notificationPingService =
            notificationPingService ??
-           _defaultNotificationPingService(authService ?? OtpAuthApi()),
+           _defaultNotificationPingService(authService ?? AuthApi()),
        _onAuthenticated = onAuthenticated,
        _onSessionCleared = onSessionCleared,
        _onSessionRestoreStarted = onSessionRestoreStarted,
        super(initialState ?? const AuthFlowState());
 
   final AvatarPickerService _avatarPicker;
-  final OtpAuthService _authService;
+  final AuthService _authService;
   final ProfileSessionResolver _profileResolver;
   final PasscodeService _passcodeService;
   final NotificationPingService _notificationPingService;
@@ -452,7 +454,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
           clearOtpError: true,
         ),
       );
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       if (state.checkedPhone != phone) {
         return;
       }
@@ -542,7 +544,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
             clearOtpError: true,
           ),
         );
-      } on OtpAuthException catch (error) {
+      } on AuthException catch (error) {
         _emitAuthError(error.message, isSendingOtp: false);
       } catch (_) {
         _emitAuthError(
@@ -618,7 +620,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         ),
       );
       await _sendLoginOtp(phone);
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       if (isAuthUserNotFoundStatus(error.status)) {
         emit(
           state.copyWith(
@@ -685,7 +687,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
           clearOtpError: true,
         ),
       );
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       if (state.phoneNumber != phone) {
         return;
       }
@@ -780,7 +782,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         profileResolution: profileResolution,
         isVerifyingOtp: false,
       );
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       if (isOtpValidationStatus(error.status)) {
         emit(
           state.copyWith(
@@ -865,7 +867,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         profileResolution: profileResolution,
         isSigningUp: false,
       );
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       emit(state.copyWith(isSigningUp: false, authError: error.message));
     } catch (_) {
       emit(
@@ -1030,7 +1032,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         ),
       );
       unawaited(checkPinLoginAvailability());
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       emit(
         state.copyWith(
           screen: AppScreen.login,
@@ -1211,9 +1213,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   }
 
   static NotificationPingService _defaultNotificationPingService(
-    OtpAuthService authService,
+    AuthService authService,
   ) {
-    return authService is OtpAuthApi
+    return authService is AuthApi
         ? ApiNotificationPingService()
         : const NoopNotificationPingService();
   }

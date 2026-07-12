@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/active_profile_session.dart';
 import 'package:numi/features/settings/widgets/profile_list/parent_profile_manage_panel.dart';
 import 'package:numi/features/settings/widgets/profile_list/profile_add_button.dart';

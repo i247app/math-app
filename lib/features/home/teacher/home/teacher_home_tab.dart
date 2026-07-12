@@ -8,7 +8,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi/features/classroom/presentation/teacher_classroom_screens.dart';
 import 'package:numi/features/home/cache/home_profile_cache.dart';
