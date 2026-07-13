@@ -19,88 +19,92 @@ class WelcomeComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double scale = screenHeight > 700 ? 1.0 : 0.8;
-
-    return Stack(
-      children: [
-        // 1. BACKGROUND LAYER: Waves anchored perfectly at the bottom
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: Image.asset(
-            _wavesAsset,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-        ),
-
-        // 2. FOREGROUND CONTENT LAYER: Wrapped in a Center to lock alignment
-        SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center, // Forces all children to center horizontally
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(flex: 2),
-
-                  // Mascot Graphic
-                  Image.asset(
-                    _mascotAsset,
-                    height: screenHeight * 0.22 * scale,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Core Typography Engine using Bagel Fat One
-                  const NumiBrandText(),
-
-                  const Spacer(flex: 3),
-
-                  // The Books & Plants Illustration
-                  Image.asset(
-                    _booksAsset,
-                    height: screenHeight * 0.18 * scale,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(height: 28),
-
-                  // 3. BUTTONS LAYOUT ZONE: Centered and constrained
-                  SizedBox(
-                    width: screenWidth * 0.68,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: 56 * scale,
-                          width: double.infinity,
-                          child: WelcomeStartButton(
-                            onStart: onStart,
-                            scale: scale,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        WelcomeLoginButton(
-                          onLogin: onLogin,
-                          scale: scale,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Spacer(flex: 1),
-                ],
-              ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // 1. BACKGROUND LAYER: Glued to the absolute bottom edge
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Image.asset(
+              _wavesAsset,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
           ),
-        ),
-      ],
+
+          // 2. CONTENT LAYER: Scrollable container viewport to cleanly absorb tight screens
+          SafeArea(
+            bottom: false,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 24),
+
+                          // Mascot Graphics
+                          Image.asset(
+                            _mascotAsset,
+                            height: 160,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Brand text
+                          const NumiBrandText(fontSize: 42.0),
+
+                          // This spacer natively pushes everything down to the background curves
+                          const Spacer(),
+
+                          // Book Illustration
+                          Image.asset(
+                            _booksAsset,
+                            height: 130,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Button action hub
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 56),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                WelcomeStartButton(
+                                  onStart: onStart,
+                                  scale: 1.0,
+                                ),
+                                const SizedBox(height: 16),
+                                WelcomeLoginButton(
+                                  onLogin: onLogin,
+                                  scale: 1.0,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Dynamically pads the baseline using the device safe area guidelines
+                          SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

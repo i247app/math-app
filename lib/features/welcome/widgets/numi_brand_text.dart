@@ -43,9 +43,9 @@ class NumiBrandText extends StatelessWidget {
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
-            style: GoogleFonts.bagelFatOne(
-              fontSize: 24.0, // Clean, explicit fixed sizing
-              letterSpacing: 0.5,
+            style: const TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.w400, // Clean semi-bold looks great without extra spacing
             ),
             children: [
               TextSpan(text: 'Math ', style: TextStyle(color: tealBrandColor)),

@@ -21,7 +21,9 @@ class WelcomeStartButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final radius = BorderRadius.circular(20 * scale);
+
+    // 1. INCREASED BORDER RADIUS FOR A TRUE SMOOTH PILL SHAPE
+    final radius = BorderRadius.circular(28 * scale);
 
     return Material(
       color: colors.accent,
@@ -32,19 +34,23 @@ class WelcomeStartButton extends StatelessWidget {
           onStart();
         },
         borderRadius: radius,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              context.getText(labelKey),
-              style: GoogleFonts.nunito(
-                color: Theme.of(context).colorScheme.onSecondary,
-                fontSize: 18 * scale,
-                fontWeight: FontWeight.w900,
-                height: 1.2,
+        // 2. ADDED INTERNAL VERTICAL PADDING TO CHUNK UP THE SIZE
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16 * scale),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                context.getText(labelKey),
+                style: GoogleFonts.nunito(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontSize: 18 * scale,
+                  fontWeight: FontWeight.w900,
+                  height: 1.2,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
