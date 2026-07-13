@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -9,9 +10,9 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 import 'package:numi/features/profile/widgets/list/managed_profile_role_pill.dart';
-import 'package:numi/features/profile/widgets/list/parent_icon_button.dart';
 import 'package:numi/features/profile/widgets/list/parent_profile_code_line.dart';
-import 'package:numi/features/profile/widgets/list/parent_profile_info_line.dart';
+import 'package:numi/features/profile/widgets/list/profile_action_button.dart';
+import 'package:numi/features/profile/widgets/list/profile_detail_line.dart';
 import 'package:numi/features/profile/widgets/list/profile_list_helpers.dart';
 import 'package:numi/features/profile/widgets/list/profile_radio.dart';
 
@@ -115,41 +116,64 @@ class ParentChildProfileCard extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 14 * scale),
-                  ParentProfileInfoLine(
-                    assetPath: 'assets/images/parent_profile_manage_grade.svg',
+                  ProfileDetailLine(
+                    leading: SizedBox(
+                      width: 18 * scale,
+                      height: 18 * scale,
+                      child: SvgPicture.asset(
+                        'assets/images/parent_profile_manage_grade.svg',
+                      ),
+                    ),
                     label: context.getText(AppKeys.grade),
                     value: settingsProfileGrade(context, profile),
-                    isActive: isActive,
+                    color: isActive
+                        ? const Color(0xFF008080)
+                        : const Color(0xFF6B7280),
                     scale: scale,
                   ),
                   SizedBox(height: 12 * scale),
-                  ParentProfileInfoLine(
-                    assetPath:
+                  ProfileDetailLine(
+                    leading: SizedBox(
+                      width: 18 * scale,
+                      height: 18 * scale,
+                      child: SvgPicture.asset(
                         'assets/images/parent_profile_manage_program.svg',
+                      ),
+                    ),
                     label: context.getText(AppKeys.learningProgram),
                     value: settingsProfileProgram(context, profile),
-                    isActive: isActive,
+                    color: isActive
+                        ? const Color(0xFF008080)
+                        : const Color(0xFF6B7280),
                     scale: scale,
                   ),
                   SizedBox(height: 14 * scale),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ParentIconButton(
-                        assetPath:
-                            'assets/images/parent_profile_manage_edit.svg',
+                      ProfileActionButton(
+                        child: SvgPicture.asset(
+                          'assets/images/parent_profile_manage_edit.svg',
+                          width: 20 * scale,
+                          height: 20 * scale,
+                        ),
                         backgroundColor: colors.brand.withValues(alpha: 0.12),
-                        size: 42 * scale,
-                        iconSize: 20 * scale,
+                        width: 42 * scale,
+                        height: 42 * scale,
+                        borderRadius: BorderRadius.circular(10 * scale),
                         onTap: onEdit,
                       ),
                       SizedBox(width: 12 * scale),
-                      ParentIconButton(
-                        assetPath:
-                            'assets/images/parent_profile_manage_delete.svg',
+                      ProfileActionButton(
+                        child: SvgPicture.asset(
+                          'assets/images/parent_profile_manage_delete.svg',
+                          width: 20 * scale,
+                          height: 20 * scale,
+                        ),
                         backgroundColor: const Color(0xFFFFE4E4),
-                        size: 42 * scale,
-                        iconSize: 20 * scale,
+                        width: 42 * scale,
+                        height: 42 * scale,
+                        borderRadius: BorderRadius.circular(10 * scale),
                         onTap: onDelete,
                       ),
                     ],

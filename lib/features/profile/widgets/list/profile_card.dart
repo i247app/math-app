@@ -9,9 +9,9 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/list/managed_profile_role_pill.dart';
 import 'package:numi/features/profile/widgets/list/profile_avatar.dart';
-import 'package:numi/features/profile/widgets/list/profile_icon_button.dart';
+import 'package:numi/features/profile/widgets/list/profile_action_button.dart';
+import 'package:numi/features/profile/widgets/list/profile_detail_line.dart';
 import 'package:numi/features/profile/widgets/list/profile_id_line.dart';
-import 'package:numi/features/profile/widgets/list/profile_info_line.dart';
 import 'package:numi/features/profile/widgets/list/profile_list_helpers.dart';
 import 'package:numi/features/profile/widgets/list/profile_radio.dart';
 
@@ -115,11 +115,13 @@ class ProfileCard extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 14 * scale),
-              ProfileInfoLine(
-                icon: isTeacher
-                    ? Icons.apartment_rounded
-                    : Icons.school_outlined,
-                iconColor: accent,
+              ProfileDetailLine(
+                leading: Icon(
+                  isTeacher ? Icons.apartment_rounded : Icons.school_outlined,
+                  color: accent,
+                  size: 18 * scale,
+                ),
+                color: accent,
                 label: isTeacher
                     ? context.getText(AppKeys.school)
                     : context.getText(AppKeys.grade),
@@ -130,9 +132,13 @@ class ProfileCard extends StatelessWidget {
               ),
               if (!isTeacher) ...[
                 SizedBox(height: 12 * scale),
-                ProfileInfoLine(
-                  icon: Icons.book_outlined,
-                  iconColor: accent,
+                ProfileDetailLine(
+                  leading: Icon(
+                    Icons.book_outlined,
+                    color: accent,
+                    size: 18 * scale,
+                  ),
+                  color: accent,
                   label: context.getText(AppKeys.program),
                   value: settingsProfileProgram(context, profile),
                   scale: scale,
@@ -142,19 +148,29 @@ class ProfileCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ProfileIconButton(
-                    icon: Icons.edit_rounded,
-                    foregroundColor: colors.brandStrong,
+                  ProfileActionButton(
+                    child: Icon(
+                      Icons.edit_rounded,
+                      color: colors.brandStrong,
+                      size: 23 * scale,
+                    ),
                     backgroundColor: colors.brand.withValues(alpha: 0.12),
-                    scale: scale,
+                    width: 42 * scale,
+                    height: 42 * scale,
+                    borderRadius: BorderRadius.circular(10 * scale),
                     onTap: onEdit,
                   ),
                   SizedBox(width: 12 * scale),
-                  ProfileIconButton(
-                    icon: Icons.delete_outline_rounded,
-                    foregroundColor: const Color(0xFFE83434),
+                  ProfileActionButton(
+                    child: Icon(
+                      Icons.delete_outline_rounded,
+                      color: const Color(0xFFE83434),
+                      size: 23 * scale,
+                    ),
                     backgroundColor: const Color(0xFFFFD8D8),
-                    scale: scale,
+                    width: 42 * scale,
+                    height: 42 * scale,
+                    borderRadius: BorderRadius.circular(10 * scale),
                     onTap: onDelete,
                   ),
                 ],

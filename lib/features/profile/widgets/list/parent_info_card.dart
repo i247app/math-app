@@ -10,8 +10,8 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/list/managed_profile_role_pill.dart';
-import 'package:numi/features/profile/widgets/list/parent_icon_button.dart';
 import 'package:numi/features/profile/widgets/list/parent_profile_avatar.dart';
+import 'package:numi/features/profile/widgets/list/profile_action_button.dart';
 import 'package:numi/features/profile/widgets/list/profile_radio.dart';
 
 class ParentInfoCard extends StatelessWidget {
@@ -84,12 +84,16 @@ class ParentInfoCard extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 8 * scale),
-                      ParentIconButton(
-                        assetPath:
-                            'assets/images/parent_profile_manage_edit.svg',
+                      ProfileActionButton(
+                        child: SvgPicture.asset(
+                          'assets/images/parent_profile_manage_edit.svg',
+                          width: 19 * scale,
+                          height: 19 * scale,
+                        ),
                         backgroundColor: const Color(0xFFE6F5F5),
-                        size: 34 * scale,
-                        iconSize: 19 * scale,
+                        width: 34 * scale,
+                        height: 34 * scale,
+                        borderRadius: BorderRadius.circular(10 * scale),
                         onTap: onEdit,
                       ),
                       SizedBox(width: 8 * scale),
