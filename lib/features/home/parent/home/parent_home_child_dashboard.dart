@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/home_api.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_child_dashboard_loading.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_child_overview_content.dart';
 
 extension ParentHomeChildDashboardView on ParentHomeContentState {
   Widget buildChildDashboard() {
+    final colors = context.themeColors;
     final parent = homeLayout?.parent;
     final padding = EdgeInsets.fromLTRB(
       14 * widget.args.scale,
@@ -15,16 +17,20 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
     );
 
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFFFFF), Color(0xFFF8FCFC), Color(0xFFEFF8F7)],
+          colors: [
+            colors.pageBackground,
+            colors.pageBackgroundTop,
+            colors.surface,
+          ],
           stops: [0, 0.42, 1],
         ),
       ),
       child: RefreshIndicator(
-        color: const Color(0xFF159A86),
+        color: colors.brandStrong,
         onRefresh: loadHome,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(

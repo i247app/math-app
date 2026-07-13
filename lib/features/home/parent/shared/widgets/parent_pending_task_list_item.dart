@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/home_api.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/widgets/home_profile_menu.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_task_icon_box.dart';
@@ -19,6 +20,7 @@ class ParentPendingTaskListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final exercise = pending.exercise;
     final title = roomExerciseTitle(context, exercise);
     final childName = pending.child == null
@@ -27,8 +29,8 @@ class ParentPendingTaskListItem extends StatelessWidget {
     final classroomName = roomClassName(context, pending.classroom);
     final accent = isExpired
         ? (
-            color: const Color(0xFFFF7A1A),
-            background: const Color(0xFFFFF0D8),
+            color: colors.warning,
+            background: colors.warningSurface,
             icon: Icons.warning_amber_rounded,
             asset: null,
           )

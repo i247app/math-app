@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_teacher_message_item.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_empty_task_line.dart';
@@ -12,6 +13,7 @@ class ParentTeacherMessagesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final visibleSummaries = summaries.take(2).toList(growable: false);
     if (visibleSummaries.isEmpty) {
       return ParentEmptyTaskLine(
@@ -28,7 +30,7 @@ class ParentTeacherMessagesList extends StatelessWidget {
             index: index,
           ),
           if (index != visibleSummaries.length - 1)
-            const Divider(height: 24, color: Color(0xFFE9EEF2)),
+            Divider(height: 24, color: colors.border),
         ],
       ],
     );

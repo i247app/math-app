@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_dashed_circle_painter.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_streak_day_state.dart';
 
@@ -11,12 +12,13 @@ class ParentStreakDay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Column(
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF9A6B61),
+          style: TextStyle(
+            color: colors.textMuted,
             fontSize: FontSize.caption * 0.77,
             fontWeight: FontWeight.w700,
             height: 1,
@@ -27,31 +29,35 @@ class ParentStreakDay extends StatelessWidget {
           width: 31,
           height: 31,
           child: switch (state) {
-            ParentStreakDayState.done => const DecoratedBox(
+            ParentStreakDayState.done => DecoratedBox(
               decoration: BoxDecoration(
-                color: Color(0xFF4FB465),
+                color: colors.success,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.check_rounded, color: Colors.white, size: 19),
+              child: Icon(
+                Icons.check_rounded,
+                color: colors.onSuccess,
+                size: 19,
+              ),
             ),
-            ParentStreakDayState.current => const DecoratedBox(
+            ParentStreakDayState.current => DecoratedBox(
               decoration: BoxDecoration(
-                color: Color(0xFFFF5F19),
+                color: colors.accent,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.local_fire_department_rounded,
-                color: Colors.white,
+                color: colors.onAccent,
                 size: 21,
               ),
             ),
-            ParentStreakDayState.upcoming => const CustomPaint(
-              painter: ParentDashedCirclePainter(),
+            ParentStreakDayState.upcoming => CustomPaint(
+              painter: ParentDashedCirclePainter(color: colors.borderStrong),
               child: Center(
                 child: Text(
                   '5',
                   style: TextStyle(
-                    color: Color(0xFFC98E7E),
+                    color: colors.textMuted,
                     fontSize: FontSize.caption,
                     fontWeight: FontWeight.w700,
                   ),

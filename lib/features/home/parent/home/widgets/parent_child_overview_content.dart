@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/home_api.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
@@ -15,7 +16,8 @@ import 'package:numi/features/home/parent/shared/widgets/parent_completed_task_l
 import 'package:numi/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
 
 class ParentChildOverviewContent extends StatelessWidget {
-  const ParentChildOverviewContent({super.key,
+  const ParentChildOverviewContent({
+    super.key,
     required this.summaries,
     required this.pendingExercises,
     required this.completions,
@@ -43,6 +45,7 @@ class ParentChildOverviewContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final primarySummary = parentPrimarySummary(summaries);
     final showGameSuggestions = pendingExercises.isEmpty || completions.isEmpty;
     final visiblePendingExercises = pendingExercises
@@ -82,11 +85,7 @@ class ParentChildOverviewContent extends StatelessWidget {
                       pending: visiblePendingExercises[index],
                     ),
                     if (index != visiblePendingExercises.length - 1)
-                      const Divider(
-                        height: 24,
-                        indent: 62,
-                        color: Color(0xFFE9EEF2),
-                      ),
+                      Divider(height: 24, indent: 62, color: colors.border),
                   ],
                 ],
               ),
@@ -112,11 +111,7 @@ class ParentChildOverviewContent extends StatelessWidget {
                       onTap: () => onCompletionTap(visibleCompletions[index]),
                     ),
                     if (index != visibleCompletions.length - 1)
-                      const Divider(
-                        height: 24,
-                        indent: 62,
-                        color: Color(0xFFE9EEF2),
-                      ),
+                      Divider(height: 24, indent: 62, color: colors.border),
                   ],
                 ],
               ),

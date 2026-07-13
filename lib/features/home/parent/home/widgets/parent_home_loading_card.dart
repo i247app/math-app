@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/shared/widgets/home_skeleton_shimmer.dart';
 import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
 import 'package:numi/features/home/shared/widgets/home_skeleton_line.dart';
@@ -29,13 +30,10 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
+        final colors = context.themeColors;
         final pulseValue =
             0.5 - 0.5 * math.cos(math.pi * 2 * _controller.value);
-        final color = Color.lerp(
-          const Color(0xFFF1F3F3),
-          const Color(0xFFE1E8E7),
-          pulseValue,
-        )!;
+        final color = Color.lerp(colors.skeleton, colors.border, pulseValue)!;
 
         return HomeSkeletonShimmer(
           controller: _controller,

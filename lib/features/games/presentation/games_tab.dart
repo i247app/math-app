@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/games/math_squadron/math_squadron_data.dart';
 import 'package:numi/features/games/presentation/math_squadron_stage_screen.dart';
@@ -13,8 +14,6 @@ import 'package:numi/features/practice/practice_catalog.dart';
 import 'package:numi/features/practice/presentation/practice_chapter_screen.dart';
 
 const _gamesTeal = Color(0xFF006762);
-const _gamesInk = Color(0xFF253228);
-const _gamesMuted = Color(0xFF66736A);
 const _gamesOrange = Color(0xFFFF7B54);
 const _gamesCream = Color(0xFFFFF6DA);
 
@@ -303,6 +302,7 @@ class _GamesGradeSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final visibleGrades =
         grades.where((grade) => grade.label?.trim().isNotEmpty == true).toList()
           ..sort(
@@ -310,7 +310,7 @@ class _GamesGradeSelection extends StatelessWidget {
           );
 
     return ColoredBox(
-      color: Colors.white,
+      color: colors.pageBackground,
       child: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
@@ -328,8 +328,8 @@ class _GamesGradeSelection extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       context.getText(AppKeys.gamesGradeTitle),
-                      style: const TextStyle(
-                        color: _gamesInk,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 31,
                         fontWeight: FontWeight.w900,
                         height: 1.08,
@@ -338,8 +338,8 @@ class _GamesGradeSelection extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       context.getText(AppKeys.gamesGradeSubtitle),
-                      style: const TextStyle(
-                        color: _gamesMuted,
+                      style: TextStyle(
+                        color: colors.textSecondary,
                         fontSize: FontSize.normal,
                         fontWeight: FontWeight.w700,
                         height: 1.35,
@@ -415,9 +415,10 @@ class _GamesCatalog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final games = _gamePreviews(context, selectedGrade);
     return ColoredBox(
-      color: const Color(0xFFF6FBF7),
+      color: colors.pageBackground,
       child: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -447,8 +448,8 @@ class _GamesCatalog extends StatelessWidget {
                       const SizedBox(height: 22),
                       Text(
                         context.getText(AppKeys.gamesChooseTitle),
-                        style: const TextStyle(
-                          color: _gamesInk,
+                        style: TextStyle(
+                          color: colors.textPrimary,
                           fontSize: 30,
                           fontWeight: FontWeight.w900,
                           height: 1.08,
@@ -457,8 +458,8 @@ class _GamesCatalog extends StatelessWidget {
                       const SizedBox(height: 9),
                       Text(
                         context.getText(AppKeys.gamesChooseSubtitle),
-                        style: const TextStyle(
-                          color: _gamesMuted,
+                        style: TextStyle(
+                          color: colors.textSecondary,
                           fontSize: FontSize.normal,
                           fontWeight: FontWeight.w700,
                           height: 1.35,
@@ -548,10 +549,11 @@ class _GamesEyebrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Text(
       label.toUpperCase(),
-      style: const TextStyle(
-        color: _gamesTeal,
+      style: TextStyle(
+        color: colors.brandStrong,
         fontSize: 12,
         fontWeight: FontWeight.w900,
         letterSpacing: 1.8,
@@ -573,6 +575,7 @@ class _GamesGradeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     const palettes = <_GradeNumberPalette>[
       _GradeNumberPalette(
         top: Color(0xFFFFDA17),
@@ -614,12 +617,12 @@ class _GamesGradeCard extends StatelessWidget {
       label: label,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.elevatedSurface,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: const Color(0xFFE8EEEA)),
+          border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF24483E).withValues(alpha: 0.13),
+              color: colors.shadow.withValues(alpha: 0.22),
               blurRadius: 18,
               spreadRadius: 1,
               offset: Offset.zero,
@@ -706,21 +709,6 @@ class _ThreeDimensionalNumber extends StatelessWidget {
               style: _numberStyle.copyWith(color: Colors.white),
             ),
           ),
-          Positioned(
-            top: 22,
-            left: 34,
-            child: Transform.rotate(
-              angle: -0.5,
-              child: Container(
-                width: 18,
-                height: 7,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.42),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -754,8 +742,9 @@ class _GradeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: BorderRadius.circular(999),
       child: InkWell(
         onTap: onTap,
@@ -765,20 +754,20 @@ class _GradeChip extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.school_rounded, color: _gamesTeal, size: 18),
+              Icon(Icons.school_rounded, color: colors.brandStrong, size: 18),
               const SizedBox(width: 7),
               Text(
                 label,
-                style: const TextStyle(
-                  color: _gamesInk,
+                style: TextStyle(
+                  color: colors.textPrimary,
                   fontSize: 13,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(
+              Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: _gamesTeal,
+                color: colors.brandStrong,
                 size: 18,
               ),
             ],
@@ -797,8 +786,12 @@ class _GamePreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final background = Theme.of(context).brightness == Brightness.dark
+        ? colors.elevatedSurface
+        : game.background;
     return Material(
-      color: game.background,
+      color: background,
       borderRadius: BorderRadius.circular(30),
       child: InkWell(
         onTap: onTap,
@@ -829,7 +822,7 @@ class _GamePreviewCard extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.74),
+                        color: colors.surface.withValues(alpha: 0.74),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
@@ -847,8 +840,8 @@ class _GamePreviewCard extends StatelessWidget {
                       game.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: _gamesInk,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 21,
                         fontWeight: FontWeight.w900,
                         height: 1.08,
@@ -859,8 +852,8 @@ class _GamePreviewCard extends StatelessWidget {
                       context.formatText(AppKeys.gamesLevelCount, {
                         'count': game.levelCount,
                       }),
-                      style: const TextStyle(
-                        color: _gamesMuted,
+                      style: TextStyle(
+                        color: colors.textSecondary,
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                       ),
@@ -873,7 +866,7 @@ class _GamePreviewCard extends StatelessWidget {
                 width: 104,
                 height: 112,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.48),
+                  color: colors.surface.withValues(alpha: 0.48),
                   borderRadius: BorderRadius.circular(26),
                 ),
                 child: ClipRRect(
@@ -896,6 +889,7 @@ class _GamesGradeLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -908,7 +902,7 @@ class _GamesGradeLoading extends StatelessWidget {
       ),
       itemBuilder: (_, _) => Container(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
+          color: colors.elevatedSurface.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(28),
         ),
       ),
@@ -931,21 +925,22 @@ class _GamesMessageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.84),
+        color: colors.infoSurface,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
         children: [
-          Icon(icon, color: _gamesTeal, size: 34),
+          Icon(icon, color: colors.info, size: 34),
           const SizedBox(height: 12),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: _gamesInk,
+            style: TextStyle(
+              color: colors.textPrimary,
               fontSize: 14,
               fontWeight: FontWeight.w800,
               height: 1.3,

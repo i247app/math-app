@@ -2,19 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/widgets/home_profile_menu.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 
 class ParentTeacherMessageItem extends StatelessWidget {
-  const ParentTeacherMessageItem({super.key, required this.summary, required this.index});
+  const ParentTeacherMessageItem({
+    super.key,
+    required this.summary,
+    required this.index,
+  });
 
   final ParentChildSummary summary;
   final int index;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final childName = homeProfileDisplayName(context, summary.profile);
     final className = parentClassroomName(context, summary);
     final teacherName = context.getText(
@@ -54,8 +60,8 @@ class ParentTeacherMessageItem extends StatelessWidget {
                         teacherName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.black87,
+                        style: TextStyle(
+                          color: colors.textPrimary,
                           fontSize: FontSize.normal,
                           fontWeight: FontWeight.w600,
                         ),
@@ -63,8 +69,8 @@ class ParentTeacherMessageItem extends StatelessWidget {
                     ),
                     Text(
                       time,
-                      style: const TextStyle(
-                        color: Colors.black87,
+                      style: TextStyle(
+                        color: colors.textMuted,
                         fontSize: FontSize.xxs,
                         fontWeight: FontWeight.w600,
                       ),
@@ -76,8 +82,8 @@ class ParentTeacherMessageItem extends StatelessWidget {
                   '$className - ${childName.toUpperCase()}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.black87,
+                  style: TextStyle(
+                    color: colors.textSecondary,
                     fontSize: FontSize.small,
                     fontWeight: FontWeight.w400,
                   ),
@@ -87,8 +93,8 @@ class ParentTeacherMessageItem extends StatelessWidget {
                   body,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.black87,
+                  style: TextStyle(
+                    color: colors.textSecondary,
                     fontSize: FontSize.small,
                     fontWeight: FontWeight.w400,
                   ),
