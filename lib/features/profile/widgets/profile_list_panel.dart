@@ -7,10 +7,10 @@ import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/settings/widgets/profile_list/parent_profile_manage_panel.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_add_button.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_card.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_state_panel.dart';
+import 'package:numi/features/profile/widgets/list/parent_profile_manage_panel.dart';
+import 'package:numi/features/profile/widgets/list/profile_add_button.dart';
+import 'package:numi/features/profile/widgets/list/profile_card.dart';
+import 'package:numi/features/profile/widgets/list/profile_state_panel.dart';
 
 class ProfilePlaceholderPanel extends StatelessWidget {
   const ProfilePlaceholderPanel({

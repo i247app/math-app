@@ -11,9 +11,9 @@ import 'package:numi/core/network/school_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/settings/widgets/account/settings_cancel_button.dart';
 import 'package:numi/features/settings/widgets/account/settings_save_button.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_avatar.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_dropdown.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_text_field.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_avatar.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_dropdown.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_text_field.dart';
 
 class AddProfilePanel extends StatelessWidget {
   const AddProfilePanel({

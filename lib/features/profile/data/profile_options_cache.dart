@@ -3,10 +3,10 @@ import 'package:numi/core/network/program_models.dart';
 import 'package:numi/core/network/school_models.dart';
 import 'package:numi/core/network/semester_models.dart';
 
-const settingsProfileOptionsCacheTtl = Duration(minutes: 10);
+const profileOptionsCacheTtl = Duration(minutes: 10);
 
-class SettingsProfileOptionsSnapshot {
-  const SettingsProfileOptionsSnapshot({
+class ProfileOptionsSnapshot {
+  const ProfileOptionsSnapshot({
     required this.userId,
     required this.schools,
     required this.grades,
@@ -23,20 +23,18 @@ class SettingsProfileOptionsSnapshot {
   final DateTime createdAt;
 
   bool get isFresh {
-    return DateTime.now().difference(createdAt) <
-        settingsProfileOptionsCacheTtl;
+    return DateTime.now().difference(createdAt) < profileOptionsCacheTtl;
   }
 }
 
-class SettingsProfileOptionsCache {
-  SettingsProfileOptionsCache._();
+class ProfileOptionsCache {
+  ProfileOptionsCache._();
 
-  static final SettingsProfileOptionsCache instance =
-      SettingsProfileOptionsCache._();
+  static final ProfileOptionsCache instance = ProfileOptionsCache._();
 
-  SettingsProfileOptionsSnapshot? _snapshot;
+  ProfileOptionsSnapshot? _snapshot;
 
-  SettingsProfileOptionsSnapshot? readFresh({required int userId}) {
+  ProfileOptionsSnapshot? readFresh({required int userId}) {
     final snapshot = _snapshot;
     if (snapshot == null || snapshot.userId != userId || !snapshot.isFresh) {
       return null;
@@ -51,7 +49,7 @@ class SettingsProfileOptionsCache {
     required List<ProgramModel> programs,
     required List<SemesterModel> semesters,
   }) {
-    _snapshot = SettingsProfileOptionsSnapshot(
+    _snapshot = ProfileOptionsSnapshot(
       userId: userId,
       schools: List<SchoolModel>.unmodifiable(schools),
       grades: List<GradeModel>.unmodifiable(grades),

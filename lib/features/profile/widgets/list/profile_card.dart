@@ -7,13 +7,13 @@ import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/settings/widgets/profile_list/managed_profile_role_pill.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_avatar.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_icon_button.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_id_line.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_info_line.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_list_helpers.dart';
-import 'package:numi/features/settings/widgets/profile_list/profile_radio.dart';
+import 'package:numi/features/profile/widgets/list/managed_profile_role_pill.dart';
+import 'package:numi/features/profile/widgets/list/profile_avatar.dart';
+import 'package:numi/features/profile/widgets/list/profile_icon_button.dart';
+import 'package:numi/features/profile/widgets/list/profile_id_line.dart';
+import 'package:numi/features/profile/widgets/list/profile_info_line.dart';
+import 'package:numi/features/profile/widgets/list/profile_list_helpers.dart';
+import 'package:numi/features/profile/widgets/list/profile_radio.dart';
 
 class ProfileCard extends StatelessWidget {
   const ProfileCard({

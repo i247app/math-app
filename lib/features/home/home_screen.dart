@@ -12,7 +12,7 @@ import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/profile/presentation/helpers/profile_display_helpers.dart';
+import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/home/cache/home_profile_cache.dart';
