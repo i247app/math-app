@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/settings/widgets/profile_list/profile_list_helpers.dart';
 
