@@ -15,22 +15,20 @@ class NumiBrandText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Exact hex color codes from welcome.jpg
+    // Exact hex color codes mapped from your design layout
     final Color tealBrandColor = firstColor ?? const Color(0xFF1C8E9B);
     final Color orangeBrandColor = secondColor ?? const Color(0xFFF16634);
-
-    final double baseSize = fontSize ?? 42.0;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // 1. Brand Title using Bagel Fat One
+        // 1. Brand Title - "NUMINUMI"
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
             style: GoogleFonts.bagelFatOne(
-              fontSize: baseSize,
+              fontSize: fontSize ?? 42.0, // Fixed size for the main title
               letterSpacing: 1.0,
             ),
             children: [
@@ -39,14 +37,14 @@ class NumiBrandText extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 4),
 
-        // 2. Subtitle Main using Bagel Fat One
+        // 2. Main Subtitle - "Math AI"
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
             style: GoogleFonts.bagelFatOne(
-              fontSize: baseSize * 0.55,
+              fontSize: 24.0, // Clean, explicit fixed sizing
               letterSpacing: 0.5,
             ),
             children: [
@@ -57,12 +55,12 @@ class NumiBrandText extends StatelessWidget {
         ),
         const SizedBox(height: 6),
 
-        // 3. Description Subtitle
+        // 3. Description Subtitle - "Learning & Assessment"
         Text(
           'Learning & Assessment',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: baseSize * 0.48,
+            fontSize: 20.0, // Clean, explicit fixed sizing
             fontWeight: FontWeight.w500,
             color: tealBrandColor,
           ),
