@@ -25,7 +25,7 @@ import 'package:numi/features/home/widgets/home_visual_constants.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/grade_selection_screen.dart';
 import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
-import 'package:numi/features/settings/setting_tab.dart';
+import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/student/shared/widgets/student_home_sections_loading.dart';
 import 'package:numi/features/classroom/presentation/student_class_detail_screen.dart';
 import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
@@ -369,27 +369,27 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
         widget.activeRole == ProfileRole.student && _classrooms.isNotEmpty;
     final hasCompletedAssessment = _completedAssessments.isNotEmpty;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: widget.padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (widget.header != null) widget.header!,
-          Padding(
+    final content = widget.activeRole == ProfileRole.parent
+        ? _buildStudentInitialAssessmentState()
+        : isLoadingHomeSections
+        ? const StudentHomeSectionsLoading()
+        : hasClassroom
+        ? _buildStudentClassroomOverviewState()
+        : hasCompletedAssessment
+        ? _buildStudentCompletedAssessmentState()
+        : _buildStudentInitialAssessmentState();
+
+    return Column(
+      children: [
+        if (widget.header != null) widget.header!,
+        Expanded(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: widget.padding,
-            child: widget.activeRole == ProfileRole.parent
-                ? _buildStudentInitialAssessmentState()
-                : isLoadingHomeSections
-                ? const StudentHomeSectionsLoading()
-                : hasClassroom
-                ? _buildStudentClassroomOverviewState()
-                : hasCompletedAssessment
-                ? _buildStudentCompletedAssessmentState()
-                : _buildStudentInitialAssessmentState(),
+            child: content,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -506,8 +506,8 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           ),
           title: Text(
             context.getText(AppKeys.parentSwitchStudentTitle),
-            style: const TextStyle(
-              color: Color(0xFF001741),
+            style: TextStyle(
+              color: context.themeColors.textPrimary,
               fontSize: FontSize.large,
               fontWeight: FontWeight.w900,
               height: 1.2,
@@ -515,8 +515,8 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           ),
           content: Text(
             context.getText(AppKeys.parentSwitchStudentMessage),
-            style: const TextStyle(
-              color: Color(0xFF444650),
+            style: TextStyle(
+              color: context.themeColors.textSecondary,
               fontSize: FontSize.normal,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -544,7 +544,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
     HapticFeedback.selectionClick();
     return showDialog<bool>(
       context: context,
-      barrierColor: const Color(0xFF001741).withValues(alpha: 0.40),
+      barrierColor: context.themeColors.shadow.withValues(alpha: 0.40),
       builder: (_) => const HomeMissingStudentDialog(),
     );
   }

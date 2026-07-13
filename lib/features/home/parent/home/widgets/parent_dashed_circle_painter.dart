@@ -2,12 +2,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class ParentDashedCirclePainter extends CustomPainter {
-  const ParentDashedCirclePainter();
+  const ParentDashedCirclePainter({required this.color});
+
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFE6B5A7)
+      ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.6
       ..strokeCap = StrokeCap.round;
@@ -24,5 +26,6 @@ class ParentDashedCirclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant ParentDashedCirclePainter oldDelegate) =>
+      color != oldDelegate.color;
 }

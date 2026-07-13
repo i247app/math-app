@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/shared/widgets/home_skeleton_shimmer.dart';
 import 'package:numi/features/home/student/classroom/widgets/student_classroom_skeleton_block.dart';
 
@@ -25,6 +26,7 @@ class _StudentHomeSectionsLoadingState extends State<StudentHomeSectionsLoading>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return HomeSkeletonShimmer(
       controller: _controller,
       child: Column(
@@ -34,9 +36,9 @@ class _StudentHomeSectionsLoadingState extends State<StudentHomeSectionsLoading>
             height: 116,
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colors.elevatedSurface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE4EAEC)),
+              border: Border.all(color: colors.border),
             ),
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,

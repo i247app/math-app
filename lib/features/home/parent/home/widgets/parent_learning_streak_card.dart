@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_streak_day_state.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_streak_day.dart';
 
 class ParentLearningStreakCard extends StatelessWidget {
-  const ParentLearningStreakCard({super.key, required this.hasCompletedAssessment});
+  const ParentLearningStreakCard({
+    super.key,
+    required this.hasCompletedAssessment,
+  });
 
   final bool hasCompletedAssessment;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final dayLabels = <String>[
       context.getText(AppKeys.parentWeekdaySun),
       context.getText(AppKeys.parentWeekdayMon),
@@ -44,12 +49,12 @@ class ParentLearningStreakCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 9, 16, 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: const Color(0xFFF0DFD8)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colors.shadow.withValues(alpha: 0.20),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -60,8 +65,8 @@ class ParentLearningStreakCard extends StatelessWidget {
         children: [
           Text(
             context.getText(AppKeys.parentLearningStreak),
-            style: const TextStyle(
-              color: Color(0xFF282828),
+            style: TextStyle(
+              color: colors.textPrimary,
               fontSize: FontSize.small,
               fontWeight: FontWeight.w900,
               height: 1,

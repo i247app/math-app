@@ -303,6 +303,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     required bool shouldShowFullSkeleton,
     required double scale,
   }) {
+    final colors = context.themeColors;
     final shouldShowProgressChart = _entries.length > 1;
 
     if (shouldShowFullSkeleton) {
@@ -329,7 +330,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         Text(
           context.getText(AppKeys.parentLearningProgress),
           style: TextStyle(
-            color: const Color(0xFF17252B),
+            color: colors.textPrimary,
             fontSize: FontSize.large * scale,
             fontWeight: FontWeight.w900,
             height: 1.1,

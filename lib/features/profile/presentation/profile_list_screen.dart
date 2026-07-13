@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/features/settings/helpers/setting_page_builders.dart';
+import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
-import 'package:numi/features/settings/setting_tab.dart';
 import 'package:numi/features/settings/widgets/setting_safe_screen.dart';
 
-class SettingProfileListScreen extends StatelessWidget {
-  const SettingProfileListScreen({
+class ProfileListScreen extends StatelessWidget {
+  const ProfileListScreen({
     super.key,
     required this.args,
     this.openAddProfileOnStart = false,

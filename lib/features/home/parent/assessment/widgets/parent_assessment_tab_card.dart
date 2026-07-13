@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/parent/assessment/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_score_badge.dart';
@@ -20,6 +21,7 @@ class AssessmentResultListItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final percent = quiz.grading?.scorePercentage;
     final scoreStyle = parentAssessmentScoreStyle(context, percent);
     final dateParts = parentAssessmentDateParts(quiz.createDt);
@@ -27,7 +29,7 @@ class AssessmentResultListItemCard extends StatelessWidget {
     final radius = BorderRadius.circular(24 * scale);
 
     return Material(
-      color: Colors.white,
+      color: colors.elevatedSurface,
       borderRadius: radius,
       child: InkWell(
         onTap: onTap,
@@ -41,15 +43,12 @@ class AssessmentResultListItemCard extends StatelessWidget {
             14 * scale,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.elevatedSurface,
             borderRadius: radius,
-            border: Border.all(
-              color: const Color(0xFFE3DDDF),
-              width: 1.3 * scale,
-            ),
+            border: Border.all(color: colors.border, width: 1.3 * scale),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.07),
+                color: colors.shadow.withValues(alpha: 0.25),
                 blurRadius: 12 * scale,
                 offset: Offset(0, 4 * scale),
               ),
@@ -91,7 +90,7 @@ class AssessmentResultListItemCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: const Color(0xFF17252B),
+                        color: colors.textPrimary,
                         fontSize: FontSize.normal * scale,
                         fontWeight: FontWeight.w800,
                         height: 1.28,
@@ -103,8 +102,8 @@ class AssessmentResultListItemCard extends StatelessWidget {
                         shortText,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF5D4A54),
+                        style: TextStyle(
+                          color: colors.textSecondary,
                           fontSize: FontSize.small,
                           fontWeight: FontWeight.w500,
                         ),
@@ -115,7 +114,7 @@ class AssessmentResultListItemCard extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: const Color(0xFF083B78),
+                color: colors.brandStrong,
                 size: 26 * scale,
               ),
             ],

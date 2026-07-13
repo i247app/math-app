@@ -1,4 +1,4 @@
-import 'package:numi/features/settings/settings_constants.dart';
+import 'package:numi/features/settings/application/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';

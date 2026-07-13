@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
@@ -46,6 +47,7 @@ class HomeHeaderBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final contentHeight = height - topInset;
 
     return RepaintBoundary(
@@ -57,7 +59,7 @@ class HomeHeaderBar extends StatelessWidget {
           horizontalPadding,
           contentHeight * 0.10,
         ),
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(color: colors.elevatedSurface),
         child: Row(
           children: [
             Expanded(
@@ -75,7 +77,7 @@ class HomeHeaderBar extends StatelessWidget {
                         avatarUrl: profile?.avatarUrl,
                         showStatus: role != ProfileRole.parent,
                         borderColor: role == ProfileRole.parent
-                            ? const Color(0xFFE7DAC8)
+                            ? colors.accent.withValues(alpha: 0.35)
                             : null,
                       ),
                       SizedBox(width: contentHeight * 0.14),
@@ -89,8 +91,8 @@ class HomeHeaderBar extends StatelessWidget {
                               homeRoleLabel(context, role),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.black87,
+                              style: TextStyle(
+                                color: colors.textSecondary,
                                 fontSize: FontSize.small,
                                 fontWeight: FontWeight.w400,
                                 height: 1.05,
@@ -107,8 +109,8 @@ class HomeHeaderBar extends StatelessWidget {
                                         : '$name👋',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: Colors.black87,
+                                    style: TextStyle(
+                                      color: colors.textPrimary,
                                       fontSize: FontSize.small,
                                       fontWeight: FontWeight.w600,
                                       height: 1.05,
@@ -123,7 +125,7 @@ class HomeHeaderBar extends StatelessWidget {
                                     child: Icon(
                                       Icons.keyboard_arrow_down_rounded,
                                       size: contentHeight * 0.18,
-                                      color: const Color(0xFF8294B0),
+                                      color: colors.textMuted,
                                     ),
                                   ),
                                 ],
@@ -164,27 +166,28 @@ class HomeParentFireBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: height,
       constraints: BoxConstraints(minWidth: height * 1.5),
       padding: EdgeInsets.symmetric(horizontal: height * 0.30),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF4EC),
+        color: colors.accent.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(height),
-        border: Border.all(color: const Color(0xFFFFCBAF)),
+        border: Border.all(color: colors.accent.withValues(alpha: 0.35)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             Icons.local_fire_department_rounded,
-            color: const Color(0xFFFF650B),
+            color: colors.accent,
             size: height * 0.66,
           ),
           Text(
             '$count',
             style: TextStyle(
-              color: const Color(0xFFFF650B),
+              color: colors.accent,
               fontSize: FontSize.caption * (height / 30),
               fontWeight: FontWeight.w900,
               height: 1,
@@ -214,6 +217,7 @@ class HomeProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -222,11 +226,11 @@ class HomeProfileAvatar extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: homeTeal.withValues(alpha: 0.05),
+                color: colors.brand.withValues(alpha: 0.05),
                 spreadRadius: size * 0.08,
               ),
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.11),
+                color: colors.shadow.withValues(alpha: 0.30),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -251,7 +255,7 @@ class HomeProfileAvatar extends StatelessWidget {
                 color: const Color(0xFF22C55E),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: homeMintBackground,
+                  color: colors.elevatedSurface,
                   width: size * 0.05,
                 ),
               ),
@@ -269,9 +273,10 @@ class HomeNotificationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
-      color: Colors.white,
-      shadowColor: Colors.black.withValues(alpha: 0.08),
+      color: colors.elevatedSurface,
+      shadowColor: colors.shadow.withValues(alpha: 0.24),
       elevation: 2,
       borderRadius: BorderRadius.circular(size * 0.36),
       child: InkWell(

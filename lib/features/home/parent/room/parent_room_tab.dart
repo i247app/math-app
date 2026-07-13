@@ -11,7 +11,7 @@ import 'package:numi/features/home/parent/cache/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_dashboard_args.dart';
 import 'package:numi/features/home/shell/widgets/home_tab_header.dart';
 import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
-import 'package:numi/features/settings/setting_tab.dart';
+import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
@@ -223,7 +223,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     return ColoredBox(
       color: isEmptyRoomState ? colors.surface : colors.pageBackground,
       child: RefreshIndicator(
-        color: const Color(0xFF339395),
+        color: colors.brandStrong,
         onRefresh: () => _loadLayout(forceRefresh: true),
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -289,6 +289,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     required List<HomeLayoutPendingExercise> expiredExercises,
     required List<HomeLayoutRecentCompletion> completions,
   }) {
+    final colors = context.themeColors;
     if (_isLoading && !_hasLoaded) {
       return const ParentRoomLoading(key: ValueKey('room-loading'));
     }
@@ -343,11 +344,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                         ParentPendingTaskListItem(pending: pending),
                         if (pending != pendingExercises.take(3).last ||
                             expiredExercises.isNotEmpty)
-                          const Divider(
-                            height: 24,
-                            indent: 62,
-                            color: Color(0xFFE9EEF2),
-                          ),
+                          Divider(height: 24, indent: 62, color: colors.border),
                       ],
                       for (final expired in expiredExercises.take(3)) ...[
                         ParentPendingTaskListItem(
@@ -356,11 +353,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                           onTap: () => showExpiredExerciseMessage(context),
                         ),
                         if (expired != expiredExercises.take(3).last)
-                          const Divider(
-                            height: 24,
-                            indent: 62,
-                            color: Color(0xFFE9EEF2),
-                          ),
+                          Divider(height: 24, indent: 62, color: colors.border),
                       ],
                     ],
                   ),
@@ -386,11 +379,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                           onTap: () => _openCompletionResult(completion),
                         ),
                         if (completion != completions.take(5).last)
-                          const Divider(
-                            height: 24,
-                            indent: 62,
-                            color: Color(0xFFE9EEF2),
-                          ),
+                          Divider(height: 24, indent: 62, color: colors.border),
                       ],
                     ],
                   ),

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class ParentDashboardSection extends StatelessWidget {
-  const ParentDashboardSection({super.key,
+  const ParentDashboardSection({
+    super.key,
     required this.title,
     required this.child,
     this.onViewAll,
@@ -16,15 +18,16 @@ class ParentDashboardSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFF0F3F7)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.055),
+            color: colors.shadow.withValues(alpha: 0.20),
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),
@@ -40,8 +43,8 @@ class ParentDashboardSection extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.black87,
+                  style: TextStyle(
+                    color: colors.textPrimary,
                     fontSize: FontSize.xl,
                     fontWeight: FontWeight.w600,
                   ),
@@ -51,7 +54,7 @@ class ParentDashboardSection extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onViewAll,
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF2775FF),
+                    foregroundColor: colors.info,
                     visualDensity: VisualDensity.compact,
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/widgets/home_guide_item.dart';
 
 class HomeStartGuideCard extends StatelessWidget {
@@ -18,15 +19,16 @@ class HomeStartGuideCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 13, 16, 13),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: const Color(0xFFE4E1E1)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colors.shadow.withValues(alpha: 0.20),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -36,7 +38,7 @@ class HomeStartGuideCard extends StatelessWidget {
         children: [
           HomeGuideItem(
             icon: Icons.fact_check_rounded,
-            color: const Color(0xFF069C95),
+            color: colors.brandStrong,
             title: context.getText(AppKeys.parentAssessmentTitle),
             subtitle: context.getText(AppKeys.parentAssessmentSubtitle),
             onTap: onAssessmentTap,
@@ -44,7 +46,7 @@ class HomeStartGuideCard extends StatelessWidget {
           const SizedBox(height: 10),
           HomeGuideItem(
             icon: Icons.sports_esports_rounded,
-            color: const Color(0xFFFF6636),
+            color: colors.accent,
             title: context.getText(AppKeys.parentRoadmapTitle),
             subtitle: context.getText(AppKeys.parentRoadmapSubtitle),
             onTap: onRoadmapTap,
@@ -52,7 +54,7 @@ class HomeStartGuideCard extends StatelessWidget {
           const SizedBox(height: 10),
           HomeGuideItem(
             icon: Icons.meeting_room_rounded,
-            color: const Color(0xFF6451A6),
+            color: colors.info,
             title: context.getText(AppKeys.parentJoinRoomTitle),
             subtitle: context.getText(AppKeys.parentJoinRoomSubtitle),
             onTap: onClassroomTap,

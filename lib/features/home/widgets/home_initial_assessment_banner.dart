@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class HomeInitialAssessmentBanner extends StatelessWidget {
   const HomeInitialAssessmentBanner({super.key, required this.onTap});
@@ -9,6 +10,7 @@ class HomeInitialAssessmentBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final borderRadius = BorderRadius.circular(30);
 
     return DecoratedBox(
@@ -16,7 +18,7 @@ class HomeInitialAssessmentBanner extends StatelessWidget {
         borderRadius: borderRadius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
+            color: colors.shadow.withValues(alpha: 0.35),
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),

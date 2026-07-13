@@ -1,5 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/settings/settings_constants.dart';
+import 'package:numi/features/profile/models/profile_id_type_option.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,9 +11,9 @@ import 'package:numi/core/network/school_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/settings/widgets/account/settings_cancel_button.dart';
 import 'package:numi/features/settings/widgets/account/settings_save_button.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_avatar.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_dropdown.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_text_field.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_avatar.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_dropdown.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_text_field.dart';
 
 class AddProfilePanel extends StatelessWidget {
   const AddProfilePanel({
@@ -85,8 +85,8 @@ class AddProfilePanel extends StatelessWidget {
     final isTeacherProfile = role == 'TEACHER';
     final isParentProfile = role == 'PARENT';
     final idTypeOptions = isTeacherProfile
-        ? teacherIdTypeOptions
-        : studentIdTypeOptions;
+        ? teacherProfileIdTypeOptions
+        : studentProfileIdTypeOptions;
     final selectedIdTypeOption = _firstIdTypeOption(
       idTypeOptions,
       selectedIdType,
@@ -188,7 +188,7 @@ class AddProfilePanel extends StatelessWidget {
                 hintText: context.getText(AppKeys.profileIdTypeHint),
                 value: selectedIdTypeOption,
                 items: idTypeOptions,
-                itemLabel: (option) => context.getText(option.label),
+                itemLabel: (option) => context.getText(option.labelKey),
                 onChanged: (option) => onIdTypeChanged(option?.value),
                 scale: scale,
               ),

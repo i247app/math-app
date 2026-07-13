@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
 import 'package:numi/features/home/shared/widgets/home_skeleton_line.dart';
 
@@ -29,9 +30,10 @@ class _ParentChildDashboardLoadingState
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
+        final colors = context.themeColors;
         final color = Color.lerp(
-          const Color(0xFFF1F3F3),
-          const Color(0xFFE1E8E7),
+          colors.skeleton,
+          colors.border,
           _controller.value,
         )!;
         return Column(

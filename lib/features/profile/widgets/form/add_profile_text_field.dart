@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_field_shell.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_field_shell.dart';
 
 class AddProfileTextField extends StatelessWidget {
   const AddProfileTextField({

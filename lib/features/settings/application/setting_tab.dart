@@ -1,4 +1,5 @@
-import 'package:numi/features/settings/settings_constants.dart';
+import 'package:numi/features/profile/models/profile_id_type_option.dart';
+import 'package:numi/features/settings/application/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,6 +16,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/application/profile_management_cubit.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
@@ -28,13 +30,13 @@ import 'package:numi/features/auth/presentation/passcode_screen.dart';
 import 'package:numi/shared/widgets/loading_screen.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
-import 'package:numi/features/settings/cache/settings_profile_options_cache.dart';
+import 'package:numi/features/profile/data/profile_options_cache.dart';
 import 'package:numi/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
 import 'package:numi/features/settings/presentation/setting_account_screen.dart';
 import 'package:numi/features/settings/widgets/account_details_panel.dart';
-import 'package:numi/features/settings/widgets/profile_form_panel.dart';
-import 'package:numi/features/settings/widgets/profile_list_panel.dart';
+import 'package:numi/features/profile/widgets/profile_form_panel.dart';
+import 'package:numi/features/profile/widgets/profile_list_panel.dart';
 import 'package:numi/features/settings/widgets/setting_header.dart';
 import 'package:numi/features/settings/widgets/setting_safe_screen.dart';
 import 'package:numi/features/settings/widgets/menu/passcode_settings_sheet.dart';
@@ -187,6 +189,7 @@ class _SettingTabState extends State<SettingTab> {
   final SchoolService _schoolService = SchoolApi();
   final ActiveProfileSession _activeProfileSession =
       const ActiveProfileSession();
+  late final ProfileManagementCubit _profileManagementCubit;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -239,6 +242,12 @@ class _SettingTabState extends State<SettingTab> {
   @override
   void initState() {
     super.initState();
+    _profileManagementCubit = ProfileManagementCubit(
+      profileService: _profileService,
+      gradeService: _gradeService,
+      schoolService: _schoolService,
+      activeProfileSession: _activeProfileSession,
+    );
     _profileNameController.addListener(_onProfileNameChanged);
     _view = widget._initialView;
     _applyUser(widget.user);
@@ -349,6 +358,7 @@ class _SettingTabState extends State<SettingTab> {
 
   @override
   void dispose() {
+    _profileManagementCubit.close();
     _profileNameController.removeListener(_onProfileNameChanged);
     _usernameController.dispose();
     _phoneController.dispose();
@@ -997,36 +1007,20 @@ class _SettingTabState extends State<SettingTab> {
       _profileLoadError = null;
     });
 
-    try {
-      final profiles = await _profileService.listProfiles(userId: userId);
-      final activeProfileId = await _activeProfileSession.readActiveProfileId(
-        userId,
-      );
-      if (!mounted) {
-        return;
-      }
-
+    await _profileManagementCubit.loadProfiles(userId);
+    if (!mounted) {
+      return;
+    }
+    final profileState = _profileManagementCubit.state;
+    if (profileState.errorMessage != null) {
       setState(() {
-        _profiles = profiles;
-        _localActiveProfileId = activeProfileId;
+        _profileLoadError = profileState.errorMessage;
         _isLoadingProfiles = false;
       });
-    } on ProfileException catch (error) {
-      if (!mounted) {
-        return;
-      }
-
+    } else {
       setState(() {
-        _profileLoadError = error.message;
-        _isLoadingProfiles = false;
-      });
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _profileLoadError = context.readText(AppKeys.profileLoadFailed);
+        _profiles = profileState.profiles;
+        _localActiveProfileId = profileState.activeProfileId;
         _isLoadingProfiles = false;
       });
     }
@@ -1061,6 +1055,9 @@ class _SettingTabState extends State<SettingTab> {
 
     final userId = widget.user?.id;
     if (userId == null || userId <= 0) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _isLoadingProfileOptions = false;
         _profileOptionsError = context.readText(
@@ -1093,7 +1090,7 @@ class _SettingTabState extends State<SettingTab> {
       final grades = results[1] as List<GradeModel>;
       final programs = results[2] as List<ProgramModel>;
       final semesters = results[3] as List<SemesterModel>;
-      SettingsProfileOptionsCache.instance.save(
+      ProfileOptionsCache.instance.save(
         userId: userId,
         schools: schools,
         grades: grades,
@@ -1161,9 +1158,7 @@ class _SettingTabState extends State<SettingTab> {
     required int userId,
     StudentProfile? profileToSelect,
   }) {
-    final cached = SettingsProfileOptionsCache.instance.readFresh(
-      userId: userId,
-    );
+    final cached = ProfileOptionsCache.instance.readFresh(userId: userId);
     if (cached == null) {
       return false;
     }
@@ -1303,7 +1298,7 @@ class _SettingTabState extends State<SettingTab> {
           isDefault: _profiles.isEmpty,
           role: formRole,
           avatarKey: _selectedProfileAvatarKey,
-          idType: isTeacherProfile ? normalizedIdType : settingsIdTypeMoet,
+          idType: isTeacherProfile ? normalizedIdType : profileIdTypeMoet,
           studentId: isTeacherProfile ? null : profileIdValue,
           teacherId: shouldSubmitTeacherId ? profileIdValue : null,
         );
@@ -1339,7 +1334,7 @@ class _SettingTabState extends State<SettingTab> {
             role: formRole,
             dob: _dateOnly(editingProfile.dob),
             avatarKey: _selectedProfileAvatarKey,
-            idType: isTeacherProfile ? normalizedIdType : settingsIdTypeMoet,
+            idType: isTeacherProfile ? normalizedIdType : profileIdTypeMoet,
             studentId: isTeacherProfile ? null : profileIdValue,
             teacherId: shouldSubmitTeacherId ? profileIdValue : null,
           );
@@ -1945,15 +1940,15 @@ class _SettingTabState extends State<SettingTab> {
   static String? _normalizedProfileIdType(String? value, String role) {
     final normalized = value?.trim().toUpperCase();
     if (role != 'TEACHER' && (normalized == null || normalized.isEmpty)) {
-      return settingsIdTypeMoet;
+      return profileIdTypeMoet;
     }
     if (normalized == null || normalized.isEmpty) {
       return null;
     }
 
     final allowedOptions = role == 'TEACHER'
-        ? teacherIdTypeOptions
-        : studentIdTypeOptions;
+        ? teacherProfileIdTypeOptions
+        : studentProfileIdTypeOptions;
     final isAllowed = allowedOptions.any(
       (option) => option.value == normalized,
     );

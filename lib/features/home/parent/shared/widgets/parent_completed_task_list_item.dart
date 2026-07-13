@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/home_api.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/widgets/home_profile_menu.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_task_score_ring.dart';
@@ -17,11 +18,10 @@ class ParentCompletedTaskListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final exercise = completion.exercise;
     final score = ((completion.scorePercentage ?? 0) / 10).round().clamp(0, 10);
-    final color = score >= 8
-        ? const Color(0xFF07824C)
-        : const Color(0xFFFF6B17);
+    final color = score >= 8 ? colors.success : colors.accent;
 
     return ParentTaskListItem(
       leading: ParentTaskScoreRing(score: score, color: color),

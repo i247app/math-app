@@ -5,9 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_field_shell.dart';
-import 'package:numi/features/settings/widgets/profile_form/add_profile_select_result.dart';
-import 'package:numi/features/settings/widgets/profile_form/profile_form_keyboard.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_field_shell.dart';
+import 'package:numi/features/profile/widgets/form/add_profile_select_result.dart';
+import 'package:numi/features/profile/widgets/form/profile_form_keyboard.dart';
 
 class AddProfileDropdown<T> extends StatelessWidget {
   const AddProfileDropdown({
