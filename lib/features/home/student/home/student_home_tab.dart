@@ -506,8 +506,8 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           ),
           title: Text(
             context.getText(AppKeys.parentSwitchStudentTitle),
-            style: const TextStyle(
-              color: Color(0xFF001741),
+            style: TextStyle(
+              color: context.themeColors.textPrimary,
               fontSize: FontSize.large,
               fontWeight: FontWeight.w900,
               height: 1.2,
@@ -515,8 +515,8 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           ),
           content: Text(
             context.getText(AppKeys.parentSwitchStudentMessage),
-            style: const TextStyle(
-              color: Color(0xFF444650),
+            style: TextStyle(
+              color: context.themeColors.textSecondary,
               fontSize: FontSize.normal,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -544,7 +544,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
     HapticFeedback.selectionClick();
     return showDialog<bool>(
       context: context,
-      barrierColor: const Color(0xFF001741).withValues(alpha: 0.40),
+      barrierColor: context.themeColors.shadow.withValues(alpha: 0.40),
       builder: (_) => const HomeMissingStudentDialog(),
     );
   }

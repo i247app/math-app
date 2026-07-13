@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
@@ -23,6 +24,7 @@ class HomeProfileMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final width = _preferredWidth(context);
 
     return SizedBox(
@@ -32,7 +34,7 @@ class HomeProfileMenu extends StatelessWidget {
           borderRadius: BorderRadius.circular(12 * scale),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.18),
+              color: colors.shadow.withValues(alpha: 0.42),
               blurRadius: 16 * scale,
               spreadRadius: 1 * scale,
               offset: Offset.zero,
@@ -40,7 +42,7 @@ class HomeProfileMenu extends StatelessWidget {
           ],
         ),
         child: Material(
-          color: Colors.white,
+          color: colors.elevatedSurface,
           elevation: 0,
           borderRadius: BorderRadius.circular(12 * scale),
           clipBehavior: Clip.antiAlias,
@@ -77,7 +79,7 @@ class HomeProfileMenu extends StatelessWidget {
                             name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: _nameStyle,
+                            style: _nameStyle(colors),
                           ),
                         ),
                       ],
@@ -92,8 +94,8 @@ class HomeProfileMenu extends StatelessWidget {
     );
   }
 
-  TextStyle get _nameStyle => TextStyle(
-    color: const Color(0xFF002B6A),
+  TextStyle _nameStyle(AppThemeColors colors) => TextStyle(
+    color: colors.textPrimary,
     fontSize: FontSize.avatarName * scale,
     fontWeight: FontWeight.w900,
     height: 1.1,
@@ -105,7 +107,7 @@ class HomeProfileMenu extends StatelessWidget {
       final painter = TextPainter(
         text: TextSpan(
           text: compactHomeProfileName(profileDisplayName(context, profile)),
-          style: _nameStyle,
+          style: _nameStyle(context.themeColors),
         ),
         maxLines: 1,
         textDirection: Directionality.of(context),

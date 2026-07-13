@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
 
@@ -12,6 +13,7 @@ class HomeMissingStudentDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 24),
@@ -23,12 +25,12 @@ class HomeMissingStudentDialog extends StatelessWidget {
             width: 303,
             padding: const EdgeInsets.fromLTRB(25, 32, 25, 24),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.92),
+              color: colors.elevatedSurface.withValues(alpha: 0.94),
               borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+              border: Border.all(color: colors.border.withValues(alpha: 0.7)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.25),
+                  color: colors.shadow.withValues(alpha: 0.58),
                   blurRadius: 50,
                   offset: const Offset(0, 25),
                 ),
@@ -44,13 +46,11 @@ class HomeMissingStudentDialog extends StatelessWidget {
                       width: 192,
                       height: 192,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFAA2A6C).withValues(alpha: 0.10),
+                        color: colors.brandStrong.withValues(alpha: 0.10),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(
-                              0xFFAA2A6C,
-                            ).withValues(alpha: 0.16),
+                            color: colors.brandStrong.withValues(alpha: 0.16),
                             blurRadius: 30,
                             spreadRadius: 12,
                           ),
@@ -69,8 +69,8 @@ class HomeMissingStudentDialog extends StatelessWidget {
                 Text(
                   context.getText(AppKeys.parentNoStudentTitle),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF001741),
+                  style: TextStyle(
+                    color: colors.textPrimary,
                     fontSize: FontSize.xxxl,
                     fontWeight: FontWeight.w900,
                     height: 1.2,
@@ -81,8 +81,8 @@ class HomeMissingStudentDialog extends StatelessWidget {
                 Text(
                   context.getText(AppKeys.parentNoStudentMessage),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF444650),
+                  style: TextStyle(
+                    color: colors.textSecondary,
                     fontSize: FontSize.normal,
                     fontWeight: FontWeight.w400,
                     height: 1.5,
@@ -96,7 +96,7 @@ class HomeMissingStudentDialog extends StatelessWidget {
                   child: FilledButton(
                     onPressed: () => Navigator.of(context).pop(true),
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFAA2A6C),
+                      backgroundColor: colors.brandStrong,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -104,8 +104,8 @@ class HomeMissingStudentDialog extends StatelessWidget {
                     ),
                     child: Text(
                       context.getText(AppKeys.parentCreateStudentNow),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: FontSize.large,
                         fontWeight: FontWeight.w400,
                         height: 1,
@@ -121,15 +121,15 @@ class HomeMissingStudentDialog extends StatelessWidget {
                   child: TextButton(
                     onPressed: () => Navigator.of(context).pop(false),
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFFAA2A6C),
+                      foregroundColor: colors.brandStrong,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     child: Text(
                       context.getText(AppKeys.parentCreateStudentLater),
-                      style: const TextStyle(
-                        color: Color(0xFFAA2A6C),
+                      style: TextStyle(
+                        color: colors.brandStrong,
                         fontSize: FontSize.large,
                         fontWeight: FontWeight.w400,
                         height: 1,

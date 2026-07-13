@@ -4,6 +4,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/home/cache/home_profile_cache.dart';
 import 'package:numi/features/home/home_api.dart';
@@ -333,7 +334,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     );
 
     return RefreshIndicator(
-      color: const Color(0xFF159A86),
+      color: context.themeColors.brandStrong,
       onRefresh: loadHome,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(
@@ -441,7 +442,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     if (_children.isEmpty) {
       final shouldCreate = await showDialog<bool>(
         context: context,
-        barrierColor: const Color(0xFF001741).withValues(alpha: 0.48),
+        barrierColor: context.themeColors.shadow.withValues(alpha: 0.48),
         builder: (_) => const HomeMissingStudentDialog(),
       );
       if (shouldCreate == true && mounted) {
@@ -452,7 +453,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
     final action = await showDialog<ParentProfileDialogAction>(
       context: context,
-      barrierColor: const Color(0xFF001741).withValues(alpha: 0.48),
+      barrierColor: context.themeColors.shadow.withValues(alpha: 0.48),
       builder: (_) => const ParentSelectStudentDialog(),
     );
     if (!mounted) {
@@ -475,7 +476,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => Material(
-          color: Colors.white,
+          color: context.themeColors.pageBackground,
           child: SafeArea(
             child: SettingTab.page(
               user: widget.args.user,

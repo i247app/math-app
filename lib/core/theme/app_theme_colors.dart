@@ -14,9 +14,22 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     required this.textMuted,
     required this.brand,
     required this.brandStrong,
+    required this.onBrand,
     required this.accent,
     required this.accentStrong,
+    required this.onAccent,
     required this.error,
+    required this.onError,
+    required this.errorSurface,
+    required this.success,
+    required this.onSuccess,
+    required this.successSurface,
+    required this.warning,
+    required this.onWarning,
+    required this.warningSurface,
+    required this.info,
+    required this.onInfo,
+    required this.infoSurface,
     required this.border,
     required this.borderStrong,
     required this.disabledBackground,
@@ -24,6 +37,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     required this.inputSurface,
     required this.inputHint,
     required this.shadow,
+    required this.scrim,
+    required this.skeleton,
     required this.authBackSurface,
     required this.authBackBorder,
     required this.otpBorder,
@@ -42,9 +57,22 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
   final Color textMuted;
   final Color brand;
   final Color brandStrong;
+  final Color onBrand;
   final Color accent;
   final Color accentStrong;
+  final Color onAccent;
   final Color error;
+  final Color onError;
+  final Color errorSurface;
+  final Color success;
+  final Color onSuccess;
+  final Color successSurface;
+  final Color warning;
+  final Color onWarning;
+  final Color warningSurface;
+  final Color info;
+  final Color onInfo;
+  final Color infoSurface;
   final Color border;
   final Color borderStrong;
   final Color disabledBackground;
@@ -52,6 +80,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
   final Color inputSurface;
   final Color inputHint;
   final Color shadow;
+  final Color scrim;
+  final Color skeleton;
   final Color authBackSurface;
   final Color authBackBorder;
   final Color otpBorder;
@@ -70,9 +100,22 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     textMuted: AppColors.grayText,
     brand: AppColors.welcomeTeal,
     brandStrong: AppColors.tealIcon,
+    onBrand: Colors.white,
     accent: AppColors.coral600,
     accentStrong: AppColors.coral500,
+    onAccent: Colors.white,
     error: Color(0xFFD9534F),
+    onError: Colors.white,
+    errorSurface: Color(0xFFFFEDEC),
+    success: AppColors.scoreGreen,
+    onSuccess: Colors.white,
+    successSurface: Color(0xFFE7F5ED),
+    warning: AppColors.scoreYellow,
+    onWarning: AppColors.textPrimary,
+    warningSurface: Color(0xFFFFF4D8),
+    info: AppColors.assessmentProgress,
+    onInfo: Colors.white,
+    infoSurface: Color(0xFFE6F4FA),
     border: AppColors.borderNeutral,
     borderStrong: Color(0xFFB5BFC2),
     disabledBackground: Color(0xFFB5BFC2),
@@ -80,6 +123,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     inputSurface: Colors.white,
     inputHint: Color(0xFFB9C2C5),
     shadow: Color(0x14000000),
+    scrim: Color(0x66001741),
+    skeleton: Color(0xFFE8EEF0),
     authBackSurface: Color(0xCCFFFFFF),
     authBackBorder: Color(0x1AA2B1A3),
     otpBorder: Color(0xFFF47B55),
@@ -99,9 +144,22 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     textMuted: Color(0xFF88A19E),
     brand: AppColors.darkPrimaryTeal,
     brandStrong: Color(0xFF5EC7C2),
+    onBrand: AppColors.darkOnPrimary,
     accent: AppColors.darkActionOrange,
     accentStrong: AppColors.darkActionOrange,
+    onAccent: AppColors.darkBackground,
     error: Color(0xFFFF8A8A),
+    onError: AppColors.darkBackground,
+    errorSurface: Color(0xFF4A292B),
+    success: Color(0xFF5DD6A0),
+    onSuccess: AppColors.darkBackground,
+    successSurface: Color(0xFF1E4435),
+    warning: Color(0xFFFFD37A),
+    onWarning: AppColors.darkBackground,
+    warningSurface: Color(0xFF4B3B1D),
+    info: Color(0xFF78C7FF),
+    onInfo: AppColors.darkBackground,
+    infoSurface: Color(0xFF1E3C50),
     border: AppColors.darkOutline,
     borderStrong: Color(0xFF547070),
     disabledBackground: AppColors.darkSurfaceHigh,
@@ -109,6 +167,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     inputSurface: AppColors.darkSurface,
     inputHint: AppColors.darkOnSurfaceMuted,
     shadow: Color(0x52000000),
+    scrim: Color(0xB8000000),
+    skeleton: Color(0xFF2B4141),
     authBackSurface: Color(0xE6243333),
     authBackBorder: Color(0x80355151),
     otpBorder: AppColors.darkActionOrange,
@@ -129,9 +189,22 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     Color? textMuted,
     Color? brand,
     Color? brandStrong,
+    Color? onBrand,
     Color? accent,
     Color? accentStrong,
+    Color? onAccent,
     Color? error,
+    Color? onError,
+    Color? errorSurface,
+    Color? success,
+    Color? onSuccess,
+    Color? successSurface,
+    Color? warning,
+    Color? onWarning,
+    Color? warningSurface,
+    Color? info,
+    Color? onInfo,
+    Color? infoSurface,
     Color? border,
     Color? borderStrong,
     Color? disabledBackground,
@@ -139,6 +212,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     Color? inputSurface,
     Color? inputHint,
     Color? shadow,
+    Color? scrim,
+    Color? skeleton,
     Color? authBackSurface,
     Color? authBackBorder,
     Color? otpBorder,
@@ -157,9 +232,22 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       textMuted: textMuted ?? this.textMuted,
       brand: brand ?? this.brand,
       brandStrong: brandStrong ?? this.brandStrong,
+      onBrand: onBrand ?? this.onBrand,
       accent: accent ?? this.accent,
       accentStrong: accentStrong ?? this.accentStrong,
+      onAccent: onAccent ?? this.onAccent,
       error: error ?? this.error,
+      onError: onError ?? this.onError,
+      errorSurface: errorSurface ?? this.errorSurface,
+      success: success ?? this.success,
+      onSuccess: onSuccess ?? this.onSuccess,
+      successSurface: successSurface ?? this.successSurface,
+      warning: warning ?? this.warning,
+      onWarning: onWarning ?? this.onWarning,
+      warningSurface: warningSurface ?? this.warningSurface,
+      info: info ?? this.info,
+      onInfo: onInfo ?? this.onInfo,
+      infoSurface: infoSurface ?? this.infoSurface,
       border: border ?? this.border,
       borderStrong: borderStrong ?? this.borderStrong,
       disabledBackground: disabledBackground ?? this.disabledBackground,
@@ -167,6 +255,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       inputSurface: inputSurface ?? this.inputSurface,
       inputHint: inputHint ?? this.inputHint,
       shadow: shadow ?? this.shadow,
+      scrim: scrim ?? this.scrim,
+      skeleton: skeleton ?? this.skeleton,
       authBackSurface: authBackSurface ?? this.authBackSurface,
       authBackBorder: authBackBorder ?? this.authBackBorder,
       otpBorder: otpBorder ?? this.otpBorder,
@@ -197,9 +287,22 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       textMuted: Color.lerp(textMuted, other.textMuted, t)!,
       brand: Color.lerp(brand, other.brand, t)!,
       brandStrong: Color.lerp(brandStrong, other.brandStrong, t)!,
+      onBrand: Color.lerp(onBrand, other.onBrand, t)!,
       accent: Color.lerp(accent, other.accent, t)!,
       accentStrong: Color.lerp(accentStrong, other.accentStrong, t)!,
+      onAccent: Color.lerp(onAccent, other.onAccent, t)!,
       error: Color.lerp(error, other.error, t)!,
+      onError: Color.lerp(onError, other.onError, t)!,
+      errorSurface: Color.lerp(errorSurface, other.errorSurface, t)!,
+      success: Color.lerp(success, other.success, t)!,
+      onSuccess: Color.lerp(onSuccess, other.onSuccess, t)!,
+      successSurface: Color.lerp(successSurface, other.successSurface, t)!,
+      warning: Color.lerp(warning, other.warning, t)!,
+      onWarning: Color.lerp(onWarning, other.onWarning, t)!,
+      warningSurface: Color.lerp(warningSurface, other.warningSurface, t)!,
+      info: Color.lerp(info, other.info, t)!,
+      onInfo: Color.lerp(onInfo, other.onInfo, t)!,
+      infoSurface: Color.lerp(infoSurface, other.infoSurface, t)!,
       border: Color.lerp(border, other.border, t)!,
       borderStrong: Color.lerp(borderStrong, other.borderStrong, t)!,
       disabledBackground: Color.lerp(
@@ -215,6 +318,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       inputSurface: Color.lerp(inputSurface, other.inputSurface, t)!,
       inputHint: Color.lerp(inputHint, other.inputHint, t)!,
       shadow: Color.lerp(shadow, other.shadow, t)!,
+      scrim: Color.lerp(scrim, other.scrim, t)!,
+      skeleton: Color.lerp(skeleton, other.skeleton, t)!,
       authBackSurface: Color.lerp(authBackSurface, other.authBackSurface, t)!,
       authBackBorder: Color.lerp(authBackBorder, other.authBackBorder, t)!,
       otpBorder: Color.lerp(otpBorder, other.otpBorder, t)!,
