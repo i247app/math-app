@@ -85,16 +85,17 @@ class ParentInfoCard extends StatelessWidget {
                       ),
                       SizedBox(width: 8 * scale),
                       ProfileActionButton(
-                        child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_edit.svg',
-                          width: 19 * scale,
-                          height: 19 * scale,
-                        ),
                         backgroundColor: const Color(0xFFE6F5F5),
                         width: 34 * scale,
                         height: 34 * scale,
                         borderRadius: BorderRadius.circular(10 * scale),
                         onTap: onEdit,
+                        child: SvgPicture.asset(
+                          'assets/images/parent_profile_manage_edit.svg',
+                          width: 19 * scale,
+                          height: 19 * scale,
+                        ),
+
                       ),
                       SizedBox(width: 8 * scale),
                       ProfileRadio(isActive: isActive, scale: scale),

@@ -149,29 +149,31 @@ class ProfileCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ProfileActionButton(
-                    child: Icon(
-                      Icons.edit_rounded,
-                      color: colors.brandStrong,
-                      size: 23 * scale,
-                    ),
                     backgroundColor: colors.brand.withValues(alpha: 0.12),
                     width: 42 * scale,
                     height: 42 * scale,
                     borderRadius: BorderRadius.circular(10 * scale),
                     onTap: onEdit,
+                    child: Icon(
+                      Icons.edit_rounded,
+                      color: colors.brandStrong,
+                      size: 23 * scale,
+                    ),
+
                   ),
                   SizedBox(width: 12 * scale),
                   ProfileActionButton(
-                    child: Icon(
-                      Icons.delete_outline_rounded,
-                      color: const Color(0xFFE83434),
-                      size: 23 * scale,
-                    ),
                     backgroundColor: const Color(0xFFFFD8D8),
                     width: 42 * scale,
                     height: 42 * scale,
                     borderRadius: BorderRadius.circular(10 * scale),
                     onTap: onDelete,
+                    child: Icon(
+                      Icons.delete_outline_rounded,
+                      color: const Color(0xFFE83434),
+                      size: 23 * scale,
+                    ),
+
                   ),
                 ],
               ),
