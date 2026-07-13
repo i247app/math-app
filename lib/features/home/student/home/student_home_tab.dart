@@ -369,27 +369,27 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
         widget.activeRole == ProfileRole.student && _classrooms.isNotEmpty;
     final hasCompletedAssessment = _completedAssessments.isNotEmpty;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: widget.padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (widget.header != null) widget.header!,
-          Padding(
+    final content = widget.activeRole == ProfileRole.parent
+        ? _buildStudentInitialAssessmentState()
+        : isLoadingHomeSections
+        ? const StudentHomeSectionsLoading()
+        : hasClassroom
+        ? _buildStudentClassroomOverviewState()
+        : hasCompletedAssessment
+        ? _buildStudentCompletedAssessmentState()
+        : _buildStudentInitialAssessmentState();
+
+    return Column(
+      children: [
+        if (widget.header != null) widget.header!,
+        Expanded(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: widget.padding,
-            child: widget.activeRole == ProfileRole.parent
-                ? _buildStudentInitialAssessmentState()
-                : isLoadingHomeSections
-                ? const StudentHomeSectionsLoading()
-                : hasClassroom
-                ? _buildStudentClassroomOverviewState()
-                : hasCompletedAssessment
-                ? _buildStudentCompletedAssessmentState()
-                : _buildStudentInitialAssessmentState(),
+            child: content,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
