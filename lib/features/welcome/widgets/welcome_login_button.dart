@@ -11,7 +11,7 @@ class WelcomeLoginButton extends StatelessWidget {
     super.key,
     required this.onLogin,
     required this.scale,
-    this.labelKey = AppKeys.continueLabel,
+    this.labelKey = AppKeys.login,
   });
 
   final VoidCallback onLogin;
@@ -36,7 +36,7 @@ class WelcomeLoginButton extends StatelessWidget {
             vertical: 6 * scale,
           ),
           child: Text(
-            context.getText(labelKey),
+            context.getText(labelKey.toUpperCase()),
             style: GoogleFonts.nunito(
               color: loginColor,
               fontSize: 18 * scale,

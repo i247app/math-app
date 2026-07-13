@@ -1,118 +1,25 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-import 'package:numi/core/theme/app_theme_colors.dart';
+// Using an absolute package path bypasses relative directory confusion completely
 import 'package:numi/features/welcome/widgets/welcome_composition.dart';
 
-class WelcomeScreen extends StatefulWidget {
+class WelcomeScreen extends StatelessWidget {
+  final VoidCallback onStart;
+  final VoidCallback onLogin;
+
   const WelcomeScreen({
     super.key,
     required this.onStart,
     required this.onLogin,
   });
 
-  final VoidCallback onStart;
-  final VoidCallback onLogin;
-
-  @override
-  State<WelcomeScreen> createState() => _WelcomeScreenState();
-}
-
-class _WelcomeScreenState extends State<WelcomeScreen> {
-  bool _didPrecacheNextScreenAssets = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_didPrecacheNextScreenAssets) {
-      return;
-    }
-
-    _didPrecacheNextScreenAssets = true;
-    const welcomeAssetPrefix = 'assets/images/welcome_screen/';
-    precacheImage(
-      const AssetImage('assets/images/welcome_figma_mascot.png'),
-      context,
-    );
-    precacheImage(
-      const AssetImage('assets/images/welcome_figma_waves.png'),
-      context,
-    );
-    precacheImage(
-      const AssetImage('assets/images/welcome_figma_books.png'),
-      context,
-    );
-    precacheImage(
-      const AssetImage('${welcomeAssetPrefix}welcome_hero_math_friends.png'),
-      context,
-    );
-    precacheImage(
-      const AssetImage('${welcomeAssetPrefix}welcome_logo_mascot.png'),
-      context,
-    );
-    precacheImage(
-      const AssetImage('${welcomeAssetPrefix}welcome_card_assessment.png'),
-      context,
-    );
-    precacheImage(
-      const AssetImage('${welcomeAssetPrefix}welcome_card_teacher_support.png'),
-      context,
-    );
-    precacheImage(
-      const AssetImage(
-        '${welcomeAssetPrefix}welcome_card_progress_tracking.png',
-      ),
-      context,
-    );
-    precacheImage(
-      const AssetImage('${welcomeAssetPrefix}welcome_card_game_learning.png'),
-      context,
-    );
-    // The first Welcome Details → Login transition used to decode this large
-    // image while the page slide was already running. Warm it here so the
-    // first transition is as smooth as subsequent ones.
-    precacheImage(
-      const AssetImage('assets/images/numi-mascot.png'),
-      context,
-    );
-    unawaited(
-      GoogleFonts.pendingFonts([
-        GoogleFonts.andika(fontWeight: FontWeight.w400),
-        GoogleFonts.andika(fontWeight: FontWeight.w500),
-        GoogleFonts.andika(fontWeight: FontWeight.w600),
-        GoogleFonts.andika(fontWeight: FontWeight.w800),
-      ]),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    final overlayStyle = Theme.of(context).brightness == Brightness.dark
-        ? SystemUiOverlayStyle.light
-        : SystemUiOverlayStyle.dark;
-
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: overlayStyle,
-      child: ColoredBox(
-        color: colors.pageBackground,
-        child: SafeArea(
-          bottom: false,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SizedBox(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight,
-                child: WelcomeComposition(
-                  onStart: widget.onStart,
-                  onLogin: widget.onLogin,
-                ),
-              );
-            },
-          ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: WelcomeComposition(
+          onStart: onStart,
+          onLogin: onLogin,
         ),
       ),
     );

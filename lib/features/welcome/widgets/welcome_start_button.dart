@@ -11,7 +11,7 @@ class WelcomeStartButton extends StatelessWidget {
     super.key,
     required this.onStart,
     required this.scale,
-    this.labelKey = AppKeys.continueLabel,
+    this.labelKey = AppKeys.start,
   });
 
   final VoidCallback onStart;
