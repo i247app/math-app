@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 abstract final class AppColors {
-  // Brand
+  // Brand vibrant mid-tones for
+  static const brandTeal = Color(0xFF339395); // Based on tealIcon
+  static const brandOrange = Color(0xFFFC6128); // Based on coral600
+  // brand deep mid-tones for button background, avatar background, etc
+  // static const brandTealSolid = Color(0xFF007A78); // Based on teal600
+  // static const brandOrangeSolid = Color(0xFFDE5E31); // Based on orange500
+
   static const ink = Color(0xFF25352E);
   static const muted = Color(0xFF53675F);
   static const teal = Color(0xFF00776F);

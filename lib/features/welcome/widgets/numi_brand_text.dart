@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
 class NumiBrandText extends StatelessWidget {
   final double? fontSize;
@@ -16,8 +17,10 @@ class NumiBrandText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Exact hex color codes mapped from your design layout
-    final Color tealBrandColor = firstColor ?? const Color(0xFF1C8E9B);
-    final Color orangeBrandColor = secondColor ?? const Color(0xFFF16634);
+    // final Color tealBrandColor = firstColor ?? const Color(0xFF1C8E9B);
+    // final Color orangeBrandColor = secondColor ?? const Color(0xFFF16634);
+    final Color tealBrandColor = firstColor ?? const Color(0xFF058A95);
+    final Color orangeBrandColor = secondColor ?? const Color(0xFFFC6128);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -32,8 +35,8 @@ class NumiBrandText extends StatelessWidget {
               letterSpacing: 1.0,
             ),
             children: [
-              TextSpan(text: 'NUMI', style: TextStyle(color: tealBrandColor)),
-              TextSpan(text: 'NUMI', style: TextStyle(color: orangeBrandColor)),
+              const TextSpan(text: 'NUMI', style: TextStyle(color: AppColors.brandTeal)),
+              const TextSpan(text: 'NUMI', style: TextStyle(color: AppColors.brandOrange)),
             ],
           ),
         ),
