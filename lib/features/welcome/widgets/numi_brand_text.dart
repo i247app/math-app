@@ -37,45 +37,6 @@ class NumiBrandText extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 4),
-
-        // 2. Main Subtitle - "Math AI"
-        RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: const TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.w400, // Clean semi-bold looks great without extra spacing
-            ),
-            children: [
-              TextSpan(text: 'Math ', style: TextStyle(color: tealBrandColor)),
-              TextSpan(text: 'AI', style: TextStyle(color: orangeBrandColor)),
-            ],
-          ),
-        ),
-        const SizedBox(height: 6),
-
-        // 3. Description Subtitle - "Learning & Assessment"
-        Text(
-          'Learning & Assessment',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20.0, // Clean, explicit fixed sizing
-            fontWeight: FontWeight.w500,
-            color: tealBrandColor,
-          ),
-        ),
-        const SizedBox(height: 14),
-
-        // 4. Capsule Indicator bar
-        Container(
-          width: 44,
-          height: 5,
-          decoration: BoxDecoration(
-            color: orangeBrandColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
       ],
     );
   }

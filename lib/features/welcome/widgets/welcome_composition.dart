@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart'; // Added this import for the tagline font
 import 'numi_brand_text.dart';
 import 'welcome_start_button.dart';
 import 'welcome_login_button.dart';
@@ -61,6 +62,50 @@ class WelcomeComposition extends StatelessWidget {
 
                           // Brand text
                           const NumiBrandText(fontSize: 42.0),
+
+                          // === INLINE ADDITIONS START ===
+                          const SizedBox(height: 4),
+
+                          // Math AI Subtitle
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: const TextSpan(
+                              style: TextStyle(
+                                fontSize: 28.0,
+                                fontWeight: FontWeight.w600, // Locked semi-bold
+                              ),
+                              children: [
+                                TextSpan(text: 'Math ', style: TextStyle(color: Color(0xFF2B8A9E))),
+                                TextSpan(text: 'AI', style: TextStyle(color: Color(0xFFFF6B2C))),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          // Learning & Assessment Tagline
+                          Text(
+                            'Learning & Assessment',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.nunito(
+                              color: const Color(0xFF2B8A9E),
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Accent Orange Divider
+                          Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF6B2C),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                          // === INLINE ADDITIONS END ===
 
                           // This spacer natively pushes everything down to the background curves
                           const Spacer(),
