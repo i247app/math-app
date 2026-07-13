@@ -12,7 +12,7 @@ import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/homework/presentation/homework_review_screen.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/quiz/controllers/history_controller.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';

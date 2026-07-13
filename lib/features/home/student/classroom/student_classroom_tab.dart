@@ -7,7 +7,7 @@ import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_state.dart';
 import 'package:numi/features/classroom/classroom_api.dart';

@@ -1,6 +1,6 @@
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/home/home_api.dart';
 
 class ParentRoomEntry {

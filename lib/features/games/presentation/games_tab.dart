@@ -8,7 +8,7 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/games/math_squadron/math_squadron_data.dart';
 import 'package:numi/features/games/presentation/math_squadron_stage_screen.dart';
 import 'package:numi/features/games/presentation/numi_farm_stage_screen.dart';
-import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/practice/practice_catalog.dart';
 import 'package:numi/features/practice/presentation/practice_chapter_screen.dart';
 

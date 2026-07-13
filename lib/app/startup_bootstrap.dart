@@ -6,8 +6,8 @@ import 'package:numi/core/theme/app_theme_controller.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
-import 'package:numi/features/profile/profile_api.dart';
-import 'package:numi/features/profile/services/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
 

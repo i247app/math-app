@@ -25,7 +25,7 @@ String compactProfileName(String name) {
       .split(RegExp(r'\s+'))
       .where((part) => part.isNotEmpty)
       .toList(growable: false);
-  if (parts.length <= 2) {
+  if (parts.length < 3) {
     return parts.join(' ');
   }
   return '${parts.first} ${parts.last}';

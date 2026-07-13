@@ -5,7 +5,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/home/cache/home_profile_cache.dart';
 import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/cache/parent_home_snapshot.dart';

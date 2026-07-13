@@ -2,16 +2,7 @@ import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/network/program_models.dart';
 import 'package:numi/core/network/semester_models.dart';
-
-class ProfileException implements Exception {
-  const ProfileException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
+import 'package:numi/features/profile/data/profile_exception.dart';
 
 abstract class ProfileService {
   Future<List<StudentProfile>> listProfiles({required int userId});

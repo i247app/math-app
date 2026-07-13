@@ -6,7 +6,6 @@ class AvatarPickerService {
 
   final MethodChannel _channel;
 
-  Future<String?> pickAvatarPath() {
-    return _channel.invokeMethod<String>('pickAvatar');
-  }
+  Future<String?> pickAvatarPath() =>
+      _channel.invokeMethod<String>('pickAvatar');
 }

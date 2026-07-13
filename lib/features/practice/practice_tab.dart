@@ -8,7 +8,7 @@ import 'package:numi/core/network/chapter_models.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/practice/practice_api.dart';
 import 'package:numi/features/practice/practice_catalog.dart';
 import 'package:numi/features/auth/data/auth_models.dart';

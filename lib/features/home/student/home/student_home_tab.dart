@@ -11,7 +11,8 @@ import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_state.dart';
 import 'package:numi/features/homework/homework_api.dart';
@@ -38,7 +39,7 @@ import 'package:numi/features/home/student/student_home_cubit.dart';
 import 'package:numi/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi/features/homework/student_homework_open_guard.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_tab_card.dart';
-import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 
 class StudentHomeContent extends StatefulWidget {

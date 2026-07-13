@@ -22,7 +22,7 @@ import 'package:numi/features/classroom/presentation/teacher_classroom_screens.d
 import 'package:numi/features/home/shell/widgets/home_tab_header.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 
 part 'helpers/teacher_study_helpers.dart';
 part 'models/teacher_study_date_parts.dart';

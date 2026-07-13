@@ -83,9 +83,9 @@ class ActiveProfileSession {
     return 'active_profile_id:${_encodeStoredUserId(userId)}';
   }
 
-  static String _encodeStoredUserId(int userId) => '$userId';
+  static String _encodeStoredUserId(int userId) => userId.toString();
 
-  static String _encodeStoredProfileId(int profileId) => '$profileId';
+  static String _encodeStoredProfileId(int profileId) => profileId.toString();
 
   static int? _decodeStoredProfileId(String? value) {
     final stored = value?.trim();

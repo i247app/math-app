@@ -7,7 +7,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/settings/widgets/profile_list/parent_child_profile_card.dart';
 import 'package:numi/features/settings/widgets/profile_list/parent_info_card.dart';
 import 'package:numi/features/settings/widgets/profile_list/profile_add_button.dart';

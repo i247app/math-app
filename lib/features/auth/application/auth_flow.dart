@@ -9,7 +9,7 @@ import 'package:numi/features/session/presentation/bloc/app_session_cubit.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi/features/homework/homework_api.dart';
-import 'package:numi/features/profile/grade_api.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
