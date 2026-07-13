@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // Added this import for the tagline font
+import 'package:google_fonts/google_fonts.dart';
 import 'numi_brand_text.dart';
 import 'welcome_start_button.dart';
 import 'welcome_login_button.dart';
@@ -41,6 +41,8 @@ class WelcomeComposition extends StatelessWidget {
             bottom: false,
             child: LayoutBuilder(
               builder: (context, constraints) {
+                final isTablet = constraints.maxWidth > 600;
+
                 return SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
                   child: ConstrainedBox(
@@ -50,12 +52,12 @@ class WelcomeComposition extends StatelessWidget {
                     child: IntrinsicHeight(
                       child: Column(
                         children: [
-                          const SizedBox(height: 24),
+                          SizedBox(height: isTablet ? 48 : 24),
 
                           // Mascot Graphics
                           Image.asset(
                             _mascotAsset,
-                            height: 160,
+                            height: isTablet ? 220 : 160,
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(height: 16),
@@ -63,7 +65,6 @@ class WelcomeComposition extends StatelessWidget {
                           // Brand text
                           const NumiBrandText(fontSize: 42.0),
 
-                          // === INLINE ADDITIONS START ===
                           const SizedBox(height: 4),
 
                           // Math AI Subtitle
@@ -72,7 +73,7 @@ class WelcomeComposition extends StatelessWidget {
                             text: const TextSpan(
                               style: TextStyle(
                                 fontSize: 28.0,
-                                fontWeight: FontWeight.w600, // Locked semi-bold
+                                fontWeight: FontWeight.w600,
                               ),
                               children: [
                                 TextSpan(text: 'Math ', style: TextStyle(color: Color(0xFF2B8A9E))),
@@ -105,36 +106,42 @@ class WelcomeComposition extends StatelessWidget {
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
-                          // === INLINE ADDITIONS END ===
 
-                          // This spacer natively pushes everything down to the background curves
+                          // Restored the true Spacer! This expands aggressively to lock buttons to the bottom.
                           const Spacer(),
 
                           // Book Illustration
                           Image.asset(
                             _booksAsset,
-                            height: 130,
+                            height: isTablet ? 180 : 130,
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(height: 24),
 
-                          // Button action hub
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 56),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                WelcomeStartButton(
-                                  onStart: onStart,
-                                  scale: 1.0,
+                          // Button action hub - Tablet-safe, beautifully constrained layout
+                          Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                maxWidth: 420, // Clean desktop/tablet capping width
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 56),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    WelcomeStartButton(
+                                      onStart: onStart,
+                                      scale: 1.0,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    WelcomeLoginButton(
+                                      onLogin: onLogin,
+                                      scale: 1.0,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 16),
-                                WelcomeLoginButton(
-                                  onLogin: onLogin,
-                                  scale: 1.0,
-                                ),
-                              ],
+                              ),
                             ),
                           ),
 
