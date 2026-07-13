@@ -4,11 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/utils/phone_number_validator.dart';
-import 'package:numi/features/auth/auth_flow_cubit.dart';
-import 'package:numi/features/auth/auth_flow_state.dart';
-import 'package:numi/features/auth/helpers/auth_error_helpers.dart';
-import 'package:numi/features/auth/phone_region.dart';
+import 'package:numi/core/utils/phone/phone_number_validator.dart';
+import 'package:numi/features/auth/application/auth_cubit.dart';
+import 'package:numi/features/auth/application/auth_state.dart';
+import 'package:numi/core/utils/phone/phone_region.dart';
+import 'package:numi/features/auth/errors/auth_error_messages.dart';
 import 'package:numi/features/auth/presentation/login_screen.dart';
 import 'package:numi/features/auth/presentation/otp_screen.dart';
 import 'package:numi/features/auth/presentation/passcode_screen.dart';
@@ -16,7 +16,7 @@ import 'package:numi/features/auth/presentation/signup_screen.dart';
 import 'package:numi/features/auth/widgets/session_home_screen.dart';
 import 'package:numi/features/welcome/presentation/welcome_details_screen.dart';
 import 'package:numi/features/welcome/presentation/welcome_screen.dart';
-import 'package:numi/shared/widgets/common_widgets.dart';
+import 'package:numi/shared/widgets/loading_screen.dart';
 
 class OnboardingScreenSwitcher extends StatelessWidget {
   const OnboardingScreenSwitcher({
@@ -154,7 +154,7 @@ class OnboardingScreenSwitcher extends StatelessWidget {
                 AppScreen.otp => OtpScreen(
                   key: const ValueKey('otp'),
                   onBack: cubit.openLogin,
-                  onConfirm: cubit.verifyLoginOtp,
+                  onConfirm: cubit.verifyOtp,
                   onResend: cubit.resendLoginOtp,
                   isVerifyingOtp: state.isVerifyingOtp || state.isSendingOtp,
                   resendSeconds: state.otpExpiresIn ?? 0,

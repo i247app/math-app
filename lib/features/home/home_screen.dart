@@ -10,8 +10,9 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/grade_models.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/presentation/helpers/profile_display_helpers.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/home/cache/home_profile_cache.dart';
@@ -29,8 +30,8 @@ import 'package:numi/features/home/widgets/home_dashboard_args.dart';
 import 'package:numi/features/home/shell/widgets/home_header_bar.dart';
 import 'package:numi/features/home/widgets/home_profile_menu.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
-import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 import 'package:numi/features/settings/helpers/setting_page_builders.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
@@ -277,22 +278,24 @@ class _HomeScreenState extends State<HomeScreen>
                   .toList(growable: false);
               final isMenuOpen = profileState.isMenuOpen;
               final homeHeader = showHeader
-                  ? HomeHeaderBar(
-                      height: headerHeight,
-                      topInset: topInset,
-                      horizontalPadding: s(14),
-                      name: studentName,
-                      profile: widget.activeProfile,
-                      role: widget.activeRole,
-                      canSwitchProfile: switchableProfiles.isNotEmpty,
-                      isProfileMenuOpen: isMenuOpen,
-                      parentStreakCount: _parentStreakCount,
-                      onProfileTap: switchableProfiles.isEmpty
-                          ? null
-                          : () {
-                              HapticFeedback.selectionClick();
-                              _profileController.toggleMenu();
-                            },
+                  ? RepaintBoundary(
+                      child: HomeHeaderBar(
+                        height: headerHeight,
+                        topInset: topInset,
+                        horizontalPadding: s(14),
+                        name: studentName,
+                        profile: widget.activeProfile,
+                        role: widget.activeRole,
+                        canSwitchProfile: switchableProfiles.isNotEmpty,
+                        isProfileMenuOpen: isMenuOpen,
+                        parentStreakCount: _parentStreakCount,
+                        onProfileTap: switchableProfiles.isEmpty
+                            ? null
+                            : () {
+                                HapticFeedback.selectionClick();
+                                _profileController.toggleMenu();
+                              },
+                      ),
                     )
                   : null;
               return Center(
@@ -302,7 +305,9 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      const Positioned.fill(child: HomeBackground()),
+                      const Positioned.fill(
+                        child: RepaintBoundary(child: HomeBackground()),
+                      ),
                       Positioned.fill(
                         child: HomeRoleDashboard(
                           // No ValueKey — profileResetSignal drives selective
@@ -412,21 +417,23 @@ class _HomeScreenState extends State<HomeScreen>
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        child: HomeBottomNavigation(
-                          height: navHeight,
-                          bottomInset: bottomInset,
-                          scale: scale,
-                          activeIndex: navigation.activeTab,
-                          activeRole: widget.activeRole,
-                          user: widget.user,
-                          onTabSelected: (index) {
-                            if (widget.activeRole == ProfileRole.parent &&
-                                index != navigation.activeTab &&
-                                index == 0) {
-                              _playParentHomeEntrance();
-                            }
-                            _selectTab(homeCubit, index);
-                          },
+                        child: RepaintBoundary(
+                          child: HomeBottomNavigation(
+                            height: navHeight,
+                            bottomInset: bottomInset,
+                            scale: scale,
+                            activeIndex: navigation.activeTab,
+                            activeRole: widget.activeRole,
+                            user: widget.user,
+                            onTabSelected: (index) {
+                              if (widget.activeRole == ProfileRole.parent &&
+                                  index != navigation.activeTab &&
+                                  index == 0) {
+                                _playParentHomeEntrance();
+                              }
+                              _selectTab(homeCubit, index);
+                            },
+                          ),
                         ),
                       ),
                       // LoadingScreen overlay removed — skeleton in content

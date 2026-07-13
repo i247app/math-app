@@ -8,7 +8,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi/features/classroom/presentation/teacher_classroom_screens.dart';
 import 'package:numi/features/home/cache/home_profile_cache.dart';
@@ -16,7 +16,7 @@ import 'package:numi/features/home/home_api.dart';
 import 'package:numi/features/home/teacher/cache/teacher_home_snapshot.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 
 import 'package:numi/features/home/teacher/home/helpers/teacher_home_helpers.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_assignments_loading_panel.dart';

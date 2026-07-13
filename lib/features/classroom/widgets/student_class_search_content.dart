@@ -22,8 +22,8 @@ import 'package:numi/features/classroom/widgets/student_search/student_join_retr
 import 'package:numi/features/classroom/widgets/student_search/student_join_search_field.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_school_filter_bottom_sheet.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_state_card.dart';
-import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/profile/school_api.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/data/school_api.dart';
 
 class StudentClassSearchContent extends StatefulWidget {
   const StudentClassSearchContent({

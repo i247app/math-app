@@ -22,19 +22,13 @@ class AuthBackButton extends StatelessWidget {
     return SizedBox.square(
       dimension: size,
       child: Material(
-        color: colors.authBackSurface,
-        shadowColor: colors.shadow,
-        elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(999),
-          side: BorderSide(color: colors.authBackBorder),
-        ),
+        type: MaterialType.transparency,
         child: InkWell(
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
             onPressed();
           },
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(size / 2),
           child: Center(
             child: SvgPicture.asset(
               iconAsset,

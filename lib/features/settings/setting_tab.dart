@@ -13,15 +13,19 @@ import 'package:numi/core/network/program_models.dart';
 import 'package:numi/core/network/semester_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
-import 'package:numi/features/profile/services/avatar_picker_service.dart';
-import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
-import 'package:numi/features/auth/passcode_service.dart';
-import 'package:numi/features/profile/profile_api.dart';
-import 'package:numi/features/profile/school_api.dart';
+import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_exception.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/session/services/passcode_service.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/data/profile_exception.dart';
+import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/data/school_api.dart';
 import 'package:numi/features/auth/presentation/passcode_screen.dart';
-import 'package:numi/shared/widgets/common_widgets.dart';
+import 'package:numi/shared/widgets/loading_screen.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/settings/cache/settings_profile_options_cache.dart';
@@ -176,7 +180,7 @@ class SettingTab extends StatefulWidget {
 
 class _SettingTabState extends State<SettingTab> {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
-  final OtpAuthService _authService = OtpAuthApi();
+  final AuthService _authService = AuthApi();
   final PasscodeService _passcodeService = const SecurePasscodeService();
   final ProfileService _profileService = ProfileApi();
   final GradeService _gradeService = GradeApi();
@@ -207,6 +211,7 @@ class _SettingTabState extends State<SettingTab> {
   bool _isLoadingPasscode = false;
   bool _hasPasscode = false;
   bool _hasPlayedSettingsMenuEntrance = false;
+  bool _isPasscodeStatusLoadScheduled = false;
   String? _profileLoadError;
   String? _profileOptionsError;
   String? _profileCreateError;
@@ -289,18 +294,14 @@ class _SettingTabState extends State<SettingTab> {
         }
       });
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && widget.isActive) {
-        _loadPasscodeStatus();
-      }
-    });
+    _schedulePasscodeStatusLoad();
   }
 
   @override
   void didUpdateWidget(covariant SettingTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _loadPasscodeStatus();
+      _schedulePasscodeStatusLoad();
     }
     if (oldWidget.openAddProfileRequestId != widget.openAddProfileRequestId) {
       _openAddProfile();
@@ -342,7 +343,7 @@ class _SettingTabState extends State<SettingTab> {
     }
 
     if (oldWidget.user?.id != widget.user?.id) {
-      _loadPasscodeStatus();
+      _schedulePasscodeStatusLoad();
     }
   }
 
@@ -377,6 +378,21 @@ class _SettingTabState extends State<SettingTab> {
   int? get _effectiveUserId {
     final userId = _effectiveUser?.id;
     return userId != null && userId > 0 ? userId : null;
+  }
+
+  void _schedulePasscodeStatusLoad() {
+    if (_isPasscodeStatusLoadScheduled) {
+      return;
+    }
+
+    _isPasscodeStatusLoadScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isPasscodeStatusLoadScheduled = false;
+      if (!mounted || !widget.isActive) {
+        return;
+      }
+      _loadPasscodeStatus();
+    });
   }
 
   Future<void> _loadPasscodeStatus() async {
@@ -899,7 +915,7 @@ class _SettingTabState extends State<SettingTab> {
         _isSavingAccount = false;
       });
       FocusScope.of(context).unfocus();
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       if (!mounted) {
         return;
       }

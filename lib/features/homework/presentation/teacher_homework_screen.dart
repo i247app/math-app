@@ -18,9 +18,9 @@ import 'package:numi/core/network/school_models.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/classroom/presentation/teacher_classroom_screens.dart';
 import 'package:numi/features/homework/homework_api.dart';
-import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/profile/profile_api.dart';
-import 'package:numi/features/profile/school_api.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/data/school_api.dart';
 
 part '../cache/teacher_homework_cache.dart';
 part 'teacher_homework_detail_screen.dart';

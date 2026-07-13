@@ -9,8 +9,8 @@ import '../core/localization/lingo_scope.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/app_theme_controller.dart';
 import '../core/theme/app_theme_scope.dart';
-import 'package:numi/features/auth/auth_flow.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/application/auth_flow.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
 
 class NumiApp extends StatefulWidget {
@@ -23,7 +23,7 @@ class NumiApp extends StatefulWidget {
     this.restoreSessionOnStart = false,
   });
 
-  final OtpAuthService? authService;
+  final AuthService? authService;
   final LingoProvider? lingoProvider;
   final AppThemeController? themeController;
   final AuthenticatedSession? initialSession;

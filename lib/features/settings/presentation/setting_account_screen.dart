@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
-import 'package:numi/features/profile/services/avatar_picker_service.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_exception.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
 import 'package:numi/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
 import 'package:numi/features/settings/widgets/account/account_screen_skeleton.dart';
@@ -25,7 +27,7 @@ class SettingAccountScreen extends StatefulWidget {
 class _SettingAccountScreenState extends State<SettingAccountScreen>
     with SingleTickerProviderStateMixin {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
-  final OtpAuthService _authService = OtpAuthApi();
+  final AuthService _authService = AuthApi();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -168,7 +170,7 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
         _didSave = true;
       });
       FocusScope.of(context).unfocus();
-    } on OtpAuthException catch (error) {
+    } on AuthException catch (error) {
       if (!mounted) {
         return;
       }

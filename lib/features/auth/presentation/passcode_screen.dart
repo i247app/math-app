@@ -10,6 +10,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_action_button.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_input_row.dart';
+import 'package:numi/shared/widgets/numeric_code_input_controller.dart';
 
 enum PasscodeScreenMode { setup, unlock, verify }
 
@@ -45,13 +46,15 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     with SingleTickerProviderStateMixin {
   static const passcodeLength = 4;
 
-  late final List<TextEditingController> _controllers;
-  late final List<FocusNode> _focusNodes;
+  late final NumericCodeInputController _codeInput;
   late final AnimationController _shakeController;
   late final ValueNotifier<int> _digitRevision;
   String? _firstPasscode;
   String? _localError;
   int _lastErrorId = 0;
+
+  List<TextEditingController> get _controllers => _codeInput.controllers;
+  List<FocusNode> get _focusNodes => _codeInput.focusNodes;
 
   static const _backIconAsset = 'assets/images/pin_figma_back.svg';
 
@@ -61,11 +64,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   @override
   void initState() {
     super.initState();
-    _controllers = List.generate(
-      passcodeLength,
-      (_) => TextEditingController(),
-    );
-    _focusNodes = List.generate(passcodeLength, (_) => FocusNode());
+    _codeInput = NumericCodeInputController(length: passcodeLength);
     _shakeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 380),
@@ -88,43 +87,12 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   void dispose() {
     _shakeController.dispose();
     _digitRevision.dispose();
-    for (final controller in _controllers) {
-      controller.dispose();
-    }
-    for (final node in _focusNodes) {
-      node.dispose();
-    }
+    _codeInput.dispose();
     super.dispose();
   }
 
   void _updateDigit(int index, String value) {
-    final digits = value.replaceAll(RegExp(r'\D'), '');
-    if (digits.isEmpty) {
-      _controllers[index].clear();
-      if (index > 0) {
-        _focusNodes[index - 1].requestFocus();
-      }
-      _clearLocalErrorOrNotify();
-      return;
-    }
-
-    var nextIndex = index;
-    for (final digit in digits.split('')) {
-      if (nextIndex >= _controllers.length) {
-        break;
-      }
-      _controllers[nextIndex].text = digit;
-      _controllers[nextIndex].selection = const TextSelection.collapsed(
-        offset: 1,
-      );
-      nextIndex++;
-    }
-
-    if (nextIndex < _focusNodes.length) {
-      _focusNodes[nextIndex].requestFocus();
-    } else {
-      _focusNodes.last.unfocus();
-    }
+    _codeInput.updateDigit(index, value);
     _clearLocalErrorOrNotify();
   }
 
@@ -132,8 +100,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     if (index == 0) {
       return;
     }
-    _controllers[index - 1].clear();
-    _focusNodes[index - 1].requestFocus();
+    _codeInput.clearPreviousAndFocus(index);
     _clearLocalErrorOrNotify();
   }
 
@@ -182,22 +149,16 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   }
 
   void _clearDigits({bool focusFirst = false}) {
-    for (final controller in _controllers) {
-      controller.clear();
-    }
+    _codeInput.clear();
     if (focusFirst) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _focusNodes.first.requestFocus();
-        }
-      });
+      _requestPasscodeFocus();
     }
   }
 
   void _requestPasscodeFocus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _focusNodes.first.requestFocus();
+        _codeInput.requestFocusFirst();
       }
     });
   }

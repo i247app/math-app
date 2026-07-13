@@ -1,20 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/services/auth_profile_resolver.dart';
-import 'package:numi/features/profile/profile_api.dart';
-import 'package:numi/features/profile/services/active_profile_session.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
+import 'package:numi/features/session/services/profile_session_resolver.dart';
 
 /// Owns authenticated account and profile state for the entire app session.
 class AppSessionCubit extends Cubit<AppSessionState> {
   AppSessionCubit({
     AuthenticatedSession? initialSession,
-    AuthProfileResolver? profileResolver,
+    ProfileSessionResolver? profileResolver,
   }) : _sessionEpoch = initialSession == null ? 0 : 1,
        _profileResolver =
            profileResolver ??
-           AuthProfileResolver(
+           ProfileSessionResolver(
              profileService: ProfileApi(),
              activeProfileSession: const ActiveProfileSession(),
            ),
@@ -31,7 +31,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
                ),
        );
 
-  final AuthProfileResolver _profileResolver;
+  final ProfileSessionResolver _profileResolver;
   int _sessionEpoch;
 
   void beginRestore() {
@@ -76,7 +76,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
       return;
     }
 
-    final resolution = await _profileResolver.resolveForUser(user);
+    final resolution = await _profileResolver.resolveForUserId(user.id);
     if (isClosed || state.user?.id != user.id) {
       return;
     }
@@ -97,7 +97,10 @@ class AppSessionCubit extends Cubit<AppSessionState> {
       return;
     }
 
-    await _profileResolver.rememberActiveProfile(user: user, profile: profile);
+    await _profileResolver.rememberActiveProfile(
+      userId: user.id,
+      profile: profile,
+    );
     if (isClosed || state.user?.id != user.id) {
       return;
     }

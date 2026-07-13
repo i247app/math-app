@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/auth/widgets/auth_app_bar.dart';
+import 'package:numi/shared/widgets/auth_back_button.dart';
+import 'package:numi/shared/widgets/page_header.dart';
 
 class AuthLayout extends StatelessWidget {
   const AuthLayout({
@@ -13,8 +14,6 @@ class AuthLayout extends StatelessWidget {
     required this.bodyBuilder,
     this.title,
     this.titleWidget,
-    this.backLeft = 20,
-    this.backTop = 22,
     this.horizontalPadding,
     this.maxWidth = 430,
     this.minCompactHeight = 610,
@@ -43,8 +42,6 @@ class AuthLayout extends StatelessWidget {
   final Widget Function(BuildContext context, bool compact) bodyBuilder;
   final String? title;
   final Widget? titleWidget;
-  final double backLeft;
-  final double backTop;
   final double? horizontalPadding;
   final double maxWidth;
   final double minCompactHeight;
@@ -115,11 +112,16 @@ class AuthLayout extends StatelessWidget {
                             left: 0,
                             right: 0,
                             top: 0,
-                            child: AuthAppBar(
-                              onBack: onBack,
-                              left: backLeft,
-                              top: backTop,
-                              iconAsset: backIconAsset,
+                            child: PageHeader(
+                              scale: 1,
+                              backgroundColor: Colors.transparent,
+                              actionWidth: 44,
+                              horizontalPadding: 20,
+                              verticalPadding: 8,
+                              leading: AuthBackButton(
+                                iconAsset: backIconAsset,
+                                onPressed: onBack,
+                              ),
                             ),
                           ),
                           Padding(

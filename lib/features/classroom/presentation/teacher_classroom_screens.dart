@@ -20,8 +20,8 @@ import 'package:numi/core/network/school_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/active_profile_session.dart';
-import 'package:numi/features/profile/services/avatar_picker_service.dart';
+import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/classroom/classroom_api.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
 import 'package:numi/features/classroom/presentation/bloc/classroom_state.dart';
@@ -29,10 +29,11 @@ import 'package:numi/features/classroom/widgets/teacher_shared/teacher_member_su
 import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_block.dart';
 import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_card.dart';
 import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
-import 'package:numi/features/profile/grade_api.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
-import 'package:numi/features/profile/profile_api.dart';
-import 'package:numi/features/profile/school_api.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/data/profile_exception.dart';
+import 'package:numi/features/profile/data/school_api.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 import 'package:numi/shared/widgets/page_header.dart';
 

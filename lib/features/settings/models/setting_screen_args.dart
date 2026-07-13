@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/otp_auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 
 class SettingScreenArgs {
   const SettingScreenArgs({

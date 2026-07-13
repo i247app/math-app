@@ -5,17 +5,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/auth/auth_flow_cubit.dart';
-import 'package:numi/features/auth/auth_flow_state.dart';
-import 'package:numi/features/auth/helpers/auth_error_helpers.dart';
-import 'package:numi/features/auth/widgets/auth_app_bar.dart';
+import 'package:numi/features/auth/application/auth_cubit.dart';
+import 'package:numi/features/auth/application/auth_state.dart';
+import 'package:numi/features/auth/errors/auth_error_messages.dart';
 import 'package:numi/features/auth/widgets/signup/signup_action_button.dart';
 import 'package:numi/features/auth/widgets/signup/signup_field_label.dart';
 import 'package:numi/features/auth/widgets/signup/signup_gender_choice.dart';
 import 'package:numi/features/auth/widgets/signup/signup_gender_radio_group.dart';
 import 'package:numi/features/auth/widgets/signup/signup_role_card.dart';
 import 'package:numi/features/auth/widgets/signup/signup_text_field.dart';
-import 'package:numi/shared/widgets/common_widgets.dart';
+import 'package:numi/shared/widgets/screen_frame.dart';
+import 'package:numi/shared/widgets/auth_back_button.dart';
+import 'package:numi/shared/widgets/page_header.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({
@@ -153,13 +154,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final genderChoices = _genderChoicesForRole(role);
     final nameLabelKey = _signupNameLabelKey(role, gender);
 
-    return BlocConsumer<AuthFlowCubit, AuthFlowState>(
-      listenWhen: (previous, current) =>
-          previous.avatarError != current.avatarError &&
-          current.avatarError != null,
-      listener: (context, state) {
-        context.showErrorDialog(state.avatarError!);
-      },
+    return BlocBuilder<AuthFlowCubit, AuthFlowState>(
       builder: (context, state) {
         final localUsernameErrorText = username.isNotEmpty && !isUsernameValid
             ? context.getText(AppKeys.signupNameInvalid)
@@ -397,7 +392,15 @@ class _SignupHeroBanner extends StatelessWidget {
             left: 0,
             right: 0,
             top: 0,
-            child: AuthAppBar(onBack: onBack),
+            child: PageHeader(
+              scale: 1,
+              topInset: 0,
+              backgroundColor: Colors.transparent,
+              actionWidth: 44,
+              horizontalPadding: 20,
+              verticalPadding: 8,
+              leading: AuthBackButton(onPressed: onBack),
+            ),
           ),
           Positioned(
             left: 0,
