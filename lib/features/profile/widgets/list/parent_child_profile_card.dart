@@ -152,29 +152,31 @@ class ParentChildProfileCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       ProfileActionButton(
-                        child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_edit.svg',
-                          width: 20 * scale,
-                          height: 20 * scale,
-                        ),
                         backgroundColor: colors.brand.withValues(alpha: 0.12),
                         width: 42 * scale,
                         height: 42 * scale,
                         borderRadius: BorderRadius.circular(10 * scale),
                         onTap: onEdit,
-                      ),
-                      SizedBox(width: 12 * scale),
-                      ProfileActionButton(
                         child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_delete.svg',
+                          'assets/images/parent_profile_manage_edit.svg',
                           width: 20 * scale,
                           height: 20 * scale,
                         ),
+
+                      ),
+                      SizedBox(width: 12 * scale),
+                      ProfileActionButton(
                         backgroundColor: const Color(0xFFFFE4E4),
                         width: 42 * scale,
                         height: 42 * scale,
                         borderRadius: BorderRadius.circular(10 * scale),
                         onTap: onDelete,
+                        child: SvgPicture.asset(
+                          'assets/images/parent_profile_manage_delete.svg',
+                          width: 20 * scale,
+                          height: 20 * scale,
+                        ),
+
                       ),
                     ],
                   ),
