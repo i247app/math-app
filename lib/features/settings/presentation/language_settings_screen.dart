@@ -1,5 +1,5 @@
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/settings/settings_constants.dart';
+import 'package:numi/features/settings/application/settings_constants.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';

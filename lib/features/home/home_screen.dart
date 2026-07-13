@@ -34,8 +34,8 @@ import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 import 'package:numi/features/settings/helpers/setting_page_builders.dart';
+import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
-import 'package:numi/features/settings/setting_tab.dart';
 
 part 'widgets/home_role_dashboard.dart';
 

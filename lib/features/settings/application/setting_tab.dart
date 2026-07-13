@@ -1,4 +1,5 @@
-import 'package:numi/features/settings/settings_constants.dart';
+import 'package:numi/features/profile/models/profile_id_type_option.dart';
+import 'package:numi/features/settings/application/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -1297,7 +1298,7 @@ class _SettingTabState extends State<SettingTab> {
           isDefault: _profiles.isEmpty,
           role: formRole,
           avatarKey: _selectedProfileAvatarKey,
-          idType: isTeacherProfile ? normalizedIdType : settingsIdTypeMoet,
+          idType: isTeacherProfile ? normalizedIdType : profileIdTypeMoet,
           studentId: isTeacherProfile ? null : profileIdValue,
           teacherId: shouldSubmitTeacherId ? profileIdValue : null,
         );
@@ -1333,7 +1334,7 @@ class _SettingTabState extends State<SettingTab> {
             role: formRole,
             dob: _dateOnly(editingProfile.dob),
             avatarKey: _selectedProfileAvatarKey,
-            idType: isTeacherProfile ? normalizedIdType : settingsIdTypeMoet,
+            idType: isTeacherProfile ? normalizedIdType : profileIdTypeMoet,
             studentId: isTeacherProfile ? null : profileIdValue,
             teacherId: shouldSubmitTeacherId ? profileIdValue : null,
           );
@@ -1939,15 +1940,15 @@ class _SettingTabState extends State<SettingTab> {
   static String? _normalizedProfileIdType(String? value, String role) {
     final normalized = value?.trim().toUpperCase();
     if (role != 'TEACHER' && (normalized == null || normalized.isEmpty)) {
-      return settingsIdTypeMoet;
+      return profileIdTypeMoet;
     }
     if (normalized == null || normalized.isEmpty) {
       return null;
     }
 
     final allowedOptions = role == 'TEACHER'
-        ? teacherIdTypeOptions
-        : studentIdTypeOptions;
+        ? teacherProfileIdTypeOptions
+        : studentProfileIdTypeOptions;
     final isAllowed = allowedOptions.any(
       (option) => option.value == normalized,
     );

@@ -25,7 +25,7 @@ import 'package:numi/features/home/widgets/home_visual_constants.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/grade_selection_screen.dart';
 import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
-import 'package:numi/features/settings/setting_tab.dart';
+import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/student/shared/widgets/student_home_sections_loading.dart';
 import 'package:numi/features/classroom/presentation/student_class_detail_screen.dart';
 import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';

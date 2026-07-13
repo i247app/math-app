@@ -1,5 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/settings/settings_constants.dart';
+import 'package:numi/features/profile/models/profile_id_type_option.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -85,8 +85,8 @@ class AddProfilePanel extends StatelessWidget {
     final isTeacherProfile = role == 'TEACHER';
     final isParentProfile = role == 'PARENT';
     final idTypeOptions = isTeacherProfile
-        ? teacherIdTypeOptions
-        : studentIdTypeOptions;
+        ? teacherProfileIdTypeOptions
+        : studentProfileIdTypeOptions;
     final selectedIdTypeOption = _firstIdTypeOption(
       idTypeOptions,
       selectedIdType,
@@ -188,7 +188,7 @@ class AddProfilePanel extends StatelessWidget {
                 hintText: context.getText(AppKeys.profileIdTypeHint),
                 value: selectedIdTypeOption,
                 items: idTypeOptions,
-                itemLabel: (option) => context.getText(option.label),
+                itemLabel: (option) => context.getText(option.labelKey),
                 onChanged: (option) => onIdTypeChanged(option?.value),
                 scale: scale,
               ),

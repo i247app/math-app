@@ -11,7 +11,7 @@ import 'package:numi/features/home/parent/cache/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_dashboard_args.dart';
 import 'package:numi/features/home/shell/widgets/home_tab_header.dart';
 import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
-import 'package:numi/features/settings/setting_tab.dart';
+import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
