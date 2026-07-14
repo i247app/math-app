@@ -4,10 +4,24 @@ abstract final class AppColors {
   // Brand vibrant mid-tones for
   static const brandTeal = Color(0xFF339395); // Based on tealIcon
   static const brandOrange = Color(0xFFFC6128); // Based on coral600
-  // brand deep mid-tones for button background, avatar background, etc
-  // static const brandTealSolid = Color(0xFF007A78); // Based on teal600
-  // static const brandOrangeSolid = Color(0xFFDE5E31); // Based on orange500
 
+  // brand deep mid-tones for button background, avatar background, etc
+  static const brandTealSolid = Color(0xFF007A78); // Based on teal600
+  static const brandOrangeSolid = Color(0xFFDE5E31); // Based on orange500
+
+  // light/dark mode universal text teal and orange
+  static const textTeal = Color(0xFF257072); // universal text teal
+  static const textOrange = Color(0xFFD84B16); // universal text orange
+
+  // light mode
+  static const black87 = Color(0xFF212121); // light mode primary text color
+  static const limeGreen = Color(0xFF32CD32); // light mode green text color
+
+  // dark mode
+  static const white87 = Color(0xFFDEDEDE); // dark mode primary text color
+  static const neonGreen = Color(0xFF39FF14); // dark mode green text color
+
+  // others
   static const ink = Color(0xFF25352E);
   static const muted = Color(0xFF53675F);
   static const teal = Color(0xFF00776F);
