@@ -1,4 +1,4 @@
-part of '../../presentation/teacher_classroom_screens.dart';
+part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 
 String _detailIdLabel(String prefix, int? value) {
   final displayValue = displayBackendId(value);

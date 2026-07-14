@@ -9,7 +9,7 @@ import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
-import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/homework/presentation/homework_review_screen.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';

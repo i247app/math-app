@@ -1,4 +1,4 @@
-part of '../../presentation/teacher_classroom_screens.dart';
+part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 
 class _TeacherClassroomNumberBadge extends StatelessWidget {
   const _TeacherClassroomNumberBadge({

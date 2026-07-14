@@ -13,8 +13,8 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/classroom/presentation/bloc/classroom_cubit.dart';
-import 'package:numi/features/classroom/presentation/bloc/classroom_state.dart';
+import 'package:numi/features/classroom/application/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/home/cache/home_profile_cache.dart';
 import 'package:numi/features/home/home_api.dart';
@@ -27,7 +27,7 @@ import 'package:numi/features/quiz/presentation/grade_selection_screen.dart';
 import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/student/shared/widgets/student_home_sections_loading.dart';
-import 'package:numi/features/classroom/presentation/student_class_detail_screen.dart';
+import 'package:numi/features/classroom/presentation/screens/student_class_detail_screen.dart';
 import 'package:numi/features/home/shared/widgets/home_entrance_animation.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
 import 'package:numi/features/home/widgets/home_initial_assessment_banner.dart';
@@ -40,7 +40,7 @@ import 'package:numi/features/homework/presentation/student_homework_attempt_scr
 import 'package:numi/features/homework/student_homework_open_guard.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_tab_card.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
-import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
 
 class StudentHomeContent extends StatefulWidget {
   const StudentHomeContent({

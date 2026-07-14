@@ -1,5 +1,5 @@
 import 'package:numi/core/network/classroom_exercise_models.dart';
-import 'package:numi/features/classroom/classroom_api.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/homework_api.dart';
 
 class QuizHistoryHomeworkCache {

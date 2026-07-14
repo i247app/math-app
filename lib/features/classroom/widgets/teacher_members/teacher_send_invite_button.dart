@@ -1,4 +1,4 @@
-part of '../../presentation/teacher_classroom_screens.dart';
+part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 
 class _TeacherSendInviteButton extends StatelessWidget {
   const _TeacherSendInviteButton({required this.enabled, required this.onTap});

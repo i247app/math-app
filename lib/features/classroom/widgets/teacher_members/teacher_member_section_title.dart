@@ -1,4 +1,4 @@
-part of '../../presentation/teacher_classroom_screens.dart';
+part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 
 class _TeacherMemberSectionTitle extends StatelessWidget {
   const _TeacherMemberSectionTitle({required this.scale, required this.title});

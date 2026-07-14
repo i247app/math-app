@@ -1,4 +1,4 @@
-part of '../../presentation/teacher_classroom_screens.dart';
+part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 
 class TeacherAvatar extends StatelessWidget {
   const TeacherAvatar({super.key, required this.profile, required this.size});

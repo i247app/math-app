@@ -5,7 +5,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 
 class TeacherTopBar extends StatelessWidget {
   const TeacherTopBar({

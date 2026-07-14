@@ -1,4 +1,4 @@
-part of 'teacher_classroom_screens.dart';
+part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 
 class TeacherClassMembersScreen extends StatefulWidget {
   const TeacherClassMembersScreen({

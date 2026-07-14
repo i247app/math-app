@@ -4,7 +4,7 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/classroom/presentation/teacher_classroom_screens.dart';
+import 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 import 'package:numi/features/home/shared/widgets/home_section_header.dart';
 
 class TeacherClassSectionHeader extends StatelessWidget {
