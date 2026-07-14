@@ -10,7 +10,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_action_button.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_input_row.dart';
-import 'package:numi/shared/widgets/numeric_code_input_controller.dart';
+import 'package:numi/shared/controllers/numeric_code_input_controller.dart';
 
 enum PasscodeScreenMode { setup, unlock, verify }
 

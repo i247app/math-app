@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/shared/widgets/auth_back_button.dart';
-import 'package:numi/shared/widgets/page_header.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 class AuthLayout extends StatelessWidget {
   const AuthLayout({

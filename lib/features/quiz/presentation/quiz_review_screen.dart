@@ -9,7 +9,7 @@ import 'package:numi/features/quiz/controllers/quiz_review_controller.dart';
 import 'package:numi/features/quiz/quiz_api.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/shared/widgets/page_header.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 part '../widgets/quiz_review/quiz_review_header.dart';
 part '../widgets/quiz_review/quiz_review_content.dart';

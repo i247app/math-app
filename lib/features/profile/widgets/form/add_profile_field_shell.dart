@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/settings/widgets/common/settings_field_shell.dart';
+import 'package:numi/shared/layouts/app_form_field_layout.dart';
 
 class AddProfileFieldShell extends StatelessWidget {
   const AddProfileFieldShell({
@@ -18,7 +18,7 @@ class AddProfileFieldShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsFieldShell(
+    return AppFormFieldLayout(
       label: label,
       scale: scale,
       labelStyle: GoogleFonts.andika(

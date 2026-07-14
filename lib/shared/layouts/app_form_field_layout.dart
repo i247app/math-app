@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 
-class SettingsFieldShell extends StatelessWidget {
-  const SettingsFieldShell({
+class AppFormFieldLayout extends StatelessWidget {
+  const AppFormFieldLayout({
     super.key,
     required this.label,
     required this.child,

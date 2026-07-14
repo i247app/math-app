@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numi/shared/widgets/page_header.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 class HomeTabHeader extends StatelessWidget {
   const HomeTabHeader({

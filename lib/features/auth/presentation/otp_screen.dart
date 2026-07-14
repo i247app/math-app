@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/otp/otp_card.dart';
-import 'package:numi/shared/widgets/numeric_code_input_controller.dart';
+import 'package:numi/shared/controllers/numeric_code_input_controller.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({

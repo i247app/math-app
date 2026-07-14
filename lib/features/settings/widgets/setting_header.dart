@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/shared/widgets/page_header.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 class SettingHeader extends StatelessWidget {
   const SettingHeader({
