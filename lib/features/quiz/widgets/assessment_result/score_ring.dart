@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/score_number.dart';
+import 'package:numi/features/quiz/helpers/score_number.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
 
 class AssessmentScoreRing extends StatelessWidget {

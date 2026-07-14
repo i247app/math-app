@@ -1,4 +1,4 @@
-part of '../../history_tab.dart';
+part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
 
 class _HistorySkeletonBlock extends StatelessWidget {
   const _HistorySkeletonBlock({

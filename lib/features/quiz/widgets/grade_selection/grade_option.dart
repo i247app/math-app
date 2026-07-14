@@ -1,5 +1,5 @@
 import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/features/quiz/widgets/grade_selection/grade_number_from_label.dart';
+import 'package:numi/features/quiz/helpers/grade_number_from_label.dart';
 
 class GradeOption {
   const GradeOption(this.number, this.label, {this.displayOrder = 0});

@@ -13,8 +13,8 @@ import 'package:numi/features/practice/practice_api.dart';
 import 'package:numi/features/practice/practice_catalog.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/practice/cache/practice_chapter_cache.dart';
-import 'package:numi/features/quiz/quiz_api.dart';
-import 'package:numi/features/quiz/presentation/assessment_screen.dart';
+import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/presentation/screens/assessment_screen.dart';
 import 'package:numi/features/practice/presentation/practice_chapter_screen.dart';
 
 part 'widgets/practice_tab/practice_header.dart';

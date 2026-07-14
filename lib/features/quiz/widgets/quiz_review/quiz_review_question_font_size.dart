@@ -1,4 +1,4 @@
-part of '../../presentation/quiz_review_screen.dart';
+part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
 
 double _quizReviewQuestionFontSize(String text) {
   final length = text.trim().length;

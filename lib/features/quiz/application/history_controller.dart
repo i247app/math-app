@@ -6,13 +6,14 @@ import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/homework_api.dart';
-import 'package:numi/features/quiz/cache/quiz_cache.dart';
-import 'package:numi/features/quiz/cache/quiz_history_homework_cache.dart';
-import 'package:numi/features/quiz/quiz_api.dart';
-import 'package:numi/features/quiz/widgets/history_tab/history_compare_homework_descending.dart';
-import 'package:numi/features/quiz/widgets/history_tab/history_compare_quiz_descending.dart';
-import 'package:numi/features/quiz/widgets/history_tab/history_is_assessment_quiz.dart';
-import 'package:numi/features/quiz/widgets/history_tab/history_is_submitted_homework.dart';
+import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
+import 'package:numi/features/quiz/data/cache/quiz_history_homework_cache.dart';
+import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/errors/quiz_exception.dart';
+import 'package:numi/features/quiz/helpers/history_compare_homework_descending.dart';
+import 'package:numi/features/quiz/helpers/history_compare_quiz_descending.dart';
+import 'package:numi/features/quiz/helpers/history_is_assessment_quiz.dart';
+import 'package:numi/features/quiz/helpers/history_is_submitted_homework.dart';
 
 class HistoryController extends ChangeNotifier {
   HistoryController({

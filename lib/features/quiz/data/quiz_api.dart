@@ -2,6 +2,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/errors/quiz_exception.dart';
 
 const quizPurposeAssessment = 'ASSESSMENT';
 const quizPurposePractice = 'PRACTICE';
@@ -9,16 +10,6 @@ const quizTypeGeneral = 'GENERAL';
 const quizTypeReinforcement = 'REINFORCEMENT';
 const assessmentQuizType = quizPurposeAssessment;
 const assessmentQuizGradeLabel = 'Grade 1';
-
-class QuizException implements Exception {
-  const QuizException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
 
 abstract class QuizService {
   Future<GeneratedQuiz> generateAssessmentQuiz({

@@ -1,4 +1,4 @@
-part of '../../history_tab.dart';
+part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
 
 _HistoryDateParts _historyDatePartsFromIso(String? isoDate) {
   if (isoDate == null || isoDate.trim().isEmpty) {

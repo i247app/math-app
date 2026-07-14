@@ -1,4 +1,4 @@
-part of 'quiz_review_screen.dart';
+part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
 
 /// Quiz-specific route into the shared review-detail layout.
 class QuizReviewScreen extends StatelessWidget {

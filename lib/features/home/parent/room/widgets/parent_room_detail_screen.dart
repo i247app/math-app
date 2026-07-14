@@ -5,7 +5,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/home/home_api.dart';
-import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
 import 'package:numi/features/home/parent/room/models/parent_room_entry.dart';

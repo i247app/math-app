@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/homework/homework_quiz_review_service.dart';
-import 'package:numi/features/quiz/presentation/quiz_review_screen.dart';
+import 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
 
 /// Homework-specific route into the shared review-detail layout.
 class HomeworkReviewScreen extends StatelessWidget {

@@ -1,4 +1,4 @@
-part of '../../history_tab.dart';
+part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
 
 String _historyHomeworkTitle(BuildContext context, ClassroomExercise exercise) {
   final title = exercise.title?.trim();
