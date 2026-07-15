@@ -4,6 +4,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/errors/classroom_exception.dart';
 import 'package:numi/features/home/student/shared/widgets/student_inline_error_panel.dart';
 import 'package:numi/features/home/student/shared/widgets/student_state_card.dart';
 import 'package:numi/features/home/student/invitations/widgets/student_invitation_card.dart';

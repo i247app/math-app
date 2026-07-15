@@ -1,15 +1,6 @@
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/network/network_client.dart';
-
-class ClassroomException implements Exception {
-  const ClassroomException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
+import 'package:numi/features/classroom/errors/classroom_exception.dart';
 
 abstract class ClassroomService {
   Future<List<ClassroomModel>> listClassrooms({required int profileId});

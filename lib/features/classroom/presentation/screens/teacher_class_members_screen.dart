@@ -11,6 +11,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/errors/classroom_exception.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_class_members_content.dart';

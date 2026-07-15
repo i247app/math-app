@@ -5,6 +5,7 @@ import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/errors/classroom_exception.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 import 'package:numi/features/quiz/data/cache/quiz_history_homework_cache.dart';

@@ -16,6 +16,7 @@ import 'package:numi/core/network/grade_models.dart';
 import 'package:numi/core/network/program_models.dart';
 import 'package:numi/core/network/school_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/errors/classroom_exception.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
