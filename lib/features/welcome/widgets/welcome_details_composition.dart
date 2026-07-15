@@ -48,7 +48,10 @@ class WelcomeDetailsComposition extends StatelessWidget {
         final bottomSafe = MediaQuery.paddingOf(context).bottom;
 
         double s(double value) => value * scale;
-        final controlsHeight = s(42);
+        // The start button has 16px vertical padding on each side plus its
+        // label. Reserve enough height for that content so the label is not
+        // clipped by this fixed-size control area.
+        final controlsHeight = s(56);
         final controlsBottom = math.max(bottomSafe + s(22), s(30));
         final gridGap = s(12);
         final gridHeight = s(132) * 2 + gridGap;
