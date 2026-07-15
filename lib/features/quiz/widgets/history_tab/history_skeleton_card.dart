@@ -1,7 +1,10 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistorySkeletonCard extends StatelessWidget {
-  const _HistorySkeletonCard({required this.scale});
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_skeleton_block.dart';
+
+class HistorySkeletonCard extends StatelessWidget {
+  const HistorySkeletonCard({super.key, required this.scale});
 
   final double scale;
 
@@ -23,7 +26,7 @@ class _HistorySkeletonCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _HistorySkeletonBlock(
+          HistorySkeletonBlock(
             width: 54 * scale,
             height: 54 * scale,
             radius: 27 * scale,
@@ -36,13 +39,13 @@ class _HistorySkeletonCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    _HistorySkeletonBlock(
+                    HistorySkeletonBlock(
                       width: 82 * scale,
                       height: 12 * scale,
                       radius: 6 * scale,
                     ),
                     SizedBox(width: 12 * scale),
-                    _HistorySkeletonBlock(
+                    HistorySkeletonBlock(
                       width: 54 * scale,
                       height: 12 * scale,
                       radius: 6 * scale,
@@ -50,13 +53,13 @@ class _HistorySkeletonCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 12 * scale),
-                _HistorySkeletonBlock(
+                HistorySkeletonBlock(
                   width: 150 * scale,
                   height: 17 * scale,
                   radius: 8 * scale,
                 ),
                 SizedBox(height: 8 * scale),
-                _HistorySkeletonBlock(
+                HistorySkeletonBlock(
                   width: 110 * scale,
                   height: 11 * scale,
                   radius: 6 * scale,

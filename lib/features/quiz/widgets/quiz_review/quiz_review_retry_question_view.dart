@@ -1,7 +1,14 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewRetryQuestionView extends StatelessWidget {
-  const _QuizReviewRetryQuestionView({
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_answer_list.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_card.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_navigation_bar.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_selector.dart';
+
+class QuizReviewRetryQuestionView extends StatelessWidget {
+  const QuizReviewRetryQuestionView({
+    super.key,
     required this.questions,
     required this.selectedIndex,
     required this.question,
@@ -26,22 +33,22 @@ class _QuizReviewRetryQuestionView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _QuizReviewQuestionSelector(
+        QuizReviewQuestionSelector(
           questions: questions,
           selectedIndex: selectedIndex,
           onSelected: onQuestionSelected,
         ),
         const SizedBox(height: 20),
-        _QuizReviewQuestionCard(question: question),
+        QuizReviewQuestionCard(question: question),
         const SizedBox(height: 23),
-        _QuizReviewAnswerList(
+        QuizReviewAnswerList(
           question: question,
           selectedLabel: selectedAnswers[question.questionNumber],
           onSelected: (label) =>
               onAnswerSelected(question.questionNumber, label),
         ),
         const SizedBox(height: 13),
-        _QuizReviewQuestionNavigationBar(
+        QuizReviewQuestionNavigationBar(
           canGoPrevious: selectedIndex > 0,
           canGoNext: selectedIndex < questions.length - 1,
           onPrevious: onPrevious,

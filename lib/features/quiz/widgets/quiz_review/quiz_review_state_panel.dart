@@ -1,7 +1,13 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewStatePanel extends StatelessWidget {
-  const _QuizReviewStatePanel({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_card.dart';
+
+class QuizReviewStatePanel extends StatelessWidget {
+  const QuizReviewStatePanel({
+    super.key,
     required this.isLoading,
     required this.message,
     required this.onRetry,
@@ -16,7 +22,7 @@ class _QuizReviewStatePanel extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: _QuizReviewCard(
+        child: QuizReviewCard(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,

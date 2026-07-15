@@ -1,6 +1,10 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewLoadingContentState extends State<_QuizReviewLoadingContent>
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_loading_content.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_loading_section.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_skeleton_block.dart';
+
+class QuizReviewLoadingContentState extends State<QuizReviewLoadingContent>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
@@ -31,19 +35,19 @@ class _QuizReviewLoadingContentState extends State<_QuizReviewLoadingContent>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _QuizReviewSkeletonBlock(
+              QuizReviewSkeletonBlock(
                 progress: progress,
                 height: 44,
                 borderRadius: 12,
               ),
               const SizedBox(height: 12),
-              _QuizReviewSkeletonBlock(
+              QuizReviewSkeletonBlock(
                 progress: progress,
                 height: 94,
                 borderRadius: 14,
               ),
               const SizedBox(height: 24),
-              _QuizReviewQuestionLoadingSection(progress: progress),
+              QuizReviewQuestionLoadingSection(progress: progress),
             ],
           ),
         );

@@ -1,7 +1,12 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewHeader extends StatelessWidget {
-  const _QuizReviewHeader({required this.onBack});
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/shared/layouts/page_header.dart';
+
+class QuizReviewHeader extends StatelessWidget {
+  const QuizReviewHeader({super.key, required this.onBack});
 
   final VoidCallback onBack;
 

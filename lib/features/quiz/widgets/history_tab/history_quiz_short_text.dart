@@ -1,6 +1,6 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:numi/core/network/quiz_models.dart';
 
-String? _historyQuizShortText(GeneratedQuiz quiz) {
+String? historyQuizShortText(GeneratedQuiz quiz) {
   final shortText = quiz.shortText?.trim();
   if (shortText == null || shortText.isEmpty) {
     return null;

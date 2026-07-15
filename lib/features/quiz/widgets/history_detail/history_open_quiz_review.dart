@@ -1,6 +1,12 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void _historyOpenQuizReview(BuildContext context, GeneratedQuiz quiz) {
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
+
+void historyOpenQuizReview(BuildContext context, GeneratedQuiz quiz) {
   final quizId = quiz.quizId ?? quiz.id;
   if (quizId == null) {
     context.showErrorDialog(context.readText(AppKeys.missingQuizId));

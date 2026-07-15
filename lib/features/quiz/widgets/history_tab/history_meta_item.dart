@@ -1,7 +1,11 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryMetaItem extends StatelessWidget {
-  const _HistoryMetaItem({
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_colors.dart';
+
+class HistoryMetaItem extends StatelessWidget {
+  const HistoryMetaItem({
+    super.key,
     required this.icon,
     required this.label,
     required this.scale,

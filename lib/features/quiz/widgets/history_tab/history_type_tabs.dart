@@ -1,14 +1,18 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryTypeTabs extends StatelessWidget {
-  const _HistoryTypeTabs({
+import 'package:numi/features/quiz/widgets/history_tab/history_filter.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_type_tab_button.dart';
+
+class HistoryTypeTabs extends StatelessWidget {
+  const HistoryTypeTabs({
+    super.key,
     required this.selectedFilter,
     required this.onSelected,
     required this.scale,
   });
 
-  final _HistoryFilter selectedFilter;
-  final ValueChanged<_HistoryFilter> onSelected;
+  final HistoryFilter selectedFilter;
+  final ValueChanged<HistoryFilter> onSelected;
   final double scale;
 
   @override
@@ -22,9 +26,9 @@ class _HistoryTypeTabs extends StatelessWidget {
       ),
       child: Row(
         children: [
-          for (final filter in _HistoryFilter.values)
+          for (final filter in HistoryFilter.values)
             Expanded(
-              child: _HistoryTypeTabButton(
+              child: HistoryTypeTabButton(
                 filter: filter,
                 selected: selectedFilter == filter,
                 onTap: () => onSelected(filter),

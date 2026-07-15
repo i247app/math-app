@@ -1,7 +1,8 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistorySkeletonBlock extends StatelessWidget {
-  const _HistorySkeletonBlock({
+class HistorySkeletonBlock extends StatelessWidget {
+  const HistorySkeletonBlock({
+    super.key,
     required this.width,
     required this.height,
     required this.radius,

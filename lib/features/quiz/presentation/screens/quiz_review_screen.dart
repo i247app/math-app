@@ -1,50 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi/core/extension/localization_extension.dart';
-import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/features/quiz/application/quiz_review_controller.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/shared/layouts/page_header.dart';
-
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_header.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_content.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_mode_tabs.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_mode_tab_button.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_stats_card.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_stat_item.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_selector.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_centered_text.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_card.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_retry_question_view.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_result_question_list.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_result_question_card.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_badge.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_status.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_navigation_bar.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_nav_button.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_answer_list.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_answer_tile.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_card.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_loading_content.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_loading_content_state.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_loading_section.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_loading_section_state.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_skeleton.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_skeleton_block.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_inline_error.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_state_panel.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_selected_answer_label.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_correct_answer_label.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_computed_correct_count.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_time_label.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_font_size.dart';
-part 'package:numi/features/quiz/widgets/quiz_review/quiz_review_two_digits.dart';
-part 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_content.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_header.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_loading_content.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_state_panel.dart';
 
 /// Shared review-detail layout used by quiz and classroom-exercise entry
 /// screens. Source-specific screens provide the detail loader and data model.
@@ -131,7 +95,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
         bottom: false,
         child: Column(
           children: [
-            _QuizReviewHeader(onBack: () => Navigator.of(context).pop()),
+            QuizReviewHeader(onBack: () => Navigator.of(context).pop()),
             Expanded(
               child: AnimatedBuilder(
                 animation: _controller,
@@ -139,8 +103,8 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                   final quiz = _controller.quiz;
                   if (quiz == null) {
                     return _controller.isLoading
-                        ? const _QuizReviewLoadingContent()
-                        : _QuizReviewStatePanel(
+                        ? const QuizReviewLoadingContent()
+                        : QuizReviewStatePanel(
                             isLoading: false,
                             message: _controller.errorMessage,
                             onRetry: () =>
@@ -148,7 +112,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                           );
                   }
 
-                  return _QuizReviewContent(
+                  return QuizReviewContent(
                     quiz: quiz,
                     selectedIndex: _controller.selectedIndex,
                     mode: _controller.mode,

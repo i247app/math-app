@@ -1,7 +1,9 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewCard extends StatelessWidget {
-  const _QuizReviewCard({required this.child, required this.padding});
+import 'package:numi/core/theme/app_theme_colors.dart';
+
+class QuizReviewCard extends StatelessWidget {
+  const QuizReviewCard({super.key, required this.child, required this.padding});
 
   final Widget child;
   final EdgeInsetsGeometry padding;

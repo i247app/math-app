@@ -1,9 +1,11 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewLoadingContent extends StatefulWidget {
-  const _QuizReviewLoadingContent();
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_loading_content_state.dart';
+
+class QuizReviewLoadingContent extends StatefulWidget {
+  const QuizReviewLoadingContent({super.key});
 
   @override
-  State<_QuizReviewLoadingContent> createState() =>
-      _QuizReviewLoadingContentState();
+  State<QuizReviewLoadingContent> createState() =>
+      QuizReviewLoadingContentState();
 }

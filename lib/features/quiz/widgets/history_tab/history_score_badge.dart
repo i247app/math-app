@@ -1,14 +1,19 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryScoreBadge extends StatelessWidget {
-  const _HistoryScoreBadge({
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/shared/widgets/score_progress_ring.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_score_badge_colors.dart';
+
+class HistoryScoreBadge extends StatelessWidget {
+  const HistoryScoreBadge({
+    super.key,
     required this.percentage,
     required this.colors,
     required this.scale,
   });
 
   final int percentage;
-  final _HistoryScoreBadgeColors colors;
+  final HistoryScoreBadgeColors colors;
   final double scale;
 
   @override

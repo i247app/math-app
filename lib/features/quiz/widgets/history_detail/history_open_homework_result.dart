@@ -1,6 +1,13 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void _historyOpenHomeworkResult(
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/homework/presentation/homework_review_screen.dart';
+
+void historyOpenHomeworkResult(
   BuildContext context,
   ClassroomExercise exercise, {
   required int? profileId,

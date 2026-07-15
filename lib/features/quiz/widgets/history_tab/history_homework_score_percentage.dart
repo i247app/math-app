@@ -1,6 +1,7 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/quiz/helpers/history_metadata_int.dart';
 
-int? _historyHomeworkScorePercentage(ClassroomExercise exercise) {
+int? historyHomeworkScorePercentage(ClassroomExercise exercise) {
   final metadata = exercise.metadata;
   if (metadata == null) {
     return null;

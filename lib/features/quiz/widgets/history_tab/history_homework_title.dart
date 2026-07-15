@@ -1,6 +1,10 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-String _historyHomeworkTitle(BuildContext context, ClassroomExercise exercise) {
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+
+String historyHomeworkTitle(BuildContext context, ClassroomExercise exercise) {
   final title = exercise.title?.trim();
   if (title != null && title.isNotEmpty) {
     return title;

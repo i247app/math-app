@@ -1,14 +1,23 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewInlineError extends StatelessWidget {
-  const _QuizReviewInlineError({required this.message, required this.onRetry});
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_card.dart';
+
+class QuizReviewInlineError extends StatelessWidget {
+  const QuizReviewInlineError({
+    super.key,
+    required this.message,
+    required this.onRetry,
+  });
 
   final String message;
   final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    return _QuizReviewCard(
+    return QuizReviewCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [

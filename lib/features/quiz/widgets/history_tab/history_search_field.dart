@@ -1,7 +1,17 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _HistorySearchField extends StatelessWidget {
-  const _HistorySearchField({required this.controller, required this.scale});
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+
+class HistorySearchField extends StatelessWidget {
+  const HistorySearchField({
+    super.key,
+    required this.controller,
+    required this.scale,
+  });
 
   final TextEditingController controller;
   final double scale;

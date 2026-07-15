@@ -1,7 +1,10 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewStatItem extends StatelessWidget {
-  const _QuizReviewStatItem({
+import 'package:numi/core/theme/app_colors.dart';
+
+class QuizReviewStatItem extends StatelessWidget {
+  const QuizReviewStatItem({
+    super.key,
     required this.icon,
     required this.iconColor,
     required this.iconBackground,

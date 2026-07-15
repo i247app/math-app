@@ -1,13 +1,15 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_correct_answer_label.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_selected_answer_label.dart';
 
-int _quizReviewComputedCorrectCount(GeneratedQuiz quiz) {
+int quizReviewComputedCorrectCount(GeneratedQuiz quiz) {
   var count = 0;
   for (final question in quiz.questions) {
-    final selected = _quizReviewSelectedAnswerLabel(
+    final selected = quizReviewSelectedAnswerLabel(
       quiz,
       question.questionNumber,
     );
-    final correct = _quizReviewCorrectAnswerLabel(question);
+    final correct = quizReviewCorrectAnswerLabel(question);
     if (selected != null && selected == correct) {
       count++;
     }

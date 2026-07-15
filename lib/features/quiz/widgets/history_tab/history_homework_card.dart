@@ -1,7 +1,19 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryHomeworkCard extends StatelessWidget {
-  const _HistoryHomeworkCard({
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/quiz/helpers/history_homework_date_text.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_date_parts_from_iso.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_entry_card.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_homework_score_percentage.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_homework_short_text.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_homework_title.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_score_badge.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_score_colors.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_submitted_badge.dart';
+
+class HistoryHomeworkCard extends StatelessWidget {
+  const HistoryHomeworkCard({
+    super.key,
     required this.exercise,
     required this.scale,
     required this.onTap,
@@ -13,98 +25,20 @@ class _HistoryHomeworkCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scorePercent = _historyHomeworkScorePercentage(exercise);
-    final dateParts = _historyDatePartsFromIso(
-      historyHomeworkDateText(exercise),
-    );
-    final radius = BorderRadius.circular(24 * scale);
-    final colors = context.themeColors;
-
-    return Material(
-      color: colors.elevatedSurface,
-      borderRadius: radius,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Container(
-          constraints: BoxConstraints(minHeight: 116 * scale),
-          padding: EdgeInsets.fromLTRB(
-            16 * scale,
-            14 * scale,
-            10 * scale,
-            14 * scale,
-          ),
-          decoration: BoxDecoration(
-            color: colors.elevatedSurface,
-            borderRadius: radius,
-            border: Border.all(color: colors.border, width: 1.3 * scale),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow,
-                blurRadius: 12 * scale,
-                offset: Offset(0, 4 * scale),
-              ),
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (scorePercent != null)
-                _HistoryScoreBadge(
-                  percentage: scorePercent,
-                  colors: _historyScoreColors(context, scorePercent),
-                  scale: scale,
-                )
-              else
-                _HistorySubmittedBadge(scale: scale),
-              SizedBox(width: 12 * scale),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _HistoryMetaRow(parts: dateParts, scale: scale),
-                    SizedBox(height: 7 * scale),
-                    Text(
-                      _historyHomeworkTitle(context, exercise),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: FontSize.normal * scale,
-                        fontWeight: FontWeight.w800,
-                        height: 1.28,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                    if (_historyHomeworkShortText(context, exercise)
-                        case final shortText?) ...[
-                      SizedBox(height: 4 * scale),
-                      Text(
-                        shortText,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: colors.textSecondary,
-                          fontSize: FontSize.small * scale,
-                          fontWeight: FontWeight.w500,
-                          height: 1.22,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: colors.brandStrong,
-                size: 26 * scale,
-              ),
-            ],
-          ),
-        ),
-      ),
+    final percentage = historyHomeworkScorePercentage(exercise);
+    return HistoryEntryCard(
+      leading: percentage == null
+          ? HistorySubmittedBadge(scale: scale)
+          : HistoryScoreBadge(
+              percentage: percentage,
+              colors: historyScoreColors(context, percentage),
+              scale: scale,
+            ),
+      dateParts: historyDatePartsFromIso(historyHomeworkDateText(exercise)),
+      title: historyHomeworkTitle(context, exercise),
+      subtitle: historyHomeworkShortText(context, exercise),
+      scale: scale,
+      onTap: onTap,
     );
   }
 }

@@ -1,7 +1,9 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewQuestionSkeleton extends StatelessWidget {
-  const _QuizReviewQuestionSkeleton({required this.progress});
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_skeleton_block.dart';
+
+class QuizReviewQuestionSkeleton extends StatelessWidget {
+  const QuizReviewQuestionSkeleton({super.key, required this.progress});
 
   final double progress;
 
@@ -10,14 +12,14 @@ class _QuizReviewQuestionSkeleton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _QuizReviewSkeletonBlock(
+        QuizReviewSkeletonBlock(
           progress: progress,
           height: 146,
           borderRadius: 14,
         ),
         const SizedBox(height: 23),
         for (var index = 0; index < 4; index++) ...[
-          _QuizReviewSkeletonBlock(
+          QuizReviewSkeletonBlock(
             progress: progress,
             height: 59,
             borderRadius: 12,
@@ -30,7 +32,7 @@ class _QuizReviewQuestionSkeleton extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: _QuizReviewSkeletonBlock(
+                child: QuizReviewSkeletonBlock(
                   progress: progress,
                   height: 40,
                   borderRadius: 9,
@@ -38,7 +40,7 @@ class _QuizReviewQuestionSkeleton extends StatelessWidget {
               ),
               const SizedBox(width: 28),
               Expanded(
-                child: _QuizReviewSkeletonBlock(
+                child: QuizReviewSkeletonBlock(
                   progress: progress,
                   height: 40,
                   borderRadius: 9,

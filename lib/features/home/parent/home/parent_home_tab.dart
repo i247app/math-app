@@ -14,7 +14,7 @@ import 'package:numi/features/home/widgets/home_dashboard_args.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
-import 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';

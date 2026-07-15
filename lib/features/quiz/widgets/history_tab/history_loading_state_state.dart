@@ -1,6 +1,9 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryLoadingStateState extends State<_HistoryLoadingState>
+import 'package:numi/features/quiz/widgets/history_tab/history_loading_state.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_skeleton_card.dart';
+
+class HistoryLoadingStateState extends State<HistoryLoadingState>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -40,7 +43,7 @@ class _HistoryLoadingStateState extends State<_HistoryLoadingState>
       child: Column(
         children: [
           for (var index = 0; index < 3; index++) ...[
-            _HistorySkeletonCard(scale: widget.scale),
+            HistorySkeletonCard(scale: widget.scale),
             if (index != 2) SizedBox(height: 14 * widget.scale),
           ],
         ],

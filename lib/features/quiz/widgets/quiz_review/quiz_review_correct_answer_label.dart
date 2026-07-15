@@ -1,6 +1,6 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:numi/core/network/quiz_models.dart';
 
-String? _quizReviewCorrectAnswerLabel(QuizQuestion question) {
+String? quizReviewCorrectAnswerLabel(QuizQuestion question) {
   final rightAnswer = question.rightAnswer?.trim();
   if (rightAnswer != null && rightAnswer.isNotEmpty) {
     return rightAnswer.toUpperCase();

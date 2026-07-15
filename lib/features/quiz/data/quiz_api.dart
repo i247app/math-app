@@ -51,8 +51,8 @@ class QuizApi implements QuizService {
   }) async {
     final GenerateQuizResponse response;
     final cleanGradeLabel = gradeLabel?.trim();
-    try {
-      response = await _networkApi.generateQuiz(
+    response = await _runQuizRequest(
+      () => _networkApi.generateQuiz(
         GenerateQuizRequest(
           purpose: purpose,
           typeOfQuiz: typeOfQuiz,
@@ -65,10 +65,8 @@ class QuizApi implements QuizService {
           chapters: _cleanChapters(chapters),
           profileId: profileId,
         ),
-      );
-    } on NetworkException catch (error) {
-      throw QuizException(error.message, status: error.status);
-    }
+      ),
+    );
 
     final quiz = response.quiz;
     if (quiz == null || quiz.questions.isEmpty) {
@@ -85,17 +83,15 @@ class QuizApi implements QuizService {
     int? profileId,
   }) async {
     final SubmitQuizResponse response;
-    try {
-      response = await _networkApi.submitQuiz(
+    response = await _runQuizRequest(
+      () => _networkApi.submitQuiz(
         SubmitQuizRequest(
           quizId: quizId,
           answers: answers,
           profileId: profileId,
         ),
-      );
-    } on NetworkException catch (error) {
-      throw QuizException(error.message, status: error.status);
-    }
+      ),
+    );
 
     final quiz = response.quiz;
     if (quiz == null) {
@@ -114,13 +110,11 @@ class QuizApi implements QuizService {
     }
 
     final QuizListResponse response;
-    try {
-      response = await _networkApi.listQuizzes(
+    response = await _runQuizRequest(
+      () => _networkApi.listQuizzes(
         QuizListRequest(userId: userId, profileId: profileId),
-      );
-    } on NetworkException catch (error) {
-      throw QuizException(error.message, status: error.status);
-    }
+      ),
+    );
 
     return response.quizzes;
   }
@@ -132,11 +126,7 @@ class QuizApi implements QuizService {
     }
 
     final QuizDetailResponse response;
-    try {
-      response = await _networkApi.getQuizDetail(quizId);
-    } on NetworkException catch (error) {
-      throw QuizException(error.message, status: error.status);
-    }
+    response = await _runQuizRequest(() => _networkApi.getQuizDetail(quizId));
 
     final quiz = response.quiz;
     if (quiz == null) {
@@ -144,6 +134,14 @@ class QuizApi implements QuizService {
     }
 
     return quiz;
+  }
+}
+
+Future<T> _runQuizRequest<T>(Future<T> Function() request) async {
+  try {
+    return await request();
+  } on NetworkException catch (error) {
+    throw QuizException(error.message, status: error.status);
   }
 }
 

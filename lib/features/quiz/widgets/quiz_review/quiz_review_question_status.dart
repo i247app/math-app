@@ -1,7 +1,11 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewQuestionStatus extends StatelessWidget {
-  const _QuizReviewQuestionStatus({required this.isCorrect});
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+
+class QuizReviewQuestionStatus extends StatelessWidget {
+  const QuizReviewQuestionStatus({super.key, required this.isCorrect});
 
   final bool isCorrect;
 

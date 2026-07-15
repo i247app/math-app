@@ -1,7 +1,16 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewResultQuestionCard extends StatelessWidget {
-  const _QuizReviewResultQuestionCard({
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_answer_list.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_correct_answer_label.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_badge.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_status.dart';
+
+class QuizReviewResultQuestionCard extends StatelessWidget {
+  const QuizReviewResultQuestionCard({
+    super.key,
     required this.question,
     required this.selectedLabel,
   });
@@ -11,7 +20,7 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final correctLabel = _quizReviewCorrectAnswerLabel(question);
+    final correctLabel = quizReviewCorrectAnswerLabel(question);
     final isCorrect = selectedLabel != null && selectedLabel == correctLabel;
     final accent = isCorrect ? AppColors.teal600 : AppColors.red;
     final colors = context.themeColors;
@@ -42,7 +51,7 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        _QuizReviewQuestionBadge(
+                        QuizReviewQuestionBadge(
                           number: question.questionNumber,
                           color: isCorrect
                               ? AppColors.aquaMist
@@ -52,7 +61,7 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
                               : AppColors.red,
                         ),
                         const Spacer(),
-                        _QuizReviewQuestionStatus(isCorrect: isCorrect),
+                        QuizReviewQuestionStatus(isCorrect: isCorrect),
                       ],
                     ),
                     const SizedBox(height: 18),
@@ -69,7 +78,7 @@ class _QuizReviewResultQuestionCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 18),
-                    _QuizReviewAnswerList(
+                    QuizReviewAnswerList(
                       question: question,
                       selectedLabel: selectedLabel,
                       showCorrectAnswer: true,

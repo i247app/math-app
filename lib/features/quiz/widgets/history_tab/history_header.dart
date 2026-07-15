@@ -1,7 +1,11 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryHeader extends StatelessWidget {
-  const _HistoryHeader({required this.scale, required this.topInset});
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/shared/layouts/page_header.dart';
+
+class HistoryHeader extends StatelessWidget {
+  const HistoryHeader({super.key, required this.scale, required this.topInset});
 
   final double scale;
   final double topInset;

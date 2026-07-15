@@ -1,7 +1,11 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewNavButton extends StatelessWidget {
-  const _QuizReviewNavButton({
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_centered_text.dart';
+
+class QuizReviewNavButton extends StatelessWidget {
+  const QuizReviewNavButton({
+    super.key,
     required this.label,
     required this.icon,
     required this.filled,
@@ -27,7 +31,7 @@ class _QuizReviewNavButton extends StatelessWidget {
         children: [
           if (!iconAfter) Icon(icon, color: foreground, size: 20),
           if (!iconAfter) const SizedBox(width: 2),
-          _QuizReviewCenteredText(
+          QuizReviewCenteredText(
             label,
             color: foreground,
             fontSize: 15,

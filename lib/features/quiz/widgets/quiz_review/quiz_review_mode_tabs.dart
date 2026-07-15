@@ -1,7 +1,13 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewModeTabs extends StatelessWidget {
-  const _QuizReviewModeTabs({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/quiz/application/quiz_review_controller.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_mode_tab_button.dart';
+
+class QuizReviewModeTabs extends StatelessWidget {
+  const QuizReviewModeTabs({
+    super.key,
     required this.selectedMode,
     required this.onSelected,
   });
@@ -21,14 +27,14 @@ class _QuizReviewModeTabs extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _QuizReviewModeTabButton(
+            child: QuizReviewModeTabButton(
               label: context.getText(AppKeys.testAgain),
               selected: selectedMode == QuizReviewMode.retry,
               onTap: () => onSelected(QuizReviewMode.retry),
             ),
           ),
           Expanded(
-            child: _QuizReviewModeTabButton(
+            child: QuizReviewModeTabButton(
               label: context.getText(AppKeys.viewResult),
               selected: selectedMode == QuizReviewMode.result,
               onTap: () => onSelected(QuizReviewMode.result),

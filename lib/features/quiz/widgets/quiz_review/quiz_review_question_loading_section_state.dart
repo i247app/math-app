@@ -1,7 +1,10 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewQuestionLoadingSectionState
-    extends State<_QuizReviewQuestionLoadingSection>
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_loading_section.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_skeleton.dart';
+
+class QuizReviewQuestionLoadingSectionState
+    extends State<QuizReviewQuestionLoadingSection>
     with SingleTickerProviderStateMixin {
   AnimationController? _controller;
 
@@ -26,13 +29,13 @@ class _QuizReviewQuestionLoadingSectionState
   Widget build(BuildContext context) {
     final controller = _controller;
     if (controller == null) {
-      return _QuizReviewQuestionSkeleton(progress: widget.progress ?? 0);
+      return QuizReviewQuestionSkeleton(progress: widget.progress ?? 0);
     }
 
     return AnimatedBuilder(
       animation: controller,
       builder: (context, child) {
-        return _QuizReviewQuestionSkeleton(progress: controller.value);
+        return QuizReviewQuestionSkeleton(progress: controller.value);
       },
     );
   }

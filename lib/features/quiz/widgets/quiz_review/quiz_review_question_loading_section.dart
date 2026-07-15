@@ -1,11 +1,13 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewQuestionLoadingSection extends StatefulWidget {
-  const _QuizReviewQuestionLoadingSection({this.progress});
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_loading_section_state.dart';
+
+class QuizReviewQuestionLoadingSection extends StatefulWidget {
+  const QuizReviewQuestionLoadingSection({super.key, this.progress});
 
   final double? progress;
 
   @override
-  State<_QuizReviewQuestionLoadingSection> createState() =>
-      _QuizReviewQuestionLoadingSectionState();
+  State<QuizReviewQuestionLoadingSection> createState() =>
+      QuizReviewQuestionLoadingSectionState();
 }

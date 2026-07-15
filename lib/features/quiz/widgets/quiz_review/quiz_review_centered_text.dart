@@ -1,8 +1,9 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewCenteredText extends StatelessWidget {
-  const _QuizReviewCenteredText(
+class QuizReviewCenteredText extends StatelessWidget {
+  const QuizReviewCenteredText(
     this.text, {
+    super.key,
     required this.color,
     required this.fontSize,
     required this.fontWeight,

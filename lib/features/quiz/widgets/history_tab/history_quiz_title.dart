@@ -1,6 +1,11 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-String _historyQuizTitle(BuildContext context, GeneratedQuiz quiz) {
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/helpers/history_quiz_purpose.dart';
+
+String historyQuizTitle(BuildContext context, GeneratedQuiz quiz) {
   if (quiz.title != null && quiz.title!.trim().isNotEmpty) {
     return quiz.title!;
   }

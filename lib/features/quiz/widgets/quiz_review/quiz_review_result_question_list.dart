@@ -1,7 +1,11 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewResultQuestionList extends StatelessWidget {
-  const _QuizReviewResultQuestionList({
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_result_question_card.dart';
+
+class QuizReviewResultQuestionList extends StatelessWidget {
+  const QuizReviewResultQuestionList({
+    super.key,
     required this.quiz,
     required this.selectedAnswers,
   });
@@ -14,7 +18,7 @@ class _QuizReviewResultQuestionList extends StatelessWidget {
     return Column(
       children: [
         for (var index = 0; index < quiz.questions.length; index++) ...[
-          _QuizReviewResultQuestionCard(
+          QuizReviewResultQuestionCard(
             question: quiz.questions[index],
             selectedLabel:
                 selectedAnswers[quiz.questions[index].questionNumber],

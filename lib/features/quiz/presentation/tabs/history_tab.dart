@@ -1,58 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi/core/extension/localization_extension.dart';
-import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
-import 'package:numi/features/homework/presentation/homework_review_screen.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/quiz/application/history_controller.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
-import 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
-import 'package:numi/features/quiz/helpers/history_homework_date_text.dart';
-import 'package:numi/features/quiz/helpers/history_metadata_int.dart';
-import 'package:numi/features/quiz/helpers/history_quiz_purpose.dart';
-import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/shared/widgets/score_progress_ring.dart';
-import 'package:numi/shared/layouts/page_header.dart';
-
-part 'package:numi/features/quiz/widgets/history_tab/history_header.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_search_field.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_filter.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_type_tabs.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_type_tab_button.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_body.dart';
-part 'package:numi/features/quiz/widgets/history_detail/history_open_quiz_review.dart';
-part 'package:numi/features/quiz/widgets/history_detail/history_open_homework_result.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_quiz_card.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_homework_card.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_meta_row.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_meta_item.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_score_badge.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_incomplete_badge.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_submitted_badge.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_loading_state.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_loading_state_state.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_skeleton_card.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_skeleton_block.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_message_state.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_score_badge_colors.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_date_parts.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_quiz_title.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_quiz_short_text.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_homework_title.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_homework_short_text.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_homework_score_percentage.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_score_colors.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_date_parts_from_iso.dart';
-part 'package:numi/features/quiz/widgets/history_tab/history_two_digits.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_body.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_filter.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_header.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_homework_short_text.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_homework_title.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_quiz_title.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_search_field.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_type_tabs.dart';
 
 class HistoryTab extends StatefulWidget {
   const HistoryTab({
@@ -86,7 +52,7 @@ class _HistoryTabState extends State<HistoryTab> {
   late final HistoryController _controller;
   final TextEditingController _searchController = TextEditingController();
 
-  _HistoryFilter _selectedFilter = _HistoryFilter.homework;
+  HistoryFilter _selectedFilter = HistoryFilter.homework;
 
   @override
   void initState() {
@@ -156,7 +122,7 @@ class _HistoryTabState extends State<HistoryTab> {
       }
 
       final searchable = <String>[
-        _historyQuizTitle(context, quiz),
+        historyQuizTitle(context, quiz),
         quiz.shortText ?? '',
         quiz.purpose ?? '',
         quiz.typeOfQuiz ?? '',
@@ -177,8 +143,8 @@ class _HistoryTabState extends State<HistoryTab> {
       }
 
       final searchable = <String>[
-        _historyHomeworkTitle(context, exercise),
-        _historyHomeworkShortText(context, exercise) ?? '',
+        historyHomeworkTitle(context, exercise),
+        historyHomeworkShortText(context, exercise) ?? '',
         exercise.chapterName ?? '',
         exercise.lessonName ?? '',
         exercise.purpose ?? '',
@@ -190,7 +156,7 @@ class _HistoryTabState extends State<HistoryTab> {
     }).toList();
   }
 
-  void _selectFilter(_HistoryFilter filter) {
+  void _selectFilter(HistoryFilter filter) {
     if (_selectedFilter == filter) {
       return;
     }
@@ -210,11 +176,10 @@ class _HistoryTabState extends State<HistoryTab> {
         builder: (context, child) {
           final quizzes = _filteredQuizzes;
           final homeworkExercises = _filteredHomeworkExercises;
-          final selectedItemsCount = _selectedFilter == _HistoryFilter.homework
+          final selectedItemsCount = _selectedFilter == HistoryFilter.homework
               ? homeworkExercises.length
               : quizzes.length;
-          final selectedErrorMessage =
-              _selectedFilter == _HistoryFilter.homework
+          final selectedErrorMessage = _selectedFilter == HistoryFilter.homework
               ? _controller.homeworkErrorMessage
               : _controller.assessmentErrorMessage;
 
@@ -225,11 +190,11 @@ class _HistoryTabState extends State<HistoryTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _HistoryHeader(scale: scale, topInset: topInset),
+                HistoryHeader(scale: scale, topInset: topInset),
                 SizedBox(height: 12 * scale),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-                  child: _HistorySearchField(
+                  child: HistorySearchField(
                     controller: _searchController,
                     scale: scale,
                   ),
@@ -237,7 +202,7 @@ class _HistoryTabState extends State<HistoryTab> {
                 SizedBox(height: 12 * scale),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-                  child: _HistoryTypeTabs(
+                  child: HistoryTypeTabs(
                     selectedFilter: _selectedFilter,
                     onSelected: _selectFilter,
                     scale: scale,
@@ -246,8 +211,8 @@ class _HistoryTabState extends State<HistoryTab> {
                 SizedBox(height: 12 * scale),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-                  child: _HistoryBody(
-                    isLoading: _selectedFilter == _HistoryFilter.homework
+                  child: HistoryBody(
+                    isLoading: _selectedFilter == HistoryFilter.homework
                         ? _controller.isLoadingHomework
                         : _controller.isLoadingAssessments,
                     errorMessage: selectedErrorMessage,

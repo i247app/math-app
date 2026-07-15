@@ -1,7 +1,21 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewContent extends StatelessWidget {
-  const _QuizReviewContent({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/application/quiz_review_controller.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_inline_error.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_mode_tabs.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_loading_section.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_result_question_list.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_retry_question_view.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_state_panel.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_stats_card.dart';
+
+class QuizReviewContent extends StatelessWidget {
+  const QuizReviewContent({
+    super.key,
     required this.quiz,
     required this.selectedIndex,
     required this.mode,
@@ -49,30 +63,30 @@ class _QuizReviewContent extends StatelessWidget {
         children: [
           if (isLoading) const LinearProgressIndicator(color: AppColors.navy),
           if (errorMessage != null && errorMessage!.isNotEmpty) ...[
-            _QuizReviewInlineError(message: errorMessage!, onRetry: onRetry),
+            QuizReviewInlineError(message: errorMessage!, onRetry: onRetry),
             const SizedBox(height: 10),
           ],
           if (allowRetry) ...[
-            _QuizReviewModeTabs(selectedMode: mode, onSelected: onModeSelected),
+            QuizReviewModeTabs(selectedMode: mode, onSelected: onModeSelected),
             const SizedBox(height: 12),
           ],
-          _QuizReviewStatsCard(quiz: quiz),
+          QuizReviewStatsCard(quiz: quiz),
           const SizedBox(height: 11),
           if (isLoading && question == null)
-            const _QuizReviewQuestionLoadingSection()
+            const QuizReviewQuestionLoadingSection()
           else if (question == null)
-            _QuizReviewStatePanel(
+            QuizReviewStatePanel(
               isLoading: false,
               message: context.getText(AppKeys.emptyQuizQuestions),
               onRetry: onRetry,
             )
           else if (!allowRetry || mode == QuizReviewMode.result)
-            _QuizReviewResultQuestionList(
+            QuizReviewResultQuestionList(
               quiz: quiz,
               selectedAnswers: submittedAnswers,
             )
           else
-            _QuizReviewRetryQuestionView(
+            QuizReviewRetryQuestionView(
               questions: questions,
               selectedIndex: safeIndex,
               question: question,

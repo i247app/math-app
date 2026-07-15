@@ -1,7 +1,12 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewQuestionSelector extends StatelessWidget {
-  const _QuizReviewQuestionSelector({
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_centered_text.dart';
+
+class QuizReviewQuestionSelector extends StatelessWidget {
+  const QuizReviewQuestionSelector({
+    super.key,
     required this.questions,
     required this.selectedIndex,
     required this.onSelected,
@@ -37,7 +42,7 @@ class _QuizReviewQuestionSelector extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.teal600, width: 1.2),
                   ),
-                  child: _QuizReviewCenteredText(
+                  child: QuizReviewCenteredText(
                     '${index + 1}',
                     color: selected ? Colors.white : AppColors.teal600,
                     fontSize: 16,

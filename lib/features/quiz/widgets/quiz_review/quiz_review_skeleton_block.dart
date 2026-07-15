@@ -1,7 +1,8 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewSkeletonBlock extends StatelessWidget {
-  const _QuizReviewSkeletonBlock({
+class QuizReviewSkeletonBlock extends StatelessWidget {
+  const QuizReviewSkeletonBlock({
+    super.key,
     required this.progress,
     required this.height,
     required this.borderRadius,

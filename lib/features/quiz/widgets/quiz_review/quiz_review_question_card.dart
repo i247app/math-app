@@ -1,7 +1,13 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewQuestionCard extends StatelessWidget {
-  const _QuizReviewQuestionCard({required this.question});
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_badge.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_font_size.dart';
+
+class QuizReviewQuestionCard extends StatelessWidget {
+  const QuizReviewQuestionCard({super.key, required this.question});
 
   final QuizQuestion question;
 
@@ -26,7 +32,7 @@ class _QuizReviewQuestionCard extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.topLeft,
-            child: _QuizReviewQuestionBadge(
+            child: QuizReviewQuestionBadge(
               number: question.questionNumber,
               color: AppColors.aquaMist,
               textColor: AppColors.teal600,
@@ -40,7 +46,7 @@ class _QuizReviewQuestionCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: colors.textPrimary,
-                fontSize: _quizReviewQuestionFontSize(question.questionName),
+                fontSize: quizReviewQuestionFontSize(question.questionName),
                 fontWeight: FontWeight.w900,
                 height: 1.08,
                 letterSpacing: 0,

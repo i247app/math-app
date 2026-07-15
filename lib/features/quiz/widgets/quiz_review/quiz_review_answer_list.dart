@@ -1,7 +1,12 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewAnswerList extends StatelessWidget {
-  const _QuizReviewAnswerList({
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_answer_tile.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_correct_answer_label.dart';
+
+class QuizReviewAnswerList extends StatelessWidget {
+  const QuizReviewAnswerList({
+    super.key,
     required this.question,
     required this.selectedLabel,
     this.onSelected,
@@ -15,12 +20,12 @@ class _QuizReviewAnswerList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final correctLabel = _quizReviewCorrectAnswerLabel(question);
+    final correctLabel = quizReviewCorrectAnswerLabel(question);
 
     return Column(
       children: [
         for (final answer in question.answers) ...[
-          _QuizReviewAnswerTile(
+          QuizReviewAnswerTile(
             answer: answer,
             selectedLabel: selectedLabel,
             correctLabel: correctLabel,

@@ -1,10 +1,12 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryLoadingState extends StatefulWidget {
-  const _HistoryLoadingState({required this.scale});
+import 'package:numi/features/quiz/widgets/history_tab/history_loading_state_state.dart';
+
+class HistoryLoadingState extends StatefulWidget {
+  const HistoryLoadingState({super.key, required this.scale});
 
   final double scale;
 
   @override
-  State<_HistoryLoadingState> createState() => _HistoryLoadingStateState();
+  State<HistoryLoadingState> createState() => HistoryLoadingStateState();
 }

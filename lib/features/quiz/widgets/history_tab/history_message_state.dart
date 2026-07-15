@@ -1,7 +1,11 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryMessageState extends StatelessWidget {
-  const _HistoryMessageState({
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+
+class HistoryMessageState extends StatelessWidget {
+  const HistoryMessageState({
+    super.key,
     required this.icon,
     required this.title,
     required this.subtitle,

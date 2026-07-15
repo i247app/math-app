@@ -1,11 +1,12 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/helpers/two_digits.dart';
 
-String _quizReviewTimeLabel(GeneratedQuiz quiz) {
+String quizReviewTimeLabel(GeneratedQuiz quiz) {
   final parsed = DateTime.tryParse(
     quiz.modifyDt ?? quiz.createDt ?? '',
   )?.toLocal();
   if (parsed == null) {
     return '--:--';
   }
-  return '${_quizReviewTwoDigits(parsed.hour)}:${_quizReviewTwoDigits(parsed.minute)}';
+  return '${twoDigits(parsed.hour)}:${twoDigits(parsed.minute)}';
 }

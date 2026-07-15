@@ -14,7 +14,7 @@ import 'package:numi/features/home/shell/widgets/home_tab_header.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
-import 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_tab_card.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 import 'package:numi/features/home/parent/assessment/models/parent_assessment_entry.dart';

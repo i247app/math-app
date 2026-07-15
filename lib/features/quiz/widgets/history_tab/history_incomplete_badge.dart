@@ -1,7 +1,12 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryIncompleteBadge extends StatelessWidget {
-  const _HistoryIncompleteBadge({required this.scale});
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_colors.dart';
+
+class HistoryIncompleteBadge extends StatelessWidget {
+  const HistoryIncompleteBadge({super.key, required this.scale});
 
   final double scale;
 

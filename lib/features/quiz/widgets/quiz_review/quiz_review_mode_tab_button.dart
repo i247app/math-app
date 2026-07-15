@@ -1,7 +1,10 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewModeTabButton extends StatelessWidget {
-  const _QuizReviewModeTabButton({
+import 'package:numi/core/theme/app_colors.dart';
+
+class QuizReviewModeTabButton extends StatelessWidget {
+  const QuizReviewModeTabButton({
+    super.key,
     required this.label,
     required this.selected,
     required this.onTap,

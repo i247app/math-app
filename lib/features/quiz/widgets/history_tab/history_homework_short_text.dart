@@ -1,6 +1,10 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-String? _historyHomeworkShortText(
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+
+String? historyHomeworkShortText(
   BuildContext context,
   ClassroomExercise exercise,
 ) {

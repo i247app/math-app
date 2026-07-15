@@ -1,7 +1,11 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewQuestionBadge extends StatelessWidget {
-  const _QuizReviewQuestionBadge({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+
+class QuizReviewQuestionBadge extends StatelessWidget {
+  const QuizReviewQuestionBadge({
+    super.key,
     required this.number,
     required this.color,
     required this.textColor,

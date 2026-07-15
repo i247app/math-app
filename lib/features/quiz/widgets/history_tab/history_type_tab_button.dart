@@ -1,14 +1,20 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryTypeTabButton extends StatelessWidget {
-  const _HistoryTypeTabButton({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_filter.dart';
+
+class HistoryTypeTabButton extends StatelessWidget {
+  const HistoryTypeTabButton({
+    super.key,
     required this.filter,
     required this.selected,
     required this.onTap,
     required this.scale,
   });
 
-  final _HistoryFilter filter;
+  final HistoryFilter filter;
   final bool selected;
   final VoidCallback onTap;
   final double scale;

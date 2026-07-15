@@ -1,7 +1,8 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _HistoryScoreBadgeColors {
-  const _HistoryScoreBadgeColors({
+class HistoryScoreBadgeColors {
+  const HistoryScoreBadgeColors({
     required this.foreground,
     required this.label,
   });

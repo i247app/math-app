@@ -1,19 +1,18 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_date_parts.dart';
+import 'package:numi/features/quiz/helpers/two_digits.dart';
 
-_HistoryDateParts _historyDatePartsFromIso(String? isoDate) {
+HistoryDateParts historyDatePartsFromIso(String? isoDate) {
   if (isoDate == null || isoDate.trim().isEmpty) {
-    return const _HistoryDateParts(date: '--/--/----', time: '--:--');
+    return const HistoryDateParts(date: '--/--/----', time: '--:--');
   }
 
   final parsed = DateTime.tryParse(isoDate)?.toLocal();
   if (parsed == null) {
-    return _HistoryDateParts(date: isoDate, time: '--:--');
+    return HistoryDateParts(date: isoDate, time: '--:--');
   }
 
-  return _HistoryDateParts(
-    date:
-        '${_historyTwoDigits(parsed.day)}/${_historyTwoDigits(parsed.month)}/${parsed.year}',
-    time:
-        '${_historyTwoDigits(parsed.hour)}:${_historyTwoDigits(parsed.minute)}',
+  return HistoryDateParts(
+    date: '${twoDigits(parsed.day)}/${twoDigits(parsed.month)}/${parsed.year}',
+    time: '${twoDigits(parsed.hour)}:${twoDigits(parsed.minute)}',
   );
 }

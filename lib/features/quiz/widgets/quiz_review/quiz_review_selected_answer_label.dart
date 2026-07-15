@@ -1,6 +1,6 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:numi/core/network/quiz_models.dart';
 
-String? _quizReviewSelectedAnswerLabel(GeneratedQuiz quiz, int questionNumber) {
+String? quizReviewSelectedAnswerLabel(GeneratedQuiz quiz, int questionNumber) {
   for (final answer in quiz.answers) {
     if (answer.questionNumber == questionNumber) {
       return answer.label.trim().toUpperCase();

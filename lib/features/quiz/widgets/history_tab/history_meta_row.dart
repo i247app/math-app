@@ -1,9 +1,12 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryMetaRow extends StatelessWidget {
-  const _HistoryMetaRow({required this.parts, required this.scale});
+import 'package:numi/features/quiz/widgets/history_tab/history_date_parts.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_meta_item.dart';
 
-  final _HistoryDateParts parts;
+class HistoryMetaRow extends StatelessWidget {
+  const HistoryMetaRow({super.key, required this.parts, required this.scale});
+
+  final HistoryDateParts parts;
   final double scale;
 
   @override
@@ -12,12 +15,12 @@ class _HistoryMetaRow extends StatelessWidget {
       spacing: 14 * scale,
       runSpacing: 5 * scale,
       children: [
-        _HistoryMetaItem(
+        HistoryMetaItem(
           icon: Icons.calendar_month_outlined,
           label: parts.date,
           scale: scale,
         ),
-        _HistoryMetaItem(
+        HistoryMetaItem(
           icon: Icons.schedule_rounded,
           label: parts.time,
           scale: scale,

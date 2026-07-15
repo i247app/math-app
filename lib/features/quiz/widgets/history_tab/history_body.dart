@@ -1,7 +1,21 @@
-part of 'package:numi/features/quiz/presentation/tabs/history_tab.dart';
+import 'package:flutter/material.dart';
 
-class _HistoryBody extends StatelessWidget {
-  const _HistoryBody({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/quiz/widgets/history_detail/history_open_homework_result.dart';
+import 'package:numi/features/quiz/widgets/history_detail/history_open_quiz_review.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_filter.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_homework_card.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_loading_state.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_message_state.dart';
+import 'package:numi/features/quiz/widgets/history_tab/history_quiz_card.dart';
+
+class HistoryBody extends StatelessWidget {
+  const HistoryBody({
+    super.key,
     required this.isLoading,
     required this.errorMessage,
     required this.selectedFilter,
@@ -16,7 +30,7 @@ class _HistoryBody extends StatelessWidget {
 
   final bool isLoading;
   final String? errorMessage;
-  final _HistoryFilter selectedFilter;
+  final HistoryFilter selectedFilter;
   final int selectedItemsCount;
   final List<GeneratedQuiz> quizzes;
   final List<ClassroomExercise> homeworkExercises;
@@ -28,11 +42,11 @@ class _HistoryBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading && selectedItemsCount == 0) {
-      return _HistoryLoadingState(scale: scale);
+      return HistoryLoadingState(scale: scale);
     }
 
     if (errorMessage != null && selectedItemsCount == 0) {
-      return _HistoryMessageState(
+      return HistoryMessageState(
         icon: Icons.cloud_off_rounded,
         title: context.getText(AppKeys.historyLoadErrorTitle),
         subtitle: errorMessage!,
@@ -43,7 +57,7 @@ class _HistoryBody extends StatelessWidget {
     }
 
     if (selectedItemsCount == 0) {
-      return _HistoryMessageState(
+      return HistoryMessageState(
         icon: Icons.history_toggle_off_rounded,
         title: context.getText(AppKeys.noHistoryTitle),
         subtitle: context.getText(AppKeys.noHistoryMessage),
@@ -52,13 +66,13 @@ class _HistoryBody extends StatelessWidget {
     }
 
     return switch (selectedFilter) {
-      _HistoryFilter.homework => Column(
+      HistoryFilter.homework => Column(
         children: [
           for (final exercise in homeworkExercises) ...[
-            _HistoryHomeworkCard(
+            HistoryHomeworkCard(
               exercise: exercise,
               scale: scale,
-              onTap: () => _historyOpenHomeworkResult(
+              onTap: () => historyOpenHomeworkResult(
                 context,
                 exercise,
                 profileId: profileId,
@@ -69,13 +83,13 @@ class _HistoryBody extends StatelessWidget {
           ],
         ],
       ),
-      _HistoryFilter.assessment => Column(
+      HistoryFilter.assessment => Column(
         children: [
           for (final quiz in quizzes) ...[
-            _HistoryQuizCard(
+            HistoryQuizCard(
               quiz: quiz,
               scale: scale,
-              onTap: () => _historyOpenQuizReview(context, quiz),
+              onTap: () => historyOpenQuizReview(context, quiz),
             ),
             SizedBox(height: 14 * scale),
           ],

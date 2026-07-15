@@ -1,7 +1,12 @@
-part of 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
+import 'package:flutter/material.dart';
 
-class _QuizReviewQuestionNavigationBar extends StatelessWidget {
-  const _QuizReviewQuestionNavigationBar({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_nav_button.dart';
+
+class QuizReviewQuestionNavigationBar extends StatelessWidget {
+  const QuizReviewQuestionNavigationBar({
+    super.key,
     required this.canGoPrevious,
     required this.canGoNext,
     required this.onPrevious,
@@ -20,7 +25,7 @@ class _QuizReviewQuestionNavigationBar extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _QuizReviewNavButton(
+            child: QuizReviewNavButton(
               label: context.getText(AppKeys.previous),
               icon: Icons.chevron_left_rounded,
               filled: false,
@@ -30,7 +35,7 @@ class _QuizReviewQuestionNavigationBar extends StatelessWidget {
           ),
           const SizedBox(width: 28),
           Expanded(
-            child: _QuizReviewNavButton(
+            child: QuizReviewNavButton(
               label: context.getText(AppKeys.next),
               icon: Icons.chevron_right_rounded,
               filled: true,
