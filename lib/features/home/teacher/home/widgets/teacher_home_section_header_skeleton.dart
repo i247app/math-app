@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_shimmer.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi/features/home/widgets/home_skeleton_shimmer.dart';
+import 'package:numi/features/home/widgets/home_skeleton_block.dart';
 
 class TeacherHomeSectionHeaderSkeleton extends StatefulWidget {
   const TeacherHomeSectionHeaderSkeleton({super.key, required this.scale});

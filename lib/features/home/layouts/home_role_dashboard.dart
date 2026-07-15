@@ -1,4 +1,17 @@
-part of '../home_screen.dart';
+import 'package:flutter/material.dart';
+
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/home/parent/presentation/parent_dashboard.dart';
+import 'package:numi/features/home/student/presentation/student_dashboard.dart';
+import 'package:numi/features/home/teacher/presentation/teacher_dashboard.dart';
+import 'package:numi/features/home/models/home_dashboard_args.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/quiz/data/quiz_api.dart';
 
 class HomeRoleDashboard extends StatefulWidget {
   const HomeRoleDashboard({

@@ -1,7 +1,7 @@
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/shared/widgets/home_inline_error_banner.dart';
+import 'package:numi/features/home/widgets/home_inline_error_banner.dart';
 
 class StudentInlineErrorPanel extends StatelessWidget {
   const StudentInlineErrorPanel({

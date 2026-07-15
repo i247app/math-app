@@ -1,7 +1,9 @@
-part of '../teacher_study_tab.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _TeacherStudyLoadingIndicator extends StatelessWidget {
-  const _TeacherStudyLoadingIndicator({required this.scale});
+import 'package:flutter/material.dart';
+
+class TeacherStudyLoadingIndicator extends StatelessWidget {
+  const TeacherStudyLoadingIndicator({super.key, required this.scale});
 
   final double scale;
 

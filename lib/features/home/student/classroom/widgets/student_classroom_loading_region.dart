@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_shimmer.dart';
+import 'package:numi/features/home/widgets/home_skeleton_shimmer.dart';
 import 'package:numi/features/home/student/classroom/widgets/student_classroom_skeleton_block.dart';
 
 class StudentClassroomLoadingRegion extends StatefulWidget {

@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_shimmer.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_line.dart';
+import 'package:numi/features/home/widgets/home_skeleton_shimmer.dart';
+import 'package:numi/features/home/widgets/home_skeleton_block.dart';
+import 'package:numi/features/home/widgets/home_skeleton_line.dart';
 
 class ParentHomeLoadingCard extends StatefulWidget {
   const ParentHomeLoadingCard({super.key});

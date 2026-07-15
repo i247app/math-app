@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
+import 'package:numi/features/home/helpers/home_profile_display_helpers.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 
 class HomeProfileMenu extends StatelessWidget {
@@ -56,7 +56,7 @@ class HomeProfileMenu extends StatelessWidget {
               itemBuilder: (context, index) {
                 final profile = profiles[index];
                 final name = compactHomeProfileName(
-                  profileDisplayName(context, profile),
+                  homeProfileDisplayName(context, profile),
                 );
 
                 return InkWell(
@@ -106,7 +106,9 @@ class HomeProfileMenu extends StatelessWidget {
     for (final profile in profiles) {
       final painter = TextPainter(
         text: TextSpan(
-          text: compactHomeProfileName(profileDisplayName(context, profile)),
+          text: compactHomeProfileName(
+            homeProfileDisplayName(context, profile),
+          ),
           style: _nameStyle(context.themeColors),
         ),
         maxLines: 1,
@@ -120,12 +122,4 @@ class HomeProfileMenu extends StatelessWidget {
     final desiredWidth = fixedContentWidth + longestNameWidth + 10 * scale;
     return desiredWidth.clamp(150 * scale, maxWidth);
   }
-}
-
-String compactHomeProfileName(String name) {
-  return compactProfileName(name);
-}
-
-String homeProfileDisplayName(BuildContext context, StudentProfile profile) {
-  return profileDisplayName(context, profile);
 }

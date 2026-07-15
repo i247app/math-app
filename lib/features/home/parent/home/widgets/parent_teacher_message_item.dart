@@ -3,8 +3,8 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/widgets/home_profile_menu.dart';
-import 'package:numi/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/features/home/helpers/home_profile_display_helpers.dart';
+import 'package:numi/features/home/constants/home_visual_constants.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 

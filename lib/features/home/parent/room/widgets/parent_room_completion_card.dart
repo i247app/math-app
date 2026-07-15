@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/home/home_api.dart';
-import 'package:numi/features/home/widgets/home_profile_menu.dart';
+import 'package:numi/features/home/data/home_api.dart';
+import 'package:numi/features/home/helpers/home_profile_display_helpers.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
 import 'package:numi/features/home/parent/room/widgets/parent_room_task_header.dart';
 import 'package:numi/features/home/parent/room/widgets/parent_room_task_shell.dart';

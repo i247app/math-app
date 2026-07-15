@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/features/home/shared/widgets/home_section_header.dart';
+import 'package:numi/features/home/widgets/home_section_header.dart';
 import 'package:numi/features/home/student/invitations/widgets/student_invitation_card.dart';
 import 'package:numi/features/home/student/invitations/widgets/student_join_class_cta.dart';
 

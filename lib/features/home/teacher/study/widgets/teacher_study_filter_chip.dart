@@ -1,7 +1,13 @@
-part of '../teacher_study_tab.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _TeacherStudyFilterChip extends StatelessWidget {
-  const _TeacherStudyFilterChip({
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/theme/font_size.dart';
+
+class TeacherStudyFilterChip extends StatelessWidget {
+  const TeacherStudyFilterChip({
+    super.key,
     required this.label,
     required this.selected,
     required this.scale,

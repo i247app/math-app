@@ -1,7 +1,7 @@
-part of '../teacher_study_tab.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
 
-class _TeacherStudyExerciseBatch {
-  const _TeacherStudyExerciseBatch({
+class TeacherStudyExerciseBatch {
+  const TeacherStudyExerciseBatch({
     this.exercises = const <ClassroomExercise>[],
     this.error,
   });

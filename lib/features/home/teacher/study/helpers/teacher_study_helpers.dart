@@ -1,6 +1,9 @@
-part of '../teacher_study_tab.dart';
+import 'package:flutter/material.dart';
 
-List<ClassroomExercise> _deduplicateTeacherStudyExercises(
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/home/teacher/study/models/teacher_study_date_parts.dart';
+
+List<ClassroomExercise> deduplicateTeacherStudyExercises(
   List<ClassroomExercise> exercises,
 ) {
   final ids = <int>{};
@@ -12,12 +15,12 @@ List<ClassroomExercise> _deduplicateTeacherStudyExercises(
       .toList(growable: false);
 }
 
-int _compareTeacherStudyExercises(
+int compareTeacherStudyExercises(
   ClassroomExercise first,
   ClassroomExercise second,
 ) {
-  final firstDate = _teacherStudySortDate(first);
-  final secondDate = _teacherStudySortDate(second);
+  final firstDate = teacherStudySortDate(first);
+  final secondDate = teacherStudySortDate(second);
   if (firstDate == null && secondDate == null) {
     return (second.stableId ?? 0).compareTo(first.stableId ?? 0);
   }
@@ -30,7 +33,7 @@ int _compareTeacherStudyExercises(
   return secondDate.compareTo(firstDate);
 }
 
-DateTime? _teacherStudySortDate(ClassroomExercise exercise) {
+DateTime? teacherStudySortDate(ClassroomExercise exercise) {
   for (final value in [
     exercise.createDt,
     exercise.startDate,
@@ -44,30 +47,30 @@ DateTime? _teacherStudySortDate(ClassroomExercise exercise) {
   return null;
 }
 
-_TeacherStudyDateParts? _teacherStudyDateParts(String? value) {
+TeacherStudyDateParts? teacherStudyDateParts(String? value) {
   final parsed = DateTime.tryParse(value?.trim() ?? '');
   if (parsed == null) {
     return null;
   }
   final local = parsed.toLocal();
-  return _TeacherStudyDateParts(
-    day: _twoDigits(local.day),
-    month: _twoDigits(local.month),
+  return TeacherStudyDateParts(
+    day: teacherStudyTwoDigits(local.day),
+    month: teacherStudyTwoDigits(local.month),
   );
 }
 
-String? _teacherStudyDateLabel(BuildContext context, String? value) {
+String? teacherStudyDateLabel(BuildContext context, String? value) {
   final parsed = DateTime.tryParse(value?.trim() ?? '');
   if (parsed == null) {
     return null;
   }
   final local = parsed.toLocal();
-  final day = _twoDigits(local.day);
-  final month = _twoDigits(local.month);
+  final day = teacherStudyTwoDigits(local.day);
+  final month = teacherStudyTwoDigits(local.month);
   if (Localizations.localeOf(context).languageCode.toLowerCase() == 'en') {
     return '$month/$day/${local.year}';
   }
   return '$day/$month/${local.year}';
 }
 
-String _twoDigits(int value) => value.toString().padLeft(2, '0');
+String teacherStudyTwoDigits(int value) => value.toString().padLeft(2, '0');

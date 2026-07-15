@@ -1,2 +1,2 @@
-// Replaced by HomeSectionHeader in lib/features/home/shared/widgets/home_section_header.dart
-export 'package:numi/features/home/shared/widgets/home_section_header.dart';
+// Replaced by the root HomeSectionHeader shared across Home roles.
+export 'package:numi/features/home/widgets/home_section_header.dart';

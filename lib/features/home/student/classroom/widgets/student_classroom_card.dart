@@ -4,7 +4,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/features/home/constants/home_visual_constants.dart';
 
 class StudentClassroomCard extends StatelessWidget {
   const StudentClassroomCard({

@@ -4,7 +4,7 @@ import 'package:numi/features/classroom/presentation/tabs/teacher_classroom_tab.
 import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
 import 'package:numi/features/home/teacher/home/teacher_home_tab.dart';
 import 'package:numi/features/home/teacher/study/teacher_study_tab.dart';
-import 'package:numi/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi/features/home/models/home_dashboard_args.dart';
 
 class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({super.key, required this.args});

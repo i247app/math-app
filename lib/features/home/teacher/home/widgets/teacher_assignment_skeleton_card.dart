@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_card.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi/features/home/widgets/home_skeleton_card.dart';
+import 'package:numi/features/home/widgets/home_skeleton_block.dart';
 
 class TeacherAssignmentSkeletonCard extends StatelessWidget {
   const TeacherAssignmentSkeletonCard({super.key, required this.scale});

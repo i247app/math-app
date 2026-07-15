@@ -1,7 +1,16 @@
-part of '../teacher_study_tab.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _TeacherStudySearchField extends StatelessWidget {
-  const _TeacherStudySearchField({
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
+
+class TeacherStudySearchField extends StatelessWidget {
+  const TeacherStudySearchField({
+    super.key,
     required this.controller,
     required this.scale,
     required this.onChanged,

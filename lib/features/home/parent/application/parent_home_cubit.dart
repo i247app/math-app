@@ -1,4 +1,4 @@
-import 'package:numi/features/home/home_tab_cubit.dart';
+import 'package:numi/features/home/application/home_tab_cubit.dart';
 
 class ParentHomeCubit extends HomeTabCubit {
   ParentHomeCubit() : super(maxTabIndex: 4);

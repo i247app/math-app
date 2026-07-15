@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/home/home_tab_cubit.dart';
+import 'package:numi/features/home/application/home_tab_cubit.dart';
 
 void main() {
   group('HomeTabCubit characterization', () {

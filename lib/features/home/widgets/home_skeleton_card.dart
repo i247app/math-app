@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/home/shared/widgets/home_skeleton_shimmer.dart';
+import 'package:numi/features/home/widgets/home_skeleton_shimmer.dart';
 
 /// A self-animating card that wraps content with a shimmer loading effect.
 ///

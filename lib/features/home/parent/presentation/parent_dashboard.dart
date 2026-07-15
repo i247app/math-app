@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
-import 'package:numi/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi/features/home/models/home_dashboard_args.dart';
 import 'package:numi/features/games/presentation/games_tab.dart';
 import 'package:numi/features/home/parent/assessment/parent_assessment_tab.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';

@@ -1,7 +1,13 @@
-part of '../teacher_study_tab.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherStudyPurposeFilters extends StatelessWidget {
-  const _TeacherStudyPurposeFilters({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/home/teacher/study/widgets/teacher_study_filter_chip.dart';
+
+class TeacherStudyPurposeFilters extends StatelessWidget {
+  const TeacherStudyPurposeFilters({
+    super.key,
     required this.selectedPurpose,
     required this.scale,
     required this.onSelected,
@@ -16,14 +22,14 @@ class _TeacherStudyPurposeFilters extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _TeacherStudyFilterChip(
+        TeacherStudyFilterChip(
           label: context.getText(AppKeys.teacherAssignments),
           selected: selectedPurpose == classroomExercisePurposeHomework,
           scale: scale,
           onTap: () => onSelected(classroomExercisePurposeHomework),
         ),
         SizedBox(width: 8 * scale),
-        _TeacherStudyFilterChip(
+        TeacherStudyFilterChip(
           label: context.getText(AppKeys.teacherAssessments),
           selected: selectedPurpose == classroomExercisePurposeExam,
           scale: scale,

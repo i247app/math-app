@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/home_api.dart';
+import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/widgets/home_profile_menu.dart';
+import 'package:numi/features/home/helpers/home_profile_display_helpers.dart';
 import 'package:numi/features/home/parent/room/helpers/parent_room_helpers.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_task_score_ring.dart';
 import 'package:numi/features/home/parent/shared/widgets/parent_task_list_item.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/shared/widgets/home_game_preview_row.dart';
+import 'package:numi/features/home/widgets/home_game_preview_row.dart';
 
 class ParentGameSuggestionsRow extends StatelessWidget {
   const ParentGameSuggestionsRow({super.key});

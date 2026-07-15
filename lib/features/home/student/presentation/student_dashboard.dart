@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/home/widgets/home_dashboard_args.dart';
+import 'package:numi/features/home/models/home_dashboard_args.dart';
 import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
 import 'package:numi/features/home/student/home/student_home_tab.dart';
 import 'package:numi/features/home/student/classroom/student_classroom_tab.dart';

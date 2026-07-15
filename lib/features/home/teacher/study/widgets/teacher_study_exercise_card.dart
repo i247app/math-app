@@ -1,7 +1,19 @@
-part of '../teacher_study_tab.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _TeacherStudyExerciseCard extends StatelessWidget {
-  const _TeacherStudyExerciseCard({
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+import 'package:numi/features/home/teacher/study/helpers/teacher_study_helpers.dart';
+
+class TeacherStudyExerciseCard extends StatelessWidget {
+  const TeacherStudyExerciseCard({
+    super.key,
     required this.exercise,
     required this.scale,
     required this.onTap,
@@ -14,8 +26,8 @@ class _TeacherStudyExerciseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final exerciseId = exercise.stableId?.toString() ?? '-';
-    final dateParts = _teacherStudyDateParts(exercise.endDate);
-    final dueDate = _teacherStudyDateLabel(context, exercise.endDate);
+    final dateParts = teacherStudyDateParts(exercise.endDate);
+    final dueDate = teacherStudyDateLabel(context, exercise.endDate);
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(14 * scale),

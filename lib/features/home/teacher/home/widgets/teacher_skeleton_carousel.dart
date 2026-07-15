@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/shared/widgets/home_horizontal_carousel.dart';
+import 'package:numi/features/home/widgets/home_horizontal_carousel.dart';
 
 class TeacherSkeletonCarousel extends StatelessWidget {
   const TeacherSkeletonCarousel({

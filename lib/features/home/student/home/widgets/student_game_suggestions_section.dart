@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/home/shared/widgets/home_game_preview_row.dart';
+import 'package:numi/features/home/widgets/home_game_preview_row.dart';
 
 class StudentGameSuggestionsSection extends StatelessWidget {
   const StudentGameSuggestionsSection({super.key, required this.onViewAll});

@@ -4,8 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -13,12 +11,11 @@ import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
-import 'package:numi/features/home/shell/widgets/home_tab_header.dart';
+import 'package:numi/features/home/widgets/shell/home_tab_header.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/features/homework/presentation/teacher_create_homework_screen.dart';
 import 'package:numi/features/homework/presentation/teacher_homework_detail_screen.dart';
@@ -29,16 +26,13 @@ import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_add
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
-
-part 'helpers/teacher_study_helpers.dart';
-part 'models/teacher_study_date_parts.dart';
-part 'models/teacher_study_exercise_batch.dart';
-part 'widgets/teacher_study_class_filters.dart';
-part 'widgets/teacher_study_exercise_card.dart';
-part 'widgets/teacher_study_filter_chip.dart';
-part 'widgets/teacher_study_loading_indicator.dart';
-part 'widgets/teacher_study_purpose_filters.dart';
-part 'widgets/teacher_study_search_field.dart';
+import 'helpers/teacher_study_helpers.dart';
+import 'models/teacher_study_exercise_batch.dart';
+import 'widgets/teacher_study_class_filters.dart';
+import 'widgets/teacher_study_exercise_card.dart';
+import 'widgets/teacher_study_loading_indicator.dart';
+import 'widgets/teacher_study_purpose_filters.dart';
+import 'widgets/teacher_study_search_field.dart';
 
 class TeacherStudyTab extends StatefulWidget {
   const TeacherStudyTab({
@@ -254,17 +248,17 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       exercises.addAll(batch.exercises);
       firstError ??= batch.error;
     }
-    exercises.sort(_compareTeacherStudyExercises);
+    exercises.sort(compareTeacherStudyExercises);
 
     setState(() {
-      _exercises = _deduplicateTeacherStudyExercises(exercises);
+      _exercises = deduplicateTeacherStudyExercises(exercises);
       _error = exercises.isEmpty ? firstError : null;
       _isLoadingExercises = false;
       _hasCompletedInitialLoad = true;
     });
   }
 
-  Future<_TeacherStudyExerciseBatch> _loadExerciseBatch({
+  Future<TeacherStudyExerciseBatch> _loadExerciseBatch({
     required int classroomId,
     required int profileId,
     required String search,
@@ -278,13 +272,13 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
         search: search,
         purpose: purpose,
       );
-      return _TeacherStudyExerciseBatch(exercises: exercises);
+      return TeacherStudyExerciseBatch(exercises: exercises);
     } on ClassroomExerciseException catch (error) {
-      return _TeacherStudyExerciseBatch(
+      return TeacherStudyExerciseBatch(
         error: error.message.trim().isEmpty ? fallbackError : error.message,
       );
     } catch (_) {
-      return _TeacherStudyExerciseBatch(error: fallbackError);
+      return TeacherStudyExerciseBatch(error: fallbackError);
     }
   }
 
@@ -436,23 +430,23 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                       ),
                     ),
                     SizedBox(height: 18 * scale),
-                    _TeacherStudySearchField(
+                    TeacherStudySearchField(
                       controller: _searchController,
                       scale: scale,
                       onChanged: _onSearchChanged,
                     ),
                     SizedBox(height: 14 * scale),
                     if (!_hasCompletedInitialLoad)
-                      _TeacherStudyLoadingIndicator(scale: scale)
+                      TeacherStudyLoadingIndicator(scale: scale)
                     else ...[
-                      _TeacherStudyClassFilters(
+                      TeacherStudyClassFilters(
                         classrooms: _classrooms,
                         selectedClassroomId: _selectedClassroomId,
                         scale: scale,
                         onSelected: _selectClassroom,
                       ),
                       SizedBox(height: 14 * scale),
-                      _TeacherStudyPurposeFilters(
+                      TeacherStudyPurposeFilters(
                         selectedPurpose: _selectedPurpose,
                         scale: scale,
                         onSelected: _selectPurpose,
@@ -461,7 +455,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                       if (_isLoadingExercises &&
                           _exercises.isEmpty &&
                           !_hasCompletedInitialLoad)
-                        _TeacherStudyLoadingIndicator(scale: scale)
+                        TeacherStudyLoadingIndicator(scale: scale)
                       else if (_displayError != null && _exercises.isEmpty)
                         AppRetryPanel(
                           scale: scale,
@@ -500,7 +494,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                           index < visibleExercises.length;
                           index++
                         ) ...[
-                          _TeacherStudyExerciseCard(
+                          TeacherStudyExerciseCard(
                             exercise: visibleExercises[index],
                             scale: scale,
                             onTap: () =>

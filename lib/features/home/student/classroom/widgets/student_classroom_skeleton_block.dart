@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
+import 'package:numi/features/home/widgets/home_skeleton_block.dart';
 
 class StudentClassroomSkeletonBlock extends HomeSkeletonBlock {
   const StudentClassroomSkeletonBlock({
