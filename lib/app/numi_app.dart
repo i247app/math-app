@@ -11,7 +11,7 @@ import 'package:numi/core/theme/app_theme_controller.dart';
 import 'package:numi/core/theme/app_theme_scope.dart';
 import 'package:numi/features/auth/application/auth_flow.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
-import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
+import 'package:numi/features/session/application/app_session_state.dart';
 
 class NumiApp extends StatefulWidget {
   const NumiApp({

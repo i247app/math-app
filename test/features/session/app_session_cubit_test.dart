@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
-import 'package:numi/features/session/presentation/bloc/app_session_cubit.dart';
-import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
+import 'package:numi/features/session/application/app_session_cubit.dart';
+import 'package:numi/features/session/application/app_session_state.dart';
 
 void main() {
   group('AppSessionCubit', () {

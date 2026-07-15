@@ -13,7 +13,7 @@ import 'package:numi/features/auth/presentation/login_screen.dart';
 import 'package:numi/features/auth/presentation/otp_screen.dart';
 import 'package:numi/features/auth/presentation/passcode_screen.dart';
 import 'package:numi/features/auth/presentation/signup_screen.dart';
-import 'package:numi/features/auth/widgets/session_dashboard_screen.dart';
+import 'package:numi/features/session/presentation/session_dashboard_screen.dart';
 import 'package:numi/features/welcome/presentation/welcome_details_screen.dart';
 import 'package:numi/features/welcome/presentation/welcome_screen.dart';
 import 'package:numi/shared/widgets/loading_screen.dart';
@@ -190,8 +190,10 @@ class OnboardingScreenSwitcher extends StatelessWidget {
                   errorText: state.passcodeError,
                   errorId: state.passcodeErrorId,
                 ),
-                AppScreen.home => const SessionDashboardScreen(
-                  key: ValueKey('home'),
+                AppScreen.home => SessionDashboardScreen(
+                  key: const ValueKey('home'),
+                  onBack: cubit.openLogin,
+                  onLogout: cubit.logout,
                 ),
               };
         final transitionChild = KeyedSubtree(

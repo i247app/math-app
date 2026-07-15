@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
-import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
+import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
 
 /// Owns authenticated account and profile state for the entire app session.

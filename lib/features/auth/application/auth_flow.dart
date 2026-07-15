@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/core/data/session_scoped_repository_registry.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/phone/phone_number_validator.dart';
-import 'package:numi/features/session/presentation/bloc/app_session_cubit.dart';
+import 'package:numi/features/session/application/app_session_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
@@ -15,7 +15,7 @@ import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
 import 'package:numi/features/auth/widgets/onboarding_screen_switcher.dart';
-import 'package:numi/features/session/presentation/bloc/app_session_state.dart';
+import 'package:numi/features/session/application/app_session_state.dart';
 
 class NumiHome extends StatefulWidget {
   const NumiHome({
