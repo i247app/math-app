@@ -1,7 +1,15 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _CreateHomeworkSubmitButton extends StatelessWidget {
-  const _CreateHomeworkSubmitButton({
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+
+class CreateHomeworkSubmitButton extends StatelessWidget {
+  const CreateHomeworkSubmitButton({
+    super.key,
     required this.isLoading,
     required this.onTap,
   });

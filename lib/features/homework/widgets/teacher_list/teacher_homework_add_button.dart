@@ -1,4 +1,7 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class TeacherHomeworkAddButton extends StatelessWidget {
   const TeacherHomeworkAddButton({super.key, required this.onTap});

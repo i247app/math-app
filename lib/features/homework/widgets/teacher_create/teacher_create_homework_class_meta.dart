@@ -1,7 +1,11 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _CreateHomeworkClassMeta extends StatelessWidget {
-  const _CreateHomeworkClassMeta({
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class CreateHomeworkClassMeta extends StatelessWidget {
+  const CreateHomeworkClassMeta({
+    super.key,
     required this.iconAsset,
     required this.label,
   });

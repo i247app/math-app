@@ -1,7 +1,15 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _TeacherHomeworkSectionHeader extends StatelessWidget {
-  const _TeacherHomeworkSectionHeader({required this.purpose});
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
+
+class TeacherHomeworkSectionHeader extends StatelessWidget {
+  const TeacherHomeworkSectionHeader({super.key, required this.purpose});
 
   final String purpose;
 

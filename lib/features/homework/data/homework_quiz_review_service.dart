@@ -1,6 +1,7 @@
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
-import 'package:numi/features/homework/homework_api.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 
 /// Adapts a submitted classroom exercise to the shared quiz review UI.
 class HomeworkQuizReviewService {

@@ -16,8 +16,10 @@ import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_cl
 import 'package:numi/features/home/cache/home_profile_cache.dart';
 import 'package:numi/features/home/home_api.dart';
 import 'package:numi/features/home/teacher/cache/teacher_home_snapshot.dart';
-import 'package:numi/features/homework/homework_api.dart';
-import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 

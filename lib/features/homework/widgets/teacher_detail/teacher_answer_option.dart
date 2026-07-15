@@ -1,7 +1,12 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _TeacherAnswerOption extends StatelessWidget {
-  const _TeacherAnswerOption({
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class TeacherAnswerOption extends StatelessWidget {
+  const TeacherAnswerOption({
+    super.key,
     required this.letter,
     required this.text,
     this.selected = false,

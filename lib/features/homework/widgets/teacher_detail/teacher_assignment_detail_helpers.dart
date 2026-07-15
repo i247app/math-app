@@ -1,17 +1,22 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
 
-List<_TeacherAssignmentLabeledValue> _exerciseInfoRows(
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_labeled_value.dart';
+
+List<TeacherAssignmentLabeledValue> exerciseInfoRows(
   BuildContext context,
   ClassroomExercise? exercise,
 ) {
-  final rows = <_TeacherAssignmentLabeledValue>[];
+  final rows = <TeacherAssignmentLabeledValue>[];
   final chapter = exercise?.chapterName?.trim();
   final lesson = exercise?.lessonName?.trim();
   final description = exercise?.description?.trim();
 
   if (chapter != null && chapter.isNotEmpty) {
     rows.add(
-      _TeacherAssignmentLabeledValue(
+      TeacherAssignmentLabeledValue(
         context.getText(AppKeys.teacherAssignmentChapterLabel),
         chapter,
       ),
@@ -19,7 +24,7 @@ List<_TeacherAssignmentLabeledValue> _exerciseInfoRows(
   }
   if (lesson != null && lesson.isNotEmpty) {
     rows.add(
-      _TeacherAssignmentLabeledValue(
+      TeacherAssignmentLabeledValue(
         context.getText(AppKeys.teacherAssignmentLessonLabel),
         lesson,
       ),
@@ -27,7 +32,7 @@ List<_TeacherAssignmentLabeledValue> _exerciseInfoRows(
   }
   if (description != null && description.isNotEmpty) {
     rows.add(
-      _TeacherAssignmentLabeledValue(
+      TeacherAssignmentLabeledValue(
         context.getText(AppKeys.teacherAssignmentDescriptionLabel),
         description,
       ),
@@ -48,7 +53,7 @@ String teacherExerciseClassLabel(
   return context.formatText(AppKeys.teacherAssignmentId, {'id': classroomId});
 }
 
-String? _normalizeExerciseVisibility(String? value) {
+String? normalizeExerciseVisibility(String? value) {
   final normalized = value?.trim().toUpperCase();
   if (normalized == 'PUBLIC' || normalized == 'PRIVATE') {
     return normalized;
@@ -56,7 +61,7 @@ String? _normalizeExerciseVisibility(String? value) {
   return null;
 }
 
-String _answerLetter(int index) {
+String answerLetter(int index) {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   if (index < 0 || index >= letters.length) {
     return '?';
@@ -64,7 +69,7 @@ String _answerLetter(int index) {
   return letters[index];
 }
 
-bool _isCorrectAnswer(
+bool isCorrectAnswer(
   ClassroomExerciseQuestion? question,
   String answer,
   int index,
@@ -73,5 +78,5 @@ bool _isCorrectAnswer(
   if (correct == null || correct.isEmpty) {
     return false;
   }
-  return correct == answer.trim() || correct == _answerLetter(index);
+  return correct == answer.trim() || correct == answerLetter(index);
 }

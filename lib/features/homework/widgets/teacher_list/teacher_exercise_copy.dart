@@ -1,4 +1,5 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
 
 class TeacherExerciseCopy {
   const TeacherExerciseCopy({

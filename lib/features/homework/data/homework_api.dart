@@ -1,15 +1,6 @@
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/network_client.dart';
-
-class ClassroomExerciseException implements Exception {
-  const ClassroomExerciseException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
+import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 
 abstract class ClassroomExerciseService {
   Future<List<ClassroomExercise>> listExercises({

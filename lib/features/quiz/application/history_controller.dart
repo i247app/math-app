@@ -6,7 +6,7 @@ import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';
-import 'package:numi/features/homework/homework_api.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 import 'package:numi/features/quiz/data/cache/quiz_history_homework_cache.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
@@ -15,6 +15,7 @@ import 'package:numi/features/quiz/helpers/history_compare_homework_descending.d
 import 'package:numi/features/quiz/helpers/history_compare_quiz_descending.dart';
 import 'package:numi/features/quiz/helpers/history_is_assessment_quiz.dart';
 import 'package:numi/features/quiz/helpers/history_is_submitted_homework.dart';
+import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 
 class HistoryController extends ChangeNotifier {
   HistoryController({

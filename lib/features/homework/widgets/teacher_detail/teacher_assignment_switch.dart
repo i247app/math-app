@@ -1,7 +1,10 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _TeacherAssignmentSwitch extends StatelessWidget {
-  const _TeacherAssignmentSwitch({
+import 'package:flutter/material.dart';
+
+class TeacherAssignmentSwitch extends StatelessWidget {
+  const TeacherAssignmentSwitch({
+    super.key,
     required this.visibility,
     required this.onChanged,
   });

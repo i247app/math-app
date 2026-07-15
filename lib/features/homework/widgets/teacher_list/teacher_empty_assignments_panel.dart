@@ -1,4 +1,7 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class TeacherEmptyAssignmentsPanel extends StatelessWidget {
   const TeacherEmptyAssignmentsPanel({super.key, required this.message});

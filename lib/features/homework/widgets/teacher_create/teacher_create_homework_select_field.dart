@@ -1,7 +1,13 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _CreateHomeworkSelectField extends StatelessWidget {
-  const _CreateHomeworkSelectField({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+
+class CreateHomeworkSelectField extends StatelessWidget {
+  const CreateHomeworkSelectField({
+    super.key,
     required this.onTap,
     required this.iconAsset,
     required this.iconWidth,

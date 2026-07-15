@@ -1,9 +1,12 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherAssignmentInfoRow extends StatelessWidget {
-  const _TeacherAssignmentInfoRow(this.row);
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_labeled_value.dart';
 
-  final _TeacherAssignmentLabeledValue row;
+class TeacherAssignmentInfoRow extends StatelessWidget {
+  const TeacherAssignmentInfoRow(this.row, {super.key});
+
+  final TeacherAssignmentLabeledValue row;
 
   @override
   Widget build(BuildContext context) {

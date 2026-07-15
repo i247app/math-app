@@ -1,63 +1,26 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
-import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/program_models.dart';
-import 'package:numi/core/network/school_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
-import 'package:numi/features/classroom/errors/classroom_exception.dart';
-import 'package:numi/features/homework/homework_api.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
-import 'package:numi/features/profile/data/profile_api.dart';
-import 'package:numi/features/profile/data/school_api.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/shared/layouts/app_screen_app_bar.dart';
-import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
-
-part '../cache/teacher_homework_cache.dart';
-part 'teacher_homework_detail_screen.dart';
-part 'teacher_create_homework_screen.dart';
-part '../widgets/teacher_list/teacher_homework_add_button.dart';
-part '../widgets/teacher_list/teacher_homework_search_field.dart';
-part '../widgets/teacher_list/teacher_homework_section_header.dart';
-part '../widgets/teacher_list/teacher_exercise_copy.dart';
-part '../widgets/teacher_list/teacher_assignment_card.dart';
-part '../widgets/teacher_list/teacher_empty_assignments_panel.dart';
-part '../widgets/teacher_list/teacher_exercise_helpers.dart';
-part '../widgets/teacher_detail/teacher_assignment_info_card.dart';
-part '../widgets/teacher_detail/teacher_assignment_info_row.dart';
-part '../widgets/teacher_detail/teacher_assignment_labeled_value.dart';
-part '../widgets/teacher_detail/teacher_assignment_switch.dart';
-part '../widgets/teacher_detail/teacher_assignment_stat_due.dart';
-part '../widgets/teacher_detail/teacher_assignment_stat_questions.dart';
-part '../widgets/teacher_detail/teacher_assignment_stat.dart';
-part '../widgets/teacher_detail/teacher_question_card.dart';
-part '../widgets/teacher_detail/teacher_answer_option.dart';
-part '../widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
-part '../widgets/teacher_create/teacher_create_homework_class_selector.dart';
-part '../widgets/teacher_create/teacher_create_homework_class_bottom_sheet.dart';
-part '../widgets/teacher_create/teacher_create_homework_program_bottom_sheet.dart';
-part '../widgets/teacher_create/teacher_create_homework_class_summary.dart';
-part '../widgets/teacher_create/teacher_create_homework_class_meta.dart';
-part '../widgets/teacher_create/teacher_create_homework_labeled_input.dart';
-part '../widgets/teacher_create/teacher_create_homework_label.dart';
-part '../widgets/teacher_create/teacher_create_homework_input.dart';
-part '../widgets/teacher_create/teacher_create_homework_publish_switch.dart';
-part '../widgets/teacher_create/teacher_create_homework_select_field.dart';
-part '../widgets/teacher_create/teacher_create_homework_date_field.dart';
-part '../widgets/teacher_create/teacher_create_homework_submit_button.dart';
-part '../widgets/teacher_create/teacher_create_homework_helpers.dart';
+import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/data/cache/teacher_homework_cache.dart';
+import 'package:numi/features/homework/presentation/screens/teacher_create_homework_screen.dart';
+import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_assignment_card.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_add_button.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_search_field.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_section_header.dart';
 
 class TeacherHomeworkScreen extends StatefulWidget {
   const TeacherHomeworkScreen({
@@ -97,7 +60,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
 
   Future<void> _loadExercises({bool forceRefresh = false}) async {
     if (!forceRefresh) {
-      final cachedExercises = _TeacherHomeworkCache.peekList(
+      final cachedExercises = TeacherHomeworkCache.peekList(
         classroomId: widget.classroomId,
         profileId: widget.profileId,
         purpose: widget.purpose,
@@ -119,7 +82,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
     });
 
     try {
-      final exercises = await _TeacherHomeworkCache.loadList(
+      final exercises = await TeacherHomeworkCache.loadList(
         service: _exerciseService,
         classroomId: widget.classroomId,
         profileId: widget.profileId,
@@ -163,7 +126,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
       ),
     );
     if (created == true) {
-      _TeacherHomeworkCache.invalidateList(
+      TeacherHomeworkCache.invalidateList(
         classroomId: widget.classroomId,
         profileId: widget.profileId,
         purpose: widget.purpose,
@@ -178,7 +141,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
       showTeacherHomeworkSoon(context);
       return;
     }
-    _TeacherHomeworkCache.seedDetail(
+    TeacherHomeworkCache.seedDetail(
       profileId: widget.profileId,
       exercise: exercise,
     );
@@ -238,9 +201,9 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                         ),
                       ),
                       const SizedBox(height: 33),
-                      const _TeacherHomeworkSearchField(),
+                      const TeacherHomeworkSearchField(),
                       const SizedBox(height: 24),
-                      _TeacherHomeworkSectionHeader(purpose: widget.purpose),
+                      TeacherHomeworkSectionHeader(purpose: widget.purpose),
                       const SizedBox(height: 17),
                       if (_isLoading && _exercises.isEmpty)
                         Padding(
@@ -269,7 +232,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                           index < _exercises.length;
                           index++
                         ) ...[
-                          _TeacherAssignmentCard(
+                          TeacherAssignmentCard(
                             exercise: _exercises[index],
                             onTap: () => _openExerciseDetail(_exercises[index]),
                           ),

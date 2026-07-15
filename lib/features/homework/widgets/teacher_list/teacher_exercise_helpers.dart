@@ -1,4 +1,9 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
 
 void showTeacherHomeworkSoon(BuildContext context) {
   HapticFeedback.selectionClick();
@@ -43,8 +48,8 @@ String? teacherExerciseDateTimeLabel(String? value) {
     return null;
   }
   final local = parsed.toLocal();
-  return '${_twoDigits(local.hour)}:${_twoDigits(local.minute)} '
-      '${_twoDigits(local.day)}/${_twoDigits(local.month)}/${local.year}';
+  return '${twoDigits(local.hour)}:${twoDigits(local.minute)} '
+      '${twoDigits(local.day)}/${twoDigits(local.month)}/${local.year}';
 }
 
 TeacherExerciseDateParts teacherExerciseDateParts(String? value) {
@@ -54,12 +59,12 @@ TeacherExerciseDateParts teacherExerciseDateParts(String? value) {
   }
   final local = parsed.toLocal();
   return TeacherExerciseDateParts(
-    day: _twoDigits(local.day),
-    month: 'TH${_twoDigits(local.month)}',
+    day: twoDigits(local.day),
+    month: 'TH${twoDigits(local.month)}',
   );
 }
 
-String _twoDigits(int value) => value.toString().padLeft(2, '0');
+String twoDigits(int value) => value.toString().padLeft(2, '0');
 
 class TeacherExerciseDateParts {
   const TeacherExerciseDateParts({required this.day, required this.month});

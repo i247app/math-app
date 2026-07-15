@@ -1,7 +1,10 @@
-part of '../presentation/teacher_homework_screen.dart';
+import 'dart:async';
 
-class _TeacherHomeworkCache {
-  _TeacherHomeworkCache._();
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+
+class TeacherHomeworkCache {
+  TeacherHomeworkCache._();
 
   static final Map<_TeacherHomeworkListKey, List<ClassroomExercise>> _lists =
       <_TeacherHomeworkListKey, List<ClassroomExercise>>{};

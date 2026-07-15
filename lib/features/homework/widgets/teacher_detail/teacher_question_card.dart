@@ -1,7 +1,21 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'dart:ui';
 
-class _TeacherQuestionCard extends StatelessWidget {
-  const _TeacherQuestionCard({required this.questionNumber, this.question});
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_answer_option.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
+
+class TeacherQuestionCard extends StatelessWidget {
+  const TeacherQuestionCard({
+    super.key,
+    required this.questionNumber,
+    this.question,
+  });
 
   final int questionNumber;
   final ClassroomExerciseQuestion? question;
@@ -57,10 +71,10 @@ class _TeacherQuestionCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               for (var index = 0; index < answers.length; index++) ...[
-                _TeacherAnswerOption(
-                  letter: _answerLetter(index),
+                TeacherAnswerOption(
+                  letter: answerLetter(index),
                   text: answers[index],
-                  selected: _isCorrectAnswer(question, answers[index], index),
+                  selected: isCorrectAnswer(question, answers[index], index),
                 ),
                 if (index != answers.length - 1) const SizedBox(height: 8),
               ],

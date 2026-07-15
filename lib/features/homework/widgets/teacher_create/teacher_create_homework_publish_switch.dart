@@ -1,7 +1,14 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _CreateHomeworkPublishSwitch extends StatelessWidget {
-  const _CreateHomeworkPublishSwitch({
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+
+class CreateHomeworkPublishSwitch extends StatelessWidget {
+  const CreateHomeworkPublishSwitch({
+    super.key,
     required this.isPublished,
     required this.onChanged,
   });

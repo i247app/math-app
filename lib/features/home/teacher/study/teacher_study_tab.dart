@@ -19,10 +19,16 @@ import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/home/shell/widgets/home_tab_header.dart';
-import 'package:numi/features/homework/homework_api.dart';
-import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/homework/presentation/screens/teacher_create_homework_screen.dart';
+import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_add_button.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
+import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 
 part 'helpers/teacher_study_helpers.dart';
 part 'models/teacher_study_date_parts.dart';

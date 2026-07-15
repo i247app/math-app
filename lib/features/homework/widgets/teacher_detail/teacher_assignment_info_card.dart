@@ -1,7 +1,21 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'dart:ui';
 
-class _TeacherAssignmentInfoCard extends StatelessWidget {
-  const _TeacherAssignmentInfoCard({
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_info_row.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_stat_due.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_stat_questions.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_switch.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+
+class TeacherAssignmentInfoCard extends StatelessWidget {
+  const TeacherAssignmentInfoCard({
+    super.key,
     required this.exercise,
     required this.visibility,
     required this.onVisibilityChanged,
@@ -56,7 +70,7 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  _TeacherAssignmentSwitch(
+                  TeacherAssignmentSwitch(
                     visibility: visibility,
                     onChanged: onVisibilityChanged,
                   ),
@@ -74,12 +88,12 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                   height: 36 / 18,
                 ),
               ),
-              if (_exerciseInfoRows(context, exercise).isNotEmpty) ...[
+              if (exerciseInfoRows(context, exercise).isNotEmpty) ...[
                 const SizedBox(height: 6),
-                for (final row in _exerciseInfoRows(context, exercise))
+                for (final row in exerciseInfoRows(context, exercise))
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: _TeacherAssignmentInfoRow(row),
+                    child: TeacherAssignmentInfoRow(row),
                   ),
               ],
               const SizedBox(height: 8),
@@ -95,9 +109,9 @@ class _TeacherAssignmentInfoCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: _TeacherAssignmentStatDue(exercise)),
+                    Expanded(child: TeacherAssignmentStatDue(exercise)),
                     const SizedBox(width: 30),
-                    Expanded(child: _TeacherAssignmentStatQuestions(exercise)),
+                    Expanded(child: TeacherAssignmentStatQuestions(exercise)),
                   ],
                 ),
               ),

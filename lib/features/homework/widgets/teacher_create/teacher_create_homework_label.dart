@@ -1,7 +1,8 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _CreateHomeworkLabel extends StatelessWidget {
-  const _CreateHomeworkLabel(this.label);
+class CreateHomeworkLabel extends StatelessWidget {
+  const CreateHomeworkLabel(this.label, {super.key});
 
   final String label;
 

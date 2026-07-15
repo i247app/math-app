@@ -1,7 +1,13 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherHomeworkSearchField extends StatelessWidget {
-  const _TeacherHomeworkSearchField();
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+
+class TeacherHomeworkSearchField extends StatelessWidget {
+  const TeacherHomeworkSearchField({super.key});
 
   @override
   Widget build(BuildContext context) {

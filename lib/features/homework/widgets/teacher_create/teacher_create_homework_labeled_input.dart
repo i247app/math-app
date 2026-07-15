@@ -1,7 +1,12 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
 
-class _CreateHomeworkLabeledInput extends StatelessWidget {
-  const _CreateHomeworkLabeledInput({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_input.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_label.dart';
+
+class CreateHomeworkLabeledInput extends StatelessWidget {
+  const CreateHomeworkLabeledInput({
+    super.key,
     required this.labelKey,
     required this.controller,
   });
@@ -14,9 +19,9 @@ class _CreateHomeworkLabeledInput extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _CreateHomeworkLabel(context.getText(labelKey)),
+        CreateHomeworkLabel(context.getText(labelKey)),
         const SizedBox(height: 8),
-        _CreateHomeworkInput(
+        CreateHomeworkInput(
           controller: controller,
           hintKey: labelKey,
           height: 51,

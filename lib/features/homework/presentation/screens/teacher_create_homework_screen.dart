@@ -1,4 +1,37 @@
-part of 'teacher_homework_screen.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/errors/classroom_exception.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/data/school_api.dart';
+import 'package:numi/shared/layouts/app_screen_app_bar.dart';
+import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_bottom_sheet.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_selector.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_summary.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_date_field.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_input.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_label.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_labeled_input.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_program_bottom_sheet.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_publish_switch.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_select_field.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_submit_button.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
 
 class TeacherCreateHomeworkScreen extends StatefulWidget {
   const TeacherCreateHomeworkScreen({
@@ -99,17 +132,17 @@ class _TeacherCreateHomeworkScreenState
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         numQuestions: 4,
-        chapterName: _trimOrDefault(
+        chapterName: trimOrDefault(
           _chapterController.text,
           context.readText(AppKeys.teacherAssignmentDefaultChapter),
         ),
-        lessonName: _trimOrDefault(
+        lessonName: trimOrDefault(
           _lessonController.text,
           context.readText(AppKeys.teacherAssignmentDefaultLesson),
         ),
         visibility: _visibility,
-        startDate: _exerciseApiDate(_startDate!),
-        endDate: _exerciseApiDate(_endDate!),
+        startDate: exerciseApiDate(_startDate!),
+        endDate: exerciseApiDate(_endDate!),
         purpose: widget.purpose,
       );
       if (!mounted) {
@@ -180,11 +213,11 @@ class _TeacherCreateHomeworkScreenState
         return;
       }
       setState(() {
-        _classrooms = _mergeSelectedClassroom(classrooms, _selectedClassroom);
+        _classrooms = mergeSelectedClassroom(classrooms, _selectedClassroom);
         _selectedClassroom =
-            _matchingClassroom(_classrooms, _selectedClassroomId) ??
+            matchingClassroom(_classrooms, _selectedClassroomId) ??
             _selectedClassroom;
-        _selectedProgramId = _validProgramIdForClassroom(
+        _selectedProgramId = validProgramIdForClassroom(
           _selectedClassroom,
           _selectedProgramId,
           _programs,
@@ -220,7 +253,7 @@ class _TeacherCreateHomeworkScreenState
       }
       setState(() {
         _selectedClassroom = classroom;
-        _selectedProgramId = _validProgramIdForClassroom(
+        _selectedProgramId = validProgramIdForClassroom(
           classroom,
           _selectedProgramId,
           _programs,
@@ -257,7 +290,7 @@ class _TeacherCreateHomeworkScreenState
         _grades = results[0] as List<GradeModel>;
         _programs = results[1] as List<ProgramModel>;
         _schools = results[2] as List<SchoolModel>;
-        _selectedProgramId = _validProgramIdForClassroom(
+        _selectedProgramId = validProgramIdForClassroom(
           _selectedClassroom,
           _selectedProgramId,
           _programs,
@@ -289,7 +322,7 @@ class _TeacherCreateHomeworkScreenState
       backgroundColor: Colors.transparent,
       builder: (context) {
         final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return _CreateHomeworkClassBottomSheet(
+        return CreateHomeworkClassBottomSheet(
           classrooms: _classrooms,
           selectedClassroomId: _selectedClassroomId,
           bottomInset: bottomInset,
@@ -308,7 +341,7 @@ class _TeacherCreateHomeworkScreenState
 
   Future<void> _openProgramSelector() async {
     _dismissKeyboard();
-    final options = _programOptionsForClassroom(
+    final options = programOptionsForClassroom(
       context,
       _selectedClassroom,
       _programs,
@@ -318,12 +351,12 @@ class _TeacherCreateHomeworkScreenState
       return;
     }
 
-    final selected = await showModalBottomSheet<_ClassroomProgramOption>(
+    final selected = await showModalBottomSheet<ClassroomProgramOption>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
         final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return _CreateHomeworkProgramBottomSheet(
+        return CreateHomeworkProgramBottomSheet(
           options: options,
           selectedProgramId: _selectedProgramId,
           bottomInset: bottomInset,
@@ -443,13 +476,13 @@ class _TeacherCreateHomeworkScreenState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _CreateHomeworkClassSelector(
+                          CreateHomeworkClassSelector(
                             classroom: _selectedClassroom,
                             isLoading: _isLoadingClassrooms,
                             onTap: _openClassSelector,
                           ),
                           const SizedBox(height: 10),
-                          _CreateHomeworkClassSummary(
+                          CreateHomeworkClassSummary(
                             classroom: _selectedClassroom,
                             grades: _grades,
                             programs: _programs,
@@ -460,7 +493,7 @@ class _TeacherCreateHomeworkScreenState
                                 _isLoadingLookups,
                           ),
                           const SizedBox(height: 22),
-                          _CreateHomeworkInput(
+                          CreateHomeworkInput(
                             controller: _titleController,
                             hintKey: teacherExerciseCopy(
                               widget.purpose,
@@ -469,15 +502,15 @@ class _TeacherCreateHomeworkScreenState
                             radius: 10,
                           ),
                           const SizedBox(height: 13),
-                          _CreateHomeworkLabel(
+                          CreateHomeworkLabel(
                             context.getText(
                               AppKeys.teacherAssignmentProgramLabel,
                             ),
                           ),
                           const SizedBox(height: 9),
-                          _CreateHomeworkSelectField(
+                          CreateHomeworkSelectField(
                             valueKey: AppKeys.teacherAssignmentProgramLabel,
-                            valueText: _selectedHomeworkProgramName(
+                            valueText: selectedHomeworkProgramName(
                               context,
                               _programs,
                               _selectedProgramId,
@@ -492,17 +525,17 @@ class _TeacherCreateHomeworkScreenState
                             onTap: _openProgramSelector,
                           ),
                           const SizedBox(height: 18),
-                          _CreateHomeworkLabel(
+                          CreateHomeworkLabel(
                             context.getText(AppKeys.teacherAssignmentDeadline),
                           ),
                           const SizedBox(height: 10),
                           Row(
                             children: [
                               Expanded(
-                                child: _CreateHomeworkDateField(
+                                child: CreateHomeworkDateField(
                                   hintKey:
                                       AppKeys.teacherAssignmentStartDateHint,
-                                  valueText: _formatCreateHomeworkDate(
+                                  valueText: formatCreateHomeworkDate(
                                     _startDate,
                                   ),
                                   onTap: () => _openDatePicker(isStart: true),
@@ -510,11 +543,9 @@ class _TeacherCreateHomeworkScreenState
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: _CreateHomeworkDateField(
+                                child: CreateHomeworkDateField(
                                   hintKey: AppKeys.teacherAssignmentEndDateHint,
-                                  valueText: _formatCreateHomeworkDate(
-                                    _endDate,
-                                  ),
+                                  valueText: formatCreateHomeworkDate(_endDate),
                                   onTap: () => _openDatePicker(isStart: false),
                                 ),
                               ),
@@ -525,7 +556,7 @@ class _TeacherCreateHomeworkScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: _CreateHomeworkLabeledInput(
+                                child: CreateHomeworkLabeledInput(
                                   labelKey:
                                       AppKeys.teacherAssignmentChapterLabel,
                                   controller: _chapterController,
@@ -533,7 +564,7 @@ class _TeacherCreateHomeworkScreenState
                               ),
                               const SizedBox(width: 14),
                               Expanded(
-                                child: _CreateHomeworkLabeledInput(
+                                child: CreateHomeworkLabeledInput(
                                   labelKey:
                                       AppKeys.teacherAssignmentLessonLabel,
                                   controller: _lessonController,
@@ -542,7 +573,7 @@ class _TeacherCreateHomeworkScreenState
                             ],
                           ),
                           const SizedBox(height: 17),
-                          _CreateHomeworkInput(
+                          CreateHomeworkInput(
                             controller: _descriptionController,
                             hintKey: teacherExerciseCopy(
                               widget.purpose,
@@ -552,7 +583,7 @@ class _TeacherCreateHomeworkScreenState
                             textAlignVertical: TextAlignVertical.top,
                           ),
                           const SizedBox(height: 24),
-                          _CreateHomeworkPublishSwitch(
+                          CreateHomeworkPublishSwitch(
                             isPublished: _visibility == 'PUBLIC',
                             onChanged: (isPublished) {
                               setState(
@@ -564,7 +595,7 @@ class _TeacherCreateHomeworkScreenState
                           ),
                           const SizedBox(height: 24),
                           Center(
-                            child: _CreateHomeworkSubmitButton(
+                            child: CreateHomeworkSubmitButton(
                               isLoading: _isSubmitting,
                               onTap: _submit,
                             ),

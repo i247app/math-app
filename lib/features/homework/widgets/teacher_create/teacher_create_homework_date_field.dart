@@ -1,7 +1,10 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
 
-class _CreateHomeworkDateField extends StatelessWidget {
-  const _CreateHomeworkDateField({
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_select_field.dart';
+
+class CreateHomeworkDateField extends StatelessWidget {
+  const CreateHomeworkDateField({
+    super.key,
     required this.hintKey,
     required this.onTap,
     this.valueText,
@@ -13,7 +16,7 @@ class _CreateHomeworkDateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _CreateHomeworkSelectField(
+    return CreateHomeworkSelectField(
       valueKey: hintKey,
       valueText: valueText,
       iconAsset: 'assets/images/teacher_homework_create_calendar.svg',

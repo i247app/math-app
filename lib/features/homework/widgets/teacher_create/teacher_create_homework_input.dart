@@ -1,7 +1,13 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _CreateHomeworkInput extends StatelessWidget {
-  const _CreateHomeworkInput({
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+
+class CreateHomeworkInput extends StatelessWidget {
+  const CreateHomeworkInput({
+    super.key,
     required this.controller,
     required this.hintKey,
     required this.height,

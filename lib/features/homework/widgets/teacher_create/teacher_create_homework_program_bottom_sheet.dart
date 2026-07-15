@@ -1,13 +1,21 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _CreateHomeworkProgramBottomSheet extends StatelessWidget {
-  const _CreateHomeworkProgramBottomSheet({
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
+
+class CreateHomeworkProgramBottomSheet extends StatelessWidget {
+  const CreateHomeworkProgramBottomSheet({
+    super.key,
     required this.options,
     required this.selectedProgramId,
     required this.bottomInset,
   });
 
-  final List<_ClassroomProgramOption> options;
+  final List<ClassroomProgramOption> options;
   final int? selectedProgramId;
   final double bottomInset;
 

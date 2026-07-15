@@ -1,31 +1,40 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
 
-String _trimOrDefault(String value, String fallback) {
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+
+String trimOrDefault(String value, String fallback) {
   final trimmed = value.trim();
   return trimmed.isEmpty ? fallback : trimmed;
 }
 
-String? _formatCreateHomeworkDate(DateTime? value) {
+String? formatCreateHomeworkDate(DateTime? value) {
   if (value == null) {
     return null;
   }
-  return '${_twoDigits(value.day)}/${_twoDigits(value.month)}/${value.year} '
-      '${_twoDigits(value.hour)}:${_twoDigits(value.minute)}';
+  return '${twoDigits(value.day)}/${twoDigits(value.month)}/${value.year} '
+      '${twoDigits(value.hour)}:${twoDigits(value.minute)}';
 }
 
-String _exerciseApiDate(DateTime value) {
+String exerciseApiDate(DateTime value) {
   final utc = value.toUtc();
   final micros = utc.millisecond * 1000 + utc.microsecond;
   return '${utc.year.toString().padLeft(4, '0')}-'
-      '${_twoDigits(utc.month)}-'
-      '${_twoDigits(utc.day)}T'
-      '${_twoDigits(utc.hour)}:'
-      '${_twoDigits(utc.minute)}:'
-      '${_twoDigits(utc.second)}.'
+      '${twoDigits(utc.month)}-'
+      '${twoDigits(utc.day)}T'
+      '${twoDigits(utc.hour)}:'
+      '${twoDigits(utc.minute)}:'
+      '${twoDigits(utc.second)}.'
       '${micros.toString().padLeft(6, '0')}Z';
 }
 
-String _createHomeworkClassName(
+String createHomeworkClassName(
   BuildContext context,
   ClassroomModel? classroom,
 ) {
@@ -35,7 +44,7 @@ String _createHomeworkClassName(
       : name;
 }
 
-String _createHomeworkClassSummaryName(
+String createHomeworkClassSummaryName(
   BuildContext context,
   ClassroomModel? classroom,
 ) {
@@ -45,7 +54,7 @@ String _createHomeworkClassSummaryName(
       : name;
 }
 
-String _createHomeworkStudentCount(
+String createHomeworkStudentCount(
   BuildContext context,
   ClassroomModel? classroom,
 ) {
@@ -58,7 +67,7 @@ String _createHomeworkStudentCount(
   });
 }
 
-String _createHomeworkGradeName(
+String createHomeworkGradeName(
   BuildContext context,
   ClassroomModel? classroom,
   List<GradeModel> grades,
@@ -74,13 +83,13 @@ String _createHomeworkGradeName(
   return context.getText(AppKeys.teacherAssignmentClassGrade);
 }
 
-String _createHomeworkProgramName(
+String createHomeworkProgramName(
   BuildContext context,
   ClassroomModel? classroom,
   List<ProgramModel> programs, {
   int? selectedProgramId,
 }) {
-  final options = _programOptionsForClassroom(context, classroom, programs);
+  final options = programOptionsForClassroom(context, classroom, programs);
   if (selectedProgramId == null && options.isNotEmpty) {
     return options.map((option) => option.label).join(', ');
   }
@@ -95,7 +104,7 @@ String _createHomeworkProgramName(
   return context.getText(AppKeys.teacherProgramFallback);
 }
 
-String? _selectedHomeworkProgramName(
+String? selectedHomeworkProgramName(
   BuildContext context,
   List<ProgramModel> programs,
   int? selectedProgramId,
@@ -111,7 +120,7 @@ String? _selectedHomeworkProgramName(
       '$selectedProgramId';
 }
 
-String _createHomeworkSchoolName(
+String createHomeworkSchoolName(
   BuildContext context,
   ClassroomModel? classroom,
   List<SchoolModel> schools,
@@ -132,7 +141,7 @@ int? _defaultProgramId(ClassroomModel? classroom) {
   return programIds.isEmpty ? null : programIds.first;
 }
 
-int? _validProgramIdForClassroom(
+int? validProgramIdForClassroom(
   ClassroomModel? classroom,
   int? selectedProgramId,
   List<ProgramModel> programs,
@@ -151,7 +160,7 @@ int? _validProgramIdForClassroom(
   return null;
 }
 
-List<_ClassroomProgramOption> _programOptionsForClassroom(
+List<ClassroomProgramOption> programOptionsForClassroom(
   BuildContext context,
   ClassroomModel? classroom,
   List<ProgramModel> programs,
@@ -161,14 +170,14 @@ List<_ClassroomProgramOption> _programOptionsForClassroom(
     programs,
   );
   if (options.isEmpty) {
-    return const <_ClassroomProgramOption>[];
+    return const <ClassroomProgramOption>[];
   }
   return options
       .map((option) {
         if (option.label.isNotEmpty) {
           return option;
         }
-        return _ClassroomProgramOption(
+        return ClassroomProgramOption(
           id: option.id,
           label:
               '${context.getText(AppKeys.teacherProgramFallback)} ${option.id}',
@@ -177,12 +186,12 @@ List<_ClassroomProgramOption> _programOptionsForClassroom(
       .toList(growable: false);
 }
 
-List<_ClassroomProgramOption> _programOptionsForClassroomWithoutContext(
+List<ClassroomProgramOption> _programOptionsForClassroomWithoutContext(
   ClassroomModel? classroom,
   List<ProgramModel> programs,
 ) {
   if (classroom == null) {
-    return const <_ClassroomProgramOption>[];
+    return const <ClassroomProgramOption>[];
   }
 
   final ids = <int>[
@@ -191,13 +200,13 @@ List<_ClassroomProgramOption> _programOptionsForClassroomWithoutContext(
       if (id != classroom.programId) id,
   ];
   if (ids.isEmpty) {
-    return const <_ClassroomProgramOption>[];
+    return const <ClassroomProgramOption>[];
   }
 
   return ids
       .map((id) {
         final program = matchProgram(programs, id);
-        return _ClassroomProgramOption(
+        return ClassroomProgramOption(
           id: id,
           label: program == null ? '' : programLabel(program),
         );
@@ -205,27 +214,27 @@ List<_ClassroomProgramOption> _programOptionsForClassroomWithoutContext(
       .toList(growable: false);
 }
 
-class _ClassroomProgramOption {
-  const _ClassroomProgramOption({required this.id, required this.label});
+class ClassroomProgramOption {
+  const ClassroomProgramOption({required this.id, required this.label});
 
   final int id;
   final String label;
 }
 
-List<ClassroomModel> _mergeSelectedClassroom(
+List<ClassroomModel> mergeSelectedClassroom(
   List<ClassroomModel> classrooms,
   ClassroomModel? selectedClassroom,
 ) {
   final selectedId = selectedClassroom?.stableId;
   if (selectedClassroom == null ||
       selectedId == null ||
-      _matchingClassroom(classrooms, selectedId) != null) {
+      matchingClassroom(classrooms, selectedId) != null) {
     return classrooms;
   }
   return <ClassroomModel>[selectedClassroom, ...classrooms];
 }
 
-ClassroomModel? _matchingClassroom(
+ClassroomModel? matchingClassroom(
   List<ClassroomModel> classrooms,
   int classroomId,
 ) {

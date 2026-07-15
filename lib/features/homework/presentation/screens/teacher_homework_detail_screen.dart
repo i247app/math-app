@@ -1,4 +1,22 @@
-part of 'teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
+import 'package:numi/shared/layouts/app_screen_app_bar.dart';
+import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/data/cache/teacher_homework_cache.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_info_card.dart';
+import 'package:numi/features/homework/widgets/teacher_detail/teacher_question_card.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
 
 class TeacherHomeworkDetailScreen extends StatefulWidget {
   const TeacherHomeworkDetailScreen({
@@ -43,7 +61,7 @@ class _TeacherHomeworkDetailScreenState
   void initState() {
     super.initState();
     _exercise = widget.initialExercise;
-    final visibility = _normalizeExerciseVisibility(_exercise?.visibility);
+    final visibility = normalizeExerciseVisibility(_exercise?.visibility);
     _savedVisibility = visibility;
     _editingVisibility = visibility;
     _loadDetail();
@@ -51,12 +69,12 @@ class _TeacherHomeworkDetailScreenState
 
   Future<void> _loadDetail({bool forceRefresh = false}) async {
     if (!forceRefresh) {
-      final cachedExercise = _TeacherHomeworkCache.peekDetail(
+      final cachedExercise = TeacherHomeworkCache.peekDetail(
         exerciseId: widget.exerciseId,
         profileId: widget.profileId,
       );
       if (cachedExercise != null) {
-        final visibility = _normalizeExerciseVisibility(
+        final visibility = normalizeExerciseVisibility(
           cachedExercise.visibility,
         );
         setState(() {
@@ -77,7 +95,7 @@ class _TeacherHomeworkDetailScreenState
     });
 
     try {
-      final exercise = await _TeacherHomeworkCache.loadDetail(
+      final exercise = await TeacherHomeworkCache.loadDetail(
         service: _exerciseService,
         exerciseId: widget.exerciseId,
         profileId: widget.profileId,
@@ -86,7 +104,7 @@ class _TeacherHomeworkDetailScreenState
       if (!mounted) {
         return;
       }
-      final visibility = _normalizeExerciseVisibility(exercise?.visibility);
+      final visibility = normalizeExerciseVisibility(exercise?.visibility);
       setState(() {
         _exercise = exercise ?? _exercise;
         _savedVisibility = visibility;
@@ -139,11 +157,11 @@ class _TeacherHomeworkDetailScreenState
       setState(() {
         _exercise = updated ?? _exercise;
         _savedVisibility =
-            _normalizeExerciseVisibility(updated?.visibility) ?? visibility;
+            normalizeExerciseVisibility(updated?.visibility) ?? visibility;
         _editingVisibility = _savedVisibility;
       });
       if (updated != null) {
-        _TeacherHomeworkCache.replaceDetail(
+        TeacherHomeworkCache.replaceDetail(
           profileId: widget.profileId,
           exercise: updated,
         );
@@ -241,7 +259,7 @@ class _TeacherHomeworkDetailScreenState
                           onRetry: _loadDetail,
                         )
                       else ...[
-                        _TeacherAssignmentInfoCard(
+                        TeacherAssignmentInfoCard(
                           exercise: exercise,
                           visibility: _editingVisibility,
                           onVisibilityChanged: (visibility) {
@@ -269,7 +287,7 @@ class _TeacherHomeworkDetailScreenState
                             padding: EdgeInsets.only(
                               bottom: index == questions.length - 1 ? 0 : 15,
                             ),
-                            child: _TeacherQuestionCard(
+                            child: TeacherQuestionCard(
                               questionNumber:
                                   questions[index].questionNumber ?? index + 1,
                               question: questions[index],

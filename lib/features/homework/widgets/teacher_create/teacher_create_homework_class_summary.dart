@@ -1,7 +1,18 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _CreateHomeworkClassSummary extends StatelessWidget {
-  const _CreateHomeworkClassSummary({
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_meta.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
+
+class CreateHomeworkClassSummary extends StatelessWidget {
+  const CreateHomeworkClassSummary({
+    super.key,
     required this.classroom,
     required this.grades,
     required this.programs,
@@ -61,7 +72,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        _createHomeworkStudentCount(context, classroom),
+                        createHomeworkStudentCount(context, classroom),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
@@ -80,7 +91,7 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _createHomeworkClassSummaryName(context, classroom),
+                        createHomeworkClassSummaryName(context, classroom),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
@@ -91,28 +102,28 @@ class _CreateHomeworkClassSummary extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      _CreateHomeworkClassMeta(
+                      CreateHomeworkClassMeta(
                         iconAsset: 'assets/images/teacher_class_grade.png',
-                        label: _createHomeworkGradeName(
+                        label: createHomeworkGradeName(
                           context,
                           classroom,
                           grades,
                         ),
                       ),
                       const SizedBox(height: 5),
-                      _CreateHomeworkClassMeta(
+                      CreateHomeworkClassMeta(
                         iconAsset: 'assets/images/teacher_class_program.png',
-                        label: _createHomeworkProgramName(
+                        label: createHomeworkProgramName(
                           context,
                           classroom,
                           programs,
                         ),
                       ),
                       const SizedBox(height: 5),
-                      _CreateHomeworkClassMeta(
+                      CreateHomeworkClassMeta(
                         iconAsset:
                             'assets/images/teacher_class_description.png',
-                        label: _createHomeworkSchoolName(
+                        label: createHomeworkSchoolName(
                           context,
                           classroom,
                           schools,

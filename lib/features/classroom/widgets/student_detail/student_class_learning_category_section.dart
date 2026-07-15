@@ -4,7 +4,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_category_tile.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_section_title.dart';
-import 'package:numi/features/homework/presentation/student_homework_screen.dart';
+import 'package:numi/features/homework/presentation/screens/student_homework_screen.dart';
 
 class StudentClassLearningCategorySection extends StatelessWidget {
   const StudentClassLearningCategorySection({

@@ -1,7 +1,16 @@
-part of '../../presentation/teacher_homework_screen.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class _CreateHomeworkClassBottomSheet extends StatelessWidget {
-  const _CreateHomeworkClassBottomSheet({
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
+
+class CreateHomeworkClassBottomSheet extends StatelessWidget {
+  const CreateHomeworkClassBottomSheet({
+    super.key,
     required this.classrooms,
     required this.selectedClassroomId,
     required this.bottomInset,
@@ -70,7 +79,7 @@ class _CreateHomeworkClassBottomSheet extends StatelessWidget {
                     child: ListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(
-                        _createHomeworkClassName(context, classroom),
+                        createHomeworkClassName(context, classroom),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
@@ -82,7 +91,7 @@ class _CreateHomeworkClassBottomSheet extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(
-                        _createHomeworkStudentCount(context, classroom),
+                        createHomeworkStudentCount(context, classroom),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
