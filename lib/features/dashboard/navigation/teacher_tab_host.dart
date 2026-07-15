@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:numi/features/classroom/presentation/tabs/teacher_classroom_tab.dart';
 import 'package:numi/features/dashboard/helpers/dashboard_tab_builders.dart';
 import 'package:numi/features/home/teacher/home/teacher_home_tab.dart';
-import 'package:numi/features/homework/teacher/study/teacher_study_tab.dart';
+import 'package:numi/features/homework/presentation/tabs/teacher_study_tab.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 
 class TeacherTabHost extends StatelessWidget {

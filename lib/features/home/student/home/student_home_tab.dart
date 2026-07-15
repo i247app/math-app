@@ -35,9 +35,9 @@ import 'package:numi/features/home/widgets/home_start_guide_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_class_summary_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_homework_preview_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_game_suggestions_section.dart';
-import 'package:numi/features/homework/presentation/student_homework_attempt_screen.dart';
+import 'package:numi/features/homework/presentation/screens/student_homework_attempt_screen.dart';
 import 'package:numi/features/homework/helpers/student_homework_open_guard.dart';
-import 'package:numi/features/quiz/parent/assessment/widgets/parent_assessment_tab_card.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 

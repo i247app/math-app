@@ -2,7 +2,7 @@ import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/quiz/parent/assessment/helpers/parent_assessment_quiz_helpers.dart';
+import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
 
 List<GeneratedQuiz> quizzesFromLayoutQuizzes(List<HomeLayoutQuiz> quizzes) {
   return <GeneratedQuiz>[

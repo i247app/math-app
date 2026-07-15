@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:numi/features/dashboard/helpers/dashboard_tab_builders.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/games/presentation/games_tab.dart';
-import 'package:numi/features/quiz/parent/assessment/parent_assessment_tab.dart';
+import 'package:numi/features/quiz/presentation/tabs/parent_assessment_tab.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
-import 'package:numi/features/classroom/parent/room/parent_room_tab.dart';
+import 'package:numi/features/classroom/presentation/tabs/parent_room_tab.dart';
 
 class ParentTabHost extends StatelessWidget {
   const ParentTabHost({super.key, required this.args});

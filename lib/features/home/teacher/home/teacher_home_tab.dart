@@ -17,7 +17,7 @@ import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/features/home/teacher/data/cache/teacher_home_snapshot.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
-import 'package:numi/features/homework/presentation/teacher_homework_detail_screen.dart';
+import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';

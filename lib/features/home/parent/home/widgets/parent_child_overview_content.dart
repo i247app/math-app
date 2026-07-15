@@ -12,8 +12,8 @@ import 'package:numi/features/home/parent/home/widgets/parent_game_suggestions_r
 import 'package:numi/features/home/parent/home/widgets/parent_home_error_card.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_refresh_label.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
-import 'package:numi/features/classroom/parent/shared/widgets/parent_completed_task_list_item.dart';
-import 'package:numi/features/classroom/parent/shared/widgets/parent_pending_task_list_item.dart';
+import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
+import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
 
 class ParentChildOverviewContent extends StatelessWidget {
   const ParentChildOverviewContent({

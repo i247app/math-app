@@ -16,7 +16,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
-import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
+import 'package:numi/features/homework/presentation/screens/teacher_homework_screen.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/profile/data/school_api.dart';

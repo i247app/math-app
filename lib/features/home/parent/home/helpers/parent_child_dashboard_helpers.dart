@@ -1,4 +1,4 @@
-import 'package:numi/features/quiz/parent/assessment/helpers/parent_assessment_quiz_helpers.dart';
+import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
