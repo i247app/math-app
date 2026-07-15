@@ -10,7 +10,7 @@ import 'package:numi/features/home/data/home_api.dart';
 /// - If snapshot [isStale] → background refresh while user sees cached content
 /// - If no cache → show skeleton → load → cache result
 ///
-/// Lifetime: tied to the [HomeScreen] widget (create in [_HomeScreenState],
+/// Lifetime: tied to the [DashboardScreen] widget (create in [_DashboardScreenState],
 /// pass down to tabs via [HomeProfileCache.instance] or constructor injection).
 ///
 /// Call [invalidateAll] on logout.

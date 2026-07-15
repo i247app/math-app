@@ -162,7 +162,6 @@ class ParentChildProfileCard extends StatelessWidget {
                           width: 20 * scale,
                           height: 20 * scale,
                         ),
-
                       ),
                       SizedBox(width: 12 * scale),
                       ProfileActionButton(
@@ -176,7 +175,6 @@ class ParentChildProfileCard extends StatelessWidget {
                           width: 20 * scale,
                           height: 20 * scale,
                         ),
-
                       ),
                     ],
                   ),

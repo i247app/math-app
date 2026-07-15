@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
-import 'package:numi/features/home/constants/home_visual_constants.dart';
-import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_tab_card.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
+import 'package:numi/features/quiz/parent/assessment/widgets/parent_assessment_tab_card.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
 extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
@@ -14,7 +14,7 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
           child: HomeImageAction(
             asset: parentHomeAfterReviewBannerAsset,
             height: 214,
-            onTap: widget.args.onOpenPracticeTab,
+            onTap: widget.onOpenPracticeTab,
           ),
         ),
         const SizedBox(height: 8),
@@ -29,13 +29,13 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
                     HomeImageAction(
                       asset: parentHomeRaceAsset,
                       height: 83,
-                      onTap: widget.args.onOpenPracticeTab,
+                      onTap: widget.onOpenPracticeTab,
                     ),
                     const SizedBox(height: 7),
                     HomeImageAction(
                       asset: parentHomeShopAsset,
                       height: 83,
-                      onTap: widget.args.onOpenPracticeTab,
+                      onTap: widget.onOpenPracticeTab,
                     ),
                   ],
                 ),
@@ -60,7 +60,7 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
                 entry.$1 == completedAssessments.take(2).length - 1,
             child: AssessmentResultListItemCard(
               quiz: entry.$2,
-              scale: widget.args.scale,
+              scale: widget.scale,
               onTap: () => openParentAssessmentResult(entry.$2),
             ),
           ),

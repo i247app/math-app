@@ -10,10 +10,10 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
     final colors = context.themeColors;
     final parent = homeLayout?.parent;
     final padding = EdgeInsets.fromLTRB(
-      14 * widget.args.scale,
-      10 * widget.args.scale,
-      14 * widget.args.scale,
-      widget.args.bottomPadding + 18 * widget.args.scale,
+      14 * widget.scale,
+      10 * widget.scale,
+      14 * widget.scale,
+      widget.bottomPadding + 18 * widget.scale,
     );
 
     return DecoratedBox(
@@ -39,7 +39,7 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (widget.args.homeHeader != null) widget.args.homeHeader!,
+              if (widget.homeHeader != null) widget.homeHeader!,
               Padding(
                 padding: padding,
                 child: isLoading && !hasLoadedHome
@@ -54,9 +54,9 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
                             const <HomeLayoutRecentCompletion>[],
                         entranceBuilder: childOverviewFadeIn,
                         onCompletionTap: openCompletionResult,
-                        onViewTasks: widget.args.onOpenClassroomTab,
-                        onViewResults: widget.args.onOpenClassroomTab,
-                        onViewMessages: widget.args.onOpenClassroomTab,
+                        onViewTasks: widget.onOpenClassroomTab,
+                        onViewResults: widget.onOpenClassroomTab,
+                        onViewMessages: widget.onOpenClassroomTab,
                         isRefreshing: isLoading && hasLoadedHome,
                         errorMessage: errorMessage,
                         onRetry: loadHome,

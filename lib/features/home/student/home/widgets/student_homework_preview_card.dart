@@ -1,3 +1,4 @@
+import 'package:numi/features/classroom/helpers/classroom_display_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -6,7 +7,6 @@ import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/student/home/helpers/student_home_view_helpers.dart';
 import 'package:numi/features/home/student/home/widgets/student_homework_status_chip.dart';
-import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
 
 class StudentHomeworkPreviewCard extends StatelessWidget {
   const StudentHomeworkPreviewCard({

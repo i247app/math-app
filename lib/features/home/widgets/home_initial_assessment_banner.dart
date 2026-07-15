@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/home/constants/home_visual_constants.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 class HomeInitialAssessmentBanner extends StatelessWidget {

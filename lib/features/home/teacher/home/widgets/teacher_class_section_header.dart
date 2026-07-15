@@ -5,7 +5,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_small_coral_add_button.dart';
-import 'package:numi/features/home/widgets/home_section_header.dart';
+import 'package:numi/shared/widgets/app_section_header.dart';
 
 class TeacherClassSectionHeader extends StatelessWidget {
   const TeacherClassSectionHeader({
@@ -23,7 +23,7 @@ class TeacherClassSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeSectionHeader(
+    return AppSectionHeader(
       title: context.getText(AppKeys.teacherYourClasses),
       actionLabel: context.getText(AppKeys.viewAllUpper),
       onAction: onViewAll,

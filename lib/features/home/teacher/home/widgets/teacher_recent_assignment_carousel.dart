@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
-import 'package:numi/features/home/widgets/home_horizontal_carousel.dart';
+import 'package:numi/shared/widgets/app_horizontal_carousel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_recent_assignment_card.dart';
 
 class TeacherRecentAssignmentCarousel extends StatelessWidget {
@@ -17,7 +17,7 @@ class TeacherRecentAssignmentCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeHorizontalCarousel<ClassroomExercise>(
+    return AppHorizontalCarousel<ClassroomExercise>(
       items: assignments,
       itemWidth: 178 * scale,
       height: 164 * scale,

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/home/widgets/home_skeleton_shimmer.dart';
-import 'package:numi/features/home/widgets/home_skeleton_block.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_shimmer.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 
-class TeacherHomeSectionHeaderSkeleton extends StatefulWidget {
-  const TeacherHomeSectionHeaderSkeleton({super.key, required this.scale});
+class TeacherAppSectionHeaderSkeleton extends StatefulWidget {
+  const TeacherAppSectionHeaderSkeleton({super.key, required this.scale});
 
   final double scale;
 
   @override
-  State<TeacherHomeSectionHeaderSkeleton> createState() =>
-      _TeacherHomeSectionHeaderSkeletonState();
+  State<TeacherAppSectionHeaderSkeleton> createState() =>
+      _TeacherAppSectionHeaderSkeletonState();
 }
 
-class _TeacherHomeSectionHeaderSkeletonState
-    extends State<TeacherHomeSectionHeaderSkeleton>
+class _TeacherAppSectionHeaderSkeletonState
+    extends State<TeacherAppSectionHeaderSkeleton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -30,11 +30,11 @@ class _TeacherHomeSectionHeaderSkeletonState
   @override
   Widget build(BuildContext context) {
     final scale = widget.scale;
-    return HomeSkeletonShimmer(
+    return AppSkeletonShimmer(
       controller: _controller,
       child: Row(
         children: [
-          HomeSkeletonBlock(
+          AppSkeletonBlock(
             width: 42 * scale,
             height: 42 * scale,
             radius: 14 * scale,
@@ -42,14 +42,14 @@ class _TeacherHomeSectionHeaderSkeletonState
           ),
           SizedBox(width: 12 * scale),
           Expanded(
-            child: HomeSkeletonBlock(
+            child: AppSkeletonBlock(
               width: double.infinity,
               height: 22 * scale,
               radius: 10 * scale,
             ),
           ),
           SizedBox(width: 16 * scale),
-          HomeSkeletonBlock(
+          AppSkeletonBlock(
             width: 82 * scale,
             height: 22 * scale,
             radius: 11 * scale,

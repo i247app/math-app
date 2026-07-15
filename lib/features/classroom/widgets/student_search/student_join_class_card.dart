@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/helpers/classroom_display_helpers.dart';
 import 'package:numi/features/classroom/helpers/student_class_search_helpers.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_class_action_state.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_class_badge.dart';
@@ -24,14 +25,12 @@ class StudentJoinClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = classroom.name?.trim().isNotEmpty == true
-        ? classroom.name!.trim()
-        : context.getText(AppKeys.teacherClassFallback);
-    final teacher = classroom.teacherName?.trim().isNotEmpty == true
-        ? classroom.teacherName!.trim()
-        : classroom.schoolName?.trim().isNotEmpty == true
-        ? classroom.schoolName!.trim()
-        : context.getText(AppKeys.teacherFallback);
+    final name = classroomDisplayName(context, classroom);
+    final teacher = classroomTeacherName(
+      context,
+      classroom,
+      fallbackToSchool: true,
+    );
     final code = classroomCode(classroom);
     final action = StudentJoinClassActionState.fromRelationship(
       classroom.relationshipStatus,

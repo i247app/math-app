@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_block.dart';
-import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_card.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_card.dart';
 
 class TeacherClassroomSkeletonCard extends StatelessWidget {
   const TeacherClassroomSkeletonCard({super.key, required this.scale});
@@ -10,7 +10,7 @@ class TeacherClassroomSkeletonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TeacherSkeletonCard(
+    return AppSkeletonCard(
       scale: scale,
       padding: EdgeInsets.symmetric(
         horizontal: 18 * scale,
@@ -22,7 +22,7 @@ class TeacherClassroomSkeletonCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TeacherSkeletonBlock(
+              AppSkeletonBlock(
                 width: 76 * scale,
                 height: 76 * scale,
                 radius: 16 * scale,
@@ -34,13 +34,13 @@ class TeacherClassroomSkeletonCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TeacherSkeletonBlock(
+                      AppSkeletonBlock(
                         width: 128 * scale,
                         height: 21 * scale,
                         radius: 10.5 * scale,
                       ),
                       SizedBox(height: 16 * scale),
-                      TeacherSkeletonBlock(
+                      AppSkeletonBlock(
                         width: 142 * scale,
                         height: 18 * scale,
                         radius: 9 * scale,
@@ -52,7 +52,7 @@ class TeacherClassroomSkeletonCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16 * scale),
-          TeacherSkeletonBlock(
+          AppSkeletonBlock(
             width: 132 * scale,
             height: 18 * scale,
             radius: 9 * scale,

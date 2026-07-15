@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/widgets/home_skeleton_shimmer.dart';
-import 'package:numi/features/home/student/classroom/widgets/student_classroom_skeleton_block.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_shimmer.dart';
+import 'package:numi/features/classroom/widgets/student_tab/student_classroom_skeleton_block.dart';
 
 class StudentHomeSectionsLoading extends StatefulWidget {
   const StudentHomeSectionsLoading({super.key});
@@ -27,7 +27,7 @@ class _StudentHomeSectionsLoadingState extends State<StudentHomeSectionsLoading>
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    return HomeSkeletonShimmer(
+    return AppSkeletonShimmer(
       controller: _controller,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -9,6 +9,7 @@ import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:numi/features/practice/practice_api.dart';
 import 'package:numi/features/practice/practice_catalog.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
@@ -195,7 +196,7 @@ class _PracticeTabState extends State<PracticeTab> {
     }
 
     final programId = _profileProgramId(profile);
-    final gradeId = _profileGradeId(profile);
+    final gradeId = _profileGradeStableId(profile);
     final semesterId = _profileSemesterId(profile);
     if (programId == null || gradeId == null || semesterId == null) {
       setState(() {

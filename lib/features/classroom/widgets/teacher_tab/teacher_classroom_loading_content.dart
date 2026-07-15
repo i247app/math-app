@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_block.dart';
-import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_card.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_card.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_skeleton_card.dart';
 
 class TeacherClassroomLoadingContent extends StatelessWidget {
@@ -17,7 +17,7 @@ class TeacherClassroomLoadingContent extends StatelessWidget {
       children: [
         Align(
           alignment: Alignment.centerRight,
-          child: TeacherSkeletonBlock(
+          child: AppSkeletonBlock(
             width: 90 * scale,
             height: 36 * scale,
             radius: 12 * scale,
@@ -25,28 +25,28 @@ class TeacherClassroomLoadingContent extends StatelessWidget {
           ),
         ),
         SizedBox(height: 16 * scale),
-        TeacherSkeletonCard(
+        AppSkeletonCard(
           scale: scale,
           padding: EdgeInsets.symmetric(horizontal: 16 * scale),
           child: SizedBox(
             height: 48 * scale,
             child: Row(
               children: [
-                TeacherSkeletonBlock(
+                AppSkeletonBlock(
                   width: 24 * scale,
                   height: 24 * scale,
                   radius: 12 * scale,
                 ),
                 SizedBox(width: 12 * scale),
                 Expanded(
-                  child: TeacherSkeletonBlock(
+                  child: AppSkeletonBlock(
                     width: double.infinity,
                     height: 14 * scale,
                     radius: 7 * scale,
                   ),
                 ),
                 SizedBox(width: 16 * scale),
-                TeacherSkeletonBlock(
+                AppSkeletonBlock(
                   width: 24 * scale,
                   height: 24 * scale,
                   radius: 12 * scale,

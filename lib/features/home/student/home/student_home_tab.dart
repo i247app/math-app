@@ -1,3 +1,4 @@
+import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,27 +19,25 @@ import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_api.dart';
-import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
 import 'package:numi/features/home/student/data/cache/student_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
-import 'package:numi/features/home/constants/home_visual_constants.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
 import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/student/shared/widgets/student_home_sections_loading.dart';
 import 'package:numi/features/classroom/presentation/screens/student_class_detail_screen.dart';
-import 'package:numi/features/home/widgets/home_entrance_animation.dart';
+import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
 import 'package:numi/features/home/widgets/home_initial_assessment_banner.dart';
 import 'package:numi/features/home/widgets/home_start_guide_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_class_summary_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_homework_preview_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_game_suggestions_section.dart';
-import 'package:numi/features/home/student/application/student_home_cubit.dart';
 import 'package:numi/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi/features/homework/helpers/student_homework_open_guard.dart';
-import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_tab_card.dart';
+import 'package:numi/features/quiz/parent/assessment/widgets/parent_assessment_tab_card.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 
@@ -59,6 +58,7 @@ class StudentHomeContent extends StatefulWidget {
     required this.quizService,
     required this.onOpenClassroomTab,
     required this.onOpenPracticeTab,
+    required this.onOpenHistoryTab,
     required this.onRefreshProfiles,
     required this.onActivateProfile,
     required this.onProfileSaved,
@@ -81,6 +81,7 @@ class StudentHomeContent extends StatefulWidget {
   final QuizService quizService;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenPracticeTab;
+  final VoidCallback onOpenHistoryTab;
   final Future<void> Function() onRefreshProfiles;
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
@@ -319,7 +320,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
       return child;
     }
 
-    return HomeEntranceAnimation(
+    return AppStaggeredEntrance(
       order: order,
       onFinished: markOnEnd ? _markStudentModeEntrancePlayed : null,
       child: child,
@@ -346,7 +347,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
       return child;
     }
 
-    return HomeEntranceAnimation(
+    return AppStaggeredEntrance(
       order: order,
       onFinished: markOnEnd
           ? _markStudentClassroomOverviewEntrancePlayed
@@ -559,7 +560,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           gradeService: widget.gradeService,
           quizPurpose: quizPurpose,
           profileId: ActiveProfileSession.profileStableId(widget.activeProfile),
-          initialGradeId: profileGradeId(widget.activeProfile),
+          initialGradeId: profileGradeStableId(widget.activeProfile),
           initialGradeLabel: widget.activeProfile?.grade?.label,
         ),
       ),
@@ -766,7 +767,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           order: 3,
           markOnEnd: true,
           child: StudentGameSuggestionsSection(
-            onViewAll: () => context.read<StudentHomeCubit>().selectTab(3),
+            onViewAll: widget.onOpenHistoryTab,
           ),
         ),
       ],

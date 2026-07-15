@@ -4,8 +4,8 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
-class ParentDashboardSection extends StatelessWidget {
-  const ParentDashboardSection({
+class ParentTabHostSection extends StatelessWidget {
+  const ParentTabHostSection({
     super.key,
     required this.title,
     required this.child,

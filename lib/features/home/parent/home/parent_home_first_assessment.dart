@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
 import 'package:numi/features/home/widgets/home_initial_assessment_banner.dart';
 import 'package:numi/features/home/widgets/home_start_guide_card.dart';
-import 'package:numi/features/home/constants/home_visual_constants.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
 extension ParentHomeFirstAssessmentView on ParentHomeContentState {
@@ -25,7 +25,7 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
                   asset: parentHomeAfterReviewBannerAsset,
                   height: 160,
                   alignment: Alignment.centerLeft,
-                  onTap: widget.args.onOpenPracticeTab,
+                  onTap: widget.onOpenPracticeTab,
                 ),
               ),
               const SizedBox(width: 10),
@@ -45,7 +45,7 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
           markOnEnd: true,
           child: HomeStartGuideCard(
             onAssessmentTap: openAssessment,
-            onRoadmapTap: widget.args.onOpenPracticeTab,
+            onRoadmapTap: widget.onOpenPracticeTab,
             onClassroomTap: showClassroomMessage,
           ),
         ),

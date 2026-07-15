@@ -28,10 +28,10 @@ import 'package:numi/features/home/teacher/home/widgets/teacher_assignments_load
 import 'package:numi/features/home/teacher/home/widgets/teacher_class_carousel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_class_section_header.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_hero_card.dart';
-import 'package:numi/features/home/widgets/home_entrance_animation.dart';
+import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_home_hero_skeleton.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_home_section_header_skeleton.dart';
-import 'package:numi/features/home/widgets/home_section_header.dart';
+import 'package:numi/shared/widgets/app_section_header.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_loading_panel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_no_class_panel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_recent_assignment_carousel.dart';
@@ -67,10 +67,10 @@ class TeacherHomeTab extends StatefulWidget {
   final HomeLayoutService? _homeLayoutService;
 
   @override
-  State<TeacherHomeTab> createState() => _TeacherHomeTabState();
+  State<TeacherHomeTab> createState() => _TeacherRoleTabState();
 }
 
-class _TeacherHomeTabState extends State<TeacherHomeTab> {
+class _TeacherRoleTabState extends State<TeacherHomeTab> {
   late final ClassroomExerciseService _exerciseService =
       widget._exerciseService ?? ClassroomExerciseApi();
   late final HomeLayoutService _homeLayoutService =
@@ -335,7 +335,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       return child;
     }
 
-    return HomeEntranceAnimation(
+    return AppStaggeredEntrance(
       key: ValueKey<String>('teacher-home-entrance-$id'),
       order: order,
       onFinished: () => _markHomeEntrancePlayed(id),
@@ -480,7 +480,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (_isInitialHomeLoading)
-          TeacherHomeSectionHeaderSkeleton(scale: scale)
+          TeacherAppSectionHeaderSkeleton(scale: scale)
         else
           TeacherClassSectionHeader(
             scale: scale,
@@ -526,9 +526,9 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (_isInitialAssignmentsLoading)
-          TeacherHomeSectionHeaderSkeleton(scale: scale)
+          TeacherAppSectionHeaderSkeleton(scale: scale)
         else
-          HomeSectionHeader(
+          AppSectionHeader(
             scale: scale,
             title: context.getText(AppKeys.teacherRecentlyAssigned),
             actionLabel: context.getText(AppKeys.viewAllUpper),

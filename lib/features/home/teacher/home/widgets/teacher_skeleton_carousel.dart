@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/widgets/home_horizontal_carousel.dart';
+import 'package:numi/shared/widgets/app_horizontal_carousel.dart';
 
 class TeacherSkeletonCarousel extends StatelessWidget {
   const TeacherSkeletonCarousel({
@@ -19,7 +19,7 @@ class TeacherSkeletonCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeHorizontalCarousel<int>(
+    return AppHorizontalCarousel<int>(
       items: List<int>.generate(itemCount, (index) => index),
       itemWidth: itemWidth,
       height: itemHeight,

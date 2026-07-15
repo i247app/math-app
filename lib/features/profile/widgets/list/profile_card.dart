@@ -159,7 +159,6 @@ class ProfileCard extends StatelessWidget {
                       color: colors.brandStrong,
                       size: 23 * scale,
                     ),
-
                   ),
                   SizedBox(width: 12 * scale),
                   ProfileActionButton(
@@ -173,7 +172,6 @@ class ProfileCard extends StatelessWidget {
                       color: const Color(0xFFE83434),
                       size: 23 * scale,
                     ),
-
                   ),
                 ],
               ),

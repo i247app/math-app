@@ -12,8 +12,8 @@ import 'package:numi/features/home/parent/home/widgets/parent_game_suggestions_r
 import 'package:numi/features/home/parent/home/widgets/parent_home_error_card.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_refresh_label.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_completed_task_list_item.dart';
-import 'package:numi/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
+import 'package:numi/features/classroom/parent/shared/widgets/parent_completed_task_list_item.dart';
+import 'package:numi/features/classroom/parent/shared/widgets/parent_pending_task_list_item.dart';
 
 class ParentChildOverviewContent extends StatelessWidget {
   const ParentChildOverviewContent({
@@ -71,7 +71,7 @@ class ParentChildOverviewContent extends StatelessWidget {
         if (pendingExercises.isNotEmpty) ...[
           entranceBuilder(
             order: 1,
-            child: ParentDashboardSection(
+            child: ParentTabHostSection(
               title: context.getText(AppKeys.parentTasksTitle),
               onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
               child: Column(
@@ -96,7 +96,7 @@ class ParentChildOverviewContent extends StatelessWidget {
         if (completions.isNotEmpty) ...[
           entranceBuilder(
             order: 2,
-            child: ParentDashboardSection(
+            child: ParentTabHostSection(
               title: context.getText(AppKeys.assessmentResultTitle),
               onViewAll: completions.length > 2 ? onViewResults : null,
               child: Column(
@@ -122,7 +122,7 @@ class ParentChildOverviewContent extends StatelessWidget {
         entranceBuilder(
           order: 3,
           markOnEnd: !showGameSuggestions,
-          child: ParentDashboardSection(
+          child: ParentTabHostSection(
             title: context.getText(AppKeys.parentMessagesTitle),
             onViewAll: onViewMessages,
             child: ParentTeacherMessagesList(summaries: summaries),

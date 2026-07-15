@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/widgets/home_inline_error_banner.dart';
+import 'package:numi/shared/widgets/app_inline_retry_banner.dart';
 
 class ParentHomeErrorCard extends StatelessWidget {
   const ParentHomeErrorCard({
@@ -17,7 +17,7 @@ class ParentHomeErrorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    return HomeInlineErrorBanner(
+    return AppInlineRetryBanner(
       message: message,
       onRetry: onRetry,
       retryLabel: context.getText(AppKeys.parentTryAgain),

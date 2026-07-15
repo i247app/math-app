@@ -16,7 +16,7 @@ import 'package:numi/features/classroom/presentation/screens/teacher_class_detai
 import 'package:numi/features/classroom/presentation/screens/teacher_create_class_screen.dart';
 import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_body.dart';
-import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_entrance.dart';
+import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_header.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_loading_content.dart';
 
@@ -130,8 +130,9 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
       return child;
     }
 
-    return TeacherClassroomEntrance(
+    return AppStaggeredEntrance(
       order: order,
+      initialScale: 0.96,
       onFinished: markOnEnd ? _markClassroomEntrancePlayed : null,
       child: child,
     );

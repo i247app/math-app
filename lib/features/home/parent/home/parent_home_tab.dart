@@ -1,16 +1,19 @@
+import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/grade_models.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_api.dart';
-import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
+import 'package:numi/features/home/data/home_layout_mappers.dart';
 import 'package:numi/features/home/parent/data/cache/parent_home_snapshot.dart';
-import 'package:numi/features/home/models/home_dashboard_args.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
@@ -18,7 +21,7 @@ import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
-import 'package:numi/features/home/widgets/home_entrance_animation.dart';
+import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/home/parent_home_child_dashboard.dart';
 import 'package:numi/features/home/parent/home/parent_home_completed_assessment.dart';
@@ -31,9 +34,46 @@ import 'package:numi/features/home/parent/home/widgets/parent_profile_dialog_act
 import 'package:numi/features/home/parent/home/widgets/parent_select_student_dialog.dart';
 
 class ParentHomeContent extends StatefulWidget {
-  const ParentHomeContent({super.key, required this.args});
+  const ParentHomeContent({
+    super.key,
+    required this.user,
+    required this.profiles,
+    required this.activeProfile,
+    required this.isActive,
+    required this.activeRefreshTick,
+    required this.initialGrades,
+    required this.gradeService,
+    required this.quizService,
+    required this.onRefreshProfiles,
+    required this.onActivateProfile,
+    required this.onProfileSaved,
+    required this.onOpenProfileMenu,
+    required this.onOpenClassroomTab,
+    required this.onOpenPracticeTab,
+    required this.onParentAssessmentStateChanged,
+    required this.bottomPadding,
+    required this.scale,
+    this.homeHeader,
+  });
 
-  final HomeDashboardArgs args;
+  final LoginUser? user;
+  final List<StudentProfile> profiles;
+  final StudentProfile? activeProfile;
+  final bool isActive;
+  final int activeRefreshTick;
+  final List<GradeModel> initialGrades;
+  final GradeService gradeService;
+  final QuizService quizService;
+  final Future<void> Function() onRefreshProfiles;
+  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final VoidCallback onProfileSaved;
+  final VoidCallback onOpenProfileMenu;
+  final VoidCallback onOpenClassroomTab;
+  final VoidCallback onOpenPracticeTab;
+  final ValueChanged<bool> onParentAssessmentStateChanged;
+  final double bottomPadding;
+  final double scale;
+  final Widget? homeHeader;
 
   @override
   State<ParentHomeContent> createState() => ParentHomeContentState();
@@ -55,7 +95,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   @override
   void initState() {
     super.initState();
-    if (widget.args.isActive) {
+    if (widget.isActive) {
       loadHome();
     }
   }
@@ -64,36 +104,34 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   void didUpdateWidget(covariant ParentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     final oldProfileId = ActiveProfileSession.profileStableId(
-      oldWidget.args.activeProfile,
+      oldWidget.activeProfile,
     );
     final profileId = ActiveProfileSession.profileStableId(
-      widget.args.activeProfile,
+      widget.activeProfile,
     );
     final oldChildIds = studentProfiles(
-      oldWidget.args.profiles,
+      oldWidget.profiles,
     ).map(ActiveProfileSession.profileStableId).join(',');
     final childIds = studentProfiles(
-      widget.args.profiles,
+      widget.profiles,
     ).map(ActiveProfileSession.profileStableId).join(',');
     final shouldForceRefresh =
-        oldWidget.args.user?.id != widget.args.user?.id ||
-        oldChildIds != childIds;
+        oldWidget.user?.id != widget.user?.id || oldChildIds != childIds;
     if (oldProfileId != profileId || shouldForceRefresh) {
       hasLoadedHome = false;
       _resetModeEntrances();
-      if (widget.args.isActive) {
+      if (widget.isActive) {
         loadHome(forceRefresh: shouldForceRefresh);
       }
       return;
     }
-    if (!oldWidget.args.isActive && widget.args.isActive) {
+    if (!oldWidget.isActive && widget.isActive) {
       loadHome();
       return;
     }
-    if (!widget.args.isActive) {
+    if (!widget.isActive) {
       return;
-    } else if (oldWidget.args.activeRefreshTick !=
-        widget.args.activeRefreshTick) {
+    } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       loadHome(forceRefresh: true);
     }
   }
@@ -110,13 +148,13 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         (hasLoadedHome || layoutChildren.isNotEmpty)) {
       return layoutChildren;
     }
-    return studentProfiles(widget.args.profiles);
+    return studentProfiles(widget.profiles);
   }
 
   Future<void> loadHome({bool forceRefresh = false}) async {
     final requestId = ++_childLoadRequestId;
     final profileId = ActiveProfileSession.profileStableId(
-      widget.args.activeProfile,
+      widget.activeProfile,
     );
     if (profileId == null || profileId <= 0) {
       if (!mounted) {
@@ -130,7 +168,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         childSummaries = const <ParentChildSummary>[];
         completedAssessments = const <GeneratedQuiz>[];
       });
-      widget.args.onParentAssessmentStateChanged(false);
+      widget.onParentAssessmentStateChanged(false);
       return;
     }
 
@@ -138,7 +176,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     final cachedSnapshot = cache.getParent(profileId);
     if (!forceRefresh && cachedSnapshot != null) {
       setState(() => _applySnapshot(cachedSnapshot));
-      widget.args.onParentAssessmentStateChanged(
+      widget.onParentAssessmentStateChanged(
         cachedSnapshot.completedAssessments.isNotEmpty,
       );
       if (!cachedSnapshot.isStale) {
@@ -156,7 +194,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       }
     });
     if (!hadRenderableContent) {
-      widget.args.onParentAssessmentStateChanged(false);
+      widget.onParentAssessmentStateChanged(false);
     }
 
     try {
@@ -186,9 +224,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
           cachedAt: DateTime.now(),
         ),
       );
-      widget.args.onParentAssessmentStateChanged(
-        completedAssessments.isNotEmpty,
-      );
+      widget.onParentAssessmentStateChanged(completedAssessments.isNotEmpty);
     } on HomeLayoutException catch (error) {
       if (!mounted) {
         return;
@@ -208,7 +244,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         childSummaries = const <ParentChildSummary>[];
         completedAssessments = const <GeneratedQuiz>[];
       });
-      widget.args.onParentAssessmentStateChanged(false);
+      widget.onParentAssessmentStateChanged(false);
     } catch (_) {
       if (!mounted) {
         return;
@@ -230,7 +266,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         childSummaries = const <ParentChildSummary>[];
         completedAssessments = const <GeneratedQuiz>[];
       });
-      widget.args.onParentAssessmentStateChanged(false);
+      widget.onParentAssessmentStateChanged(false);
     }
   }
 
@@ -253,7 +289,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return child;
     }
 
-    return HomeEntranceAnimation(
+    return AppStaggeredEntrance(
       order: order,
       onFinished: markOnEnd ? _markInitialAssessmentEntrancePlayed : null,
       child: child,
@@ -276,7 +312,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return child;
     }
 
-    return HomeEntranceAnimation(
+    return AppStaggeredEntrance(
       order: order,
       onFinished: markOnEnd ? _markCompletedAssessmentEntrancePlayed : null,
       child: child,
@@ -299,7 +335,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return child;
     }
 
-    return HomeEntranceAnimation(
+    return AppStaggeredEntrance(
       order: order,
       onFinished: markOnEnd ? _markChildOverviewEntrancePlayed : null,
       child: child,
@@ -327,10 +363,10 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
     final hasCompletedAssessment = completedAssessments.isNotEmpty;
     final padding = EdgeInsets.fromLTRB(
-      14 * widget.args.scale,
+      14 * widget.scale,
       0,
-      14 * widget.args.scale,
-      widget.args.bottomPadding,
+      14 * widget.scale,
+      widget.bottomPadding,
     );
 
     return RefreshIndicator(
@@ -343,7 +379,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (widget.args.homeHeader != null) widget.args.homeHeader!,
+            if (widget.homeHeader != null) widget.homeHeader!,
             Padding(
               padding: padding,
               child: Column(
@@ -399,15 +435,13 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => GradeSelectionScreen(
-          user: widget.args.user,
-          initialGrades: widget.args.initialGrades,
-          gradeService: widget.args.gradeService,
+          user: widget.user,
+          initialGrades: widget.initialGrades,
+          gradeService: widget.gradeService,
           quizPurpose: quizPurposeAssessment,
-          profileId: ActiveProfileSession.profileStableId(
-            widget.args.activeProfile,
-          ),
-          initialGradeId: profileGradeId(widget.args.activeProfile),
-          initialGradeLabel: widget.args.activeProfile?.grade?.label,
+          profileId: ActiveProfileSession.profileStableId(widget.activeProfile),
+          initialGradeId: profileGradeStableId(widget.activeProfile),
+          initialGradeLabel: widget.activeProfile?.grade?.label,
         ),
       ),
     );
@@ -461,7 +495,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     }
     switch (action) {
       case ParentProfileDialogAction.choose:
-        widget.args.onOpenProfileMenu();
+        widget.onOpenProfileMenu();
         return;
       case ParentProfileDialogAction.create:
         await _openCreateStudentProfile();
@@ -479,16 +513,16 @@ class ParentHomeContentState extends State<ParentHomeContent> {
           color: context.themeColors.pageBackground,
           child: SafeArea(
             child: SettingTab.page(
-              user: widget.args.user,
-              profiles: widget.args.profiles,
-              activeProfile: widget.args.activeProfile,
+              user: widget.user,
+              profiles: widget.profiles,
+              activeProfile: widget.activeProfile,
               profileLoadError: null,
               onLogout: () {},
-              onActivateProfile: widget.args.onActivateProfile,
-              onRefreshProfiles: widget.args.onRefreshProfiles,
-              onProfileSaved: widget.args.onProfileSaved,
+              onActivateProfile: widget.onActivateProfile,
+              onRefreshProfiles: widget.onRefreshProfiles,
+              onProfileSaved: widget.onProfileSaved,
               bottomPadding: 0,
-              scale: widget.args.scale,
+              scale: widget.scale,
               initialView: SettingPageView.profile,
               isPushedPage: true,
               openAddProfileOnStart: true,
@@ -497,6 +531,6 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         ),
       ),
     );
-    await widget.args.onRefreshProfiles();
+    await widget.onRefreshProfiles();
   }
 }

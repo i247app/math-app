@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/widgets/home_skeleton_shimmer.dart';
-import 'package:numi/features/home/widgets/home_skeleton_block.dart';
-import 'package:numi/features/home/widgets/home_skeleton_line.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_shimmer.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_line.dart';
 
 class ParentHomeLoadingCard extends StatefulWidget {
   const ParentHomeLoadingCard({super.key});
@@ -35,12 +35,12 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
             0.5 - 0.5 * math.cos(math.pi * 2 * _controller.value);
         final color = Color.lerp(colors.skeleton, colors.border, pulseValue)!;
 
-        return HomeSkeletonShimmer(
+        return AppSkeletonShimmer(
           controller: _controller,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              HomeSkeletonBlock(
+              AppSkeletonBlock(
                 height: 225,
                 radius: 30,
                 color: color,
@@ -49,13 +49,13 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      HomeSkeletonLine(width: 148, height: 30, color: color),
+                      AppSkeletonLine(width: 148, height: 30, color: color),
                       const SizedBox(height: 14),
-                      HomeSkeletonLine(width: 210, height: 34, color: color),
+                      AppSkeletonLine(width: 210, height: 34, color: color),
                       const Spacer(),
-                      HomeSkeletonLine(width: 132, height: 14, color: color),
+                      AppSkeletonLine(width: 132, height: 14, color: color),
                       const SizedBox(height: 12),
-                      HomeSkeletonBlock(
+                      AppSkeletonBlock(
                         width: 150,
                         height: 44,
                         radius: 22,
@@ -69,7 +69,7 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
               Row(
                 children: [
                   Expanded(
-                    child: HomeSkeletonBlock(
+                    child: AppSkeletonBlock(
                       height: 160,
                       radius: 18,
                       color: color,
@@ -77,7 +77,7 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: HomeSkeletonBlock(
+                    child: AppSkeletonBlock(
                       height: 160,
                       radius: 18,
                       color: color,
@@ -86,7 +86,7 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
                 ],
               ),
               const SizedBox(height: 12),
-              HomeSkeletonBlock(
+              AppSkeletonBlock(
                 height: 178,
                 radius: 17,
                 color: color,
@@ -97,7 +97,7 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
                       for (var index = 0; index < 3; index++) ...[
                         Row(
                           children: [
-                            HomeSkeletonBlock(
+                            AppSkeletonBlock(
                               width: 32,
                               height: 32,
                               radius: 10,
@@ -108,13 +108,13 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  HomeSkeletonLine(
+                                  AppSkeletonLine(
                                     width: index == 0 ? 120 : 150,
                                     height: 14,
                                     color: color,
                                   ),
                                   const SizedBox(height: 7),
-                                  HomeSkeletonLine(
+                                  AppSkeletonLine(
                                     width: double.infinity,
                                     height: 10,
                                     color: color,

@@ -5,6 +5,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/helpers/classroom_display_helpers.dart';
 import 'package:numi/features/home/teacher/shared/widgets/class_thumb.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_member_summary_text.dart';
 
@@ -22,9 +23,7 @@ class TeacherClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = classroom.name?.trim().isNotEmpty == true
-        ? classroom.name!.trim()
-        : context.getText(AppKeys.teacherClassFallback);
+    final title = classroomDisplayName(context, classroom);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,

@@ -95,7 +95,6 @@ class ParentInfoCard extends StatelessWidget {
                           width: 19 * scale,
                           height: 19 * scale,
                         ),
-
                       ),
                       SizedBox(width: 8 * scale),
                       ProfileRadio(isActive: isActive, scale: scale),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/features/home/widgets/home_horizontal_carousel.dart';
+import 'package:numi/shared/widgets/app_horizontal_carousel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_class_card.dart';
 
 class TeacherClassCarousel extends StatelessWidget {
@@ -17,7 +17,7 @@ class TeacherClassCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeHorizontalCarousel<ClassroomModel>(
+    return AppHorizontalCarousel<ClassroomModel>(
       items: classrooms,
       itemWidth: 166 * scale,
       height: 176 * scale,

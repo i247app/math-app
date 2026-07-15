@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/home/student/home/widgets/student_empty_panel.dart';
+import 'package:numi/shared/widgets/student/student_empty_panel.dart';
 
 class StudentHomeworkPanel extends StatelessWidget {
   const StudentHomeworkPanel({super.key, required this.scale});

@@ -12,6 +12,7 @@ import 'package:numi/features/games/presentation/numi_farm_stage_screen.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/practice/practice_catalog.dart';
 import 'package:numi/features/practice/presentation/practice_chapter_screen.dart';
+import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 
 const _gamesTeal = Color(0xFF006762);
 const _gamesOrange = Color(0xFFFF7B54);
@@ -319,7 +320,7 @@ class _GamesGradeSelection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _GamesEntrance(
+              AppStaggeredEntrance(
                 order: 0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -352,7 +353,7 @@ class _GamesGradeSelection extends StatelessWidget {
               if (isLoading)
                 const _GamesGradeLoading()
               else if (errorMessage != null)
-                _GamesEntrance(
+                AppStaggeredEntrance(
                   order: 1,
                   child: _GamesMessageCard(
                     icon: Icons.cloud_off_rounded,
@@ -362,7 +363,7 @@ class _GamesGradeSelection extends StatelessWidget {
                   ),
                 )
               else if (visibleGrades.isEmpty)
-                _GamesEntrance(
+                AppStaggeredEntrance(
                   order: 1,
                   child: _GamesMessageCard(
                     icon: Icons.school_outlined,
@@ -382,7 +383,7 @@ class _GamesGradeSelection extends StatelessWidget {
                     crossAxisSpacing: 14,
                     childAspectRatio: 1,
                   ),
-                  itemBuilder: (context, index) => _GamesEntrance(
+                  itemBuilder: (context, index) => AppStaggeredEntrance(
                     order: index + 1,
                     child: _GamesGradeCard(
                       grade: visibleGrades[index],
@@ -427,7 +428,7 @@ class _GamesCatalog extends StatelessWidget {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
               sliver: SliverToBoxAdapter(
-                child: _GamesEntrance(
+                child: AppStaggeredEntrance(
                   order: 0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +477,7 @@ class _GamesCatalog extends StatelessWidget {
               sliver: SliverList.separated(
                 itemCount: games.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 16),
-                itemBuilder: (context, index) => _GamesEntrance(
+                itemBuilder: (context, index) => AppStaggeredEntrance(
                   order: index + 1,
                   child: _GamePreviewCard(
                     game: games[index],
@@ -949,57 +950,6 @@ class _GamesMessageCard extends StatelessWidget {
           const SizedBox(height: 12),
           TextButton(onPressed: onAction, child: Text(actionLabel)),
         ],
-      ),
-    );
-  }
-}
-
-class _GamesEntrance extends StatefulWidget {
-  const _GamesEntrance({required this.order, required this.child});
-
-  final int order;
-  final Widget child;
-
-  @override
-  State<_GamesEntrance> createState() => _GamesEntranceState();
-}
-
-class _GamesEntranceState extends State<_GamesEntrance> {
-  bool _isVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future<void>.delayed(
-        Duration(milliseconds: 55 * widget.order.clamp(0, 8)),
-      );
-      if (mounted) {
-        setState(() => _isVisible = true);
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (MediaQuery.disableAnimationsOf(context)) {
-      return widget.child;
-    }
-
-    return AnimatedOpacity(
-      opacity: _isVisible ? 1 : 0,
-      duration: const Duration(milliseconds: 280),
-      curve: Curves.easeOut,
-      child: AnimatedSlide(
-        offset: _isVisible ? Offset.zero : const Offset(0, 0.055),
-        duration: const Duration(milliseconds: 420),
-        curve: Curves.easeOutCubic,
-        child: AnimatedScale(
-          scale: _isVisible ? 1 : 0.94,
-          duration: const Duration(milliseconds: 520),
-          curve: Curves.easeOutBack,
-          child: widget.child,
-        ),
       ),
     );
   }
