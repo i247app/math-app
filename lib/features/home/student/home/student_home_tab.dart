@@ -36,7 +36,7 @@ import 'package:numi/features/home/student/home/widgets/student_class_summary_ca
 import 'package:numi/features/home/student/home/widgets/student_homework_preview_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_game_suggestions_section.dart';
 import 'package:numi/features/home/student/student_home_cubit.dart';
-import 'package:numi/features/homework/presentation/screens/student_homework_attempt_screen.dart';
+import 'package:numi/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi/features/homework/helpers/student_homework_open_guard.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_tab_card.dart';
 import 'package:numi/features/profile/data/grade_api.dart';

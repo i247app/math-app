@@ -8,7 +8,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/features/homework/data/cache/student_homework_cache.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
-import 'package:numi/features/homework/presentation/screens/student_homework_attempt_screen.dart';
+import 'package:numi/features/homework/presentation/student_homework_attempt_screen.dart';
 import 'package:numi/features/homework/helpers/student_homework_open_guard.dart';
 import 'package:numi/features/homework/widgets/student_list/student_homework_assignment_card.dart';
 import 'package:numi/features/homework/widgets/student_list/student_homework_filter.dart';

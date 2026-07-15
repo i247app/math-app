@@ -11,7 +11,7 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
-import 'package:numi/features/homework/presentation/screens/homework_review_screen.dart';
+import 'package:numi/features/homework/presentation/homework_review_screen.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/quiz/application/history_controller.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
