@@ -1,4 +1,8 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class TeacherCoralCreateButton extends StatelessWidget {
   const TeacherCoralCreateButton({

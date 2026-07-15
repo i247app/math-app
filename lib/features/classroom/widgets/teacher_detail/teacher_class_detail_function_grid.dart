@@ -1,7 +1,12 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherClassDetailFunctionGrid extends StatelessWidget {
-  const _TeacherClassDetailFunctionGrid({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_function_tile.dart';
+
+class TeacherClassDetailFunctionGrid extends StatelessWidget {
+  const TeacherClassDetailFunctionGrid({
+    super.key,
     required this.scale,
     required this.onOpenAssignments,
     required this.onOpenAssessments,
@@ -22,20 +27,20 @@ class _TeacherClassDetailFunctionGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       children: [
-        _TeacherClassDetailFunctionTile(
+        TeacherClassDetailFunctionTile(
           scale: scale,
           iconAsset: 'assets/images/classroom_homework.png',
           label: context.getText(AppKeys.teacherAssignments),
           onTap: onOpenAssignments,
         ),
-        _TeacherClassDetailFunctionTile(
+        TeacherClassDetailFunctionTile(
           scale: scale,
           iconAsset: 'assets/images/teacher_class_assignment.png',
           label: context.getText(AppKeys.teacherAssessments),
           onTap: onOpenAssessments,
         ),
-        _TeacherClassDetailFunctionTile(scale: scale),
-        _TeacherClassDetailFunctionTile(scale: scale),
+        TeacherClassDetailFunctionTile(scale: scale),
+        TeacherClassDetailFunctionTile(scale: scale),
       ],
     );
   }

@@ -1,7 +1,16 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherClassroomBody extends StatelessWidget {
-  const _TeacherClassroomBody({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_add_button.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_empty_state.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_list_card.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_search_field.dart';
+
+class TeacherClassroomBody extends StatelessWidget {
+  const TeacherClassroomBody({
+    super.key,
     required this.scale,
     required this.error,
     required this.classrooms,
@@ -29,13 +38,13 @@ class _TeacherClassroomBody extends StatelessWidget {
       children: [
         entranceBuilder(
           0,
-          _TeacherClassroomAddButton(scale: scale, onTap: onCreateClass),
+          TeacherClassroomAddButton(scale: scale, onTap: onCreateClass),
           false,
         ),
         SizedBox(height: 16 * scale),
         entranceBuilder(
           1,
-          _TeacherClassroomSearchField(
+          TeacherClassroomSearchField(
             scale: scale,
             controller: searchController,
           ),
@@ -45,13 +54,13 @@ class _TeacherClassroomBody extends StatelessWidget {
         if (error != null && classrooms.isEmpty)
           entranceBuilder(
             2,
-            _TeacherClassroomEmptyState(scale: scale, message: error!),
+            TeacherClassroomEmptyState(scale: scale, message: error!),
             true,
           )
         else if (classrooms.isEmpty)
           entranceBuilder(
             2,
-            _TeacherClassroomEmptyState(
+            TeacherClassroomEmptyState(
               scale: scale,
               message: context.getText(AppKeys.teacherEmptyClassroomList),
             ),
@@ -68,7 +77,7 @@ class _TeacherClassroomBody extends StatelessWidget {
               final classroom = displayedClassrooms[index];
               return entranceBuilder(
                 2 + index,
-                _TeacherClassroomListCard(
+                TeacherClassroomListCard(
                   scale: scale,
                   classroom: classroom,
                   onTap: () => onOpenClassDetail(classroom),

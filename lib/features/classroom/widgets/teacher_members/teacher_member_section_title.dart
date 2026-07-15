@@ -1,7 +1,12 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherMemberSectionTitle extends StatelessWidget {
-  const _TeacherMemberSectionTitle({required this.scale, required this.title});
+class TeacherMemberSectionTitle extends StatelessWidget {
+  const TeacherMemberSectionTitle({
+    super.key,
+    required this.scale,
+    required this.title,
+  });
 
   final double scale;
   final String title;

@@ -1,7 +1,22 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherClassDetailInfoCard extends StatelessWidget {
-  const _TeacherClassDetailInfoCard({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_code_chip.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_helpers.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_meta_row.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
+
+class TeacherClassDetailInfoCard extends StatelessWidget {
+  const TeacherClassDetailInfoCard({
+    super.key,
     required this.scale,
     required this.classroom,
     required this.grades,
@@ -24,14 +39,14 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title =
-        _nonEmpty(classroom?.name) ??
+        nonEmpty(classroom?.name) ??
         context.getText(AppKeys.teacherClassFallback);
-    final grade = _classroomGradeLabel(context, classroom, grades);
+    final grade = classroomGradeLabel(context, classroom, grades);
     final program =
-        _classroomProgramLabel(context, classroom, programs) ??
+        classroomProgramLabel(context, classroom, programs) ??
         context.getText(AppKeys.teacherProgramFallback);
-    final schoolName = _classroomSchoolLabel(context, classroom, schools);
-    final code = _classCode(classroom);
+    final schoolName = classroomSchoolLabel(context, classroom, schools);
+    final code = classCode(classroom);
     final joinLink = 'numinumi.vn/join/$code';
 
     final radius = BorderRadius.circular(24 * scale);
@@ -120,7 +135,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                                     ),
                                     InkWell(
                                       onTap: () =>
-                                          _copyClassroomInfo(context, joinLink),
+                                          copyClassroomInfo(context, joinLink),
                                       borderRadius: BorderRadius.circular(
                                         8 * scale,
                                       ),
@@ -166,21 +181,21 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        _TeacherClassDetailMetaRow(
+                                        TeacherClassDetailMetaRow(
                                           scale: scale,
                                           iconAsset:
                                               'assets/images/teacher_class_grade.png',
                                           text: grade,
                                         ),
                                         SizedBox(height: 5 * scale),
-                                        _TeacherClassDetailMetaRow(
+                                        TeacherClassDetailMetaRow(
                                           scale: scale,
                                           iconAsset:
                                               'assets/images/teacher_class_program.png',
                                           text: program,
                                         ),
                                         SizedBox(height: 5 * scale),
-                                        _TeacherClassDetailMetaRow(
+                                        TeacherClassDetailMetaRow(
                                           scale: scale,
                                           iconAsset:
                                               'assets/images/teacher_class_description.png',
@@ -200,10 +215,10 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                         height: 27 * scale,
                         child: Row(
                           children: [
-                            _TeacherClassDetailCodeChip(
+                            TeacherClassDetailCodeChip(
                               scale: scale,
                               code: code,
-                              onCopy: () => _copyClassroomInfo(context, code),
+                              onCopy: () => copyClassroomInfo(context, code),
                             ),
                             const Spacer(),
                             Image.asset(
@@ -240,8 +255,7 @@ class _TeacherClassDetailInfoCard extends StatelessWidget {
                             ),
                             SizedBox(width: 8 * scale),
                             InkWell(
-                              onTap: () =>
-                                  _copyClassroomInfo(context, joinLink),
+                              onTap: () => copyClassroomInfo(context, joinLink),
                               borderRadius: BorderRadius.circular(8 * scale),
                               child: Padding(
                                 padding: EdgeInsets.all(2 * scale),

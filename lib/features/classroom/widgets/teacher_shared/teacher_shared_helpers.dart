@@ -1,6 +1,10 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-InputDecoration _teacherInputDecoration({
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+
+InputDecoration teacherInputDecoration({
   required double scale,
   String? hintText,
   bool outlined = false,
@@ -37,7 +41,7 @@ InputDecoration _teacherInputDecoration({
   );
 }
 
-String? _nonEmpty(String? value) {
+String? nonEmpty(String? value) {
   final trimmed = value?.trim();
   if (trimmed == null || trimmed.isEmpty) {
     return null;

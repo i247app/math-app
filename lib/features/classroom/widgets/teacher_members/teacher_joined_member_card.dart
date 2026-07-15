@@ -1,15 +1,24 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherJoinedMemberCard extends StatelessWidget {
-  const _TeacherJoinedMemberCard({required this.scale, required this.member});
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_joined_member_avatar.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_text_block.dart';
+
+class TeacherJoinedMemberCard extends StatelessWidget {
+  const TeacherJoinedMemberCard({
+    super.key,
+    required this.scale,
+    required this.member,
+  });
 
   final double scale;
   final ClassroomStudent member;
 
   @override
   Widget build(BuildContext context) {
-    final name = _classroomMemberName(context, member);
-    final status = _classroomMemberStatus(context, member);
+    final name = classroomMemberName(context, member);
+    final status = classroomMemberStatus(context, member);
     return Container(
       constraints: BoxConstraints(minHeight: 82 * scale),
       padding: EdgeInsets.all(13 * scale),
@@ -27,10 +36,10 @@ class _TeacherJoinedMemberCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _TeacherJoinedMemberAvatar(member: member, scale: scale),
+          TeacherJoinedMemberAvatar(member: member, scale: scale),
           SizedBox(width: 24 * scale),
           Expanded(
-            child: _TeacherMemberTextBlock(
+            child: TeacherMemberTextBlock(
               name: name,
               status: status,
               nameFontSize: 14 * scale,

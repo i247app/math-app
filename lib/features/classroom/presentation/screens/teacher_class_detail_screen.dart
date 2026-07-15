@@ -1,4 +1,31 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/application/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/data/school_api.dart';
+import 'package:numi/shared/layouts/app_screen_app_bar.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
+import 'package:numi/features/classroom/data/cache/teacher_classroom_lookup_cache.dart';
+import 'package:numi/features/classroom/presentation/screens/teacher_class_members_screen.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_lower_content.dart';
 
 class TeacherClassDetailScreen extends StatefulWidget {
   const TeacherClassDetailScreen({
@@ -69,7 +96,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
       return;
     }
 
-    final cachedOptions = _TeacherClassroomLookupCache.shared.get(userId);
+    final cachedOptions = TeacherClassroomLookupCache.shared.get(userId);
     if (!forceRefresh && cachedOptions != null) {
       setState(() => _applyLookupOptions(cachedOptions));
       unawaited(_loadLookupOptions(forceRefresh: true));
@@ -77,7 +104,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
     }
 
     try {
-      final options = await _TeacherClassroomLookupCache.shared.load(
+      final options = await TeacherClassroomLookupCache.shared.load(
         userId: userId,
         gradeService: _gradeService,
         profileService: _profileService,
@@ -93,7 +120,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
     }
   }
 
-  void _applyLookupOptions(_TeacherClassroomLookupOptions options) {
+  void _applyLookupOptions(TeacherClassroomLookupOptions options) {
     _grades = options.grades;
     _programs = options.programs;
     _schools = options.schools;
@@ -153,7 +180,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                                       _loadDetail(forceRefresh: true),
                                 )
                               else
-                                _TeacherClassDetailInfoCard(
+                                TeacherClassDetailInfoCard(
                                   scale: scale,
                                   classroom: classroom,
                                   grades: _grades,
@@ -167,7 +194,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                                 ),
                               if (detailState.errorMessage == null ||
                                   classroom != null)
-                                _TeacherClassDetailLowerContent(
+                                TeacherClassDetailLowerContent(
                                   scale: scale,
                                   memberCount: count,
                                   requestCount: requestCount,

@@ -1,7 +1,11 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherFieldShell extends StatelessWidget {
-  const _TeacherFieldShell({
+import 'package:numi/core/theme/font_size.dart';
+
+class TeacherFieldShell extends StatelessWidget {
+  const TeacherFieldShell({
+    super.key,
     required this.label,
     required this.scale,
     required this.child,

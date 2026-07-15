@@ -1,7 +1,16 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherStudentSearchResultList extends StatelessWidget {
-  const _TeacherStudentSearchResultList({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_student_search_result_tile.dart';
+
+class TeacherStudentSearchResultList extends StatelessWidget {
+  const TeacherStudentSearchResultList({
+    super.key,
     required this.scrollController,
     required this.profiles,
     required this.selectedProfileIds,
@@ -62,7 +71,7 @@ class _TeacherStudentSearchResultList extends StatelessWidget {
         final profile = profiles[index];
         final id = ActiveProfileSession.profileStableId(profile);
         final selected = id != null && selectedProfileIds.contains(id);
-        return _TeacherStudentSearchResultTile(
+        return TeacherStudentSearchResultTile(
           profile: profile,
           selected: selected,
           onTap: () => onToggle(profile),

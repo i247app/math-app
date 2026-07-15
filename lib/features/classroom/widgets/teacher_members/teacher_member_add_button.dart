@@ -1,7 +1,14 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class _TeacherMemberAddButton extends StatelessWidget {
-  const _TeacherMemberAddButton({required this.scale, required this.onTap});
+import 'package:numi/core/theme/app_colors.dart';
+
+class TeacherMemberAddButton extends StatelessWidget {
+  const TeacherMemberAddButton({
+    super.key,
+    required this.scale,
+    required this.onTap,
+  });
 
   final double scale;
   final VoidCallback? onTap;

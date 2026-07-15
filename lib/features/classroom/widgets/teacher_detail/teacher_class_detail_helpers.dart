@@ -1,4 +1,14 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
 
 String _detailIdLabel(String prefix, int? value) {
   final displayValue = displayBackendId(value);
@@ -8,7 +18,7 @@ String _detailIdLabel(String prefix, int? value) {
   return '$prefix $displayValue';
 }
 
-String _classroomGradeLabel(
+String classroomGradeLabel(
   BuildContext context,
   ClassroomModel? classroom,
   List<GradeModel> grades,
@@ -20,7 +30,7 @@ String _classroomGradeLabel(
   return _detailIdLabel(context.getText(AppKeys.grade), classroom?.gradeId);
 }
 
-String? _classroomProgramLabel(
+String? classroomProgramLabel(
   BuildContext context,
   ClassroomModel? classroom,
   List<ProgramModel> programs,
@@ -60,7 +70,7 @@ List<int> _classroomProgramIds(ClassroomModel? classroom) {
   return ids;
 }
 
-String _classroomSchoolLabel(
+String classroomSchoolLabel(
   BuildContext context,
   ClassroomModel? classroom,
   List<SchoolModel> schools,
@@ -73,8 +83,8 @@ String _classroomSchoolLabel(
       context.getText(AppKeys.school);
 }
 
-String _classCode(ClassroomModel? classroom) {
-  final classroomCode = _nonEmpty(classroom?.classroomCode);
+String classCode(ClassroomModel? classroom) {
+  final classroomCode = nonEmpty(classroom?.classroomCode);
   if (classroomCode != null) {
     return classroomCode;
   }
@@ -94,7 +104,7 @@ String _classCode(ClassroomModel? classroom) {
 
 String _displayClassStableId(int value) => '$value';
 
-void _copyClassroomInfo(BuildContext context, String value) {
+void copyClassroomInfo(BuildContext context, String value) {
   Clipboard.setData(ClipboardData(text: value));
   HapticFeedback.selectionClick();
 }

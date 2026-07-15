@@ -1,4 +1,24 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/classroom/application/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/classroom/presentation/screens/teacher_class_detail_screen.dart';
+import 'package:numi/features/classroom/presentation/screens/teacher_create_class_screen.dart';
+import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_body.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_entrance.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_header.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_loading_content.dart';
 
 class TeacherClassroomTab extends StatefulWidget {
   const TeacherClassroomTab({
@@ -110,7 +130,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
       return child;
     }
 
-    return _TeacherClassroomEntrance(
+    return TeacherClassroomEntrance(
       order: order,
       onFinished: markOnEnd ? _markClassroomEntrancePlayed : null,
       child: child,
@@ -231,7 +251,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _TeacherClassroomHeader(scale: scale),
+          TeacherClassroomHeader(scale: scale),
           Padding(
             padding: EdgeInsets.fromLTRB(
               22 * scale,
@@ -244,9 +264,9 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
               children: [
                 SizedBox(height: 16 * scale),
                 if (isInitialLoading)
-                  _TeacherClassroomLoadingContent(scale: scale)
+                  TeacherClassroomLoadingContent(scale: scale)
                 else
-                  _TeacherClassroomBody(
+                  TeacherClassroomBody(
                     scale: scale,
                     error: _error,
                     classrooms: _classrooms,

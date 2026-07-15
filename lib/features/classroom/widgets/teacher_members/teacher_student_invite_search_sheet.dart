@@ -1,17 +1,34 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
 
-class _TeacherStudentInviteSearchSheet extends StatefulWidget {
-  const _TeacherStudentInviteSearchSheet({required this.profileService});
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/data/profile_exception.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_send_invite_button.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_student_search_result_list.dart';
+
+class TeacherStudentInviteSearchSheet extends StatefulWidget {
+  const TeacherStudentInviteSearchSheet({
+    super.key,
+    required this.profileService,
+  });
 
   final ProfileService profileService;
 
   @override
-  State<_TeacherStudentInviteSearchSheet> createState() =>
+  State<TeacherStudentInviteSearchSheet> createState() =>
       _TeacherStudentInviteSearchSheetState();
 }
 
 class _TeacherStudentInviteSearchSheetState
-    extends State<_TeacherStudentInviteSearchSheet> {
+    extends State<TeacherStudentInviteSearchSheet> {
   final TextEditingController _searchController = TextEditingController();
   final Set<int> _selectedProfileIds = <int>{};
   final Map<int, StudentProfile> _selectedProfilesById =
@@ -69,7 +86,7 @@ class _TeacherStudentInviteSearchSheetState
         return;
       }
       setState(() {
-        _results = profiles.where(_isStudentProfile).toList();
+        _results = profiles.where(isStudentProfile).toList();
       });
     } on ProfileException catch (error) {
       if (!mounted || requestId != _requestSerial) {
@@ -195,7 +212,7 @@ class _TeacherStudentInviteSearchSheetState
               ),
               const SizedBox(height: 8),
               Expanded(
-                child: _TeacherStudentSearchResultList(
+                child: TeacherStudentSearchResultList(
                   scrollController: scrollController,
                   profiles: _results,
                   selectedProfileIds: _selectedProfileIds,
@@ -206,7 +223,7 @@ class _TeacherStudentInviteSearchSheetState
                 ),
               ),
               const SizedBox(height: 12),
-              _TeacherSendInviteButton(
+              TeacherSendInviteButton(
                 enabled: selectedCount > 0,
                 onTap: selectedCount == 0
                     ? null

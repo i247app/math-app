@@ -1,7 +1,12 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherClassroomEmptyState extends StatelessWidget {
-  const _TeacherClassroomEmptyState({
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+
+class TeacherClassroomEmptyState extends StatelessWidget {
+  const TeacherClassroomEmptyState({
+    super.key,
     required this.scale,
     required this.message,
   });

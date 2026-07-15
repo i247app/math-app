@@ -1,4 +1,30 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/classroom/application/classroom_cubit.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/data/school_api.dart';
+import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
+import 'package:numi/shared/layouts/app_screen_app_bar.dart';
+import 'package:numi/features/classroom/data/cache/teacher_classroom_lookup_cache.dart';
+import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_form.dart';
+import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_full_screen_error.dart';
 
 class TeacherCreateClassScreen extends StatefulWidget {
   const TeacherCreateClassScreen({
@@ -77,7 +103,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       return;
     }
 
-    final cachedOptions = _TeacherClassroomLookupCache.shared.get(userId);
+    final cachedOptions = TeacherClassroomLookupCache.shared.get(userId);
     if (!forceRefresh && cachedOptions != null) {
       setState(() {
         _applyOptions(cachedOptions);
@@ -94,7 +120,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     });
 
     try {
-      final options = await _TeacherClassroomLookupCache.shared.load(
+      final options = await TeacherClassroomLookupCache.shared.load(
         userId: userId,
         gradeService: _gradeService,
         profileService: _profileService,
@@ -121,7 +147,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     }
   }
 
-  void _applyOptions(_TeacherClassroomLookupOptions options) {
+  void _applyOptions(TeacherClassroomLookupOptions options) {
     _grades = options.grades;
     _programs = options.programs;
     _schools = options.schools;
@@ -237,13 +263,13 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     }
     final optionsError = _optionsError;
     if (optionsError != null) {
-      return _TeacherFullScreenError(
+      return TeacherFullScreenError(
         message: optionsError,
         onRetry: () => _loadOptions(forceRefresh: true),
         scale: scale,
       );
     }
-    return _TeacherCreateClassForm(
+    return TeacherCreateClassForm(
       scale: scale,
       avatarPath: _avatarPath,
       grades: _grades,

@@ -1,7 +1,12 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherClassDetailCodeChip extends StatelessWidget {
-  const _TeacherClassDetailCodeChip({
+import 'package:numi/core/theme/app_theme_colors.dart';
+
+class TeacherClassDetailCodeChip extends StatelessWidget {
+  const TeacherClassDetailCodeChip({
+    super.key,
     required this.scale,
     required this.code,
     required this.onCopy,

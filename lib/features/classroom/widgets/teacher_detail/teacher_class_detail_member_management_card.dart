@@ -1,7 +1,15 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherClassDetailMemberManagementCard extends StatelessWidget {
-  const _TeacherClassDetailMemberManagementCard({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_member_summary_text.dart';
+
+class TeacherClassDetailMemberManagementCard extends StatelessWidget {
+  const TeacherClassDetailMemberManagementCard({
+    super.key,
     required this.scale,
     required this.memberCount,
     required this.requestCount,

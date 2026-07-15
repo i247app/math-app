@@ -1,4 +1,21 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/application/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_class_members_content.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_sending_invite_overlay.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_student_invite_search_sheet.dart';
 
 class TeacherClassMembersScreen extends StatefulWidget {
   const TeacherClassMembersScreen({
@@ -107,7 +124,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
                   selector: (state) =>
                       state.members(widget.profileId, widget.classroomId),
                   builder: (context, membersState) {
-                    return _TeacherClassMembersContent(
+                    return TeacherClassMembersContent(
                       scale: scale,
                       isLoading: membersState.isLoading,
                       isSendingInvites: _isSendingInvites,
@@ -128,7 +145,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
                 );
               },
             ),
-            if (_isSendingInvites) const _TeacherSendingInviteOverlay(),
+            if (_isSendingInvites) const TeacherSendingInviteOverlay(),
           ],
         ),
       ),
@@ -142,7 +159,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _TeacherStudentInviteSearchSheet(
+      builder: (sheetContext) => TeacherStudentInviteSearchSheet(
         profileService: widget._profileService ?? ProfileApi(),
       ),
     );

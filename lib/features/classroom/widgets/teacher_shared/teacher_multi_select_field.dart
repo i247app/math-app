@@ -1,7 +1,21 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
+import 'dart:math' as math;
 
-class _TeacherMultiSelectField<T> extends StatelessWidget {
-  const _TeacherMultiSelectField({
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_field_shell.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_primary_button.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_selected_chip.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
+
+class TeacherMultiSelectField<T> extends StatelessWidget {
+  const TeacherMultiSelectField({
+    super.key,
     required this.label,
     required this.values,
     required this.items,
@@ -29,7 +43,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _TeacherFieldShell(
+        TeacherFieldShell(
           label: label,
           scale: scale,
           child: Material(
@@ -43,7 +57,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
               focusColor: Colors.transparent,
               child: InputDecorator(
                 isEmpty: values.isEmpty,
-                decoration: _teacherInputDecoration(
+                decoration: teacherInputDecoration(
                   hintText: items.isEmpty
                       ? context.getText(AppKeys.teacherNoOptions)
                       : emptyText,
@@ -89,7 +103,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
             runSpacing: 8 * scale,
             children: [
               for (final value in values)
-                _TeacherSelectedChip(
+                TeacherSelectedChip(
                   label: displayText(value),
                   scale: scale,
                   onDeleted: () {
@@ -227,7 +241,7 @@ class _TeacherMultiSelectField<T> extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 14 * scale),
-                    _TeacherPrimaryButton(
+                    TeacherPrimaryButton(
                       label: context.getText(AppKeys.save),
                       icon: Icons.check_rounded,
                       width: double.infinity,

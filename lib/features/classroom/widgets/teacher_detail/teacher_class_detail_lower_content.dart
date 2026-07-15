@@ -1,7 +1,14 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherClassDetailLowerContent extends StatelessWidget {
-  const _TeacherClassDetailLowerContent({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_function_grid.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_member_management_card.dart';
+
+class TeacherClassDetailLowerContent extends StatelessWidget {
+  const TeacherClassDetailLowerContent({
+    super.key,
     required this.scale,
     required this.memberCount,
     required this.requestCount,
@@ -24,7 +31,7 @@ class _TeacherClassDetailLowerContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _TeacherClassDetailMemberManagementCard(
+          TeacherClassDetailMemberManagementCard(
             scale: scale,
             memberCount: memberCount,
             requestCount: requestCount,
@@ -43,7 +50,7 @@ class _TeacherClassDetailLowerContent extends StatelessWidget {
             ),
           ),
           SizedBox(height: 7 * scale),
-          _TeacherClassDetailFunctionGrid(
+          TeacherClassDetailFunctionGrid(
             scale: scale,
             onOpenAssignments: onOpenAssignments,
             onOpenAssessments: onOpenAssessments,

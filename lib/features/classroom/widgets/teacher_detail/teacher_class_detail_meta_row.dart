@@ -1,7 +1,9 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherClassDetailMetaRow extends StatelessWidget {
-  const _TeacherClassDetailMetaRow({
+class TeacherClassDetailMetaRow extends StatelessWidget {
+  const TeacherClassDetailMetaRow({
+    super.key,
     required this.scale,
     required this.iconAsset,
     required this.text,

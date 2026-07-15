@@ -1,7 +1,8 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherRequestActionIcon extends StatelessWidget {
-  const _TeacherRequestActionIcon({
+class TeacherRequestActionIcon extends StatelessWidget {
+  const TeacherRequestActionIcon({
+    super.key,
     required this.asset,
     required this.size,
     required this.onTap,

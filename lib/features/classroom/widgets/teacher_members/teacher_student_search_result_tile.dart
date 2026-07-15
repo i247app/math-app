@@ -1,7 +1,16 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherStudentSearchResultTile extends StatelessWidget {
-  const _TeacherStudentSearchResultTile({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
+
+class TeacherStudentSearchResultTile extends StatelessWidget {
+  const TeacherStudentSearchResultTile({
+    super.key,
     required this.profile,
     required this.selected,
     required this.onTap,
@@ -16,7 +25,7 @@ class _TeacherStudentSearchResultTile extends StatelessWidget {
     final name = profile.name?.trim().isNotEmpty == true
         ? profile.name!.trim()
         : context.getText(AppKeys.teacherStudentFallback);
-    final subtitle = _studentSearchSubtitle(context, profile);
+    final subtitle = studentSearchSubtitle(context, profile);
     return Material(
       color: selected ? const Color(0xFFE8F7F7) : Colors.white,
       borderRadius: BorderRadius.circular(16),

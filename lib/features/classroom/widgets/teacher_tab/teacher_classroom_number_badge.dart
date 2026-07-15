@@ -1,7 +1,10 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherClassroomNumberBadge extends StatelessWidget {
-  const _TeacherClassroomNumberBadge({
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_number_helpers.dart';
+
+class TeacherClassroomNumberBadge extends StatelessWidget {
+  const TeacherClassroomNumberBadge({
+    super.key,
     required this.scale,
     required this.number,
     required this.palette,
@@ -9,7 +12,7 @@ class _TeacherClassroomNumberBadge extends StatelessWidget {
 
   final double scale;
   final String number;
-  final _TeacherClassroomNumberPalette palette;
+  final TeacherClassroomNumberPalette palette;
 
   TextStyle get _numberStyle =>
       TextStyle(fontSize: 50 * scale, fontWeight: FontWeight.w900, height: 1);

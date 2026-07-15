@@ -1,7 +1,17 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherJoinRequestRow extends StatelessWidget {
-  const _TeacherJoinRequestRow({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_classroom_member_avatar.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_text_block.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_request_action_icon.dart';
+
+class TeacherJoinRequestRow extends StatelessWidget {
+  const TeacherJoinRequestRow({
+    super.key,
     required this.scale,
     required this.request,
     required this.isProcessing,
@@ -17,13 +27,13 @@ class _TeacherJoinRequestRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = _classroomMemberName(context, request);
+    final name = classroomMemberName(context, request);
     return Row(
       children: [
-        _TeacherClassroomMemberAvatar(member: request, size: 40 * scale),
+        TeacherClassroomMemberAvatar(member: request, size: 40 * scale),
         SizedBox(width: 12 * scale),
         Expanded(
-          child: _TeacherMemberTextBlock(
+          child: TeacherMemberTextBlock(
             name: name,
             status: context.getText(AppKeys.teacherPendingApproval),
             nameFontSize: 16 * scale,
@@ -48,13 +58,13 @@ class _TeacherJoinRequestRow extends StatelessWidget {
             ),
           )
         else ...[
-          _TeacherRequestActionIcon(
+          TeacherRequestActionIcon(
             asset: 'assets/images/teacher_member_accept.png',
             size: 25 * scale,
             onTap: request.profileId == null ? null : onApprove,
           ),
           SizedBox(width: 5 * scale),
-          _TeacherRequestActionIcon(
+          TeacherRequestActionIcon(
             asset: 'assets/images/teacher_member_reject.png',
             size: 23 * scale,
             onTap: request.profileId == null ? null : onReject,

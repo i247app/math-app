@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:numi/features/classroom/presentation/tabs/teacher_classroom_tab.dart';
 import 'package:numi/features/home/helpers/home_dashboard_helpers.dart';
 import 'package:numi/features/home/teacher/home/teacher_home_tab.dart';
 import 'package:numi/features/home/teacher/study/teacher_study_tab.dart';

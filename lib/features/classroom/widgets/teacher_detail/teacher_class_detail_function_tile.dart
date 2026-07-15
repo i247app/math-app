@@ -1,7 +1,11 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherClassDetailFunctionTile extends StatelessWidget {
-  const _TeacherClassDetailFunctionTile({
+import 'package:numi/core/theme/app_colors.dart';
+
+class TeacherClassDetailFunctionTile extends StatelessWidget {
+  const TeacherClassDetailFunctionTile({
+    super.key,
     required this.scale,
     this.iconAsset,
     this.label,

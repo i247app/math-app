@@ -1,7 +1,14 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherJoinRequestCard extends StatelessWidget {
-  const _TeacherJoinRequestCard({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_empty_member_text.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_join_request_row.dart';
+
+class TeacherJoinRequestCard extends StatelessWidget {
+  const TeacherJoinRequestCard({
+    super.key,
     required this.scale,
     required this.requests,
     required this.processingProfileIds,
@@ -18,7 +25,7 @@ class _TeacherJoinRequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (requests.isEmpty) {
-      return _TeacherEmptyMemberText(
+      return TeacherEmptyMemberText(
         scale: scale,
         text: context.getText(AppKeys.teacherNoJoinRequests),
       );
@@ -43,7 +50,7 @@ class _TeacherJoinRequestCard extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 10 * scale),
                 child: const Divider(height: 1, color: Color(0xFFF9FAFB)),
               ),
-            _TeacherJoinRequestRow(
+            TeacherJoinRequestRow(
               scale: scale,
               request: requests[index],
               isProcessing: processingProfileIds.contains(

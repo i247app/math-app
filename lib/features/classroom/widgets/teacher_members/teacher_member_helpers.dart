@@ -1,11 +1,17 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-bool _isStudentProfile(StudentProfile profile) {
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
+
+bool isStudentProfile(StudentProfile profile) {
   final role = profile.role?.trim().toUpperCase();
   return role == null || role.isEmpty || role == 'STUDENT';
 }
 
-String? _studentSearchSubtitle(BuildContext context, StudentProfile profile) {
+String? studentSearchSubtitle(BuildContext context, StudentProfile profile) {
   final studentId = profile.studentId?.trim();
   if (studentId != null && studentId.isNotEmpty) {
     return studentId;
@@ -19,13 +25,13 @@ String? _studentSearchSubtitle(BuildContext context, StudentProfile profile) {
   return null;
 }
 
-String _classroomMemberName(BuildContext context, ClassroomStudent member) {
-  return _nonEmpty(member.name) ??
+String classroomMemberName(BuildContext context, ClassroomStudent member) {
+  return nonEmpty(member.name) ??
       context.getText(AppKeys.teacherStudentFallback);
 }
 
-String _classroomMemberStatus(BuildContext context, ClassroomStudent member) {
-  final status = _nonEmpty(member.status);
+String classroomMemberStatus(BuildContext context, ClassroomStudent member) {
+  final status = nonEmpty(member.status);
   if (status == null || status.toUpperCase() == 'ACTIVE') {
     return context.getText(AppKeys.teacherJustJoined);
   }

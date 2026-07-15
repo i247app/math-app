@@ -1,7 +1,18 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
 
-class _TeacherDropdownField<T> extends StatelessWidget {
-  const _TeacherDropdownField({
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_field_shell.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
+
+class TeacherDropdownField<T> extends StatelessWidget {
+  const TeacherDropdownField({
+    super.key,
     required this.label,
     required this.value,
     required this.items,
@@ -25,7 +36,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
     final canSelect = items.isNotEmpty;
     final colors = context.themeColors;
 
-    return _TeacherFieldShell(
+    return TeacherFieldShell(
       label: label,
       scale: scale,
       child: Material(
@@ -41,7 +52,7 @@ class _TeacherDropdownField<T> extends StatelessWidget {
           focusColor: Colors.transparent,
           child: InputDecorator(
             isEmpty: selectedLabel == null,
-            decoration: _teacherInputDecoration(
+            decoration: teacherInputDecoration(
               hintText: items.isEmpty
                   ? context.getText(AppKeys.teacherNoOptions)
                   : null,

@@ -1,7 +1,10 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherClassroomSkeletonCard extends StatelessWidget {
-  const _TeacherClassroomSkeletonCard({required this.scale});
+import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_block.dart';
+import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_card.dart';
+
+class TeacherClassroomSkeletonCard extends StatelessWidget {
+  const TeacherClassroomSkeletonCard({super.key, required this.scale});
 
   final double scale;
 

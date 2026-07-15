@@ -1,7 +1,10 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class _TeacherClassroomNumberPalette {
-  const _TeacherClassroomNumberPalette({
+import 'package:numi/core/network/classroom_models.dart';
+
+class TeacherClassroomNumberPalette {
+  const TeacherClassroomNumberPalette({
     required this.top,
     required this.bottom,
     required this.depth,
@@ -18,8 +21,8 @@ class _TeacherClassroomNumberPalette {
   final Color border;
 }
 
-const _teacherClassroomNumberPalettes = <_TeacherClassroomNumberPalette>[
-  _TeacherClassroomNumberPalette(
+const _teacherClassroomNumberPalettes = <TeacherClassroomNumberPalette>[
+  TeacherClassroomNumberPalette(
     top: Color(0xFF76DCCB),
     bottom: Color(0xFF3DB9A5),
     depth: Color(0xFF168A7C),
@@ -27,7 +30,7 @@ const _teacherClassroomNumberPalettes = <_TeacherClassroomNumberPalette>[
     background: Color(0xFFEAF9F7),
     border: Color(0xFFCDEDEA),
   ),
-  _TeacherClassroomNumberPalette(
+  TeacherClassroomNumberPalette(
     top: Color(0xFF20C8ED),
     bottom: Color(0xFF0794D3),
     depth: Color(0xFF075FB3),
@@ -35,7 +38,7 @@ const _teacherClassroomNumberPalettes = <_TeacherClassroomNumberPalette>[
     background: Color(0xFFEAF7FF),
     border: Color(0xFFD2ECFA),
   ),
-  _TeacherClassroomNumberPalette(
+  TeacherClassroomNumberPalette(
     top: Color(0xFFFFDA17),
     bottom: Color(0xFFFFA800),
     depth: Color(0xFFF06B17),
@@ -43,7 +46,7 @@ const _teacherClassroomNumberPalettes = <_TeacherClassroomNumberPalette>[
     background: Color(0xFFFFF7DE),
     border: Color(0xFFFFE8AC),
   ),
-  _TeacherClassroomNumberPalette(
+  TeacherClassroomNumberPalette(
     top: Color(0xFFA9DD35),
     bottom: Color(0xFF71BD26),
     depth: Color(0xFF2A8B22),
@@ -51,7 +54,7 @@ const _teacherClassroomNumberPalettes = <_TeacherClassroomNumberPalette>[
     background: Color(0xFFF1FAE6),
     border: Color(0xFFDDEFC1),
   ),
-  _TeacherClassroomNumberPalette(
+  TeacherClassroomNumberPalette(
     top: Color(0xFFFF514B),
     bottom: Color(0xFFF01422),
     depth: Color(0xFFB8071C),
@@ -61,7 +64,7 @@ const _teacherClassroomNumberPalettes = <_TeacherClassroomNumberPalette>[
   ),
 ];
 
-String _teacherClassroomNumber(ClassroomModel classroom) {
+String teacherClassroomNumber(ClassroomModel classroom) {
   final source = [
     classroom.name,
     classroom.classroomCode,
@@ -71,7 +74,7 @@ String _teacherClassroomNumber(ClassroomModel classroom) {
   return match?.group(0) ?? '1';
 }
 
-_TeacherClassroomNumberPalette _teacherClassroomNumberPalette(
+TeacherClassroomNumberPalette teacherClassroomNumberPalette(
   ClassroomModel classroom,
 ) {
   final seed =

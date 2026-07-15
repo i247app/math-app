@@ -1,7 +1,9 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherMemberTextBlock extends StatelessWidget {
-  const _TeacherMemberTextBlock({
+class TeacherMemberTextBlock extends StatelessWidget {
+  const TeacherMemberTextBlock({
+    super.key,
     required this.name,
     required this.status,
     required this.nameFontSize,

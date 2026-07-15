@@ -1,7 +1,12 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherClassroomLoadingContent extends StatelessWidget {
-  const _TeacherClassroomLoadingContent({required this.scale});
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_block.dart';
+import 'package:numi/features/home/teacher/shared/widgets/teacher_skeleton_card.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_skeleton_card.dart';
+
+class TeacherClassroomLoadingContent extends StatelessWidget {
+  const TeacherClassroomLoadingContent({super.key, required this.scale});
 
   final double scale;
 
@@ -52,7 +57,7 @@ class _TeacherClassroomLoadingContent extends StatelessWidget {
         ),
         SizedBox(height: 24 * scale),
         for (var index = 0; index < 3; index++) ...[
-          _TeacherClassroomSkeletonCard(scale: scale),
+          TeacherClassroomSkeletonCard(scale: scale),
           if (index != 2) SizedBox(height: 16 * scale),
         ],
       ],

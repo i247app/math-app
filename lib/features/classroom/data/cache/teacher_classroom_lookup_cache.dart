@@ -1,7 +1,14 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
 
-class _TeacherClassroomLookupOptions {
-  const _TeacherClassroomLookupOptions({
+import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/program_models.dart';
+import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/data/school_api.dart';
+
+class TeacherClassroomLookupOptions {
+  const TeacherClassroomLookupOptions({
     required this.userId,
     required this.grades,
     required this.programs,
@@ -14,21 +21,21 @@ class _TeacherClassroomLookupOptions {
   final List<SchoolModel> schools;
 }
 
-class _TeacherClassroomLookupCache {
-  _TeacherClassroomLookupCache._();
+class TeacherClassroomLookupCache {
+  TeacherClassroomLookupCache._();
 
-  static final shared = _TeacherClassroomLookupCache._();
+  static final shared = TeacherClassroomLookupCache._();
 
-  final Map<int, _TeacherClassroomLookupOptions> _cache =
-      <int, _TeacherClassroomLookupOptions>{};
-  final Map<int, Future<_TeacherClassroomLookupOptions>> _pending =
-      <int, Future<_TeacherClassroomLookupOptions>>{};
+  final Map<int, TeacherClassroomLookupOptions> _cache =
+      <int, TeacherClassroomLookupOptions>{};
+  final Map<int, Future<TeacherClassroomLookupOptions>> _pending =
+      <int, Future<TeacherClassroomLookupOptions>>{};
 
-  _TeacherClassroomLookupOptions? get(int userId) {
+  TeacherClassroomLookupOptions? get(int userId) {
     return _cache[userId];
   }
 
-  Future<_TeacherClassroomLookupOptions> load({
+  Future<TeacherClassroomLookupOptions> load({
     required int userId,
     required GradeService gradeService,
     required ProfileService profileService,
@@ -60,7 +67,7 @@ class _TeacherClassroomLookupCache {
     });
   }
 
-  Future<_TeacherClassroomLookupOptions> _loadFresh({
+  Future<TeacherClassroomLookupOptions> _loadFresh({
     required int userId,
     required GradeService gradeService,
     required ProfileService profileService,
@@ -71,7 +78,7 @@ class _TeacherClassroomLookupCache {
       profileService.listPrograms(userId: userId),
       schoolService.listSchools(),
     ]);
-    final options = _TeacherClassroomLookupOptions(
+    final options = TeacherClassroomLookupOptions(
       userId: userId,
       grades: List.unmodifiable(results[0] as List<GradeModel>),
       programs: List.unmodifiable(results[1] as List<ProgramModel>),

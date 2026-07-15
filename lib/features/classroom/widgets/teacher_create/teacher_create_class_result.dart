@@ -1,4 +1,4 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:numi/core/network/classroom_models.dart';
 
 class TeacherCreateClassResult {
   const TeacherCreateClassResult({this.classroom});

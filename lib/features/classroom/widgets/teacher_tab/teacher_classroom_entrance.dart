@@ -1,7 +1,10 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
 
-class _TeacherClassroomEntrance extends StatefulWidget {
-  const _TeacherClassroomEntrance({
+import 'package:flutter/material.dart';
+
+class TeacherClassroomEntrance extends StatefulWidget {
+  const TeacherClassroomEntrance({
+    super.key,
     required this.order,
     required this.child,
     this.onFinished,
@@ -12,11 +15,11 @@ class _TeacherClassroomEntrance extends StatefulWidget {
   final VoidCallback? onFinished;
 
   @override
-  State<_TeacherClassroomEntrance> createState() =>
+  State<TeacherClassroomEntrance> createState() =>
       _TeacherClassroomEntranceState();
 }
 
-class _TeacherClassroomEntranceState extends State<_TeacherClassroomEntrance> {
+class _TeacherClassroomEntranceState extends State<TeacherClassroomEntrance> {
   bool _isVisible = false;
   bool _hasNotifiedFinished = false;
 

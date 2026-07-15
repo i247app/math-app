@@ -1,7 +1,14 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherJoinedMemberAvatar extends StatelessWidget {
-  const _TeacherJoinedMemberAvatar({required this.member, required this.scale});
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_classroom_member_avatar.dart';
+
+class TeacherJoinedMemberAvatar extends StatelessWidget {
+  const TeacherJoinedMemberAvatar({
+    super.key,
+    required this.member,
+    required this.scale,
+  });
 
   final ClassroomStudent member;
   final double scale;
@@ -14,7 +21,7 @@ class _TeacherJoinedMemberAvatar extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: _TeacherClassroomMemberAvatar(
+            child: TeacherClassroomMemberAvatar(
               member: member,
               size: 56 * scale,
             ),

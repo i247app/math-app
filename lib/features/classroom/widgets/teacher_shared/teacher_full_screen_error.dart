@@ -1,7 +1,10 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherFullScreenError extends StatelessWidget {
-  const _TeacherFullScreenError({
+import 'package:numi/shared/widgets/app_retry_panel.dart';
+
+class TeacherFullScreenError extends StatelessWidget {
+  const TeacherFullScreenError({
+    super.key,
     required this.message,
     required this.onRetry,
     required this.scale,

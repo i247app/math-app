@@ -1,7 +1,14 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherTextField extends StatelessWidget {
-  const _TeacherTextField({
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_field_shell.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
+
+class TeacherTextField extends StatelessWidget {
+  const TeacherTextField({
+    super.key,
     required this.label,
     required this.hintText,
     required this.controller,
@@ -17,7 +24,7 @@ class _TeacherTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TeacherFieldShell(
+    return TeacherFieldShell(
       label: label,
       scale: scale,
       child: TextField(
@@ -29,7 +36,7 @@ class _TeacherTextField extends StatelessWidget {
           fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w400,
         ),
-        decoration: _teacherInputDecoration(hintText: hintText, scale: scale),
+        decoration: teacherInputDecoration(hintText: hintText, scale: scale),
       ),
     );
   }

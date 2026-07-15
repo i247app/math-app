@@ -1,7 +1,16 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class _TeacherClassroomListCard extends StatelessWidget {
-  const _TeacherClassroomListCard({
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_number_badge.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_number_helpers.dart';
+
+class TeacherClassroomListCard extends StatelessWidget {
+  const TeacherClassroomListCard({
+    super.key,
     required this.scale,
     required this.classroom,
     required this.onTap,
@@ -17,8 +26,8 @@ class _TeacherClassroomListCard extends StatelessWidget {
         classroom.name ?? context.getText(AppKeys.teacherClassFallback);
     final code = classroom.classroomCode ?? classroom.id?.toString() ?? '--';
     final memberCount = classroom.displayStudentCount;
-    final classNumber = _teacherClassroomNumber(classroom);
-    final numberPalette = _teacherClassroomNumberPalette(classroom);
+    final classNumber = teacherClassroomNumber(classroom);
+    final numberPalette = teacherClassroomNumberPalette(classroom);
     final colors = context.themeColors;
 
     return GestureDetector(
@@ -46,7 +55,7 @@ class _TeacherClassroomListCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _TeacherClassroomNumberBadge(
+                TeacherClassroomNumberBadge(
                   scale: scale,
                   number: classNumber,
                   palette: numberPalette,
