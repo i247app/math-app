@@ -33,7 +33,8 @@ class _TeacherClassMembersContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TeacherScreenAppBar(
+        AppScreenAppBar(
+          backIconAsset: 'assets/images/teacher_class_back.svg',
           title: context.getText(AppKeys.teacherMembersTitle),
           scale: scale,
           onBack: onBack,
@@ -75,7 +76,7 @@ class _TeacherClassMembersContent extends StatelessWidget {
                   else if (error != null &&
                       joinRequests.isEmpty &&
                       members.isEmpty)
-                    TeacherErrorPanel(
+                    AppRetryPanel(
                       scale: scale,
                       message: error!,
                       onRetry: onRefresh,

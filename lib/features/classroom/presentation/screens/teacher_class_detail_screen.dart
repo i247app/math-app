@@ -41,7 +41,6 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   late final SchoolService _schoolService =
       widget._schoolService ?? SchoolApi();
 
-  bool _isLoadingLookups = false;
   late bool _isInfoExpanded;
   List<GradeModel> _grades = const <GradeModel>[];
   List<ProgramModel> _programs = const <ProgramModel>[];
@@ -77,7 +76,6 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
       return;
     }
 
-    setState(() => _isLoadingLookups = true);
     try {
       final options = await _TeacherClassroomLookupCache.shared.load(
         userId: userId,
@@ -92,10 +90,6 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
       setState(() => _applyLookupOptions(options));
     } catch (_) {
       // Detail can still render backend ids if lookup endpoints fail.
-    } finally {
-      if (mounted) {
-        setState(() => _isLoadingLookups = false);
-      }
     }
   }
 
@@ -127,7 +121,8 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
 
                 return Column(
                   children: [
-                    TeacherScreenAppBar(
+                    AppScreenAppBar(
+                      backIconAsset: 'assets/images/teacher_class_back.svg',
                       title: context.getText(AppKeys.teacherClassDetailTitle),
                       scale: scale,
                       onBack: () => Navigator.of(context).maybePop(),
@@ -151,7 +146,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                             children: [
                               if (detailState.errorMessage != null &&
                                   classroom == null)
-                                TeacherErrorPanel(
+                                AppRetryPanel(
                                   scale: scale,
                                   message: detailState.errorMessage!,
                                   onRetry: () =>
@@ -170,9 +165,6 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                                   isExpanded: _isInfoExpanded,
                                   onToggleExpanded: _toggleInfoExpanded,
                                 ),
-                              if (classroom != null &&
-                                  (detailState.isLoading || _isLoadingLookups))
-                                TeacherBackgroundRefreshLabel(scale: scale),
                               if (detailState.errorMessage == null ||
                                   classroom != null)
                                 _TeacherClassDetailLowerContent(

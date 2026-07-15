@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/shared/helpers/teacher_display_helpers.dart';
 
 class TeacherTopBar extends StatelessWidget {
   const TeacherTopBar({
@@ -33,7 +35,13 @@ class TeacherTopBar extends StatelessWidget {
       decoration: BoxDecoration(color: colors.pageBackgroundTop),
       child: Row(
         children: [
-          TeacherAvatar(profile: profile, size: 48 * scale),
+          ProfileAvatarImage(
+            size: 48 * scale,
+            avatarKey: profile?.avatarKey,
+            avatarUrl: profile?.avatarUrl,
+            borderColor: AppColors.navy900.withValues(alpha: 0.10),
+            borderWidth: 2,
+          ),
           SizedBox(width: 12 * scale),
           Expanded(
             child: Column(

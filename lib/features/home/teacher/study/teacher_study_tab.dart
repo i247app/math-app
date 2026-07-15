@@ -18,11 +18,11 @@ import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
-import 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 import 'package:numi/features/home/shell/widgets/home_tab_header.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
 
 part 'helpers/teacher_study_helpers.dart';
 part 'models/teacher_study_date_parts.dart';
@@ -457,7 +457,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                           !_hasCompletedInitialLoad)
                         _TeacherStudyLoadingIndicator(scale: scale)
                       else if (_displayError != null && _exercises.isEmpty)
-                        TeacherErrorPanel(
+                        AppRetryPanel(
                           scale: scale,
                           message: _displayError!,
                           onRetry: _refreshClassrooms,

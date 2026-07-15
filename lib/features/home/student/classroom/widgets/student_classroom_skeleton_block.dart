@@ -7,7 +7,5 @@ class StudentClassroomSkeletonBlock extends HomeSkeletonBlock {
     super.width,
     required super.height,
     required super.radius,
-  }) : super(
-         color: const Color(0xFFE8EEF0),
-       );
+  }) : super(color: const Color(0xFFE8EEF0));
 }

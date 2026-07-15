@@ -17,6 +17,7 @@ import 'package:numi/features/home/teacher/cache/teacher_home_snapshot.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/homework/presentation/teacher_homework_screen.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
 
 import 'package:numi/features/home/teacher/home/helpers/teacher_home_helpers.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_assignments_loading_panel.dart';
@@ -487,7 +488,7 @@ class _TeacherHomeTabState extends State<TeacherHomeTab> {
         if (_isInitialHomeLoading)
           TeacherLoadingPanel(scale: scale)
         else if (_error != null && _classrooms.isEmpty)
-          TeacherErrorPanel(
+          AppRetryPanel(
             scale: scale,
             message: _error!,
             onRetry: _refreshClassrooms,

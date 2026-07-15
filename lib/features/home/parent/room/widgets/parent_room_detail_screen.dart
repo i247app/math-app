@@ -18,7 +18,8 @@ import 'package:numi/features/home/parent/shared/widgets/parent_empty_task_line.
 import 'package:numi/features/home/parent/shared/widgets/parent_pending_task_list_item.dart';
 
 class ParentRoomDetailScreen extends StatelessWidget {
-  const ParentRoomDetailScreen({super.key,
+  const ParentRoomDetailScreen({
+    super.key,
     required this.entry,
     required this.pendingExercises,
     required this.expiredExercises,

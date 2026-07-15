@@ -3,17 +3,21 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 
-class AuthBackButton extends StatelessWidget {
-  const AuthBackButton({
+class AppBackButton extends StatelessWidget {
+  const AppBackButton({
     super.key,
     required this.onPressed,
     this.iconAsset = 'assets/images/pin_figma_back.svg',
     this.size = 44,
+    this.iconSize = 16,
+    this.color,
   });
 
   final VoidCallback onPressed;
   final String iconAsset;
   final double size;
+  final double iconSize;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +36,10 @@ class AuthBackButton extends StatelessWidget {
           child: Center(
             child: SvgPicture.asset(
               iconAsset,
-              width: 16,
-              height: 16,
+              width: iconSize,
+              height: iconSize,
               colorFilter: ColorFilter.mode(
-                colors.brandStrong,
+                color ?? colors.brandStrong,
                 BlendMode.srcIn,
               ),
             ),

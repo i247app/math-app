@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 class ParentRoomTaskShell extends StatelessWidget {
-  const ParentRoomTaskShell({super.key,
+  const ParentRoomTaskShell({
+    super.key,
     required this.accent,
     required this.child,
     required this.onTap,

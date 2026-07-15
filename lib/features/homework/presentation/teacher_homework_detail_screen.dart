@@ -178,7 +178,8 @@ class _TeacherHomeworkDetailScreenState
         bottom: false,
         child: Column(
           children: [
-            TeacherScreenAppBar(
+            AppScreenAppBar(
+              backIconAsset: 'assets/images/teacher_class_back.svg',
               title: context.getText(
                 teacherExerciseCopy(_effectivePurpose).titleKey,
               ),
@@ -234,7 +235,7 @@ class _TeacherHomeworkDetailScreenState
                           ),
                         )
                       else if (_error != null && exercise == null)
-                        TeacherErrorPanel(
+                        AppRetryPanel(
                           scale: 1,
                           message: _error!,
                           onRetry: _loadDetail,
@@ -274,8 +275,6 @@ class _TeacherHomeworkDetailScreenState
                               question: questions[index],
                             ),
                           ),
-                        if (_isLoading)
-                          const TeacherBackgroundRefreshLabel(scale: 1),
                       ],
                     ],
                   ),

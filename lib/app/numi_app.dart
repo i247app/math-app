@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../core/localization/app_keys.dart';
-import '../core/localization/lingo_provider.dart';
-import '../core/localization/lingo_scope.dart';
-import '../core/theme/app_theme.dart';
-import '../core/theme/app_theme_controller.dart';
-import '../core/theme/app_theme_scope.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/lingo_provider.dart';
+import 'package:numi/core/localization/lingo_scope.dart';
+import 'package:numi/core/theme/app_theme.dart';
+import 'package:numi/core/theme/app_theme_controller.dart';
+import 'package:numi/core/theme/app_theme_scope.dart';
 import 'package:numi/features/auth/application/auth_flow.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/session/presentation/bloc/app_session_state.dart';

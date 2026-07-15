@@ -4,24 +4,11 @@ import 'package:numi/core/theme/app_colors.dart';
 
 class NumiBrandText extends StatelessWidget {
   final double? fontSize;
-  final Color? firstColor;
-  final Color? secondColor;
 
-  const NumiBrandText({
-    super.key,
-    this.fontSize,
-    this.firstColor,
-    this.secondColor,
-  });
+  const NumiBrandText({super.key, this.fontSize});
 
   @override
   Widget build(BuildContext context) {
-    // Exact hex color codes mapped from your design layout
-    // final Color tealBrandColor = firstColor ?? const Color(0xFF1C8E9B);
-    // final Color orangeBrandColor = secondColor ?? const Color(0xFFF16634);
-    final Color tealBrandColor = firstColor ?? const Color(0xFF058A95);
-    final Color orangeBrandColor = secondColor ?? const Color(0xFFFC6128);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -35,8 +22,14 @@ class NumiBrandText extends StatelessWidget {
               letterSpacing: 1.0,
             ),
             children: [
-              const TextSpan(text: 'NUMI', style: TextStyle(color: AppColors.brandTeal)),
-              const TextSpan(text: 'NUMI', style: TextStyle(color: AppColors.brandOrange)),
+              const TextSpan(
+                text: 'NUMI',
+                style: TextStyle(color: AppColors.brandTeal),
+              ),
+              const TextSpan(
+                text: 'NUMI',
+                style: TextStyle(color: AppColors.brandOrange),
+              ),
             ],
           ),
         ),

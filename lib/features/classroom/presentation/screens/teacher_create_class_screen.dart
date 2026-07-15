@@ -150,12 +150,12 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
-    final gradeId = _gradeStableId(_selectedGrade);
+    final gradeId = gradeStableId(_selectedGrade);
     final programIds = _selectedPrograms
-        .map(_programStableId)
+        .map(programStableId)
         .whereType<int>()
         .toList(growable: false);
-    final schoolId = _schoolStableId(_selectedSchool);
+    final schoolId = schoolStableId(_selectedSchool);
     final name = _nameController.text.trim();
     final description = _descriptionController.text.trim();
 
@@ -212,7 +212,8 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
             final scale = math.min(constraints.maxWidth / 390, 1.12);
             return Column(
               children: [
-                TeacherScreenAppBar(
+                AppScreenAppBar(
+                  backIconAsset: 'assets/images/teacher_class_back.svg',
                   title: context.getText(AppKeys.teacherCreateClassTitle),
                   scale: scale,
                   onBack: () => Navigator.of(context).maybePop(),

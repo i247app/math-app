@@ -5,7 +5,8 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/widgets/home_visual_constants.dart';
 
 class ParentRoomSelectStudentCard extends StatelessWidget {
-  const ParentRoomSelectStudentCard({super.key,
+  const ParentRoomSelectStudentCard({
+    super.key,
     required this.onChooseProfile,
     required this.onCreateProfile,
   });

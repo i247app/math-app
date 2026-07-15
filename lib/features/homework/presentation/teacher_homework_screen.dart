@@ -16,11 +16,13 @@ import 'package:numi/core/network/grade_models.dart';
 import 'package:numi/core/network/program_models.dart';
 import 'package:numi/core/network/school_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
-import 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
 import 'package:numi/features/homework/homework_api.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/profile/data/school_api.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
+import 'package:numi/shared/layouts/app_screen_app_bar.dart';
+import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
 
 part '../cache/teacher_homework_cache.dart';
 part 'teacher_homework_detail_screen.dart';
@@ -203,7 +205,8 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
         bottom: false,
         child: Column(
           children: [
-            TeacherScreenAppBar(
+            AppScreenAppBar(
+              backIconAsset: 'assets/images/teacher_class_back.svg',
               title: context.getText(
                 teacherExerciseCopy(widget.purpose).titleKey,
               ),
@@ -248,7 +251,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                           ),
                         )
                       else if (_error != null && _exercises.isEmpty)
-                        TeacherErrorPanel(
+                        AppRetryPanel(
                           scale: 1,
                           message: _error!,
                           onRetry: _loadExercises,
@@ -272,8 +275,6 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                           if (index != _exercises.length - 1)
                             const SizedBox(height: 10),
                         ],
-                        if (_isLoading)
-                          const TeacherBackgroundRefreshLabel(scale: 1),
                       ],
                     ],
                   ),

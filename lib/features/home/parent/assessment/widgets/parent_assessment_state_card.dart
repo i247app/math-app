@@ -4,7 +4,8 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentAssessmentStateCard extends StatelessWidget {
-  const ParentAssessmentStateCard({super.key,
+  const ParentAssessmentStateCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.message,

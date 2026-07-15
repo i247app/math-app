@@ -18,6 +18,7 @@ class PageHeader extends StatelessWidget {
     this.horizontalPadding = 0,
     this.verticalPadding = 0,
     this.titleFontSize = FontSize.xxxl,
+    this.boxShadow,
   });
 
   final String? title;
@@ -30,6 +31,7 @@ class PageHeader extends StatelessWidget {
   final double horizontalPadding;
   final double verticalPadding;
   final double titleFontSize;
+  final List<BoxShadow>? boxShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,10 @@ class PageHeader extends StatelessWidget {
 
     return Container(
       height: resolvedTopInset + 60 * scale,
-      color: backgroundColor ?? colors.elevatedSurface,
+      decoration: BoxDecoration(
+        color: backgroundColor ?? colors.elevatedSurface,
+        boxShadow: boxShadow,
+      ),
       padding: EdgeInsets.fromLTRB(
         horizontalPadding * scale,
         resolvedTopInset + verticalPadding * scale,

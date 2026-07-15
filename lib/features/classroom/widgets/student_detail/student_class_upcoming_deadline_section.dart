@@ -7,7 +7,6 @@ import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_empty_panel.dart';
-import 'package:numi/features/classroom/widgets/student_detail/student_class_refresh_label.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_section_title.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_upcoming_deadline_tile.dart';
 import 'package:numi/features/homework/presentation/student_homework_attempt_screen.dart';
@@ -72,8 +71,6 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
                     _openHomeworkAttempt(context, upcomingExercises[index]),
               ),
             ),
-        if (isLoading && upcomingExercises.isNotEmpty)
-          const StudentClassRefreshLabel(),
       ],
     );
   }

@@ -3,7 +3,8 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentRoomShortcutTile extends StatelessWidget {
-  const ParentRoomShortcutTile({super.key,
+  const ParentRoomShortcutTile({
+    super.key,
     required this.icon,
     required this.iconColor,
     required this.iconBg,

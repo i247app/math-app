@@ -4,7 +4,8 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/home/parent/room/widgets/parent_room_shortcut_tile.dart';
 
 class ParentRoomDetailShortcuts extends StatelessWidget {
-  const ParentRoomDetailShortcuts({super.key,
+  const ParentRoomDetailShortcuts({
+    super.key,
     required this.pendingCount,
     required this.completedCount,
   });

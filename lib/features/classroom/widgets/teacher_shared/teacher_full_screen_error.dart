@@ -16,11 +16,7 @@ class _TeacherFullScreenError extends StatelessWidget {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(24 * scale),
-        child: TeacherErrorPanel(
-          scale: scale,
-          message: message,
-          onRetry: onRetry,
-        ),
+        child: AppRetryPanel(scale: scale, message: message, onRetry: onRetry),
       ),
     );
   }

@@ -9,7 +9,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
-import 'package:numi/features/classroom/widgets/student_detail/student_class_error_card.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_learning_category_section.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_teacher_profile_card.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_top_bar.dart';
@@ -130,7 +130,13 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                         children: [
                           if (detailState.errorMessage != null &&
                               classroom == null)
-                            StudentClassErrorCard(
+                            AppRetryPanel(
+                              scale: 1,
+                              padding: 17,
+                              borderRadius: 16,
+                              messageFontSize: 14,
+                              messageFontWeight: FontWeight.w700,
+                              filledAction: true,
                               message: detailState.errorMessage!,
                               onRetry: () => _loadDetail(forceRefresh: true),
                             )

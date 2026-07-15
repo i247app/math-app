@@ -418,7 +418,8 @@ class _TeacherCreateHomeworkScreenState
           bottom: false,
           child: Column(
             children: [
-              TeacherScreenAppBar(
+              AppScreenAppBar(
+                backIconAsset: 'assets/images/teacher_class_back.svg',
                 title: context.getText(
                   teacherExerciseCopy(widget.purpose).createTitleKey,
                 ),

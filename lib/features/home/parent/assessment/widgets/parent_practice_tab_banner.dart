@@ -4,7 +4,11 @@ import 'package:numi/features/home/shared/widgets/home_skeleton_block.dart';
 import 'package:numi/features/home/parent/assessment/widgets/parent_assessment_skeleton_pulse.dart';
 
 class ParentPracticeTabBanner extends StatelessWidget {
-  const ParentPracticeTabBanner({super.key, required this.onTap, required this.scale});
+  const ParentPracticeTabBanner({
+    super.key,
+    required this.onTap,
+    required this.scale,
+  });
 
   final VoidCallback onTap;
   final double scale;

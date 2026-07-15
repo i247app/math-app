@@ -5,7 +5,8 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentRoomListSection extends StatelessWidget {
-  const ParentRoomListSection({super.key,
+  const ParentRoomListSection({
+    super.key,
     required this.title,
     required this.child,
     required this.onViewAll,

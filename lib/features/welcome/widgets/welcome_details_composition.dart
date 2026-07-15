@@ -228,11 +228,7 @@ class _BrandLogo extends StatelessWidget {
                   fit: BoxFit.contain,
                 ),
                 SizedBox(width: 8 * scale),
-                NumiBrandText(
-                  fontSize: 20 * scale,
-                  firstColor: context.themeColors.brandStrong,
-                  secondColor: context.themeColors.accentStrong,
-                ),
+                NumiBrandText(fontSize: 20 * scale),
               ],
             ),
           ),

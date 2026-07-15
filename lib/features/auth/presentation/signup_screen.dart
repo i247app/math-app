@@ -15,7 +15,7 @@ import 'package:numi/features/auth/widgets/signup/signup_gender_radio_group.dart
 import 'package:numi/features/auth/widgets/signup/signup_role_card.dart';
 import 'package:numi/features/auth/widgets/signup/signup_text_field.dart';
 import 'package:numi/shared/layouts/screen_frame.dart';
-import 'package:numi/shared/widgets/auth_back_button.dart';
+import 'package:numi/shared/widgets/app_back_button.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -399,7 +399,7 @@ class _SignupHeroBanner extends StatelessWidget {
               actionWidth: 44,
               horizontalPadding: 20,
               verticalPadding: 8,
-              leading: AuthBackButton(onPressed: onBack),
+              leading: AppBackButton(onPressed: onBack),
             ),
           ),
           Positioned(

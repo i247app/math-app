@@ -78,7 +78,7 @@ class _TeacherCreateClassForm extends StatelessWidget {
             values: selectedPrograms,
             items: programs,
             displayText: programLabel,
-            itemId: _programStableId,
+            itemId: programStableId,
             emptyText: context.getText(AppKeys.chooseProgram),
             onChanged: onProgramsChanged,
             scale: scale,

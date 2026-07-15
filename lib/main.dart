@@ -4,13 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'app/numi_app.dart';
-import 'app/startup_bootstrap.dart';
-import 'core/debug/app_debug_bloc_observer.dart';
-import 'core/network/api_metadata.dart';
-import 'core/notifications/notification_service.dart';
+import 'package:numi/app/numi_app.dart';
+import 'package:numi/app/startup_bootstrap.dart';
+import 'package:numi/core/debug/app_debug_bloc_observer.dart';
+import 'package:numi/core/network/api_metadata.dart';
+import 'package:numi/core/notifications/notification_service.dart';
 
-export 'app/numi_app.dart';
+export 'package:numi/app/numi_app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

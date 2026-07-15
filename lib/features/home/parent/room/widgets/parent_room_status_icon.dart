@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ParentRoomStatusIcon extends StatelessWidget {
-  const ParentRoomStatusIcon({super.key,
+  const ParentRoomStatusIcon({
+    super.key,
     required this.icon,
     required this.color,
     required this.backgroundColor,
