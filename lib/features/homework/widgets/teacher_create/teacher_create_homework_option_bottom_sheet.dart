@@ -1,23 +1,25 @@
-import 'package:numi/core/theme/app_colors.dart';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
-import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
-class CreateHomeworkClassBottomSheet extends StatelessWidget {
-  const CreateHomeworkClassBottomSheet({
+class CreateHomeworkOptionBottomSheet<T> extends StatelessWidget {
+  const CreateHomeworkOptionBottomSheet({
     super.key,
-    required this.classrooms,
-    required this.selectedClassroomId,
+    required this.options,
+    required this.titleKey,
+    required this.isSelected,
+    required this.titleBuilder,
     required this.bottomInset,
+    this.subtitleBuilder,
   });
 
-  final List<ClassroomModel> classrooms;
-  final int selectedClassroomId;
+  final List<T> options;
+  final String titleKey;
+  final bool Function(T option) isSelected;
+  final String Function(BuildContext context, T option) titleBuilder;
+  final String Function(BuildContext context, T option)? subtitleBuilder;
   final double bottomInset;
 
   @override
@@ -53,7 +55,7 @@ class CreateHomeworkClassBottomSheet extends StatelessWidget {
               ),
             ),
             Text(
-              context.getText(AppKeys.teacherAssignmentSelectClass),
+              context.getText(titleKey),
               style: GoogleFonts.andika(
                 color: AppColors.teal520,
                 fontSize: 22,
@@ -67,47 +69,49 @@ class CreateHomeworkClassBottomSheet extends StatelessWidget {
               child: ListView.separated(
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
-                itemCount: classrooms.length,
+                itemCount: options.length,
                 separatorBuilder: (_, _) =>
                     const Divider(height: 1, color: Color(0xFFEFF4F5)),
                 itemBuilder: (context, index) {
-                  final classroom = classrooms[index];
-                  final classroomId = classroom.stableId;
-                  final isSelected = classroomId == selectedClassroomId;
+                  final option = options[index];
+                  final selected = isSelected(option);
+                  final subtitle = subtitleBuilder?.call(context, option);
                   return Material(
                     color: Colors.transparent,
                     child: ListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(
-                        createHomeworkClassName(context, classroom),
+                        titleBuilder(context, option),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: AppColors.textInkDark,
                           fontSize: 16,
-                          fontWeight: isSelected
+                          fontWeight: selected
                               ? FontWeight.w800
                               : FontWeight.w500,
                         ),
                       ),
-                      subtitle: Text(
-                        createHomeworkStudentCount(context, classroom),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.andika(
-                          color: AppColors.textCoolMuted,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      trailing: isSelected
+                      subtitle: subtitle == null
+                          ? null
+                          : Text(
+                              subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.andika(
+                                color: AppColors.textCoolMuted,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                      trailing: selected
                           ? const Icon(
                               Icons.check_circle_rounded,
                               color: AppColors.teal520,
                               size: 22,
                             )
                           : null,
-                      onTap: () => Navigator.of(context).pop(classroom),
+                      onTap: () => Navigator.of(context).pop(option),
                     ),
                   );
                 },

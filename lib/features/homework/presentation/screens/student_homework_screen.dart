@@ -15,7 +15,6 @@ import 'package:numi/features/homework/widgets/student_list/student_homework_fil
 import 'package:numi/features/homework/widgets/student_list/student_homework_filter_tabs.dart';
 import 'package:numi/features/homework/widgets/student_list/student_homework_helpers.dart';
 import 'package:numi/features/homework/widgets/student_list/student_homework_message.dart';
-import 'package:numi/features/homework/widgets/student_list/student_homework_refresh_label.dart';
 import 'package:numi/features/homework/widgets/student_list/student_homework_search_field.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/homework/widgets/student_list/student_homework_top_bar.dart';
@@ -253,7 +252,6 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                             onTap: () => _openExercise(visibleExercises[index]),
                           ),
                         ),
-                      if (_isLoading) const StudentHomeworkRefreshLabel(),
                     ],
                   ],
                 ),

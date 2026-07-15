@@ -19,15 +19,13 @@ import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/profile/data/school_api.dart';
 import 'package:numi/shared/layouts/app_screen_app_bar.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_bottom_sheet.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_selector.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_summary.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_date_field.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_input.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_label.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_labeled_input.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_program_bottom_sheet.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_option_bottom_sheet.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_publish_switch.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_select_field.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_submit_button.dart';
@@ -322,9 +320,12 @@ class _TeacherCreateHomeworkScreenState
       backgroundColor: Colors.transparent,
       builder: (context) {
         final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return CreateHomeworkClassBottomSheet(
-          classrooms: _classrooms,
-          selectedClassroomId: _selectedClassroomId,
+        return CreateHomeworkOptionBottomSheet<ClassroomModel>(
+          options: _classrooms,
+          titleKey: AppKeys.teacherAssignmentSelectClass,
+          isSelected: (classroom) => classroom.stableId == _selectedClassroomId,
+          titleBuilder: createHomeworkClassName,
+          subtitleBuilder: createHomeworkStudentCount,
           bottomInset: bottomInset,
         );
       },
@@ -356,9 +357,11 @@ class _TeacherCreateHomeworkScreenState
       backgroundColor: Colors.transparent,
       builder: (context) {
         final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return CreateHomeworkProgramBottomSheet(
+        return CreateHomeworkOptionBottomSheet<ClassroomProgramOption>(
           options: options,
-          selectedProgramId: _selectedProgramId,
+          titleKey: AppKeys.teacherAssignmentProgramLabel,
+          isSelected: (option) => option.id == _selectedProgramId,
+          titleBuilder: (_, option) => option.label,
           bottomInset: bottomInset,
         );
       },
@@ -476,9 +479,20 @@ class _TeacherCreateHomeworkScreenState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          CreateHomeworkClassSelector(
-                            classroom: _selectedClassroom,
+                          CreateHomeworkSelectField(
+                            valueText: createHomeworkClassName(
+                              context,
+                              _selectedClassroom,
+                            ),
                             isLoading: _isLoadingClassrooms,
+                            radius: 16,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            textOpacity: 1,
+                            iconAsset:
+                                'assets/images/teacher_homework_dropdown.svg',
+                            iconWidth: 12,
+                            iconHeight: 8,
                             onTap: _openClassSelector,
                           ),
                           const SizedBox(height: 10),

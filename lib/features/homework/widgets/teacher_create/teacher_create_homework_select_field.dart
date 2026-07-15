@@ -17,6 +17,10 @@ class CreateHomeworkSelectField extends StatelessWidget {
     this.radius = 8,
     this.borderColor = const Color(0xFFDDE4E6),
     this.borderWidth = 2,
+    this.isLoading = false,
+    this.fontSize = 14,
+    this.fontWeight = FontWeight.w400,
+    this.textOpacity = 0.7,
   });
 
   final String? valueKey;
@@ -28,6 +32,10 @@ class CreateHomeworkSelectField extends StatelessWidget {
   final double radius;
   final Color borderColor;
   final double borderWidth;
+  final bool isLoading;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final double textOpacity;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +45,7 @@ class CreateHomeworkSelectField extends StatelessWidget {
       color: colors.inputSurface,
       borderRadius: BorderRadius.circular(radius),
       child: InkWell(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         borderRadius: BorderRadius.circular(radius),
         child: Ink(
           height: 56,
@@ -60,13 +68,27 @@ class CreateHomeworkSelectField extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
-                    color: colors.textPrimary.withValues(alpha: 0.7),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    color: colors.textPrimary.withValues(alpha: textOpacity),
+                    fontSize: fontSize,
+                    fontWeight: fontWeight,
                   ),
                 ),
               ),
-              SvgPicture.asset(iconAsset, width: iconWidth, height: iconHeight),
+              if (isLoading)
+                SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colors.brandStrong,
+                  ),
+                )
+              else
+                SvgPicture.asset(
+                  iconAsset,
+                  width: iconWidth,
+                  height: iconHeight,
+                ),
             ],
           ),
         ),

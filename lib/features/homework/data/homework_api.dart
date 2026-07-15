@@ -62,8 +62,8 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     String? visibility,
     String? submissionStatus,
     String? purpose,
-  }) async {
-    try {
+  }) {
+    return _runExerciseRequest(() async {
       final response = await _networkApi.listClassroomExercises(
         ClassroomExerciseListRequest(
           classroomId: classroomId,
@@ -79,9 +79,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
         ),
       );
       return response.exercises;
-    } on NetworkException catch (error) {
-      throw ClassroomExerciseException(error.message, status: error.status);
-    }
+    });
   }
 
   @override
@@ -98,8 +96,8 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required String startDate,
     required String endDate,
     String purpose = classroomExercisePurposeHomework,
-  }) async {
-    try {
+  }) {
+    return _runExerciseRequest(() async {
       final response = await _networkApi.createClassroomExercise(
         CreateClassroomExerciseRequest(
           profileId: profileId,
@@ -117,17 +115,15 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
         ),
       );
       return response.exercise;
-    } on NetworkException catch (error) {
-      throw ClassroomExerciseException(error.message, status: error.status);
-    }
+    });
   }
 
   @override
   Future<ClassroomExercise?> getExerciseDetail({
     required int exerciseId,
     required int profileId,
-  }) async {
-    try {
+  }) {
+    return _runExerciseRequest(() async {
       final response = await _networkApi.getClassroomExerciseDetail(
         exerciseId: exerciseId,
         profileId: profileId,
@@ -137,9 +133,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
         throw const ClassroomExerciseException('');
       }
       return exercise;
-    } on NetworkException catch (error) {
-      throw ClassroomExerciseException(error.message, status: error.status);
-    }
+    });
   }
 
   @override
@@ -148,8 +142,8 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required int classroomExerciseId,
     required String visibility,
     String purpose = classroomExercisePurposeHomework,
-  }) async {
-    try {
+  }) {
+    return _runExerciseRequest(() async {
       final response = await _networkApi.updateClassroomExercise(
         UpdateClassroomExerciseRequest(
           profileId: profileId,
@@ -159,9 +153,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
         ),
       );
       return response.exercise;
-    } on NetworkException catch (error) {
-      throw ClassroomExerciseException(error.message, status: error.status);
-    }
+    });
   }
 
   @override
@@ -169,17 +161,23 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required int profileId,
     required int classroomExerciseId,
     required List<SubmitClassroomExerciseAnswer> answers,
-  }) async {
-    try {
-      return await _networkApi.submitClassroomExercise(
+  }) {
+    return _runExerciseRequest(() {
+      return _networkApi.submitClassroomExercise(
         SubmitClassroomExerciseRequest(
           profileId: profileId,
           classroomExerciseId: classroomExerciseId,
           answers: answers,
         ),
       );
-    } on NetworkException catch (error) {
-      throw ClassroomExerciseException(error.message, status: error.status);
-    }
+    });
+  }
+}
+
+Future<T> _runExerciseRequest<T>(Future<T> Function() request) async {
+  try {
+    return await request();
+  } on NetworkException catch (error) {
+    throw ClassroomExerciseException(error.message, status: error.status);
   }
 }
