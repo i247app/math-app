@@ -9,7 +9,6 @@ class AuthHeader extends StatelessWidget {
   const AuthHeader({
     super.key,
     required this.onBack,
-    required this.compact,
     required this.mascotShape,
     required this.mascotShadowAlpha,
     required this.mascotShadowBlur,
@@ -19,7 +18,6 @@ class AuthHeader extends StatelessWidget {
   });
 
   final VoidCallback onBack;
-  final bool compact;
   final String? title;
   final Widget? titleWidget;
   final BoxShape mascotShape;
@@ -33,9 +31,6 @@ class AuthHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final topGap = compact ? 54.0 : 74.0;
-    final mascotSize = compact ? 156.0 : 184.0;
-    final titleGap = compact ? 2.0 : 4.0;
 
     return Stack(
       children: [
@@ -58,11 +53,11 @@ class AuthHeader extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: topGap),
+            const SizedBox(height: 74),
             RepaintBoundary(
               child: Center(
                 child: _AuthMascot(
-                  size: mascotSize,
+                  size: 184,
                   shape: mascotShape,
                   shadowAlpha: mascotShadowAlpha,
                   shadowBlur: mascotShadowBlur,
@@ -71,7 +66,7 @@ class AuthHeader extends StatelessWidget {
               ),
             ),
             if (titleWidget != null || title != null) ...[
-              SizedBox(height: titleGap),
+              const SizedBox(height: 4),
               Center(
                 child:
                     titleWidget ??

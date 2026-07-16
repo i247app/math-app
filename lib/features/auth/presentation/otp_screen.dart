@@ -208,7 +208,7 @@ class _OtpScreenState extends State<OtpScreen>
     return AuthLayout(
       onBack: widget.onBack,
       title: 'OTP',
-      bodyBuilder: (context, compact) {
+      bodyBuilder: (context) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(

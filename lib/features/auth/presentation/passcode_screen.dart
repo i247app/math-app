@@ -176,13 +176,12 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       child: AuthLayout(
         onBack: widget.onBack,
         title: _titleText(context),
-        compactBodyGap: 46,
-        regularBodyGap: 54,
+        bodyGap: 54,
         mascotShape: BoxShape.rectangle,
         mascotShadowAlpha: 0.10,
         mascotShadowBlur: 24,
         mascotShadowOffset: const Offset(0, 16),
-        bodyBuilder: (context, compact) {
+        bodyBuilder: (context) {
           return ValueListenableBuilder<int>(
             valueListenable: _digitRevision,
             builder: (context, _, child) {
@@ -190,7 +189,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                 (controller) => controller.text.isNotEmpty,
               );
               return Padding(
-                padding: EdgeInsets.fromLTRB(28, 0, 28, compact ? 28 : 44),
+                padding: const EdgeInsets.fromLTRB(28, 0, 28, 44),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -246,7 +245,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                               ),
                       ),
                     ),
-                    SizedBox(height: compact ? 30 : 36),
+                    const SizedBox(height: 36),
                     PasscodeActionButton(
                       label: context.getText(_primaryLabelKey),
                       onPressed: isFull && !widget.isBusy

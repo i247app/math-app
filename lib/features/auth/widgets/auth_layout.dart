@@ -10,8 +10,7 @@ class AuthLayout extends StatelessWidget {
     required this.bodyBuilder,
     this.title,
     this.titleWidget,
-    this.compactBodyGap = 34,
-    this.regularBodyGap = 46,
+    this.bodyGap = 46,
     this.fillRemainingBody = false,
     this.mascotShape = BoxShape.circle,
     this.mascotShadowAlpha = 0.08,
@@ -20,11 +19,10 @@ class AuthLayout extends StatelessWidget {
   });
 
   final VoidCallback onBack;
-  final Widget Function(BuildContext context, bool compact) bodyBuilder;
+  final WidgetBuilder bodyBuilder;
   final String? title;
   final Widget? titleWidget;
-  final double compactBodyGap;
-  final double regularBodyGap;
+  final double bodyGap;
   final bool fillRemainingBody;
   final BoxShape mascotShape;
   final double mascotShadowAlpha;
@@ -32,7 +30,7 @@ class AuthLayout extends StatelessWidget {
   final Offset mascotShadowOffset;
 
   static const _maxWidth = 430.0;
-  static const _compactBreakpoint = 690.0;
+  static const _minHeight = 690.0;
 
   @override
   Widget build(BuildContext context) {
@@ -45,19 +43,14 @@ class AuthLayout extends StatelessWidget {
         color: colors.pageBackground,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final compact =
-                MediaQuery.sizeOf(context).height < _compactBreakpoint;
-            final minHeight = compact ? 610.0 : 690.0;
-            final bodyGap = compact ? compactBodyGap : regularBodyGap;
-
             return SingleChildScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               physics: const ClampingScrollPhysics(),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxWidth: _maxWidth,
-                    minHeight: minHeight,
+                    minHeight: _minHeight,
                   ),
                   child: SizedBox(
                     width: double.infinity,
@@ -69,7 +62,6 @@ class AuthLayout extends StatelessWidget {
                           onBack: onBack,
                           title: title,
                           titleWidget: titleWidget,
-                          compact: compact,
                           mascotShape: mascotShape,
                           mascotShadowAlpha: mascotShadowAlpha,
                           mascotShadowBlur: mascotShadowBlur,
@@ -77,9 +69,9 @@ class AuthLayout extends StatelessWidget {
                         ),
                         SizedBox(height: bodyGap),
                         if (fillRemainingBody)
-                          Expanded(child: bodyBuilder(context, compact))
+                          Expanded(child: bodyBuilder(context))
                         else
-                          bodyBuilder(context, compact),
+                          bodyBuilder(context),
                       ],
                     ),
                   ),
