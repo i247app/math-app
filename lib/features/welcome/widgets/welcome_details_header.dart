@@ -37,10 +37,14 @@ class WelcomeDetailsHeader extends StatelessWidget {
           child: SizedBox(
             height: isTablet ? 340 : 280,
             width: double.infinity,
-            child: Image.asset(
-              _heroAsset,
-              fit: BoxFit.cover,
-              alignment: Alignment.centerRight,
+            child: Transform.translate(
+              offset: const Offset(-32, 0),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 540),
+                  child: Image.asset(_heroAsset, fit: BoxFit.contain),
+                ),
+              ),
             ),
           ),
         ),
