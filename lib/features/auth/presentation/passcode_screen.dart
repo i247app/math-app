@@ -56,8 +56,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   List<TextEditingController> get _controllers => _codeInput.controllers;
   List<FocusNode> get _focusNodes => _codeInput.focusNodes;
 
-  static const _backIconAsset = 'assets/images/pin_figma_back.svg';
-
   bool get _isConfirmingSetup =>
       widget.mode == PasscodeScreenMode.setup && _firstPasscode != null;
 
@@ -178,14 +176,12 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       child: AuthLayout(
         onBack: widget.onBack,
         title: _titleText(context),
-        horizontalPadding: 0,
         compactBodyGap: 46,
         regularBodyGap: 54,
         mascotShape: BoxShape.rectangle,
         mascotShadowAlpha: 0.10,
         mascotShadowBlur: 24,
         mascotShadowOffset: const Offset(0, 16),
-        backIconAsset: _backIconAsset,
         bodyBuilder: (context, compact) {
           return ValueListenableBuilder<int>(
             valueListenable: _digitRevision,
