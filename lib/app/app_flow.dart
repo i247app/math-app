@@ -14,11 +14,11 @@ import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
-import 'package:numi/features/auth/widgets/onboarding_screen_switcher.dart';
+import 'package:numi/app/app_screen_router.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 
-class NumiHome extends StatefulWidget {
-  const NumiHome({
+class AppFlow extends StatefulWidget {
+  const AppFlow({
     super.key,
     this.authService,
     this.initialSession,
@@ -30,10 +30,10 @@ class NumiHome extends StatefulWidget {
   final bool restoreSessionOnStart;
 
   @override
-  State<NumiHome> createState() => _NumiHomeState();
+  State<AppFlow> createState() => _AppFlowState();
 }
 
-class _NumiHomeState extends State<NumiHome> {
+class _AppFlowState extends State<AppFlow> {
   final phoneController = TextEditingController();
   bool _phoneHasInput = false;
   String? _lastLookupPhone;
@@ -226,7 +226,7 @@ class _NumiHomeState extends State<NumiHome> {
                         scaffoldState.screen != AppScreen.login &&
                         scaffoldState.screen != AppScreen.otp &&
                         scaffoldState.screen != AppScreen.passcode,
-                    body: OnboardingScreenSwitcher(
+                    body: AppScreenRouter(
                       phoneController: phoneController,
                       phoneHasInput: _phoneHasInput,
                       clearLoginPhoneInput: clearLoginPhoneInput,

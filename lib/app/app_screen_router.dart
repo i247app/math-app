@@ -18,8 +18,8 @@ import 'package:numi/features/welcome/presentation/welcome_details_screen.dart';
 import 'package:numi/features/welcome/presentation/welcome_screen.dart';
 import 'package:numi/shared/widgets/loading_screen.dart';
 
-class OnboardingScreenSwitcher extends StatelessWidget {
-  const OnboardingScreenSwitcher({
+class AppScreenRouter extends StatelessWidget {
+  const AppScreenRouter({
     super.key,
     required this.phoneController,
     required this.phoneHasInput,
@@ -220,7 +220,7 @@ class OnboardingScreenSwitcher extends StatelessWidget {
                 actionLabel: actionLabel,
                 isSignupEntry: isSignupEntry,
               ),
-            _OnboardingSlideSwitcher(
+            _AppScreenSlideSwitcher(
               screen: state.isRestoringSession ? null : state.screen,
               child: transitionChild,
             ),
@@ -314,18 +314,18 @@ String? _phoneLookupErrorText({
   return phoneLookupError;
 }
 
-class _OnboardingSlideSwitcher extends StatefulWidget {
-  const _OnboardingSlideSwitcher({required this.screen, required this.child});
+class _AppScreenSlideSwitcher extends StatefulWidget {
+  const _AppScreenSlideSwitcher({required this.screen, required this.child});
 
   final AppScreen? screen;
   final Widget child;
 
   @override
-  State<_OnboardingSlideSwitcher> createState() =>
-      _OnboardingSlideSwitcherState();
+  State<_AppScreenSlideSwitcher> createState() =>
+      _AppScreenSlideSwitcherState();
 }
 
-class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
+class _AppScreenSlideSwitcherState extends State<_AppScreenSlideSwitcher>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late Widget _currentChild;
@@ -350,7 +350,7 @@ class _OnboardingSlideSwitcherState extends State<_OnboardingSlideSwitcher>
   }
 
   @override
-  void didUpdateWidget(covariant _OnboardingSlideSwitcher oldWidget) {
+  void didUpdateWidget(covariant _AppScreenSlideSwitcher oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.child.key == _currentChild.key) {
       _currentChild = widget.child;

@@ -9,7 +9,7 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/core/theme/app_theme_controller.dart';
 import 'package:numi/core/theme/app_theme_scope.dart';
-import 'package:numi/features/auth/application/auth_flow.dart';
+import 'package:numi/app/app_flow.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 
@@ -127,7 +127,7 @@ class _NumiAppState extends State<NumiApp> {
                 darkTheme: AppTheme.dark(),
                 themeMode: _themeController.themeMode,
                 navigatorObservers: [_KeyboardDismissNavigatorObserver()],
-                home: NumiHome(
+                home: AppFlow(
                   authService: widget.authService,
                   initialSession: _startupSession,
                   restoreSessionOnStart: _restoreSessionOnNextHome,
