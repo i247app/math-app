@@ -16,6 +16,11 @@ class PasscodeActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AuthActionButton(label: label, onPressed: onPressed, isBusy: isBusy);
+    return AuthActionButton(
+      label: label,
+      onPressed: onPressed,
+      layout: AuthActionButtonLayout.compact,
+      isBusy: isBusy,
+    );
   }
 }

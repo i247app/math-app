@@ -190,7 +190,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                 (controller) => controller.text.isNotEmpty,
               );
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
+                padding: EdgeInsets.fromLTRB(28, 0, 28, compact ? 28 : 44),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -247,23 +247,18 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                       ),
                     ),
                     SizedBox(height: compact ? 30 : 36),
-                    SizedBox(
-                      width: 230,
-                      height: 58,
-                      child: PasscodeActionButton(
-                        label: context.getText(_primaryLabelKey),
-                        onPressed: isFull && !widget.isBusy
-                            ? _handleSubmit
-                            : null,
-                        isBusy: widget.isBusy,
-                      ),
+                    PasscodeActionButton(
+                      label: context.getText(_primaryLabelKey),
+                      onPressed: isFull && !widget.isBusy
+                          ? _handleSubmit
+                          : null,
+                      isBusy: widget.isBusy,
                     ),
                     const SizedBox(height: 14),
                     _PasscodeTextAction(
                       label: context.getText(_secondaryLabelKey),
                       onPressed: widget.isBusy ? null : _secondaryAction,
                     ),
-                    SizedBox(height: compact ? 28 : 44),
                   ],
                 ),
               );
