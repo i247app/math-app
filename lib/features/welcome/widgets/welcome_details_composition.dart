@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,8 +19,6 @@ class WelcomeDetailsComposition extends StatelessWidget {
   final VoidCallback onStart;
   final VoidCallback onBack;
 
-  static const _designWidth = 360.0;
-  static const _designHeight = 800.0;
   static const _assetPrefix = 'assets/images/welcome_screen/';
   static const _heroAsset = '${_assetPrefix}welcome_hero_math_friends.png';
   static const _mascotLogoAsset = '${_assetPrefix}welcome_logo_mascot.png';
@@ -37,168 +33,156 @@ class WelcomeDetailsComposition extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final height = constraints.maxHeight;
-        final scale = math.min(width / _designWidth, height / _designHeight);
-        final canvasWidth = _designWidth * scale;
-        final canvasLeft = (width - canvasWidth) / 2;
-        final topPadding = math.max(0.0, (height - _designHeight * scale) / 2);
-        final bottomSafe = MediaQuery.paddingOf(context).bottom;
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  colors.pageBackgroundTop,
+                  colors.pageBackground,
+                  colors.surface,
+                ],
+                stops: const [0, 0.42, 1],
+              ),
+            ),
+          ),
+        ),
+        SafeArea(
+          bottom: false,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
 
-        double s(double value) => value * scale;
-        // The start button has 16px vertical padding on each side plus its
-        // label. Reserve enough height for that content so the label is not
-        // clipped by this fixed-size control area.
-        final controlsHeight = s(56);
-        final controlsBottom = math.max(bottomSafe + s(22), s(30));
-        final gridGap = s(12);
-        final gridHeight = s(132) * 2 + gridGap;
-        final gridBottom = controlsBottom + controlsHeight + s(35);
-        final logoTop = math.max(topPadding + s(18), s(14));
-        final heroTop = math.max(topPadding + s(78), s(68));
-
-        return MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: TextScaler.noScaling),
-          child: Stack(
-            clipBehavior: Clip.hardEdge,
-            children: [
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        colors.pageBackgroundTop,
-                        colors.pageBackground,
-                        colors.surface,
+              return MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: TextScaler.noScaling),
+                child: SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                              child: Center(
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 420,
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: _BrandLogo(onTap: onBack),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: SizedBox(
+                                height: isTablet ? 340 : 280,
+                                width: double.infinity,
+                                child: Image.asset(
+                                  _heroAsset,
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.centerRight,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            children: [
+                              const Center(child: _FeatureGrid()),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  top: 28,
+                                  bottom:
+                                      MediaQuery.paddingOf(context).bottom + 20,
+                                ),
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 420,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const _PageIndicator(),
+                                      const Spacer(),
+                                      SizedBox(
+                                        width: 143,
+                                        child: WelcomeStartButton(
+                                          onStart: onStart,
+                                          scale: 1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
-                      stops: [0, 0.42, 1],
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                left: canvasLeft + s(-128),
-                top: heroTop,
-                width: s(540),
-                height: s(360),
-                child: IgnorePointer(
-                  child: Image.asset(_heroAsset, fit: BoxFit.contain),
-                ),
-              ),
-              Positioned(
-                left: canvasLeft + s(16),
-                top: logoTop,
-                width: s(156),
-                height: s(32),
-                child: _BrandLogo(onTap: onBack),
-              ),
-              Positioned(
-                left: canvasLeft + s(16),
-                bottom: gridBottom,
-                width: canvasWidth - s(32),
-                height: gridHeight,
-                child: _FeatureGrid(scale: scale),
-              ),
-              Positioned(
-                left: canvasLeft + s(24),
-                bottom: controlsBottom,
-                width: canvasWidth - s(39),
-                height: controlsHeight,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: s(56),
-                      height: s(8),
-                      child: const _PageIndicator(),
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                      width: s(143),
-                      height: controlsHeight,
-                      child: WelcomeStartButton(onStart: onStart, scale: scale),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              );
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }
 
 class _FeatureGrid extends StatelessWidget {
-  const _FeatureGrid({required this.scale});
-
-  final double scale;
+  const _FeatureGrid();
 
   @override
   Widget build(BuildContext context) {
-    final cardWidth = 156 * scale;
-    final cardHeight = 132 * scale;
-    final gap = 12 * scale;
-
-    return Column(
-      children: [
-        Row(
-          children: [
-            SizedBox(
-              width: cardWidth,
-              height: cardHeight,
-              child: _FeatureCard(
-                imageAsset: WelcomeDetailsComposition._teacherAsset,
-                imageSize: 54,
-                title: context.getText(AppKeys.welcomeAssessmentTitle),
-                subtitle: context.getText(AppKeys.welcomeAssessmentSubtitle),
-              ),
-            ),
-            SizedBox(width: gap),
-            SizedBox(
-              width: cardWidth,
-              height: cardHeight,
-              child: _FeatureCard(
-                imageAsset: WelcomeDetailsComposition._assessmentAsset,
-                imageSize: 54,
-                title: context.getText(AppKeys.welcomeLearnMathTitle),
-                subtitle: context.getText(AppKeys.welcomeLearnMathSubtitle),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: gap),
-        Row(
-          children: [
-            SizedBox(
-              width: cardWidth,
-              height: cardHeight,
-              child: _FeatureCard(
-                imageAsset: WelcomeDetailsComposition._progressAsset,
-                imageSize: 54,
-                title: context.getText(AppKeys.welcomeParentTeacherTitle),
-                subtitle: context.getText(AppKeys.welcomeParentTeacherSubtitle),
-              ),
-            ),
-            SizedBox(width: gap),
-            SizedBox(
-              width: cardWidth,
-              height: cardHeight,
-              child: _FeatureCard(
-                imageAsset: WelcomeDetailsComposition._gameAsset,
-                imageSize: 54,
-                title: context.getText(AppKeys.welcomeGamesTitle),
-                subtitle: context.getText(AppKeys.welcomeGamesSubtitle),
-              ),
-            ),
-          ],
-        ),
-      ],
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 420),
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        mainAxisExtent: 132,
+        children: [
+          _FeatureCard(
+            imageAsset: WelcomeDetailsComposition._teacherAsset,
+            title: context.getText(AppKeys.welcomeAssessmentTitle),
+            subtitle: context.getText(AppKeys.welcomeAssessmentSubtitle),
+          ),
+          _FeatureCard(
+            imageAsset: WelcomeDetailsComposition._assessmentAsset,
+            title: context.getText(AppKeys.welcomeLearnMathTitle),
+            subtitle: context.getText(AppKeys.welcomeLearnMathSubtitle),
+          ),
+          _FeatureCard(
+            imageAsset: WelcomeDetailsComposition._progressAsset,
+            title: context.getText(AppKeys.welcomeParentTeacherTitle),
+            subtitle: context.getText(AppKeys.welcomeParentTeacherSubtitle),
+          ),
+          _FeatureCard(
+            imageAsset: WelcomeDetailsComposition._gameAsset,
+            title: context.getText(AppKeys.welcomeGamesTitle),
+            subtitle: context.getText(AppKeys.welcomeGamesSubtitle),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -210,33 +194,28 @@ class _BrandLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final scale = constraints.maxHeight / 32;
-
-        return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              onTap();
-            },
-            borderRadius: BorderRadius.circular(10 * scale),
-            child: Row(
-              children: [
-                Image.asset(
-                  WelcomeDetailsComposition._mascotLogoAsset,
-                  width: 31 * scale,
-                  height: 31 * scale,
-                  fit: BoxFit.contain,
-                ),
-                SizedBox(width: 8 * scale),
-                NumiBrandText(fontSize: 20 * scale),
-              ],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              WelcomeDetailsComposition._mascotLogoAsset,
+              width: 31,
+              height: 31,
+              fit: BoxFit.contain,
             ),
-          ),
-        );
-      },
+            const SizedBox(width: 8),
+            const NumiBrandText(fontSize: 20),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -244,13 +223,11 @@ class _BrandLogo extends StatelessWidget {
 class _FeatureCard extends StatelessWidget {
   const _FeatureCard({
     required this.imageAsset,
-    required this.imageSize,
     required this.title,
     required this.subtitle,
   });
 
   final String imageAsset;
-  final double imageSize;
   final String title;
   final String subtitle;
 
@@ -258,72 +235,56 @@ class _FeatureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final scale = constraints.maxWidth / 156;
-
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            color: colors.elevatedSurface,
-            borderRadius: BorderRadius.circular(8 * scale),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withValues(alpha: 0.08),
-                offset: Offset(0, 8 * scale),
-                blurRadius: 20 * scale,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.elevatedSurface,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.08),
+            offset: const Offset(0, 8),
+            blurRadius: 20,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
+        child: Column(
+          children: [
+            Image.asset(imageAsset, width: 54, height: 54, fit: BoxFit.contain),
+            const SizedBox(height: 8),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                title,
+                maxLines: 1,
+                style: GoogleFonts.nunito(
+                  color: colors.welcomeTitle,
+                  fontSize: FontSize.normal,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ],
-          ),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              12 * scale,
-              14 * scale,
-              12 * scale,
-              10 * scale,
             ),
-            child: Column(
-              children: [
-                Image.asset(
-                  imageAsset,
-                  width: imageSize * scale,
-                  height: imageSize * scale,
-                  fit: BoxFit.contain,
+            const SizedBox(height: 4),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                subtitle,
+                maxLines: 1,
+                style: GoogleFonts.nunito(
+                  color: colors.textSecondary,
+                  fontSize: FontSize.small,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
                 ),
-                SizedBox(height: 8 * scale),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    title,
-                    maxLines: 1,
-                    style: GoogleFonts.nunito(
-                      color: colors.welcomeTitle,
-                      fontSize: FontSize.normal,
-                      fontWeight: FontWeight.w800,
-                      height: 1.15,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(height: 4 * scale),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    subtitle,
-                    maxLines: 1,
-                    style: GoogleFonts.nunito(
-                      color: colors.textSecondary,
-                      fontSize: FontSize.small,
-                      fontWeight: FontWeight.w500,
-                      height: 1.2,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }
@@ -335,44 +296,36 @@ class _PageIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final scale = constraints.maxWidth / 56;
-        final dotSize = 8 * scale;
-
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _IndicatorDot(color: colors.welcomeInactiveDot, size: dotSize),
-            SizedBox(width: 8 * scale),
-            Container(
-              width: 24 * scale,
-              height: dotSize,
-              decoration: BoxDecoration(
-                color: colors.accent,
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
-            SizedBox(width: 8 * scale),
-            _IndicatorDot(color: colors.welcomeInactiveDot, size: dotSize),
-          ],
-        );
-      },
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _IndicatorDot(color: colors.welcomeInactiveDot),
+        const SizedBox(width: 8),
+        Container(
+          width: 24,
+          height: 8,
+          decoration: BoxDecoration(
+            color: colors.accent,
+            borderRadius: BorderRadius.circular(999),
+          ),
+        ),
+        const SizedBox(width: 8),
+        _IndicatorDot(color: colors.welcomeInactiveDot),
+      ],
     );
   }
 }
 
 class _IndicatorDot extends StatelessWidget {
-  const _IndicatorDot({required this.color, required this.size});
+  const _IndicatorDot({required this.color});
 
   final Color color;
-  final double size;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: size,
-      height: size,
+      width: 8,
+      height: 8,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }

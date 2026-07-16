@@ -23,23 +23,9 @@ class WelcomeDetailsScreen extends StatelessWidget {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayStyle,
-      child: ColoredBox(
-        color: colors.pageBackground,
-        child: SafeArea(
-          bottom: false,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SizedBox(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight,
-                child: WelcomeDetailsComposition(
-                  onStart: onStart,
-                  onBack: onBack,
-                ),
-              );
-            },
-          ),
-        ),
+      child: Scaffold(
+        backgroundColor: colors.pageBackground,
+        body: WelcomeDetailsComposition(onStart: onStart, onBack: onBack),
       ),
     );
   }
