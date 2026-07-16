@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/auth/widgets/auth_digit_box.dart';
 import 'package:numi/features/auth/widgets/otp/otp_action_button.dart';
-import 'package:numi/features/auth/widgets/otp/otp_digit_box.dart';
 
 class OtpCard extends StatelessWidget {
   const OtpCard({
@@ -53,7 +53,7 @@ class OtpCard extends StatelessWidget {
               child: SizedBox(
                 width: 64,
                 height: 70,
-                child: OtpDigitBox(
+                child: AuthDigitBox.otp(
                   controller: controllers[index],
                   focusNode: focusNodes[index],
                   // Focus is requested by OtpScreen after the fields have

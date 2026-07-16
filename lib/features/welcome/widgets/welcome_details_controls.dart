@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/welcome/widgets/welcome_start_button.dart';
 
@@ -22,7 +23,11 @@ class WelcomeDetailsControls extends StatelessWidget {
             const Spacer(),
             SizedBox(
               width: 143,
-              child: WelcomeStartButton(onStart: onStart, scale: 1),
+              child: WelcomeStartButton(
+                onStart: onStart,
+                scale: 1,
+                labelKey: AppKeys.continueUpper,
+              ),
             ),
           ],
         ),
