@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+
 import 'numi_brand_text.dart';
-import 'welcome_start_button.dart';
 import 'welcome_login_button.dart';
+import 'welcome_start_button.dart';
 
 class WelcomeComposition extends StatelessWidget {
   final VoidCallback onStart;
@@ -20,37 +24,36 @@ class WelcomeComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // 1. BACKGROUND LAYER: Glued to the absolute bottom edge
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Image.asset(
-              _wavesAsset,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+    final colors = context.themeColors;
+
+    return Stack(
+      children: [
+        Positioned.fill(child: ColoredBox(color: colors.pageBackground)),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Image.asset(
+            _wavesAsset,
+            width: double.infinity,
+            fit: BoxFit.cover,
           ),
+        ),
 
-          // 2. CONTENT LAYER: Scrollable container viewport to cleanly absorb tight screens
-          SafeArea(
-            bottom: false,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isTablet = constraints.maxWidth > 600;
+        SafeArea(
+          bottom: false,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
 
-                return SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: IntrinsicHeight(
-                      child: Column(
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
                         children: [
                           SizedBox(height: isTablet ? 48 : 24),
 
@@ -70,14 +73,22 @@ class WelcomeComposition extends StatelessWidget {
                           // Math AI Subtitle
                           RichText(
                             textAlign: TextAlign.center,
-                            text: const TextSpan(
-                              style: TextStyle(
+                            text: TextSpan(
+                              style: const TextStyle(
                                 fontSize: 28.0,
                                 fontWeight: FontWeight.w600,
                               ),
                               children: [
-                                TextSpan(text: 'Math ', style: TextStyle(color: Color(0xFF2B8A9E))),
-                                TextSpan(text: 'AI', style: TextStyle(color: Color(0xFFFF6B2C))),
+                                TextSpan(
+                                  text: context.getText(
+                                    AppKeys.welcomeTaglineMath,
+                                  ),
+                                  style: TextStyle(color: colors.brand),
+                                ),
+                                TextSpan(
+                                  text: 'AI',
+                                  style: TextStyle(color: colors.accentStrong),
+                                ),
                               ],
                             ),
                           ),
@@ -86,10 +97,12 @@ class WelcomeComposition extends StatelessWidget {
 
                           // Learning & Assessment Tagline
                           Text(
-                            'Learning & Assessment',
+                            context.getText(
+                              AppKeys.welcomeTaglineStudyAssessment,
+                            ),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.nunito(
-                              color: const Color(0xFF2B8A9E),
+                              color: colors.brand,
                               fontSize: 20.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -102,33 +115,31 @@ class WelcomeComposition extends StatelessWidget {
                             width: 40,
                             height: 4,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF6B2C),
+                              color: colors.accentStrong,
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
-
-                          // Restored the true Spacer! This expands aggressively to lock buttons to the bottom.
-                          const Spacer(),
-
-                          // Book Illustration
+                        ],
+                      ),
+                      Column(
+                        children: [
                           Image.asset(
                             _booksAsset,
                             height: isTablet ? 180 : 130,
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(height: 24),
-
-                          // Button action hub - Tablet-safe, beautifully constrained layout
                           Center(
                             child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxWidth: 420, // Clean desktop/tablet capping width
-                              ),
+                              constraints: const BoxConstraints(maxWidth: 420),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 56),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 56,
+                                ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     WelcomeStartButton(
                                       onStart: onStart,
@@ -138,25 +149,26 @@ class WelcomeComposition extends StatelessWidget {
                                     WelcomeLoginButton(
                                       onLogin: onLogin,
                                       scale: 1.0,
+                                      labelKey: AppKeys.welcomeLogin,
                                     ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-
-                          // Dynamically pads the baseline using the device safe area guidelines
-                          SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
+                          SizedBox(
+                            height: MediaQuery.paddingOf(context).bottom + 20,
+                          ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// Using an absolute package path bypasses relative directory confusion completely
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/welcome/widgets/welcome_composition.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -15,13 +15,8 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: WelcomeComposition(
-          onStart: onStart,
-          onLogin: onLogin,
-        ),
-      ),
+      backgroundColor: context.themeColors.pageBackground,
+      body: WelcomeComposition(onStart: onStart, onLogin: onLogin),
     );
   }
 }

@@ -27,7 +27,7 @@ const welcomeStrings = <String, Map<String, String>>{
     AppKeys.welcomeLogin: 'LOG IN',
     AppKeys.start: 'START',
     AppKeys.welcomeTaglineMath: 'Math ',
-    AppKeys.welcomeTaglineStudyAssessment: 'Learn & assessment',
+    AppKeys.welcomeTaglineStudyAssessment: 'Learn & Assessment',
     AppKeys.welcomeAssessmentTitle: 'Assessments',
     AppKeys.welcomeAssessmentSubtitle: 'Skills assessment',
     AppKeys.welcomeLearnMathTitle: 'Learn Math',
