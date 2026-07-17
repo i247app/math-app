@@ -243,7 +243,6 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
                 canGoBack: true,
                 onBack: _close,
                 backgroundColor: context.themeColors.elevatedSurface,
-                scale: scale,
                 topInset: 0,
               ),
               SizedBox(height: 36 * scale),

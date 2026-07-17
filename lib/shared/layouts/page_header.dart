@@ -8,7 +8,7 @@ import 'package:numi/core/theme/font_size.dart';
 class PageHeader extends StatelessWidget {
   const PageHeader({
     super.key,
-    required this.scale,
+    this.scale = 1,
     this.title,
     this.topInset,
     this.backgroundColor,

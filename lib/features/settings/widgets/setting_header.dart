@@ -9,7 +9,6 @@ class SettingHeader extends StatelessWidget {
     required this.canGoBack,
     required this.onBack,
     required this.backgroundColor,
-    required this.scale,
     required this.topInset,
   });
 
@@ -17,14 +16,12 @@ class SettingHeader extends StatelessWidget {
   final bool canGoBack;
   final VoidCallback onBack;
   final Color backgroundColor;
-  final double scale;
   final double topInset;
 
   @override
   Widget build(BuildContext context) {
     return PageHeader(
       title: title,
-      scale: scale,
       topInset: topInset,
       backgroundColor: backgroundColor,
       actionWidth: 40,
@@ -35,7 +32,6 @@ class SettingHeader extends StatelessWidget {
               icon: Icons.arrow_back_rounded,
               outlined: false,
               onTap: onBack,
-              scale: scale,
             )
           : null,
     );
@@ -47,13 +43,11 @@ class _SettingHeaderButton extends StatelessWidget {
     required this.icon,
     required this.outlined,
     required this.onTap,
-    required this.scale,
   });
 
   final IconData icon;
   final bool outlined;
   final VoidCallback onTap;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +59,9 @@ class _SettingHeaderButton extends StatelessWidget {
         onTap();
       },
       child: SizedBox(
-        width: 40 * scale,
-        height: 40 * scale,
-        child: Icon(icon, color: colors.brandStrong, size: 22 * scale),
+        width: 40,
+        height: 40,
+        child: Icon(icon, color: colors.brandStrong, size: 22),
       ),
     );
   }

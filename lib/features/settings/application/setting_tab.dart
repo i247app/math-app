@@ -1616,7 +1616,6 @@ class _SettingTabState extends State<SettingTab> {
                           ? _returnToProfileList
                           : _returnToSettings,
                       backgroundColor: backgroundColor,
-                      scale: scale,
                       topInset: topInset,
                     ),
                     SizedBox(height: _topGapForView(_view) * scale),
