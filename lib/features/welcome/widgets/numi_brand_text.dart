@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class NumiBrandText extends StatelessWidget {
   final double? fontSize;
@@ -18,7 +19,7 @@ class NumiBrandText extends StatelessWidget {
           textAlign: TextAlign.center,
           text: TextSpan(
             style: GoogleFonts.bagelFatOne(
-              fontSize: fontSize ?? 42.0, // Fixed size for the main title
+              fontSize: fontSize ?? FontSize.displayExtraLarge,
               letterSpacing: 1.0,
             ),
             children: [

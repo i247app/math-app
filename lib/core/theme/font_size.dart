@@ -1,7 +1,11 @@
 abstract final class FontSize {
+  static const double displayExtraLarge = 42.0;
   static const double displayLarge = 36.0;
   static const double displayMedium = 34.0;
   static const double displaySmall = 30.0;
+
+  static const double headlineLarge = 28.0;
+
   static const double xxxl = 24.0;
   static const double xxl = 22.0;
   static const double xl = 20.0;

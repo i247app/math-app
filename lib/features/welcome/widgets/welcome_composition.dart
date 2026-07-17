@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'numi_brand_text.dart';
 import 'welcome_login_button.dart';
@@ -66,7 +67,7 @@ class WelcomeComposition extends StatelessWidget {
                           const SizedBox(height: 16),
 
                           // Brand text
-                          const NumiBrandText(fontSize: 42.0),
+                          const NumiBrandText(),
 
                           const SizedBox(height: 4),
 
@@ -74,10 +75,11 @@ class WelcomeComposition extends StatelessWidget {
                           RichText(
                             textAlign: TextAlign.center,
                             text: TextSpan(
-                              style: const TextStyle(
-                                fontSize: 28.0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium!
+                                  .copyWith(
+                                    fontSize: FontSize.headlineLarge,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                               children: [
                                 TextSpan(
                                   text: context.getText(
@@ -103,7 +105,7 @@ class WelcomeComposition extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: GoogleFonts.nunito(
                               color: colors.brand,
-                              fontSize: 20.0,
+                              fontSize: FontSize.xl,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -141,14 +143,10 @@ class WelcomeComposition extends StatelessWidget {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    WelcomeStartButton(
-                                      onStart: onStart,
-                                      scale: 1.0,
-                                    ),
+                                    WelcomeStartButton(onStart: onStart),
                                     const SizedBox(height: 16),
                                     WelcomeLoginButton(
                                       onLogin: onLogin,
-                                      scale: 1.0,
                                       labelKey: AppKeys.welcomeLogin,
                                     ),
                                   ],

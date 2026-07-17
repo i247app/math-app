@@ -5,17 +5,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class WelcomeLoginButton extends StatelessWidget {
   const WelcomeLoginButton({
     super.key,
     required this.onLogin,
-    required this.scale,
     this.labelKey = AppKeys.login,
   });
 
   final VoidCallback onLogin;
-  final double scale;
   final String labelKey;
 
   @override
@@ -31,15 +30,12 @@ class WelcomeLoginButton extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(999),
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 12 * scale,
-            vertical: 6 * scale,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Text(
             context.getText(labelKey).toUpperCase(),
             style: GoogleFonts.nunito(
               color: loginColor,
-              fontSize: 18 * scale,
+              fontSize: FontSize.large,
               fontWeight: FontWeight.w800,
               height: 1.2,
               decorationColor: loginColor,

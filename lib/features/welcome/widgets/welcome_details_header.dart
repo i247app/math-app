@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/welcome/widgets/numi_brand_text.dart';
 
 class WelcomeDetailsHeader extends StatelessWidget {
@@ -78,7 +79,7 @@ class _BrandLogo extends StatelessWidget {
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 8),
-            const NumiBrandText(fontSize: 20),
+            const NumiBrandText(fontSize: FontSize.xl),
           ],
         ),
       ),

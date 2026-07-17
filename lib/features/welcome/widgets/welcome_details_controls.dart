@@ -25,7 +25,6 @@ class WelcomeDetailsControls extends StatelessWidget {
               width: 143,
               child: WelcomeStartButton(
                 onStart: onStart,
-                scale: 1,
                 labelKey: AppKeys.continueUpper,
               ),
             ),
