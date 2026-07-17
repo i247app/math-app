@@ -86,6 +86,7 @@ class _AuthActionButtonLabel extends StatelessWidget {
         maxLines: 1,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+          color: DefaultTextStyle.of(context).style.color,
           fontSize: FontSize.large,
           fontWeight: FontWeight.w700,
           height: 1.1,
