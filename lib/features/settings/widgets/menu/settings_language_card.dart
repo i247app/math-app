@@ -14,12 +14,10 @@ class SettingsLanguageCard extends StatelessWidget {
   const SettingsLanguageCard({
     super.key,
     required this.currentLanguage,
-    required this.scale,
     required this.onLanguageChanged,
   });
 
   final AppLanguage currentLanguage;
-  final double scale;
   final ValueChanged<AppLanguage> onLanguageChanged;
 
   Future<void> _showLanguageSheet(BuildContext context) async {
@@ -29,10 +27,7 @@ class SettingsLanguageCard extends StatelessWidget {
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(alpha: 0.32),
       builder: (sheetContext) {
-        return LanguageBottomSheet(
-          currentLanguage: currentLanguage,
-          scale: scale,
-        );
+        return LanguageBottomSheet(currentLanguage: currentLanguage);
       },
     );
 
@@ -45,7 +40,7 @@ class SettingsLanguageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final radius = BorderRadius.circular(16 * scale);
+    final radius = BorderRadius.circular(16);
 
     return Material(
       color: colors.elevatedSurface,
@@ -55,24 +50,24 @@ class SettingsLanguageCard extends StatelessWidget {
         onTap: () => _showLanguageSheet(context),
         borderRadius: radius,
         child: Container(
-          height: 72 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 16 * scale),
+          constraints: const BoxConstraints(minHeight: 72),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: colors.elevatedSurface,
             borderRadius: radius,
             boxShadow: [
               BoxShadow(
                 color: colors.shadow.withValues(alpha: 0.06),
-                blurRadius: 10 * scale,
-                offset: Offset(0, 3 * scale),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Row(
             children: [
               Container(
-                width: 42 * scale,
-                height: 42 * scale,
+                width: 42,
+                height: 42,
                 decoration: BoxDecoration(
                   color: colors.brand.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
@@ -80,23 +75,23 @@ class SettingsLanguageCard extends StatelessWidget {
                 child: Icon(
                   Icons.language_rounded,
                   color: colors.brandStrong,
-                  size: 22 * scale,
+                  size: 22,
                 ),
               ),
-              SizedBox(width: 14 * scale),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   context.getText(AppKeys.language),
                   style: GoogleFonts.andika(
                     color: colors.textPrimary,
-                    fontSize: FontSize.normal * scale,
+                    fontSize: FontSize.normal,
                     fontWeight: FontWeight.w700,
                     height: 1,
                     letterSpacing: 0,
                   ),
                 ),
               ),
-              LanguagePill(currentLanguage: currentLanguage, scale: scale),
+              LanguagePill(currentLanguage: currentLanguage),
             ],
           ),
         ),

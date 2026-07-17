@@ -1669,7 +1669,6 @@ class _SettingTabState extends State<SettingTab> {
                                 username: settingsFallbackUsername(
                                   _effectiveUser,
                                 ),
-                                scale: scale,
                                 currentLanguage: lingo.language,
                                 hasPasscode: _hasPasscode,
                                 isLoadingPasscode: _isLoadingPasscode,

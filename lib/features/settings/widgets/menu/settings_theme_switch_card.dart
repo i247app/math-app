@@ -9,19 +9,14 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class SettingsThemeSwitchCard extends StatelessWidget {
-  const SettingsThemeSwitchCard({
-    super.key,
-    required this.controller,
-    required this.scale,
-  });
+  const SettingsThemeSwitchCard({super.key, required this.controller});
 
   final AppThemeController controller;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final radius = BorderRadius.circular(16 * scale);
+    final radius = BorderRadius.circular(16);
     final isDarkMode = controller.isDarkMode;
 
     return Material(
@@ -29,24 +24,24 @@ class SettingsThemeSwitchCard extends StatelessWidget {
       elevation: 0,
       borderRadius: radius,
       child: Container(
-        height: 72 * scale,
-        padding: EdgeInsets.symmetric(horizontal: 16 * scale),
+        constraints: const BoxConstraints(minHeight: 72),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: colors.elevatedSurface,
           borderRadius: radius,
           boxShadow: [
             BoxShadow(
               color: colors.shadow.withValues(alpha: 0.06),
-              blurRadius: 10 * scale,
-              offset: Offset(0, 3 * scale),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 42 * scale,
-              height: 42 * scale,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
                 color: colors.brand.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
@@ -54,10 +49,10 @@ class SettingsThemeSwitchCard extends StatelessWidget {
               child: Icon(
                 isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
                 color: colors.brandStrong,
-                size: 22 * scale,
+                size: 22,
               ),
             ),
-            SizedBox(width: 14 * scale),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -69,20 +64,20 @@ class SettingsThemeSwitchCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.andika(
                       color: colors.textPrimary,
-                      fontSize: FontSize.normal * scale,
+                      fontSize: FontSize.normal,
                       fontWeight: FontWeight.w700,
                       height: 1,
                       letterSpacing: 0,
                     ),
                   ),
-                  SizedBox(height: 5 * scale),
+                  const SizedBox(height: 5),
                   Text(
                     context.getText(_subtitleKey(controller.themeMode)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.andika(
                       color: colors.textMuted,
-                      fontSize: FontSize.caption * scale,
+                      fontSize: FontSize.caption,
                       fontWeight: FontWeight.w400,
                       height: 1,
                       letterSpacing: 0,
@@ -92,7 +87,7 @@ class SettingsThemeSwitchCard extends StatelessWidget {
               ),
             ),
             Transform.scale(
-              scale: (0.82 * scale).clamp(0.72, 0.92),
+              scale: 0.82,
               child: Switch.adaptive(
                 value: isDarkMode,
                 activeThumbColor: colors.brandStrong,

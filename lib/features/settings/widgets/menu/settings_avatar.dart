@@ -12,23 +12,21 @@ class SettingsAvatar extends StatelessWidget {
     required this.activeProfile,
     required this.fallbackAvatarUrl,
     required this.fallbackAvatarPath,
-    required this.scale,
     required this.onSwitchTap,
   });
 
   final StudentProfile? activeProfile;
   final String? fallbackAvatarUrl;
   final String? fallbackAvatarPath;
-  final double scale;
   final VoidCallback onSwitchTap;
 
   @override
   Widget build(BuildContext context) {
-    final size = 92 * scale;
+    const size = 92.0;
 
     return SizedBox(
-      width: size + 20 * scale,
-      height: size + 20 * scale,
+      width: 112,
+      height: 112,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -39,8 +37,8 @@ class SettingsAvatar extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFFE8601C).withValues(alpha: 0.15),
-                    blurRadius: 14 * scale,
-                    offset: Offset(0, 5 * scale),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
                   ),
                 ],
               ),
@@ -50,14 +48,14 @@ class SettingsAvatar extends StatelessWidget {
                 avatarUrl: activeProfile?.avatarUrl ?? fallbackAvatarUrl,
                 avatarPath: activeProfile == null ? fallbackAvatarPath : null,
                 borderColor: const Color(0xFFE8601C),
-                borderWidth: 3.2 * scale,
-                padding: EdgeInsets.all(4 * scale),
+                borderWidth: 3.2,
+                padding: const EdgeInsets.all(4),
               ),
             ),
           ),
           Positioned(
-            right: 8 * scale,
-            bottom: 14 * scale,
+            right: 8,
+            bottom: 14,
             child: Semantics(
               button: true,
               label: context.getText(AppKeys.profileMenuTitle),
@@ -65,19 +63,19 @@ class SettingsAvatar extends StatelessWidget {
                 color: AppColors.tealIcon,
                 elevation: 5,
                 shadowColor: AppColors.tealIcon.withValues(alpha: 0.22),
-                shape: CircleBorder(
-                  side: BorderSide(color: Colors.white, width: 2.5 * scale),
+                shape: const CircleBorder(
+                  side: BorderSide(color: Colors.white, width: 2.5),
                 ),
                 child: InkWell(
                   customBorder: const CircleBorder(),
                   onTap: onSwitchTap,
-                  child: SizedBox(
-                    width: 30 * scale,
-                    height: 30 * scale,
+                  child: const SizedBox(
+                    width: 30,
+                    height: 30,
                     child: Icon(
                       Icons.swap_horiz_rounded,
                       color: Colors.white,
-                      size: 18 * scale,
+                      size: 18,
                     ),
                   ),
                 ),

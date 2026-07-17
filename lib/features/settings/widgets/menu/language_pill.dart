@@ -5,14 +5,9 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class LanguagePill extends StatelessWidget {
-  const LanguagePill({
-    super.key,
-    required this.currentLanguage,
-    required this.scale,
-  });
+  const LanguagePill({super.key, required this.currentLanguage});
 
   final AppLanguage currentLanguage;
-  final double scale;
 
   static String _flagFor(AppLanguage lang) {
     return switch (lang) {
@@ -24,27 +19,24 @@ class LanguagePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 10 * scale,
-        vertical: 7 * scale,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20 * scale),
-        border: Border.all(color: const Color(0xFF006762), width: 1.5 * scale),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF006762), width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             _flagFor(currentLanguage),
-            style: TextStyle(fontSize: FontSize.small * scale),
+            style: const TextStyle(fontSize: FontSize.small),
           ),
-          SizedBox(width: 5 * scale),
+          const SizedBox(width: 5),
           Text(
             currentLanguage.displayName,
             style: GoogleFonts.andika(
-              fontSize: FontSize.caption * scale,
+              fontSize: FontSize.caption,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF006762),
               letterSpacing: 0,

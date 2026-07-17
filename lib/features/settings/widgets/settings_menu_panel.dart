@@ -22,7 +22,6 @@ class SettingsMenuPanel extends StatelessWidget {
     required this.fallbackAvatarUrl,
     required this.fallbackAvatarPath,
     required this.username,
-    required this.scale,
     required this.currentLanguage,
     required this.hasPasscode,
     required this.isLoadingPasscode,
@@ -39,7 +38,6 @@ class SettingsMenuPanel extends StatelessWidget {
   final String? fallbackAvatarUrl;
   final String? fallbackAvatarPath;
   final String username;
-  final double scale;
   final AppLanguage currentLanguage;
   final bool hasPasscode;
   final bool isLoadingPasscode;
@@ -56,107 +54,112 @@ class SettingsMenuPanel extends StatelessWidget {
     final colors = context.themeColors;
     final themeController = AppThemeScope.of(context);
 
-    return Padding(
-      padding: EdgeInsets.only(top: 4 * scale),
-      child: Column(
-        children: [
-          SettingsAvatar(
-            activeProfile: activeProfile,
-            fallbackAvatarUrl: fallbackAvatarUrl,
-            fallbackAvatarPath: fallbackAvatarPath,
-            scale: scale,
-            onSwitchTap: onProfileTap,
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 14 * scale),
-            child: Text(
-              _displayName(),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.andika(
-                color: colors.textPrimary,
-                fontSize: FontSize.xxxl * scale,
-                fontWeight: FontWeight.w700,
-                height: 1.05,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 32 * scale),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 4),
             child: Column(
-              spacing: 12 * scale,
               children: [
-                _animatedAction(
-                  child: SettingsActionCard(
-                    icon: Icons.account_circle_outlined,
-                    iconColor: const Color(0xFFC21873),
-                    iconBackground: const Color(0xFFFFF0F7),
-                    title: context.getText(AppKeys.accountMenuTitle),
-                    subtitle: context.getText(AppKeys.accountMenuSubtitle),
-                    scale: scale,
-                    onTap: onAccountTap,
-                  ),
+                SettingsAvatar(
+                  activeProfile: activeProfile,
+                  fallbackAvatarUrl: fallbackAvatarUrl,
+                  fallbackAvatarPath: fallbackAvatarPath,
+                  onSwitchTap: onProfileTap,
                 ),
-                _animatedAction(
-                  child: SettingsActionCard(
-                    icon: Icons.person_outline_rounded,
-                    iconColor: const Color(0xFF008A52),
-                    iconBackground: const Color(0xFFD6FFE3),
-                    title: context.getText(AppKeys.profileMenuTitle),
-                    subtitle: context.getText(AppKeys.profileMenuSubtitle),
-                    scale: scale,
-                    onTap: onProfileTap,
-                  ),
-                ),
-                _animatedAction(
-                  child: SettingsActionCard(
-                    icon: Icons.lock_outline_rounded,
-                    iconColor: const Color(0xFF327F84),
-                    iconBackground: const Color(0xFFE5F7F8),
-                    title: context.getText(AppKeys.passcodeMenuTitle),
-                    subtitle: context.getText(
-                      hasPasscode
-                          ? AppKeys.passcodeMenuSubtitleManage
-                          : AppKeys.passcodeMenuSubtitleSet,
+                Padding(
+                  padding: const EdgeInsets.only(top: 14),
+                  child: Text(
+                    _displayName(),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.andika(
+                      color: colors.textPrimary,
+                      fontSize: FontSize.xxxl,
+                      fontWeight: FontWeight.w700,
+                      height: 1.05,
+                      letterSpacing: 0,
                     ),
-                    scale: scale,
-                    onTap: onPasscodeTap,
                   ),
                 ),
-                _animatedAction(
-                  child: SettingsLanguageCard(
-                    currentLanguage: currentLanguage,
-                    scale: scale,
-                    onLanguageChanged: onLanguageChanged,
-                  ),
-                ),
-                _animatedAction(
-                  child: SettingsThemeSwitchCard(
-                    controller: themeController,
-                    scale: scale,
-                  ),
-                ),
-                _animatedAction(
-                  child: SettingsActionCard(
-                    icon: Icons.logout_rounded,
-                    iconColor: colors.accentStrong,
-                    iconBackground: const Color(0xFFFFEAEA),
-                    title: context.getText(AppKeys.logout),
-                    subtitle: context.getText(AppKeys.logoutSubtitle),
-                    isDestructive: true,
-                    scale: scale,
-                    onTap: () {
-                      HapticFeedback.selectionClick();
-                      onLogoutTap();
-                    },
+                Padding(
+                  padding: const EdgeInsets.only(top: 32),
+                  child: Column(
+                    spacing: 12,
+                    children: [
+                      _animatedAction(
+                        child: SettingsActionCard(
+                          icon: Icons.account_circle_outlined,
+                          iconColor: const Color(0xFFC21873),
+                          iconBackground: const Color(0xFFFFF0F7),
+                          title: context.getText(AppKeys.accountMenuTitle),
+                          subtitle: context.getText(
+                            AppKeys.accountMenuSubtitle,
+                          ),
+                          onTap: onAccountTap,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsActionCard(
+                          icon: Icons.person_outline_rounded,
+                          iconColor: const Color(0xFF008A52),
+                          iconBackground: const Color(0xFFD6FFE3),
+                          title: context.getText(AppKeys.profileMenuTitle),
+                          subtitle: context.getText(
+                            AppKeys.profileMenuSubtitle,
+                          ),
+                          onTap: onProfileTap,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsActionCard(
+                          icon: Icons.lock_outline_rounded,
+                          iconColor: const Color(0xFF327F84),
+                          iconBackground: const Color(0xFFE5F7F8),
+                          title: context.getText(AppKeys.passcodeMenuTitle),
+                          subtitle: context.getText(
+                            hasPasscode
+                                ? AppKeys.passcodeMenuSubtitleManage
+                                : AppKeys.passcodeMenuSubtitleSet,
+                          ),
+                          onTap: onPasscodeTap,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsLanguageCard(
+                          currentLanguage: currentLanguage,
+                          onLanguageChanged: onLanguageChanged,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsThemeSwitchCard(
+                          controller: themeController,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsActionCard(
+                          icon: Icons.logout_rounded,
+                          iconColor: colors.accentStrong,
+                          iconBackground: const Color(0xFFFFEAEA),
+                          title: context.getText(AppKeys.logout),
+                          subtitle: context.getText(AppKeys.logoutSubtitle),
+                          isDestructive: true,
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            onLogoutTap();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
