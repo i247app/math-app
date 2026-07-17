@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/auth/models/signup_gender.dart';
 import 'package:numi/features/auth/widgets/signup/signup_gender_choice.dart';
 
 class SignupGenderRadioGroup extends StatelessWidget {
@@ -14,10 +15,10 @@ class SignupGenderRadioGroup extends StatelessWidget {
     required this.onChanged,
   });
 
-  final String? value;
+  final SignupGender? value;
   final String hintText;
   final List<SignupGenderChoice> items;
-  final ValueChanged<String?>? onChanged;
+  final ValueChanged<SignupGender?>? onChanged;
 
   @override
   Widget build(BuildContext context) {

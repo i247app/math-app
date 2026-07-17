@@ -15,6 +15,7 @@ import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/auth/models/signup_form_data.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
@@ -781,15 +782,11 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     return result.isTrusted == true && !result.requiredOtp;
   }
 
-  Future<void> submitSignup({
-    required String name,
-    required String role,
-    String? email,
-  }) async {
+  Future<void> submitSignup(SignupFormData form) async {
     final phone = state.phoneNumber;
-    final trimmedName = name.trim();
-    final trimmedEmail = email?.trim();
-    final trimmedRole = role.trim().toUpperCase();
+    final trimmedName = form.name.trim();
+    final trimmedEmail = form.email?.trim();
+    final role = form.role.apiValue;
     if (state.isSigningUp || phone == null) {
       return;
     }
@@ -802,22 +799,13 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       );
       return;
     }
-    if (trimmedRole.isEmpty) {
-      emit(
-        state.copyWith(
-          authError: AppStrings.current(AppKeys.missingProfileSelections),
-        ),
-      );
-      return;
-    }
-
     emit(state.copyWith(isSigningUp: true, clearAuthError: true));
 
     try {
       final user = await _authService.signupWithPhone(
         phone: phone,
         name: trimmedName,
-        role: trimmedRole,
+        role: role,
         email: trimmedEmail?.isEmpty == true ? null : trimmedEmail,
       );
       final profileResolution = await _profileResolver.resolveForUserId(

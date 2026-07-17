@@ -168,9 +168,10 @@ class AppScreenRouter extends StatelessWidget {
                   key: const ValueKey('signup'),
                   onBack: cubit.cancelSignupToLogin,
                   isSigningUp: state.isSigningUp,
-                  onContinue: (name, email, role) {
+                  authError: state.authError,
+                  onContinue: (form) {
                     HapticFeedback.mediumImpact();
-                    cubit.submitSignup(name: name, email: email, role: role);
+                    cubit.submitSignup(form);
                   },
                 ),
                 AppScreen.passcode => PasscodeScreen(
