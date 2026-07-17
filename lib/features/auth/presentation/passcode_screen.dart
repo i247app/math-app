@@ -177,10 +177,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         onBack: widget.onBack,
         title: _titleText(context),
         bodyGap: 54,
-        mascotShape: BoxShape.rectangle,
-        mascotShadowAlpha: 0.10,
-        mascotShadowBlur: 24,
-        mascotShadowOffset: const Offset(0, 16),
         bodyBuilder: (context) {
           return ValueListenableBuilder<int>(
             valueListenable: _digitRevision,

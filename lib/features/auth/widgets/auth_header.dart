@@ -9,10 +9,6 @@ class AuthHeader extends StatelessWidget {
   const AuthHeader({
     super.key,
     required this.onBack,
-    required this.mascotShape,
-    required this.mascotShadowAlpha,
-    required this.mascotShadowBlur,
-    required this.mascotShadowOffset,
     this.title,
     this.titleWidget,
   });
@@ -20,10 +16,6 @@ class AuthHeader extends StatelessWidget {
   final VoidCallback onBack;
   final String? title;
   final Widget? titleWidget;
-  final BoxShape mascotShape;
-  final double mascotShadowAlpha;
-  final double mascotShadowBlur;
-  final Offset mascotShadowOffset;
 
   static const _backIconAsset = 'assets/images/pin_figma_back.svg';
   static const _mascotAsset = 'assets/images/numi-mascot.png';
@@ -54,17 +46,7 @@ class AuthHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 74),
-            RepaintBoundary(
-              child: Center(
-                child: _AuthMascot(
-                  size: 184,
-                  shape: mascotShape,
-                  shadowAlpha: mascotShadowAlpha,
-                  shadowBlur: mascotShadowBlur,
-                  shadowOffset: mascotShadowOffset,
-                ),
-              ),
-            ),
+            const RepaintBoundary(child: Center(child: _AuthMascot())),
             if (titleWidget != null || title != null) ...[
               const SizedBox(height: 4),
               Center(
@@ -91,42 +73,31 @@ class AuthHeader extends StatelessWidget {
 }
 
 class _AuthMascot extends StatelessWidget {
-  const _AuthMascot({
-    required this.size,
-    required this.shape,
-    required this.shadowAlpha,
-    required this.shadowBlur,
-    required this.shadowOffset,
-  });
-
-  final double size;
-  final BoxShape shape;
-  final double shadowAlpha;
-  final double shadowBlur;
-  final Offset shadowOffset;
+  const _AuthMascot();
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: shape,
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow.withValues(alpha: shadowAlpha),
-            blurRadius: shadowBlur,
-            offset: shadowOffset,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 184),
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withValues(alpha: 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Center(
-        child: SizedBox(
-          width: size * 0.88 * (759 / 698),
-          height: size * 0.88,
-          child: Image.asset(AuthHeader._mascotAsset, fit: BoxFit.contain),
+          child: Padding(
+            padding: const EdgeInsets.all(11),
+            child: Image.asset(AuthHeader._mascotAsset, fit: BoxFit.contain),
+          ),
         ),
       ),
     );

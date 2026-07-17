@@ -12,10 +12,6 @@ class AuthLayout extends StatelessWidget {
     this.titleWidget,
     this.bodyGap = 46,
     this.fillRemainingBody = false,
-    this.mascotShape = BoxShape.circle,
-    this.mascotShadowAlpha = 0.08,
-    this.mascotShadowBlur = 24,
-    this.mascotShadowOffset = const Offset(0, 12),
   });
 
   final VoidCallback onBack;
@@ -24,10 +20,6 @@ class AuthLayout extends StatelessWidget {
   final Widget? titleWidget;
   final double bodyGap;
   final bool fillRemainingBody;
-  final BoxShape mascotShape;
-  final double mascotShadowAlpha;
-  final double mascotShadowBlur;
-  final Offset mascotShadowOffset;
 
   static const _maxWidth = 430.0;
   static const _minHeight = 690.0;
@@ -62,10 +54,6 @@ class AuthLayout extends StatelessWidget {
                           onBack: onBack,
                           title: title,
                           titleWidget: titleWidget,
-                          mascotShape: mascotShape,
-                          mascotShadowAlpha: mascotShadowAlpha,
-                          mascotShadowBlur: mascotShadowBlur,
-                          mascotShadowOffset: mascotShadowOffset,
                         ),
                         SizedBox(height: bodyGap),
                         if (fillRemainingBody)

@@ -52,8 +52,6 @@ class LoginScreen extends StatelessWidget {
       titleWidget: const NumiBrandText(fontSize: 36),
       fillRemainingBody: true,
       bodyGap: 54,
-      mascotShadowBlur: 30,
-      mascotShadowOffset: const Offset(0, 15),
       bodyBuilder: (context) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
