@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class PasscodeSkipButton extends StatelessWidget {
   const PasscodeSkipButton({
@@ -28,9 +28,9 @@ class PasscodeSkipButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Text(
             label,
-            style: GoogleFonts.andika(
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
               color: textColor,
-              fontSize: 16,
+              fontSize: FontSize.normal,
               fontWeight: FontWeight.w400,
               height: 20 / 16,
               decoration: TextDecoration.underline,

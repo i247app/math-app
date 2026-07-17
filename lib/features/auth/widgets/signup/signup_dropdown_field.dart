@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/widgets/signup/signup_gender_choice.dart';
 
 class SignupDropdownField extends StatelessWidget {
@@ -22,15 +22,15 @@ class SignupDropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final textStyle = GoogleFonts.andika(
+    final textStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
       color: colors.textPrimary,
-      fontSize: 16,
+      fontSize: FontSize.normal,
       fontWeight: FontWeight.w500,
       letterSpacing: 0,
     );
-    final hintStyle = GoogleFonts.andika(
+    final hintStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
       color: colors.inputHint,
-      fontSize: 16,
+      fontSize: FontSize.normal,
       fontWeight: FontWeight.w400,
       letterSpacing: 0,
     );

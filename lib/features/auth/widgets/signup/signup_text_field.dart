@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class SignupTextField extends StatelessWidget {
   const SignupTextField({
@@ -39,9 +39,9 @@ class SignupTextField extends StatelessWidget {
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: GoogleFonts.andika(
+              hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: colors.inputHint,
-                fontSize: 15,
+                fontSize: FontSize.compact,
                 fontWeight: FontWeight.w400,
               ),
               filled: true,
@@ -69,9 +69,9 @@ class SignupTextField extends StatelessWidget {
                 borderSide: BorderSide(color: colors.brandStrong, width: 2),
               ),
             ),
-            style: GoogleFonts.andika(
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
               color: colors.textPrimary,
-              fontSize: 15,
+              fontSize: FontSize.compact,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -82,9 +82,9 @@ class SignupTextField extends StatelessWidget {
             padding: const EdgeInsets.only(left: 2),
             child: Text(
               errorText!,
-              style: GoogleFonts.andika(
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: colors.error,
-                fontSize: 13,
+                fontSize: FontSize.xs,
                 fontWeight: FontWeight.w600,
               ),
             ),

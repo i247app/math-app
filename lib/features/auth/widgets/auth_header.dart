@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 
@@ -55,9 +55,9 @@ class AuthHeader extends StatelessWidget {
                     Text(
                       title!,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.andika(
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: colors.textPrimary,
-                        fontSize: 36,
+                        fontSize: FontSize.displayLarge,
                         fontWeight: FontWeight.w800,
                         height: 1.05,
                         letterSpacing: 0,

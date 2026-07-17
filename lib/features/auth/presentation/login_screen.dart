@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
@@ -49,7 +49,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AuthLayout(
       onBack: onBack,
-      titleWidget: const NumiBrandText(fontSize: 36),
+      titleWidget: const NumiBrandText(fontSize: FontSize.displayLarge),
       fillRemainingBody: true,
       bodyGap: 54,
       bodyBuilder: (context) => Column(
@@ -110,9 +110,9 @@ class _AuthEntrySwitchPrompt extends StatelessWidget {
       children: [
         Text(
           context.getText(promptKey),
-          style: GoogleFonts.andika(
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
             color: colors.textSecondary,
-            fontSize: 16,
+            fontSize: FontSize.normal,
             fontWeight: FontWeight.w500,
             height: 1.25,
           ),
@@ -124,9 +124,9 @@ class _AuthEntrySwitchPrompt extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             child: Text(
               context.getText(actionKey),
-              style: GoogleFonts.andika(
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: colors.brandStrong,
-                fontSize: 16,
+                fontSize: FontSize.normal,
                 fontWeight: FontWeight.w800,
                 height: 1.25,
                 decoration: TextDecoration.underline,

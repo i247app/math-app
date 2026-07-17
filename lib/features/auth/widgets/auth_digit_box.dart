@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 enum _AuthDigitBoxVariant { otp, passcode }
 
@@ -66,9 +66,11 @@ class AuthDigitBox extends StatelessWidget {
             extentOffset: controller.text.length,
           );
         },
-        style: GoogleFonts.andika(
+        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
           color: colors.textPrimary,
-          fontSize: _isPasscode ? 34 : 36,
+          fontSize: _isPasscode
+              ? FontSize.displayMedium
+              : FontSize.displayLarge,
           fontWeight: _isPasscode ? FontWeight.w700 : FontWeight.w600,
           height: _isPasscode ? 1 : null,
           letterSpacing: 0,

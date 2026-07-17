@@ -2,10 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_action_button.dart';
@@ -219,25 +219,27 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                                 context.getText(_subtitleKey),
                                 key: ValueKey(_subtitleKey),
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.andika(
-                                  color: colors.textPrimary,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.25,
-                                  letterSpacing: 0,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium!
+                                    .copyWith(
+                                      color: colors.textPrimary,
+                                      fontSize: FontSize.medium,
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.25,
+                                      letterSpacing: 0,
+                                    ),
                               )
                             : Text(
                                 errorText,
                                 key: ValueKey(errorText),
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.andika(
-                                  color: colors.error,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.25,
-                                  letterSpacing: 0,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium!
+                                    .copyWith(
+                                      color: colors.error,
+                                      fontSize: FontSize.xs,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.25,
+                                      letterSpacing: 0,
+                                    ),
                               ),
                       ),
                     ),
@@ -345,9 +347,9 @@ class _PasscodeTextAction extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 18),
           child: Text(
             label,
-            style: GoogleFonts.andika(
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
               color: color,
-              fontSize: 16,
+              fontSize: FontSize.normal,
               fontWeight: FontWeight.w400,
               height: 20 / 16,
               decoration: TextDecoration.underline,

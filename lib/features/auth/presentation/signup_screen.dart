@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
@@ -185,7 +185,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       SizedBox(height: compact ? 10 : 14),
                       _SignupHeroBanner(
                         title: context.getText(AppKeys.signup),
-                        titleFontSize: tight ? 30 : 34,
+                        titleFontSize: tight
+                            ? FontSize.displaySmall
+                            : FontSize.displayMedium,
                         onBack: widget.onBack,
                       ),
                       _SignupSectionCard(
@@ -407,7 +409,7 @@ class _SignupHeroBanner extends StatelessWidget {
             top: 76,
             child: Text(
               title,
-              style: GoogleFonts.andika(
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: colors.brandStrong,
                 fontSize: titleFontSize,
                 fontWeight: FontWeight.w700,

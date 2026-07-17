@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/widgets/auth_digit_box.dart';
 import 'package:numi/features/auth/widgets/otp/otp_action_button.dart';
@@ -78,9 +78,9 @@ class OtpCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: GoogleFonts.andika(
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: colors.brandStrong,
-                fontSize: 14,
+                fontSize: FontSize.small,
                 fontWeight: FontWeight.w700,
                 height: 1.25,
                 letterSpacing: 0,
@@ -108,7 +108,7 @@ class OtpCard extends StatelessWidget {
                           errorText!,
                           style: TextStyle(
                             color: colors.error,
-                            fontSize: 13,
+                            fontSize: FontSize.xs,
                             height: 1.25,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0,
@@ -158,8 +158,8 @@ class _OtpCountdownText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final baseStyle = GoogleFonts.andika(
-      fontSize: 16,
+    final baseStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
+      fontSize: FontSize.normal,
       fontWeight: FontWeight.w500,
       height: 1.25,
       color: colors.textPrimary,

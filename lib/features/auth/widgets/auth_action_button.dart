@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 enum AuthActionButtonLayout { fullWidth, compact }
@@ -85,8 +85,8 @@ class _AuthActionButtonLabel extends StatelessWidget {
         label,
         maxLines: 1,
         textAlign: TextAlign.center,
-        style: GoogleFonts.andika(
-          fontSize: 18,
+        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+          fontSize: FontSize.large,
           fontWeight: FontWeight.w700,
           height: 1.1,
           letterSpacing: 0,

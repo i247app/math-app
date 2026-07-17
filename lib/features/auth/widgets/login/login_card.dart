@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/phone/phone_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
@@ -80,10 +80,10 @@ class LoginCard extends StatelessWidget {
                   onChanged: onPhoneChanged,
                   decoration: InputDecoration(
                     hintText: region.hint,
-                    hintStyle: GoogleFonts.andika(
+                    hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: colors.inputHint,
                       fontWeight: FontWeight.w500,
-                      fontSize: 18,
+                      fontSize: FontSize.large,
                     ),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
@@ -95,9 +95,9 @@ class LoginCard extends StatelessWidget {
                     isCollapsed: true,
                     contentPadding: EdgeInsets.zero,
                   ),
-                  style: GoogleFonts.andika(
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: colors.textPrimary,
-                    fontSize: 20,
+                    fontSize: FontSize.xl,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0,
                   ),
@@ -116,7 +116,7 @@ class LoginCard extends StatelessWidget {
                     phoneErrorText!,
                     style: TextStyle(
                       color: colors.error,
-                      fontSize: 13,
+                      fontSize: FontSize.xs,
                       height: 1.25,
                       fontWeight: FontWeight.w800,
                     ),
@@ -147,14 +147,15 @@ class LoginCard extends StatelessWidget {
                         ),
                         child: Text(
                           context.getText(AppKeys.loginWithPin),
-                          style: GoogleFonts.andika(
-                            color: colors.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            height: 20 / 16,
-                            decoration: TextDecoration.underline,
-                            decorationColor: colors.textPrimary,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium!
+                              .copyWith(
+                                color: colors.textPrimary,
+                                fontSize: FontSize.normal,
+                                fontWeight: FontWeight.w400,
+                                height: 20 / 16,
+                                decoration: TextDecoration.underline,
+                                decorationColor: colors.textPrimary,
+                              ),
                         ),
                       ),
                     ),

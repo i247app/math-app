@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class SignupRoleCard extends StatelessWidget {
   const SignupRoleCard({
@@ -68,11 +68,11 @@ class SignupRoleCard extends StatelessWidget {
                         label,
                         textAlign: TextAlign.center,
                         maxLines: 1,
-                        style: GoogleFonts.andika(
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: isSelected
                               ? colors.brandStrong
                               : colors.textPrimary,
-                          fontSize: 14,
+                          fontSize: FontSize.small,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0,
                         ),
