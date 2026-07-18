@@ -20,7 +20,6 @@ import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/profile/data/profile_exception.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/data/school_api.dart';
 import 'package:numi/shared/widgets/loading_screen.dart';
 import 'package:numi/core/localization/app_language.dart';
@@ -28,8 +27,10 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/profile/data/profile_options_cache.dart';
 import 'package:numi/features/settings/application/settings_passcode_controller.dart';
 import 'package:numi/features/settings/helpers/settings_account_helpers.dart';
+import 'package:numi/features/settings/helpers/settings_profile_helpers.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
 import 'package:numi/features/settings/navigation/settings_depth_route.dart';
+import 'package:numi/features/settings/navigation/settings_passcode_flow.dart';
 import 'package:numi/features/settings/presentation/setting_account_screen.dart';
 import 'package:numi/features/profile/widgets/profile_form_panel.dart';
 import 'package:numi/features/profile/widgets/profile_list_panel.dart';
@@ -37,7 +38,8 @@ import 'package:numi/features/settings/widgets/setting_header.dart';
 import 'package:numi/features/settings/widgets/setting_safe_screen.dart';
 import 'package:numi/features/settings/widgets/settings_menu_panel.dart';
 
-part 'setting_profile_state.dart';
+part 'setting_profile_management.dart';
+part 'setting_profile_form.dart';
 
 enum SettingPageView { settings, account, profile, addProfile }
 
@@ -107,9 +109,10 @@ class SettingTab extends StatefulWidget {
 }
 
 class _SettingTabState extends State<SettingTab>
-    with _SettingProfileStateMixin {
+    with _SettingProfileManagementMixin, _SettingProfileFormMixin {
   final SettingsPasscodeController _passcodeController =
       SettingsPasscodeController();
+  final SettingsPasscodeFlow _passcodeFlow = const SettingsPasscodeFlow();
 
   @override
   late final SettingPageView _view;
@@ -121,7 +124,8 @@ class _SettingTabState extends State<SettingTab>
   void initState() {
     super.initState();
     _view = widget._initialView;
-    _initializeProfileState();
+    _initializeProfileManagementState();
+    _initializeProfileFormState();
     _passcodeController.addListener(_onPasscodeChanged);
     if (widget.openAddProfileRequestId > 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -143,7 +147,8 @@ class _SettingTabState extends State<SettingTab>
       _openAddProfile();
       return;
     }
-    _updateProfileState(oldWidget);
+    _updateProfileManagementState(oldWidget);
+    _updateProfileFormState(oldWidget);
 
     if (oldWidget.user?.id != widget.user?.id) {
       _schedulePasscodeStatusLoad();
@@ -155,7 +160,8 @@ class _SettingTabState extends State<SettingTab>
     _passcodeController
       ..removeListener(_onPasscodeChanged)
       ..dispose();
-    _disposeProfileState();
+    _disposeProfileFormState();
+    _disposeProfileManagementState();
     super.dispose();
   }
 
@@ -430,9 +436,10 @@ class _SettingTabState extends State<SettingTab>
                               _pushView(SettingPageView.account),
                           onProfileTap: () =>
                               _pushView(SettingPageView.profile),
-                          onPasscodeTap: () => _passcodeController.open(
-                            context,
-                            _effectiveUserId,
+                          onPasscodeTap: () => _passcodeFlow.open(
+                            context: context,
+                            userId: _effectiveUserId,
+                            controller: _passcodeController,
                           ),
                           onLanguageChanged: _changeLanguage,
                           onLogoutTap: widget.onLogout,
@@ -461,7 +468,10 @@ class _SettingTabState extends State<SettingTab>
                           phoneController: _profilePhoneController,
                           emailController: _profileEmailController,
                           idController: _profileIdController,
-                          role: _profileFormRole(_editingProfile),
+                          role: settingsProfileFormRole(
+                            user: widget.user,
+                            editingProfile: _editingProfile,
+                          ),
                           avatarKey: _selectedProfileAvatarKey,
                           avatarUrl: _editingProfile?.avatarUrl,
                           schools: _schoolOptions,

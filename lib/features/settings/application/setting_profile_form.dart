@@ -1,31 +1,23 @@
 part of 'setting_tab.dart';
 
-mixin _SettingProfileStateMixin on State<SettingTab> {
-  final ProfileService _profileService = ProfileApi();
+mixin _SettingProfileFormMixin
+    on State<SettingTab>, _SettingProfileManagementMixin {
+  final ProfileService _formProfileService = ProfileApi();
   final GradeService _gradeService = GradeApi();
   final SchoolService _schoolService = SchoolApi();
-  final ActiveProfileSession _activeProfileSession =
-      const ActiveProfileSession();
-  late final ProfileManagementCubit _profileManagementCubit;
 
   final TextEditingController _profileNameController = TextEditingController();
   final TextEditingController _profilePhoneController = TextEditingController();
   final TextEditingController _profileEmailController = TextEditingController();
   final TextEditingController _profileIdController = TextEditingController();
 
-  bool _isLoadingProfiles = false;
   bool _isLoadingProfileOptions = false;
   bool _isSavingProfile = false;
   bool _isUpdatingProfile = false;
-  bool _isDeletingProfile = false;
-  bool _isSettingDefaultProfile = false;
-  bool _isSwitchingProfile = false;
-  String? _profileLoadError;
   String? _profileOptionsError;
   String? _profileCreateError;
   String? _selectedProfileAvatarKey;
   StudentProfile? _editingProfile;
-  List<StudentProfile> _profiles = const <StudentProfile>[];
   List<SchoolModel> _schoolOptions = const <SchoolModel>[];
   List<GradeModel> _gradeOptions = const <GradeModel>[];
   List<ProgramModel> _programOptions = const <ProgramModel>[];
@@ -35,115 +27,65 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
   ProgramModel? _selectedProgram;
   SemesterModel? _selectedSemester;
   String? _selectedProfileIdType;
-  int? _localActiveProfileId;
 
-  SettingPageView get _view;
-
-  Future<void> _pushView(
-    SettingPageView view, {
-    StudentProfile? editingProfile,
-    bool openAddProfileOnStart = false,
-  });
-
-  Future<T> _runWithDeferredLoading<T>({
-    required Future<T> Function() action,
-    required VoidCallback show,
-    required VoidCallback hide,
-  });
-
-  void _initializeProfileState() {
-    _profileManagementCubit = ProfileManagementCubit(
-      profileService: _profileService,
-      gradeService: _gradeService,
-      schoolService: _schoolService,
-      activeProfileSession: _activeProfileSession,
-    );
+  void _initializeProfileFormState() {
     _profileNameController.addListener(_onProfileNameChanged);
-    _profiles = widget.profiles;
-    _localActiveProfileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
-    _profileLoadError = widget.profileLoadError;
-
     final initialEditingProfile = widget._initialEditingProfile;
     if (initialEditingProfile != null) {
       _editingProfile = initialEditingProfile;
       _profileNameController.text = initialEditingProfile.name?.trim() ?? '';
       _selectedProfileAvatarKey = initialEditingProfile.avatarKey?.trim();
-      if (_profileRole(initialEditingProfile) == 'PARENT') {
+      if (settingsProfileRole(initialEditingProfile) == 'PARENT') {
         _applyParentContactFields();
       } else {
         _applyProfileIdFields(initialEditingProfile);
       }
     }
 
-    if (_view == SettingPageView.profile) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-        _loadProfiles();
-        _preloadProfileOptions();
-        if (widget._openAddProfileOnStart) {
-          _openAddProfile();
-        }
-      });
-    } else if (_view == SettingPageView.addProfile) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-        final isEditingParent =
-            initialEditingProfile != null &&
-            _profileRole(initialEditingProfile) == 'PARENT';
-        if (initialEditingProfile != null && !isEditingParent) {
-          _selectOptionsForProfile(initialEditingProfile);
-        } else if (initialEditingProfile == null) {
-          _resetCreateProfileForm();
-        }
-        if (!isEditingParent && !_hasProfileOptions) {
-          _loadProfileOptions(profileToSelect: initialEditingProfile);
-        }
-      });
-    }
-  }
-
-  void _updateProfileState(SettingTab oldWidget) {
-    if (oldWidget.user != widget.user) {
-      _profiles = widget.profiles;
-      _schoolOptions = const <SchoolModel>[];
-      _gradeOptions = const <GradeModel>[];
-      _programOptions = const <ProgramModel>[];
-      _semesterOptions = const <SemesterModel>[];
-      _selectedSchool = null;
-      _selectedGrade = null;
-      _selectedProgram = null;
-      _selectedSemester = null;
-      _profileLoadError = widget.profileLoadError;
-      _profileOptionsError = null;
-      if (_view == SettingPageView.profile) {
-        _loadProfiles();
-        _preloadProfileOptions();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
       }
-    }
+      if (_view == SettingPageView.profile) {
+        _preloadProfileOptions();
+        return;
+      }
+      if (_view != SettingPageView.addProfile) {
+        return;
+      }
+      final isEditingParent =
+          initialEditingProfile != null &&
+          settingsProfileRole(initialEditingProfile) == 'PARENT';
+      if (initialEditingProfile != null && !isEditingParent) {
+        _selectOptionsForProfile(initialEditingProfile);
+      } else if (initialEditingProfile == null) {
+        _resetCreateProfileForm();
+      }
+      if (!isEditingParent && !_hasProfileOptions) {
+        _loadProfileOptions(profileToSelect: initialEditingProfile);
+      }
+    });
+  }
 
-    if (oldWidget.profiles != widget.profiles) {
-      _profiles = widget.profiles;
+  void _updateProfileFormState(SettingTab oldWidget) {
+    if (oldWidget.user == widget.user) {
+      return;
     }
-
-    if (oldWidget.activeProfile != widget.activeProfile) {
-      _localActiveProfileId = ActiveProfileSession.profileStableId(
-        widget.activeProfile,
-      );
-    }
-
-    if (oldWidget.profileLoadError != widget.profileLoadError) {
-      _profileLoadError = widget.profileLoadError;
+    _schoolOptions = const <SchoolModel>[];
+    _gradeOptions = const <GradeModel>[];
+    _programOptions = const <ProgramModel>[];
+    _semesterOptions = const <SemesterModel>[];
+    _selectedSchool = null;
+    _selectedGrade = null;
+    _selectedProgram = null;
+    _selectedSemester = null;
+    _profileOptionsError = null;
+    if (_view == SettingPageView.profile) {
+      _preloadProfileOptions();
     }
   }
 
-  void _disposeProfileState() {
-    _profileManagementCubit.close();
+  void _disposeProfileFormState() {
     _profileNameController.removeListener(_onProfileNameChanged);
     _profileNameController.dispose();
     _profilePhoneController.dispose();
@@ -158,70 +100,9 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
     setState(() {});
   }
 
-  void _openAddProfile() {
-    if (!_canCreateProfile) {
-      return;
-    }
-    if (!widget._isPushedPage) {
-      _pushView(SettingPageView.profile, openAddProfileOnStart: true);
-      return;
-    }
-    _pushView(SettingPageView.addProfile);
-  }
-
-  void _openUpdateProfile(StudentProfile profile) {
-    _pushView(SettingPageView.addProfile, editingProfile: profile);
-  }
-
-  void _returnToProfileList() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    if (widget._isPushedPage) {
-      HapticFeedback.selectionClick();
-      Navigator.of(context).maybePop();
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-  }
-
   void _cancelAddProfile() {
     _resetCreateProfileForm();
     _returnToProfileList();
-  }
-
-  Future<void> _loadProfiles() async {
-    final userId = widget.user?.id;
-    if (userId == null || userId <= 0) {
-      setState(() {
-        _isLoadingProfiles = false;
-        _profileLoadError = context.readText(AppKeys.noAccountForProfile);
-        _profiles = const <StudentProfile>[];
-      });
-      return;
-    }
-
-    setState(() {
-      _isLoadingProfiles = true;
-      _profileLoadError = null;
-    });
-
-    await _profileManagementCubit.loadProfiles(userId);
-    if (!mounted) {
-      return;
-    }
-    final profileState = _profileManagementCubit.state;
-    if (profileState.errorMessage != null) {
-      setState(() {
-        _profileLoadError = profileState.errorMessage;
-        _isLoadingProfiles = false;
-      });
-    } else {
-      setState(() {
-        _profiles = profileState.profiles;
-        _localActiveProfileId = profileState.activeProfileId;
-        _isLoadingProfiles = false;
-      });
-    }
   }
 
   bool get _hasProfileOptions {
@@ -281,8 +162,8 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
       final results = await Future.wait<Object>([
         _schoolService.listSchools(),
         _gradeService.listGrades(userId: userId),
-        _profileService.listPrograms(userId: userId),
-        _profileService.listSemesters(userId: userId),
+        _formProfileService.listPrograms(userId: userId),
+        _formProfileService.listSemesters(userId: userId),
       ]);
       final schools = results[0] as List<SchoolModel>;
       final grades = results[1] as List<GradeModel>;
@@ -416,10 +297,13 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
     final program = _selectedProgram;
     final semester = _selectedSemester;
     final editingProfile = _editingProfile;
-    final formRole = _profileFormRole(editingProfile);
+    final formRole = settingsProfileFormRole(
+      user: widget.user,
+      editingProfile: editingProfile,
+    );
     final isTeacherProfile = formRole == 'TEACHER';
     final isParentProfile = formRole == 'PARENT';
-    final normalizedIdType = _normalizedProfileIdType(
+    final normalizedIdType = settingsNormalizedProfileIdType(
       _selectedProfileIdType,
       formRole,
     );
@@ -486,7 +370,7 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
 
     try {
       if (editingProfile == null) {
-        final createdProfile = await _profileService.createProfile(
+        final createdProfile = await _formProfileService.createProfile(
           userId: userId,
           schoolId: school!.schoolId!,
           name: name,
@@ -515,13 +399,13 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
         }
 
         if (isParentProfile) {
-          await _profileService.updateProfile(
+          await _formProfileService.updateProfile(
             profileId: profileId,
             name: name,
             avatarKey: _selectedProfileAvatarKey,
           );
         } else {
-          await _profileService.updateProfile(
+          await _formProfileService.updateProfile(
             profileId: profileId,
             schoolId: school!.schoolId!,
             name: settingsEmptyToNull(name),
@@ -530,7 +414,7 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
             semesterId: isTeacherProfile ? null : semester?.semesterId,
             isDefault: editingProfile.isDefault,
             role: formRole,
-            dob: _dateOnly(editingProfile.dob),
+            dob: settingsProfileDateOnly(editingProfile.dob),
             avatarKey: _selectedProfileAvatarKey,
             idType: isTeacherProfile ? normalizedIdType : profileIdTypeMoet,
             studentId: isTeacherProfile ? null : profileIdValue,
@@ -598,130 +482,6 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
     }
   }
 
-  Future<void> _confirmDeleteProfile(StudentProfile profile) async {
-    final profileId = profile.profileId;
-    if (profileId == null) {
-      context.showErrorDialog(context.readText(AppKeys.missingProfileId));
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(context.readText(AppKeys.deleteProfileTitle)),
-          content: Text(
-            context.readText(AppKeys.deleteProfileMessage),
-            style: GoogleFonts.andika(
-              color: const Color(0xFF1B1B1B),
-              fontSize: FontSize.normal,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(context.readText(AppKeys.cancel)),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(context.readText(AppKeys.delete)),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldDelete != true || !mounted) {
-      return;
-    }
-
-    await _deleteProfile(profileId);
-  }
-
-  Future<void> _selectActiveProfile(StudentProfile selectedProfile) async {
-    final userId = widget.user?.id;
-    final profileId = ActiveProfileSession.profileStableId(selectedProfile);
-    if (_isSettingDefaultProfile ||
-        userId == null ||
-        userId <= 0 ||
-        profileId == null ||
-        profileId == _activeProfileId) {
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    setState(() {
-      _isSettingDefaultProfile = true;
-    });
-
-    try {
-      await _runWithDeferredLoading(
-        action: () => widget.onActivateProfile(selectedProfile),
-        show: () => setState(() => _isSwitchingProfile = true),
-        hide: () => setState(() => _isSwitchingProfile = false),
-      );
-      if (!mounted) {
-        return;
-      }
-      setState(() => _localActiveProfileId = profileId);
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      context.showErrorDialog(context.readText(AppKeys.profileUpdateFailed));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSettingDefaultProfile = false;
-          _isSwitchingProfile = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _deleteProfile(int profileId) async {
-    setState(() => _isDeletingProfile = true);
-    final deletedActiveProfile = profileId == _activeProfileId;
-
-    try {
-      await _profileService.forceDeleteProfile(profileId: profileId);
-      if (!mounted) {
-        return;
-      }
-
-      if (deletedActiveProfile) {
-        final userId = widget.user?.id;
-        if (userId != null && userId > 0) {
-          await _activeProfileSession.clearActiveProfileId(userId);
-        }
-      }
-      await _loadProfiles();
-      await widget.onRefreshProfiles?.call();
-      if (deletedActiveProfile && mounted) {
-        NumiApp.restart(context);
-      }
-    } on ProfileException catch (error) {
-      if (!mounted) {
-        return;
-      }
-
-      context.showErrorDialog(error.message);
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
-      context.showErrorDialog(context.readText(AppKeys.profileDeleteFailed));
-    } finally {
-      if (mounted) {
-        setState(() => _isDeletingProfile = false);
-      }
-    }
-  }
-
   void _resetCreateProfileForm() {
     _profileNameController.clear();
     _profilePhoneController.clear();
@@ -740,19 +500,19 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
   }
 
   void _selectOptionsForProfile(StudentProfile profile) {
-    _selectedSchool = _firstWhereOrNull(
+    _selectedSchool = settingsFirstWhereOrNull(
       _schoolOptions,
       (school) => school.schoolId == profile.schoolId,
     );
-    _selectedGrade = _firstWhereOrNull(
+    _selectedGrade = settingsFirstWhereOrNull(
       _gradeOptions,
       (grade) => grade.gradeId == profile.gradeId,
     );
-    _selectedProgram = _firstWhereOrNull(
+    _selectedProgram = settingsFirstWhereOrNull(
       _programOptions,
       (program) => program.programId == profile.programId,
     );
-    _selectedSemester = _firstWhereOrNull(
+    _selectedSemester = settingsFirstWhereOrNull(
       _semesterOptions,
       (semester) => semester.semesterId == profile.semesterId,
     );
@@ -769,61 +529,6 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
     _profileEmailController.text = user?.email?.trim() ?? '';
   }
 
-  static T? _firstWhereOrNull<T>(Iterable<T> items, bool Function(T) test) {
-    for (final item in items) {
-      if (test(item)) {
-        return item;
-      }
-    }
-    return null;
-  }
-
-  static String? _dateOnly(String? value) {
-    final date = value?.trim();
-    if (date == null || date.isEmpty) {
-      return null;
-    }
-    final parsed = DateTime.tryParse(date);
-    if (parsed == null) {
-      return date.length >= 10 ? date.substring(0, 10) : date;
-    }
-    return parsed.toIso8601String().substring(0, 10);
-  }
-
-  static String _profileRole(StudentProfile profile) {
-    final role = profile.role?.trim().toUpperCase();
-    return switch (role) {
-      'TEACHER' || 'PARENT' || 'STUDENT' => role!,
-      _ => 'STUDENT',
-    };
-  }
-
-  String _profileFormRole(StudentProfile? editingProfile) {
-    if (editingProfile != null) {
-      return _profileRole(editingProfile);
-    }
-
-    final userRole = widget.user?.role?.trim().toUpperCase();
-    return userRole == 'TEACHER' ? 'TEACHER' : 'STUDENT';
-  }
-
-  bool get _canCreateProfile {
-    final userRole = widget.user?.role?.trim().toUpperCase();
-    if (userRole == 'STUDENT' || userRole?.endsWith('_STUDENT') == true) {
-      return false;
-    }
-    if (userRole == 'PARENT' ||
-        userRole == 'TEACHER' ||
-        userRole?.endsWith('_PARENT') == true ||
-        userRole?.endsWith('_TEACHER') == true) {
-      return true;
-    }
-
-    return _profiles.any(
-      (profile) => ProfileRole.fromProfile(profile) != ProfileRole.student,
-    );
-  }
-
   bool get _canSaveProfileForm {
     if (_isSavingProfile || _isLoadingProfileOptions) {
       return false;
@@ -834,7 +539,10 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
       return false;
     }
 
-    final formRole = _profileFormRole(_editingProfile);
+    final formRole = settingsProfileFormRole(
+      user: widget.user,
+      editingProfile: _editingProfile,
+    );
     if (formRole == 'PARENT') {
       return true;
     }
@@ -852,33 +560,11 @@ mixin _SettingProfileStateMixin on State<SettingTab> {
   }
 
   void _applyProfileIdFields(StudentProfile profile) {
-    final role = _profileRole(profile);
-    final idType = _normalizedProfileIdType(profile.idType, role);
+    final role = settingsProfileRole(profile);
+    final idType = settingsNormalizedProfileIdType(profile.idType, role);
     _selectedProfileIdType = idType;
     _profileIdController.text = role == 'TEACHER'
         ? profile.teacherId?.trim() ?? ''
         : profile.studentId?.trim() ?? '';
-  }
-
-  static String? _normalizedProfileIdType(String? value, String role) {
-    final normalized = value?.trim().toUpperCase();
-    if (role != 'TEACHER' && (normalized == null || normalized.isEmpty)) {
-      return profileIdTypeMoet;
-    }
-    if (normalized == null || normalized.isEmpty) {
-      return null;
-    }
-
-    final allowedOptions = role == 'TEACHER'
-        ? teacherProfileIdTypeOptions
-        : studentProfileIdTypeOptions;
-    final isAllowed = allowedOptions.any(
-      (option) => option.value == normalized,
-    );
-    return isAllowed ? normalized : null;
-  }
-
-  int? get _activeProfileId {
-    return _localActiveProfileId;
   }
 }
