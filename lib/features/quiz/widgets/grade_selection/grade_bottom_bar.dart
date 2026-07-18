@@ -11,12 +11,9 @@ import 'package:numi/features/quiz/widgets/grade_selection/pill_action_button.da
 class GradeBottomBar extends StatelessWidget {
   const GradeBottomBar({
     super.key,
-    required this.scale,
     required this.onSkip,
     required this.onContinue,
   });
-
-  final double scale;
   final VoidCallback onSkip;
   final VoidCallback onContinue;
 
@@ -27,24 +24,20 @@ class GradeBottomBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Container(
-          height: 72 * scale,
-          padding: EdgeInsets.fromLTRB(
-            24 * scale,
-            10 * scale,
-            24 * scale,
-            10 * scale,
-          ),
+          height: 72,
+          padding: const EdgeInsets.fromLTRB(24, 10, 24, 10),
           decoration: BoxDecoration(
             color: colors.elevatedSurface.withValues(alpha: 0.90),
             boxShadow: [
               BoxShadow(
                 color: colors.shadow,
-                blurRadius: 22 * scale,
-                offset: Offset(0, -8 * scale),
+                blurRadius: 22,
+                offset: const Offset(0, -8),
               ),
             ],
           ),
           child: Row(
+            spacing: 20,
             children: [
               Expanded(
                 flex: 9,
@@ -52,11 +45,9 @@ class GradeBottomBar extends StatelessWidget {
                   label: context.getText(AppKeys.skipUpper),
                   background: AppColors.peachSoft,
                   foreground: AppColors.rust,
-                  scale: scale,
                   onPressed: onSkip,
                 ),
               ),
-              SizedBox(width: 20 * scale),
               Expanded(
                 flex: 10,
                 child: PillActionButton(
@@ -67,7 +58,6 @@ class GradeBottomBar extends StatelessWidget {
                   gradient: const LinearGradient(
                     colors: [AppColors.teal700, Color(0xFF55E0D6)],
                   ),
-                  scale: scale,
                   onPressed: onContinue,
                 ),
               ),

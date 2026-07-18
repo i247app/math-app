@@ -8,18 +8,16 @@ class HistoryTypeTabs extends StatelessWidget {
     super.key,
     required this.selectedFilter,
     required this.onSelected,
-    required this.scale,
   });
 
   final HistoryFilter selectedFilter;
   final ValueChanged<HistoryFilter> onSelected;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 36 * scale,
-      padding: EdgeInsets.all(3 * scale),
+      height: 36,
+      padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: const Color(0xFFE0E8EA),
         borderRadius: BorderRadius.circular(999),
@@ -32,7 +30,6 @@ class HistoryTypeTabs extends StatelessWidget {
                 filter: filter,
                 selected: selectedFilter == filter,
                 onTap: () => onSelected(filter),
-                scale: scale,
               ),
             ),
         ],

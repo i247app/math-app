@@ -4,25 +4,21 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
 
 class ParentAssessmentChartPainter extends CustomPainter {
-  const ParentAssessmentChartPainter({
-    required this.entries,
-    required this.scale,
-  });
+  const ParentAssessmentChartPainter({required this.entries});
 
   final List<ParentAssessmentEntry> entries;
-  final double scale;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final left = 22 * scale;
-    final top = 10 * scale;
-    final right = size.width - 5 * scale;
-    final bottom = size.height - 18 * scale;
+    const left = 22.0;
+    const top = 10.0;
+    final right = size.width - 5;
+    final bottom = size.height - 18;
     final chartHeight = bottom - top;
     final chartWidth = right - left;
     final gridPaint = Paint()
       ..color = const Color(0xFFD7E5E4)
-      ..strokeWidth = 0.7 * scale;
+      ..strokeWidth = 0.7;
 
     for (var index = 0; index <= 5; index++) {
       final y = top + chartHeight * index / 5;
@@ -30,9 +26,9 @@ class ParentAssessmentChartPainter extends CustomPainter {
       _paintText(
         canvas,
         '${10 - index * 2}',
-        Offset(2 * scale, y - 5 * scale),
+        Offset(2, y - 5),
         color: const Color(0xFF5A676A),
-        fontSize: FontSize.caption * 0.54 * scale,
+        fontSize: FontSize.caption * 0.54,
       );
     }
 
@@ -73,7 +69,7 @@ class ParentAssessmentChartPainter extends CustomPainter {
       linePath,
       Paint()
         ..color = const Color(0xFF109B96)
-        ..strokeWidth = 1.4 * scale
+        ..strokeWidth = 1.4
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round,
@@ -83,17 +79,13 @@ class ParentAssessmentChartPainter extends CustomPainter {
       final point = points[index];
       final score = ((entries[index].quiz.grading?.scorePercentage ?? 0) / 10)
           .clamp(0, 10);
-      canvas.drawCircle(
-        point,
-        2.2 * scale,
-        Paint()..color = const Color(0xFF007E79),
-      );
+      canvas.drawCircle(point, 2.2, Paint()..color = const Color(0xFF007E79));
       _paintText(
         canvas,
         score.toStringAsFixed(1),
-        Offset(point.dx - 6 * scale, point.dy - 12 * scale),
+        Offset(point.dx - 6, point.dy - 12),
         color: const Color(0xFF007E79),
-        fontSize: FontSize.caption * 0.5 * scale,
+        fontSize: FontSize.caption * 0.5,
         fontWeight: FontWeight.w800,
       );
       final date = quizDate(entries[index].quiz).toLocal();
@@ -104,9 +96,9 @@ class ParentAssessmentChartPainter extends CustomPainter {
       _paintText(
         canvas,
         label,
-        Offset(point.dx - 9 * scale, bottom + 5 * scale),
+        Offset(point.dx - 9, bottom + 5),
         color: const Color(0xFF5A676A),
-        fontSize: FontSize.caption * 0.5 * scale,
+        fontSize: FontSize.caption * 0.5,
       );
     }
   }
@@ -136,6 +128,6 @@ class ParentAssessmentChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant ParentAssessmentChartPainter oldDelegate) {
-    return oldDelegate.entries != entries || oldDelegate.scale != scale;
+    return oldDelegate.entries != entries;
   }
 }

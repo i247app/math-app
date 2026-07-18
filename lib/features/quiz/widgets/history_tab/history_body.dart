@@ -25,7 +25,6 @@ class HistoryBody extends StatelessWidget {
     required this.profileId,
     required this.exerciseService,
     required this.onRetry,
-    required this.scale,
   });
 
   final bool isLoading;
@@ -37,12 +36,11 @@ class HistoryBody extends StatelessWidget {
   final int? profileId;
   final ClassroomExerciseService exerciseService;
   final VoidCallback onRetry;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     if (isLoading && selectedItemsCount == 0) {
-      return HistoryLoadingState(scale: scale);
+      return const HistoryLoadingState();
     }
 
     if (errorMessage != null && selectedItemsCount == 0) {
@@ -52,7 +50,6 @@ class HistoryBody extends StatelessWidget {
         subtitle: errorMessage!,
         actionLabel: context.getText(AppKeys.retry).toUpperCase(),
         onAction: onRetry,
-        scale: scale,
       );
     }
 
@@ -61,39 +58,36 @@ class HistoryBody extends StatelessWidget {
         icon: Icons.history_toggle_off_rounded,
         title: context.getText(AppKeys.noHistoryTitle),
         subtitle: context.getText(AppKeys.noHistoryMessage),
-        scale: scale,
       );
     }
 
     return switch (selectedFilter) {
       HistoryFilter.homework => Column(
-        children: [
-          for (final exercise in homeworkExercises) ...[
-            HistoryHomeworkCard(
-              exercise: exercise,
-              scale: scale,
-              onTap: () => historyOpenHomeworkResult(
-                context,
-                exercise,
-                profileId: profileId,
-                exerciseService: exerciseService,
+        spacing: 14,
+        children: homeworkExercises
+            .map(
+              (exercise) => HistoryHomeworkCard(
+                exercise: exercise,
+                onTap: () => historyOpenHomeworkResult(
+                  context,
+                  exercise,
+                  profileId: profileId,
+                  exerciseService: exerciseService,
+                ),
               ),
-            ),
-            SizedBox(height: 14 * scale),
-          ],
-        ],
+            )
+            .toList(growable: false),
       ),
       HistoryFilter.assessment => Column(
-        children: [
-          for (final quiz in quizzes) ...[
-            HistoryQuizCard(
-              quiz: quiz,
-              scale: scale,
-              onTap: () => historyOpenQuizReview(context, quiz),
-            ),
-            SizedBox(height: 14 * scale),
-          ],
-        ],
+        spacing: 14,
+        children: quizzes
+            .map(
+              (quiz) => HistoryQuizCard(
+                quiz: quiz,
+                onTap: () => historyOpenQuizReview(context, quiz),
+              ),
+            )
+            .toList(growable: false),
       ),
     };
   }

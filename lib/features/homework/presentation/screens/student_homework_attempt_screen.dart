@@ -341,7 +341,6 @@ class _StudentHomeworkAttemptScreenState
                         : _isSubmitting
                         ? QuizWaveLoader(
                             key: const ValueKey('homework-submit-loader'),
-                            scale: s,
                             message: context.getText(AppKeys.submittingForYou),
                             letterStyle: TextStyle(
                               color: colors.brandStrong,

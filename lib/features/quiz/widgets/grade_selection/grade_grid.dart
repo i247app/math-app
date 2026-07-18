@@ -11,7 +11,6 @@ import 'package:numi/features/quiz/widgets/grade_selection/grade_option.dart';
 class GradeGrid extends StatelessWidget {
   const GradeGrid({
     super.key,
-    required this.scale,
     required this.grades,
     required this.selectedGradeLabel,
     required this.isLoading,
@@ -19,8 +18,6 @@ class GradeGrid extends StatelessWidget {
     required this.onSelected,
     required this.onRetry,
   });
-
-  final double scale;
   final List<GradeModel> grades;
   final String? selectedGradeLabel;
   final bool isLoading;
@@ -31,15 +28,11 @@ class GradeGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return GradeLoadState(scale: scale);
+      return const GradeLoadState();
     }
 
     if (errorMessage != null) {
-      return GradeLoadError(
-        scale: scale,
-        message: errorMessage!,
-        onRetry: onRetry,
-      );
+      return GradeLoadError(message: errorMessage!, onRetry: onRetry);
     }
 
     final items =
@@ -54,7 +47,6 @@ class GradeGrid extends StatelessWidget {
 
     if (items.isEmpty) {
       return GradeLoadError(
-        scale: scale,
         message: context.getText(AppKeys.noGrades),
         onRetry: onRetry,
       );
@@ -64,17 +56,16 @@ class GradeGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 12 * scale,
-        crossAxisSpacing: 12 * scale,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
         childAspectRatio: 1.12,
       ),
       itemBuilder: (context, index) {
         final option = items[index];
         return GradeCard(
           option: option,
-          scale: scale,
           isSelected: option.label == selectedGradeLabel,
           onSelected: () => onSelected(option),
         );

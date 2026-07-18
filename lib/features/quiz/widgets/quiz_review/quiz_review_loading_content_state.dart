@@ -35,18 +35,22 @@ class QuizReviewLoadingContentState extends State<QuizReviewLoadingContent>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              QuizReviewSkeletonBlock(
-                progress: progress,
-                height: 44,
-                borderRadius: 12,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: QuizReviewSkeletonBlock(
+                  progress: progress,
+                  height: 44,
+                  borderRadius: 12,
+                ),
               ),
-              const SizedBox(height: 12),
-              QuizReviewSkeletonBlock(
-                progress: progress,
-                height: 94,
-                borderRadius: 14,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: QuizReviewSkeletonBlock(
+                  progress: progress,
+                  height: 94,
+                  borderRadius: 14,
+                ),
               ),
-              const SizedBox(height: 24),
               QuizReviewQuestionLoadingSection(progress: progress),
             ],
           ),

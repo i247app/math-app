@@ -5,7 +5,6 @@ class QuizHeaderIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     required this.color,
-    required this.scale,
     required this.onTap,
     this.size = 34,
     this.iconSize = 22,
@@ -15,7 +14,6 @@ class QuizHeaderIconButton extends StatelessWidget {
 
   final IconData icon;
   final Color color;
-  final double scale;
   final VoidCallback onTap;
   final double size;
   final double iconSize;
@@ -26,7 +24,7 @@ class QuizHeaderIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = borderRadius ?? size / 2;
     final shape = circle ? const CircleBorder() : null;
-    final border = BorderRadius.circular(radius * scale);
+    final border = BorderRadius.circular(radius);
 
     return Material(
       color: Colors.transparent,
@@ -40,9 +38,9 @@ class QuizHeaderIconButton extends StatelessWidget {
         customBorder: circle ? const CircleBorder() : null,
         borderRadius: circle ? null : border,
         child: SizedBox(
-          width: size * scale,
-          height: size * scale,
-          child: Icon(icon, color: color, size: iconSize * scale),
+          width: size,
+          height: size,
+          child: Icon(icon, color: color, size: iconSize),
         ),
       ),
     );

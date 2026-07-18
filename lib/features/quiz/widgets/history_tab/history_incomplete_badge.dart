@@ -6,22 +6,20 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_colors.dart';
 
 class HistoryIncompleteBadge extends StatelessWidget {
-  const HistoryIncompleteBadge({super.key, required this.scale});
-
-  final double scale;
+  const HistoryIncompleteBadge({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 56 * scale,
+      width: 56,
       child: Text(
         context.getText(AppKeys.incomplete),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           color: AppColors.orangeMuted,
-          fontSize: FontSize.caption * 0.77 * scale,
+          fontSize: FontSize.caption * 0.77,
           fontWeight: FontWeight.w900,
           height: 1.1,
           letterSpacing: 0,

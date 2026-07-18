@@ -15,12 +15,10 @@ class HistoryHomeworkCard extends StatelessWidget {
   const HistoryHomeworkCard({
     super.key,
     required this.exercise,
-    required this.scale,
     required this.onTap,
   });
 
   final ClassroomExercise exercise;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -28,16 +26,14 @@ class HistoryHomeworkCard extends StatelessWidget {
     final percentage = historyHomeworkScorePercentage(exercise);
     return HistoryEntryCard(
       leading: percentage == null
-          ? HistorySubmittedBadge(scale: scale)
+          ? const HistorySubmittedBadge()
           : HistoryScoreBadge(
               percentage: percentage,
               colors: historyScoreColors(context, percentage),
-              scale: scale,
             ),
       dateParts: historyDatePartsFromIso(historyHomeworkDateText(exercise)),
       title: historyHomeworkTitle(context, exercise),
       subtitle: historyHomeworkShortText(context, exercise),
-      scale: scale,
       onTap: onTap,
     );
   }

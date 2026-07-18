@@ -7,22 +7,20 @@ class ParentAssessmentScoreBadge extends StatelessWidget {
     super.key,
     required this.percentage,
     required this.color,
-    required this.scale,
   });
 
   final int? percentage;
   final Color color;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 56 * scale,
+      width: 56,
       child: ScoreProgressRing(
         progress: percentage == null ? 0.0 : percentage!.clamp(0, 100) / 100,
         color: color,
-        size: 48 * scale,
-        strokeWidth: 5 * scale,
+        size: 48,
+        strokeWidth: 5,
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
@@ -30,7 +28,7 @@ class ParentAssessmentScoreBadge extends StatelessWidget {
             maxLines: 1,
             style: TextStyle(
               color: color,
-              fontSize: FontSize.xxxl * scale,
+              fontSize: FontSize.xxxl,
               fontWeight: FontWeight.w900,
               height: 1,
             ),

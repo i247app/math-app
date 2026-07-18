@@ -36,7 +36,6 @@ class StudentHomeworkResultHeader extends StatelessWidget {
             child: QuizHeaderIconButton(
               icon: Icons.arrow_back_rounded,
               color: colors.brandStrong,
-              scale: scale,
               size: 40,
               iconSize: 23,
               borderRadius: 12,

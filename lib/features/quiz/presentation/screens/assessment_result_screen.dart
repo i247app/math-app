@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,9 +43,6 @@ class AssessmentResultScreen extends StatefulWidget {
 class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
   late final QuizService _quizService;
   bool isGeneratingAgain = false;
-
-  static const _designWidth = 390.0;
-  static const _designHeight = 800.0;
 
   @override
   void initState() {
@@ -165,98 +160,65 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
       child: Scaffold(
         backgroundColor: colors.pageBackground,
         body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = math.min(constraints.maxWidth, 430.0);
-              final height = constraints.maxHeight;
-              final scale = math.min(
-                width / _designWidth,
-                height / _designHeight,
-              );
-
-              double s(double value) => value * scale;
-              final grading = widget.quiz?.grading;
-              final score = scoreOutOf10(grading);
-              final scoreText = '$score/10';
-              final resultLevel = resultLevelForScore(score);
-              final reviewText = assessmentResultReviewText(grading);
-
-              return Center(
-                child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: isGeneratingAgain
-                      ? AssessmentTestAgainLoader(scale: scale)
-                      : Stack(
-                          children: [
-                            Positioned.fill(
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: colors.pageBackground,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              top: 0,
-                              child: AssessmentResultHeader(
-                                scale: scale,
-                                onBack: exitResult,
-                              ),
-                            ),
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              top: s(111),
-                              child: AssessmentScoreRing(
-                                scale: scale,
-                                scoreText: scoreText,
-                                accentColor: resultLevel.color,
-                              ),
-                            ),
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              top: s(285),
-                              child: Text(
-                                context.getText(resultLevel.titleKey),
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.andika(
-                                  color: resultLevel.color,
-                                  fontSize: 24 * scale,
-                                  fontWeight: FontWeight.w800,
-                                  height: 32 / 24,
-                                  letterSpacing: -0.4 * scale,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: s(26),
-                              right: s(26),
-                              top: s(369),
-                              child: AssessmentAiReviewCard(
-                                scale: scale,
-                                reviewText: reviewText,
-                              ),
-                            ),
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              top: s(592),
-                              child: AssessmentResultBottomBar(
-                                scale: scale,
-                                onTest: generateTestAgain,
-                                onPractice: generatePracticeAgain,
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-              );
-            },
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 430),
+              child: isGeneratingAgain
+                  ? const AssessmentTestAgainLoader()
+                  : _buildResultContent(context),
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildResultContent(BuildContext context) {
+    final grading = widget.quiz?.grading;
+    final score = scoreOutOf10(grading);
+    final resultLevel = resultLevelForScore(score);
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AssessmentResultHeader(onBack: exitResult),
+          Padding(
+            padding: const EdgeInsets.only(top: 51),
+            child: AssessmentScoreRing(
+              scoreText: '$score/10',
+              accentColor: resultLevel.color,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              context.getText(resultLevel.titleKey),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.andika(
+                color: resultLevel.color,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                height: 32 / 24,
+                letterSpacing: -0.4,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(26, 52, 26, 0),
+            child: AssessmentAiReviewCard(
+              reviewText: assessmentResultReviewText(grading),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(26, 62, 26, 24),
+            child: AssessmentResultBottomBar(
+              onTest: generateTestAgain,
+              onPractice: generatePracticeAgain,
+            ),
+          ),
+        ],
       ),
     );
   }

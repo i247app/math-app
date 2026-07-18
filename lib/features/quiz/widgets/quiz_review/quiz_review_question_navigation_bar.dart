@@ -23,6 +23,7 @@ class QuizReviewQuestionNavigationBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
+        spacing: 28,
         children: [
           Expanded(
             child: QuizReviewNavButton(
@@ -33,7 +34,6 @@ class QuizReviewQuestionNavigationBar extends StatelessWidget {
               onTap: onPrevious,
             ),
           ),
-          const SizedBox(width: 28),
           Expanded(
             child: QuizReviewNavButton(
               label: context.getText(AppKeys.next),

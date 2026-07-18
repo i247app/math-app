@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -48,9 +46,6 @@ class AiAssessmentScreen extends StatefulWidget {
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   late final AssessmentController _controller;
-
-  static const _designWidth = 390.0;
-  static const _designHeight = 844.0;
 
   @override
   void initState() {
@@ -248,129 +243,104 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           return Scaffold(
             backgroundColor: backgroundColor,
             body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final width = math.min(constraints.maxWidth, 430.0);
-                  final height = constraints.maxHeight;
-                  final scale = math.min(
-                    width / _designWidth,
-                    height / _designHeight,
-                  );
-
-                  double s(double value) => value * scale;
-
-                  return Center(
-                    child: SizedBox(
-                      width: width,
-                      height: height,
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: ColoredBox(color: backgroundColor),
-                          ),
-                          Positioned.fill(
-                            top: isGeneratingQuestion || isSubmittingQuiz
-                                ? 0
-                                : s(80),
-                            bottom:
-                                isGeneratingQuestion ||
-                                    isSubmittingQuiz ||
-                                    errorMessage != null
-                                ? 0
-                                : s(97),
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 320),
-                              switchInCurve: Curves.easeOutCubic,
-                              switchOutCurve: Curves.easeInCubic,
-                              child: errorMessage != null
-                                  ? AssessmentErrorState(
-                                      key: const ValueKey('question-error'),
-                                      scale: scale,
-                                      message: errorMessage,
-                                      onRetry: retryErrorAction,
-                                    )
-                                  : isSubmittingQuiz
-                                  ? AssessmentGeneratingLoader(
-                                      key: const ValueKey('submit-loader'),
-                                      scale: scale,
-                                      message: context.getText(
-                                        AppKeys.submittingForYou,
-                                      ),
-                                    )
-                                  : isGeneratingQuestion
-                                  ? AssessmentGeneratingLoader(
-                                      key: const ValueKey('question-loader'),
-                                      scale: scale,
-                                      message: context.getText(
-                                        AppKeys.generatingAssessment,
-                                      ),
-                                    )
-                                  : SingleChildScrollView(
-                                      key: const ValueKey('question-content'),
-                                      physics: const BouncingScrollPhysics(),
-                                      padding: EdgeInsets.fromLTRB(
-                                        s(24),
-                                        0,
-                                        s(24),
-                                        s(24),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          AssessmentProgressSection(
-                                            scale: scale,
-                                            currentQuestion:
-                                                _controller.questionIndex + 1,
-                                            totalQuestions: questions.length,
-                                          ),
-                                          SizedBox(height: s(32)),
-                                          AssessmentQuestionCard(
-                                            scale: scale,
-                                            question:
-                                                currentQuestion!.questionName,
-                                          ),
-                                          SizedBox(height: s(32)),
-                                          AssessmentAnswerGrid(
-                                            scale: scale,
-                                            answers: currentQuestion.answers,
-                                            selectedAnswerLabel:
-                                                _controller.selectedAnswerLabel,
-                                            onSelected: selectAnswer,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                            ),
-                          ),
-                          if (!isGeneratingQuestion && !isSubmittingQuiz)
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              top: 0,
-                              child: AssessmentHeader(scale: scale),
-                            ),
-                          if (!isGeneratingQuestion &&
-                              !isSubmittingQuiz &&
-                              errorMessage == null)
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: AssessmentBottomBar(
-                                scale: scale,
-                                canGoBack: _controller.questionIndex > 0,
-                                isLastQuestion: _controller.isLastQuestion,
-                                isSubmitting: isSubmittingQuiz,
-                                onBack: goToPreviousQuestion,
-                                onContinue: goToNextQuestion,
-                              ),
-                            ),
-                        ],
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 430),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: ColoredBox(color: backgroundColor),
                       ),
-                    ),
-                  );
-                },
+                      Positioned.fill(
+                        top: isGeneratingQuestion || isSubmittingQuiz ? 0 : 80,
+                        bottom:
+                            isGeneratingQuestion ||
+                                isSubmittingQuiz ||
+                                errorMessage != null
+                            ? 0
+                            : 97,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 320),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          child: errorMessage != null
+                              ? AssessmentErrorState(
+                                  key: const ValueKey('question-error'),
+                                  message: errorMessage,
+                                  onRetry: retryErrorAction,
+                                )
+                              : isSubmittingQuiz
+                              ? AssessmentGeneratingLoader(
+                                  key: const ValueKey('submit-loader'),
+                                  message: context.getText(
+                                    AppKeys.submittingForYou,
+                                  ),
+                                )
+                              : isGeneratingQuestion
+                              ? AssessmentGeneratingLoader(
+                                  key: const ValueKey('question-loader'),
+                                  message: context.getText(
+                                    AppKeys.generatingAssessment,
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  key: const ValueKey('question-content'),
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: const EdgeInsets.fromLTRB(
+                                    24,
+                                    0,
+                                    24,
+                                    24,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    spacing: 32,
+                                    children: [
+                                      AssessmentProgressSection(
+                                        currentQuestion:
+                                            _controller.questionIndex + 1,
+                                        totalQuestions: questions.length,
+                                      ),
+                                      AssessmentQuestionCard(
+                                        question: currentQuestion!.questionName,
+                                      ),
+                                      AssessmentAnswerGrid(
+                                        answers: currentQuestion.answers,
+                                        selectedAnswerLabel:
+                                            _controller.selectedAnswerLabel,
+                                        onSelected: selectAnswer,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                      ),
+                      if (!isGeneratingQuestion && !isSubmittingQuiz)
+                        const Positioned(
+                          left: 0,
+                          right: 0,
+                          top: 0,
+                          child: AssessmentHeader(),
+                        ),
+                      if (!isGeneratingQuestion &&
+                          !isSubmittingQuiz &&
+                          errorMessage == null)
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: AssessmentBottomBar(
+                            canGoBack: _controller.questionIndex > 0,
+                            isLastQuestion: _controller.isLastQuestion,
+                            isSubmitting: isSubmittingQuiz,
+                            onBack: goToPreviousQuestion,
+                            onContinue: goToNextQuestion,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
           );

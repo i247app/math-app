@@ -6,14 +6,12 @@ class AssessmentResultActionButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.background,
-    required this.scale,
     required this.onTap,
     this.icon,
   });
 
   final String label;
   final Color background;
-  final double scale;
   final VoidCallback onTap;
   final IconData? icon;
 
@@ -21,26 +19,26 @@ class AssessmentResultActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(20 * scale),
+      borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20 * scale),
+        borderRadius: BorderRadius.circular(20),
         child: Ink(
-          width: 145 * scale,
-          height: 57 * scale,
+          height: 57,
           decoration: BoxDecoration(
             color: background,
-            borderRadius: BorderRadius.circular(20 * scale),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 2 * scale,
-                offset: Offset(0, 4 * scale),
+                blurRadius: 2,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 8,
             children: [
               Flexible(
                 child: FittedBox(
@@ -50,18 +48,16 @@ class AssessmentResultActionButton extends StatelessWidget {
                     maxLines: 1,
                     style: GoogleFonts.andika(
                       color: Colors.white,
-                      fontSize: 18 * scale,
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
                       height: 28 / 18,
-                      letterSpacing: -0.2 * scale,
+                      letterSpacing: -0.2,
                     ),
                   ),
                 ),
               ),
-              if (icon != null) ...[
-                SizedBox(width: 8 * scale),
-                Icon(icon, color: Colors.white, size: 18 * scale, weight: 700),
-              ],
+              if (icon != null)
+                Icon(icon, color: Colors.white, size: 18, weight: 700),
             ],
           ),
         ),

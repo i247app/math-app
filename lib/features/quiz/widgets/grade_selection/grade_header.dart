@@ -8,9 +8,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 class GradeHeader extends StatelessWidget {
-  const GradeHeader({super.key, required this.scale});
-
-  final double scale;
+  const GradeHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +17,8 @@ class GradeHeader extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          height: 70 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 20 * scale),
+          height: 70,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           color: colors.elevatedSurface.withValues(alpha: 0.78),
           alignment: Alignment.centerLeft,
           child: IconButton(
@@ -32,13 +30,10 @@ class GradeHeader extends StatelessWidget {
             icon: Icon(
               Icons.arrow_back_rounded,
               color: colors.brandStrong,
-              size: 28 * scale,
+              size: 28,
             ),
             padding: EdgeInsets.zero,
-            constraints: BoxConstraints.tightFor(
-              width: 42 * scale,
-              height: 42 * scale,
-            ),
+            constraints: const BoxConstraints.tightFor(width: 42, height: 42),
             tooltip: context.getText(AppKeys.back),
           ),
         ),

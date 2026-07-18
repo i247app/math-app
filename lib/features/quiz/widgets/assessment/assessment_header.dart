@@ -9,30 +9,28 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 class AssessmentHeader extends StatelessWidget {
-  const AssessmentHeader({super.key, required this.scale});
-
-  final double scale;
+  const AssessmentHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return ClipRRect(
-      borderRadius: BorderRadius.vertical(bottom: Radius.circular(32 * scale)),
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          height: 80 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 24 * scale),
+          height: 80,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           decoration: BoxDecoration(
             color: colors.elevatedSurface.withValues(alpha: 0.84),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(32 * scale),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(32),
             ),
             boxShadow: [
               BoxShadow(
                 color: colors.shadow,
-                blurRadius: 2 * scale,
-                offset: Offset(0, 1 * scale),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
               ),
             ],
           ),
@@ -41,29 +39,29 @@ class AssessmentHeader extends StatelessWidget {
               QuizHeaderIconButton(
                 icon: Icons.close_rounded,
                 color: colors.brandStrong,
-                scale: scale,
                 circle: true,
                 onTap: () => Navigator.of(context).maybePop(),
               ),
-              SizedBox(width: 16 * scale),
               Expanded(
-                child: Text(
-                  context.getText(AppKeys.aiChallenge),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colors.brandStrong,
-                    fontSize: 20 * scale,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: 0,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    context.getText(AppKeys.aiChallenge),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colors.brandStrong,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      letterSpacing: 0,
+                    ),
                   ),
                 ),
               ),
               QuizHeaderIconButton(
                 icon: Icons.help_outline_rounded,
                 color: colors.brandStrong,
-                scale: scale,
                 circle: true,
                 onTap: HapticFeedback.selectionClick,
               ),

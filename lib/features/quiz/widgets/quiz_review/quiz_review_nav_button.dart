@@ -28,9 +28,9 @@ class QuizReviewNavButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 2,
         children: [
           if (!iconAfter) Icon(icon, color: foreground, size: 20),
-          if (!iconAfter) const SizedBox(width: 2),
           QuizReviewCenteredText(
             label,
             color: foreground,
@@ -38,7 +38,6 @@ class QuizReviewNavButton extends StatelessWidget {
             fontWeight: FontWeight.w900,
             verticalOffset: 0.4,
           ),
-          if (iconAfter) const SizedBox(width: 2),
           if (iconAfter) Icon(icon, color: foreground, size: 20),
         ],
       ),

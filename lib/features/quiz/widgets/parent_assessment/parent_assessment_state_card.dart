@@ -10,51 +10,55 @@ class ParentAssessmentStateCard extends StatelessWidget {
     required this.title,
     required this.message,
     required this.onTap,
-    required this.scale,
   });
 
   final IconData icon;
   final String title;
   final String message;
   final VoidCallback onTap;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(18 * scale),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16 * scale),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE1E8E7)),
       ),
       child: Column(
         children: [
-          Icon(icon, color: const Color(0xFF339395), size: 32 * scale),
-          SizedBox(height: 8 * scale),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Icon(icon, color: const Color(0xFF339395), size: 32),
+          ),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: const Color(0xFF17252B),
-              fontSize: FontSize.normal * scale,
+            style: const TextStyle(
+              color: Color(0xFF17252B),
+              fontSize: FontSize.normal,
               fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(height: 4 * scale),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: const Color(0xFF77859A),
-              fontSize: FontSize.caption * scale,
-              fontWeight: FontWeight.w600,
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF77859A),
+                fontSize: FontSize.caption,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          SizedBox(height: 10 * scale),
-          TextButton(
-            onPressed: onTap,
-            child: Text(context.getText(AppKeys.retry)),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: TextButton(
+              onPressed: onTap,
+              child: Text(context.getText(AppKeys.retry)),
+            ),
           ),
         ],
       ),

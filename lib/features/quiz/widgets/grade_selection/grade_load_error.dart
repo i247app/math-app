@@ -7,52 +7,47 @@ import 'package:numi/core/theme/app_colors.dart';
 class GradeLoadError extends StatelessWidget {
   const GradeLoadError({
     super.key,
-    required this.scale,
     required this.message,
     required this.onRetry,
   });
-
-  final double scale;
   final String message;
   final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(24 * scale),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(28 * scale),
+        borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
+        spacing: 12,
         children: [
-          Icon(
-            Icons.school_outlined,
-            color: AppColors.teal700,
-            size: 34 * scale,
-          ),
-          SizedBox(height: 12 * scale),
+          const Icon(Icons.school_outlined, color: AppColors.teal700, size: 34),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 14 * scale,
+              fontSize: 14,
               fontWeight: FontWeight.w800,
               height: 1.3,
               letterSpacing: 0,
             ),
           ),
-          SizedBox(height: 14 * scale),
-          TextButton(
-            onPressed: onRetry,
-            child: Text(
-              context.getText(AppKeys.retryUpper),
-              style: TextStyle(
-                color: AppColors.teal700,
-                fontSize: 13 * scale,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.6,
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: TextButton(
+              onPressed: onRetry,
+              child: Text(
+                context.getText(AppKeys.retryUpper),
+                style: const TextStyle(
+                  color: AppColors.teal700,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.6,
+                ),
               ),
             ),
           ),

@@ -6,13 +6,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
 
 class AssessmentAiReviewText extends StatelessWidget {
-  const AssessmentAiReviewText({
-    super.key,
-    required this.scale,
-    required this.reviewText,
-  });
-
-  final double scale;
+  const AssessmentAiReviewText({super.key, required this.reviewText});
   final String reviewText;
 
   @override
@@ -22,10 +16,10 @@ class AssessmentAiReviewText extends StatelessWidget {
     final highlightIndex = text.toLowerCase().indexOf(highlight);
     final bodyStyle = GoogleFonts.andika(
       color: AppColors.textSubtle,
-      fontSize: 12 * scale,
+      fontSize: 12,
       fontWeight: FontWeight.w400,
       height: 19.5 / 12,
-      letterSpacing: -0.1 * scale,
+      letterSpacing: -0.1,
     );
 
     if (highlightIndex == -1) {

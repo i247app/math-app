@@ -60,7 +60,6 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
                 entry.$1 == completedAssessments.take(2).length - 1,
             child: AssessmentResultListItemCard(
               quiz: entry.$2,
-              scale: widget.scale,
               onTap: () => openParentAssessmentResult(entry.$2),
             ),
           ),

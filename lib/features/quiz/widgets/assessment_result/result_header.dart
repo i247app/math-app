@@ -7,27 +7,21 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 class AssessmentResultHeader extends StatelessWidget {
-  const AssessmentResultHeader({
-    super.key,
-    required this.scale,
-    required this.onBack,
-  });
-
-  final double scale;
+  const AssessmentResultHeader({super.key, required this.onBack});
   final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60 * scale,
-      padding: EdgeInsets.only(left: 20 * scale, right: 20 * scale),
+      height: 60,
+      padding: const EdgeInsets.only(left: 20, right: 20),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 0,
-            offset: Offset(0, 4 * scale),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -39,7 +33,6 @@ class AssessmentResultHeader extends StatelessWidget {
             child: QuizHeaderIconButton(
               icon: Icons.arrow_back_rounded,
               color: AppColors.teal500,
-              scale: scale,
               size: 40,
               iconSize: 23,
               borderRadius: 12,
@@ -53,10 +46,10 @@ class AssessmentResultHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: AppColors.teal500,
-              fontSize: 25 * scale,
+              fontSize: 25,
               fontWeight: FontWeight.w800,
               height: 34 / 25,
-              letterSpacing: -0.2 * scale,
+              letterSpacing: -0.2,
             ),
           ),
         ],

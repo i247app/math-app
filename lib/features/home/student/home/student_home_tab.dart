@@ -719,7 +719,6 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
                 entry.$1 == _completedAssessments.take(2).length - 1,
             child: AssessmentResultListItemCard(
               quiz: entry.$2,
-              scale: widget.scale,
               onTap: () => _openStudentAssessmentResult(entry.$2),
             ),
           ),

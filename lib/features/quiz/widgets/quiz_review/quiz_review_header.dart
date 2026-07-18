@@ -15,7 +15,6 @@ class QuizReviewHeader extends StatelessWidget {
     final colors = context.themeColors;
     return PageHeader(
       title: context.getText(AppKeys.quizDetailTitle),
-      scale: 1,
       topInset: 0,
       actionWidth: 52,
       horizontalPadding: 12,

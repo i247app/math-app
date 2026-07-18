@@ -12,24 +12,30 @@ class QuizReviewQuestionSkeleton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        QuizReviewSkeletonBlock(
-          progress: progress,
-          height: 146,
-          borderRadius: 14,
-        ),
-        const SizedBox(height: 23),
-        for (var index = 0; index < 4; index++) ...[
-          QuizReviewSkeletonBlock(
-            progress: progress,
-            height: 59,
-            borderRadius: 12,
-          ),
-          if (index != 3) const SizedBox(height: 10),
-        ],
-        const SizedBox(height: 13),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.only(bottom: 23),
+          child: QuizReviewSkeletonBlock(
+            progress: progress,
+            height: 146,
+            borderRadius: 14,
+          ),
+        ),
+        Column(
+          spacing: 10,
+          children: List.generate(
+            4,
+            (_) => QuizReviewSkeletonBlock(
+              progress: progress,
+              height: 59,
+              borderRadius: 12,
+            ),
+            growable: false,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 13, 20, 0),
           child: Row(
+            spacing: 28,
             children: [
               Expanded(
                 child: QuizReviewSkeletonBlock(
@@ -38,7 +44,6 @@ class QuizReviewQuestionSkeleton extends StatelessWidget {
                   borderRadius: 9,
                 ),
               ),
-              const SizedBox(width: 28),
               Expanded(
                 child: QuizReviewSkeletonBlock(
                   progress: progress,

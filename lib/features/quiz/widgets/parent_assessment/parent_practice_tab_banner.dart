@@ -4,18 +4,13 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_skeleton_pulse.dart';
 
 class ParentPracticeTabBanner extends StatelessWidget {
-  const ParentPracticeTabBanner({
-    super.key,
-    required this.onTap,
-    required this.scale,
-  });
+  const ParentPracticeTabBanner({super.key, required this.onTap});
 
   final VoidCallback onTap;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(10 * scale);
+    final borderRadius = BorderRadius.circular(10);
 
     return Material(
       color: Colors.transparent,
@@ -35,7 +30,7 @@ class ParentPracticeTabBanner extends StatelessWidget {
               if (frame == null) {
                 return ParentAssessmentSkeletonPulse(
                   builder: (context, color) =>
-                      AppSkeletonBlock(radius: 10 * scale, color: color),
+                      AppSkeletonBlock(radius: 10, color: color),
                 );
               }
               return TweenAnimationBuilder<double>(

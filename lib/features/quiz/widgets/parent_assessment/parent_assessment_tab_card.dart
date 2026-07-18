@@ -11,12 +11,10 @@ class AssessmentResultListItemCard extends StatelessWidget {
   const AssessmentResultListItemCard({
     super.key,
     required this.quiz,
-    required this.scale,
     required this.onTap,
   });
 
   final GeneratedQuiz quiz;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -26,7 +24,7 @@ class AssessmentResultListItemCard extends StatelessWidget {
     final scoreStyle = parentAssessmentScoreStyle(context, percent);
     final dateParts = parentAssessmentDateParts(quiz.createDt);
     final shortText = homeQuizShortText(quiz);
-    final radius = BorderRadius.circular(24 * scale);
+    final radius = BorderRadius.circular(24);
 
     return Material(
       color: colors.elevatedSurface,
@@ -35,22 +33,17 @@ class AssessmentResultListItemCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: Container(
-          constraints: BoxConstraints(minHeight: 116 * scale),
-          padding: EdgeInsets.fromLTRB(
-            16 * scale,
-            14 * scale,
-            10 * scale,
-            14 * scale,
-          ),
+          constraints: const BoxConstraints(minHeight: 116),
+          padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
           decoration: BoxDecoration(
             color: colors.elevatedSurface,
             borderRadius: radius,
-            border: Border.all(color: colors.border, width: 1.3 * scale),
+            border: Border.all(color: colors.border, width: 1.3),
             boxShadow: [
               BoxShadow(
                 color: colors.shadow.withValues(alpha: 0.25),
-                blurRadius: 12 * scale,
-                offset: Offset(0, 4 * scale),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -60,62 +53,64 @@ class AssessmentResultListItemCard extends StatelessWidget {
               ParentAssessmentScoreBadge(
                 percentage: percent,
                 color: scoreStyle.color,
-                scale: scale,
               ),
-              SizedBox(width: 12 * scale),
               Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 14 * scale,
-                      runSpacing: 5 * scale,
-                      children: [
-                        ParentAssessmentMetaItem(
-                          icon: Icons.calendar_month_outlined,
-                          label: dateParts.dt,
-                          scale: scale,
-                        ),
-                        ParentAssessmentMetaItem(
-                          icon: Icons.schedule_rounded,
-                          label: dateParts.tm,
-                          scale: scale,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 7 * scale),
-                    Text(
-                      homeQuizTitle(context, quiz),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: FontSize.normal * scale,
-                        fontWeight: FontWeight.w800,
-                        height: 1.28,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 14,
+                        runSpacing: 5,
+                        children: [
+                          ParentAssessmentMetaItem(
+                            icon: Icons.calendar_month_outlined,
+                            label: dateParts.dt,
+                          ),
+                          ParentAssessmentMetaItem(
+                            icon: Icons.schedule_rounded,
+                            label: dateParts.tm,
+                          ),
+                        ],
                       ),
-                    ),
-                    if (shortText != null) ...[
-                      SizedBox(height: 4 * scale),
-                      Text(
-                        shortText,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: colors.textSecondary,
-                          fontSize: FontSize.small,
-                          fontWeight: FontWeight.w500,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 7),
+                        child: Text(
+                          homeQuizTitle(context, quiz),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: FontSize.normal,
+                            fontWeight: FontWeight.w800,
+                            height: 1.28,
+                          ),
                         ),
                       ),
+                      if (shortText != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            shortText,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: colors.textSecondary,
+                              fontSize: FontSize.small,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                     ],
-                  ],
+                  ),
                 ),
               ),
               Icon(
                 Icons.chevron_right_rounded,
                 color: colors.brandStrong,
-                size: 26 * scale,
+                size: 26,
               ),
             ],
           ),

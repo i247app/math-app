@@ -48,6 +48,7 @@ class QuizReviewResultQuestionCard extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(20, 20, 18, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: 18,
                   children: [
                     Row(
                       children: [
@@ -64,7 +65,6 @@ class QuizReviewResultQuestionCard extends StatelessWidget {
                         QuizReviewQuestionStatus(isCorrect: isCorrect),
                       ],
                     ),
-                    const SizedBox(height: 18),
                     Text(
                       question.questionName,
                       maxLines: 3,
@@ -77,7 +77,6 @@ class QuizReviewResultQuestionCard extends StatelessWidget {
                         letterSpacing: 0,
                       ),
                     ),
-                    const SizedBox(height: 18),
                     QuizReviewAnswerList(
                       question: question,
                       selectedLabel: selectedLabel,

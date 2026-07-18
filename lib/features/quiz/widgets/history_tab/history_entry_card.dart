@@ -11,7 +11,6 @@ class HistoryEntryCard extends StatelessWidget {
     required this.leading,
     required this.dateParts,
     required this.title,
-    required this.scale,
     required this.onTap,
     this.subtitle,
   });
@@ -20,12 +19,11 @@ class HistoryEntryCard extends StatelessWidget {
   final HistoryDateParts dateParts;
   final String title;
   final String? subtitle;
-  final double scale;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(24 * scale);
+    final radius = BorderRadius.circular(24);
     final colors = context.themeColors;
     return Material(
       color: colors.elevatedSurface,
@@ -34,71 +32,71 @@ class HistoryEntryCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: Container(
-          constraints: BoxConstraints(minHeight: 116 * scale),
-          padding: EdgeInsets.fromLTRB(
-            16 * scale,
-            14 * scale,
-            10 * scale,
-            14 * scale,
-          ),
+          constraints: const BoxConstraints(minHeight: 116),
+          padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
           decoration: BoxDecoration(
             color: colors.elevatedSurface,
             borderRadius: radius,
-            border: Border.all(color: colors.border, width: 1.3 * scale),
+            border: Border.all(color: colors.border, width: 1.3),
             boxShadow: [
               BoxShadow(
                 color: colors.shadow,
-                blurRadius: 12 * scale,
-                offset: Offset(0, 4 * scale),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              leading,
-              SizedBox(width: 12 * scale),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: leading,
+              ),
               Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    HistoryMetaRow(parts: dateParts, scale: scale),
-                    SizedBox(height: 7 * scale),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 7),
+                      child: HistoryMetaRow(parts: dateParts),
+                    ),
                     Text(
                       title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: colors.textPrimary,
-                        fontSize: FontSize.normal * scale,
+                        fontSize: FontSize.normal,
                         fontWeight: FontWeight.w800,
                         height: 1.28,
                         letterSpacing: 0,
                       ),
                     ),
-                    if (subtitle case final subtitle?) ...[
-                      SizedBox(height: 4 * scale),
-                      Text(
-                        subtitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: colors.textSecondary,
-                          fontSize: FontSize.small * scale,
-                          fontWeight: FontWeight.w500,
-                          height: 1.22,
-                          letterSpacing: 0,
+                    if (subtitle case final subtitle?)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          subtitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colors.textSecondary,
+                            fontSize: FontSize.small,
+                            fontWeight: FontWeight.w500,
+                            height: 1.22,
+                            letterSpacing: 0,
+                          ),
                         ),
                       ),
-                    ],
                   ],
                 ),
               ),
               Icon(
                 Icons.chevron_right_rounded,
                 color: colors.brandStrong,
-                size: 26 * scale,
+                size: 26,
               ),
             ],
           ),

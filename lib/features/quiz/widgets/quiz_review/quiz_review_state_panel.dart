@@ -26,6 +26,7 @@ class QuizReviewStatePanel extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: 14,
             children: [
               if (isLoading)
                 const CircularProgressIndicator(color: AppColors.navy)
@@ -35,7 +36,6 @@ class QuizReviewStatePanel extends StatelessWidget {
                   color: AppColors.navy,
                   size: 42,
                 ),
-                const SizedBox(height: 14),
                 Text(
                   message ?? context.getText(AppKeys.quizDetailErrorTitle),
                   textAlign: TextAlign.center,
@@ -45,10 +45,12 @@ class QuizReviewStatePanel extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: onRetry,
-                  child: Text(context.getText(AppKeys.retry)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: TextButton(
+                    onPressed: onRetry,
+                    child: Text(context.getText(AppKeys.retry)),
+                  ),
                 ),
               ],
             ],

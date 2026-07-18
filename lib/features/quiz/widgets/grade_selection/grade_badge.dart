@@ -4,20 +4,14 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/quiz/widgets/grade_selection/grade_option.dart';
 
 class GradeBadge extends StatelessWidget {
-  const GradeBadge({
-    super.key,
-    required this.option,
-    required this.scale,
-    required this.isSelected,
-  });
+  const GradeBadge({super.key, required this.option, required this.isSelected});
 
   final GradeOption option;
-  final double scale;
   final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
-    final size = 35 * scale;
+    const size = 35.0;
 
     return Container(
       width: size,
@@ -31,13 +25,13 @@ class GradeBadge extends StatelessWidget {
           ? Icon(
               Icons.school_rounded,
               color: isSelected ? Colors.white : AppColors.teal700,
-              size: 19 * scale,
+              size: 19,
             )
           : Text(
               option.number!,
               style: TextStyle(
                 color: isSelected ? Colors.white : AppColors.teal700,
-                fontSize: 17 * scale,
+                fontSize: 17,
                 fontWeight: FontWeight.w900,
                 height: 1,
                 letterSpacing: 0,

@@ -16,16 +16,15 @@ class QuizReviewResultQuestionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        for (var index = 0; index < quiz.questions.length; index++) ...[
-          QuizReviewResultQuestionCard(
-            question: quiz.questions[index],
-            selectedLabel:
-                selectedAnswers[quiz.questions[index].questionNumber],
-          ),
-          if (index != quiz.questions.length - 1) const SizedBox(height: 14),
-        ],
-      ],
+      spacing: 14,
+      children: quiz.questions
+          .map(
+            (question) => QuizReviewResultQuestionCard(
+              question: question,
+              selectedLabel: selectedAnswers[question.questionNumber],
+            ),
+          )
+          .toList(growable: false),
     );
   }
 }

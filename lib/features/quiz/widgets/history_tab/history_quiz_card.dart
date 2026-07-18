@@ -10,15 +10,9 @@ import 'package:numi/features/quiz/widgets/history_tab/history_score_badge.dart'
 import 'package:numi/features/quiz/widgets/history_tab/history_score_colors.dart';
 
 class HistoryQuizCard extends StatelessWidget {
-  const HistoryQuizCard({
-    super.key,
-    required this.quiz,
-    required this.scale,
-    required this.onTap,
-  });
+  const HistoryQuizCard({super.key, required this.quiz, required this.onTap});
 
   final GeneratedQuiz quiz;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -26,16 +20,14 @@ class HistoryQuizCard extends StatelessWidget {
     final percent = quiz.grading?.scorePercentage;
     return HistoryEntryCard(
       leading: percent == null
-          ? HistoryIncompleteBadge(scale: scale)
+          ? const HistoryIncompleteBadge()
           : HistoryScoreBadge(
               percentage: percent,
               colors: historyScoreColors(context, percent),
-              scale: scale,
             ),
       dateParts: historyDatePartsFromIso(quiz.createDt),
       title: historyQuizTitle(context, quiz),
       subtitle: historyQuizShortText(quiz),
-      scale: scale,
       onTap: onTap,
     );
   }

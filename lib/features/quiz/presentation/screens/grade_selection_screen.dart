@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,9 +42,6 @@ class GradeSelectionScreen extends StatefulWidget {
   final int? initialGradeId;
   final String? initialGradeLabel;
   final VoidCallback? onResultBack;
-
-  static const _designWidth = 390.0;
-  static const _designHeight = 844.0;
 
   @override
   State<GradeSelectionScreen> createState() => _GradeSelectionScreenState();
@@ -196,96 +192,75 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
       child: Scaffold(
         backgroundColor: colors.pageBackground,
         body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = math.min(constraints.maxWidth, 430.0);
-              final height = constraints.maxHeight;
-              final scale = math.min(
-                width / GradeSelectionScreen._designWidth,
-                height / GradeSelectionScreen._designHeight,
-              );
-
-              double s(double value) => value * scale;
-
-              return Center(
-                child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: Stack(
-                    children: [
-                      const Positioned.fill(child: GradeBackground()),
-                      Positioned.fill(
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          padding: EdgeInsets.fromLTRB(
-                            s(38),
-                            s(132),
-                            s(38),
-                            s(128),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 430),
+              child: Stack(
+                children: [
+                  const Positioned.fill(child: GradeBackground()),
+                  Positioned.fill(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(38, 132, 38, 128),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            context.getText(AppKeys.gradeQuestionTitle),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: colors.textPrimary,
+                              fontSize: 31,
+                              fontWeight: FontWeight.w900,
+                              height: 1.08,
+                              letterSpacing: 0,
+                            ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                context.getText(AppKeys.gradeQuestionTitle),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: colors.textPrimary,
-                                  fontSize: s(31),
-                                  fontWeight: FontWeight.w900,
-                                  height: 1.08,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 220),
-                                child: showGenerationFailed
-                                    ? Padding(
-                                        key: const ValueKey(
-                                          'generate-failed-notice',
-                                        ),
-                                        padding: EdgeInsets.only(top: s(18)),
-                                        child: GradeFailureNotice(scale: scale),
-                                      )
-                                    : const SizedBox.shrink(),
-                              ),
-                              SizedBox(height: s(26)),
-                              GradeGrid(
-                                scale: scale,
-                                grades: grades,
-                                selectedGradeLabel: selectedGradeLabel,
-                                isLoading: isLoadingGrades,
-                                errorMessage: gradeLoadError,
-                                onSelected: selectGrade,
-                                onRetry: loadGrades,
-                              ),
-                            ],
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 26),
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 220),
+                              child: showGenerationFailed
+                                  ? const Padding(
+                                      key: ValueKey('generate-failed-notice'),
+                                      padding: EdgeInsets.only(top: 18),
+                                      child: GradeFailureNotice(),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
                           ),
-                        ),
+                          GradeGrid(
+                            grades: grades,
+                            selectedGradeLabel: selectedGradeLabel,
+                            isLoading: isLoadingGrades,
+                            errorMessage: gradeLoadError,
+                            onSelected: selectGrade,
+                            onRetry: loadGrades,
+                          ),
+                        ],
                       ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        child: GradeHeader(scale: scale),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: GradeBottomBar(
-                          scale: scale,
-                          onSkip: openAssessment,
-                          onContinue: continueWithSelectedGrade,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              );
-            },
+                  const Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    child: GradeHeader(),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: GradeBottomBar(
+                      onSkip: openAssessment,
+                      onContinue: continueWithSelectedGrade,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

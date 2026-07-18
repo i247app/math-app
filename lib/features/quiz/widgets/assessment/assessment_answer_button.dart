@@ -8,13 +8,11 @@ class AssessmentAnswerButton extends StatelessWidget {
     super.key,
     required this.answer,
     required this.selected,
-    required this.scale,
     required this.onTap,
   });
 
   final QuizAnswer answer;
   final bool selected;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -27,34 +25,34 @@ class AssessmentAnswerButton extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(32 * scale),
+      borderRadius: BorderRadius.circular(32),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(32 * scale),
+        borderRadius: BorderRadius.circular(32),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
             color: colors.elevatedSurface,
-            borderRadius: BorderRadius.circular(32 * scale),
-            border: Border.all(color: borderColor, width: 2 * scale),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: borderColor, width: 2),
             boxShadow: selected
                 ? [
                     BoxShadow(
                       color: const Color(0xFF73F1E7).withValues(alpha: 0.20),
-                      spreadRadius: 4 * scale,
+                      spreadRadius: 4,
                     ),
                     BoxShadow(
                       color: colors.shadow,
-                      blurRadius: 6 * scale,
-                      offset: Offset(0, 4 * scale),
+                      blurRadius: 6,
+                      offset: const Offset(0, 4),
                     ),
                   ]
                 : [
                     BoxShadow(
                       color: colors.shadow,
-                      blurRadius: 2 * scale,
-                      offset: Offset(0, 1 * scale),
+                      blurRadius: 2,
+                      offset: const Offset(0, 1),
                     ),
                   ],
           ),
@@ -65,7 +63,7 @@ class AssessmentAnswerButton extends StatelessWidget {
                 answer.content,
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 30 * scale,
+                  fontSize: 30,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
@@ -73,9 +71,9 @@ class AssessmentAnswerButton extends StatelessWidget {
               ),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
-                width: selected ? 8 * scale : 0,
-                height: selected ? 12 * scale : 0,
-                padding: EdgeInsets.only(top: 4 * scale),
+                width: selected ? 8 : 0,
+                height: selected ? 12 : 0,
+                padding: const EdgeInsets.only(top: 4),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: colors.brandStrong,

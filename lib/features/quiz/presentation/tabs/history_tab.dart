@@ -26,7 +26,6 @@ class HistoryTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.bottomPadding,
-    required this.scale,
     required this.classroomService,
     required this.assignmentService,
     this.quizService,
@@ -37,7 +36,6 @@ class HistoryTab extends StatefulWidget {
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final double bottomPadding;
-  final double scale;
   final ClassroomService classroomService;
   final ClassroomExerciseService assignmentService;
   final QuizService? quizService;
@@ -166,7 +164,6 @@ class _HistoryTabState extends State<HistoryTab> {
 
   @override
   Widget build(BuildContext context) {
-    final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
 
     return ColoredBox(
@@ -189,28 +186,22 @@ class _HistoryTabState extends State<HistoryTab> {
             padding: EdgeInsets.only(bottom: widget.bottomPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 12,
               children: [
-                HistoryHeader(scale: scale, topInset: topInset),
-                SizedBox(height: 12 * scale),
+                HistoryHeader(topInset: topInset),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-                  child: HistorySearchField(
-                    controller: _searchController,
-                    scale: scale,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: HistorySearchField(controller: _searchController),
                 ),
-                SizedBox(height: 12 * scale),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20 * scale),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: HistoryTypeTabs(
                     selectedFilter: _selectedFilter,
                     onSelected: _selectFilter,
-                    scale: scale,
                   ),
                 ),
-                SizedBox(height: 12 * scale),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20 * scale),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: HistoryBody(
                     isLoading: _selectedFilter == HistoryFilter.homework
                         ? _controller.isLoadingHomework
@@ -225,7 +216,6 @@ class _HistoryTabState extends State<HistoryTab> {
                     ),
                     exerciseService: widget.assignmentService,
                     onRetry: () => _loadHistory(forceRefresh: true),
-                    scale: scale,
                   ),
                 ),
               ],

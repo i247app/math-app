@@ -9,12 +9,9 @@ import 'package:numi/core/theme/app_colors.dart';
 class AssessmentProgressSection extends StatelessWidget {
   const AssessmentProgressSection({
     super.key,
-    required this.scale,
     required this.currentQuestion,
     required this.totalQuestions,
   });
-
-  final double scale;
   final int currentQuestion;
   final int totalQuestions;
 
@@ -27,26 +24,26 @@ class AssessmentProgressSection extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 12,
       children: [
         Text(
           context.formatText(AppKeys.questionProgress, {
             'current': currentQuestion,
             'total': totalQuestions,
           }),
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.textSubtle,
-            fontSize: 16 * scale,
+            fontSize: 16,
             fontWeight: FontWeight.w900,
             height: 1.5,
             letterSpacing: 0.8,
           ),
         ),
-        SizedBox(height: 12 * scale),
         SizedBox(
-          height: 16 * scale,
+          height: 16,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final inset = 4 * scale;
+              const inset = 4.0;
               final trackWidth = constraints.maxWidth;
               final fillWidth = math.max(
                 0.0,
@@ -54,15 +51,15 @@ class AssessmentProgressSection extends StatelessWidget {
               );
 
               return Container(
-                padding: EdgeInsets.all(inset),
+                padding: const EdgeInsets.all(inset),
                 decoration: BoxDecoration(
                   color: AppColors.peachStrong,
                   borderRadius: BorderRadius.circular(999),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 4 * scale,
-                      offset: Offset(0, 2 * scale),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                       blurStyle: BlurStyle.inner,
                     ),
                   ],

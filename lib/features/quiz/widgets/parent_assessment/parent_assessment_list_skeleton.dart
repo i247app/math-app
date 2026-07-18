@@ -4,68 +4,55 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_line.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_skeleton_pulse.dart';
 
 class ParentAssessmentListSkeleton extends StatelessWidget {
-  const ParentAssessmentListSkeleton({super.key, required this.scale});
-
-  final double scale;
+  const ParentAssessmentListSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ParentAssessmentSkeletonPulse(
       builder: (context, color) => Column(
-        children: [
-          for (var index = 0; index < 3; index++) ...[
-            AppSkeletonBlock(
-              height: 116 * scale,
-              radius: 24 * scale,
-              color: color,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  16 * scale,
-                  14 * scale,
-                  16 * scale,
-                  14 * scale,
-                ),
-                child: Row(
-                  children: [
-                    AppSkeletonBlock(
-                      width: 54 * scale,
-                      height: 54 * scale,
-                      radius: 27 * scale,
-                      color: color,
+        spacing: 14,
+        children: List.generate(
+          3,
+          (index) => AppSkeletonBlock(
+            height: 116,
+            radius: 24,
+            color: color,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              child: Row(
+                spacing: 12,
+                children: [
+                  AppSkeletonBlock(
+                    width: 54,
+                    height: 54,
+                    radius: 27,
+                    color: color,
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 6,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 1),
+                          child: AppSkeletonLine(
+                            width: 136,
+                            height: 8,
+                            color: color,
+                          ),
+                        ),
+                        AppSkeletonLine(width: 176, height: 13, color: color),
+                        AppSkeletonLine(width: 112, height: 8, color: color),
+                      ],
                     ),
-                    SizedBox(width: 12 * scale),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppSkeletonLine(
-                            width: 136 * scale,
-                            height: 8 * scale,
-                            color: color,
-                          ),
-                          SizedBox(height: 7 * scale),
-                          AppSkeletonLine(
-                            width: 176 * scale,
-                            height: 13 * scale,
-                            color: color,
-                          ),
-                          SizedBox(height: 6 * scale),
-                          AppSkeletonLine(
-                            width: 112 * scale,
-                            height: 8 * scale,
-                            color: color,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            if (index < 2) SizedBox(height: 14 * scale),
-          ],
-        ],
+          ),
+          growable: false,
+        ),
       ),
     );
   }

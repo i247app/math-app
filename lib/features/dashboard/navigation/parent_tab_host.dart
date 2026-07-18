@@ -47,7 +47,6 @@ class ParentTabHost extends StatelessWidget {
         gradeService: args.gradeService,
         quizService: args.quizService,
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
       );
     }
 

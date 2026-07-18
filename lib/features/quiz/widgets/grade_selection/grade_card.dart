@@ -8,13 +8,11 @@ class GradeCard extends StatelessWidget {
   const GradeCard({
     super.key,
     required this.option,
-    required this.scale,
     required this.isSelected,
     required this.onSelected,
   });
 
   final GradeOption option;
-  final double scale;
   final bool isSelected;
   final VoidCallback onSelected;
 
@@ -27,44 +25,35 @@ class GradeCard extends StatelessWidget {
       enabled: true,
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(28 * scale),
+        borderRadius: BorderRadius.circular(28),
         child: InkWell(
           onTap: onSelected,
-          borderRadius: BorderRadius.circular(28 * scale),
+          borderRadius: BorderRadius.circular(28),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
-            padding: EdgeInsets.fromLTRB(
-              20 * scale,
-              20 * scale,
-              20 * scale,
-              17 * scale,
-            ),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 17),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.92),
-              borderRadius: BorderRadius.circular(28 * scale),
+              borderRadius: BorderRadius.circular(28),
               border: Border.all(
                 color: isSelected ? AppColors.teal700 : Colors.transparent,
-                width: 2 * scale,
+                width: 2,
               ),
               boxShadow: [
                 BoxShadow(
                   color: isSelected
                       ? AppColors.teal700.withValues(alpha: 0.16)
                       : Colors.black.withValues(alpha: 0.03),
-                  blurRadius: isSelected ? 16 * scale : 10 * scale,
-                  offset: Offset(0, isSelected ? 7 * scale : 4 * scale),
+                  blurRadius: isSelected ? 16 : 10,
+                  offset: Offset(0, isSelected ? 7 : 4),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GradeBadge(
-                  option: option,
-                  scale: scale,
-                  isSelected: isSelected,
-                ),
+                GradeBadge(option: option, isSelected: isSelected),
                 const Spacer(),
                 FittedBox(
                   fit: BoxFit.scaleDown,
@@ -72,9 +61,9 @@ class GradeCard extends StatelessWidget {
                   child: Text(
                     option.label,
                     maxLines: 1,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 17 * scale,
+                      fontSize: 17,
                       fontWeight: FontWeight.w900,
                       height: 1,
                       letterSpacing: 0,

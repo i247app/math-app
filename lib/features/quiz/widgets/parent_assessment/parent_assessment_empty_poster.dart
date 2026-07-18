@@ -4,18 +4,13 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_skeleton_pulse.dart';
 
 class ParentAssessmentEmptyPoster extends StatelessWidget {
-  const ParentAssessmentEmptyPoster({
-    super.key,
-    required this.onTap,
-    required this.scale,
-  });
+  const ParentAssessmentEmptyPoster({super.key, required this.onTap});
 
   final VoidCallback onTap;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(24 * scale);
+    final borderRadius = BorderRadius.circular(24);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -23,8 +18,8 @@ class ParentAssessmentEmptyPoster extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.10),
-            blurRadius: 18 * scale,
-            offset: Offset(0, 8 * scale),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -46,7 +41,7 @@ class ParentAssessmentEmptyPoster extends StatelessWidget {
                 if (frame == null) {
                   return ParentAssessmentSkeletonPulse(
                     builder: (context, color) =>
-                        AppSkeletonBlock(radius: 24 * scale, color: color),
+                        AppSkeletonBlock(radius: 24, color: color),
                   );
                 }
                 return TweenAnimationBuilder<double>(

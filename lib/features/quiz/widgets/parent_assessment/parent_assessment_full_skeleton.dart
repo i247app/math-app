@@ -5,9 +5,7 @@ import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_l
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_skeleton_pulse.dart';
 
 class ParentAssessmentFullSkeleton extends StatelessWidget {
-  const ParentAssessmentFullSkeleton({super.key, required this.scale});
-
-  final double scale;
+  const ParentAssessmentFullSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,65 +13,60 @@ class ParentAssessmentFullSkeleton extends StatelessWidget {
       builder: (context, color) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppSkeletonBlock(
-            height: 111 * scale,
-            radius: 10 * scale,
-            color: color,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 13),
+            child: AppSkeletonBlock(height: 111, radius: 10, color: color),
           ),
-          SizedBox(height: 13 * scale),
-          AppSkeletonBlock(
-            height: 44 * scale,
-            radius: 22 * scale,
-            color: color,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 18 * scale),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: AppSkeletonLine(
-                  width: 150 * scale,
-                  height: 10 * scale,
-                  color: color,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: AppSkeletonBlock(
+              height: 44,
+              radius: 22,
+              color: color,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: AppSkeletonLine(width: 150, height: 10, color: color),
                 ),
               ),
             ),
           ),
-          SizedBox(height: 20 * scale),
-          AppSkeletonLine(width: 178 * scale, height: 18 * scale, color: color),
-          SizedBox(height: 8 * scale),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: AppSkeletonLine(width: 178, height: 18, color: color),
+          ),
           AppSkeletonBlock(
-            height: 124 * scale,
-            radius: 10 * scale,
+            height: 124,
+            radius: 10,
             color: color,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                16 * scale,
-                20 * scale,
-                16 * scale,
-                14 * scale,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  for (var index = 0; index < 5; index++) ...[
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: AppSkeletonBlock(
-                          width: 28 * scale,
-                          height: (34 + index * 13) * scale,
-                          radius: 14 * scale,
-                          color: color,
-                        ),
+                spacing: 10,
+                children: List.generate(
+                  5,
+                  (index) => Expanded(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: AppSkeletonBlock(
+                        width: 28,
+                        height: (34 + index * 13),
+                        radius: 14,
+                        color: color,
                       ),
                     ),
-                    if (index < 4) SizedBox(width: 10 * scale),
-                  ],
-                ],
+                  ),
+                  growable: false,
+                ),
               ),
             ),
           ),
-          SizedBox(height: 16 * scale),
-          ParentAssessmentListSkeleton(scale: scale),
+          const Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: ParentAssessmentListSkeleton(),
+          ),
         ],
       ),
     );

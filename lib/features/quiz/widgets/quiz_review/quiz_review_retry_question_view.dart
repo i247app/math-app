@@ -33,21 +33,27 @@ class QuizReviewRetryQuestionView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        QuizReviewQuestionSelector(
-          questions: questions,
-          selectedIndex: selectedIndex,
-          onSelected: onQuestionSelected,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: QuizReviewQuestionSelector(
+            questions: questions,
+            selectedIndex: selectedIndex,
+            onSelected: onQuestionSelected,
+          ),
         ),
-        const SizedBox(height: 20),
-        QuizReviewQuestionCard(question: question),
-        const SizedBox(height: 23),
-        QuizReviewAnswerList(
-          question: question,
-          selectedLabel: selectedAnswers[question.questionNumber],
-          onSelected: (label) =>
-              onAnswerSelected(question.questionNumber, label),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 23),
+          child: QuizReviewQuestionCard(question: question),
         ),
-        const SizedBox(height: 13),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 13),
+          child: QuizReviewAnswerList(
+            question: question,
+            selectedLabel: selectedAnswers[question.questionNumber],
+            onSelected: (label) =>
+                onAnswerSelected(question.questionNumber, label),
+          ),
+        ),
         QuizReviewQuestionNavigationBar(
           canGoPrevious: selectedIndex > 0,
           canGoNext: selectedIndex < questions.length - 1,

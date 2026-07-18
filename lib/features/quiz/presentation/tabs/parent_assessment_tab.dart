@@ -39,7 +39,6 @@ class ParentAssessmentTab extends StatefulWidget {
     required this.gradeService,
     required this.quizService,
     required this.bottomPadding,
-    required this.scale,
   });
 
   final LoginUser? user;
@@ -50,7 +49,6 @@ class ParentAssessmentTab extends StatefulWidget {
   final GradeService gradeService;
   final QuizService quizService;
   final double bottomPadding;
-  final double scale;
 
   @override
   State<ParentAssessmentTab> createState() => _ParentAssessmentTabState();
@@ -268,7 +266,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
 
   @override
   Widget build(BuildContext context) {
-    final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
     final entries = _filteredEntries;
     final shouldShowFullSkeleton = _isLoading && _entries.isEmpty;
@@ -290,15 +287,14 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
               child: PageHeader(
                 title: context.getText(AppKeys.parentAssessmentTabTitle),
                 topInset: topInset,
-                scale: scale,
               ),
             ),
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
-                16 * scale,
-                14 * scale,
-                16 * scale,
-                widget.bottomPadding + 20 * scale,
+                16,
+                14,
+                16,
+                widget.bottomPadding + 20,
               ),
               sliver: SliverList(
                 delegate: SliverChildListDelegate(
@@ -306,7 +302,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                     entries: entries,
                     hasNoAssessments: hasNoAssessments,
                     shouldShowFullSkeleton: shouldShowFullSkeleton,
-                    scale: scale,
                   ),
                 ),
               ),
@@ -321,81 +316,84 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     required List<ParentAssessmentEntry> entries,
     required bool hasNoAssessments,
     required bool shouldShowFullSkeleton,
-    required double scale,
   }) {
     final colors = context.themeColors;
     final shouldShowProgressChart = _entries.length > 1;
 
     if (shouldShowFullSkeleton) {
-      return [ParentAssessmentFullSkeleton(scale: scale)];
+      return [const ParentAssessmentFullSkeleton()];
     }
 
     if (hasNoAssessments) {
       return [
         _initialFadeIn(
-          child: ParentAssessmentEmptyPoster(
-            onTap: _openAssessment,
-            scale: scale,
-          ),
+          child: ParentAssessmentEmptyPoster(onTap: _openAssessment),
         ),
       ];
     }
 
     return [
-      ParentPracticeTabBanner(onTap: _openAssessment, scale: scale),
-      SizedBox(height: 13 * scale),
-      ParentAssessmentSearchField(controller: _searchController, scale: scale),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 13),
+        child: ParentPracticeTabBanner(onTap: _openAssessment),
+      ),
+      ParentAssessmentSearchField(controller: _searchController),
       if (shouldShowProgressChart) ...[
-        SizedBox(height: 20 * scale),
-        Text(
-          context.getText(AppKeys.parentLearningProgress),
-          style: TextStyle(
-            color: colors.textPrimary,
-            fontSize: FontSize.large * scale,
-            fontWeight: FontWeight.w900,
-            height: 1.1,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 20, 0, 8),
+          child: Text(
+            context.getText(AppKeys.parentLearningProgress),
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: FontSize.large,
+              fontWeight: FontWeight.w900,
+              height: 1.1,
+            ),
           ),
         ),
-        SizedBox(height: 8 * scale),
         ParentAssessmentProgressChart(
           entries: _entries.take(5).toList().reversed.toList(),
-          scale: scale,
         ),
       ],
-      SizedBox(height: 16 * scale),
       if (_errorMessage != null && _entries.isEmpty)
-        _initialFadeIn(
-          child: ParentAssessmentStateCard(
-            icon: Icons.cloud_off_rounded,
-            title: context.getText(AppKeys.historyLoadErrorTitle),
-            message: _errorMessage!,
-            onTap: _loadAssessments,
-            scale: scale,
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: _initialFadeIn(
+            child: ParentAssessmentStateCard(
+              icon: Icons.cloud_off_rounded,
+              title: context.getText(AppKeys.historyLoadErrorTitle),
+              message: _errorMessage!,
+              onTap: _loadAssessments,
+            ),
           ),
         )
       else if (entries.isEmpty)
-        _initialFadeIn(
-          child: ParentAssessmentStateCard(
-            icon: Icons.assignment_turned_in_outlined,
-            title: context.getText(AppKeys.noHistoryTitle),
-            message: context.getText(AppKeys.noHistoryMessage),
-            onTap: _loadAssessments,
-            scale: scale,
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: _initialFadeIn(
+            child: ParentAssessmentStateCard(
+              icon: Icons.assignment_turned_in_outlined,
+              title: context.getText(AppKeys.noHistoryTitle),
+              message: context.getText(AppKeys.noHistoryMessage),
+              onTap: _loadAssessments,
+            ),
           ),
         )
       else
-        _initialFadeIn(
-          child: Column(
-            children: [
-              for (final entry in entries) ...[
-                AssessmentResultListItemCard(
-                  quiz: entry.quiz,
-                  scale: scale,
-                  onTap: () => _openQuizReview(entry.quiz),
-                ),
-                SizedBox(height: 14 * scale),
-              ],
-            ],
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: _initialFadeIn(
+            child: Column(
+              spacing: 14,
+              children: entries
+                  .map(
+                    (entry) => AssessmentResultListItemCard(
+                      quiz: entry.quiz,
+                      onTap: () => _openQuizReview(entry.quiz),
+                    ),
+                  )
+                  .toList(growable: false),
+            ),
           ),
         ),
     ];

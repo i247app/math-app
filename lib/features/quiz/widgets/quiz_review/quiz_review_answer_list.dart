@@ -23,18 +23,20 @@ class QuizReviewAnswerList extends StatelessWidget {
     final correctLabel = quizReviewCorrectAnswerLabel(question);
 
     return Column(
-      children: [
-        for (final answer in question.answers) ...[
-          QuizReviewAnswerTile(
-            answer: answer,
-            selectedLabel: selectedLabel,
-            correctLabel: correctLabel,
-            showCorrectAnswer: showCorrectAnswer,
-            onTap: onSelected == null ? null : () => onSelected!(answer.label),
-          ),
-          const SizedBox(height: 10),
-        ],
-      ],
+      spacing: 10,
+      children: question.answers
+          .map(
+            (answer) => QuizReviewAnswerTile(
+              answer: answer,
+              selectedLabel: selectedLabel,
+              correctLabel: correctLabel,
+              showCorrectAnswer: showCorrectAnswer,
+              onTap: onSelected == null
+                  ? null
+                  : () => onSelected!(answer.label),
+            ),
+          )
+          .toList(growable: false),
     );
   }
 }

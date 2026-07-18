@@ -11,13 +11,11 @@ class HistoryTypeTabButton extends StatelessWidget {
     required this.filter,
     required this.selected,
     required this.onTap,
-    required this.scale,
   });
 
   final HistoryFilter filter;
   final bool selected;
   final VoidCallback onTap;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +38,7 @@ class HistoryTypeTabButton extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: selected ? Colors.white : AppColors.textWarmMuted,
-              fontSize: FontSize.caption * scale,
+              fontSize: FontSize.caption,
               fontWeight: FontWeight.w500,
               height: 1,
               letterSpacing: 0,

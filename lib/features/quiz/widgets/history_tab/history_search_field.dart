@@ -7,29 +7,24 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class HistorySearchField extends StatelessWidget {
-  const HistorySearchField({
-    super.key,
-    required this.controller,
-    required this.scale,
-  });
+  const HistorySearchField({super.key, required this.controller});
 
   final TextEditingController controller;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Container(
-      height: 42 * scale,
+      height: 42,
       decoration: BoxDecoration(
         color: colors.inputSurface,
-        borderRadius: BorderRadius.circular(30 * scale),
+        borderRadius: BorderRadius.circular(30),
         border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
             color: colors.shadow,
-            blurRadius: 10 * scale,
-            offset: Offset(0, 3 * scale),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -39,7 +34,7 @@ class HistorySearchField extends StatelessWidget {
         textInputAction: TextInputAction.search,
         style: TextStyle(
           color: colors.textPrimary,
-          fontSize: FontSize.normal * scale,
+          fontSize: FontSize.normal,
           fontWeight: FontWeight.w800,
           letterSpacing: 0,
         ),
@@ -47,31 +42,27 @@ class HistorySearchField extends StatelessWidget {
           hintText: context.getText(AppKeys.searchHint),
           hintStyle: TextStyle(
             color: colors.inputHint,
-            fontSize: FontSize.normal * scale,
+            fontSize: FontSize.normal,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
           ),
           prefixIcon: Padding(
-            padding: EdgeInsets.only(left: 14 * scale, right: 6 * scale),
+            padding: const EdgeInsets.only(left: 14, right: 6),
             child: Icon(
               Icons.search_rounded,
               color: colors.brandStrong,
-              size: 22 * scale,
+              size: 22,
             ),
           ),
           suffixIcon: IconButton(
             onPressed: HapticFeedback.selectionClick,
-            icon: Icon(
-              Icons.tune_rounded,
-              color: colors.brandStrong,
-              size: 22 * scale,
-            ),
+            icon: Icon(Icons.tune_rounded, color: colors.brandStrong, size: 22),
           ),
           border: InputBorder.none,
           isCollapsed: true,
-          contentPadding: EdgeInsets.symmetric(
-            vertical: 11 * scale,
-            horizontal: 10 * scale,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 11,
+            horizontal: 10,
           ),
         ),
       ),

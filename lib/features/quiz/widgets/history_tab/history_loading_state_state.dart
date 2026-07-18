@@ -41,11 +41,9 @@ class HistoryLoadingStateState extends State<HistoryLoadingState>
         );
       },
       child: Column(
+        spacing: 14,
         children: [
-          for (var index = 0; index < 3; index++) ...[
-            HistorySkeletonCard(scale: widget.scale),
-            if (index != 2) SizedBox(height: 14 * widget.scale),
-          ],
+          for (var index = 0; index < 3; index++) const HistorySkeletonCard(),
         ],
       ),
     );

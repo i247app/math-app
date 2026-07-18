@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 class QuizWaveLoader extends StatefulWidget {
   const QuizWaveLoader({
     super.key,
-    required this.scale,
     required this.letterStyle,
     this.message,
     this.messageStyle,
@@ -13,8 +12,6 @@ class QuizWaveLoader extends StatefulWidget {
     this.leading,
     this.leadingSpacing = 22,
   });
-
-  final double scale;
   final TextStyle letterStyle;
   final String? message;
   final TextStyle? messageStyle;
@@ -57,8 +54,10 @@ class _QuizWaveLoaderState extends State<QuizWaveLoader>
             mainAxisSize: MainAxisSize.min,
             children: [
               if (widget.leading != null) ...[
-                widget.leading!,
-                SizedBox(height: widget.leadingSpacing * widget.scale),
+                Padding(
+                  padding: EdgeInsets.only(bottom: widget.leadingSpacing),
+                  child: widget.leading!,
+                ),
               ],
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -66,9 +65,7 @@ class _QuizWaveLoaderState extends State<QuizWaveLoader>
                   final delayedProgress =
                       (controller.value - (index * 0.075)) % 1.0;
                   final lift = delayedProgress <= 0.20
-                      ? -34 *
-                            widget.scale *
-                            math.sin(delayedProgress / 0.20 * math.pi)
+                      ? -34 * math.sin(delayedProgress / 0.20 * math.pi)
                       : 0.0;
 
                   return Transform.translate(
@@ -78,10 +75,12 @@ class _QuizWaveLoaderState extends State<QuizWaveLoader>
                 }),
               ),
               if (widget.message != null) ...[
-                SizedBox(height: 18 * widget.scale),
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: widget.messageHorizontalPadding * widget.scale,
+                  padding: EdgeInsets.fromLTRB(
+                    widget.messageHorizontalPadding,
+                    18,
+                    widget.messageHorizontalPadding,
+                    0,
                   ),
                   child: Text(
                     widget.message!,

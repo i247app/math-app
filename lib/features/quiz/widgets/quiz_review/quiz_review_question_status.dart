@@ -14,13 +14,13 @@ class QuizReviewQuestionStatus extends StatelessWidget {
     final color = isCorrect ? AppColors.teal600 : AppColors.red;
     return Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: 4,
       children: [
         Icon(
           isCorrect ? Icons.verified_outlined : Icons.error_outline_rounded,
           color: color,
           size: 17,
         ),
-        const SizedBox(width: 4),
         Text(
           context
               .getText(

@@ -5,28 +5,23 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentAssessmentSearchField extends StatelessWidget {
-  const ParentAssessmentSearchField({
-    super.key,
-    required this.controller,
-    required this.scale,
-  });
+  const ParentAssessmentSearchField({super.key, required this.controller});
 
   final TextEditingController controller;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 42 * scale,
+      height: 42,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFFE4DDDF)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 8 * scale,
-            offset: Offset(0, 2 * scale),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -34,34 +29,30 @@ class ParentAssessmentSearchField extends StatelessWidget {
         controller: controller,
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         textInputAction: TextInputAction.search,
-        style: TextStyle(
-          color: const Color(0xFF17252B),
-          fontSize: FontSize.normal * scale,
+        style: const TextStyle(
+          color: Color(0xFF17252B),
+          fontSize: FontSize.normal,
           fontWeight: FontWeight.w700,
         ),
         decoration: InputDecoration(
           hintText: context.getText(AppKeys.searchHint),
-          hintStyle: TextStyle(
-            color: const Color(0xFFD8C5CC),
-            fontSize: FontSize.normal * scale,
+          hintStyle: const TextStyle(
+            color: Color(0xFFD8C5CC),
+            fontSize: FontSize.normal,
             fontWeight: FontWeight.w700,
           ),
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.search_rounded,
-            color: const Color(0xFF063A7B),
-            size: 23 * scale,
+            color: Color(0xFF063A7B),
+            size: 23,
           ),
-          suffixIcon: IconButton(
+          suffixIcon: const IconButton(
             onPressed: HapticFeedback.selectionClick,
-            icon: Icon(
-              Icons.tune_rounded,
-              color: const Color(0xFF063A7B),
-              size: 21 * scale,
-            ),
+            icon: Icon(Icons.tune_rounded, color: Color(0xFF063A7B), size: 21),
           ),
           border: InputBorder.none,
           isCollapsed: true,
-          contentPadding: EdgeInsets.symmetric(vertical: 11 * scale),
+          contentPadding: const EdgeInsets.symmetric(vertical: 11),
         ),
       ),
     );

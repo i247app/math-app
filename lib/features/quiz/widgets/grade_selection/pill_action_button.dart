@@ -8,7 +8,6 @@ class PillActionButton extends StatelessWidget {
     required this.label,
     required this.background,
     required this.foreground,
-    required this.scale,
     required this.onPressed,
     this.icon,
     this.gradient,
@@ -17,7 +16,6 @@ class PillActionButton extends StatelessWidget {
   final String label;
   final Color background;
   final Color foreground;
-  final double scale;
   final VoidCallback onPressed;
   final IconData? icon;
   final Gradient? gradient;
@@ -25,7 +23,7 @@ class PillActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44 * scale,
+      height: 44,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: gradient == null ? background : null,
@@ -36,8 +34,8 @@ class PillActionButton extends StatelessWidget {
               : [
                   BoxShadow(
                     color: AppColors.teal700.withValues(alpha: 0.24),
-                    blurRadius: 12 * scale,
-                    offset: Offset(0, 8 * scale),
+                    blurRadius: 12,
+                    offset: const Offset(0, 8),
                   ),
                 ],
         ),
@@ -46,26 +44,24 @@ class PillActionButton extends StatelessWidget {
           style: TextButton.styleFrom(
             foregroundColor: foreground,
             shape: const StadiumBorder(),
-            padding: EdgeInsets.symmetric(horizontal: 12 * scale),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
           ),
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Row(
               mainAxisSize: MainAxisSize.min,
+              spacing: 8,
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 12 * scale,
+                  style: const TextStyle(
+                    fontSize: 12,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0.8,
                   ),
                 ),
-                if (icon != null) ...[
-                  SizedBox(width: 8 * scale),
-                  Icon(icon, size: 18 * scale),
-                ],
+                if (icon != null) Icon(icon, size: 18),
               ],
             ),
           ),

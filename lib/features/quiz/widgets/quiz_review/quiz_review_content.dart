@@ -63,15 +63,27 @@ class QuizReviewContent extends StatelessWidget {
         children: [
           if (isLoading) const LinearProgressIndicator(color: AppColors.navy),
           if (errorMessage != null && errorMessage!.isNotEmpty) ...[
-            QuizReviewInlineError(message: errorMessage!, onRetry: onRetry),
-            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: QuizReviewInlineError(
+                message: errorMessage!,
+                onRetry: onRetry,
+              ),
+            ),
           ],
           if (allowRetry) ...[
-            QuizReviewModeTabs(selectedMode: mode, onSelected: onModeSelected),
-            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: QuizReviewModeTabs(
+                selectedMode: mode,
+                onSelected: onModeSelected,
+              ),
+            ),
           ],
-          QuizReviewStatsCard(quiz: quiz),
-          const SizedBox(height: 11),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 11),
+            child: QuizReviewStatsCard(quiz: quiz),
+          ),
           if (isLoading && question == null)
             const QuizReviewQuestionLoadingSection()
           else if (question == null)

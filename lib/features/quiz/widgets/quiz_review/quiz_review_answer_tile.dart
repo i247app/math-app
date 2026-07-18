@@ -57,6 +57,7 @@ class QuizReviewAnswerTile extends StatelessWidget {
             border: Border.all(color: borderColor, width: isSelected ? 1.8 : 1),
           ),
           child: Row(
+            spacing: 14,
             children: [
               Container(
                 width: 32,
@@ -84,7 +85,6 @@ class QuizReviewAnswerTile extends StatelessWidget {
                   verticalOffset: 1.2,
                 ),
               ),
-              const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   answer.content,

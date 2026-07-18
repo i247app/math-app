@@ -9,7 +9,6 @@ class HistoryMessageState extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.scale,
     this.actionLabel,
     this.onAction,
   });
@@ -19,59 +18,63 @@ class HistoryMessageState extends StatelessWidget {
   final String subtitle;
   final String? actionLabel;
   final VoidCallback? onAction;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Container(
-      padding: EdgeInsets.all(26 * scale),
+      padding: const EdgeInsets.all(26),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: colors.border),
       ),
       child: Column(
         children: [
-          Icon(icon, color: colors.brandStrong, size: 42 * scale),
-          SizedBox(height: 14 * scale),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Icon(icon, color: colors.brandStrong, size: 42),
+          ),
           Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: colors.textPrimary,
-              fontSize: FontSize.large * scale,
+              fontSize: FontSize.large,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
           ),
-          SizedBox(height: 6 * scale),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: colors.textSecondary,
-              fontSize: FontSize.caption * scale,
-              fontWeight: FontWeight.w700,
-              height: 1.35,
-              letterSpacing: 0,
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: FontSize.caption,
+                fontWeight: FontWeight.w700,
+                height: 1.35,
+                letterSpacing: 0,
+              ),
             ),
           ),
-          if (actionLabel != null && onAction != null) ...[
-            SizedBox(height: 18 * scale),
-            TextButton(
-              onPressed: onAction,
-              child: Text(
-                actionLabel!,
-                style: TextStyle(
-                  color: colors.brandStrong,
-                  fontSize: FontSize.caption * scale,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
+          if (actionLabel != null && onAction != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 18),
+              child: TextButton(
+                onPressed: onAction,
+                child: Text(
+                  actionLabel!,
+                  style: TextStyle(
+                    color: colors.brandStrong,
+                    fontSize: FontSize.caption,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
+                  ),
                 ),
               ),
             ),
-          ],
         ],
       ),
     );

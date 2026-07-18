@@ -77,7 +77,6 @@ class StudentTabHost extends StatelessWidget {
         user: args.user,
         activeProfile: args.activeProfile,
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
         classroomService: args.classroomService,
         assignmentService: args.assignmentService,
         quizService: args.quizService,
