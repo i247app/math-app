@@ -10,7 +10,6 @@ class AccountAvatar extends StatelessWidget {
     required this.avatarPath,
     required this.isEditing,
     required this.isPickingAvatar,
-    required this.scale,
     required this.onCameraTap,
   });
 
@@ -18,17 +17,16 @@ class AccountAvatar extends StatelessWidget {
   final String? avatarPath;
   final bool isEditing;
   final bool isPickingAvatar;
-  final double scale;
   final VoidCallback onCameraTap;
 
   @override
   Widget build(BuildContext context) {
-    final size = 126 * scale;
+    const size = 126.0;
 
     return Center(
       child: SizedBox(
-        width: size + 30 * scale,
-        height: size + 30 * scale,
+        width: 156,
+        height: 156,
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.center,
@@ -39,8 +37,8 @@ class AccountAvatar extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFFE8601C).withValues(alpha: 0.16),
-                    blurRadius: 14 * scale,
-                    offset: Offset(0, 5 * scale),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
                   ),
                 ],
               ),
@@ -49,14 +47,14 @@ class AccountAvatar extends StatelessWidget {
                 avatarPath: avatarPath,
                 avatarUrl: avatarUrl,
                 borderColor: const Color(0xFFFF7451),
-                borderWidth: 3.8 * scale,
-                padding: EdgeInsets.all(6 * scale),
+                borderWidth: 3.8,
+                padding: const EdgeInsets.all(6),
               ),
             ),
             if (isPickingAvatar)
               Positioned.fill(
                 child: Container(
-                  margin: EdgeInsets.all(16 * scale),
+                  margin: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.18),
                     shape: BoxShape.circle,
@@ -71,12 +69,12 @@ class AccountAvatar extends StatelessWidget {
               ),
             if (isEditing)
               Positioned(
-                right: 16 * scale,
-                bottom: 20 * scale,
+                right: 16,
+                bottom: 20,
                 child: SettingsRoundIconButton(
                   icon: Icons.photo_camera_outlined,
-                  size: 38 * scale,
-                  iconSize: 20 * scale,
+                  size: 38,
+                  iconSize: 20,
                   borderColor: const Color(0xFFC21873),
                   foregroundColor: const Color(0xFF253228),
                   backgroundColor: Colors.white,

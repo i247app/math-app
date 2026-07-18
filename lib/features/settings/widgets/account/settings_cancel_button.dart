@@ -6,13 +6,8 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class SettingsCancelButton extends StatelessWidget {
-  const SettingsCancelButton({
-    super.key,
-    required this.scale,
-    required this.onTap,
-  });
+  const SettingsCancelButton({super.key, required this.onTap});
 
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -25,22 +20,22 @@ class SettingsCancelButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
         child: SizedBox(
-          width: 138 * scale,
-          height: 60 * scale,
+          width: 138,
+          height: 60,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 4,
             children: [
-              Icon(
+              const Icon(
                 Icons.arrow_back_rounded,
-                color: const Color(0xFFB74419),
-                size: 20 * scale,
+                color: Color(0xFFB74419),
+                size: 20,
               ),
-              SizedBox(width: 4 * scale),
               Text(
                 context.getText(AppKeys.cancel).toUpperCase(),
                 style: GoogleFonts.andika(
                   color: const Color(0xFFB74419),
-                  fontSize: FontSize.normal * scale,
+                  fontSize: FontSize.normal,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,

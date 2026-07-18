@@ -9,14 +9,12 @@ class LanguageOptionCard extends StatelessWidget {
     required this.flag,
     required this.title,
     required this.selected,
-    required this.scale,
     required this.onTap,
   });
 
   final String flag;
   final String title;
   final bool selected;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -25,35 +23,33 @@ class LanguageOptionCard extends StatelessWidget {
 
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(26 * scale),
+      borderRadius: BorderRadius.circular(26),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(26 * scale),
+        borderRadius: BorderRadius.circular(26),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: EdgeInsets.symmetric(
-            horizontal: 18 * scale,
-            vertical: 18 * scale,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
           decoration: BoxDecoration(
             color: selected
                 ? const Color(0xFFFFF2F8)
                 : Colors.white.withValues(alpha: 0.96),
-            borderRadius: BorderRadius.circular(26 * scale),
-            border: Border.all(color: borderColor, width: 2 * scale),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: borderColor, width: 2),
             boxShadow: [
               BoxShadow(
                 color: borderColor.withValues(alpha: selected ? 0.18 : 0.06),
-                blurRadius: 14 * scale,
-                offset: Offset(0, 5 * scale),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
           child: Row(
+            spacing: 16,
             children: [
               Container(
-                width: 48 * scale,
-                height: 48 * scale,
+                width: 48,
+                height: 48,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: selected
@@ -63,18 +59,17 @@ class LanguageOptionCard extends StatelessWidget {
                 ),
                 child: Text(
                   flag,
-                  style: TextStyle(fontSize: FontSize.xxxl * scale, height: 1),
+                  style: const TextStyle(fontSize: FontSize.xxxl, height: 1),
                 ),
               ),
-              SizedBox(width: 16 * scale),
               Expanded(
                 child: Text(
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: FontSize.large * scale,
+                    fontSize: FontSize.large,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
@@ -83,18 +78,18 @@ class LanguageOptionCard extends StatelessWidget {
               ),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
-                width: 34 * scale,
-                height: 34 * scale,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
                   color: selected ? AppColors.pink : Colors.transparent,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.pink, width: 2.4 * scale),
+                  border: Border.all(color: AppColors.pink, width: 2.4),
                 ),
                 child: selected
-                    ? Icon(
+                    ? const Icon(
                         Icons.check_rounded,
                         color: Colors.white,
-                        size: 24 * scale,
+                        size: 24,
                       )
                     : null,
               ),

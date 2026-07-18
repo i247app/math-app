@@ -27,12 +27,12 @@ class LanguagePill extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        spacing: 5,
         children: [
           Text(
             _flagFor(currentLanguage),
             style: const TextStyle(fontSize: FontSize.small),
           ),
-          const SizedBox(width: 5),
           Text(
             currentLanguage.displayName,
             style: GoogleFonts.andika(

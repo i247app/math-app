@@ -24,7 +24,6 @@ class AccountDetailsPanel extends StatelessWidget {
     required this.onSave,
     required this.onCancel,
     required this.onAvatarTap,
-    required this.scale,
   });
 
   final String? avatarUrl;
@@ -39,82 +38,83 @@ class AccountDetailsPanel extends StatelessWidget {
   final VoidCallback onSave;
   final VoidCallback onCancel;
   final VoidCallback onAvatarTap;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
-    final fieldGap = 20 * scale;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (!isEditing) ...[
-          Align(
-            alignment: Alignment.centerRight,
-            child: AccountEditButton(
-              enabled: true,
-              scale: scale,
-              onTap: onEdit,
-            ),
-          ),
-          SizedBox(height: 10 * scale),
-        ],
-        AccountAvatar(
-          avatarUrl: avatarUrl,
-          avatarPath: avatarPath,
-          isEditing: isEditing,
-          isPickingAvatar: isPickingAvatar,
-          scale: scale,
-          onCameraTap: onAvatarTap,
-        ),
-        SizedBox(height: 4 * scale),
-        AccountTextField(
-          label: context.getText(AppKeys.username),
-          controller: usernameController,
-          isEditing: isEditing,
-          trailing: Icon(
-            Icons.check_circle_rounded,
-            color: const Color(0xFF087A40),
-            size: 19 * scale,
-          ),
-          scale: scale,
-        ),
-        SizedBox(height: fieldGap),
-        AccountPhoneField(
-          label: context.getText(AppKeys.phoneNumber),
-          controller: phoneController,
-          isEditing: isEditing,
-          scale: scale,
-        ),
-        SizedBox(height: fieldGap),
-        AccountTextField(
-          label: context.getText(AppKeys.email),
-          controller: emailController,
-          isEditing: isEditing,
-          keyboardType: TextInputType.emailAddress,
-          scale: scale,
-        ),
-        if (isEditing) ...[
-          SizedBox(height: 22 * scale),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SettingsCancelButton(
-                scale: scale,
-                onTap: isSaving ? () {} : onCancel,
+              if (!isEditing)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: AccountEditButton(enabled: true, onTap: onEdit),
+                  ),
+                ),
+              AccountAvatar(
+                avatarUrl: avatarUrl,
+                avatarPath: avatarPath,
+                isEditing: isEditing,
+                isPickingAvatar: isPickingAvatar,
+                onCameraTap: onAvatarTap,
               ),
-              SizedBox(width: 14 * scale),
-              Opacity(
-                opacity: isSaving ? 0.72 : 1,
-                child: SettingsSaveButton(
-                  scale: scale,
-                  onTap: isSaving ? () {} : onSave,
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: AccountTextField(
+                  label: context.getText(AppKeys.username),
+                  controller: usernameController,
+                  isEditing: isEditing,
+                  trailing: const Icon(
+                    Icons.check_circle_rounded,
+                    color: Color(0xFF087A40),
+                    size: 19,
+                  ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: AccountPhoneField(
+                  label: context.getText(AppKeys.phoneNumber),
+                  controller: phoneController,
+                  isEditing: isEditing,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: AccountTextField(
+                  label: context.getText(AppKeys.email),
+                  controller: emailController,
+                  isEditing: isEditing,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+              ),
+              if (isEditing)
+                Padding(
+                  padding: const EdgeInsets.only(top: 22),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 14,
+                    children: [
+                      SettingsCancelButton(onTap: isSaving ? () {} : onCancel),
+                      Opacity(
+                        opacity: isSaving ? 0.72 : 1,
+                        child: SettingsSaveButton(
+                          onTap: isSaving ? () {} : onSave,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
-        ],
-      ],
+        ),
+      ),
     );
   }
 }

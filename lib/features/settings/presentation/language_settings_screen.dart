@@ -1,6 +1,5 @@
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/settings/application/settings_constants.dart';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,9 +20,6 @@ class LanguageSettingsScreen extends StatefulWidget {
 }
 
 class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
-  static const _designWidth = 390.0;
-  static const _designHeight = 844.0;
-
   bool _isChangingLanguage = false;
   bool _showChangingLanguageOverlay = false;
 
@@ -72,13 +68,6 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final currentLanguage = LingoScope.of(context).language;
-    final media = MediaQuery.of(context);
-    final width = math.min(media.size.width, 430.0);
-    final scale = math.min(
-      width / _designWidth,
-      media.size.height / _designHeight,
-    );
-
     final colors = context.themeColors;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -93,38 +82,40 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               backgroundColor: colors.pageBackground,
               body: SafeArea(
                 child: Center(
-                  child: SizedBox(
-                    width: width,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        LanguageHeader(scale: scale),
-                        SizedBox(height: 62 * scale),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24 * scale),
-                          child: Column(
-                            children: [
-                              LanguageOptionCard(
-                                flag: '🇻🇳',
-                                title: context.getText(
-                                  AppKeys.languageVietnamese,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 430),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const LanguageHeader(),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(24, 62, 24, 0),
+                            child: Column(
+                              spacing: 18,
+                              children: [
+                                LanguageOptionCard(
+                                  flag: '🇻🇳',
+                                  title: context.getText(
+                                    AppKeys.languageVietnamese,
+                                  ),
+                                  selected: currentLanguage == AppLanguage.vi,
+                                  onTap: () => _changeLanguage(AppLanguage.vi),
                                 ),
-                                selected: currentLanguage == AppLanguage.vi,
-                                scale: scale,
-                                onTap: () => _changeLanguage(AppLanguage.vi),
-                              ),
-                              SizedBox(height: 18 * scale),
-                              LanguageOptionCard(
-                                flag: '🇺🇸',
-                                title: context.getText(AppKeys.languageEnglish),
-                                selected: currentLanguage == AppLanguage.en,
-                                scale: scale,
-                                onTap: () => _changeLanguage(AppLanguage.en),
-                              ),
-                            ],
+                                LanguageOptionCard(
+                                  flag: '🇺🇸',
+                                  title: context.getText(
+                                    AppKeys.languageEnglish,
+                                  ),
+                                  selected: currentLanguage == AppLanguage.en,
+                                  onTap: () => _changeLanguage(AppLanguage.en),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -446,7 +446,6 @@ class _SettingTabState extends State<SettingTab> {
       barrierColor: Colors.black.withValues(alpha: 0.32),
       builder: (sheetContext) {
         return PasscodeSettingsSheet(
-          scale: widget.scale,
           onChange: () =>
               Navigator.of(sheetContext).pop(PasscodeSettingsAction.change),
           onRemove: () =>
@@ -1702,7 +1701,6 @@ class _SettingTabState extends State<SettingTab> {
                                 onSave: _saveEditing,
                                 onCancel: _cancelEditing,
                                 onAvatarTap: _pickAccountAvatar,
-                                scale: scale,
                               ),
                               SettingPageView.profile =>
                                 ProfilePlaceholderPanel(

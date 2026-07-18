@@ -7,7 +7,7 @@ class AppFormFieldLayout extends StatelessWidget {
     super.key,
     required this.label,
     required this.child,
-    required this.scale,
+    this.scale = 1,
     required this.labelStyle,
     this.trailing,
     this.labelGap = 8,

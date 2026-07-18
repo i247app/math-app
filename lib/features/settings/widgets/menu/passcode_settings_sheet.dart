@@ -10,12 +10,10 @@ enum PasscodeSettingsAction { change, remove }
 class PasscodeSettingsSheet extends StatelessWidget {
   const PasscodeSettingsSheet({
     super.key,
-    required this.scale,
     required this.onChange,
     required this.onRemove,
   });
 
-  final double scale;
   final VoidCallback onChange;
   final VoidCallback onRemove;
 
@@ -24,21 +22,22 @@ class PasscodeSettingsSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        margin: EdgeInsets.all(16 * scale),
-        padding: EdgeInsets.all(18 * scale),
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24 * scale),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 18 * scale,
-              offset: Offset(0, 8 * scale),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          spacing: 12,
           children: [
             SettingsActionCard(
               icon: Icons.edit_outlined,
@@ -48,7 +47,6 @@ class PasscodeSettingsSheet extends StatelessWidget {
               subtitle: context.getText(AppKeys.passcodeMenuSubtitleManage),
               onTap: onChange,
             ),
-            SizedBox(height: 12 * scale),
             SettingsActionCard(
               icon: Icons.lock_open_rounded,
               iconColor: AppColors.orange500,

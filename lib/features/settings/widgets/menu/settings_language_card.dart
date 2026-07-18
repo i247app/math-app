@@ -65,20 +65,22 @@ class SettingsLanguageCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: colors.brand.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.language_rounded,
-                  color: colors.brandStrong,
-                  size: 22,
+              Padding(
+                padding: const EdgeInsets.only(right: 14),
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: colors.brand.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.language_rounded,
+                    color: colors.brandStrong,
+                    size: 22,
+                  ),
                 ),
               ),
-              const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   context.getText(AppKeys.language),

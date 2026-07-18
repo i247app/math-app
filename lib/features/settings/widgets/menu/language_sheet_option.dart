@@ -41,8 +41,13 @@ class LanguageSheetOption extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Text(flag, style: const TextStyle(fontSize: FontSize.xxxl)),
-              const SizedBox(width: 12),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Text(
+                  flag,
+                  style: const TextStyle(fontSize: FontSize.xxxl),
+                ),
+              ),
               Expanded(
                 child: Text(
                   label,

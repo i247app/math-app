@@ -9,20 +9,17 @@ class AccountFieldShell extends StatelessWidget {
     super.key,
     required this.label,
     required this.child,
-    required this.scale,
     this.trailing,
   });
 
   final String label;
   final Widget child;
-  final double scale;
   final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     return AppFormFieldLayout(
       label: label,
-      scale: scale,
       trailing: trailing,
       labelGap: 12,
       height: 60,
@@ -32,7 +29,7 @@ class AccountFieldShell extends StatelessWidget {
       borderWidth: 1.2,
       labelStyle: GoogleFonts.andika(
         color: const Color(0xFF604950),
-        fontSize: FontSize.normal * scale,
+        fontSize: FontSize.normal,
         fontWeight: FontWeight.w900,
         height: 1,
         letterSpacing: 0,

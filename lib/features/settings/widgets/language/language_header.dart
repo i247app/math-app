@@ -8,31 +8,23 @@ import 'package:numi/features/settings/widgets/language/language_back_button.dar
 import 'package:numi/features/settings/widgets/language/language_header_curve_painter.dart';
 
 class LanguageHeader extends StatelessWidget {
-  const LanguageHeader({super.key, required this.scale});
-
-  final double scale;
+  const LanguageHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return SizedBox(
-      height: 70 * scale,
+      height: 70,
       child: CustomPaint(
         painter: LanguageHeaderCurvePainter(
-          scale: scale,
           backgroundColor: colors.pageBackground,
           lineColor: colors.accentStrong,
         ),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            20 * scale,
-            8 * scale,
-            20 * scale,
-            12 * scale,
-          ),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
           child: Row(
             children: [
-              LanguageBackButton(scale: scale),
+              const LanguageBackButton(),
               Expanded(
                 child: Text(
                   context.getText(AppKeys.languageTitle),
@@ -41,14 +33,14 @@ class LanguageHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: colors.textPrimary,
-                    fontSize: FontSize.large * scale,
+                    fontSize: FontSize.large,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0,
                   ),
                 ),
               ),
-              SizedBox(width: 44 * scale),
+              const SizedBox(width: 44),
             ],
           ),
         ),

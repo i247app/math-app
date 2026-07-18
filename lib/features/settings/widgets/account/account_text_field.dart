@@ -9,7 +9,6 @@ class AccountTextField extends StatelessWidget {
     required this.label,
     required this.controller,
     required this.isEditing,
-    required this.scale,
     this.trailing,
     this.keyboardType,
   });
@@ -17,7 +16,6 @@ class AccountTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final bool isEditing;
-  final double scale;
   final Widget? trailing;
   final TextInputType? keyboardType;
 
@@ -26,12 +24,10 @@ class AccountTextField extends StatelessWidget {
     return AccountFieldShell(
       label: label,
       trailing: trailing,
-      scale: scale,
       child: PlainAccountTextField(
         controller: controller,
         enabled: isEditing,
         keyboardType: keyboardType,
-        scale: scale,
       ),
     );
   }

@@ -9,12 +9,10 @@ import 'package:numi/core/theme/font_size.dart';
 class SettingsSaveButton extends StatelessWidget {
   const SettingsSaveButton({
     super.key,
-    required this.scale,
     required this.onTap,
     this.enabled = true,
   });
 
-  final double scale;
   final VoidCallback onTap;
   final bool enabled;
 
@@ -34,26 +32,26 @@ class SettingsSaveButton extends StatelessWidget {
         onTap: enabled ? onTap : null,
         borderRadius: BorderRadius.circular(999),
         child: SizedBox(
-          width: 142 * scale,
-          height: 60 * scale,
+          width: 142,
+          height: 60,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 10,
             children: [
               Text(
                 context.getText(AppKeys.save),
                 style: GoogleFonts.andika(
                   color: foregroundColor,
-                  fontSize: FontSize.large * scale,
+                  fontSize: FontSize.large,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
                 ),
               ),
-              SizedBox(width: 10 * scale),
               Icon(
                 Icons.arrow_forward_rounded,
                 color: foregroundColor,
-                size: 24 * scale,
+                size: 24,
               ),
             ],
           ),

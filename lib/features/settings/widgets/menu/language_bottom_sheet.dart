@@ -60,35 +60,41 @@ class LanguageBottomSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    Text(
-                      context.getText(AppKeys.languageTitle),
-                      style: GoogleFonts.andika(
-                        color: AppColors.textPrimary,
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                        letterSpacing: 0,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 18),
+                      child: Text(
+                        context.getText(AppKeys.languageTitle),
+                        style: GoogleFonts.andika(
+                          color: AppColors.textPrimary,
+                          fontSize: FontSize.large,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: 0,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    for (final language in AppLanguage.values) ...[
-                      LanguageSheetOption(
-                        flag: _flagFor(language),
-                        label: switch (language) {
-                          AppLanguage.vi => context.getText(
-                            AppKeys.languageVietnamese,
-                          ),
-                          AppLanguage.en => context.getText(
-                            AppKeys.languageEnglish,
-                          ),
-                        },
-                        selected: language == currentLanguage,
-                        onTap: () => Navigator.of(context).pop(language),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 18),
+                      child: Column(
+                        spacing: 10,
+                        children: [
+                          for (final language in AppLanguage.values)
+                            LanguageSheetOption(
+                              flag: _flagFor(language),
+                              label: switch (language) {
+                                AppLanguage.vi => context.getText(
+                                  AppKeys.languageVietnamese,
+                                ),
+                                AppLanguage.en => context.getText(
+                                  AppKeys.languageEnglish,
+                                ),
+                              },
+                              selected: language == currentLanguage,
+                              onTap: () => Navigator.of(context).pop(language),
+                            ),
+                        ],
                       ),
-                      if (language != AppLanguage.values.last)
-                        const SizedBox(height: 10),
-                    ],
+                    ),
                   ],
                 ),
               ),

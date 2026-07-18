@@ -9,14 +9,12 @@ class PlainAccountTextField extends StatelessWidget {
     super.key,
     required this.controller,
     required this.enabled,
-    required this.scale,
     this.keyboardType,
     this.textStyle,
   });
 
   final TextEditingController controller;
   final bool enabled;
-  final double scale;
   final TextInputType? keyboardType;
   final TextStyle? textStyle;
 
@@ -26,7 +24,7 @@ class PlainAccountTextField extends StatelessWidget {
         textStyle ??
         GoogleFonts.andika(
           color: AppColors.textPrimary,
-          fontSize: FontSize.large * scale,
+          fontSize: FontSize.large,
           fontWeight: FontWeight.w700,
           height: 1,
           letterSpacing: 0,

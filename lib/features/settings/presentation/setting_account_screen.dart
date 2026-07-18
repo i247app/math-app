@@ -249,7 +249,7 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24 * scale),
                 child: _isLoadingAccount
-                    ? AccountScreenSkeleton(scale: scale)
+                    ? const AccountScreenSkeleton()
                     : AccountDetailsPanel(
                         avatarUrl: _user?.avatarUrl,
                         avatarPath: _isEditing
@@ -265,7 +265,6 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
                         onSave: _saveEditing,
                         onCancel: _cancelEditing,
                         onAvatarTap: _pickAvatar,
-                        scale: scale,
                       ),
               ),
               SizedBox(height: 24 * scale),

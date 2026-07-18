@@ -12,49 +12,48 @@ class AccountPhoneField extends StatelessWidget {
     required this.label,
     required this.controller,
     required this.isEditing,
-    required this.scale,
   });
 
   final String label;
   final TextEditingController controller;
   final bool isEditing;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return AccountFieldShell(
       label: label,
-      scale: scale,
       child: Row(
         children: [
-          Container(
-            width: 28 * scale,
-            height: 20 * scale,
-            decoration: BoxDecoration(
-              color: AppColors.vietnamRed,
-              borderRadius: BorderRadius.circular(2 * scale),
-            ),
-            child: Icon(
-              Icons.star_rounded,
-              color: const Color(0xFFFFE14D),
-              size: 13 * scale,
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Container(
+              width: 28,
+              height: 20,
+              decoration: BoxDecoration(
+                color: AppColors.vietnamRed,
+                borderRadius: BorderRadius.circular(2),
+              ),
+              child: const Icon(
+                Icons.star_rounded,
+                color: Color(0xFFFFE14D),
+                size: 13,
+              ),
             ),
           ),
-          SizedBox(width: 12 * scale),
           Text(
             '+84',
             style: GoogleFonts.andika(
               color: AppColors.textPrimary,
-              fontSize: FontSize.large * scale,
+              fontSize: FontSize.large,
               fontWeight: FontWeight.w900,
               height: 1,
               letterSpacing: 0,
             ),
           ),
           Container(
-            width: 1 * scale,
-            height: 35 * scale,
-            margin: EdgeInsets.symmetric(horizontal: 18 * scale),
+            width: 1,
+            height: 35,
+            margin: const EdgeInsets.symmetric(horizontal: 18),
             color: const Color(0xFFDCE5E3),
           ),
           Expanded(
@@ -62,10 +61,9 @@ class AccountPhoneField extends StatelessWidget {
               controller: controller,
               enabled: isEditing,
               keyboardType: TextInputType.phone,
-              scale: scale,
               textStyle: GoogleFonts.andika(
                 color: Colors.black,
-                fontSize: FontSize.xxxl * scale,
+                fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w900,
                 height: 1,
                 letterSpacing: 0,
