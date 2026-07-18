@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class GradeLoadError extends StatelessWidget {
   const GradeLoadError({
@@ -30,7 +31,7 @@ class GradeLoadError extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 14,
+              fontSize: FontSize.small,
               fontWeight: FontWeight.w800,
               height: 1.3,
               letterSpacing: 0,
@@ -44,7 +45,7 @@ class GradeLoadError extends StatelessWidget {
                 context.getText(AppKeys.retryUpper),
                 style: const TextStyle(
                   color: AppColors.teal700,
-                  fontSize: 13,
+                  fontSize: FontSize.xs,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.6,
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_centered_text.dart';
 
 class QuizReviewAnswerTile extends StatelessWidget {
@@ -80,7 +81,7 @@ class QuizReviewAnswerTile extends StatelessWidget {
                   color: isWrongSelected || isRevealedCorrect
                       ? Colors.white
                       : AppColors.textInk,
-                  fontSize: 13,
+                  fontSize: FontSize.xs,
                   fontWeight: FontWeight.w900,
                   verticalOffset: 1.2,
                 ),
@@ -92,7 +93,7 @@ class QuizReviewAnswerTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: foreground,
-                    fontSize: 18,
+                    fontSize: FontSize.large,
                     fontWeight: isWrongSelected || isRevealedCorrect
                         ? FontWeight.w900
                         : FontWeight.w600,

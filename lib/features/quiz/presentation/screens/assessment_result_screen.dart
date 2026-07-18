@@ -7,6 +7,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/errors/quiz_exception.dart';
@@ -198,7 +199,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
               textAlign: TextAlign.center,
               style: GoogleFonts.andika(
                 color: resultLevel.color,
-                fontSize: 24,
+                fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w800,
                 height: 32 / 24,
                 letterSpacing: -0.4,

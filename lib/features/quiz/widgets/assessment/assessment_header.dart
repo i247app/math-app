@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 class AssessmentHeader extends StatelessWidget {
@@ -51,7 +52,7 @@ class AssessmentHeader extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: colors.brandStrong,
-                      fontSize: 20,
+                      fontSize: FontSize.xl,
                       fontWeight: FontWeight.w900,
                       height: 1,
                       letterSpacing: 0,

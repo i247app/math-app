@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class AssessmentAnswerButton extends StatelessWidget {
   const AssessmentAnswerButton({
@@ -63,7 +64,7 @@ class AssessmentAnswerButton extends StatelessWidget {
                 answer.content,
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 30,
+                  fontSize: FontSize.displaySmall,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,

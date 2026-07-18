@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class GradeFailureNotice extends StatelessWidget {
   const GradeFailureNotice({super.key});
@@ -31,7 +32,7 @@ class GradeFailureNotice extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: AppColors.rust,
-                fontSize: 13,
+                fontSize: FontSize.xs,
                 fontWeight: FontWeight.w900,
                 height: 1.25,
                 letterSpacing: 0,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class QuizReviewStatItem extends StatelessWidget {
   const QuizReviewStatItem({
@@ -47,7 +48,7 @@ class QuizReviewStatItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: valueColor,
-                fontSize: 18,
+                fontSize: FontSize.large,
                 fontWeight: FontWeight.w900,
                 height: 1,
                 letterSpacing: 0,
@@ -60,7 +61,7 @@ class QuizReviewStatItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: AppColors.textInk,
-              fontSize: 12,
+              fontSize: FontSize.xxs,
               fontWeight: FontWeight.w700,
               height: 1,
               letterSpacing: 0,

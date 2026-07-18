@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/helpers/score_number.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
 
@@ -78,7 +79,7 @@ class AssessmentScoreRing extends StatelessWidget {
                           text: scoreTotal,
                           style: GoogleFonts.andika(
                             color: Colors.black,
-                            fontSize: 36,
+                            fontSize: FontSize.displayLarge,
                             fontWeight: FontWeight.w800,
                             height: 40 / 36,
                             letterSpacing: -0.9,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_card.dart';
 
 class QuizReviewStatePanel extends StatelessWidget {
@@ -41,7 +42,7 @@ class QuizReviewStatePanel extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: AppColors.textInk,
-                    fontSize: 15,
+                    fontSize: FontSize.compact,
                     fontWeight: FontWeight.w800,
                   ),
                 ),

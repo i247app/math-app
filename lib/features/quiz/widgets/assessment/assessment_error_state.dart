@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
 
 class AssessmentErrorState extends StatelessWidget {
@@ -41,7 +42,7 @@ class AssessmentErrorState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.textSubtle,
-                fontSize: 15,
+                fontSize: FontSize.compact,
                 fontWeight: FontWeight.w800,
                 height: 1.35,
                 letterSpacing: 0,

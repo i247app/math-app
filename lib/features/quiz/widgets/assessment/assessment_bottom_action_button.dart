@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class AssessmentBottomActionButton extends StatelessWidget {
   const AssessmentBottomActionButton({
@@ -59,7 +60,7 @@ class AssessmentBottomActionButton extends StatelessWidget {
                 maxLines: 1,
                 style: TextStyle(
                   color: effectiveForeground,
-                  fontSize: 12,
+                  fontSize: FontSize.xxs,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 1.2,

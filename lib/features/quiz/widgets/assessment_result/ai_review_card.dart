@@ -6,6 +6,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/quiz/widgets/assessment_result/ai_review_text.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class AssessmentAiReviewCard extends StatelessWidget {
   const AssessmentAiReviewCard({super.key, required this.reviewText});
@@ -82,7 +83,7 @@ class AssessmentAiReviewCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.andika(
                                 color: colors.textPrimary,
-                                fontSize: 14,
+                                fontSize: FontSize.small,
                                 fontWeight: FontWeight.w800,
                                 height: 20 / 14,
                                 letterSpacing: -0.1,

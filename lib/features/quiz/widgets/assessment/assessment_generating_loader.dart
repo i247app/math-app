@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/shared/quiz_wave_loader.dart';
 
 class AssessmentGeneratingLoader extends StatelessWidget {
@@ -26,7 +27,7 @@ class AssessmentGeneratingLoader extends StatelessWidget {
       ),
       messageStyle: const TextStyle(
         color: AppColors.textSubtle,
-        fontSize: 16,
+        fontSize: FontSize.normal,
         fontWeight: FontWeight.w800,
         height: 1.35,
         letterSpacing: 0,

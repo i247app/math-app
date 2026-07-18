@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class PillActionButton extends StatelessWidget {
   const PillActionButton({
@@ -55,7 +56,7 @@ class PillActionButton extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: FontSize.xxs,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: 0.8,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/features/quiz/widgets/grade_selection/grade_badge.dart';
 import 'package:numi/features/quiz/widgets/grade_selection/grade_option.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class GradeCard extends StatelessWidget {
   const GradeCard({
@@ -63,7 +64,7 @@ class GradeCard extends StatelessWidget {
                     maxLines: 1,
                     style: const TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 17,
+                      fontSize: FontSize.medium,
                       fontWeight: FontWeight.w900,
                       height: 1,
                       letterSpacing: 0,

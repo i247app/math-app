@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_centered_text.dart';
 
 class QuizReviewQuestionSelector extends StatelessWidget {
@@ -45,7 +46,7 @@ class QuizReviewQuestionSelector extends StatelessWidget {
                   child: QuizReviewCenteredText(
                     '${index + 1}',
                     color: selected ? Colors.white : AppColors.teal600,
-                    fontSize: 16,
+                    fontSize: FontSize.normal,
                     fontWeight: FontWeight.w900,
                   ),
                 ),

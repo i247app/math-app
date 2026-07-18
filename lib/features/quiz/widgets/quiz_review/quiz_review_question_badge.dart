@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class QuizReviewQuestionBadge extends StatelessWidget {
   const QuizReviewQuestionBadge({
@@ -29,7 +30,7 @@ class QuizReviewQuestionBadge extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: textColor,
-          fontSize: 12,
+          fontSize: FontSize.xxs,
           fontWeight: FontWeight.w900,
           height: 1,
           letterSpacing: 0,

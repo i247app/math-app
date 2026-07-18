@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class QuizReviewModeTabButton extends StatelessWidget {
   const QuizReviewModeTabButton({
@@ -44,7 +45,7 @@ class QuizReviewModeTabButton extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: selected ? AppColors.teal600 : AppColors.textInk,
-              fontSize: 14,
+              fontSize: FontSize.small,
               fontWeight: FontWeight.w900,
               height: 1,
               letterSpacing: 0,

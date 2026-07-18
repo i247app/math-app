@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_centered_text.dart';
 
 class QuizReviewNavButton extends StatelessWidget {
@@ -34,7 +35,7 @@ class QuizReviewNavButton extends StatelessWidget {
           QuizReviewCenteredText(
             label,
             color: foreground,
-            fontSize: 15,
+            fontSize: FontSize.compact,
             fontWeight: FontWeight.w900,
             verticalOffset: 0.4,
           ),
