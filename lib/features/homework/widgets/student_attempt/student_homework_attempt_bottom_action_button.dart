@@ -8,7 +8,6 @@ class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.foreground,
-    required this.scale,
     required this.onTap,
     this.background,
     this.gradient,
@@ -17,7 +16,6 @@ class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color foreground;
-  final double scale;
   final VoidCallback? onTap;
   final Color? background;
   final Gradient? gradient;
@@ -36,7 +34,7 @@ class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
         child: Ink(
-          height: 48 * scale,
+          height: 48,
           decoration: BoxDecoration(
             color: background?.withValues(alpha: enabled ? 1 : 0.42),
             gradient: gradient,
@@ -46,22 +44,22 @@ class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
                 : [
                     BoxShadow(
                       color: AppColors.teal700.withValues(alpha: 0.20),
-                      blurRadius: 6 * scale,
-                      offset: Offset(0, 4 * scale),
+                      blurRadius: 6,
+                      offset: const Offset(0, 4),
                     ),
                   ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 8,
             children: [
-              Icon(icon, color: effectiveForeground, size: 16 * scale),
-              SizedBox(width: 8 * scale),
+              Icon(icon, color: effectiveForeground, size: 16),
               Text(
                 label,
                 maxLines: 1,
                 style: TextStyle(
                   color: effectiveForeground,
-                  fontSize: 13 * scale,
+                  fontSize: 13,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,

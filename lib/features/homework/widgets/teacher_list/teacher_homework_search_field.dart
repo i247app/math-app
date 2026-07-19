@@ -34,25 +34,29 @@ class TeacherHomeworkSearchField extends StatelessWidget {
             width: 18,
             height: 18,
           ),
-          const SizedBox(width: 22),
           Expanded(
-            child: Text(
-              context.getText(AppKeys.teacherAssignmentSearchHint),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.andika(
-                color: colors.inputHint,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                height: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 22),
+              child: Text(
+                context.getText(AppKeys.teacherAssignmentSearchHint),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.andika(
+                  color: colors.inputHint,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  height: 1,
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          SvgPicture.asset(
-            'assets/images/teacher_homework_filter.svg',
-            width: 18,
-            height: 18,
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: SvgPicture.asset(
+              'assets/images/teacher_homework_filter.svg',
+              width: 18,
+              height: 18,
+            ),
           ),
         ],
       ),

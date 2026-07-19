@@ -10,13 +10,11 @@ class TeacherStudyFilterChip extends StatelessWidget {
     super.key,
     required this.label,
     required this.selected,
-    required this.scale,
     required this.onTap,
   });
 
   final String label;
   final bool selected;
-  final double scale;
   final VoidCallback? onTap;
 
   @override
@@ -28,9 +26,9 @@ class TeacherStudyFilterChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
         child: Container(
-          constraints: BoxConstraints(minWidth: 80 * scale),
-          height: 43 * scale,
-          padding: EdgeInsets.symmetric(horizontal: 18 * scale),
+          constraints: const BoxConstraints(minWidth: 80),
+          height: 43,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? AppColors.teal450 : Colors.white,
@@ -43,8 +41,8 @@ class TeacherStudyFilterChip extends StatelessWidget {
                 : [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 3 * scale,
-                      offset: Offset(0, 2 * scale),
+                      blurRadius: 3,
+                      offset: const Offset(0, 2),
                     ),
                   ],
           ),
@@ -54,7 +52,7 @@ class TeacherStudyFilterChip extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: selected ? Colors.white : const Color(0xFF737373),
-              fontSize: FontSize.small * scale,
+              fontSize: FontSize.small,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
           ),

@@ -9,30 +9,26 @@ class TeacherStudyPurposeFilters extends StatelessWidget {
   const TeacherStudyPurposeFilters({
     super.key,
     required this.selectedPurpose,
-    required this.scale,
     required this.onSelected,
   });
 
   final String selectedPurpose;
-  final double scale;
   final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: 8,
       children: [
         TeacherStudyFilterChip(
           label: context.getText(AppKeys.teacherAssignments),
           selected: selectedPurpose == classroomExercisePurposeHomework,
-          scale: scale,
           onTap: () => onSelected(classroomExercisePurposeHomework),
         ),
-        SizedBox(width: 8 * scale),
         TeacherStudyFilterChip(
           label: context.getText(AppKeys.teacherAssessments),
           selected: selectedPurpose == classroomExercisePurposeExam,
-          scale: scale,
           onTap: () => onSelected(classroomExercisePurposeExam),
         ),
       ],

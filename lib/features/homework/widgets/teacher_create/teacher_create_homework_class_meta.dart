@@ -16,6 +16,7 @@ class CreateHomeworkClassMeta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 10,
       children: [
         Image.asset(
           iconAsset,
@@ -23,7 +24,6 @@ class CreateHomeworkClassMeta extends StatelessWidget {
           height: 18,
           opacity: const AlwaysStoppedAnimation<double>(0.7),
         ),
-        const SizedBox(width: 10),
         Expanded(
           child: Text(
             label,

@@ -9,7 +9,7 @@ class AppScreenAppBar extends StatelessWidget {
   const AppScreenAppBar({
     super.key,
     required this.title,
-    required this.scale,
+    this.scale = 1,
     required this.onBack,
     required this.backIconAsset,
     this.action,

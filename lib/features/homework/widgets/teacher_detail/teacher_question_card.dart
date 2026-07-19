@@ -59,25 +59,36 @@ class TeacherQuestionCard extends StatelessWidget {
                   height: 24 / 15,
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                prompt,
-                style: GoogleFonts.andika(
-                  color: colors.textPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  height: 24 / 14,
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  prompt,
+                  style: GoogleFonts.andika(
+                    color: colors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    height: 24 / 14,
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              for (var index = 0; index < answers.length; index++) ...[
-                TeacherAnswerOption(
-                  letter: answerLetter(index),
-                  text: answers[index],
-                  selected: isCorrectAnswer(question, answers[index], index),
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Column(
+                  spacing: 8,
+                  children: List.generate(
+                    answers.length,
+                    (index) => TeacherAnswerOption(
+                      letter: answerLetter(index),
+                      text: answers[index],
+                      selected: isCorrectAnswer(
+                        question,
+                        answers[index],
+                        index,
+                      ),
+                    ),
+                  ),
                 ),
-                if (index != answers.length - 1) const SizedBox(height: 8),
-              ],
+              ),
             ],
           ),
         ),

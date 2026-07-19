@@ -211,48 +211,38 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                       onChanged: _onSearchChanged,
                       onSubmitted: (value) => _loadExercises(search: value),
                     ),
-                    const SizedBox(height: 17),
-                    StudentHomeworkFilterTabs(
-                      activeFilter: _activeFilter,
-                      onFilterSelected: _setFilter,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 17),
+                      child: StudentHomeworkFilterTabs(
+                        activeFilter: _activeFilter,
+                        onFilterSelected: _setFilter,
+                      ),
                     ),
-                    const SizedBox(height: 18),
-                    if (_isLoading && _exercises.isEmpty)
-                      StudentHomeworkMessage(
-                        message: context.getText(AppKeys.loading),
-                      )
-                    else if (_error != null && _exercises.isEmpty)
-                      StudentHomeworkMessage(message: _error!)
-                    else if (_exercises.isEmpty)
-                      StudentHomeworkMessage(
-                        message: context.getText(
-                          AppKeys.studentNoHomeworkMessage,
-                        ),
-                      )
-                    else if (visibleExercises.isEmpty)
-                      StudentHomeworkMessage(
-                        message: context.getText(
-                          AppKeys.studentNoHomeworkMessage,
-                        ),
-                      )
-                    else ...[
-                      for (
-                        var index = 0;
-                        index < visibleExercises.length;
-                        index++
-                      )
-                        Padding(
-                          padding: EdgeInsets.only(
-                            bottom: index == visibleExercises.length - 1
-                                ? 0
-                                : 14,
-                          ),
-                          child: StudentHomeworkAssignmentCard(
-                            exercise: visibleExercises[index],
-                            onTap: () => _openExercise(visibleExercises[index]),
-                          ),
-                        ),
-                    ],
+                    Padding(
+                      padding: const EdgeInsets.only(top: 18),
+                      child: _isLoading && _exercises.isEmpty
+                          ? StudentHomeworkMessage(
+                              message: context.getText(AppKeys.loading),
+                            )
+                          : _error != null && _exercises.isEmpty
+                          ? StudentHomeworkMessage(message: _error!)
+                          : _exercises.isEmpty || visibleExercises.isEmpty
+                          ? StudentHomeworkMessage(
+                              message: context.getText(
+                                AppKeys.studentNoHomeworkMessage,
+                              ),
+                            )
+                          : Column(
+                              spacing: 14,
+                              children: [
+                                for (final exercise in visibleExercises)
+                                  StudentHomeworkAssignmentCard(
+                                    exercise: exercise,
+                                    onTap: () => _openExercise(exercise),
+                                  ),
+                              ],
+                            ),
+                    ),
                   ],
                 ),
               ),

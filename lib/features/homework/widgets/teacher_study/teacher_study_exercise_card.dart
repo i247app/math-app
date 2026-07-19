@@ -15,12 +15,10 @@ class TeacherStudyExerciseCard extends StatelessWidget {
   const TeacherStudyExerciseCard({
     super.key,
     required this.exercise,
-    required this.scale,
     required this.onTap,
   });
 
   final ClassroomExercise exercise;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -30,73 +28,68 @@ class TeacherStudyExerciseCard extends StatelessWidget {
     final dueDate = teacherStudyDateLabel(context, exercise.endDate);
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(14 * scale),
+      borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14 * scale),
+        borderRadius: BorderRadius.circular(14),
         child: Ink(
-          padding: EdgeInsets.fromLTRB(
-            12 * scale,
-            10 * scale,
-            12 * scale,
-            10 * scale,
-          ),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14 * scale),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: const Color(0xFFE5ECEF)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 2 * scale,
-                offset: Offset(0, 1 * scale),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
               ),
             ],
           ),
           child: Column(
             children: [
               Row(
+                spacing: 16,
                 children: [
                   Container(
-                    width: 60 * scale,
-                    height: 55 * scale,
+                    width: 60,
+                    height: 55,
                     decoration: BoxDecoration(
                       color: const Color(0xFFEFF6FF).withValues(alpha: 0.55),
-                      borderRadius: BorderRadius.circular(8 * scale),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 2,
                       children: [
                         Text(
                           dateParts?.day ?? '--',
                           style: GoogleFonts.andika(
                             color: AppColors.navy900,
-                            fontSize: FontSize.large * scale,
+                            fontSize: FontSize.large,
                             fontWeight: FontWeight.w800,
                             height: 1,
                           ),
                         ),
-                        if (dateParts != null) ...[
-                          SizedBox(height: 2 * scale),
+                        if (dateParts != null)
                           Text(
                             context.formatText(AppKeys.teacherStudyMonth, {
                               'month': dateParts.month,
                             }),
                             style: GoogleFonts.andika(
                               color: const Color(0xFF6B7280),
-                              fontSize: FontSize.caption * 0.77 * scale,
+                              fontSize: FontSize.caption * 0.77,
                               fontWeight: FontWeight.w700,
                               height: 1,
                             ),
                           ),
-                        ],
                       ],
                     ),
                   ),
-                  SizedBox(width: 16 * scale),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 5,
                       children: [
                         Text(
                           teacherExerciseTitle(context, exercise),
@@ -104,12 +97,11 @@ class TeacherStudyExerciseCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: AppColors.navy900,
-                            fontSize: FontSize.normal * scale,
+                            fontSize: FontSize.normal,
                             fontWeight: FontWeight.w700,
                             height: 1.25,
                           ),
                         ),
-                        SizedBox(height: 5 * scale),
                         Text(
                           context.formatText(AppKeys.teacherAssignmentId, {
                             'id': exerciseId,
@@ -118,7 +110,7 @@ class TeacherStudyExerciseCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: const Color(0xFF7B8494),
-                            fontSize: FontSize.caption * scale,
+                            fontSize: FontSize.caption,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -128,19 +120,19 @@ class TeacherStudyExerciseCard extends StatelessWidget {
                 ],
               ),
               if (dueDate != null) ...[
-                Divider(height: 16 * scale, color: const Color(0xFFE9EDF0)),
+                const Divider(height: 16, color: Color(0xFFE9EDF0)),
                 Row(
+                  spacing: 7,
                   children: [
                     SvgPicture.asset(
                       'assets/images/teacher_homework_detail_calendar.svg',
-                      width: 15 * scale,
-                      height: 15 * scale,
+                      width: 15,
+                      height: 15,
                       colorFilter: const ColorFilter.mode(
                         Color(0xFF4B5563),
                         BlendMode.srcIn,
                       ),
                     ),
-                    SizedBox(width: 7 * scale),
                     Expanded(
                       child: Text(
                         context.formatText(AppKeys.teacherStudyDueDate, {
@@ -150,7 +142,7 @@ class TeacherStudyExerciseCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: const Color(0xFF4B5563),
-                          fontSize: FontSize.caption * scale,
+                          fontSize: FontSize.caption,
                           fontWeight: FontWeight.w400,
                         ),
                       ),

@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 class StudentHomeworkAttemptLoadingSkeleton extends StatefulWidget {
-  const StudentHomeworkAttemptLoadingSkeleton({super.key, required this.scale});
-
-  final double scale;
+  const StudentHomeworkAttemptLoadingSkeleton({super.key});
 
   @override
   State<StudentHomeworkAttemptLoadingSkeleton> createState() =>
@@ -28,42 +26,50 @@ class _StudentHomeworkAttemptLoadingSkeletonState
 
   @override
   Widget build(BuildContext context) {
-    final s = widget.scale;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
         final progress = _controller.value;
         return Padding(
-          padding: EdgeInsets.fromLTRB(24 * s, 56 * s, 24 * s, 24 * s),
+          padding: const EdgeInsets.fromLTRB(24, 56, 24, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _HomeworkSkeletonBlock(
-                progress: progress,
-                height: 12 * s,
-                borderRadius: 8 * s,
-              ),
-              SizedBox(height: 13 * s),
-              _HomeworkSkeletonBlock(
-                progress: progress,
-                height: 8 * s,
-                borderRadius: 6 * s,
-              ),
-              SizedBox(height: 32 * s),
-              _HomeworkSkeletonBlock(
-                progress: progress,
-                height: 146 * s,
-                borderRadius: 20 * s,
-              ),
-              SizedBox(height: 32 * s),
-              for (var index = 0; index < 4; index++) ...[
-                _HomeworkSkeletonBlock(
+              Padding(
+                padding: const EdgeInsets.only(bottom: 13),
+                child: _HomeworkSkeletonBlock(
                   progress: progress,
-                  height: 58 * s,
-                  borderRadius: 14 * s,
+                  height: 12,
+                  borderRadius: 8,
                 ),
-                if (index != 3) SizedBox(height: 12 * s),
-              ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 32),
+                child: _HomeworkSkeletonBlock(
+                  progress: progress,
+                  height: 8,
+                  borderRadius: 6,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 32),
+                child: _HomeworkSkeletonBlock(
+                  progress: progress,
+                  height: 146,
+                  borderRadius: 20,
+                ),
+              ),
+              Column(
+                spacing: 12,
+                children: List.generate(
+                  4,
+                  (_) => _HomeworkSkeletonBlock(
+                    progress: progress,
+                    height: 58,
+                    borderRadius: 14,
+                  ),
+                ),
+              ),
             ],
           ),
         );

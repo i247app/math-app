@@ -81,46 +81,47 @@ class TeacherAssignmentCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
               Expanded(
-                child: SizedBox(
-                  height: 55,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        teacherExerciseTitle(context, exercise),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.andika(
-                          color: colors.textPrimary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          height: 17.5 / 14,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: SizedBox(
+                    height: 55,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 3,
+                      children: [
+                        Text(
+                          teacherExerciseTitle(context, exercise),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.andika(
+                            color: colors.textPrimary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            height: 17.5 / 14,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        context.formatText(AppKeys.teacherAssignmentId, {
-                          'id': exerciseId,
-                        }),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.andika(
-                          color: colors.textSecondary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          height: 16 / 12,
+                        Text(
+                          context.formatText(AppKeys.teacherAssignmentId, {
+                            'id': exerciseId,
+                          }),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.andika(
+                            color: colors.textSecondary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            height: 16 / 12,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
               Padding(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
                 child: SvgPicture.asset(
                   'assets/images/teacher_homework_more.svg',
                   width: 20,

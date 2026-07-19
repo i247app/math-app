@@ -41,6 +41,7 @@ class CreateHomeworkSubmitButton extends StatelessWidget {
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 5,
                 children: [
                   Text(
                     context.getText(AppKeys.teacherCreate).toUpperCase(),
@@ -52,7 +53,6 @@ class CreateHomeworkSubmitButton extends StatelessWidget {
                       letterSpacing: 1.2,
                     ),
                   ),
-                  const SizedBox(width: 5),
                   SvgPicture.asset(
                     'assets/images/teacher_homework_create_arrow.svg',
                     width: 14,

@@ -18,9 +18,9 @@ class CreateHomeworkLabeledInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
       children: [
         CreateHomeworkLabel(context.getText(labelKey)),
-        const SizedBox(height: 8),
         CreateHomeworkInput(
           controller: controller,
           hintKey: labelKey,

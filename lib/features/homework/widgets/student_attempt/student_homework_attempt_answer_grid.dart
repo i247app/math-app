@@ -6,13 +6,10 @@ import 'package:numi/features/homework/widgets/student_attempt/student_homework_
 class StudentHomeworkAttemptAnswerGrid extends StatelessWidget {
   const StudentHomeworkAttemptAnswerGrid({
     super.key,
-    required this.scale,
     required this.answers,
     required this.selectedAnswerLabel,
     required this.onSelected,
   });
-
-  final double scale;
   final List<StudentHomeworkAttemptAnswer> answers;
   final String? selectedAnswerLabel;
   final ValueChanged<StudentHomeworkAttemptAnswer> onSelected;
@@ -23,18 +20,17 @@ class StudentHomeworkAttemptAnswerGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: answers.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 16 * scale,
-        crossAxisSpacing: 16 * scale,
-        mainAxisExtent: 96 * scale,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        mainAxisExtent: 96,
       ),
       itemBuilder: (context, index) {
         final answer = answers[index];
         return StudentHomeworkAttemptAnswerButton(
           answer: answer,
           selected: answer.label == selectedAnswerLabel,
-          scale: scale,
           onTap: () => onSelected(answer),
         );
       },

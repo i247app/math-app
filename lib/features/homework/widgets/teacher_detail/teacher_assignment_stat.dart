@@ -22,6 +22,7 @@ class TeacherAssignmentStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 4,
       children: [
         Text(
           label,
@@ -35,11 +36,10 @@ class TeacherAssignmentStat extends StatelessWidget {
             letterSpacing: 0.6,
           ),
         ),
-        const SizedBox(height: 4),
         Row(
+          spacing: 8,
           children: [
             SvgPicture.asset(iconAsset, width: 15, height: 15),
-            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 value,

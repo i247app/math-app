@@ -8,23 +8,21 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 class StudentHomeworkResultHeader extends StatelessWidget {
-  const StudentHomeworkResultHeader({super.key, required this.scale});
-
-  final double scale;
+  const StudentHomeworkResultHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Container(
-      height: 60 * scale,
-      padding: EdgeInsets.only(left: 20 * scale, right: 20 * scale),
+      height: 60,
+      padding: const EdgeInsets.only(left: 20, right: 20),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         boxShadow: [
           BoxShadow(
             color: colors.shadow,
             blurRadius: 0,
-            offset: Offset(0, 4 * scale),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -49,10 +47,10 @@ class StudentHomeworkResultHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: colors.brandStrong,
-              fontSize: 25 * scale,
+              fontSize: 25,
               fontWeight: FontWeight.w800,
               height: 34 / 25,
-              letterSpacing: -0.2 * scale,
+              letterSpacing: -0.2,
             ),
           ),
         ],

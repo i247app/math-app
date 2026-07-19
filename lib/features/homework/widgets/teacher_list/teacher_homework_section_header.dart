@@ -27,13 +27,13 @@ class TeacherHomeworkSectionHeader extends StatelessWidget {
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
+        spacing: 4,
         children: [
           SvgPicture.asset(
             'assets/images/teacher_homework_sort.svg',
             width: 16,
             height: 16,
           ),
-          const SizedBox(width: 4),
           Text(
             context.getText(AppKeys.teacherAssignmentNewest),
             style: GoogleFonts.andika(

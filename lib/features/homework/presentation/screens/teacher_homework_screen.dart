@@ -174,7 +174,6 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
               title: context.getText(
                 teacherExerciseCopy(widget.purpose).titleKey,
               ),
-              scale: 1,
               onBack: () => Navigator.of(context).maybePop(),
             ),
             Expanded(
@@ -200,46 +199,50 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                           onTap: _openCreateHomework,
                         ),
                       ),
-                      const SizedBox(height: 33),
-                      const TeacherHomeworkSearchField(),
-                      const SizedBox(height: 24),
-                      TeacherHomeworkSectionHeader(purpose: widget.purpose),
-                      const SizedBox(height: 17),
-                      if (_isLoading && _exercises.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 40),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: colors.brandStrong,
-                            ),
-                          ),
-                        )
-                      else if (_error != null && _exercises.isEmpty)
-                        AppRetryPanel(
-                          scale: 1,
-                          message: _error!,
-                          onRetry: _loadExercises,
-                        )
-                      else if (_exercises.isEmpty)
-                        TeacherEmptyAssignmentsPanel(
-                          message: context.getText(
-                            teacherExerciseCopy(widget.purpose).emptyKey,
-                          ),
-                        )
-                      else ...[
-                        for (
-                          var index = 0;
-                          index < _exercises.length;
-                          index++
-                        ) ...[
-                          TeacherAssignmentCard(
-                            exercise: _exercises[index],
-                            onTap: () => _openExerciseDetail(_exercises[index]),
-                          ),
-                          if (index != _exercises.length - 1)
-                            const SizedBox(height: 10),
-                        ],
-                      ],
+                      const Padding(
+                        padding: EdgeInsets.only(top: 33),
+                        child: TeacherHomeworkSearchField(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 24),
+                        child: TeacherHomeworkSectionHeader(
+                          purpose: widget.purpose,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 17),
+                        child: _isLoading && _exercises.isEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 40),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: colors.brandStrong,
+                                  ),
+                                ),
+                              )
+                            : _error != null && _exercises.isEmpty
+                            ? AppRetryPanel(
+                                message: _error!,
+                                onRetry: _loadExercises,
+                              )
+                            : _exercises.isEmpty
+                            ? TeacherEmptyAssignmentsPanel(
+                                message: context.getText(
+                                  teacherExerciseCopy(widget.purpose).emptyKey,
+                                ),
+                              )
+                            : Column(
+                                spacing: 10,
+                                children: [
+                                  for (final exercise in _exercises)
+                                    TeacherAssignmentCard(
+                                      exercise: exercise,
+                                      onTap: () =>
+                                          _openExerciseDetail(exercise),
+                                    ),
+                                ],
+                              ),
+                      ),
                     ],
                   ),
                 ),

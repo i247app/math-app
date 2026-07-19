@@ -201,7 +201,6 @@ class _TeacherHomeworkDetailScreenState
               title: context.getText(
                 teacherExerciseCopy(_effectivePurpose).titleKey,
               ),
-              scale: 1,
               onBack: () => Navigator.of(context).maybePop(),
               action: _hasVisibilityChange
                   ? TextButton(
@@ -253,11 +252,7 @@ class _TeacherHomeworkDetailScreenState
                           ),
                         )
                       else if (_error != null && exercise == null)
-                        AppRetryPanel(
-                          scale: 1,
-                          message: _error!,
-                          onRetry: _loadDetail,
-                        )
+                        AppRetryPanel(message: _error!, onRetry: _loadDetail)
                       else ...[
                         TeacherAssignmentInfoCard(
                           exercise: exercise,
@@ -266,9 +261,8 @@ class _TeacherHomeworkDetailScreenState
                             setState(() => _editingVisibility = visibility);
                           },
                         ),
-                        const SizedBox(height: 13),
                         Padding(
-                          padding: const EdgeInsets.only(left: 7),
+                          padding: const EdgeInsets.only(top: 13, left: 7),
                           child: Text(
                             context.getText(
                               AppKeys.teacherAssignmentQuestionContent,
@@ -281,18 +275,25 @@ class _TeacherHomeworkDetailScreenState
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        for (var index = 0; index < questions.length; index++)
-                          Padding(
-                            padding: EdgeInsets.only(
-                              bottom: index == questions.length - 1 ? 0 : 15,
-                            ),
-                            child: TeacherQuestionCard(
-                              questionNumber:
-                                  questions[index].questionNumber ?? index + 1,
-                              question: questions[index],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Column(
+                            spacing: 15,
+                            children: [
+                              for (
+                                var index = 0;
+                                index < questions.length;
+                                index++
+                              )
+                                TeacherQuestionCard(
+                                  questionNumber:
+                                      questions[index].questionNumber ??
+                                      index + 1,
+                                  question: questions[index],
+                                ),
+                            ],
                           ),
+                        ),
                       ],
                     ],
                   ),

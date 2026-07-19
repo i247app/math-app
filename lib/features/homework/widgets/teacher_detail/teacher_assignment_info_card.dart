@@ -56,17 +56,19 @@ class TeacherAssignmentInfoCard extends StatelessWidget {
                     width: 17,
                     height: 14,
                   ),
-                  const SizedBox(width: 4),
                   Expanded(
-                    child: Text(
-                      teacherExerciseClassLabel(context, exercise),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.andika(
-                        color: colors.textSecondary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 24 / 14,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Text(
+                        teacherExerciseClassLabel(context, exercise),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.andika(
+                          color: colors.textSecondary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          height: 24 / 14,
+                        ),
                       ),
                     ),
                   ),
@@ -76,43 +78,52 @@ class TeacherAssignmentInfoCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                teacherExerciseTitle(context, exercise),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: colors.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  height: 36 / 18,
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  teacherExerciseTitle(context, exercise),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.andika(
+                    color: colors.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    height: 36 / 18,
+                  ),
                 ),
               ),
-              if (exerciseInfoRows(context, exercise).isNotEmpty) ...[
-                const SizedBox(height: 6),
-                for (final row in exerciseInfoRows(context, exercise))
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: TeacherAssignmentInfoRow(row),
-                  ),
-              ],
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.only(top: 19),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: colors.border.withValues(alpha: 0.7),
-                    ),
+              if (exerciseInfoRows(context, exercise).isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Column(
+                    children: [
+                      for (final row in exerciseInfoRows(context, exercise))
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: TeacherAssignmentInfoRow(row),
+                        ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: TeacherAssignmentStatDue(exercise)),
-                    const SizedBox(width: 30),
-                    Expanded(child: TeacherAssignmentStatQuestions(exercise)),
-                  ],
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Container(
+                  padding: const EdgeInsets.only(top: 19),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: colors.border.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 30,
+                    children: [
+                      Expanded(child: TeacherAssignmentStatDue(exercise)),
+                      Expanded(child: TeacherAssignmentStatQuestions(exercise)),
+                    ],
+                  ),
                 ),
               ),
             ],

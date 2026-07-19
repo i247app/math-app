@@ -51,10 +51,12 @@ class CreateHomeworkClassSummary extends StatelessWidget {
               ),
             )
           : Row(
+              spacing: 29,
               children: [
                 SizedBox(
                   width: 76,
                   child: Column(
+                    spacing: 6,
                     children: [
                       Container(
                         width: 71,
@@ -70,7 +72,6 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                           height: 40,
                         ),
                       ),
-                      const SizedBox(height: 6),
                       Text(
                         createHomeworkStudentCount(context, classroom),
                         maxLines: 1,
@@ -85,10 +86,10 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 29),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 5,
                     children: [
                       Text(
                         createHomeworkClassSummaryName(context, classroom),
@@ -101,7 +102,6 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                           height: 32 / 20,
                         ),
                       ),
-                      const SizedBox(height: 5),
                       CreateHomeworkClassMeta(
                         iconAsset: 'assets/images/teacher_class_grade.png',
                         label: createHomeworkGradeName(
@@ -110,7 +110,6 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                           grades,
                         ),
                       ),
-                      const SizedBox(height: 5),
                       CreateHomeworkClassMeta(
                         iconAsset: 'assets/images/teacher_class_program.png',
                         label: createHomeworkProgramName(
@@ -119,7 +118,6 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                           programs,
                         ),
                       ),
-                      const SizedBox(height: 5),
                       CreateHomeworkClassMeta(
                         iconAsset:
                             'assets/images/teacher_class_description.png',

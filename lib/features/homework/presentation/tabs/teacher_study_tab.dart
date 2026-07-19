@@ -40,7 +40,6 @@ class TeacherStudyTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.bottomPadding,
-    required this.scale,
     ClassroomService? classroomService,
     ClassroomExerciseService? exerciseService,
     this.activeRefreshTick = 0,
@@ -51,7 +50,6 @@ class TeacherStudyTab extends StatefulWidget {
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final double bottomPadding;
-  final double scale;
   final int activeRefreshTick;
   final bool isActive;
   final ClassroomService? _classroomService;
@@ -393,7 +391,6 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
         (cubit) => cubit.owned(profileId),
       );
     }
-    final scale = widget.scale;
     final visibleExercises = _exercises.take(10).toList(growable: false);
     return ColoredBox(
       color: context.themeColors.pageBackground,
@@ -409,17 +406,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              PageHeader(
-                title: context.getText(AppKeys.teacherStudyTitle),
-                scale: scale,
-              ),
+              PageHeader(title: context.getText(AppKeys.teacherStudyTitle)),
               Padding(
-                padding: EdgeInsets.fromLTRB(
-                  19 * scale,
-                  18 * scale,
-                  19 * scale,
-                  widget.bottomPadding,
-                ),
+                padding: EdgeInsets.fromLTRB(19, 18, 19, widget.bottomPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -429,82 +418,84 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                         onTap: _openCreateExercise,
                       ),
                     ),
-                    SizedBox(height: 18 * scale),
-                    TeacherStudySearchField(
-                      controller: _searchController,
-                      scale: scale,
-                      onChanged: _onSearchChanged,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 18),
+                      child: TeacherStudySearchField(
+                        controller: _searchController,
+                        onChanged: _onSearchChanged,
+                      ),
                     ),
-                    SizedBox(height: 14 * scale),
                     if (!_hasCompletedInitialLoad)
-                      TeacherStudyLoadingIndicator(scale: scale)
-                    else ...[
-                      TeacherStudyClassFilters(
-                        classrooms: _classrooms,
-                        selectedClassroomId: _selectedClassroomId,
-                        scale: scale,
-                        onSelected: _selectClassroom,
-                      ),
-                      SizedBox(height: 14 * scale),
-                      TeacherStudyPurposeFilters(
-                        selectedPurpose: _selectedPurpose,
-                        scale: scale,
-                        onSelected: _selectPurpose,
-                      ),
-                      SizedBox(height: 24 * scale),
-                      if (_isLoadingExercises &&
-                          _exercises.isEmpty &&
-                          !_hasCompletedInitialLoad)
-                        TeacherStudyLoadingIndicator(scale: scale)
-                      else if (_displayError != null && _exercises.isEmpty)
-                        AppRetryPanel(
-                          scale: scale,
-                          message: _displayError!,
-                          onRetry: _refreshClassrooms,
-                        )
-                      else if (_classrooms.isEmpty)
-                        Column(
+                      const Padding(
+                        padding: EdgeInsets.only(top: 14),
+                        child: TeacherStudyLoadingIndicator(),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.only(top: 14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            TeacherEmptyAssignmentsPanel(
-                              message: context.getText(
-                                AppKeys.teacherEmptyClassroomList,
+                            TeacherStudyClassFilters(
+                              classrooms: _classrooms,
+                              selectedClassroomId: _selectedClassroomId,
+                              onSelected: _selectClassroom,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 14),
+                              child: TeacherStudyPurposeFilters(
+                                selectedPurpose: _selectedPurpose,
+                                onSelected: _selectPurpose,
                               ),
                             ),
-                          ],
-                        )
-                      else if (_exercises.isEmpty)
-                        Column(
-                          children: [
-                            TeacherEmptyAssignmentsPanel(
-                              message: _searchController.text.trim().isNotEmpty
-                                  ? context.getText(
-                                      AppKeys.teacherStudyNoResults,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 24),
+                              child:
+                                  _isLoadingExercises &&
+                                      _exercises.isEmpty &&
+                                      !_hasCompletedInitialLoad
+                                  ? const TeacherStudyLoadingIndicator()
+                                  : _displayError != null && _exercises.isEmpty
+                                  ? AppRetryPanel(
+                                      message: _displayError!,
+                                      onRetry: _refreshClassrooms,
                                     )
-                                  : context.getText(
-                                      teacherExerciseCopy(
-                                        _selectedPurpose,
-                                      ).emptyKey,
+                                  : _classrooms.isEmpty
+                                  ? TeacherEmptyAssignmentsPanel(
+                                      message: context.getText(
+                                        AppKeys.teacherEmptyClassroomList,
+                                      ),
+                                    )
+                                  : _exercises.isEmpty
+                                  ? TeacherEmptyAssignmentsPanel(
+                                      message:
+                                          _searchController.text
+                                              .trim()
+                                              .isNotEmpty
+                                          ? context.getText(
+                                              AppKeys.teacherStudyNoResults,
+                                            )
+                                          : context.getText(
+                                              teacherExerciseCopy(
+                                                _selectedPurpose,
+                                              ).emptyKey,
+                                            ),
+                                    )
+                                  : Column(
+                                      spacing: 14,
+                                      children: [
+                                        for (final exercise in visibleExercises)
+                                          TeacherStudyExerciseCard(
+                                            exercise: exercise,
+                                            onTap: () =>
+                                                _openExerciseDetail(exercise),
+                                          ),
+                                      ],
                                     ),
                             ),
                           ],
-                        )
-                      else ...[
-                        for (
-                          var index = 0;
-                          index < visibleExercises.length;
-                          index++
-                        ) ...[
-                          TeacherStudyExerciseCard(
-                            exercise: visibleExercises[index],
-                            scale: scale,
-                            onTap: () =>
-                                _openExerciseDetail(visibleExercises[index]),
-                          ),
-                          if (index != visibleExercises.length - 1)
-                            SizedBox(height: 14 * scale),
-                        ],
-                      ],
-                    ],
+                        ),
+                      ),
                   ],
                 ),
               ),

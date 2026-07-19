@@ -48,6 +48,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                spacing: 8,
                 children: [
                   Expanded(
                     child: Text(
@@ -62,25 +63,25 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
                   StudentHomeworkStatusBadge(exercise: exercise),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                studentHomeworkTitle(exercise),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: colors.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  height: 28 / 18,
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  studentHomeworkTitle(exercise),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.andika(
+                    color: colors.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    height: 28 / 18,
+                  ),
                 ),
               ),
-              const SizedBox(height: 4),
               Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(top: 4, bottom: 12),
                 child: Text(
                   studentHomeworkQuestionCount(context, exercise),
                   maxLines: 1,
@@ -104,13 +105,13 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                   ),
                 ),
                 child: Row(
+                  spacing: 8,
                   children: [
                     SvgPicture.asset(
                       'assets/images/student_homework_calendar.svg',
                       width: 12,
                       height: 13.33,
                     ),
-                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         studentHomeworkDueDate(context, exercise),

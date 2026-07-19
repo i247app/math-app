@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -54,9 +52,6 @@ class _StudentHomeworkAttemptScreenState
   bool _isSubmitting = false;
   String? _errorMessage;
   VoidCallback? _errorRetryAction;
-
-  static const _designWidth = 390.0;
-  static const _designHeight = 844.0;
 
   @override
   void initState() {
@@ -290,136 +285,137 @@ class _StudentHomeworkAttemptScreenState
       backgroundColor: colors.pageBackground,
       body: SafeArea(
         bottom: false,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            final height = constraints.maxHeight;
-            final scale = math
-                .min(width / _designWidth, height / _designHeight)
-                .clamp(0.78, 1.18);
-            final s = scale.toDouble();
-            final questions = studentHomeworkAttemptQuestions(_exercise);
-            final questionError = _isLoading
-                ? null
-                : studentHomeworkAttemptQuestionDataError(context, questions);
-            final effectiveError = _errorMessage ?? questionError;
-            final currentQuestion = questions.isEmpty
-                ? null
-                : questions[_questionIndex.clamp(0, questions.length - 1)];
-            final selectedAnswerLabel = _selectedAnswerLabels[_questionIndex];
-            final isQuestionContentVisible =
-                !_isLoading &&
-                !_isSubmitting &&
-                effectiveError == null &&
-                currentQuestion != null;
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 430),
+            child: Builder(
+              builder: (context) {
+                final questions = studentHomeworkAttemptQuestions(_exercise);
+                final questionError = _isLoading
+                    ? null
+                    : studentHomeworkAttemptQuestionDataError(
+                        context,
+                        questions,
+                      );
+                final effectiveError = _errorMessage ?? questionError;
+                final currentQuestion = questions.isEmpty
+                    ? null
+                    : questions[_questionIndex.clamp(0, questions.length - 1)];
+                final selectedAnswerLabel =
+                    _selectedAnswerLabels[_questionIndex];
+                final isQuestionContentVisible =
+                    !_isLoading &&
+                    !_isSubmitting &&
+                    effectiveError == null &&
+                    currentQuestion != null;
 
-            return Stack(
-              children: [
-                Positioned.fill(
-                  child: ColoredBox(
-                    color: _isLoading || _isSubmitting
-                        ? colors.surface
-                        : colors.pageBackground,
-                  ),
-                ),
-                Positioned.fill(
-                  top: _isLoading || _isSubmitting ? 0 : 80 * s,
-                  bottom: _isLoading || _isSubmitting || effectiveError != null
-                      ? 0
-                      : 97 * s,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    child: effectiveError != null
-                        ? StudentHomeworkAttemptErrorState(
-                            key: const ValueKey('homework-error'),
-                            scale: s,
-                            message: effectiveError,
-                            onRetry: _errorRetryAction ?? _loadDetail,
-                          )
-                        : _isSubmitting
-                        ? QuizWaveLoader(
-                            key: const ValueKey('homework-submit-loader'),
-                            message: context.getText(AppKeys.submittingForYou),
-                            letterStyle: TextStyle(
-                              color: colors.brandStrong,
-                              fontSize: 40 * s,
-                              fontWeight: FontWeight.w900,
-                              height: 1,
-                              letterSpacing: 3 * s,
-                            ),
-                            messageStyle: TextStyle(
-                              color: colors.textSecondary,
-                              fontSize: 16 * s,
-                              fontWeight: FontWeight.w800,
-                              height: 1.35,
-                              letterSpacing: 0,
-                            ),
-                          )
-                        : _isLoading
-                        ? StudentHomeworkAttemptLoadingSkeleton(
-                            key: const ValueKey('homework-loader'),
-                            scale: s,
-                          )
-                        : SingleChildScrollView(
-                            key: const ValueKey('homework-content'),
-                            physics: const BouncingScrollPhysics(),
-                            padding: EdgeInsets.fromLTRB(
-                              24 * s,
-                              0,
-                              24 * s,
-                              24 * s,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                StudentHomeworkAttemptProgressSection(
-                                  scale: s,
-                                  currentQuestion: _questionIndex + 1,
-                                  totalQuestions: questions.length,
-                                ),
-                                SizedBox(height: 32 * s),
-                                StudentHomeworkAttemptQuestionCard(
-                                  scale: s,
-                                  question: currentQuestion!.prompt,
-                                ),
-                                SizedBox(height: 32 * s),
-                                StudentHomeworkAttemptAnswerGrid(
-                                  scale: s,
-                                  answers: currentQuestion.answers,
-                                  selectedAnswerLabel: selectedAnswerLabel,
-                                  onSelected: _selectAnswer,
-                                ),
-                              ],
-                            ),
-                          ),
-                  ),
-                ),
-                if (!_isLoading && !_isSubmitting)
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    child: StudentHomeworkAttemptHeader(scale: s),
-                  ),
-                if (isQuestionContentVisible)
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: StudentHomeworkAttemptBottomBar(
-                      scale: s,
-                      canGoBack: _questionIndex > 0,
-                      isLastQuestion: _questionIndex >= questions.length - 1,
-                      isSubmitting: _isSubmitting,
-                      onBack: _goToPreviousQuestion,
-                      onContinue: () => _goToNextQuestion(questions),
+                return Stack(
+                  children: [
+                    Positioned.fill(
+                      child: ColoredBox(
+                        color: _isLoading || _isSubmitting
+                            ? colors.surface
+                            : colors.pageBackground,
+                      ),
                     ),
-                  ),
-              ],
-            );
-          },
+                    Positioned.fill(
+                      top: _isLoading || _isSubmitting ? 0 : 80,
+                      bottom:
+                          _isLoading || _isSubmitting || effectiveError != null
+                          ? 0
+                          : 97,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        child: effectiveError != null
+                            ? StudentHomeworkAttemptErrorState(
+                                key: const ValueKey('homework-error'),
+                                message: effectiveError,
+                                onRetry: _errorRetryAction ?? _loadDetail,
+                              )
+                            : _isSubmitting
+                            ? QuizWaveLoader(
+                                key: const ValueKey('homework-submit-loader'),
+                                message: context.getText(
+                                  AppKeys.submittingForYou,
+                                ),
+                                letterStyle: TextStyle(
+                                  color: colors.brandStrong,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1,
+                                  letterSpacing: 3,
+                                ),
+                                messageStyle: TextStyle(
+                                  color: colors.textSecondary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.35,
+                                  letterSpacing: 0,
+                                ),
+                              )
+                            : _isLoading
+                            ? const StudentHomeworkAttemptLoadingSkeleton(
+                                key: ValueKey('homework-loader'),
+                              )
+                            : SingleChildScrollView(
+                                key: const ValueKey('homework-content'),
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.fromLTRB(
+                                  24,
+                                  0,
+                                  24,
+                                  24,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  spacing: 32,
+                                  children: [
+                                    StudentHomeworkAttemptProgressSection(
+                                      currentQuestion: _questionIndex + 1,
+                                      totalQuestions: questions.length,
+                                    ),
+                                    StudentHomeworkAttemptQuestionCard(
+                                      question: currentQuestion!.prompt,
+                                    ),
+                                    StudentHomeworkAttemptAnswerGrid(
+                                      answers: currentQuestion.answers,
+                                      selectedAnswerLabel: selectedAnswerLabel,
+                                      onSelected: _selectAnswer,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ),
+                    ),
+                    if (!_isLoading && !_isSubmitting)
+                      const Positioned(
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        child: StudentHomeworkAttemptHeader(),
+                      ),
+                    if (isQuestionContentVisible)
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: StudentHomeworkAttemptBottomBar(
+                          canGoBack: _questionIndex > 0,
+                          isLastQuestion:
+                              _questionIndex >= questions.length - 1,
+                          isSubmitting: _isSubmitting,
+                          onBack: _goToPreviousQuestion,
+                          onContinue: () => _goToNextQuestion(questions),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

@@ -459,7 +459,6 @@ class _TeacherCreateHomeworkScreenState
                 title: context.getText(
                   teacherExerciseCopy(widget.purpose).createTitleKey,
                 ),
-                scale: 1,
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               Expanded(
@@ -495,123 +494,149 @@ class _TeacherCreateHomeworkScreenState
                             iconHeight: 8,
                             onTap: _openClassSelector,
                           ),
-                          const SizedBox(height: 10),
-                          CreateHomeworkClassSummary(
-                            classroom: _selectedClassroom,
-                            grades: _grades,
-                            programs: _programs,
-                            schools: _schools,
-                            isLoading:
-                                _isLoadingClassrooms ||
-                                _isLoadingSelectedClassroom ||
-                                _isLoadingLookups,
-                          ),
-                          const SizedBox(height: 22),
-                          CreateHomeworkInput(
-                            controller: _titleController,
-                            hintKey: teacherExerciseCopy(
-                              widget.purpose,
-                            ).titleHintKey,
-                            height: 62,
-                            radius: 10,
-                          ),
-                          const SizedBox(height: 13),
-                          CreateHomeworkLabel(
-                            context.getText(
-                              AppKeys.teacherAssignmentProgramLabel,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: CreateHomeworkClassSummary(
+                              classroom: _selectedClassroom,
+                              grades: _grades,
+                              programs: _programs,
+                              schools: _schools,
+                              isLoading:
+                                  _isLoadingClassrooms ||
+                                  _isLoadingSelectedClassroom ||
+                                  _isLoadingLookups,
                             ),
                           ),
-                          const SizedBox(height: 9),
-                          CreateHomeworkSelectField(
-                            valueKey: AppKeys.teacherAssignmentProgramLabel,
-                            valueText: selectedHomeworkProgramName(
-                              context,
-                              _programs,
-                              _selectedProgramId,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 22),
+                            child: CreateHomeworkInput(
+                              controller: _titleController,
+                              hintKey: teacherExerciseCopy(
+                                widget.purpose,
+                              ).titleHintKey,
+                              height: 62,
+                              radius: 10,
                             ),
-                            radius: 12,
-                            borderColor: const Color(0xFFC4C6D2),
-                            borderWidth: 1,
-                            iconAsset:
-                                'assets/images/teacher_homework_dropdown.svg',
-                            iconWidth: 12,
-                            iconHeight: 8,
-                            onTap: _openProgramSelector,
                           ),
-                          const SizedBox(height: 18),
-                          CreateHomeworkLabel(
-                            context.getText(AppKeys.teacherAssignmentDeadline),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 13),
+                            child: CreateHomeworkLabel(
+                              context.getText(
+                                AppKeys.teacherAssignmentProgramLabel,
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CreateHomeworkDateField(
-                                  hintKey:
-                                      AppKeys.teacherAssignmentStartDateHint,
-                                  valueText: formatCreateHomeworkDate(
-                                    _startDate,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 9),
+                            child: CreateHomeworkSelectField(
+                              valueKey: AppKeys.teacherAssignmentProgramLabel,
+                              valueText: selectedHomeworkProgramName(
+                                context,
+                                _programs,
+                                _selectedProgramId,
+                              ),
+                              radius: 12,
+                              borderColor: const Color(0xFFC4C6D2),
+                              borderWidth: 1,
+                              iconAsset:
+                                  'assets/images/teacher_homework_dropdown.svg',
+                              iconWidth: 12,
+                              iconHeight: 8,
+                              onTap: _openProgramSelector,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 18),
+                            child: CreateHomeworkLabel(
+                              context.getText(
+                                AppKeys.teacherAssignmentDeadline,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Row(
+                              spacing: 10,
+                              children: [
+                                Expanded(
+                                  child: CreateHomeworkDateField(
+                                    hintKey:
+                                        AppKeys.teacherAssignmentStartDateHint,
+                                    valueText: formatCreateHomeworkDate(
+                                      _startDate,
+                                    ),
+                                    onTap: () => _openDatePicker(isStart: true),
                                   ),
-                                  onTap: () => _openDatePicker(isStart: true),
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: CreateHomeworkDateField(
-                                  hintKey: AppKeys.teacherAssignmentEndDateHint,
-                                  valueText: formatCreateHomeworkDate(_endDate),
-                                  onTap: () => _openDatePicker(isStart: false),
+                                Expanded(
+                                  child: CreateHomeworkDateField(
+                                    hintKey:
+                                        AppKeys.teacherAssignmentEndDateHint,
+                                    valueText: formatCreateHomeworkDate(
+                                      _endDate,
+                                    ),
+                                    onTap: () =>
+                                        _openDatePicker(isStart: false),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 18),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: CreateHomeworkLabeledInput(
-                                  labelKey:
-                                      AppKeys.teacherAssignmentChapterLabel,
-                                  controller: _chapterController,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 18),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 14,
+                              children: [
+                                Expanded(
+                                  child: CreateHomeworkLabeledInput(
+                                    labelKey:
+                                        AppKeys.teacherAssignmentChapterLabel,
+                                    controller: _chapterController,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: CreateHomeworkLabeledInput(
-                                  labelKey:
-                                      AppKeys.teacherAssignmentLessonLabel,
-                                  controller: _lessonController,
+                                Expanded(
+                                  child: CreateHomeworkLabeledInput(
+                                    labelKey:
+                                        AppKeys.teacherAssignmentLessonLabel,
+                                    controller: _lessonController,
+                                  ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 17),
+                            child: CreateHomeworkInput(
+                              controller: _descriptionController,
+                              hintKey: teacherExerciseCopy(
+                                widget.purpose,
+                              ).descriptionHintKey,
+                              height: 167,
+                              maxLines: 6,
+                              textAlignVertical: TextAlignVertical.top,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 24),
+                            child: CreateHomeworkPublishSwitch(
+                              isPublished: _visibility == 'PUBLIC',
+                              onChanged: (isPublished) {
+                                setState(
+                                  () => _visibility = isPublished
+                                      ? 'PUBLIC'
+                                      : 'PRIVATE',
+                                );
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 24),
+                            child: Center(
+                              child: CreateHomeworkSubmitButton(
+                                isLoading: _isSubmitting,
+                                onTap: _submit,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 17),
-                          CreateHomeworkInput(
-                            controller: _descriptionController,
-                            hintKey: teacherExerciseCopy(
-                              widget.purpose,
-                            ).descriptionHintKey,
-                            height: 167,
-                            maxLines: 6,
-                            textAlignVertical: TextAlignVertical.top,
-                          ),
-                          const SizedBox(height: 24),
-                          CreateHomeworkPublishSwitch(
-                            isPublished: _visibility == 'PUBLIC',
-                            onChanged: (isPublished) {
-                              setState(
-                                () => _visibility = isPublished
-                                    ? 'PUBLIC'
-                                    : 'PRIVATE',
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          Center(
-                            child: CreateHomeworkSubmitButton(
-                              isLoading: _isSubmitting,
-                              onTap: _submit,
                             ),
                           ),
                         ],

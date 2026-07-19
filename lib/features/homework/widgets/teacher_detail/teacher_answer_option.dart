@@ -54,28 +54,31 @@ class TeacherAnswerOption extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.andika(
-                color: AppColors.textInkDark,
-                fontSize: 16,
-                fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
-                height: 24 / 16,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.andika(
+                  color: AppColors.textInkDark,
+                  fontSize: 16,
+                  fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+                  height: 24 / 16,
+                ),
               ),
             ),
           ),
-          if (selected) ...[
-            const SizedBox(width: 8),
-            SvgPicture.asset(
-              'assets/images/teacher_homework_detail_check.svg',
-              width: 20,
-              height: 20,
+          if (selected)
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: SvgPicture.asset(
+                'assets/images/teacher_homework_detail_check.svg',
+                width: 20,
+                height: 20,
+              ),
             ),
-          ],
         ],
       ),
     );

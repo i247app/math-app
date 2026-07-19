@@ -51,17 +51,19 @@ class StudentHomeworkTopBar extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 80),
           Expanded(
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.andika(
-                color: colors.brandStrong,
-                fontSize: 25,
-                fontWeight: FontWeight.w700,
-                height: 34 / 25,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 80),
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.andika(
+                  color: colors.brandStrong,
+                  fontSize: 25,
+                  fontWeight: FontWeight.w700,
+                  height: 34 / 25,
+                ),
               ),
             ),
           ),

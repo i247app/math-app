@@ -8,13 +8,11 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
     super.key,
     required this.answer,
     required this.selected,
-    required this.scale,
     required this.onTap,
   });
 
   final StudentHomeworkAttemptAnswer answer;
   final bool selected;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -27,51 +25,51 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(32 * scale),
+      borderRadius: BorderRadius.circular(32),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(32 * scale),
+        borderRadius: BorderRadius.circular(32),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
-          padding: EdgeInsets.symmetric(horizontal: 14 * scale),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             color: colors.elevatedSurface,
-            borderRadius: BorderRadius.circular(32 * scale),
-            border: Border.all(color: borderColor, width: 2 * scale),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: borderColor, width: 2),
             boxShadow: selected
                 ? [
                     BoxShadow(
                       color: const Color(0xFF73F1E7).withValues(alpha: 0.20),
-                      spreadRadius: 4 * scale,
+                      spreadRadius: 4,
                     ),
                     BoxShadow(
                       color: colors.shadow,
-                      blurRadius: 6 * scale,
-                      offset: Offset(0, 4 * scale),
+                      blurRadius: 6,
+                      offset: const Offset(0, 4),
                     ),
                   ]
                 : [
                     BoxShadow(
                       color: colors.shadow,
-                      blurRadius: 2 * scale,
-                      offset: Offset(0, 1 * scale),
+                      blurRadius: 2,
+                      offset: const Offset(0, 1),
                     ),
                   ],
           ),
           child: Row(
+            spacing: 10,
             children: [
               Text(
                 answer.label,
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 20 * scale,
+                  fontSize: 20,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
                 ),
               ),
-              SizedBox(width: 10 * scale),
               Expanded(
                 child: Text(
                   answer.content,
@@ -79,7 +77,7 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: textColor,
-                    fontSize: 18 * scale,
+                    fontSize: 18,
                     fontWeight: FontWeight.w800,
                     height: 1.15,
                     letterSpacing: 0,

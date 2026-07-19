@@ -7,42 +7,36 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 class StudentHomeworkReviewCard extends StatelessWidget {
-  const StudentHomeworkReviewCard({
-    super.key,
-    required this.scale,
-    required this.reviewText,
-  });
-
-  final double scale;
+  const StudentHomeworkReviewCard({super.key, required this.reviewText});
   final String reviewText;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Container(
-      height: 161 * scale,
+      height: 161,
       clipBehavior: Clip.antiAlias,
-      padding: EdgeInsets.all(20 * scale),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         border: Border.all(color: colors.border),
-        borderRadius: BorderRadius.circular(32 * scale),
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
             color: colors.shadow,
-            blurRadius: 2 * scale,
-            offset: Offset(0, 1 * scale),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
       child: Stack(
         children: [
           Positioned(
-            right: -45 * scale,
-            top: -45 * scale,
+            right: -45,
+            top: -45,
             child: Container(
-              width: 96 * scale,
-              height: 96 * scale,
+              width: 96,
+              height: 96,
               decoration: const BoxDecoration(
                 color: AppColors.aiAccentSurface,
                 shape: BoxShape.circle,
@@ -51,38 +45,34 @@ class StudentHomeworkReviewCard extends StatelessWidget {
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 16,
             children: [
               Container(
-                width: 56 * scale,
-                height: 56 * scale,
-                padding: EdgeInsets.all(2 * scale),
+                width: 56,
+                height: 56,
+                padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   color: colors.surface,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.mascotBorder,
-                    width: 2 * scale,
-                  ),
+                  border: Border.all(color: AppColors.mascotBorder, width: 2),
                 ),
                 child: ClipOval(
-                  child: Transform.scale(
-                    scale: 1.18,
-                    child: Image.asset(
-                      'assets/images/onboarding_splash_mascot.png',
-                      fit: BoxFit.cover,
-                      alignment: Alignment.topCenter,
-                    ),
+                  child: Image.asset(
+                    'assets/images/onboarding_splash_mascot.png',
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
                   ),
                 ),
               ),
-              SizedBox(width: 16 * scale),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.only(top: 2 * scale),
+                  padding: const EdgeInsets.only(top: 2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 4,
                     children: [
                       Row(
+                        spacing: 4,
                         children: [
                           Flexible(
                             child: Text(
@@ -91,32 +81,30 @@ class StudentHomeworkReviewCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.andika(
                                 color: colors.textPrimary,
-                                fontSize: 14 * scale,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w800,
                                 height: 20 / 14,
-                                letterSpacing: -0.1 * scale,
+                                letterSpacing: -0.1,
                               ),
                             ),
                           ),
-                          SizedBox(width: 4 * scale),
                           Icon(
                             Icons.auto_awesome_rounded,
                             color: colors.brandStrong,
-                            size: 15 * scale,
+                            size: 15,
                           ),
                         ],
                       ),
-                      SizedBox(height: 4 * scale),
                       Text(
                         '"$reviewText"',
                         maxLines: 4,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: colors.textSecondary,
-                          fontSize: 12 * scale,
+                          fontSize: 12,
                           fontWeight: FontWeight.w400,
                           height: 19.5 / 12,
-                          letterSpacing: -0.1 * scale,
+                          letterSpacing: -0.1,
                         ),
                       ),
                     ],

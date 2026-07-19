@@ -7,30 +7,28 @@ import 'package:numi/features/homework/widgets/student_result/student_homework_r
 import 'package:numi/core/theme/app_colors.dart';
 
 class StudentHomeworkCloseButton extends StatelessWidget {
-  const StudentHomeworkCloseButton({super.key, required this.scale});
-
-  final double scale;
+  const StudentHomeworkCloseButton({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20 * scale),
+        borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: () => closeStudentHomeworkResult(context),
-          borderRadius: BorderRadius.circular(20 * scale),
+          borderRadius: BorderRadius.circular(20),
           child: Ink(
-            width: 180 * scale,
-            height: 57 * scale,
+            width: 180,
+            height: 57,
             decoration: BoxDecoration(
               color: AppColors.teal500,
-              borderRadius: BorderRadius.circular(20 * scale),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.25),
-                  blurRadius: 2 * scale,
-                  offset: Offset(0, 4 * scale),
+                  blurRadius: 2,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
@@ -40,10 +38,10 @@ class StudentHomeworkCloseButton extends StatelessWidget {
                 maxLines: 1,
                 style: GoogleFonts.andika(
                   color: Colors.white,
-                  fontSize: 18 * scale,
+                  fontSize: 18,
                   fontWeight: FontWeight.w800,
                   height: 28 / 18,
-                  letterSpacing: -0.2 * scale,
+                  letterSpacing: -0.2,
                 ),
               ),
             ),

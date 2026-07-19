@@ -8,12 +8,9 @@ import 'package:numi/core/theme/app_colors.dart';
 class StudentHomeworkAttemptErrorState extends StatelessWidget {
   const StudentHomeworkAttemptErrorState({
     super.key,
-    required this.scale,
     required this.message,
     required this.onRetry,
   });
-
-  final double scale;
   final String message;
   final VoidCallback onRetry;
 
@@ -21,48 +18,49 @@ class StudentHomeworkAttemptErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32 * scale),
+        padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          spacing: 20,
           children: [
             Container(
-              width: 72 * scale,
-              height: 72 * scale,
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
                 color: AppColors.peachStrong.withValues(alpha: 0.58),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.refresh_rounded,
                 color: AppColors.rust,
-                size: 34 * scale,
+                size: 34,
               ),
             ),
-            SizedBox(height: 20 * scale),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.textSubtle,
-                fontSize: 15 * scale,
+                fontSize: 15,
                 fontWeight: FontWeight.w800,
                 height: 1.35,
                 letterSpacing: 0,
               ),
             ),
-            SizedBox(height: 24 * scale),
-            SizedBox(
-              width: 168 * scale,
-              child: StudentHomeworkAttemptBottomActionButton(
-                label: context.getText(AppKeys.retryUpper),
-                icon: Icons.refresh_rounded,
-                foreground: const Color(0xFFBEFFF9),
-                scale: scale,
-                onTap: onRetry,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppColors.teal700, Color(0xFF73F1E7)],
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: SizedBox(
+                width: 168,
+                child: StudentHomeworkAttemptBottomActionButton(
+                  label: context.getText(AppKeys.retryUpper),
+                  icon: Icons.refresh_rounded,
+                  foreground: const Color(0xFFBEFFF9),
+                  onTap: onRetry,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.teal700, Color(0xFF73F1E7)],
+                  ),
                 ),
               ),
             ),

@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,9 +16,6 @@ class StudentHomeworkResultScreen extends StatelessWidget {
 
   final StudentHomeworkResultSummary summary;
 
-  static const _designWidth = 390.0;
-  static const _designHeight = 800.0;
-
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
@@ -33,80 +28,49 @@ class StudentHomeworkResultScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: colors.pageBackground,
         body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = math.min(constraints.maxWidth, 430.0);
-              final height = constraints.maxHeight;
-              final scale = math.min(
-                width / _designWidth,
-                height / _designHeight,
-              );
-              double s(double value) => value * scale;
-
-              return Center(
-                child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: colors.pageBackground,
-                          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 430),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const StudentHomeworkResultHeader(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 51),
+                      child: StudentHomeworkScoreRing(
+                        scoreText: summary.scoreText,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        context.getText(AppKeys.excellentResultTitle),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.andika(
+                          color: colors.textPrimary,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          height: 32 / 24,
+                          letterSpacing: -0.4,
                         ),
                       ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        child: StudentHomeworkResultHeader(scale: scale),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(26, 52, 26, 0),
+                      child: StudentHomeworkReviewCard(
+                        reviewText: summary.reviewText,
                       ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: s(111),
-                        child: StudentHomeworkScoreRing(
-                          scale: scale,
-                          scoreText: summary.scoreText,
-                        ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: s(285),
-                        child: Text(
-                          context.getText(AppKeys.excellentResultTitle),
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.andika(
-                            color: colors.textPrimary,
-                            fontSize: 24 * scale,
-                            fontWeight: FontWeight.w800,
-                            height: 32 / 24,
-                            letterSpacing: -0.4 * scale,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: s(26),
-                        right: s(26),
-                        top: s(369),
-                        child: StudentHomeworkReviewCard(
-                          scale: scale,
-                          reviewText: summary.reviewText,
-                        ),
-                      ),
-                      Positioned(
-                        left: s(26),
-                        right: s(26),
-                        top: s(592),
-                        child: StudentHomeworkCloseButton(scale: scale),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(26, 62, 26, 24),
+                      child: StudentHomeworkCloseButton(),
+                    ),
+                  ],
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),

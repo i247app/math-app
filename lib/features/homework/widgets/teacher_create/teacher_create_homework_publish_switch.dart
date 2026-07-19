@@ -48,14 +48,16 @@ class CreateHomeworkPublishSwitch extends StatelessWidget {
             height: 16 / 12,
           ),
         ),
-        const SizedBox(width: 8),
-        Switch.adaptive(
-          value: isPublished,
-          activeThumbColor: Colors.white,
-          activeTrackColor: AppColors.teal520,
-          inactiveThumbColor: Colors.white,
-          inactiveTrackColor: const Color(0xFFC4C6D2),
-          onChanged: onChanged,
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Switch.adaptive(
+            value: isPublished,
+            activeThumbColor: Colors.white,
+            activeTrackColor: AppColors.teal520,
+            inactiveThumbColor: Colors.white,
+            inactiveTrackColor: const Color(0xFFC4C6D2),
+            onChanged: onChanged,
+          ),
         ),
       ],
     );

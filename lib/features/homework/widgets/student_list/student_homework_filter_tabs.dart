@@ -18,21 +18,21 @@ class StudentHomeworkFilterTabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 60,
-      child: ListView(
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 8),
-        children: [
-          for (final filter in StudentHomeworkFilter.values) ...[
-            StudentHomeworkFilterChip(
-              label: context.getText(filter.labelKey),
-              selected: filter == activeFilter,
-              onTap: () => onFilterSelected(filter),
-            ),
-            if (filter != StudentHomeworkFilter.values.last)
-              const SizedBox(width: 8),
-          ],
-        ],
+        itemCount: StudentHomeworkFilter.values.length,
+        separatorBuilder: (_, _) =>
+            const Padding(padding: EdgeInsets.only(right: 8)),
+        itemBuilder: (context, index) {
+          final filter = StudentHomeworkFilter.values[index];
+          return StudentHomeworkFilterChip(
+            label: context.getText(filter.labelKey),
+            selected: filter == activeFilter,
+            onTap: () => onFilterSelected(filter),
+          );
+        },
       ),
     );
   }

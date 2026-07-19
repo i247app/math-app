@@ -11,15 +11,12 @@ import 'package:numi/features/homework/widgets/student_attempt/student_homework_
 class StudentHomeworkAttemptBottomBar extends StatelessWidget {
   const StudentHomeworkAttemptBottomBar({
     super.key,
-    required this.scale,
     required this.canGoBack,
     required this.isLastQuestion,
     required this.isSubmitting,
     required this.onBack,
     required this.onContinue,
   });
-
-  final double scale;
   final bool canGoBack;
   final bool isLastQuestion;
   final bool isSubmitting;
@@ -33,13 +30,8 @@ class StudentHomeworkAttemptBottomBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
-          height: 97 * scale,
-          padding: EdgeInsets.fromLTRB(
-            24 * scale,
-            25 * scale,
-            24 * scale,
-            24 * scale,
-          ),
+          height: 97,
+          padding: const EdgeInsets.fromLTRB(24, 25, 24, 24),
           decoration: BoxDecoration(
             color: colors.elevatedSurface.withValues(alpha: 0.90),
             border: Border(
@@ -47,6 +39,7 @@ class StudentHomeworkAttemptBottomBar extends StatelessWidget {
             ),
           ),
           child: Row(
+            spacing: 48,
             children: [
               Expanded(
                 child: StudentHomeworkAttemptBottomActionButton(
@@ -54,11 +47,9 @@ class StudentHomeworkAttemptBottomBar extends StatelessWidget {
                   icon: Icons.arrow_back_rounded,
                   background: AppColors.peachStrong.withValues(alpha: 0.50),
                   foreground: AppColors.rust,
-                  scale: scale,
                   onTap: canGoBack && !isSubmitting ? onBack : null,
                 ),
               ),
-              SizedBox(width: 48 * scale),
               Expanded(
                 child: StudentHomeworkAttemptBottomActionButton(
                   label: isSubmitting
@@ -70,7 +61,6 @@ class StudentHomeworkAttemptBottomBar extends StatelessWidget {
                       ? Icons.check_rounded
                       : Icons.arrow_forward_rounded,
                   foreground: const Color(0xFFBEFFF9),
-                  scale: scale,
                   onTap: isSubmitting ? null : onContinue,
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
