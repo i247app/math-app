@@ -460,7 +460,6 @@ class _SettingTabState extends State<SettingTab>
                           onSelect: _selectActiveProfile,
                           onEdit: _openUpdateProfile,
                           onDelete: _confirmDeleteProfile,
-                          scale: scale,
                           canAddProfile: _canCreateProfile,
                         ),
                         SettingPageView.addProfile => AddProfilePanel(
@@ -507,7 +506,6 @@ class _SettingTabState extends State<SettingTab>
                           onRetryOptions: _loadProfileOptions,
                           onCancel: _cancelAddProfile,
                           onSave: _saveProfileForm,
-                          scale: scale,
                         ),
                       },
                     ),

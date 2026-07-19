@@ -20,7 +20,6 @@ class ProfileCard extends StatelessWidget {
     super.key,
     required this.profile,
     required this.isActive,
-    required this.scale,
     required this.onSelect,
     required this.onEdit,
     required this.onDelete,
@@ -28,7 +27,6 @@ class ProfileCard extends StatelessWidget {
 
   final StudentProfile profile;
   final bool isActive;
-  final double scale;
   final VoidCallback onSelect;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -37,7 +35,7 @@ class ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final accent = isActive ? colors.brandStrong : colors.textSecondary;
-    final radius = BorderRadius.circular(18 * scale);
+    final radius = BorderRadius.circular(18);
     final role = ProfileRole.fromProfile(profile);
     final isTeacher = role == ProfileRole.teacher;
 
@@ -48,12 +46,7 @@ class ProfileCard extends StatelessWidget {
         onTap: onSelect,
         borderRadius: radius,
         child: Container(
-          padding: EdgeInsets.fromLTRB(
-            18 * scale,
-            16 * scale,
-            16 * scale,
-            16 * scale,
-          ),
+          padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
           decoration: BoxDecoration(
             color: colors.elevatedSurface.withValues(alpha: 0.96),
             borderRadius: radius,
@@ -61,13 +54,13 @@ class ProfileCard extends StatelessWidget {
               color: isActive
                   ? colors.brandStrong
                   : colors.border.withValues(alpha: 0.92),
-              width: isActive ? 1.6 * scale : 1.3 * scale,
+              width: isActive ? 1.6 : 1.3,
             ),
             boxShadow: [
               BoxShadow(
                 color: colors.shadow,
-                blurRadius: 18 * scale,
-                offset: Offset(0, 8 * scale),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -77,103 +70,105 @@ class ProfileCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ProfileAvatar(
-                    avatarKey: profile.avatarKey,
-                    avatarUrl: profile.avatarUrl,
-                    isActive: isActive,
-                    scale: scale,
+                  Padding(
+                    padding: const EdgeInsets.only(right: 14),
+                    child: ProfileAvatar(
+                      avatarKey: profile.avatarKey,
+                      avatarUrl: profile.avatarUrl,
+                      isActive: isActive,
+                    ),
                   ),
-                  SizedBox(width: 14 * scale),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          settingsProfileName(context, profile),
-                          softWrap: true,
-                          style: GoogleFonts.andika(
-                            color: colors.textPrimary,
-                            fontSize: FontSize.large * scale,
-                            fontWeight: FontWeight.w900,
-                            height: 1,
-                            letterSpacing: 0,
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 5),
+                          child: Text(
+                            settingsProfileName(context, profile),
+                            softWrap: true,
+                            style: GoogleFonts.andika(
+                              color: colors.textPrimary,
+                              fontSize: FontSize.large,
+                              fontWeight: FontWeight.w900,
+                              height: 1,
+                              letterSpacing: 0,
+                            ),
                           ),
                         ),
-                        SizedBox(height: 5 * scale),
-                        ManagedProfileRolePill(role: role, scale: scale),
-                        SizedBox(height: 9 * scale),
-                        ProfileIdLine(
-                          profile: profile,
-                          isActive: isActive,
-                          scale: scale,
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 9),
+                          child: ManagedProfileRolePill(role: role),
                         ),
+                        ProfileIdLine(profile: profile, isActive: isActive),
                       ],
                     ),
                   ),
-                  SizedBox(width: 10 * scale),
-                  ProfileRadio(isActive: isActive, scale: scale),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: ProfileRadio(isActive: isActive),
+                  ),
                 ],
               ),
-              SizedBox(height: 14 * scale),
-              ProfileDetailLine(
-                leading: Icon(
-                  isTeacher ? Icons.apartment_rounded : Icons.school_outlined,
-                  color: accent,
-                  size: 18 * scale,
-                ),
-                color: accent,
-                label: isTeacher
-                    ? context.getText(AppKeys.school)
-                    : context.getText(AppKeys.grade),
-                value: isTeacher
-                    ? settingsProfileSchool(context, profile)
-                    : settingsProfileGrade(context, profile),
-                scale: scale,
-              ),
-              if (!isTeacher) ...[
-                SizedBox(height: 12 * scale),
-                ProfileDetailLine(
+              Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: ProfileDetailLine(
                   leading: Icon(
-                    Icons.book_outlined,
+                    isTeacher ? Icons.apartment_rounded : Icons.school_outlined,
                     color: accent,
-                    size: 18 * scale,
+                    size: 18,
                   ),
                   color: accent,
-                  label: context.getText(AppKeys.program),
-                  value: settingsProfileProgram(context, profile),
-                  scale: scale,
+                  label: isTeacher
+                      ? context.getText(AppKeys.school)
+                      : context.getText(AppKeys.grade),
+                  value: isTeacher
+                      ? settingsProfileSchool(context, profile)
+                      : settingsProfileGrade(context, profile),
                 ),
-              ],
-              SizedBox(height: 14 * scale),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ProfileActionButton(
-                    backgroundColor: colors.brand.withValues(alpha: 0.12),
-                    width: 42 * scale,
-                    height: 42 * scale,
-                    borderRadius: BorderRadius.circular(10 * scale),
-                    onTap: onEdit,
-                    child: Icon(
-                      Icons.edit_rounded,
-                      color: colors.brandStrong,
-                      size: 23 * scale,
-                    ),
+              ),
+              if (!isTeacher)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: ProfileDetailLine(
+                    leading: Icon(Icons.book_outlined, color: accent, size: 18),
+                    color: accent,
+                    label: context.getText(AppKeys.program),
+                    value: settingsProfileProgram(context, profile),
                   ),
-                  SizedBox(width: 12 * scale),
-                  ProfileActionButton(
-                    backgroundColor: const Color(0xFFFFD8D8),
-                    width: 42 * scale,
-                    height: 42 * scale,
-                    borderRadius: BorderRadius.circular(10 * scale),
-                    onTap: onDelete,
-                    child: Icon(
-                      Icons.delete_outline_rounded,
-                      color: const Color(0xFFE83434),
-                      size: 23 * scale,
+                ),
+              Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  spacing: 12,
+                  children: [
+                    ProfileActionButton(
+                      backgroundColor: colors.brand.withValues(alpha: 0.12),
+                      width: 42,
+                      height: 42,
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: onEdit,
+                      child: Icon(
+                        Icons.edit_rounded,
+                        color: colors.brandStrong,
+                        size: 23,
+                      ),
                     ),
-                  ),
-                ],
+                    ProfileActionButton(
+                      backgroundColor: const Color(0xFFFFD8D8),
+                      width: 42,
+                      height: 42,
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: onDelete,
+                      child: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: Color(0xFFE83434),
+                        size: 23,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

@@ -21,7 +21,6 @@ class ParentChildProfileCard extends StatelessWidget {
     super.key,
     required this.profile,
     required this.isActive,
-    required this.scale,
     required this.onSelect,
     required this.onEdit,
     required this.onDelete,
@@ -29,7 +28,6 @@ class ParentChildProfileCard extends StatelessWidget {
 
   final StudentProfile profile;
   final bool isActive;
-  final double scale;
   final VoidCallback onSelect;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -37,7 +35,7 @@ class ParentChildProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final radius = BorderRadius.circular(16 * scale);
+    final radius = BorderRadius.circular(16);
     final borderColor = isActive ? colors.brandStrong : colors.border;
     final textColor = isActive ? colors.textPrimary : colors.textSecondary;
 
@@ -48,19 +46,16 @@ class ParentChildProfileCard extends StatelessWidget {
         onTap: onSelect,
         borderRadius: radius,
         child: Container(
-          padding: EdgeInsets.all(16 * scale),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: colors.elevatedSurface,
             borderRadius: radius,
-            border: Border.all(
-              color: borderColor,
-              width: isActive ? 1.4 * scale : 1 * scale,
-            ),
+            border: Border.all(color: borderColor, width: isActive ? 1.4 : 1),
             boxShadow: [
               BoxShadow(
                 color: colors.shadow,
-                blurRadius: 18 * scale,
-                offset: Offset(0, 8 * scale),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -72,42 +67,46 @@ class ParentChildProfileCard extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ProfileAvatarImage(
-                        size: 72 * scale,
-                        avatarKey: profile.avatarKey,
-                        avatarUrl: profile.avatarUrl,
-                        borderColor: isActive
-                            ? colors.brandStrong
-                            : colors.border,
-                        borderWidth: 3 * scale,
+                      Padding(
+                        padding: const EdgeInsets.only(right: 14),
+                        child: ProfileAvatarImage(
+                          size: 72,
+                          avatarKey: profile.avatarKey,
+                          avatarUrl: profile.avatarUrl,
+                          borderColor: isActive
+                              ? colors.brandStrong
+                              : colors.border,
+                          borderWidth: 3,
+                        ),
                       ),
-                      SizedBox(width: 14 * scale),
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsets.only(right: 28 * scale),
+                          padding: const EdgeInsets.only(right: 28),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                settingsProfileName(context, profile),
-                                softWrap: true,
-                                style: GoogleFonts.andika(
-                                  color: textColor,
-                                  fontSize: FontSize.large * scale,
-                                  fontWeight: FontWeight.w900,
-                                  height: 1.1,
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Text(
+                                  settingsProfileName(context, profile),
+                                  softWrap: true,
+                                  style: GoogleFonts.andika(
+                                    color: textColor,
+                                    fontSize: FontSize.large,
+                                    fontWeight: FontWeight.w900,
+                                    height: 1.1,
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: 4 * scale),
-                              ManagedProfileRolePill(
-                                role: ProfileRole.student,
-                                scale: scale,
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 8),
+                                child: ManagedProfileRolePill(
+                                  role: ProfileRole.student,
+                                ),
                               ),
-                              SizedBox(height: 8 * scale),
                               ParentProfileCodeLine(
                                 profile: profile,
                                 isActive: isActive,
-                                scale: scale,
                               ),
                             ],
                           ),
@@ -115,75 +114,79 @@ class ParentChildProfileCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 14 * scale),
-                  ProfileDetailLine(
-                    leading: SizedBox(
-                      width: 18 * scale,
-                      height: 18 * scale,
-                      child: SvgPicture.asset(
-                        'assets/images/parent_profile_manage_grade.svg',
-                      ),
-                    ),
-                    label: context.getText(AppKeys.grade),
-                    value: settingsProfileGrade(context, profile),
-                    color: isActive
-                        ? const Color(0xFF008080)
-                        : const Color(0xFF6B7280),
-                    scale: scale,
-                  ),
-                  SizedBox(height: 12 * scale),
-                  ProfileDetailLine(
-                    leading: SizedBox(
-                      width: 18 * scale,
-                      height: 18 * scale,
-                      child: SvgPicture.asset(
-                        'assets/images/parent_profile_manage_program.svg',
-                      ),
-                    ),
-                    label: context.getText(AppKeys.learningProgram),
-                    value: settingsProfileProgram(context, profile),
-                    color: isActive
-                        ? const Color(0xFF008080)
-                        : const Color(0xFF6B7280),
-                    scale: scale,
-                  ),
-                  SizedBox(height: 14 * scale),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ProfileActionButton(
-                        backgroundColor: colors.brand.withValues(alpha: 0.12),
-                        width: 42 * scale,
-                        height: 42 * scale,
-                        borderRadius: BorderRadius.circular(10 * scale),
-                        onTap: onEdit,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 14),
+                    child: ProfileDetailLine(
+                      leading: SizedBox(
+                        width: 18,
+                        height: 18,
                         child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_edit.svg',
-                          width: 20 * scale,
-                          height: 20 * scale,
+                          'assets/images/parent_profile_manage_grade.svg',
                         ),
                       ),
-                      SizedBox(width: 12 * scale),
-                      ProfileActionButton(
-                        backgroundColor: const Color(0xFFFFE4E4),
-                        width: 42 * scale,
-                        height: 42 * scale,
-                        borderRadius: BorderRadius.circular(10 * scale),
-                        onTap: onDelete,
+                      label: context.getText(AppKeys.grade),
+                      value: settingsProfileGrade(context, profile),
+                      color: isActive
+                          ? const Color(0xFF008080)
+                          : const Color(0xFF6B7280),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: ProfileDetailLine(
+                      leading: SizedBox(
+                        width: 18,
+                        height: 18,
                         child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_delete.svg',
-                          width: 20 * scale,
-                          height: 20 * scale,
+                          'assets/images/parent_profile_manage_program.svg',
                         ),
                       ),
-                    ],
+                      label: context.getText(AppKeys.learningProgram),
+                      value: settingsProfileProgram(context, profile),
+                      color: isActive
+                          ? const Color(0xFF008080)
+                          : const Color(0xFF6B7280),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 14),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      spacing: 12,
+                      children: [
+                        ProfileActionButton(
+                          backgroundColor: colors.brand.withValues(alpha: 0.12),
+                          width: 42,
+                          height: 42,
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: onEdit,
+                          child: SvgPicture.asset(
+                            'assets/images/parent_profile_manage_edit.svg',
+                            width: 20,
+                            height: 20,
+                          ),
+                        ),
+                        ProfileActionButton(
+                          backgroundColor: const Color(0xFFFFE4E4),
+                          width: 42,
+                          height: 42,
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: onDelete,
+                          child: SvgPicture.asset(
+                            'assets/images/parent_profile_manage_delete.svg',
+                            width: 20,
+                            height: 20,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
               Positioned(
                 right: 0,
                 top: 0,
-                child: ProfileRadio(isActive: isActive, scale: scale),
+                child: ProfileRadio(isActive: isActive),
               ),
             ],
           ),

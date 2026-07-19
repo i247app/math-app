@@ -12,12 +12,10 @@ class ParentProfileCodeLine extends StatelessWidget {
     super.key,
     required this.profile,
     required this.isActive,
-    required this.scale,
   });
 
   final StudentProfile profile;
   final bool isActive;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +25,7 @@ class ParentProfileCodeLine extends StatelessWidget {
     }
 
     return Row(
+      spacing: 8,
       children: [
         Flexible(
           child: Text(
@@ -37,14 +36,13 @@ class ParentProfileCodeLine extends StatelessWidget {
               color: isActive
                   ? const Color(0xFF604950)
                   : const Color(0xFF6B7280),
-              fontSize: FontSize.caption * scale,
+              fontSize: FontSize.caption,
               fontWeight: FontWeight.w700,
               height: 1,
             ),
           ),
         ),
-        SizedBox(width: 8 * scale),
-        ParentCodeActionButton(profileCode: profileCode, scale: scale),
+        ParentCodeActionButton(profileCode: profileCode),
       ],
     );
   }

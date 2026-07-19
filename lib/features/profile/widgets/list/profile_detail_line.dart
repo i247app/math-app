@@ -10,7 +10,6 @@ class ProfileDetailLine extends StatelessWidget {
     required this.label,
     required this.value,
     required this.color,
-    required this.scale,
     this.labelWeight = FontWeight.w700,
     this.valueWeight = FontWeight.w700,
   });
@@ -19,21 +18,20 @@ class ProfileDetailLine extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  final double scale;
   final FontWeight labelWeight;
   final FontWeight valueWeight;
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 8,
       children: [
         leading,
-        SizedBox(width: 8 * scale),
         Text(
           '$label : ',
           style: GoogleFonts.andika(
             color: color,
-            fontSize: FontSize.small * scale,
+            fontSize: FontSize.small,
             fontWeight: labelWeight,
             height: 1,
           ),
@@ -45,7 +43,7 @@ class ProfileDetailLine extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: color,
-              fontSize: FontSize.small * scale,
+              fontSize: FontSize.small,
               fontWeight: valueWeight,
               height: 1,
             ),

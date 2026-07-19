@@ -3,14 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ParentCodeActionButton extends StatelessWidget {
-  const ParentCodeActionButton({
-    super.key,
-    required this.profileCode,
-    required this.scale,
-  });
+  const ParentCodeActionButton({super.key, required this.profileCode});
 
   final String profileCode;
-  final double scale;
 
   Future<void> _copyProfileCode(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: profileCode));
@@ -23,28 +18,25 @@ class ParentCodeActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: const Color(0xFFF3F4F6),
-      borderRadius: BorderRadius.circular(8 * scale),
+      borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: () => _copyProfileCode(context),
-        borderRadius: BorderRadius.circular(8 * scale),
+        borderRadius: BorderRadius.circular(8),
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 8 * scale,
-            vertical: 5 * scale,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
           child: Row(
             mainAxisSize: MainAxisSize.min,
+            spacing: 6,
             children: [
               SvgPicture.asset(
                 'assets/images/parent_profile_manage_copy.svg',
-                width: 15 * scale,
-                height: 15 * scale,
+                width: 15,
+                height: 15,
               ),
-              SizedBox(width: 6 * scale),
               SvgPicture.asset(
                 'assets/images/parent_profile_manage_qr.svg',
-                width: 15 * scale,
-                height: 15 * scale,
+                width: 15,
+                height: 15,
               ),
             ],
           ),

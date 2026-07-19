@@ -6,22 +6,14 @@ import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/list/profile_list_helpers.dart';
 
 class ManagedProfileRolePill extends StatelessWidget {
-  const ManagedProfileRolePill({
-    super.key,
-    required this.role,
-    required this.scale,
-  });
+  const ManagedProfileRolePill({super.key, required this.role});
 
   final ProfileRole role;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 12 * scale,
-        vertical: 5 * scale,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
         color: const Color(0xFFFDEEE7),
         borderRadius: BorderRadius.circular(999),
@@ -30,7 +22,7 @@ class ManagedProfileRolePill extends StatelessWidget {
         localizedProfileRole(context, role),
         style: GoogleFonts.andika(
           color: const Color(0xFF008080),
-          fontSize: FontSize.caption * scale,
+          fontSize: FontSize.caption,
           fontWeight: FontWeight.w900,
           height: 1,
         ),

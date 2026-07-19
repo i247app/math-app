@@ -26,7 +26,6 @@ class ProfilePlaceholderPanel extends StatelessWidget {
     required this.onSelect,
     required this.onEdit,
     required this.onDelete,
-    required this.scale,
     required this.canAddProfile,
   });
 
@@ -41,18 +40,17 @@ class ProfilePlaceholderPanel extends StatelessWidget {
   final ValueChanged<StudentProfile> onSelect;
   final ValueChanged<StudentProfile> onEdit;
   final ValueChanged<StudentProfile> onDelete;
-  final double scale;
   final bool canAddProfile;
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return SizedBox(
-        height: 360 * scale,
+      return const SizedBox(
+        height: 360,
         child: Center(
           child: CircularProgressIndicator(
             color: AppColors.tealIcon,
-            strokeWidth: 3 * scale,
+            strokeWidth: 3,
           ),
         ),
       );
@@ -65,7 +63,6 @@ class ProfilePlaceholderPanel extends StatelessWidget {
         title: context.getText(AppKeys.profileLoadErrorTitle),
         message: error,
         buttonLabel: context.getText(AppKeys.retry),
-        scale: scale,
         onTap: onRetry,
       );
     }
@@ -76,7 +73,6 @@ class ProfilePlaceholderPanel extends StatelessWidget {
         title: context.getText(AppKeys.noProfileTitle),
         message: context.getText(AppKeys.noProfileMessage),
         buttonLabel: canAddProfile ? context.getText(AppKeys.addProfile) : null,
-        scale: scale,
         onTap: canAddProfile ? onAdd : null,
       );
     }
@@ -90,7 +86,6 @@ class ProfilePlaceholderPanel extends StatelessWidget {
         children: _studentProfiles,
         activeProfileId: activeProfileId,
         user: user,
-        scale: scale,
         canAddProfile: canAddProfile,
         onAdd: onAdd,
         onSelect: onSelect,
@@ -102,26 +97,30 @@ class ProfilePlaceholderPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (canAddProfile) ...[
-          Align(
-            alignment: Alignment.centerRight,
-            child: ProfileAddButton(scale: scale, onTap: onAdd),
+        if (canAddProfile)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: ProfileAddButton(onTap: onAdd),
+            ),
           ),
-          SizedBox(height: 10 * scale),
-        ],
-        for (var index = 0; index < sortedProfiles.length; index++) ...[
-          ProfileCard(
-            profile: sortedProfiles[index],
-            isActive:
-                ActiveProfileSession.profileStableId(sortedProfiles[index]) ==
-                activeProfileId,
-            scale: scale,
-            onSelect: () => onSelect(sortedProfiles[index]),
-            onEdit: () => onEdit(sortedProfiles[index]),
-            onDelete: () => onDelete(sortedProfiles[index]),
-          ),
-          if (index != sortedProfiles.length - 1) SizedBox(height: 16 * scale),
-        ],
+        Column(
+          spacing: 16,
+          children: sortedProfiles
+              .map(
+                (profile) => ProfileCard(
+                  profile: profile,
+                  isActive:
+                      ActiveProfileSession.profileStableId(profile) ==
+                      activeProfileId,
+                  onSelect: () => onSelect(profile),
+                  onEdit: () => onEdit(profile),
+                  onDelete: () => onDelete(profile),
+                ),
+              )
+              .toList(growable: false),
+        ),
       ],
     );
   }

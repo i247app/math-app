@@ -46,7 +46,6 @@ class AddProfilePanel extends StatelessWidget {
     required this.onRetryOptions,
     required this.onCancel,
     required this.onSave,
-    required this.scale,
   });
 
   final TextEditingController nameController;
@@ -77,7 +76,6 @@ class AddProfilePanel extends StatelessWidget {
   final VoidCallback onRetryOptions;
   final VoidCallback onCancel;
   final VoidCallback onSave;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -94,15 +92,17 @@ class AddProfilePanel extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 18,
       children: [
-        AddProfileAvatar(
-          avatarKey: avatarKey,
-          avatarUrl: avatarUrl,
-          scale: scale,
-          onChanged: onAvatarChanged,
-          onClear: onClearAvatar,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: AddProfileAvatar(
+            avatarKey: avatarKey,
+            avatarUrl: avatarUrl,
+            onChanged: onAvatarChanged,
+            onClear: onClearAvatar,
+          ),
         ),
-        SizedBox(height: 28 * scale),
         AddProfileTextField(
           label: context.getText(AppKeys.fullName),
           controller: nameController,
@@ -111,35 +111,29 @@ class AddProfilePanel extends StatelessWidget {
               : isParentProfile
               ? context.getText(AppKeys.parentProfileNameHint)
               : context.getText(AppKeys.studentNameHint),
-          scale: scale,
         ),
         if (isParentProfile) ...[
-          SizedBox(height: 18 * scale),
           AddProfileTextField(
             label: context.getText(AppKeys.email),
             controller: emailController,
             hintText: context.getText(AppKeys.parentProfileEmailHint),
             keyboardType: TextInputType.emailAddress,
-            scale: scale,
           ),
-          SizedBox(height: 18 * scale),
           AddProfileTextField(
             label: context.getText(AppKeys.phoneNumber),
             controller: phoneController,
             hintText: context.getText(AppKeys.parentProfilePhoneHint),
             keyboardType: TextInputType.phone,
-            scale: scale,
           ),
         ],
         if (!isParentProfile) ...[
-          SizedBox(height: 18 * scale),
           if (isLoadingOptions)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 58 * scale),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 58),
               child: Center(
                 child: CircularProgressIndicator(
                   color: AppColors.tealIcon,
-                  strokeWidth: 3 * scale,
+                  strokeWidth: 3,
                 ),
               ),
             ),
@@ -153,9 +147,7 @@ class AddProfilePanel extends StatelessWidget {
                   ? school.name!.trim()
                   : context.getText(AppKeys.noSchools),
               onChanged: onSchoolChanged,
-              scale: scale,
             ),
-            SizedBox(height: 18 * scale),
             if (!isTeacherProfile) ...[
               AddProfileDropdown<ProgramModel>(
                 label: context.getText(AppKeys.learningProgram),
@@ -166,9 +158,7 @@ class AddProfilePanel extends StatelessWidget {
                     ? program.label!.trim()
                     : context.getText(AppKeys.program),
                 onChanged: onProgramChanged,
-                scale: scale,
               ),
-              SizedBox(height: 18 * scale),
               AddProfileDropdown<GradeModel>(
                 label: context.getText(AppKeys.grade),
                 hintText: context.getText(AppKeys.notSelected),
@@ -178,9 +168,7 @@ class AddProfilePanel extends StatelessWidget {
                     ? grade.label!.trim()
                     : context.getText(AppKeys.grade),
                 onChanged: onGradeChanged,
-                scale: scale,
               ),
-              SizedBox(height: 18 * scale),
             ],
             if (isTeacherProfile) ...[
               AddProfileDropdown<ProfileIdTypeOption>(
@@ -190,9 +178,7 @@ class AddProfilePanel extends StatelessWidget {
                 items: idTypeOptions,
                 itemLabel: (option) => context.getText(option.labelKey),
                 onChanged: (option) => onIdTypeChanged(option?.value),
-                scale: scale,
               ),
-              SizedBox(height: 18 * scale),
             ],
             AddProfileTextField(
               label: context.getText(AppKeys.profileIdValueLabel),
@@ -200,52 +186,54 @@ class AddProfilePanel extends StatelessWidget {
               hintText: isTeacherProfile
                   ? context.getText(AppKeys.profileTeacherIdHint)
                   : context.getText(AppKeys.profileStudentIdHint),
-              scale: scale,
             ),
           ],
         ],
-        if (error != null && error.isNotEmpty) ...[
-          SizedBox(height: 14 * scale),
-          Text(
-            error,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.andika(
-              color: AppColors.orange500,
-              fontSize: FontSize.caption * scale,
-              fontWeight: FontWeight.w800,
-              height: 1.25,
-              letterSpacing: 0,
-            ),
-          ),
-          if (canRetryOptions && !isSaving && !isLoadingOptions) ...[
-            SizedBox(height: 10 * scale),
-            Center(
-              child: TextButton(
-                onPressed: onRetryOptions,
-                child: Text(
-                  context.getText(AppKeys.reloadOptions),
-                  style: GoogleFonts.andika(
-                    color: AppColors.tealIcon,
-                    fontSize: FontSize.caption * scale,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0,
-                  ),
+        if (error != null && error.isNotEmpty)
+          Column(
+            spacing: 10,
+            children: [
+              Text(
+                error,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.andika(
+                  color: AppColors.orange500,
+                  fontSize: FontSize.caption,
+                  fontWeight: FontWeight.w800,
+                  height: 1.25,
+                  letterSpacing: 0,
                 ),
               ),
-            ),
-          ],
-        ],
-        SizedBox(height: 90 * scale),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SettingsCancelButton(onTap: isSaving ? () {} : onCancel),
-            SizedBox(width: 14 * scale),
-            Opacity(
-              opacity: isSaving ? 0.72 : 1,
-              child: SettingsSaveButton(enabled: canSave, onTap: onSave),
-            ),
-          ],
+              if (canRetryOptions && !isSaving && !isLoadingOptions)
+                Center(
+                  child: TextButton(
+                    onPressed: onRetryOptions,
+                    child: Text(
+                      context.getText(AppKeys.reloadOptions),
+                      style: GoogleFonts.andika(
+                        color: AppColors.tealIcon,
+                        fontSize: FontSize.caption,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        Padding(
+          padding: const EdgeInsets.only(top: 72),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 14,
+            children: [
+              SettingsCancelButton(onTap: isSaving ? () {} : onCancel),
+              Opacity(
+                opacity: isSaving ? 0.72 : 1,
+                child: SettingsSaveButton(enabled: canSave, onTap: onSave),
+              ),
+            ],
+          ),
         ),
       ],
     );

@@ -13,12 +13,10 @@ class ProfileIdLine extends StatelessWidget {
     super.key,
     required this.profile,
     required this.isActive,
-    required this.scale,
   });
 
   final StudentProfile profile;
   final bool isActive;
-  final double scale;
 
   Future<void> _copyProfileCode(BuildContext context, String code) async {
     await Clipboard.setData(ClipboardData(text: code));
@@ -37,6 +35,7 @@ class ProfileIdLine extends StatelessWidget {
     final color = isActive ? const Color(0xFF604950) : AppColors.textSubtle;
 
     return Row(
+      spacing: 8,
       children: [
         Flexible(
           child: Text(
@@ -45,37 +44,36 @@ class ProfileIdLine extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: color,
-              fontSize: FontSize.small * scale,
+              fontSize: FontSize.small,
               fontWeight: FontWeight.w700,
               height: 1,
               letterSpacing: 0,
             ),
           ),
         ),
-        SizedBox(width: 8 * scale),
         Material(
           color: const Color(0xFFE9ECEF),
-          borderRadius: BorderRadius.circular(8 * scale),
+          borderRadius: BorderRadius.circular(8),
           child: InkWell(
             onTap: () => _copyProfileCode(context, profileCode),
-            borderRadius: BorderRadius.circular(8 * scale),
-            child: SizedBox(
-              height: 24 * scale,
+            borderRadius: BorderRadius.circular(8),
+            child: const SizedBox(
+              height: 24,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+                padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  spacing: 7,
                   children: [
                     Icon(
                       Icons.copy_rounded,
-                      color: const Color(0xFF5E6A70),
-                      size: 15 * scale,
+                      color: Color(0xFF5E6A70),
+                      size: 15,
                     ),
-                    SizedBox(width: 7 * scale),
                     Icon(
                       Icons.qr_code_2_rounded,
-                      color: const Color(0xFF5E6A70),
-                      size: 15 * scale,
+                      color: Color(0xFF5E6A70),
+                      size: 15,
                     ),
                   ],
                 ),
