@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,7 +32,7 @@ class CreateHomeworkClassMeta extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: AppColors.navy900,
-              fontSize: 14,
+              fontSize: FontSize.small,
               fontWeight: FontWeight.w400,
               height: 20 / 14,
             ),

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -54,7 +55,7 @@ class TeacherQuestionCard extends StatelessWidget {
                 }),
                 style: GoogleFonts.andika(
                   color: colors.brandStrong,
-                  fontSize: 15,
+                  fontSize: FontSize.compact,
                   fontWeight: FontWeight.w700,
                   height: 24 / 15,
                 ),
@@ -65,7 +66,7 @@ class TeacherQuestionCard extends StatelessWidget {
                   prompt,
                   style: GoogleFonts.andika(
                     color: colors.textPrimary,
-                    fontSize: 14,
+                    fontSize: FontSize.small,
                     fontWeight: FontWeight.w400,
                     height: 24 / 14,
                   ),

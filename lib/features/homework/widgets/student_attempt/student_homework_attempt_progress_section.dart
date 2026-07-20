@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -33,7 +34,7 @@ class StudentHomeworkAttemptProgressSection extends StatelessWidget {
           }),
           style: const TextStyle(
             color: AppColors.textSubtle,
-            fontSize: 16,
+            fontSize: FontSize.normal,
             fontWeight: FontWeight.w900,
             height: 1.5,
             letterSpacing: 0.8,

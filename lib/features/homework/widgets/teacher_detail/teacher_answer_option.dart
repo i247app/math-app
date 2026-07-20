@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -48,7 +49,7 @@ class TeacherAnswerOption extends StatelessWidget {
               letter,
               style: GoogleFonts.andika(
                 color: letterColor,
-                fontSize: 12,
+                fontSize: FontSize.xxs,
                 fontWeight: FontWeight.w700,
                 height: 1,
               ),
@@ -63,7 +64,7 @@ class TeacherAnswerOption extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
                   color: AppColors.textInkDark,
-                  fontSize: 16,
+                  fontSize: FontSize.normal,
                   fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
                   height: 24 / 16,
                 ),

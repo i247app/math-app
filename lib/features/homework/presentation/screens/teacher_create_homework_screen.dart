@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -485,7 +486,7 @@ class _TeacherCreateHomeworkScreenState
                             ),
                             isLoading: _isLoadingClassrooms,
                             radius: 16,
-                            fontSize: 16,
+                            fontSize: FontSize.normal,
                             fontWeight: FontWeight.w500,
                             textOpacity: 1,
                             iconAsset:

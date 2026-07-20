@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,7 +31,7 @@ class TeacherAssignmentStat extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.andika(
             color: const Color(0xFF444650),
-            fontSize: 12,
+            fontSize: FontSize.xxs,
             fontWeight: FontWeight.w500,
             height: 16 / 12,
             letterSpacing: 0.6,

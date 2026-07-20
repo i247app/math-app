@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
 
@@ -59,7 +60,7 @@ class StudentHomeworkAttemptBottomActionButton extends StatelessWidget {
                 maxLines: 1,
                 style: TextStyle(
                   color: effectiveForeground,
-                  fontSize: 13,
+                  fontSize: FontSize.xs,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,

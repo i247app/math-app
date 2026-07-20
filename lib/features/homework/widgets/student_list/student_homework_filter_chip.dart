@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
@@ -35,7 +36,7 @@ class StudentHomeworkFilterChip extends StatelessWidget {
               maxLines: 1,
               style: GoogleFonts.andika(
                 color: selected ? Colors.white : AppColors.textMuted,
-                fontSize: 16,
+                fontSize: FontSize.normal,
                 fontWeight: FontWeight.w400,
                 height: 24 / 16,
               ),

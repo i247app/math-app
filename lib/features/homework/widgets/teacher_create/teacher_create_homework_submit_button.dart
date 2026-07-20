@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -47,7 +48,7 @@ class CreateHomeworkSubmitButton extends StatelessWidget {
                     context.getText(AppKeys.teacherCreate).toUpperCase(),
                     style: GoogleFonts.andika(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: FontSize.large,
                       fontWeight: FontWeight.w700,
                       height: 16 / 18,
                       letterSpacing: 1.2,

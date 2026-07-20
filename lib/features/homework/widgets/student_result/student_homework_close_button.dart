@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -38,7 +39,7 @@ class StudentHomeworkCloseButton extends StatelessWidget {
                 maxLines: 1,
                 style: GoogleFonts.andika(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: FontSize.large,
                   fontWeight: FontWeight.w800,
                   height: 28 / 18,
                   letterSpacing: -0.2,

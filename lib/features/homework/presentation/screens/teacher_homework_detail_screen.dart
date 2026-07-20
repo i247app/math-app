@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -218,7 +219,7 @@ class _TeacherHomeworkDetailScreenState
                               context.getText(AppKeys.save),
                               style: GoogleFonts.andika(
                                 color: colors.brandStrong,
-                                fontSize: 14,
+                                fontSize: FontSize.small,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -269,7 +270,7 @@ class _TeacherHomeworkDetailScreenState
                             ),
                             style: GoogleFonts.andika(
                               color: AppColors.navy900,
-                              fontSize: 18,
+                              fontSize: FontSize.large,
                               fontWeight: FontWeight.w700,
                               height: 32 / 18,
                             ),

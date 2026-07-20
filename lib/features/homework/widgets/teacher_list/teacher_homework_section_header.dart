@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,7 +22,7 @@ class TeacherHomeworkSectionHeader extends StatelessWidget {
       title: context.getText(copy.createdTitleKey),
       titleStyle: GoogleFonts.andika(
         color: AppColors.navy900,
-        fontSize: 20,
+        fontSize: FontSize.xl,
         fontWeight: FontWeight.w800,
         height: 28 / 20,
       ),
@@ -38,7 +39,7 @@ class TeacherHomeworkSectionHeader extends StatelessWidget {
             context.getText(AppKeys.teacherAssignmentNewest),
             style: GoogleFonts.andika(
               color: const Color(0xFF6B7280),
-              fontSize: 12,
+              fontSize: FontSize.xxs,
               fontWeight: FontWeight.w400,
               height: 16 / 12,
             ),

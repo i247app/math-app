@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -17,7 +18,7 @@ class TeacherAssignmentStatDue extends StatelessWidget {
       label: context.getText(AppKeys.teacherAssignmentDueLabel),
       iconAsset: 'assets/images/teacher_homework_detail_calendar.svg',
       value: teacherExerciseDueDate(context, exercise),
-      valueFontSize: 13,
+      valueFontSize: FontSize.xs,
     );
   }
 }

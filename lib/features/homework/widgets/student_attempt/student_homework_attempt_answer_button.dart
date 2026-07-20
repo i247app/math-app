@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_helpers.dart';
@@ -64,7 +65,7 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
                 answer.label,
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 20,
+                  fontSize: FontSize.xl,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
@@ -77,7 +78,7 @@ class StudentHomeworkAttemptAnswerButton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: textColor,
-                    fontSize: 18,
+                    fontSize: FontSize.large,
                     fontWeight: FontWeight.w800,
                     height: 1.15,
                     letterSpacing: 0,

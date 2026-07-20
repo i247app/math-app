@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -50,7 +51,7 @@ class StudentHomeworkResultScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.andika(
                           color: colors.textPrimary,
-                          fontSize: 24,
+                          fontSize: FontSize.xxxl,
                           fontWeight: FontWeight.w800,
                           height: 32 / 24,
                           letterSpacing: -0.4,

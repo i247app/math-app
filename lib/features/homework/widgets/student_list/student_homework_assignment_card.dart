@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,7 +58,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
                         color: colors.textSecondary,
-                        fontSize: 12,
+                        fontSize: FontSize.xxs,
                         fontWeight: FontWeight.w500,
                         height: 16 / 12,
                       ),
@@ -74,7 +75,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: colors.textPrimary,
-                    fontSize: 18,
+                    fontSize: FontSize.large,
                     fontWeight: FontWeight.w700,
                     height: 28 / 18,
                   ),
@@ -88,7 +89,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: colors.textSecondary,
-                    fontSize: 14,
+                    fontSize: FontSize.small,
                     fontWeight: FontWeight.w400,
                     height: 20 / 14,
                   ),
@@ -119,7 +120,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: colors.textSecondary,
-                          fontSize: 16,
+                          fontSize: FontSize.normal,
                           fontWeight: FontWeight.w400,
                           height: 24 / 16,
                         ),

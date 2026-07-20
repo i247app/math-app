@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -26,7 +27,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
       textInputAction: TextInputAction.search,
       style: GoogleFonts.andika(
         color: AppColors.textNavy,
-        fontSize: 16,
+        fontSize: FontSize.normal,
         fontWeight: FontWeight.w500,
         height: 24 / 16,
       ),
@@ -34,7 +35,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
         hintText: context.getText(AppKeys.studentHomeworkSearchHint),
         hintStyle: GoogleFonts.andika(
           color: const Color(0xFF515F54).withValues(alpha: 0.7),
-          fontSize: 16,
+          fontSize: FontSize.normal,
           fontWeight: FontWeight.w400,
           height: 24 / 16,
         ),

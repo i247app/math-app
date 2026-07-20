@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,7 +28,7 @@ class CreateHomeworkPublishSwitch extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
               color: AppColors.textInkDark,
-              fontSize: 14,
+              fontSize: FontSize.small,
               fontWeight: FontWeight.w700,
               height: 18 / 14,
             ),
@@ -43,7 +44,7 @@ class CreateHomeworkPublishSwitch extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.andika(
             color: AppColors.textInkDark.withValues(alpha: 0.65),
-            fontSize: 12,
+            fontSize: FontSize.xxs,
             fontWeight: FontWeight.w600,
             height: 16 / 12,
           ),

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,7 +52,7 @@ class StudentHomeworkAttemptHeader extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: colors.brandStrong,
-                      fontSize: 20,
+                      fontSize: FontSize.xl,
                       fontWeight: FontWeight.w900,
                       height: 1,
                       letterSpacing: 0,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_labeled_value.dart';
@@ -16,7 +17,7 @@ class TeacherAssignmentInfoRow extends StatelessWidget {
       text: TextSpan(
         style: GoogleFonts.andika(
           color: const Color(0xFF444650),
-          fontSize: 14,
+          fontSize: FontSize.small,
           fontWeight: FontWeight.w400,
           height: 24 / 14,
         ),

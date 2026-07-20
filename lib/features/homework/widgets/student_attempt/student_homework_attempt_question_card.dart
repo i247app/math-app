@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 
@@ -23,7 +24,7 @@ class StudentHomeworkAttemptQuestionCard extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           color: colors.textPrimary,
-          fontSize: 36,
+          fontSize: FontSize.displayLarge,
           fontWeight: FontWeight.w900,
           height: 1.16,
           letterSpacing: 0,

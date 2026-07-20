@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -349,7 +350,7 @@ class _StudentHomeworkAttemptScreenState
                                 ),
                                 messageStyle: TextStyle(
                                   color: colors.textSecondary,
-                                  fontSize: 16,
+                                  fontSize: FontSize.normal,
                                   fontWeight: FontWeight.w800,
                                   height: 1.35,
                                   letterSpacing: 0,

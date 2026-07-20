@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -76,7 +77,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                           text: scoreTotal,
                           style: GoogleFonts.andika(
                             color: colors.textPrimary,
-                            fontSize: 36,
+                            fontSize: FontSize.displayLarge,
                             fontWeight: FontWeight.w800,
                             height: 40 / 36,
                             letterSpacing: -0.9,

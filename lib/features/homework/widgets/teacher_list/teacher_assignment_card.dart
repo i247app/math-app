@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -64,7 +65,7 @@ class TeacherAssignmentCard extends StatelessWidget {
                       dateParts.day,
                       style: GoogleFonts.andika(
                         color: colors.brandStrong,
-                        fontSize: 20,
+                        fontSize: FontSize.xl,
                         fontWeight: FontWeight.w800,
                         height: 1.05,
                       ),
@@ -97,7 +98,7 @@ class TeacherAssignmentCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: colors.textPrimary,
-                            fontSize: 14,
+                            fontSize: FontSize.small,
                             fontWeight: FontWeight.w700,
                             height: 17.5 / 14,
                           ),
@@ -110,7 +111,7 @@ class TeacherAssignmentCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: colors.textSecondary,
-                            fontSize: 12,
+                            fontSize: FontSize.xxs,
                             fontWeight: FontWeight.w400,
                             height: 16 / 12,
                           ),

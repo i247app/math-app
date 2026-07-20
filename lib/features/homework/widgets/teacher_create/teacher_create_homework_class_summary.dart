@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -78,7 +79,7 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: colors.brandStrong,
-                          fontSize: 14,
+                          fontSize: FontSize.small,
                           fontWeight: FontWeight.w400,
                           height: 20 / 14,
                         ),
@@ -97,7 +98,7 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: colors.textPrimary,
-                          fontSize: 20,
+                          fontSize: FontSize.xl,
                           fontWeight: FontWeight.w700,
                           height: 32 / 20,
                         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -58,7 +59,7 @@ class CreateHomeworkOptionBottomSheet<T> extends StatelessWidget {
               context.getText(titleKey),
               style: GoogleFonts.andika(
                 color: AppColors.teal520,
-                fontSize: 22,
+                fontSize: FontSize.xxl,
                 fontWeight: FontWeight.w700,
                 height: 1.15,
               ),
@@ -87,7 +88,7 @@ class CreateHomeworkOptionBottomSheet<T> extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.andika(
                             color: AppColors.textInkDark,
-                            fontSize: 16,
+                            fontSize: FontSize.normal,
                             fontWeight: selected
                                 ? FontWeight.w800
                                 : FontWeight.w500,
@@ -101,7 +102,7 @@ class CreateHomeworkOptionBottomSheet<T> extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.andika(
                                   color: AppColors.textCoolMuted,
-                                  fontSize: 12,
+                                  fontSize: FontSize.xxs,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),

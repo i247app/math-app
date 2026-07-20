@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -43,7 +44,7 @@ class TeacherHomeworkSearchField extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
                   color: colors.inputHint,
-                  fontSize: 18,
+                  fontSize: FontSize.large,
                   fontWeight: FontWeight.w500,
                   height: 1,
                 ),

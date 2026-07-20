@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -40,7 +41,7 @@ class StudentHomeworkStatusBadge extends StatelessWidget {
           maxLines: 1,
           style: GoogleFonts.andika(
             color: color,
-            fontSize: 12,
+            fontSize: FontSize.xxs,
             fontWeight: FontWeight.w700,
             height: 16 / 12,
           ),
