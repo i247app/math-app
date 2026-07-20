@@ -25,12 +25,13 @@ class HomeGuideItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 5,
         children: [
           Icon(icon, color: color, size: 18),
-          const SizedBox(width: 5),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 3,
               children: [
                 Text(
                   title,
@@ -41,7 +42,6 @@ class HomeGuideItem extends StatelessWidget {
                     height: 1.05,
                   ),
                 ),
-                const SizedBox(height: 3),
                 Text(
                   subtitle,
                   style: const TextStyle(

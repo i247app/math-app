@@ -4,9 +4,7 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_shimmer.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 
 class TeacherAppSectionHeaderSkeleton extends StatefulWidget {
-  const TeacherAppSectionHeaderSkeleton({super.key, required this.scale});
-
-  final double scale;
+  const TeacherAppSectionHeaderSkeleton({super.key});
 
   @override
   State<TeacherAppSectionHeaderSkeleton> createState() =>
@@ -29,31 +27,34 @@ class _TeacherAppSectionHeaderSkeletonState
 
   @override
   Widget build(BuildContext context) {
-    final scale = widget.scale;
     return AppSkeletonShimmer(
       controller: _controller,
       child: Row(
         children: [
           AppSkeletonBlock(
-            width: 42 * scale,
-            height: 42 * scale,
-            radius: 14 * scale,
+            width: 42,
+            height: 42,
+            radius: 14,
             color: AppColors.teal520.withValues(alpha: 0.16),
           ),
-          SizedBox(width: 12 * scale),
-          Expanded(
-            child: AppSkeletonBlock(
-              width: double.infinity,
-              height: 22 * scale,
-              radius: 10 * scale,
+          const Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: 12),
+              child: AppSkeletonBlock(
+                width: double.infinity,
+                height: 22,
+                radius: 10,
+              ),
             ),
           ),
-          SizedBox(width: 16 * scale),
-          AppSkeletonBlock(
-            width: 82 * scale,
-            height: 22 * scale,
-            radius: 11 * scale,
-            color: AppColors.teal520.withValues(alpha: 0.14),
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: AppSkeletonBlock(
+              width: 82,
+              height: 22,
+              radius: 11,
+              color: AppColors.teal520.withValues(alpha: 0.14),
+            ),
           ),
         ],
       ),

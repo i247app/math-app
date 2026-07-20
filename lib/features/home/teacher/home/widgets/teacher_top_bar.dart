@@ -14,35 +14,28 @@ class TeacherTopBar extends StatelessWidget {
     super.key,
     required this.profile,
     required this.topPadding,
-    required this.scale,
   });
 
   final StudentProfile? profile;
   final double topPadding;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     final name = displayTeacherName(profile);
     final colors = context.themeColors;
     return Container(
-      padding: EdgeInsets.fromLTRB(
-        18 * scale,
-        topPadding + 16 * scale,
-        18 * scale,
-        14 * scale,
-      ),
+      padding: EdgeInsets.fromLTRB(18, topPadding + 16, 18, 14),
       decoration: BoxDecoration(color: colors.pageBackgroundTop),
       child: Row(
+        spacing: 12,
         children: [
           ProfileAvatarImage(
-            size: 48 * scale,
+            size: 48,
             avatarKey: profile?.avatarKey,
             avatarUrl: profile?.avatarUrl,
             borderColor: AppColors.navy900.withValues(alpha: 0.10),
             borderWidth: 2,
           ),
-          SizedBox(width: 12 * scale),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +46,7 @@ class TeacherTopBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: colors.textSecondary,
-                    fontSize: FontSize.caption * scale,
+                    fontSize: FontSize.caption,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.6,
                     height: 1.25,
@@ -65,7 +58,7 @@ class TeacherTopBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: colors.textPrimary,
-                    fontSize: FontSize.large * scale,
+                    fontSize: FontSize.large,
                     fontWeight: FontWeight.w800,
                     height: 1.1,
                   ),
@@ -74,8 +67,8 @@ class TeacherTopBar extends StatelessWidget {
             ),
           ),
           Container(
-            width: 40 * scale,
-            height: 40 * scale,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: colors.elevatedSurface,
               shape: BoxShape.circle,
@@ -91,7 +84,7 @@ class TeacherTopBar extends StatelessWidget {
             child: Icon(
               Icons.notifications_none_rounded,
               color: colors.brandStrong,
-              size: 22 * scale,
+              size: 22,
             ),
           ),
         ],

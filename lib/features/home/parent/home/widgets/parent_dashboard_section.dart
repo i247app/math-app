@@ -35,6 +35,7 @@ class ParentTabHostSection extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 10,
         children: [
           Row(
             children: [
@@ -71,7 +72,6 @@ class ParentTabHostSection extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 10),
           child,
         ],
       ),

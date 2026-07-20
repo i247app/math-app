@@ -42,36 +42,41 @@ class _StudentHomeSectionsLoadingState extends State<StudentHomeSectionsLoading>
             ),
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 12,
               children: [
                 StudentClassroomSkeletonBlock(
                   width: 150,
                   height: 15,
                   radius: 7,
                 ),
-                SizedBox(height: 12),
                 StudentClassroomSkeletonBlock(height: 56, radius: 14),
               ],
             ),
           ),
-          const SizedBox(height: 11),
-          Row(
-            children: [
-              for (var index = 0; index < 2; index++) ...[
-                const Expanded(
+          Padding(
+            padding: const EdgeInsets.only(top: 11),
+            child: Row(
+              spacing: 10,
+              children: List.generate(
+                2,
+                (_) => const Expanded(
                   child: StudentClassroomSkeletonBlock(height: 138, radius: 18),
                 ),
-                if (index == 0) const SizedBox(width: 10),
-              ],
-            ],
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
-          const StudentClassroomSkeletonBlock(
-            width: 170,
-            height: 18,
-            radius: 8,
+          const Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: StudentClassroomSkeletonBlock(
+              width: 170,
+              height: 18,
+              radius: 8,
+            ),
           ),
-          const SizedBox(height: 10),
-          const StudentClassroomSkeletonBlock(height: 104, radius: 18),
+          const Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: StudentClassroomSkeletonBlock(height: 104, radius: 18),
+          ),
         ],
       ),
     );

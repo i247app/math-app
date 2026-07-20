@@ -14,17 +14,17 @@ class ParentStreakDay extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Column(
+      spacing: 4,
       children: [
         Text(
           label,
           style: TextStyle(
             color: colors.textMuted,
-            fontSize: FontSize.caption * 0.77,
+            fontSize: FontSize.xxxs,
             fontWeight: FontWeight.w700,
             height: 1,
           ),
         ),
-        const SizedBox(height: 4),
         SizedBox(
           width: 31,
           height: 31,

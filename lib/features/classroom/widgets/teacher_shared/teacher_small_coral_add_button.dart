@@ -6,7 +6,7 @@ import 'package:numi/core/theme/app_colors.dart';
 class TeacherSmallCoralAddButton extends StatelessWidget {
   const TeacherSmallCoralAddButton({
     super.key,
-    required this.scale,
+    this.scale = 1,
     required this.onTap,
   });
 

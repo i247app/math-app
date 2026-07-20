@@ -37,6 +37,7 @@ class ParentTeacherMessageItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
+        spacing: 12,
         children: [
           ClipOval(
             child: Image.asset(
@@ -48,10 +49,10 @@ class ParentTeacherMessageItem extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 3,
               children: [
                 Row(
                   children: [
@@ -77,7 +78,6 @@ class ParentTeacherMessageItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 3),
                 Text(
                   '$className - ${childName.toUpperCase()}',
                   maxLines: 1,
@@ -88,15 +88,17 @@ class ParentTeacherMessageItem extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  body,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colors.textSecondary,
-                    fontSize: FontSize.small,
-                    fontWeight: FontWeight.w400,
+                Padding(
+                  padding: const EdgeInsets.only(top: 1),
+                  child: Text(
+                    body,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: FontSize.small,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ],

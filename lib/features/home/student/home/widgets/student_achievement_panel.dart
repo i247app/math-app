@@ -3,20 +3,15 @@ import 'package:numi/features/home/student/home/widgets/student_achievement_card
 import 'package:numi/features/home/student/home/widgets/student_achievements_header.dart';
 
 class StudentAchievementPanel extends StatelessWidget {
-  const StudentAchievementPanel({super.key, required this.scale});
-
-  final double scale;
+  const StudentAchievementPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      key: const ValueKey('achievement_panel_content'),
+    return const Column(
+      key: ValueKey('achievement_panel_content'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        StudentAchievementsHeader(scale: scale),
-        SizedBox(height: 20 * scale),
-        StudentAchievementCard(scale: scale),
-      ],
+      spacing: 20,
+      children: [StudentAchievementsHeader(), StudentAchievementCard()],
     );
   }
 }

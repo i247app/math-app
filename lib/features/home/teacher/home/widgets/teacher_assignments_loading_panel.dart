@@ -3,18 +3,15 @@ import 'package:numi/features/home/teacher/home/widgets/teacher_skeleton_carouse
 import 'package:numi/features/home/teacher/home/widgets/teacher_assignment_skeleton_card.dart';
 
 class TeacherAssignmentsLoadingPanel extends StatelessWidget {
-  const TeacherAssignmentsLoadingPanel({super.key, required this.scale});
-
-  final double scale;
+  const TeacherAssignmentsLoadingPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
     return TeacherSkeletonCarousel(
-      scale: scale,
-      itemWidth: 178 * scale,
-      itemHeight: 164 * scale,
+      itemWidth: 178,
+      itemHeight: 164,
       itemCount: 2,
-      builder: (context) => TeacherAssignmentSkeletonCard(scale: scale),
+      builder: (context) => const TeacherAssignmentSkeletonCard(),
     );
   }
 }

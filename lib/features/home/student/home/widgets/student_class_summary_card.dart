@@ -66,6 +66,7 @@ class StudentClassSummaryCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              spacing: 10,
                               children: [
                                 Container(
                                   width: 38,
@@ -80,7 +81,6 @@ class StudentClassSummaryCard extends StatelessWidget {
                                     size: 21,
                                   ),
                                 ),
-                                const SizedBox(width: 10),
                                 Text(
                                   context.getText(AppKeys.studentClassroom),
                                   style: const TextStyle(
@@ -91,27 +91,31 @@ class StudentClassSummaryCard extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            Text(
-                              className,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF14358A),
-                                fontSize: 34,
-                                fontWeight: FontWeight.w900,
-                                height: 0.95,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: Text(
+                                className,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFF14358A),
+                                  fontSize: FontSize.displayMedium,
+                                  fontWeight: FontWeight.w900,
+                                  height: 0.95,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 5),
-                            Text(
-                              teacherName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF5C666C),
-                                fontSize: FontSize.normal,
-                                fontWeight: FontWeight.w700,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: Text(
+                                teacherName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFF5C666C),
+                                  fontSize: FontSize.normal,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ],

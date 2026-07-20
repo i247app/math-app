@@ -10,6 +10,7 @@ class HomeGamePreviewRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: gap,
       children: [
         const Expanded(
           child: HomeGamePreviewCard(
@@ -17,7 +18,6 @@ class HomeGamePreviewRow extends StatelessWidget {
             background: Color(0xFFDDF3EE),
           ),
         ),
-        SizedBox(width: gap),
         const Expanded(
           child: HomeGamePreviewCard(
             background: Color(0xFF111C4B),

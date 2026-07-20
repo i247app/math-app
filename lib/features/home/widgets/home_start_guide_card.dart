@@ -35,6 +35,7 @@ class HomeStartGuideCard extends StatelessWidget {
         ],
       ),
       child: Column(
+        spacing: 10,
         children: [
           HomeGuideItem(
             icon: Icons.fact_check_rounded,
@@ -43,7 +44,6 @@ class HomeStartGuideCard extends StatelessWidget {
             subtitle: context.getText(AppKeys.parentAssessmentSubtitle),
             onTap: onAssessmentTap,
           ),
-          const SizedBox(height: 10),
           HomeGuideItem(
             icon: Icons.sports_esports_rounded,
             color: colors.accent,
@@ -51,7 +51,6 @@ class HomeStartGuideCard extends StatelessWidget {
             subtitle: context.getText(AppKeys.parentRoadmapSubtitle),
             onTap: onRoadmapTap,
           ),
-          const SizedBox(height: 10),
           HomeGuideItem(
             icon: Icons.meeting_room_rounded,
             color: colors.info,

@@ -10,13 +10,10 @@ import 'package:numi/shared/widgets/app_section_header.dart';
 class TeacherClassSectionHeader extends StatelessWidget {
   const TeacherClassSectionHeader({
     super.key,
-    required this.scale,
     required this.hasClasses,
     required this.onAdd,
     this.onViewAll,
   });
-
-  final double scale;
   final bool hasClasses;
   final VoidCallback onAdd;
   final VoidCallback? onViewAll;
@@ -27,25 +24,22 @@ class TeacherClassSectionHeader extends StatelessWidget {
       title: context.getText(AppKeys.teacherYourClasses),
       actionLabel: context.getText(AppKeys.viewAllUpper),
       onAction: onViewAll,
-      scale: scale,
       useHaptic: false,
       titleStyle: GoogleFonts.andika(
         color: Colors.black,
-        fontSize: FontSize.large * scale,
+        fontSize: FontSize.large,
         fontWeight: FontWeight.w800,
         height: 1.25,
       ),
       actionStyle: GoogleFonts.andika(
         color: AppColors.textInkDark,
-        fontSize: FontSize.small * scale,
+        fontSize: FontSize.small,
         fontWeight: FontWeight.w800,
         decoration: TextDecoration.underline,
         height: 1.25,
       ),
-      bottom: hasClasses
-          ? TeacherSmallCoralAddButton(scale: scale, onTap: onAdd)
-          : null,
-      bottomSpacing: 8 * scale,
+      bottom: hasClasses ? TeacherSmallCoralAddButton(onTap: onAdd) : null,
+      bottomSpacing: 8,
     );
   }
 }

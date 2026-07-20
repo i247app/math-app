@@ -8,12 +8,9 @@ import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_hel
 class TeacherRecentAssignmentCard extends StatelessWidget {
   const TeacherRecentAssignmentCard({
     super.key,
-    required this.scale,
     required this.assignment,
     required this.onTap,
   });
-
-  final double scale;
   final ClassroomExercise assignment;
   final VoidCallback onTap;
 
@@ -28,35 +25,35 @@ class TeacherRecentAssignmentCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0x33C4C6D2)),
         boxShadow: [
-          BoxShadow(
-            color: const Color(0x1A002B6A),
-            blurRadius: 20 * scale,
-            spreadRadius: -4 * scale,
-            offset: Offset(0, 4 * scale),
+          const BoxShadow(
+            color: Color(0x1A002B6A),
+            blurRadius: 20,
+            spreadRadius: -4,
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: EdgeInsets.all(18 * scale),
+            padding: const EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 58 * scale,
-                  height: 42 * scale,
+                  width: 58,
+                  height: 42,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8FBFF),
-                    borderRadius: BorderRadius.circular(12 * scale),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +62,7 @@ class TeacherRecentAssignmentCard extends StatelessWidget {
                         dateParts.day,
                         style: GoogleFonts.andika(
                           color: AppColors.navy900,
-                          fontSize: FontSize.large * scale,
+                          fontSize: FontSize.large,
                           fontWeight: FontWeight.w900,
                           height: 0.95,
                         ),
@@ -74,7 +71,7 @@ class TeacherRecentAssignmentCard extends StatelessWidget {
                         dateParts.month,
                         style: GoogleFonts.andika(
                           color: AppColors.textCoolMuted,
-                          fontSize: FontSize.caption * 0.7 * scale,
+                          fontSize: FontSize.xxxs,
                           fontWeight: FontWeight.w800,
                           height: 1.15,
                         ),
@@ -89,22 +86,24 @@ class TeacherRecentAssignmentCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: AppColors.textInkDark,
-                    fontSize: FontSize.large * scale,
+                    fontSize: FontSize.large,
                     fontWeight: FontWeight.w800,
                     height: 1.25,
                   ),
                 ),
-                SizedBox(height: 8 * scale),
-                Text(
-                  timeLabel ??
-                      teacherExerciseQuestionCount(context, assignment),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.andika(
-                    color: AppColors.textCoolMuted,
-                    fontSize: FontSize.caption * scale,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    timeLabel ??
+                        teacherExerciseQuestionCount(context, assignment),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.andika(
+                      color: AppColors.textCoolMuted,
+                      fontSize: FontSize.caption,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
                   ),
                 ),
               ],

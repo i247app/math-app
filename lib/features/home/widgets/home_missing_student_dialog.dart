@@ -65,75 +65,83 @@ class HomeMissingStudentDialog extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  context.getText(AppKeys.parentNoStudentTitle),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontSize: FontSize.xxxl,
-                    fontWeight: FontWeight.w900,
-                    height: 1.2,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  context.getText(AppKeys.parentNoStudentMessage),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: colors.textSecondary,
-                    fontSize: FontSize.normal,
-                    fontWeight: FontWeight.w400,
-                    height: 1.5,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: FilledButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colors.brandStrong,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      context.getText(AppKeys.parentCreateStudentNow),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w400,
-                        height: 1,
-                        letterSpacing: 0,
-                      ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 24),
+                  child: Text(
+                    context.getText(AppKeys.parentNoStudentTitle),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: FontSize.xxxl,
+                      fontWeight: FontWeight.w900,
+                      height: 1.2,
+                      letterSpacing: 0,
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    style: TextButton.styleFrom(
-                      foregroundColor: colors.brandStrong,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(
+                    context.getText(AppKeys.parentNoStudentMessage),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: FontSize.normal,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 32),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: FilledButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colors.brandStrong,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        context.getText(AppKeys.parentCreateStudentNow),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: FontSize.large,
+                          fontWeight: FontWeight.w400,
+                          height: 1,
+                          letterSpacing: 0,
+                        ),
                       ),
                     ),
-                    child: Text(
-                      context.getText(AppKeys.parentCreateStudentLater),
-                      style: TextStyle(
-                        color: colors.brandStrong,
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w400,
-                        height: 1,
-                        letterSpacing: 0,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: TextButton.styleFrom(
+                        foregroundColor: colors.brandStrong,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        context.getText(AppKeys.parentCreateStudentLater),
+                        style: TextStyle(
+                          color: colors.brandStrong,
+                          fontSize: FontSize.large,
+                          fontWeight: FontWeight.w400,
+                          height: 1,
+                          letterSpacing: 0,
+                        ),
                       ),
                     ),
                   ),

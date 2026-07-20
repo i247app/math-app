@@ -6,29 +6,22 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 
 class TeacherHeroCard extends StatelessWidget {
-  const TeacherHeroCard({super.key, required this.scale});
-
-  final double scale;
+  const TeacherHeroCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 92 * scale,
-      padding: EdgeInsets.fromLTRB(
-        14 * scale,
-        12 * scale,
-        112 * scale,
-        18 * scale,
-      ),
+      height: 92,
+      padding: const EdgeInsets.fromLTRB(14, 12, 112, 18),
       decoration: BoxDecoration(
         color: AppColors.teal400,
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(
-            color: const Color(0x1A002B6A),
-            blurRadius: 20 * scale,
-            spreadRadius: -4 * scale,
-            offset: Offset(0, 4 * scale),
+          const BoxShadow(
+            color: Color(0x1A002B6A),
+            blurRadius: 20,
+            spreadRadius: -4,
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -37,14 +30,14 @@ class TeacherHeroCard extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Positioned(
-            right: -112 * scale,
-            bottom: -27 * scale,
+            right: -112,
+            bottom: -27,
             child: Opacity(
               opacity: 0.90,
               child: Image.asset(
                 'assets/images/numi-mascot.png',
-                width: 118 * scale,
-                height: 118 * scale,
+                width: 118,
+                height: 118,
                 fit: BoxFit.contain,
               ),
             ),
@@ -52,6 +45,7 @@ class TeacherHeroCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 3,
             children: [
               Text(
                 context.getText(AppKeys.teacherHeroTitle),
@@ -59,19 +53,18 @@ class TeacherHeroCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
                   color: Colors.white,
-                  fontSize: FontSize.large * scale,
+                  fontSize: FontSize.large,
                   fontWeight: FontWeight.w900,
                   height: 1.25,
                 ),
               ),
-              SizedBox(height: 3 * scale),
               Text(
                 context.getText(AppKeys.teacherHeroSubtitle),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.andika(
                   color: Colors.white,
-                  fontSize: FontSize.small * scale,
+                  fontSize: FontSize.small,
                   fontWeight: FontWeight.w700,
                   height: 1.25,
                 ),

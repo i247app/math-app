@@ -39,141 +39,136 @@ class _ParentChildDashboardLoadingState
         return Column(
           children: [
             Row(
-              children: [
-                for (var index = 0; index < 2; index++) ...[
-                  Expanded(
-                    child: AppSkeletonBlock(
-                      height: 121,
-                      radius: 18,
-                      color: color,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 28,
-                          vertical: 22,
-                        ),
-                        child: Column(
-                          children: [
-                            AppSkeletonLine(
-                              width: 70,
-                              height: 12,
-                              color: color,
-                            ),
-                            const SizedBox(height: 12),
-                            AppSkeletonLine(
-                              width: 88,
-                              height: 28,
-                              color: color,
-                            ),
-                            const SizedBox(height: 12),
-                            AppSkeletonLine(
-                              width: 96,
-                              height: 10,
-                              color: color,
-                            ),
-                          ],
-                        ),
+              spacing: 12,
+              children: List.generate(
+                2,
+                (_) => Expanded(
+                  child: AppSkeletonBlock(
+                    height: 121,
+                    radius: 18,
+                    color: color,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 22,
+                      ),
+                      child: Column(
+                        spacing: 12,
+                        children: [
+                          AppSkeletonLine(width: 70, height: 12, color: color),
+                          AppSkeletonLine(width: 88, height: 28, color: color),
+                          AppSkeletonLine(width: 96, height: 10, color: color),
+                        ],
                       ),
                     ),
                   ),
-                  if (index == 0) const SizedBox(width: 12),
-                ],
-              ],
+                ),
+              ),
             ),
-            const SizedBox(height: 14),
             for (var index = 0; index < 2; index++) ...[
-              AppSkeletonBlock(
-                height: 98,
-                radius: 18,
-                color: color,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Row(
-                    children: [
-                      AppSkeletonBlock(
-                        width: 50,
-                        height: 50,
-                        radius: 25,
-                        color: color,
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              Padding(
+                padding: EdgeInsets.only(top: index == 0 ? 14 : 0, bottom: 10),
+                child: AppSkeletonBlock(
+                  height: 98,
+                  radius: 18,
+                  color: color,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Row(
+                      spacing: 14,
+                      children: [
+                        AppSkeletonBlock(
+                          width: 50,
+                          height: 50,
+                          radius: 25,
+                          color: color,
+                        ),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AppSkeletonLine(
+                                width: 94,
+                                height: 10,
+                                color: color,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: AppSkeletonLine(
+                                  width: double.infinity,
+                                  height: 16,
+                                  color: color,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: AppSkeletonLine(
+                                  width: 120,
+                                  height: 10,
+                                  color: color,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            for (var index = 0; index < 2; index++) ...[
+              Padding(
+                padding: EdgeInsets.only(top: index == 0 ? 0 : 12),
+                child: AppSkeletonBlock(
+                  height: 190,
+                  radius: 22,
+                  color: color,
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      children: [
+                        Row(
+                          spacing: 12,
                           children: [
-                            AppSkeletonLine(
-                              width: 94,
-                              height: 10,
+                            AppSkeletonBlock(
+                              width: 48,
+                              height: 48,
+                              radius: 13,
                               color: color,
                             ),
-                            const SizedBox(height: 10),
-                            AppSkeletonLine(
-                              width: double.infinity,
-                              height: 16,
-                              color: color,
-                            ),
-                            const SizedBox(height: 8),
-                            AppSkeletonLine(
-                              width: 120,
-                              height: 10,
-                              color: color,
+                            Expanded(
+                              child: Column(
+                                spacing: 8,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AppSkeletonLine(
+                                    width: 135,
+                                    height: 15,
+                                    color: color,
+                                  ),
+                                  AppSkeletonLine(
+                                    width: 70,
+                                    height: 9,
+                                    color: color,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: AppSkeletonBlock(radius: 13, color: color),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-            ],
-            for (var index = 0; index < 2; index++) ...[
-              AppSkeletonBlock(
-                height: 190,
-                radius: 22,
-                color: color,
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          AppSkeletonBlock(
-                            width: 48,
-                            height: 48,
-                            radius: 13,
-                            color: color,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                AppSkeletonLine(
-                                  width: 135,
-                                  height: 15,
-                                  color: color,
-                                ),
-                                const SizedBox(height: 8),
-                                AppSkeletonLine(
-                                  width: 70,
-                                  height: 9,
-                                  color: color,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Expanded(
-                        child: AppSkeletonBlock(radius: 13, color: color),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (index == 0) const SizedBox(height: 12),
             ],
           ],
         );

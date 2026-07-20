@@ -30,6 +30,7 @@ class ParentChildClassSummaryCard extends StatelessWidget {
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 4,
         children: [
           Text(
             summary == null
@@ -44,7 +45,6 @@ class ParentChildClassSummaryCard extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
-          const SizedBox(height: 4),
           Text(
             className,
             maxLines: 1,
@@ -56,18 +56,20 @@ class ParentChildClassSummaryCard extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 5),
-          Text(
-            teacherName?.isNotEmpty == true
-                ? teacherName!
-                : context.getText(AppKeys.parentNoTeacher),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: colors.textSecondary,
-              fontSize: FontSize.large,
-              fontWeight: FontWeight.w600,
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Text(
+              teacherName?.isNotEmpty == true
+                  ? teacherName!
+                  : context.getText(AppKeys.parentNoTeacher),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: FontSize.large,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

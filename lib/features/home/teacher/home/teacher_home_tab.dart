@@ -43,7 +43,6 @@ class TeacherHomeTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.bottomPadding,
-    this.scale = 1,
     required this.onCompleteProfile,
     this.onOpenClassroomTab,
     this.onOpenStudyTab,
@@ -57,7 +56,6 @@ class TeacherHomeTab extends StatefulWidget {
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final double bottomPadding;
-  final double scale;
   final Future<void> Function() onCompleteProfile;
   final VoidCallback? onOpenClassroomTab;
   final VoidCallback? onOpenStudyTab;
@@ -472,36 +470,27 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
     context.showErrorDialog(message);
   }
 
-  Widget _buildClassroomSection({
-    required double scale,
-    required bool isProfileComplete,
-  }) {
+  Widget _buildClassroomSection({required bool isProfileComplete}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 12,
       children: [
         if (_isInitialHomeLoading)
-          TeacherAppSectionHeaderSkeleton(scale: scale)
+          const TeacherAppSectionHeaderSkeleton()
         else
           TeacherClassSectionHeader(
-            scale: scale,
             hasClasses: _classrooms.isNotEmpty,
             onAdd: _handleClassCreateAction,
             onViewAll: widget.onOpenClassroomTab,
           ),
-        SizedBox(height: 12 * scale),
         if (_isInitialHomeLoading)
-          TeacherLoadingPanel(scale: scale)
+          const TeacherLoadingPanel()
         else if (_error != null && _classrooms.isEmpty)
-          AppRetryPanel(
-            scale: scale,
-            message: _error!,
-            onRetry: _refreshClassrooms,
-          )
+          AppRetryPanel(message: _error!, onRetry: _refreshClassrooms)
         else if (_classrooms.isEmpty)
           Column(
             children: [
               TeacherNoClassPanel(
-                scale: scale,
                 isProfileComplete: isProfileComplete,
                 onCreate: _handleClassCreateAction,
               ),
@@ -511,7 +500,6 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
           Column(
             children: [
               TeacherClassCarousel(
-                scale: scale,
                 classrooms: _classrooms,
                 onOpen: _openClassDetail,
               ),
@@ -521,22 +509,21 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
     );
   }
 
-  Widget _buildRecentAssignmentsSection({required double scale}) {
+  Widget _buildRecentAssignmentsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 12,
       children: [
         if (_isInitialAssignmentsLoading)
-          TeacherAppSectionHeaderSkeleton(scale: scale)
+          const TeacherAppSectionHeaderSkeleton()
         else
           AppSectionHeader(
-            scale: scale,
             title: context.getText(AppKeys.teacherRecentlyAssigned),
             actionLabel: context.getText(AppKeys.viewAllUpper),
             onAction: widget.onOpenStudyTab,
           ),
-        SizedBox(height: 12 * scale),
         if (_isInitialAssignmentsLoading)
-          TeacherAssignmentsLoadingPanel(scale: scale)
+          const TeacherAssignmentsLoadingPanel()
         else if (_recentAssignments.isEmpty)
           Column(
             children: [
@@ -547,7 +534,6 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
           )
         else ...[
           TeacherRecentAssignmentCarousel(
-            scale: scale,
             assignments: _recentAssignments,
             onOpen: _openAssignmentDetail,
           ),
@@ -558,7 +544,6 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    final scale = widget.scale;
     final isProfileComplete = isTeacherProfileComplete(widget.activeProfile);
 
     return RefreshIndicator(
@@ -578,36 +563,40 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
               child: TeacherTopBar(
                 profile: widget.activeProfile,
                 topPadding: MediaQuery.paddingOf(context).top,
-                scale: scale,
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 18 * scale),
+              padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 22 * scale),
-                  _homeEntrance(
-                    id: _heroEntranceId,
-                    order: 1,
-                    child: _isInitialHomeLoading
-                        ? TeacherHomeHeroSkeleton(scale: scale)
-                        : TeacherHeroCard(scale: scale),
-                  ),
-                  SizedBox(height: 28 * scale),
-                  _homeEntrance(
-                    id: _classroomEntranceId,
-                    order: 2,
-                    child: _buildClassroomSection(
-                      scale: scale,
-                      isProfileComplete: isProfileComplete,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 22),
+                    child: _homeEntrance(
+                      id: _heroEntranceId,
+                      order: 1,
+                      child: _isInitialHomeLoading
+                          ? const TeacherHomeHeroSkeleton()
+                          : const TeacherHeroCard(),
                     ),
                   ),
-                  SizedBox(height: 30 * scale),
-                  _homeEntrance(
-                    id: _assignmentsEntranceId,
-                    order: 3,
-                    child: _buildRecentAssignmentsSection(scale: scale),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 28),
+                    child: _homeEntrance(
+                      id: _classroomEntranceId,
+                      order: 2,
+                      child: _buildClassroomSection(
+                        isProfileComplete: isProfileComplete,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: _homeEntrance(
+                      id: _assignmentsEntranceId,
+                      order: 3,
+                      child: _buildRecentAssignmentsSection(),
+                    ),
                   ),
                 ],
               ),

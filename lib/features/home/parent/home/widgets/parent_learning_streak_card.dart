@@ -62,6 +62,7 @@ class ParentLearningStreakCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 8,
         children: [
           Text(
             context.getText(AppKeys.parentLearningStreak),
@@ -72,7 +73,6 @@ class ParentLearningStreakCard extends StatelessWidget {
               height: 1,
             ),
           ),
-          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(

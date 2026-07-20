@@ -13,8 +13,10 @@ class StudentGameSuggestionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 10,
       children: [
         Row(
+          spacing: 9,
           children: [
             Container(
               width: 31,
@@ -29,7 +31,6 @@ class StudentGameSuggestionsSection extends StatelessWidget {
                 size: 18,
               ),
             ),
-            const SizedBox(width: 9),
             Expanded(
               child: Text(
                 context.getText(AppKeys.navGames),
@@ -52,7 +53,6 @@ class StudentGameSuggestionsSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
         const HomeGamePreviewRow(),
       ],
     );

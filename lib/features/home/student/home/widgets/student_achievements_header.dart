@@ -5,9 +5,7 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 
 class StudentAchievementsHeader extends StatelessWidget {
-  const StudentAchievementsHeader({super.key, required this.scale});
-
-  final double scale;
+  const StudentAchievementsHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,23 +15,23 @@ class StudentAchievementsHeader extends StatelessWidget {
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 10,
             children: [
               Text(
                 context.getText(AppKeys.yourAchievement),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: const TextStyle(
                   color: homeDeepInk,
-                  fontSize: FontSize.large * scale,
+                  fontSize: FontSize.large,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,
                 ),
               ),
-              SizedBox(height: 10 * scale),
               Container(
-                width: 48 * scale,
-                height: 4 * scale,
+                width: 48,
+                height: 4,
                 decoration: BoxDecoration(
                   color: const Color(0xFFA03A0F).withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(999),
@@ -43,12 +41,12 @@ class StudentAchievementsHeader extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(bottom: 3 * scale),
+          padding: const EdgeInsets.only(bottom: 3),
           child: Text(
             context.getText(AppKeys.viewAllUpper),
-            style: TextStyle(
+            style: const TextStyle(
               color: homeTeal,
-              fontSize: FontSize.caption * 0.85 * scale,
+              fontSize: FontSize.xxxs,
               fontWeight: FontWeight.w900,
               height: 1,
               letterSpacing: 0,

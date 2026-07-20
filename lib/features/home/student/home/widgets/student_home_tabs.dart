@@ -10,12 +10,10 @@ class StudentHomeTabs extends StatelessWidget {
   const StudentHomeTabs({
     super.key,
     required this.activePanel,
-    required this.scale,
     required this.onChanged,
   });
 
   final StudentHomePanel activePanel;
-  final double scale;
   final ValueChanged<StudentHomePanel> onChanged;
 
   @override
@@ -28,10 +26,10 @@ class StudentHomeTabs extends StatelessWidget {
     final activeIndex = tabs.indexWhere((tab) => tab.$1 == activePanel);
 
     return Container(
-      padding: EdgeInsets.all(5 * scale),
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.74),
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: const Color(0xFFA2B1A3).withValues(alpha: 0.14),
         ),
@@ -41,7 +39,7 @@ class StudentHomeTabs extends StatelessWidget {
           final tabWidth = constraints.maxWidth / tabs.length;
 
           return SizedBox(
-            height: 42 * scale,
+            height: 42,
             child: Stack(
               children: [
                 AnimatedPositioned(
@@ -54,12 +52,12 @@ class StudentHomeTabs extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: homeTeal,
-                      borderRadius: BorderRadius.circular(20 * scale),
+                      borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
                           color: homeTeal.withValues(alpha: 0.18),
-                          blurRadius: 12 * scale,
-                          offset: Offset(0, 6 * scale),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
@@ -72,7 +70,6 @@ class StudentHomeTabs extends StatelessWidget {
                         child: StudentHomeTabButton(
                           label: tab.$2,
                           selected: tab.$1 == activePanel,
-                          scale: scale,
                           onTap: () => onChanged(tab.$1),
                         ),
                       ),

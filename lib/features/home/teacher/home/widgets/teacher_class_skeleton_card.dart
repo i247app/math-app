@@ -4,41 +4,32 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_card.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 
 class TeacherClassSkeletonCard extends StatelessWidget {
-  const TeacherClassSkeletonCard({super.key, required this.scale});
-
-  final double scale;
+  const TeacherClassSkeletonCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppSkeletonCard(
-      scale: scale,
-      padding: EdgeInsets.all(12 * scale),
+      padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          AppSkeletonBlock(
-            width: 84 * scale,
-            height: 56 * scale,
-            radius: 16 * scale,
+          const AppSkeletonBlock(width: 84, height: 56, radius: 16),
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: AppSkeletonBlock(width: 72, height: 16, radius: 8),
           ),
-          SizedBox(height: 8 * scale),
-          AppSkeletonBlock(
-            width: 72 * scale,
-            height: 16 * scale,
-            radius: 8 * scale,
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Divider(color: Color(0x1AC4C6D2), height: 4),
           ),
-          SizedBox(height: 8 * scale),
-          Divider(color: const Color(0x1AC4C6D2), height: 4 * scale),
-          AppSkeletonBlock(
-            width: 88 * scale,
-            height: 12 * scale,
-            radius: 8 * scale,
-          ),
-          SizedBox(height: 5 * scale),
-          AppSkeletonBlock(
-            width: 69 * scale,
-            height: 14 * scale,
-            radius: 5 * scale,
-            color: AppColors.teal520.withValues(alpha: 0.20),
+          const AppSkeletonBlock(width: 88, height: 12, radius: 8),
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: AppSkeletonBlock(
+              width: 69,
+              height: 14,
+              radius: 5,
+              color: AppColors.teal520.withValues(alpha: 0.20),
+            ),
           ),
         ],
       ),

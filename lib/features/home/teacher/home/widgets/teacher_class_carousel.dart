@@ -6,12 +6,9 @@ import 'package:numi/features/home/teacher/home/widgets/teacher_class_card.dart'
 class TeacherClassCarousel extends StatelessWidget {
   const TeacherClassCarousel({
     super.key,
-    required this.scale,
     required this.classrooms,
     required this.onOpen,
   });
-
-  final double scale;
   final List<ClassroomModel> classrooms;
   final ValueChanged<ClassroomModel> onOpen;
 
@@ -19,12 +16,11 @@ class TeacherClassCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppHorizontalCarousel<ClassroomModel>(
       items: classrooms,
-      itemWidth: 166 * scale,
-      height: 176 * scale,
-      gap: 16 * scale,
+      itemWidth: 166,
+      height: 176,
+      gap: 16,
       physics: const BouncingScrollPhysics(),
       itemBuilder: (context, classroom) => TeacherClassCard(
-        scale: scale,
         classroom: classroom,
         onTap: () => onOpen(classroom),
       ),

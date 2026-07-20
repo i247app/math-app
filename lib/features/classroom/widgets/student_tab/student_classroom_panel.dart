@@ -42,10 +42,9 @@ class StudentClassroomPanel extends StatelessWidget {
         if (isLoading && classrooms.isEmpty)
           CircularLoadingCard(scale: scale)
         else if (error != null && classrooms.isEmpty)
-          StudentErrorPanel(scale: scale, message: error!, onRetry: onRetry)
+          StudentErrorPanel(message: error!, onRetry: onRetry)
         else if (classrooms.isEmpty)
           StudentEmptyPanel(
-            scale: scale,
             icon: Icons.groups_rounded,
             title: context.getText(AppKeys.studentNoClassroomsTitle),
             message: context.getText(AppKeys.studentNoClassroomsMessage),

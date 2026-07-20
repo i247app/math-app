@@ -52,7 +52,6 @@ class ParentHomeContent extends StatefulWidget {
     required this.onOpenPracticeTab,
     required this.onParentAssessmentStateChanged,
     required this.bottomPadding,
-    this.scale = 1,
     this.homeHeader,
   });
 
@@ -72,7 +71,6 @@ class ParentHomeContent extends StatefulWidget {
   final VoidCallback onOpenPracticeTab;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final double bottomPadding;
-  final double scale;
   final Widget? homeHeader;
 
   @override
@@ -362,12 +360,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     }
 
     final hasCompletedAssessment = completedAssessments.isNotEmpty;
-    final padding = EdgeInsets.fromLTRB(
-      14 * widget.scale,
-      0,
-      14 * widget.scale,
-      widget.bottomPadding,
-    );
+    final padding = EdgeInsets.fromLTRB(14, 0, 14, widget.bottomPadding);
 
     return RefreshIndicator(
       color: context.themeColors.brandStrong,
@@ -403,24 +396,27 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                     ParentLearningStreakCard(
                       hasCompletedAssessment: hasCompletedAssessment,
                     ),
-                  const SizedBox(height: 12),
-                  if (isLoading && !hasLoadedHome)
-                    const ParentHomeLoadingCard()
-                  else if (hasCompletedAssessment)
-                    buildCompletedState()
-                  else
-                    buildFirstAssessmentState(),
-                  if (isLoading && hasLoadedHome) ...[
-                    const SizedBox(height: 8),
-                    const ParentHomeRefreshLabel(),
-                  ],
-                  if (errorMessage != null) ...[
-                    const SizedBox(height: 10),
-                    ParentHomeErrorCard(
-                      message: errorMessage!,
-                      onRetry: loadHome,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: isLoading && !hasLoadedHome
+                        ? const ParentHomeLoadingCard()
+                        : hasCompletedAssessment
+                        ? buildCompletedState()
+                        : buildFirstAssessmentState(),
+                  ),
+                  if (isLoading && hasLoadedHome)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: ParentHomeRefreshLabel(),
                     ),
-                  ],
+                  if (errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: ParentHomeErrorCard(
+                        message: errorMessage!,
+                        onRetry: loadHome,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -522,7 +518,6 @@ class ParentHomeContentState extends State<ParentHomeContent> {
               onRefreshProfiles: widget.onRefreshProfiles,
               onProfileSaved: widget.onProfileSaved,
               bottomPadding: 0,
-              scale: widget.scale,
               initialView: SettingPageView.profile,
               isPushedPage: true,
               openAddProfileOnStart: true,

@@ -9,7 +9,7 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_shimmer.dart';
 class AppSkeletonCard extends StatefulWidget {
   const AppSkeletonCard({
     super.key,
-    required this.scale,
+    this.scale = 1,
     required this.child,
     this.padding = EdgeInsets.zero,
     this.borderRadius,

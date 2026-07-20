@@ -9,12 +9,7 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
   Widget buildChildDashboard() {
     final colors = context.themeColors;
     final parent = homeLayout?.parent;
-    final padding = EdgeInsets.fromLTRB(
-      14 * widget.scale,
-      10 * widget.scale,
-      14 * widget.scale,
-      widget.bottomPadding + 18 * widget.scale,
-    );
+    final padding = EdgeInsets.fromLTRB(14, 10, 14, widget.bottomPadding + 18);
 
     return DecoratedBox(
       decoration: BoxDecoration(

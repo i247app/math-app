@@ -50,52 +50,65 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppSkeletonLine(width: 148, height: 30, color: color),
-                      const SizedBox(height: 14),
-                      AppSkeletonLine(width: 210, height: 34, color: color),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 14),
+                        child: AppSkeletonLine(
+                          width: 210,
+                          height: 34,
+                          color: color,
+                        ),
+                      ),
                       const Spacer(),
                       AppSkeletonLine(width: 132, height: 14, color: color),
-                      const SizedBox(height: 12),
-                      AppSkeletonBlock(
-                        width: 150,
-                        height: 44,
-                        radius: 22,
-                        color: color,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: AppSkeletonBlock(
+                          width: 150,
+                          height: 44,
+                          radius: 22,
+                          color: color,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: AppSkeletonBlock(
-                      height: 160,
-                      radius: 18,
-                      color: color,
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  spacing: 10,
+                  children: [
+                    Expanded(
+                      child: AppSkeletonBlock(
+                        height: 160,
+                        radius: 18,
+                        color: color,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: AppSkeletonBlock(
-                      height: 160,
-                      radius: 18,
-                      color: color,
+                    Expanded(
+                      child: AppSkeletonBlock(
+                        height: 160,
+                        radius: 18,
+                        color: color,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              AppSkeletonBlock(
-                height: 178,
-                radius: 17,
-                color: color,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      for (var index = 0; index < 3; index++) ...[
-                        Row(
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: AppSkeletonBlock(
+                  height: 178,
+                  radius: 17,
+                  color: color,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      spacing: 14,
+                      children: List.generate(
+                        3,
+                        (index) => Row(
+                          spacing: 12,
                           children: [
                             AppSkeletonBlock(
                               width: 32,
@@ -103,17 +116,16 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
                               radius: 10,
                               color: color,
                             ),
-                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                spacing: 7,
                                 children: [
                                   AppSkeletonLine(
                                     width: index == 0 ? 120 : 150,
                                     height: 14,
                                     color: color,
                                   ),
-                                  const SizedBox(height: 7),
                                   AppSkeletonLine(
                                     width: double.infinity,
                                     height: 10,
@@ -124,9 +136,8 @@ class _ParentHomeLoadingCardState extends State<ParentHomeLoadingCard>
                             ),
                           ],
                         ),
-                        if (index != 2) const SizedBox(height: 14),
-                      ],
-                    ],
+                      ),
+                    ),
                   ),
                 ),
               ),

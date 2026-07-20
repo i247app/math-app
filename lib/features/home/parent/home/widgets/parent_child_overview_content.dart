@@ -67,83 +67,95 @@ class ParentChildOverviewContent extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
         if (pendingExercises.isNotEmpty) ...[
-          entranceBuilder(
-            order: 1,
-            child: ParentTabHostSection(
-              title: context.getText(AppKeys.parentTasksTitle),
-              onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
-              child: Column(
-                children: [
-                  for (
-                    var index = 0;
-                    index < visiblePendingExercises.length;
-                    index++
-                  ) ...[
-                    ParentPendingTaskListItem(
-                      pending: visiblePendingExercises[index],
-                    ),
-                    if (index != visiblePendingExercises.length - 1)
-                      Divider(height: 24, indent: 62, color: colors.border),
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: entranceBuilder(
+              order: 1,
+              child: ParentTabHostSection(
+                title: context.getText(AppKeys.parentTasksTitle),
+                onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
+                child: Column(
+                  children: [
+                    for (
+                      var index = 0;
+                      index < visiblePendingExercises.length;
+                      index++
+                    ) ...[
+                      ParentPendingTaskListItem(
+                        pending: visiblePendingExercises[index],
+                      ),
+                      if (index != visiblePendingExercises.length - 1)
+                        Divider(height: 24, indent: 62, color: colors.border),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 14),
         ],
         if (completions.isNotEmpty) ...[
-          entranceBuilder(
-            order: 2,
-            child: ParentTabHostSection(
-              title: context.getText(AppKeys.assessmentResultTitle),
-              onViewAll: completions.length > 2 ? onViewResults : null,
-              child: Column(
-                children: [
-                  for (
-                    var index = 0;
-                    index < visibleCompletions.length;
-                    index++
-                  ) ...[
-                    ParentCompletedTaskListItem(
-                      completion: visibleCompletions[index],
-                      onTap: () => onCompletionTap(visibleCompletions[index]),
-                    ),
-                    if (index != visibleCompletions.length - 1)
-                      Divider(height: 24, indent: 62, color: colors.border),
+          Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: entranceBuilder(
+              order: 2,
+              child: ParentTabHostSection(
+                title: context.getText(AppKeys.assessmentResultTitle),
+                onViewAll: completions.length > 2 ? onViewResults : null,
+                child: Column(
+                  children: [
+                    for (
+                      var index = 0;
+                      index < visibleCompletions.length;
+                      index++
+                    ) ...[
+                      ParentCompletedTaskListItem(
+                        completion: visibleCompletions[index],
+                        onTap: () => onCompletionTap(visibleCompletions[index]),
+                      ),
+                      if (index != visibleCompletions.length - 1)
+                        Divider(height: 24, indent: 62, color: colors.border),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 14),
         ],
-        entranceBuilder(
-          order: 3,
-          markOnEnd: !showGameSuggestions,
-          child: ParentTabHostSection(
-            title: context.getText(AppKeys.parentMessagesTitle),
-            onViewAll: onViewMessages,
-            child: ParentTeacherMessagesList(summaries: summaries),
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: entranceBuilder(
+            order: 3,
+            markOnEnd: !showGameSuggestions,
+            child: ParentTabHostSection(
+              title: context.getText(AppKeys.parentMessagesTitle),
+              onViewAll: onViewMessages,
+              child: ParentTeacherMessagesList(summaries: summaries),
+            ),
           ),
         ),
-        if (showGameSuggestions) ...[
-          const SizedBox(height: 14),
-          entranceBuilder(
-            order: 4,
-            markOnEnd: true,
-            child: const ParentGameSuggestionsRow(),
+        if (showGameSuggestions)
+          Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: entranceBuilder(
+              order: 4,
+              markOnEnd: true,
+              child: const ParentGameSuggestionsRow(),
+            ),
           ),
-        ],
-        if (isRefreshing) ...[
-          const SizedBox(height: 8),
-          const ParentHomeRefreshLabel(),
-        ],
-        if (errorMessage != null) ...[
-          const SizedBox(height: 10),
-          ParentHomeErrorCard(message: errorMessage!, onRetry: onRetry),
-        ],
+        if (isRefreshing)
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: ParentHomeRefreshLabel(),
+          ),
+        if (errorMessage != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: ParentHomeErrorCard(
+              message: errorMessage!,
+              onRetry: onRetry,
+            ),
+          ),
       ],
     );
   }

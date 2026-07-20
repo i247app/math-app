@@ -4,48 +4,36 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_card.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 
 class TeacherHomeHeroSkeleton extends StatelessWidget {
-  const TeacherHomeHeroSkeleton({super.key, required this.scale});
-
-  final double scale;
+  const TeacherHomeHeroSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 92 * scale,
+      height: 92,
       child: AppSkeletonCard(
-        scale: scale,
-        padding: EdgeInsets.fromLTRB(
-          14 * scale,
-          14 * scale,
-          18 * scale,
-          14 * scale,
-        ),
+        padding: const EdgeInsets.fromLTRB(14, 14, 18, 14),
         child: Row(
           children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 10,
                 children: [
                   AppSkeletonBlock(
-                    width: 148 * scale,
-                    height: 20 * scale,
-                    radius: 8 * scale,
+                    width: 148,
+                    height: 20,
+                    radius: 8,
                     color: AppColors.teal520.withValues(alpha: 0.18),
                   ),
-                  SizedBox(height: 10 * scale),
-                  AppSkeletonBlock(
-                    width: 218 * scale,
-                    height: 15 * scale,
-                    radius: 8 * scale,
-                  ),
+                  const AppSkeletonBlock(width: 218, height: 15, radius: 8),
                 ],
               ),
             ),
             AppSkeletonBlock(
-              width: 64 * scale,
-              height: 64 * scale,
-              radius: 20 * scale,
+              width: 64,
+              height: 64,
+              radius: 20,
               color: AppColors.teal400.withValues(alpha: 0.22),
             ),
           ],

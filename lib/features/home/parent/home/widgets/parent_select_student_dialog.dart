@@ -64,73 +64,81 @@ class ParentSelectStudentDialog extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  context.getText(AppKeys.parentNoStudentTitle),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontSize: FontSize.xxxl,
-                    fontWeight: FontWeight.w900,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  context.getText(AppKeys.parentSelectStudentMessage),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: colors.textSecondary,
-                    fontSize: FontSize.normal,
-                    fontWeight: FontWeight.w400,
-                    height: 1.45,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: FilledButton(
-                    onPressed: () => Navigator.of(
-                      context,
-                    ).pop(ParentProfileDialogAction.choose),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colors.brandStrong,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      context.getText(AppKeys.parentSwitchStudentAction),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w400,
-                      ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Text(
+                    context.getText(AppKeys.parentNoStudentTitle),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: FontSize.xxxl,
+                      fontWeight: FontWeight.w900,
+                      height: 1.2,
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: TextButton(
-                    onPressed: () => Navigator.of(
-                      context,
-                    ).pop(ParentProfileDialogAction.create),
-                    style: TextButton.styleFrom(
-                      foregroundColor: colors.brandStrong,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(
+                    context.getText(AppKeys.parentSelectStudentMessage),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: FontSize.normal,
+                      fontWeight: FontWeight.w400,
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: FilledButton(
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).pop(ParentProfileDialogAction.choose),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colors.brandStrong,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        context.getText(AppKeys.parentSwitchStudentAction),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: FontSize.large,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
-                    child: Text(
-                      context.getText(AppKeys.parentCreateStudent),
-                      style: TextStyle(
-                        color: colors.brandStrong,
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w400,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: TextButton(
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).pop(ParentProfileDialogAction.create),
+                      style: TextButton.styleFrom(
+                        foregroundColor: colors.brandStrong,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        context.getText(AppKeys.parentCreateStudent),
+                        style: TextStyle(
+                          color: colors.brandStrong,
+                          fontSize: FontSize.large,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                   ),

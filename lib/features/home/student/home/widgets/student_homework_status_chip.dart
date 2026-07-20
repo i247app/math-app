@@ -27,7 +27,7 @@ class StudentHomeworkStatusChip extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: textColor,
-          fontSize: FontSize.caption * 0.68,
+          fontSize: FontSize.xxxs,
           fontWeight: FontWeight.w800,
         ),
       ),

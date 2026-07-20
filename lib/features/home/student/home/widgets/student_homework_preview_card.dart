@@ -85,7 +85,7 @@ class StudentHomeworkPreviewCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: Color(0xFF6B5C62),
-                                fontSize: FontSize.caption * 0.82,
+                                fontSize: FontSize.xxxs,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -97,40 +97,43 @@ class StudentHomeworkPreviewCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF121B42),
-                                fontSize: FontSize.normal,
-                                fontWeight: FontWeight.w900,
-                                height: 1.05,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFF121B42),
+                                  fontSize: FontSize.normal,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.05,
+                                ),
                               ),
                             ),
-                          ),
-                          StudentHomeworkStatusChip(
-                            label: exercise?.purpose?.trim().isNotEmpty == true
-                                ? studentModePurposeLabel(exercise!.purpose!)
-                                : context.getText(AppKeys.studentHomework),
-                            color: badgeColor,
-                            textColor: badgeTextColor,
-                          ),
-                        ],
+                            StudentHomeworkStatusChip(
+                              label:
+                                  exercise?.purpose?.trim().isNotEmpty == true
+                                  ? studentModePurposeLabel(exercise!.purpose!)
+                                  : context.getText(AppKeys.studentHomework),
+                              color: badgeColor,
+                              textColor: badgeTextColor,
+                            ),
+                          ],
+                        ),
                       ),
                       const Spacer(),
                       Row(
+                        spacing: 6,
                         children: [
                           const Icon(
                             Icons.calendar_today_outlined,
                             size: 14,
                             color: Color(0xFF5D5D5D),
                           ),
-                          const SizedBox(width: 6),
                           Expanded(
                             child: Text(
                               dueText,

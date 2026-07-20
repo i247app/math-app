@@ -63,92 +63,98 @@ class StudentTeacherMessageCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      context.getText(data.teacherKey),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF001741),
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w900,
-                        height: 1.1,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 4,
+                    children: [
+                      Text(
+                        context.getText(data.teacherKey),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF001741),
+                          fontSize: FontSize.large,
+                          fontWeight: FontWeight.w900,
+                          height: 1.1,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      context.getText(data.classKey),
-                      style: const TextStyle(
-                        color: Color(0xFF515F6F),
-                        fontSize: FontSize.caption * 0.85,
-                        fontWeight: FontWeight.w500,
-                        height: 1.1,
+                      Text(
+                        context.getText(data.classKey),
+                        style: const TextStyle(
+                          color: Color(0xFF515F6F),
+                          fontSize: FontSize.xxxs,
+                          fontWeight: FontWeight.w500,
+                          height: 1.1,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                context.getText(data.timeKey),
-                style: const TextStyle(
-                  color: Color(0xFF6B7280),
-                  fontSize: FontSize.caption * 0.85,
-                  fontWeight: FontWeight.w500,
-                  height: 1.1,
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Text(
+                  context.getText(data.timeKey),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: FontSize.xxxs,
+                    fontWeight: FontWeight.w500,
+                    height: 1.1,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 11),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FB),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFFB9C0CE),
-                style: BorderStyle.solid,
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 11),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8F9FB),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFFB9C0CE),
+                  style: BorderStyle.solid,
+                ),
               ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: data.accentColor,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    context.getText(data.studentKey),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: FontSize.caption * 0.7,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      letterSpacing: 0.5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: data.accentColor,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      context.getText(data.studentKey),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: FontSize.xxxs,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  context.getText(data.bodyKey),
-                  style: const TextStyle(
-                    color: Color(0xFF30333A),
-                    fontSize: FontSize.small,
-                    fontWeight: FontWeight.w400,
-                    height: 1.45,
+                  Text(
+                    context.getText(data.bodyKey),
+                    style: const TextStyle(
+                      color: Color(0xFF30333A),
+                      fontSize: FontSize.small,
+                      fontWeight: FontWeight.w400,
+                      height: 1.45,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

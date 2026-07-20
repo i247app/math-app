@@ -45,7 +45,6 @@ class StudentHomeContent extends StatefulWidget {
   const StudentHomeContent({
     super.key,
     required this.padding,
-    this.scale = 1,
     required this.user,
     required this.profiles,
     required this.activeProfile,
@@ -68,7 +67,6 @@ class StudentHomeContent extends StatefulWidget {
   });
 
   final EdgeInsets padding;
-  final double scale;
   final LoginUser? user;
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
@@ -457,7 +455,6 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
               onRefreshProfiles: widget.onRefreshProfiles,
               onProfileSaved: widget.onProfileSaved,
               bottomPadding: 0,
-              scale: widget.scale,
               initialView: SettingPageView.profile,
               isPushedPage: true,
             ),
@@ -484,7 +481,6 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
               onRefreshProfiles: widget.onRefreshProfiles,
               onProfileSaved: widget.onProfileSaved,
               bottomPadding: 0,
-              scale: widget.scale,
               initialView: SettingPageView.profile,
               isPushedPage: true,
               openAddProfileOnStart: true,
@@ -616,6 +612,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
   Widget _buildStudentInitialAssessmentState() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 8,
       children: [
         _studentHomeEntrance(
           order: 0,
@@ -623,11 +620,11 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
             onTap: () => _openGradeSelection(quizPurposeAssessment),
           ),
         ),
-        const SizedBox(height: 8),
         _studentHomeEntrance(
           order: 1,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 10,
             children: [
               Expanded(
                 child: HomeImageAction(
@@ -637,7 +634,6 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
                   onTap: widget.onOpenPracticeTab,
                 ),
               ),
-              const SizedBox(width: 10),
               Expanded(
                 child: HomeImageAction(
                   asset: parentHomeClassroomAsset,
@@ -650,14 +646,16 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        _studentHomeEntrance(
-          order: 2,
-          markOnEnd: true,
-          child: HomeStartGuideCard(
-            onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
-            onRoadmapTap: widget.onOpenPracticeTab,
-            onClassroomTap: widget.onOpenClassroomTab,
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: _studentHomeEntrance(
+            order: 2,
+            markOnEnd: true,
+            child: HomeStartGuideCard(
+              onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
+              onRoadmapTap: widget.onOpenPracticeTab,
+              onClassroomTap: widget.onOpenClassroomTab,
+            ),
           ),
         ),
       ],
@@ -667,6 +665,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
   Widget _buildStudentCompletedAssessmentState() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 8,
       children: [
         _studentHomeEntrance(
           order: 0,
@@ -676,21 +675,21 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
             onTap: widget.onOpenPracticeTab,
           ),
         ),
-        const SizedBox(height: 8),
         _studentHomeEntrance(
           order: 1,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 10,
             children: [
               Expanded(
                 child: Column(
+                  spacing: 7,
                   children: [
                     HomeImageAction(
                       asset: parentHomeRaceAsset,
                       height: 83,
                       onTap: widget.onOpenPracticeTab,
                     ),
-                    const SizedBox(height: 7),
                     HomeImageAction(
                       asset: parentHomeShopAsset,
                       height: 83,
@@ -699,7 +698,6 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
               Expanded(
                 child: HomeImageAction(
                   asset: parentHomeClassroomAsset,
@@ -710,20 +708,25 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        for (final entry in _completedAssessments.take(2).indexed) ...[
-          _studentHomeEntrance(
-            order: 2 + entry.$1,
-            markOnEnd:
-                entry.$1 == 1 ||
-                entry.$1 == _completedAssessments.take(2).length - 1,
-            child: AssessmentResultListItemCard(
-              quiz: entry.$2,
-              onTap: () => _openStudentAssessmentResult(entry.$2),
-            ),
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Column(
+            spacing: 8,
+            children: [
+              for (final entry in _completedAssessments.take(2).indexed)
+                _studentHomeEntrance(
+                  order: 2 + entry.$1,
+                  markOnEnd:
+                      entry.$1 == 1 ||
+                      entry.$1 == _completedAssessments.take(2).length - 1,
+                  child: AssessmentResultListItemCard(
+                    quiz: entry.$2,
+                    onTap: () => _openStudentAssessmentResult(entry.$2),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 8),
-        ],
+        ),
       ],
     );
   }
@@ -743,30 +746,40 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
             onTap: () => _openClassDetail(classroom),
           ),
         ),
-        const SizedBox(height: 14),
-        if (_isLoadingModeHomework && exercises.isEmpty)
-          const StudentHomeSectionsLoading()
-        else ...[
-          for (var index = 0; index < previewCount; index++) ...[
-            _studentClassroomOverviewEntrance(
-              order: 1 + index,
-              child: StudentHomeworkPreviewCard(
-                exercise: index < exercises.length ? exercises[index] : null,
-                classroom: classroom,
-                index: index,
-                onTap: index < exercises.length
-                    ? () => _openModeHomework(exercises[index])
-                    : widget.onOpenClassroomTab,
-              ),
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: _isLoadingModeHomework && exercises.isEmpty
+              ? const StudentHomeSectionsLoading()
+              : Column(
+                  spacing: 10,
+                  children: [
+                    for (var index = 0; index < previewCount; index++)
+                      _studentClassroomOverviewEntrance(
+                        order: 1 + index,
+                        child: StudentHomeworkPreviewCard(
+                          exercise: index < exercises.length
+                              ? exercises[index]
+                              : null,
+                          classroom: classroom,
+                          index: index,
+                          onTap: index < exercises.length
+                              ? () => _openModeHomework(exercises[index])
+                              : widget.onOpenClassroomTab,
+                        ),
+                      ),
+                  ],
+                ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(
+            top: _isLoadingModeHomework && exercises.isEmpty ? 0 : 10,
+          ),
+          child: _studentClassroomOverviewEntrance(
+            order: 3,
+            markOnEnd: true,
+            child: StudentGameSuggestionsSection(
+              onViewAll: widget.onOpenHistoryTab,
             ),
-            const SizedBox(height: 10),
-          ],
-        ],
-        _studentClassroomOverviewEntrance(
-          order: 3,
-          markOnEnd: true,
-          child: StudentGameSuggestionsSection(
-            onViewAll: widget.onOpenHistoryTab,
           ),
         ),
       ],

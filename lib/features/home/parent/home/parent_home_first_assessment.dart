@@ -9,16 +9,17 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
   Widget buildFirstAssessmentState() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 8,
       children: [
         initialAssessmentFadeIn(
           order: 1,
           child: HomeInitialAssessmentBanner(onTap: openAssessment),
         ),
-        const SizedBox(height: 8),
         initialAssessmentFadeIn(
           order: 2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 10,
             children: [
               Expanded(
                 child: HomeImageAction(
@@ -28,7 +29,6 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
                   onTap: widget.onOpenPracticeTab,
                 ),
               ),
-              const SizedBox(width: 10),
               Expanded(
                 child: HomeImageAction(
                   asset: parentHomeClassroomAsset,
@@ -39,14 +39,16 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        initialAssessmentFadeIn(
-          order: 3,
-          markOnEnd: true,
-          child: HomeStartGuideCard(
-            onAssessmentTap: openAssessment,
-            onRoadmapTap: widget.onOpenPracticeTab,
-            onClassroomTap: showClassroomMessage,
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: initialAssessmentFadeIn(
+            order: 3,
+            markOnEnd: true,
+            child: HomeStartGuideCard(
+              onAssessmentTap: openAssessment,
+              onRoadmapTap: widget.onOpenPracticeTab,
+              onClassroomTap: showClassroomMessage,
+            ),
           ),
         ),
       ],

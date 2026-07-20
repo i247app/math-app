@@ -6,12 +6,9 @@ import 'package:numi/features/home/teacher/home/widgets/teacher_recent_assignmen
 class TeacherRecentAssignmentCarousel extends StatelessWidget {
   const TeacherRecentAssignmentCarousel({
     super.key,
-    required this.scale,
     required this.assignments,
     required this.onOpen,
   });
-
-  final double scale;
   final List<ClassroomExercise> assignments;
   final ValueChanged<ClassroomExercise> onOpen;
 
@@ -19,12 +16,11 @@ class TeacherRecentAssignmentCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppHorizontalCarousel<ClassroomExercise>(
       items: assignments,
-      itemWidth: 178 * scale,
-      height: 164 * scale,
-      gap: 14 * scale,
+      itemWidth: 178,
+      height: 164,
+      gap: 14,
       physics: const BouncingScrollPhysics(),
       itemBuilder: (context, assignment) => TeacherRecentAssignmentCard(
-        scale: scale,
         assignment: assignment,
         onTap: () => onOpen(assignment),
       ),

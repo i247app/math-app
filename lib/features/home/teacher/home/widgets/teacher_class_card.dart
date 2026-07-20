@@ -12,12 +12,9 @@ import 'package:numi/features/classroom/widgets/teacher_shared/teacher_member_su
 class TeacherClassCard extends StatelessWidget {
   const TeacherClassCard({
     super.key,
-    required this.scale,
     required this.classroom,
     required this.onTap,
   });
-
-  final double scale;
   final ClassroomModel classroom;
   final VoidCallback onTap;
 
@@ -27,43 +24,47 @@ class TeacherClassCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0x33C4C6D2)),
         boxShadow: [
-          BoxShadow(
-            color: const Color(0x1A002B6A),
-            blurRadius: 20 * scale,
-            spreadRadius: -4 * scale,
-            offset: Offset(0, 4 * scale),
+          const BoxShadow(
+            color: Color(0x1A002B6A),
+            blurRadius: 20,
+            spreadRadius: -4,
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: EdgeInsets.all(14 * scale),
+            padding: const EdgeInsets.all(14),
             child: Column(
               children: [
-                ClassThumb(classroom: classroom, scale: scale),
-                SizedBox(height: 8 * scale),
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.andika(
-                    color: Colors.black,
-                    fontSize: FontSize.normal * scale,
-                    fontWeight: FontWeight.w800,
-                    height: 1.15,
+                ClassThumb(classroom: classroom),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.andika(
+                      color: Colors.black,
+                      fontSize: FontSize.normal,
+                      fontWeight: FontWeight.w800,
+                      height: 1.15,
+                    ),
                   ),
                 ),
-                SizedBox(height: 8 * scale),
-                Divider(color: const Color(0x1AC4C6D2), height: 4 * scale),
+                const Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: Divider(color: Color(0x1AC4C6D2), height: 4),
+                ),
                 Flexible(
                   child: Text(
                     teacherMemberSummaryText(
@@ -76,29 +77,31 @@ class TeacherClassCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
                       color: AppColors.navy900.withValues(alpha: 0.60),
-                      fontSize: FontSize.caption * 0.85 * scale,
+                      fontSize: FontSize.xxxs,
                       fontWeight: FontWeight.w800,
                       height: 1.2,
                     ),
                   ),
                 ),
-                SizedBox(height: 4 * scale),
-                Container(
-                  height: 16 * scale,
-                  width: 69 * scale,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: AppColors.teal450,
-                    borderRadius: BorderRadius.circular(5 * scale),
-                  ),
-                  child: Text(
-                    context.getText(AppKeys.teacherEnterClass),
-                    maxLines: 1,
-                    style: GoogleFonts.andika(
-                      color: Colors.white,
-                      fontSize: FontSize.caption * 0.85 * scale,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Container(
+                    height: 16,
+                    width: 69,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.teal450,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      context.getText(AppKeys.teacherEnterClass),
+                      maxLines: 1,
+                      style: GoogleFonts.andika(
+                        color: Colors.white,
+                        fontSize: FontSize.xxxs,
+                        fontWeight: FontWeight.w800,
+                        height: 1,
+                      ),
                     ),
                   ),
                 ),

@@ -7,13 +7,11 @@ class StudentHomeTabButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.selected,
-    required this.scale,
     required this.onTap,
   });
 
   final String label;
   final bool selected;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -23,15 +21,15 @@ class StudentHomeTabButton extends StatelessWidget {
       button: true,
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20 * scale),
+        borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20 * scale),
+          borderRadius: BorderRadius.circular(20),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
-            height: 42 * scale,
-            padding: EdgeInsets.symmetric(horizontal: 8 * scale),
+            height: 42,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             alignment: Alignment.center,
             child: FittedBox(
               fit: BoxFit.scaleDown,
@@ -40,7 +38,7 @@ class StudentHomeTabButton extends StatelessWidget {
                 maxLines: 1,
                 style: TextStyle(
                   color: selected ? Colors.white : homeMuted,
-                  fontSize: FontSize.caption * scale,
+                  fontSize: FontSize.caption,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,

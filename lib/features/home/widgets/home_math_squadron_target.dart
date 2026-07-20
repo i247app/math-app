@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class HomeMathSquadronTarget extends StatelessWidget {
   const HomeMathSquadronTarget({super.key});
@@ -19,7 +20,7 @@ class HomeMathSquadronTarget extends StatelessWidget {
           '× 7',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 15,
+            fontSize: FontSize.compact,
             fontWeight: FontWeight.w900,
           ),
         ),
