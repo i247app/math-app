@@ -43,7 +43,7 @@ class ParentRoomTab extends StatefulWidget {
     required this.onOpenClassroomTab,
     required this.onOpenProfileMenu,
     required this.bottomPadding,
-    required this.scale,
+    this.scale = 1,
   });
 
   final LoginUser? user;

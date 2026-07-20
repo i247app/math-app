@@ -22,9 +22,7 @@ String mainShellRoleLabel(BuildContext context, ProfileRole role) {
 class DashboardHeaderBar extends StatelessWidget {
   const DashboardHeaderBar({
     super.key,
-    required this.height,
     required this.topInset,
-    required this.horizontalPadding,
     required this.name,
     required this.profile,
     required this.role,
@@ -34,9 +32,7 @@ class DashboardHeaderBar extends StatelessWidget {
     required this.onProfileTap,
   });
 
-  final double height;
   final double topInset;
-  final double horizontalPadding;
   final String name;
   final StudentProfile? profile;
   final ProfileRole role;
@@ -48,17 +44,11 @@ class DashboardHeaderBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final contentHeight = height - topInset;
 
     return RepaintBoundary(
       child: Container(
-        height: height,
-        padding: EdgeInsets.fromLTRB(
-          horizontalPadding,
-          topInset + contentHeight * 0.10,
-          horizontalPadding,
-          contentHeight * 0.10,
-        ),
+        height: topInset + 64,
+        padding: EdgeInsets.fromLTRB(14, topInset + 6, 14, 6),
         decoration: BoxDecoration(color: colors.elevatedSurface),
         child: Row(
           children: [
@@ -70,9 +60,10 @@ class DashboardHeaderBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
+                    spacing: 9,
                     children: [
                       DashboardProfileAvatar(
-                        size: contentHeight * 0.58,
+                        size: 37,
                         avatarKey: profile?.avatarKey,
                         avatarUrl: profile?.avatarUrl,
                         showStatus: role != ProfileRole.parent,
@@ -80,12 +71,12 @@ class DashboardHeaderBar extends StatelessWidget {
                             ? colors.accent.withValues(alpha: 0.35)
                             : null,
                       ),
-                      SizedBox(width: contentHeight * 0.14),
                       Flexible(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 2,
                           children: [
                             Text(
                               mainShellRoleLabel(context, role),
@@ -98,9 +89,9 @@ class DashboardHeaderBar extends StatelessWidget {
                                 height: 1.05,
                               ),
                             ),
-                            const SizedBox(height: 2),
                             Row(
                               mainAxisSize: MainAxisSize.min,
+                              spacing: 4,
                               children: [
                                 Flexible(
                                   child: Text(
@@ -117,18 +108,16 @@ class DashboardHeaderBar extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                if (canSwitchProfile) ...[
-                                  SizedBox(width: contentHeight * 0.06),
+                                if (canSwitchProfile)
                                   AnimatedRotation(
                                     turns: isProfileMenuOpen ? 0.5 : 0,
                                     duration: const Duration(milliseconds: 180),
                                     child: Icon(
                                       Icons.keyboard_arrow_down_rounded,
-                                      size: contentHeight * 0.18,
+                                      size: 12,
                                       color: colors.textMuted,
                                     ),
                                   ),
-                                ],
                               ],
                             ),
                           ],
@@ -140,13 +129,12 @@ class DashboardHeaderBar extends StatelessWidget {
               ),
             ),
             if (role == ProfileRole.parent) ...[
-              DashboardParentFireBadge(
-                count: parentStreakCount,
-                height: contentHeight * 0.45,
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: DashboardParentFireBadge(count: parentStreakCount),
               ),
-              SizedBox(width: contentHeight * 0.12),
             ],
-            DashboardNotificationButton(size: contentHeight * 0.45),
+            const DashboardNotificationButton(),
           ],
         ),
       ),
@@ -155,25 +143,20 @@ class DashboardHeaderBar extends StatelessWidget {
 }
 
 class DashboardParentFireBadge extends StatelessWidget {
-  const DashboardParentFireBadge({
-    super.key,
-    required this.count,
-    required this.height,
-  });
+  const DashboardParentFireBadge({super.key, required this.count});
 
   final int count;
-  final double height;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Container(
-      height: height,
-      constraints: BoxConstraints(minWidth: height * 1.5),
-      padding: EdgeInsets.symmetric(horizontal: height * 0.30),
+      height: 30,
+      constraints: const BoxConstraints(minWidth: 45),
+      padding: const EdgeInsets.symmetric(horizontal: 9),
       decoration: BoxDecoration(
         color: colors.accent.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(height),
+        borderRadius: BorderRadius.circular(30),
         border: Border.all(color: colors.accent.withValues(alpha: 0.35)),
       ),
       child: Row(
@@ -182,13 +165,13 @@ class DashboardParentFireBadge extends StatelessWidget {
           Icon(
             Icons.local_fire_department_rounded,
             color: colors.accent,
-            size: height * 0.66,
+            size: 20,
           ),
           Text(
             '$count',
             style: TextStyle(
               color: colors.accent,
-              fontSize: FontSize.caption * (height / 30),
+              fontSize: FontSize.caption,
               fontWeight: FontWeight.w900,
               height: 1,
             ),
@@ -267,9 +250,7 @@ class DashboardProfileAvatar extends StatelessWidget {
 }
 
 class DashboardNotificationButton extends StatelessWidget {
-  const DashboardNotificationButton({super.key, required this.size});
-
-  final double size;
+  const DashboardNotificationButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -278,18 +259,18 @@ class DashboardNotificationButton extends StatelessWidget {
       color: colors.elevatedSurface,
       shadowColor: colors.shadow.withValues(alpha: 0.24),
       elevation: 2,
-      borderRadius: BorderRadius.circular(size * 0.36),
+      borderRadius: BorderRadius.circular(11),
       child: InkWell(
         onTap: HapticFeedback.selectionClick,
-        borderRadius: BorderRadius.circular(size * 0.36),
+        borderRadius: BorderRadius.circular(11),
         child: SizedBox(
-          width: size,
-          height: size,
+          width: 30,
+          height: 30,
           child: Center(
             child: SvgPicture.asset(
               studentHomeBellAsset,
-              width: size * 0.40,
-              height: size * 0.50,
+              width: 12,
+              height: 15,
             ),
           ),
         ),

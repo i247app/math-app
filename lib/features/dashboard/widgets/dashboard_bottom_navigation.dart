@@ -14,18 +14,14 @@ import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 class DashboardBottomNavigation extends StatefulWidget {
   const DashboardBottomNavigation({
     super.key,
-    required this.height,
     required this.bottomInset,
-    required this.scale,
     required this.activeIndex,
     required this.activeRole,
     required this.user,
     required this.onTabSelected,
   });
 
-  final double height;
   final double bottomInset;
-  final double scale;
   final int activeIndex;
   final ProfileRole activeRole;
   final LoginUser? user;
@@ -164,18 +160,11 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
       ],
     };
 
-    final radius = BorderRadius.vertical(
-      top: Radius.circular(48 * widget.scale),
-    );
+    const radius = BorderRadius.vertical(top: Radius.circular(48));
 
     return Container(
-      height: widget.height,
-      padding: EdgeInsets.fromLTRB(
-        20 * widget.scale,
-        12 * widget.scale,
-        20 * widget.scale,
-        widget.bottomInset + 12 * widget.scale,
-      ),
+      height: 88 + widget.bottomInset,
+      padding: EdgeInsets.fromLTRB(20, 12, 20, widget.bottomInset + 12),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         borderRadius: radius,
@@ -188,8 +177,8 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
         boxShadow: [
           BoxShadow(
             color: colors.shadow.withValues(alpha: 0.06),
-            blurRadius: 20 * widget.scale,
-            offset: Offset(0, -6 * widget.scale),
+            blurRadius: 20,
+            offset: const Offset(0, -6),
           ),
         ],
       ),
@@ -200,7 +189,6 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
               data: items[index],
               active: _activeIndex == index,
               teacherStyle: widget.activeRole == ProfileRole.teacher,
-              scale: widget.scale,
               onTap: () => _selectTab(index),
             ),
           );
@@ -216,14 +204,12 @@ class DashboardAnimatedNavItem extends StatelessWidget {
     required this.data,
     required this.active,
     required this.teacherStyle,
-    required this.scale,
     required this.onTap,
   });
 
   final DashboardNavItemData data;
   final bool active;
   final bool teacherStyle;
-  final double scale;
   final VoidCallback onTap;
 
   @override
@@ -242,40 +228,37 @@ class DashboardAnimatedNavItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(48 * scale),
+          borderRadius: BorderRadius.circular(48),
           child: Container(
-            height: 60 * scale,
-            margin: EdgeInsets.symmetric(horizontal: 2 * scale),
-            padding: EdgeInsets.symmetric(
-              horizontal: 4 * scale,
-              vertical: 9 * scale,
-            ),
+            height: 60,
+            margin: const EdgeInsets.symmetric(horizontal: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
             decoration: BoxDecoration(
               color: active ? activeColor : Colors.transparent,
-              borderRadius: BorderRadius.circular(48 * scale),
+              borderRadius: BorderRadius.circular(48),
               boxShadow: active && !teacherStyle
                   ? [
                       BoxShadow(
                         color: colors.brand.withValues(alpha: 0.20),
-                        blurRadius: 15 * scale,
-                        offset: Offset(0, 10 * scale),
+                        blurRadius: 15,
+                        offset: const Offset(0, 10),
                       ),
                       BoxShadow(
                         color: colors.brand.withValues(alpha: 0.20),
-                        blurRadius: 6 * scale,
-                        offset: Offset(0, 4 * scale),
+                        blurRadius: 6,
+                        offset: const Offset(0, 4),
                       ),
                     ]
                   : null,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 4,
               children: [
                 SizedBox.square(
-                  dimension: 22 * scale,
+                  dimension: 22,
                   child: Center(child: _buildIcon(foregroundColor)),
                 ),
-                SizedBox(height: 4 * scale),
                 SizedBox(
                   width: double.infinity,
                   child: Text(
@@ -285,7 +268,7 @@ class DashboardAnimatedNavItem extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.andika(
                       color: foregroundColor,
-                      fontSize: FontSize.caption * 0.77 * scale,
+                      fontSize: FontSize.caption * 0.77,
                       fontWeight: FontWeight.w900,
                       height: 1,
                       letterSpacing: 0.5,
@@ -303,24 +286,20 @@ class DashboardAnimatedNavItem extends StatelessWidget {
   Widget _buildIcon(Color color) {
     final user = data.user;
     if (user != null) {
-      return DashboardUserAvatarWidget(
-        user: user,
-        size: 20 * scale,
-        color: color,
-      );
+      return DashboardUserAvatarWidget(user: user, size: 20, color: color);
     }
 
     final assetPath = data.assetPath;
     if (assetPath != null) {
       return SvgPicture.asset(
         assetPath,
-        width: 20 * scale,
-        height: 20 * scale,
+        width: 20,
+        height: 20,
         colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
       );
     }
 
-    return Icon(data.icon, color: color, size: 20 * scale);
+    return Icon(data.icon, color: color, size: 20);
   }
 }
 

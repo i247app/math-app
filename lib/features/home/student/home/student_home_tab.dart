@@ -45,7 +45,7 @@ class StudentHomeContent extends StatefulWidget {
   const StudentHomeContent({
     super.key,
     required this.padding,
-    required this.scale,
+    this.scale = 1,
     required this.user,
     required this.profiles,
     required this.activeProfile,

@@ -32,7 +32,6 @@ class ParentTabHost extends StatelessWidget {
         onOpenPracticeTab: args.onOpenPracticeTab,
         onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
         homeHeader: args.homeHeader,
       );
     }
@@ -64,7 +63,6 @@ class ParentTabHost extends StatelessWidget {
         onOpenClassroomTab: args.onOpenClassroomTab,
         onOpenProfileMenu: args.onOpenProfileMenu,
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
       );
     }
 

@@ -15,7 +15,6 @@ Widget buildSettingsTab(DashboardTabArgs args) {
     onProfileSaved: args.onProfileSaved,
     openAddProfileRequestId: args.openAddProfileRequestId,
     bottomPadding: args.bottomPadding,
-    scale: args.scale,
     isActive: args.isActive,
   );
 }

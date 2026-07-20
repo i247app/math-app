@@ -37,7 +37,6 @@ class DashboardTabArgs {
     required this.activeRefreshTick,
     required this.bottomPadding,
     this.homeHeader,
-    required this.scale,
   });
 
   final int activeTab;
@@ -67,12 +66,11 @@ class DashboardTabArgs {
   final int activeRefreshTick;
   final double bottomPadding;
   final Widget? homeHeader;
-  final double scale;
 
   EdgeInsets get contentPadding => EdgeInsets.only(
-    left: 24 * scale,
-    right: 24 * scale,
-    top: activeTab == 0 ? 0 : 24 * scale,
+    left: 24,
+    right: 24,
+    top: activeTab == 0 ? 0 : 24,
     bottom: bottomPadding,
   );
 }

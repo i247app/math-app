@@ -43,7 +43,7 @@ class TeacherHomeTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.bottomPadding,
-    required this.scale,
+    this.scale = 1,
     required this.onCompleteProfile,
     this.onOpenClassroomTab,
     this.onOpenStudyTab,

@@ -13,7 +13,7 @@ class SettingScreenArgs {
     required this.onActivateProfile,
     required this.onRefreshProfiles,
     required this.onProfileSaved,
-    required this.scale,
+    this.scale = 1,
   });
 
   final LoginUser? user;

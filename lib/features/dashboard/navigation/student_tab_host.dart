@@ -16,13 +16,7 @@ class StudentTabHost extends StatelessWidget {
   Widget build(BuildContext context) {
     if (args.activeTab == 0) {
       return StudentHomeContent(
-        padding: EdgeInsets.fromLTRB(
-          14 * args.scale,
-          0,
-          14 * args.scale,
-          args.bottomPadding,
-        ),
-        scale: args.scale,
+        padding: EdgeInsets.fromLTRB(14, 0, 14, args.bottomPadding),
         user: args.user,
         profiles: args.profiles,
         activeProfile: args.activeProfile,
@@ -48,7 +42,6 @@ class StudentTabHost extends StatelessWidget {
     if (args.activeTab == 1) {
       return StudentClassroomTab(
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
         user: args.user,
         activeProfile: args.activeProfile,
         classroomService: args.classroomService,
@@ -66,7 +59,6 @@ class StudentTabHost extends StatelessWidget {
         onRefreshProfiles: args.onRefreshProfiles,
         onAddProfile: args.onAddProfileFromPractice,
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
         activeRefreshTick: args.activeRefreshTick,
         isActive: args.isActive,
       );

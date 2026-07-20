@@ -18,7 +18,6 @@ class TeacherTabHost extends StatelessWidget {
         user: args.user,
         activeProfile: args.activeProfile,
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
         onCompleteProfile: args.onCompleteTeacherProfile,
         onOpenClassroomTab: args.onOpenClassroomTab,
         onOpenStudyTab: args.onOpenPracticeTab,
@@ -33,7 +32,6 @@ class TeacherTabHost extends StatelessWidget {
         user: args.user,
         activeProfile: args.activeProfile,
         bottomPadding: args.bottomPadding,
-        scale: args.scale,
         activeRefreshTick: args.activeRefreshTick,
         isActive: args.isActive,
       );

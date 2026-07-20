@@ -44,7 +44,6 @@ class RoleTabHost extends StatefulWidget {
     required this.profileResetSignal,
     required this.bottomPadding,
     this.homeHeader,
-    required this.scale,
   });
 
   final int activeTab;
@@ -75,7 +74,6 @@ class RoleTabHost extends StatefulWidget {
   final int profileResetSignal;
   final double bottomPadding;
   final Widget? homeHeader;
-  final double scale;
 
   @override
   State<RoleTabHost> createState() => RoleTabHostState();
@@ -199,7 +197,6 @@ class RoleTabHostState extends State<RoleTabHost> {
       activeRefreshTick: _activationTicks[tab] ?? 0,
       bottomPadding: widget.bottomPadding,
       homeHeader: tab == 0 ? widget.homeHeader : null,
-      scale: widget.scale,
     );
 
     return switch (widget.activeRole) {
@@ -219,7 +216,6 @@ class RoleTabHostState extends State<RoleTabHost> {
         previous.activeProfile != current.activeProfile ||
         previous.profileLoadError != current.profileLoadError ||
         previous.initialGrades != current.initialGrades ||
-        previous.bottomPadding != current.bottomPadding ||
-        previous.scale != current.scale;
+        previous.bottomPadding != current.bottomPadding;
   }
 }

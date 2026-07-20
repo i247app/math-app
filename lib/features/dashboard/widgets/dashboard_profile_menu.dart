@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/network/profile_models.dart';
@@ -12,31 +10,26 @@ class DashboardProfileMenu extends StatelessWidget {
   const DashboardProfileMenu({
     super.key,
     required this.profiles,
-    required this.scale,
-    required this.maxWidth,
     required this.onSelect,
   });
 
   final List<StudentProfile> profiles;
-  final double scale;
-  final double maxWidth;
   final ValueChanged<StudentProfile> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final width = _preferredWidth(context);
 
     return SizedBox(
-      width: width,
+      width: 240,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12 * scale),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: colors.shadow.withValues(alpha: 0.42),
-              blurRadius: 16 * scale,
-              spreadRadius: 1 * scale,
+              blurRadius: 16,
+              spreadRadius: 1,
               offset: Offset.zero,
             ),
           ],
@@ -44,15 +37,15 @@ class DashboardProfileMenu extends StatelessWidget {
         child: Material(
           color: colors.elevatedSurface,
           elevation: 0,
-          borderRadius: BorderRadius.circular(12 * scale),
+          borderRadius: BorderRadius.circular(12),
           clipBehavior: Clip.antiAlias,
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: 240 * scale),
+            constraints: const BoxConstraints(maxHeight: 240),
             child: ListView.separated(
               shrinkWrap: true,
-              padding: EdgeInsets.symmetric(vertical: 6 * scale),
+              padding: const EdgeInsets.symmetric(vertical: 6),
               itemCount: profiles.length,
-              separatorBuilder: (_, _) => SizedBox(height: scale),
+              separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final profile = profiles[index];
                 final name = compactProfileName(
@@ -62,18 +55,18 @@ class DashboardProfileMenu extends StatelessWidget {
                 return InkWell(
                   onTap: () => onSelect(profile),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 13 * scale,
-                      vertical: 5 * scale,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 13,
+                      vertical: 5,
                     ),
                     child: Row(
+                      spacing: 11,
                       children: [
                         ProfileAvatarImage(
-                          size: 42 * scale,
+                          size: 42,
                           avatarKey: profile.avatarKey,
                           avatarUrl: profile.avatarUrl,
                         ),
-                        SizedBox(width: 11 * scale),
                         Flexible(
                           child: Text(
                             name,
@@ -96,28 +89,8 @@ class DashboardProfileMenu extends StatelessWidget {
 
   TextStyle _nameStyle(AppThemeColors colors) => TextStyle(
     color: colors.textPrimary,
-    fontSize: FontSize.avatarName * scale,
+    fontSize: FontSize.avatarName,
     fontWeight: FontWeight.w900,
     height: 1.1,
   );
-
-  double _preferredWidth(BuildContext context) {
-    var longestNameWidth = 0.0;
-    for (final profile in profiles) {
-      final painter = TextPainter(
-        text: TextSpan(
-          text: compactProfileName(profileDisplayName(context, profile)),
-          style: _nameStyle(context.themeColors),
-        ),
-        maxLines: 1,
-        textDirection: Directionality.of(context),
-        textScaler: MediaQuery.textScalerOf(context),
-      )..layout();
-      longestNameWidth = math.max(longestNameWidth, painter.width);
-    }
-
-    final fixedContentWidth = (13 * 2 + 42 + 11) * scale;
-    final desiredWidth = fixedContentWidth + longestNameWidth + 10 * scale;
-    return desiredWidth.clamp(150 * scale, maxWidth);
-  }
 }

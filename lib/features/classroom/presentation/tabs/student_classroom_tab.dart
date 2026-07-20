@@ -25,7 +25,7 @@ class StudentClassroomTab extends StatefulWidget {
   const StudentClassroomTab({
     super.key,
     required this.bottomPadding,
-    required this.scale,
+    this.scale = 1,
     required this.user,
     required this.activeProfile,
     required this.classroomService,

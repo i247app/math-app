@@ -92,7 +92,7 @@ class PracticeTab extends StatefulWidget {
     required this.onRefreshProfiles,
     required this.onAddProfile,
     required this.bottomPadding,
-    required this.scale,
+    this.scale = 1,
     this.activeRefreshTick = 0,
     this.isActive = true,
   });

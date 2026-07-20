@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -101,9 +99,6 @@ class _DashboardScreenState extends State<DashboardScreen>
       HomeTabPerformanceMonitor();
   bool _returnToPracticeAfterProfileSave = false;
   int _parentStreakCount = 1;
-
-  static const _designWidth = 390.0;
-  static const _designHeight = 844.0;
 
   @override
   void initState() {
@@ -234,210 +229,187 @@ class _DashboardScreenState extends State<DashboardScreen>
         final profileState = _profileController.state;
         return BlocBuilder<RoleTabCubit, RoleTabState>(
           bloc: roleTabCubit,
-          builder: (context, navigation) => LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              final layoutWidth = math.min(width, 430.0);
-              final height = constraints.maxHeight;
-              final viewportHeight = MediaQuery.sizeOf(context).height;
-              final topInset = MediaQuery.paddingOf(context).top;
-              final bottomInset = MediaQuery.paddingOf(context).bottom;
-              final scale = math.min(
-                layoutWidth / _designWidth,
-                viewportHeight / _designHeight,
-              );
-              final studentName = compactProfileName(
-                _displayProfileName(
-                  context,
-                  widget.activeProfile,
-                  widget.activeRole,
-                ),
-              );
+          builder: (context, navigation) {
+            final topInset = MediaQuery.paddingOf(context).top;
+            final bottomInset = MediaQuery.paddingOf(context).bottom;
+            final studentName = compactProfileName(
+              _displayProfileName(
+                context,
+                widget.activeProfile,
+                widget.activeRole,
+              ),
+            );
 
-              double s(double value) => value * scale;
-              final navHeight = s(88) + bottomInset;
-              final headerHeight = s(64) + topInset;
-              final showHeader =
-                  widget.activeRole != ProfileRole.teacher &&
-                  navigation.activeTab == 0;
-              final switchableProfiles = widget.profiles
-                  .where(
-                    (profile) =>
-                        ActiveProfileSession.profileStableId(profile) !=
-                        ActiveProfileSession.profileStableId(
-                          widget.activeProfile,
-                        ),
-                  )
-                  .toList(growable: false);
-              final isMenuOpen = profileState.isMenuOpen;
-              final homeHeader = showHeader
-                  ? RepaintBoundary(
-                      child: DashboardHeaderBar(
-                        height: headerHeight,
-                        topInset: topInset,
-                        horizontalPadding: s(14),
-                        name: studentName,
-                        profile: widget.activeProfile,
-                        role: widget.activeRole,
-                        canSwitchProfile: switchableProfiles.isNotEmpty,
-                        isProfileMenuOpen: isMenuOpen,
-                        parentStreakCount: _parentStreakCount,
-                        onProfileTap: switchableProfiles.isEmpty
-                            ? null
-                            : () {
-                                HapticFeedback.selectionClick();
-                                _profileController.toggleMenu();
-                              },
+            final navHeight = 88 + bottomInset;
+            final headerHeight = 64 + topInset;
+            final showHeader =
+                widget.activeRole != ProfileRole.teacher &&
+                navigation.activeTab == 0;
+            final switchableProfiles = widget.profiles
+                .where(
+                  (profile) =>
+                      ActiveProfileSession.profileStableId(profile) !=
+                      ActiveProfileSession.profileStableId(
+                        widget.activeProfile,
                       ),
-                    )
-                  : null;
-              return Center(
-                child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      const Positioned.fill(
-                        child: RepaintBoundary(child: DashboardBackground()),
-                      ),
-                      Positioned.fill(
-                        child: RoleTabHost(
-                          // No ValueKey — profileResetSignal drives selective
-                          // data reload without recreating the widget subtree.
-                          profileResetSignal: profileState.profileResetSignal,
-                          activeTab: navigation.activeTab,
-                          selectionRevision: navigation.selectionRevision,
-                          user: widget.user,
-                          profiles: widget.profiles,
-                          activeProfile: widget.activeProfile,
-                          activeRole: widget.activeRole,
-                          profileLoadError: widget.profileLoadError,
-                          onRefreshProfiles: widget.onRefreshProfiles,
-                          onActivateProfile: widget.onActivateProfile,
-                          initialGrades: profileState.prefetchedGrades,
-                          gradeService: widget._gradeService ?? GradeApi(),
-                          classroomService: _classroomService,
-                          assignmentService: _assignmentService,
-                          quizService: _quizService,
-                          onLogout: () {
-                            HomeProfileCache.instance.invalidateAll();
-                            widget.onLogout();
-                          },
-                          onAddProfileFromPractice: () {
-                            HapticFeedback.selectionClick();
-                            _profileController.requestAddProfile();
-                            setState(() {
-                              _returnToPracticeAfterProfileSave = true;
-                            });
-                            _selectTab(roleTabCubit, 4);
-                          },
-                          onProfileSaved: () {
-                            if (!_returnToPracticeAfterProfileSave) {
-                              return;
-                            }
-                            setState(() {
-                              _returnToPracticeAfterProfileSave = false;
-                            });
-                            _selectTab(roleTabCubit, 3);
-                          },
-                          openAddProfileRequestId:
-                              profileState.openAddProfileRequestId,
-                          onCompleteTeacherProfile: _openTeacherProfileForm,
-                          onOpenClassroomTab: () => _selectTab(
-                            roleTabCubit,
-                            widget.activeRole == ProfileRole.parent ? 2 : 1,
-                          ),
-                          onOpenPracticeTab: () {
-                            HapticFeedback.lightImpact();
-                            _selectTab(
-                              roleTabCubit,
-                              widget.activeRole == ProfileRole.parent ? 3 : 2,
-                            );
-                          },
-                          onOpenHistoryTab: () => _selectTab(roleTabCubit, 3),
-                          onOpenProfileMenu: () {
-                            if (switchableProfiles.isEmpty || isMenuOpen) {
-                              return;
-                            }
-                            HapticFeedback.selectionClick();
-                            _profileController.openMenu();
-                          },
-                          onParentAssessmentStateChanged: (hasAssessment) {
-                            _updateParentStreak(hasAssessment ? 4 : 1);
-                          },
-                          parentHomeEntrance: _parentHomeEntranceController,
-                          bottomPadding: navHeight + s(14),
-                          homeHeader: homeHeader,
-                          scale: scale,
-                        ),
-                      ),
-                      if (isMenuOpen)
-                        Positioned.fill(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: _profileController.closeMenu,
-                          ),
-                        ),
-                      if (showHeader &&
-                          isMenuOpen &&
-                          switchableProfiles.isNotEmpty)
-                        Positioned(
-                          left: s(28),
-                          top: headerHeight - s(6),
-                          child: DashboardProfileMenu(
-                            profiles: switchableProfiles,
-                            scale: scale,
-                            maxWidth: layoutWidth - s(56),
-                            onSelect: (profile) {
+                )
+                .toList(growable: false);
+            final isMenuOpen = profileState.isMenuOpen;
+            final homeHeader = showHeader
+                ? RepaintBoundary(
+                    child: DashboardHeaderBar(
+                      topInset: topInset,
+                      name: studentName,
+                      profile: widget.activeProfile,
+                      role: widget.activeRole,
+                      canSwitchProfile: switchableProfiles.isNotEmpty,
+                      isProfileMenuOpen: isMenuOpen,
+                      parentStreakCount: _parentStreakCount,
+                      onProfileTap: switchableProfiles.isEmpty
+                          ? null
+                          : () {
                               HapticFeedback.selectionClick();
-                              _profileController.switchProfile(
-                                profile,
-                                activeProfile: widget.activeProfile,
-                                onActivateProfile: widget.onActivateProfile,
-                                onError: (_) {
-                                  if (!mounted) return;
-                                  context.showErrorDialog(
-                                    context.readText(
-                                      AppKeys.profileUpdateFailed,
-                                    ),
-                                  );
-                                },
-                              );
+                              _profileController.toggleMenu();
                             },
-                          ),
-                        ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: RepaintBoundary(
-                          child: DashboardBottomNavigation(
-                            height: navHeight,
-                            bottomInset: bottomInset,
-                            scale: scale,
-                            activeIndex: navigation.activeTab,
-                            activeRole: widget.activeRole,
-                            user: widget.user,
-                            onTabSelected: (index) {
-                              if (widget.activeRole == ProfileRole.parent &&
-                                  index != navigation.activeTab &&
-                                  index == 0) {
-                                _playParentHomeEntrance();
-                              }
-                              _selectTab(roleTabCubit, index);
-                            },
-                          ),
-                        ),
-                      ),
-                      // LoadingScreen overlay removed — skeleton in content
-                      // area provides loading feedback during profile switch.
-                    ],
+                    ),
+                  )
+                : null;
+            return Stack(
+              fit: StackFit.expand,
+              clipBehavior: Clip.none,
+              children: [
+                const Positioned.fill(
+                  child: RepaintBoundary(child: DashboardBackground()),
+                ),
+                Positioned.fill(
+                  child: RoleTabHost(
+                    // No ValueKey — profileResetSignal drives selective
+                    // data reload without recreating the widget subtree.
+                    profileResetSignal: profileState.profileResetSignal,
+                    activeTab: navigation.activeTab,
+                    selectionRevision: navigation.selectionRevision,
+                    user: widget.user,
+                    profiles: widget.profiles,
+                    activeProfile: widget.activeProfile,
+                    activeRole: widget.activeRole,
+                    profileLoadError: widget.profileLoadError,
+                    onRefreshProfiles: widget.onRefreshProfiles,
+                    onActivateProfile: widget.onActivateProfile,
+                    initialGrades: profileState.prefetchedGrades,
+                    gradeService: widget._gradeService ?? GradeApi(),
+                    classroomService: _classroomService,
+                    assignmentService: _assignmentService,
+                    quizService: _quizService,
+                    onLogout: () {
+                      HomeProfileCache.instance.invalidateAll();
+                      widget.onLogout();
+                    },
+                    onAddProfileFromPractice: () {
+                      HapticFeedback.selectionClick();
+                      _profileController.requestAddProfile();
+                      setState(() {
+                        _returnToPracticeAfterProfileSave = true;
+                      });
+                      _selectTab(roleTabCubit, 4);
+                    },
+                    onProfileSaved: () {
+                      if (!_returnToPracticeAfterProfileSave) {
+                        return;
+                      }
+                      setState(() {
+                        _returnToPracticeAfterProfileSave = false;
+                      });
+                      _selectTab(roleTabCubit, 3);
+                    },
+                    openAddProfileRequestId:
+                        profileState.openAddProfileRequestId,
+                    onCompleteTeacherProfile: _openTeacherProfileForm,
+                    onOpenClassroomTab: () => _selectTab(
+                      roleTabCubit,
+                      widget.activeRole == ProfileRole.parent ? 2 : 1,
+                    ),
+                    onOpenPracticeTab: () {
+                      HapticFeedback.lightImpact();
+                      _selectTab(
+                        roleTabCubit,
+                        widget.activeRole == ProfileRole.parent ? 3 : 2,
+                      );
+                    },
+                    onOpenHistoryTab: () => _selectTab(roleTabCubit, 3),
+                    onOpenProfileMenu: () {
+                      if (switchableProfiles.isEmpty || isMenuOpen) {
+                        return;
+                      }
+                      HapticFeedback.selectionClick();
+                      _profileController.openMenu();
+                    },
+                    onParentAssessmentStateChanged: (hasAssessment) {
+                      _updateParentStreak(hasAssessment ? 4 : 1);
+                    },
+                    parentHomeEntrance: _parentHomeEntranceController,
+                    bottomPadding: navHeight + 14,
+                    homeHeader: homeHeader,
                   ),
                 ),
-              );
-            },
-          ),
+                if (isMenuOpen)
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: _profileController.closeMenu,
+                    ),
+                  ),
+                if (showHeader && isMenuOpen && switchableProfiles.isNotEmpty)
+                  Positioned(
+                    left: 28,
+                    right: 28,
+                    top: headerHeight - 6,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: DashboardProfileMenu(
+                        profiles: switchableProfiles,
+                        onSelect: (profile) {
+                          HapticFeedback.selectionClick();
+                          _profileController.switchProfile(
+                            profile,
+                            activeProfile: widget.activeProfile,
+                            onActivateProfile: widget.onActivateProfile,
+                            onError: (_) {
+                              if (!mounted) return;
+                              context.showErrorDialog(
+                                context.readText(AppKeys.profileUpdateFailed),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: RepaintBoundary(
+                    child: DashboardBottomNavigation(
+                      bottomInset: bottomInset,
+                      activeIndex: navigation.activeTab,
+                      activeRole: widget.activeRole,
+                      user: widget.user,
+                      onTabSelected: (index) {
+                        if (widget.activeRole == ProfileRole.parent &&
+                            index != navigation.activeTab &&
+                            index == 0) {
+                          _playParentHomeEntrance();
+                        }
+                        _selectTab(roleTabCubit, index);
+                      },
+                    ),
+                  ),
+                ),
+                // LoadingScreen overlay removed — skeleton in content
+                // area provides loading feedback during profile switch.
+              ],
+            );
+          },
         );
       },
     );
@@ -490,12 +462,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     if (profile == null) {
       return;
     }
-    final size = MediaQuery.sizeOf(context);
-    final scale = math.min(
-      math.min(size.width, 430.0) / _designWidth,
-      size.height / _designHeight,
-    );
-
     final didSave = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (routeContext) => Material(
@@ -512,7 +478,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                 onActivateProfile: widget.onActivateProfile,
                 onRefreshProfiles: widget.onRefreshProfiles,
                 onProfileSaved: () => Navigator.of(routeContext).pop(true),
-                scale: scale,
               ),
               initialView: SettingPageView.addProfile,
               initialEditingProfile: profile,

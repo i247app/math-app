@@ -52,7 +52,7 @@ class ParentHomeContent extends StatefulWidget {
     required this.onOpenPracticeTab,
     required this.onParentAssessmentStateChanged,
     required this.bottomPadding,
-    required this.scale,
+    this.scale = 1,
     this.homeHeader,
   });
 

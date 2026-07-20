@@ -26,7 +26,7 @@ class TeacherClassroomTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.bottomPadding,
-    required this.scale,
+    this.scale = 1,
     this.activeRefreshTick = 0,
     this.isActive = true,
   });
