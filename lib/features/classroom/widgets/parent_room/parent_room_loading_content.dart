@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_skeleton_block.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_skeleton_line.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_line.dart';
 
 class ParentRoomLoadingContent extends StatelessWidget {
-  const ParentRoomLoadingContent({super.key});
+  const ParentRoomLoadingContent({super.key, required this.color});
+
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -19,19 +21,19 @@ class ParentRoomLoadingContent extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           childAspectRatio: 1.55,
           padding: EdgeInsets.zero,
-          children: const [
-            ParentRoomSkeletonBlock(),
-            ParentRoomSkeletonBlock(),
+          children: [
+            AppSkeletonBlock(radius: 16, color: color),
+            AppSkeletonBlock(radius: 16, color: color),
           ],
         ),
-        const Padding(
-          padding: EdgeInsets.only(top: 10),
-          child: ParentRoomSkeletonLine(width: 128),
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: AppSkeletonLine(width: 128, height: 22, color: color),
         ),
-        const ParentRoomSkeletonBlock(height: 104),
-        const ParentRoomSkeletonBlock(height: 104),
-        const ParentRoomSkeletonLine(width: 92),
-        const ParentRoomSkeletonBlock(height: 104),
+        AppSkeletonBlock(height: 104, radius: 16, color: color),
+        AppSkeletonBlock(height: 104, radius: 16, color: color),
+        AppSkeletonLine(width: 92, height: 22, color: color),
+        AppSkeletonBlock(height: 104, radius: 16, color: color),
       ],
     );
   }
