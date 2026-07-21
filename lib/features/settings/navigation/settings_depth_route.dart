@@ -5,26 +5,17 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 class SettingsDepthRoute<T> extends PageRouteBuilder<T> {
   SettingsDepthRoute({required WidgetBuilder builder})
     : super(
-        transitionDuration: const Duration(milliseconds: 420),
-        reverseTransitionDuration: const Duration(milliseconds: 380),
+        transitionDuration: const Duration(milliseconds: 430),
+        reverseTransitionDuration: const Duration(milliseconds: 430),
         opaque: false,
         allowSnapshotting: false,
         pageBuilder: (context, animation, secondaryAnimation) =>
             builder(context),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return AnimatedBuilder(
+          return _SettingsPageSlide(
             animation: animation,
+            incoming: true,
             child: child,
-            builder: (context, child) {
-              final isReversing = animation.status == AnimationStatus.reverse;
-              final progress =
-                  (isReversing ? Curves.easeInCubic : Curves.easeOutCubic)
-                      .transform(animation.value);
-              if (isReversing) {
-                return Opacity(opacity: progress, child: child);
-              }
-              return child ?? const SizedBox.shrink();
-            },
           );
         },
       );
@@ -40,36 +31,57 @@ class SettingsDepthRoute<T> extends PageRouteBuilder<T> {
     bool allowSnapshotting,
     Widget? child,
   ) {
-    return AnimatedBuilder(
-      animation: secondaryAnimation,
-      child: child,
-      builder: (context, child) {
-        final isReversing =
-            secondaryAnimation.status == AnimationStatus.reverse;
-        final progress =
-            (isReversing ? Curves.easeInCubic : Curves.easeOutCubic).transform(
-              secondaryAnimation.value,
-            );
-        if (isReversing) {
-          return ColoredBox(
-            color: context.themeColors.pageBackground,
-            child: Transform.scale(
-              scale: 1 + (0.14 * progress),
-              alignment: Alignment.center,
-              child: child,
-            ),
-          );
-        }
+    return ColoredBox(
+      color: context.themeColors.pageBackground,
+      child: _SettingsPageSlide(
+        animation: secondaryAnimation,
+        incoming: false,
+        child: child ?? const SizedBox.shrink(),
+      ),
+    );
+  }
+}
 
-        return ColoredBox(
-          color: context.themeColors.pageBackground,
-          child: Transform.scale(
-            scale: 1 - (0.12 * progress),
-            alignment: Alignment.center,
+class _SettingsPageSlide extends StatelessWidget {
+  const _SettingsPageSlide({
+    required this.animation,
+    required this.incoming,
+    required this.child,
+  });
+
+  final Animation<double> animation;
+  final bool incoming;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return AnimatedBuilder(
+            animation: animation,
             child: child,
-          ),
-        );
-      },
+            builder: (context, child) {
+              final isReversing = animation.status == AnimationStatus.reverse;
+              final elapsed = isReversing
+                  ? 1 - animation.value
+                  : animation.value;
+              final progress = Curves.easeOutCubic.transform(elapsed);
+              final distance = switch ((incoming, isReversing)) {
+                (true, false) => 1 - progress,
+                (true, true) => progress,
+                (false, false) => -progress,
+                (false, true) => -(1 - progress),
+              };
+
+              return Transform.translate(
+                offset: Offset(constraints.maxWidth * distance, 0),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -207,7 +207,8 @@ class _SettingTabState extends State<SettingTab>
       editingProfile,
       openAddProfileOnStart: openAddProfileOnStart,
     );
-    final route = view == SettingPageView.account
+    final route =
+        view == SettingPageView.account || view == SettingPageView.profile
         ? SettingsDepthRoute<bool>(builder: (_) => screen)
         : MaterialPageRoute<bool>(builder: (_) => screen);
     final didSave = await Navigator.of(context).push<bool>(route);
