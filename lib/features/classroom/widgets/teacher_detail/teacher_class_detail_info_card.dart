@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -17,7 +17,6 @@ import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_he
 class TeacherClassDetailInfoCard extends StatelessWidget {
   const TeacherClassDetailInfoCard({
     super.key,
-    required this.scale,
     required this.classroom,
     required this.grades,
     required this.programs,
@@ -26,8 +25,6 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
     required this.isExpanded,
     required this.onToggleExpanded,
   });
-
-  final double scale;
   final ClassroomModel? classroom;
   final List<GradeModel> grades;
   final List<ProgramModel> programs;
@@ -49,7 +46,7 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
     final code = classCode(classroom);
     final joinLink = 'numinumi.vn/join/$code';
 
-    final radius = BorderRadius.circular(24 * scale);
+    final radius = BorderRadius.circular(24);
 
     return Material(
       color: Colors.transparent,
@@ -64,28 +61,23 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
           alignment: Alignment.topCenter,
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.fromLTRB(
-              16 * scale,
-              15 * scale,
-              16 * scale,
-              8 * scale,
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 15, 16, 8),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: radius,
               border: Border.all(color: const Color(0x80CCCCCC)),
               boxShadow: [
-                BoxShadow(
-                  color: const Color(0x0D000000),
-                  blurRadius: 10 * scale,
-                  offset: Offset(3 * scale, 3 * scale),
+                const BoxShadow(
+                  color: Color(0x0D000000),
+                  blurRadius: 10,
+                  offset: Offset(3, 3),
                 ),
               ],
             ),
             child: isLoading
-                ? SizedBox(
-                    height: 164 * scale,
-                    child: const Center(
+                ? const SizedBox(
+                    height: 164,
+                    child: Center(
                       child: CircularProgressIndicator(
                         color: AppColors.teal520,
                       ),
@@ -96,59 +88,61 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(
-                        height: 67 * scale,
+                        height: 67,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              width: 71 * scale,
-                              height: 64 * scale,
+                              width: 71,
+                              height: 64,
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFCE4EC),
-                                borderRadius: BorderRadius.circular(12 * scale),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                               alignment: Alignment.center,
                               child: SvgPicture.asset(
                                 'assets/images/teacher_class_graduation.svg',
-                                width: 40 * scale,
-                                height: 40 * scale,
+                                width: 40,
+                                height: 40,
                               ),
                             ),
-                            SizedBox(width: 15 * scale),
                             Expanded(
-                              child: SizedBox(
-                                height: 64 * scale,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.andika(
-                                          color: AppColors.textInkDark,
-                                          fontSize: 20 * scale,
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.6,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 15),
+                                child: SizedBox(
+                                  height: 64,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          title,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: AppColors.textInkDark,
+                                            fontSize: FontSize.xl,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.6,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    InkWell(
-                                      onTap: () =>
-                                          copyClassroomInfo(context, joinLink),
-                                      borderRadius: BorderRadius.circular(
-                                        8 * scale,
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(4 * scale),
-                                        child: Image.asset(
-                                          'assets/images/teacher_class_share.png',
-                                          width: 23 * scale,
-                                          height: 23 * scale,
+                                      InkWell(
+                                        onTap: () => copyClassroomInfo(
+                                          context,
+                                          joinLink,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(4),
+                                          child: Image.asset(
+                                            'assets/images/teacher_class_share.png',
+                                            width: 23,
+                                            height: 23,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -174,34 +168,32 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                                 key: const ValueKey('class-meta-expanded'),
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height: 12 * scale),
-                                  SizedBox(
-                                    height: 74 * scale,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        TeacherClassDetailMetaRow(
-                                          scale: scale,
-                                          iconAsset:
-                                              'assets/images/teacher_class_grade.png',
-                                          text: grade,
-                                        ),
-                                        SizedBox(height: 5 * scale),
-                                        TeacherClassDetailMetaRow(
-                                          scale: scale,
-                                          iconAsset:
-                                              'assets/images/teacher_class_program.png',
-                                          text: program,
-                                        ),
-                                        SizedBox(height: 5 * scale),
-                                        TeacherClassDetailMetaRow(
-                                          scale: scale,
-                                          iconAsset:
-                                              'assets/images/teacher_class_description.png',
-                                          text: schoolName,
-                                        ),
-                                      ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: SizedBox(
+                                      height: 74,
+                                      child: Column(
+                                        spacing: 5,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          TeacherClassDetailMetaRow(
+                                            iconAsset:
+                                                'assets/images/teacher_class_grade.png',
+                                            text: grade,
+                                          ),
+                                          TeacherClassDetailMetaRow(
+                                            iconAsset:
+                                                'assets/images/teacher_class_program.png',
+                                            text: program,
+                                          ),
+                                          TeacherClassDetailMetaRow(
+                                            iconAsset:
+                                                'assets/images/teacher_class_description.png',
+                                            text: schoolName,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -210,92 +202,96 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                                 key: ValueKey('class-meta-collapsed'),
                               ),
                       ),
-                      SizedBox(height: 14 * scale),
-                      SizedBox(
-                        height: 27 * scale,
-                        child: Row(
-                          children: [
-                            TeacherClassDetailCodeChip(
-                              scale: scale,
-                              code: code,
-                              onCopy: () => copyClassroomInfo(context, code),
-                            ),
-                            const Spacer(),
-                            Image.asset(
-                              'assets/images/teacher_class_qr.png',
-                              width: 18 * scale,
-                              height: 18 * scale,
-                            ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.only(top: 14),
+                        child: SizedBox(
+                          height: 27,
+                          child: Row(
+                            children: [
+                              TeacherClassDetailCodeChip(
+                                code: code,
+                                onCopy: () => copyClassroomInfo(context, code),
+                              ),
+                              const Spacer(),
+                              Image.asset(
+                                'assets/images/teacher_class_qr.png',
+                                width: 18,
+                                height: 18,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      SizedBox(height: 11 * scale),
-                      Container(
-                        height: 38 * scale,
-                        padding: EdgeInsets.symmetric(horizontal: 21 * scale),
-                        decoration: BoxDecoration(
-                          color: AppColors.teacherMint,
-                          borderRadius: BorderRadius.circular(16 * scale),
-                          border: Border.all(color: const Color(0xFFEFF6FF)),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                joinLink,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.andika(
-                                  color: const Color(0xFF1E3A5F),
-                                  fontSize: 14 * scale,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.7,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 11),
+                        child: Container(
+                          height: 38,
+                          padding: const EdgeInsets.symmetric(horizontal: 21),
+                          decoration: BoxDecoration(
+                            color: AppColors.teacherMint,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFEFF6FF)),
+                          ),
+                          child: Row(
+                            spacing: 8,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  joinLink,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFF1E3A5F),
+                                    fontSize: FontSize.small,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.7,
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 8 * scale),
-                            InkWell(
-                              onTap: () => copyClassroomInfo(context, joinLink),
-                              borderRadius: BorderRadius.circular(8 * scale),
+                              InkWell(
+                                onTap: () =>
+                                    copyClassroomInfo(context, joinLink),
+                                borderRadius: BorderRadius.circular(8),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2),
+                                  child: SvgPicture.asset(
+                                    'assets/images/teacher_class_copy.svg',
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (isExpanded)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16, bottom: 4),
+                          child: Center(
+                            child: InkWell(
+                              onTap: onToggleExpanded,
+                              borderRadius: BorderRadius.circular(10),
                               child: Padding(
-                                padding: EdgeInsets.all(2 * scale),
-                                child: SvgPicture.asset(
-                                  'assets/images/teacher_class_copy.svg',
-                                  width: 20 * scale,
-                                  height: 20 * scale,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 5,
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (isExpanded) ...[
-                        SizedBox(height: 16 * scale),
-                        Center(
-                          child: InkWell(
-                            onTap: onToggleExpanded,
-                            borderRadius: BorderRadius.circular(10 * scale),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12 * scale,
-                                vertical: 5 * scale,
-                              ),
-                              child: Text(
-                                context.getText(AppKeys.teacherClassHideLess),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.andika(
-                                  color: AppColors.textCoolMuted,
-                                  fontSize: 13 * scale,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.2,
+                                child: Text(
+                                  context.getText(AppKeys.teacherClassHideLess),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppColors.textCoolMuted,
+                                    fontSize: FontSize.xs,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.2,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: 4 * scale),
-                      ],
                     ],
                   ),
           ),

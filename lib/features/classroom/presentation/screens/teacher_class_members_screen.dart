@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -114,35 +112,24 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
         bottom: false,
         child: Stack(
           children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final scale = math.min(constraints.maxWidth / 390, 1.12);
-                return BlocSelector<
-                  ClassroomCubit,
-                  ClassroomState,
-                  ClassroomMembersState
-                >(
-                  selector: (state) =>
-                      state.members(widget.profileId, widget.classroomId),
-                  builder: (context, membersState) {
-                    return TeacherClassMembersContent(
-                      scale: scale,
-                      isLoading: membersState.isLoading,
-                      isSendingInvites: _isSendingInvites,
-                      error: membersState.errorMessage,
-                      joinRequests: membersState.joinRequests,
-                      members: membersState.members,
-                      processingProfileIds: _processingProfileIds,
-                      onBack: () => Navigator.of(context).maybePop(),
-                      onRefresh: () => _loadMembers(forceRefresh: true),
-                      onOpenStudentSearch: () =>
-                          _openStudentSearchSheet(context),
-                      onApprove: (request) =>
-                          _handleJoinRequest(request, approve: true),
-                      onReject: (request) =>
-                          _handleJoinRequest(request, approve: false),
-                    );
-                  },
+            BlocSelector<ClassroomCubit, ClassroomState, ClassroomMembersState>(
+              selector: (state) =>
+                  state.members(widget.profileId, widget.classroomId),
+              builder: (context, membersState) {
+                return TeacherClassMembersContent(
+                  isLoading: membersState.isLoading,
+                  isSendingInvites: _isSendingInvites,
+                  error: membersState.errorMessage,
+                  joinRequests: membersState.joinRequests,
+                  members: membersState.members,
+                  processingProfileIds: _processingProfileIds,
+                  onBack: () => Navigator.of(context).maybePop(),
+                  onRefresh: () => _loadMembers(forceRefresh: true),
+                  onOpenStudentSearch: () => _openStudentSearchSheet(context),
+                  onApprove: (request) =>
+                      _handleJoinRequest(request, approve: true),
+                  onReject: (request) =>
+                      _handleJoinRequest(request, approve: false),
                 );
               },
             ),

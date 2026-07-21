@@ -1,5 +1,6 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -64,93 +65,108 @@ class StudentJoinFilterPanel extends StatelessWidget {
         children: [
           if (error != null) ...[
             StudentJoinRetryBanner(message: error!, onRetry: onRetry),
-            if (showSchoolFilter || showGradeFilter) const SizedBox(height: 13),
           ],
           if (showSchoolFilter) ...[
-            StudentJoinFilterLabel(context.getText(AppKeys.school)),
-            const SizedBox(height: 7),
-            StudentJoinSchoolFilterField(
-              valueText: selectedSchools.isEmpty
-                  ? context.getText(AppKeys.chooseSchool)
-                  : selectedSchools
-                        .map((school) => studentJoinSchoolName(context, school))
-                        .join(', '),
-              selected: selectedSchools.isNotEmpty,
-              isLoading: isLoading,
-              onTap: schools.isEmpty ? null : onSchoolTap,
+            Padding(
+              padding: EdgeInsets.only(top: error != null ? 13 : 0),
+              child: StudentJoinFilterLabel(context.getText(AppKeys.school)),
             ),
-            if (selectedSchools.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final school in selectedSchools)
-                    StudentJoinSelectedFilterPill(
-                      label: studentJoinSchoolName(context, school),
-                      onRemove: () {
-                        final schoolId = schoolStableId(school);
-                        if (schoolId != null) {
-                          onSchoolRemove(schoolId);
-                        }
+            Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: StudentJoinSchoolFilterField(
+                valueText: selectedSchools.isEmpty
+                    ? context.getText(AppKeys.chooseSchool)
+                    : selectedSchools
+                          .map(
+                            (school) => studentJoinSchoolName(context, school),
+                          )
+                          .join(', '),
+                selected: selectedSchools.isNotEmpty,
+                isLoading: isLoading,
+                onTap: schools.isEmpty ? null : onSchoolTap,
+              ),
+            ),
+            if (selectedSchools.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final school in selectedSchools)
+                      StudentJoinSelectedFilterPill(
+                        label: studentJoinSchoolName(context, school),
+                        onRemove: () {
+                          final schoolId = schoolStableId(school);
+                          if (schoolId != null) {
+                            onSchoolRemove(schoolId);
+                          }
+                        },
+                      ),
+                  ],
+                ),
+              ),
+          ],
+          if (showGradeFilter) ...[
+            Padding(
+              padding: EdgeInsets.only(
+                top: showSchoolFilter || error != null ? 13 : 0,
+              ),
+              child: StudentJoinFilterLabel(context.getText(AppKeys.grade)),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: isLoading && grades.isEmpty
+                  ? const SizedBox(
+                      height: 30,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    )
+                  : grades.isEmpty
+                  ? Text(
+                      context.getText(AppKeys.noGrades),
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: FontSize.xs,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )
+                  : GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      itemCount: grades.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 10,
+                            mainAxisExtent: 30,
+                          ),
+                      itemBuilder: (context, index) {
+                        final grade = grades[index];
+                        return StudentJoinGradeChip(
+                          label: studentJoinGradeLabel(context, grade),
+                          selected: selectedGradeIds.contains(
+                            gradeStableId(grade),
+                          ),
+                          onTap: () => onGradeTap(grade),
+                          onRemove: () {
+                            final gradeId = gradeStableId(grade);
+                            if (gradeId != null) {
+                              onGradeRemove(gradeId);
+                            }
+                          },
+                        );
                       },
                     ),
-                ],
-              ),
-            ],
-          ],
-          if (showSchoolFilter && showGradeFilter) const SizedBox(height: 13),
-          if (showGradeFilter) ...[
-            StudentJoinFilterLabel(context.getText(AppKeys.grade)),
-            const SizedBox(height: 7),
-            if (isLoading && grades.isEmpty)
-              const SizedBox(
-                height: 30,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              )
-            else if (grades.isEmpty)
-              Text(
-                context.getText(AppKeys.noGrades),
-                style: const TextStyle(
-                  color: AppColors.textMuted,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              )
-            else
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                itemCount: grades.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 10,
-                  mainAxisExtent: 30,
-                ),
-                itemBuilder: (context, index) {
-                  final grade = grades[index];
-                  return StudentJoinGradeChip(
-                    label: studentJoinGradeLabel(context, grade),
-                    selected: selectedGradeIds.contains(gradeStableId(grade)),
-                    onTap: () => onGradeTap(grade),
-                    onRemove: () {
-                      final gradeId = gradeStableId(grade);
-                      if (gradeId != null) {
-                        onGradeRemove(gradeId);
-                      }
-                    },
-                  );
-                },
-              ),
+            ),
           ],
         ],
       ),

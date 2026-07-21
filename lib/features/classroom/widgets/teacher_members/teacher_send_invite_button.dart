@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -32,7 +32,10 @@ class TeacherSendInviteButton extends StatelessWidget {
         ),
         child: Text(
           context.getText(AppKeys.teacherSendInviteRequest),
-          style: GoogleFonts.andika(fontSize: 16, fontWeight: FontWeight.w800),
+          style: const TextStyle(
+            fontSize: FontSize.normal,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
     );

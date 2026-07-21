@@ -49,24 +49,28 @@ class _ParentRoomCompletionCard extends StatelessWidget {
             childName: childName,
             classroomName: classroomName,
           ),
-          const SizedBox(height: 9),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF121B42),
-              fontSize: FontSize.normal,
-              fontWeight: FontWeight.w900,
-              height: 1.05,
+          Padding(
+            padding: const EdgeInsets.only(top: 9),
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF121B42),
+                fontSize: FontSize.normal,
+                fontWeight: FontWeight.w900,
+                height: 1.05,
+              ),
             ),
           ),
-          const SizedBox(height: 7),
-          ParentTaskMetaChip(
-            label: purpose,
-            color: accent.withValues(alpha: 0.13),
-            textColor: accent,
-            fontSize: FontSize.xxs,
+          Padding(
+            padding: const EdgeInsets.only(top: 7),
+            child: ParentTaskMetaChip(
+              label: purpose,
+              color: accent.withValues(alpha: 0.13),
+              textColor: accent,
+              fontSize: FontSize.xxs,
+            ),
           ),
         ],
       ),

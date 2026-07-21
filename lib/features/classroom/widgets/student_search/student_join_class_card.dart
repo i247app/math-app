@@ -1,6 +1,7 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -79,61 +80,66 @@ class StudentJoinClassCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textNavy,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            height: 1.25,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          teacher,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textMuted,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            height: 1.4,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 5,
-                          children: [
-                            if (code != null)
-                              StudentJoinClassBadge(
-                                label: context.formatText(
-                                  AppKeys.studentClassCodeLabel,
-                                  {'code': code},
-                                ),
-                                color: const Color(0xFFE5E8EB),
-                                textColor: const Color(0xFF747781),
-                              ),
-                            StudentJoinClassBadge(
-                              label: context.getText(action.labelKey),
-                              color: action.badgeColor,
-                              textColor: action.badgeTextColor,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppColors.textNavy,
+                              fontSize: FontSize.normal,
+                              fontWeight: FontWeight.w700,
+                              height: 1.25,
+                              letterSpacing: 0,
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              teacher,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: FontSize.small,
+                                fontWeight: FontWeight.w700,
+                                height: 1.4,
+                                letterSpacing: 0,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 5,
+                              children: [
+                                if (code != null)
+                                  StudentJoinClassBadge(
+                                    label: context.formatText(
+                                      AppKeys.studentClassCodeLabel,
+                                      {'code': code},
+                                    ),
+                                    color: const Color(0xFFE5E8EB),
+                                    textColor: const Color(0xFF747781),
+                                  ),
+                                StudentJoinClassBadge(
+                                  label: context.getText(action.labelKey),
+                                  color: action.badgeColor,
+                                  textColor: action.badgeTextColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 10),
                   SizedBox(
                     width: 62,
                     height: 36,

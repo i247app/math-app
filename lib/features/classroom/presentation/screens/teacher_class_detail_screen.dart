@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -132,86 +130,71 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
       selector: (state) => state.detail(widget.profileId, widget.classroomId),
       builder: (context, detailState) {
         final colors = context.themeColors;
+        final classroom = detailState.classroom ?? widget.initialClassroom;
+        final students = classroom?.students ?? const <ClassroomStudent>[];
+        final count = classroom?.displayStudentCount ?? students.length;
+        final requestCount = classroom?.displayPendingRequestCount ?? 0;
         return Scaffold(
           backgroundColor: colors.pageBackground,
           body: SafeArea(
             bottom: false,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final scale = math.min(constraints.maxWidth / 390, 1.12);
-                final classroom =
-                    detailState.classroom ?? widget.initialClassroom;
-                final students =
-                    classroom?.students ?? const <ClassroomStudent>[];
-                final count = classroom?.displayStudentCount ?? students.length;
-                final requestCount = classroom?.displayPendingRequestCount ?? 0;
-
-                return Column(
-                  children: [
-                    AppScreenAppBar(
-                      backIconAsset: 'assets/images/teacher_class_back.svg',
-                      title: context.getText(AppKeys.teacherClassDetailTitle),
-                      scale: scale,
-                      onBack: () => Navigator.of(context).maybePop(),
-                    ),
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: colors.brandStrong,
-                        onRefresh: () => _loadDetail(forceRefresh: true),
-                        child: SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(
-                            parent: BouncingScrollPhysics(),
-                          ),
-                          padding: EdgeInsets.fromLTRB(
-                            16 * scale,
-                            18 * scale,
-                            16 * scale,
-                            MediaQuery.paddingOf(context).bottom + 28 * scale,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (detailState.errorMessage != null &&
-                                  classroom == null)
-                                AppRetryPanel(
-                                  scale: scale,
-                                  message: detailState.errorMessage!,
-                                  onRetry: () =>
-                                      _loadDetail(forceRefresh: true),
-                                )
-                              else
-                                TeacherClassDetailInfoCard(
-                                  scale: scale,
-                                  classroom: classroom,
-                                  grades: _grades,
-                                  programs: _programs,
-                                  schools: _schools,
-                                  isLoading:
-                                      detailState.isLoading &&
-                                      classroom == null,
-                                  isExpanded: _isInfoExpanded,
-                                  onToggleExpanded: _toggleInfoExpanded,
-                                ),
-                              if (detailState.errorMessage == null ||
-                                  classroom != null)
-                                TeacherClassDetailLowerContent(
-                                  scale: scale,
-                                  memberCount: count,
-                                  requestCount: requestCount,
-                                  onOpenAssignments: () =>
-                                      _openHomework(classroom),
-                                  onOpenAssessments: () =>
-                                      _openAssessment(classroom),
-                                  onOpenMembers: _openMembers,
-                                ),
-                            ],
-                          ),
-                        ),
+            child: Column(
+              children: [
+                AppScreenAppBar(
+                  backIconAsset: 'assets/images/teacher_class_back.svg',
+                  title: context.getText(AppKeys.teacherClassDetailTitle),
+                  onBack: () => Navigator.of(context).maybePop(),
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    color: colors.brandStrong,
+                    onRefresh: () => _loadDetail(forceRefresh: true),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      padding: EdgeInsets.fromLTRB(
+                        16,
+                        18,
+                        16,
+                        MediaQuery.paddingOf(context).bottom + 28,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (detailState.errorMessage != null &&
+                              classroom == null)
+                            AppRetryPanel(
+                              message: detailState.errorMessage!,
+                              onRetry: () => _loadDetail(forceRefresh: true),
+                            )
+                          else
+                            TeacherClassDetailInfoCard(
+                              classroom: classroom,
+                              grades: _grades,
+                              programs: _programs,
+                              schools: _schools,
+                              isLoading:
+                                  detailState.isLoading && classroom == null,
+                              isExpanded: _isInfoExpanded,
+                              onToggleExpanded: _toggleInfoExpanded,
+                            ),
+                          if (detailState.errorMessage == null ||
+                              classroom != null)
+                            TeacherClassDetailLowerContent(
+                              memberCount: count,
+                              requestCount: requestCount,
+                              onOpenAssignments: () => _openHomework(classroom),
+                              onOpenAssessments: () =>
+                                  _openAssessment(classroom),
+                              onOpenMembers: _openMembers,
+                            ),
+                        ],
                       ),
                     ),
-                  ],
-                );
-              },
+                  ),
+                ),
+              ],
             ),
           ),
         );

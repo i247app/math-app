@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 class ParentRoomDetailTopBar extends StatelessWidget {
@@ -44,9 +44,9 @@ class ParentRoomDetailTopBar extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: GoogleFonts.andika(
+              style: TextStyle(
                 color: colors.brandStrong,
-                fontSize: 25,
+                fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w700,
                 height: 34 / 25,
               ),

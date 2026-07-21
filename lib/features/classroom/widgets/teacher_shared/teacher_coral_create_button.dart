@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -60,7 +59,7 @@ class TeacherCoralCreateButton extends StatelessWidget {
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.andika(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: FontSize.large,
                       fontWeight: FontWeight.w900,

@@ -54,10 +54,11 @@ class ParentRoomTaskShell extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 14),
                 child: Row(
                   children: [
-                    if (leading != null) ...[
-                      leading!,
-                      const SizedBox(width: 13),
-                    ],
+                    if (leading != null)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 13),
+                        child: leading!,
+                      ),
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(0, 12, 12, 12),

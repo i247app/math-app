@@ -37,12 +37,14 @@ class ParentRoomTaskHeader extends StatelessWidget {
             textColor: const Color(0xFF4F5960),
             fontSize: FontSize.xxs,
           ),
-        const SizedBox(width: 5),
-        ParentTaskMetaChip(
-          label: classroomName,
-          color: const Color(0xFFF2F4F6),
-          textColor: const Color(0xFF4F5960),
-          fontSize: FontSize.xxs,
+        Padding(
+          padding: const EdgeInsets.only(left: 5),
+          child: ParentTaskMetaChip(
+            label: classroomName,
+            color: const Color(0xFFF2F4F6),
+            textColor: const Color(0xFF4F5960),
+            fontSize: FontSize.xxs,
+          ),
         ),
       ],
     );

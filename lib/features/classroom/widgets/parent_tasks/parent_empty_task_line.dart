@@ -17,13 +17,13 @@ class ParentEmptyTaskLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Row(
+      spacing: 14,
       children: [
         ParentTaskIconBox(
           icon: icon,
           color: colors.brandStrong,
           backgroundColor: colors.infoSurface,
         ),
-        const SizedBox(width: 14),
         Expanded(
           child: Text(
             text,

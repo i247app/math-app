@@ -59,15 +59,17 @@ class ParentRoomShortcutTile extends StatelessWidget {
               height: 1.15,
             ),
           ),
-          const SizedBox(height: 5),
-          Text(
-            subtitle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: colors.textSecondary,
-              fontSize: FontSize.small,
-              fontWeight: FontWeight.w700,
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: FontSize.small,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],

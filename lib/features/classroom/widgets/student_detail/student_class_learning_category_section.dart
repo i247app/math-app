@@ -28,54 +28,58 @@ class StudentClassLearningCategorySection extends StatelessWidget {
         StudentClassSectionTitle(
           context.getText(AppKeys.studentClassLearningCategories),
         ),
-        const SizedBox(height: 16),
-        GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 1.14,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.zero,
-          children: [
-            StudentClassCategoryTile(
-              backgroundColor: const Color(0xFFFDF0F5),
-              iconAsset: 'assets/images/student_class_assignment.svg',
-              title: context.getText(AppKeys.studentClassAssignments),
-              subtitle: isLoadingHomework && homeworkCount == 0
-                  ? ''
-                  : context.formatText(
-                      AppKeys.studentClassAssignmentsCountFormat,
-                      {'count': homeworkCount},
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.14,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
+            children: [
+              StudentClassCategoryTile(
+                backgroundColor: const Color(0xFFFDF0F5),
+                iconAsset: 'assets/images/student_class_assignment.svg',
+                title: context.getText(AppKeys.studentClassAssignments),
+                subtitle: isLoadingHomework && homeworkCount == 0
+                    ? ''
+                    : context.formatText(
+                        AppKeys.studentClassAssignmentsCountFormat,
+                        {'count': homeworkCount},
+                      ),
+                onTap: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
+                    builder: (_) => StudentHomeworkScreen(
+                      classroomId: classroomId,
+                      profileId: profileId,
                     ),
-              onTap: () => Navigator.of(context).push<void>(
-                MaterialPageRoute<void>(
-                  builder: (_) => StudentHomeworkScreen(
-                    classroomId: classroomId,
-                    profileId: profileId,
                   ),
                 ),
               ),
-            ),
-            StudentClassCategoryTile(
-              backgroundColor: const Color(0xFFFDF4EE),
-              iconAsset: 'assets/images/student_class_quiz.svg',
-              title: context.getText(AppKeys.studentClassQuizzes),
-              subtitle: context.getText(AppKeys.studentClassQuizzesSubtitle),
-            ),
-            StudentClassCategoryTile(
-              backgroundColor: const Color(0xFFF0F4FF),
-              iconAsset: 'assets/images/student_class_resources.svg',
-              title: context.getText(AppKeys.studentClassMaterials),
-              subtitle: context.getText(AppKeys.studentClassMaterialsSubtitle),
-            ),
-            StudentClassCategoryTile(
-              backgroundColor: const Color(0xFFEDFBF3),
-              iconAsset: 'assets/images/student_class_grades.svg',
-              title: context.getText(AppKeys.studentClassGrades),
-              subtitle: context.getText(AppKeys.studentClassGradesSubtitle),
-            ),
-          ],
+              StudentClassCategoryTile(
+                backgroundColor: const Color(0xFFFDF4EE),
+                iconAsset: 'assets/images/student_class_quiz.svg',
+                title: context.getText(AppKeys.studentClassQuizzes),
+                subtitle: context.getText(AppKeys.studentClassQuizzesSubtitle),
+              ),
+              StudentClassCategoryTile(
+                backgroundColor: const Color(0xFFF0F4FF),
+                iconAsset: 'assets/images/student_class_resources.svg',
+                title: context.getText(AppKeys.studentClassMaterials),
+                subtitle: context.getText(
+                  AppKeys.studentClassMaterialsSubtitle,
+                ),
+              ),
+              StudentClassCategoryTile(
+                backgroundColor: const Color(0xFFEDFBF3),
+                iconAsset: 'assets/images/student_class_grades.svg',
+                title: context.getText(AppKeys.studentClassGrades),
+                subtitle: context.getText(AppKeys.studentClassGradesSubtitle),
+              ),
+            ],
+          ),
         ),
       ],
     );

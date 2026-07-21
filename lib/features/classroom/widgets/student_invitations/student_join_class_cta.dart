@@ -24,6 +24,7 @@ class StudentJoinClassCta extends StatelessWidget {
           elevation: 0,
         ),
         child: Row(
+          spacing: 7,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgPicture.asset(
@@ -31,7 +32,6 @@ class StudentJoinClassCta extends StatelessWidget {
               width: 20,
               height: 20,
             ),
-            const SizedBox(width: 7),
             Text(
               context.getText(AppKeys.studentJoinClassroomUpper),
               style: const TextStyle(

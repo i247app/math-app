@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class TeacherMemberSectionTitle extends StatelessWidget {
-  const TeacherMemberSectionTitle({
-    super.key,
-    required this.scale,
-    required this.title,
-  });
-
-  final double scale;
+  const TeacherMemberSectionTitle({super.key, required this.title});
   final String title;
 
   @override
@@ -17,9 +11,9 @@ class TeacherMemberSectionTitle extends StatelessWidget {
       title,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: GoogleFonts.andika(
-        color: const Color(0xFF1E3A5F),
-        fontSize: 18 * scale,
+      style: const TextStyle(
+        color: Color(0xFF1E3A5F),
+        fontSize: FontSize.large,
         fontWeight: FontWeight.w700,
         height: 1.55,
       ),

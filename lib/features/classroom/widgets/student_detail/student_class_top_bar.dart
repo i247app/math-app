@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 
@@ -40,9 +40,9 @@ class StudentClassTopBar extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: GoogleFonts.andika(
+              style: TextStyle(
                 color: colors.brandStrong,
-                fontSize: 25,
+                fontSize: FontSize.xxxl,
                 fontWeight: FontWeight.w700,
                 height: 34 / 25,
               ),

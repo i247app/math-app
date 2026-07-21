@@ -1,5 +1,6 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class StudentJoinSelectedFilterPill extends StatelessWidget {
   const StudentJoinSelectedFilterPill({
@@ -22,6 +23,7 @@ class StudentJoinSelectedFilterPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
+        spacing: 4,
         mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(
@@ -31,12 +33,11 @@ class StudentJoinSelectedFilterPill extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 13,
+                fontSize: FontSize.xs,
                 fontWeight: FontWeight.w700,
               ),
             ),
           ),
-          const SizedBox(width: 4),
           GestureDetector(
             onTap: onRemove,
             child: const Icon(

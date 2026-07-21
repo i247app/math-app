@@ -6,9 +6,7 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_card.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_skeleton_card.dart';
 
 class TeacherClassroomLoadingContent extends StatelessWidget {
-  const TeacherClassroomLoadingContent({super.key, required this.scale});
-
-  final double scale;
+  const TeacherClassroomLoadingContent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,48 +16,50 @@ class TeacherClassroomLoadingContent extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: AppSkeletonBlock(
-            width: 90 * scale,
-            height: 36 * scale,
-            radius: 12 * scale,
+            width: 90,
+            height: 36,
+            radius: 12,
             color: AppColors.coralTeacher.withValues(alpha: 0.18),
           ),
         ),
-        SizedBox(height: 16 * scale),
-        AppSkeletonCard(
-          scale: scale,
-          padding: EdgeInsets.symmetric(horizontal: 16 * scale),
-          child: SizedBox(
-            height: 48 * scale,
-            child: Row(
-              children: [
-                AppSkeletonBlock(
-                  width: 24 * scale,
-                  height: 24 * scale,
-                  radius: 12 * scale,
-                ),
-                SizedBox(width: 12 * scale),
-                Expanded(
-                  child: AppSkeletonBlock(
-                    width: double.infinity,
-                    height: 14 * scale,
-                    radius: 7 * scale,
+        const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: AppSkeletonCard(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: SizedBox(
+              height: 48,
+              child: Row(
+                children: [
+                  AppSkeletonBlock(width: 24, height: 24, radius: 12),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 12),
+                      child: AppSkeletonBlock(
+                        width: double.infinity,
+                        height: 14,
+                        radius: 7,
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(width: 16 * scale),
-                AppSkeletonBlock(
-                  width: 24 * scale,
-                  height: 24 * scale,
-                  radius: 12 * scale,
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.only(left: 16),
+                    child: AppSkeletonBlock(width: 24, height: 24, radius: 12),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-        SizedBox(height: 24 * scale),
-        for (var index = 0; index < 3; index++) ...[
-          TeacherClassroomSkeletonCard(scale: scale),
-          if (index != 2) SizedBox(height: 16 * scale),
-        ],
+        Padding(
+          padding: const EdgeInsets.only(top: 24),
+          child: Column(
+            spacing: 16,
+            children: List.generate(
+              3,
+              (_) => const TeacherClassroomSkeletonCard(),
+            ),
+          ),
+        ),
       ],
     );
   }

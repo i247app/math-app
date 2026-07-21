@@ -261,17 +261,19 @@ class DashboardAnimatedNavItem extends StatelessWidget {
                 ),
                 SizedBox(
                   width: double.infinity,
-                  child: Text(
-                    data.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.andika(
-                      color: foregroundColor,
-                      fontSize: FontSize.caption * 0.77,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      letterSpacing: 0.5,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      data.label,
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.andika(
+                        color: foregroundColor,
+                        fontSize: FontSize.caption * 0.77,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ),

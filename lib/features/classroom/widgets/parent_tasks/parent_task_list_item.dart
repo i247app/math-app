@@ -31,27 +31,29 @@ class ParentTaskListItem extends StatelessWidget {
         child: Row(
           children: [
             leading,
-            const SizedBox(width: 14),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: ParentTaskMetaBadges(
-                          childName: childName,
-                          classroomName: classroomName,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 14),
+                child: Column(
+                  spacing: 5,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      spacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ParentTaskMetaBadges(
+                            childName: childName,
+                            classroomName: classroomName,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      ParentTaskDateLabel(date: dateLabel),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  ParentTaskTitle(title: title),
-                ],
+                        ParentTaskDateLabel(date: dateLabel),
+                      ],
+                    ),
+                    ParentTaskTitle(title: title),
+                  ],
+                ),
               ),
             ),
           ],

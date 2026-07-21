@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -57,28 +57,32 @@ class StudentClassCategoryTile extends StatelessWidget {
                 ),
                 child: SvgPicture.asset(iconAsset, width: 18, height: 18),
               ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: colors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  height: 20 / 16,
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: FontSize.normal,
+                    fontWeight: FontWeight.w400,
+                    height: 20 / 16,
+                  ),
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: colors.textSecondary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  height: 16 / 12,
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.textSecondary,
+                    fontSize: FontSize.xxs,
+                    fontWeight: FontWeight.w500,
+                    height: 16 / 12,
+                  ),
                 ),
               ),
             ],

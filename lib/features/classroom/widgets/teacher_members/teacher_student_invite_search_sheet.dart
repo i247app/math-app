@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -150,84 +150,94 @@ class _TeacherStudentInviteSearchSheetState
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                context.getText(AppKeys.teacherSearchStudentTitle),
-                style: GoogleFonts.andika(
-                  color: colors.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  height: 1.25,
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _searchController,
-                autofocus: true,
-                textInputAction: TextInputAction.search,
-                onChanged: _onSearchChanged,
-                onSubmitted: _searchProfiles,
-                decoration: InputDecoration(
-                  hintText: context.getText(AppKeys.teacherSearchStudentHint),
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  suffixIcon: _searchController.text.isEmpty
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            _onSearchChanged('');
-                          },
-                          icon: const Icon(Icons.close_rounded),
-                        ),
-                  filled: true,
-                  fillColor: colors.inputSurface,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: colors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: colors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: colors.brandStrong),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                  context.getText(AppKeys.teacherSearchStudentTitle),
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: FontSize.xl,
+                    fontWeight: FontWeight.w700,
+                    height: 1.25,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                context.formatText(AppKeys.teacherSelectedStudents, {
-                  'count': selectedCount,
-                }),
-                style: GoogleFonts.andika(
-                  color: colors.textSecondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+              Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  textInputAction: TextInputAction.search,
+                  onChanged: _onSearchChanged,
+                  onSubmitted: _searchProfiles,
+                  decoration: InputDecoration(
+                    hintText: context.getText(AppKeys.teacherSearchStudentHint),
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: _searchController.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              _onSearchChanged('');
+                            },
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                    filled: true,
+                    fillColor: colors.inputSurface,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: colors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: colors.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: colors.brandStrong),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  context.formatText(AppKeys.teacherSelectedStudents, {
+                    'count': selectedCount,
+                  }),
+                  style: TextStyle(
+                    color: colors.textSecondary,
+                    fontSize: FontSize.xs,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
               Expanded(
-                child: TeacherStudentSearchResultList(
-                  scrollController: scrollController,
-                  profiles: _results,
-                  selectedProfileIds: _selectedProfileIds,
-                  isSearching: _isSearching,
-                  error: _error,
-                  query: _searchController.text.trim(),
-                  onToggle: _toggleProfile,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: TeacherStudentSearchResultList(
+                    scrollController: scrollController,
+                    profiles: _results,
+                    selectedProfileIds: _selectedProfileIds,
+                    isSearching: _isSearching,
+                    error: _error,
+                    query: _searchController.text.trim(),
+                    onToggle: _toggleProfile,
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              TeacherSendInviteButton(
-                enabled: selectedCount > 0,
-                onTap: selectedCount == 0
-                    ? null
-                    : () => Navigator.of(context).pop(_selectedProfiles),
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: TeacherSendInviteButton(
+                  enabled: selectedCount > 0,
+                  onTap: selectedCount == 0
+                      ? null
+                      : () => Navigator.of(context).pop(_selectedProfiles),
+                ),
               ),
             ],
           ),

@@ -4,28 +4,19 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:numi/core/theme/app_colors.dart';
 
 class TeacherSmallCoralAddButton extends StatelessWidget {
-  const TeacherSmallCoralAddButton({
-    super.key,
-    this.scale = 1,
-    required this.onTap,
-  });
-
-  final double scale;
+  const TeacherSmallCoralAddButton({super.key, required this.onTap});
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(12 * scale);
+    final radius = BorderRadius.circular(12);
     return Padding(
-      padding: EdgeInsets.only(bottom: 4 * scale),
+      padding: const EdgeInsets.only(bottom: 4),
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: radius,
           boxShadow: [
-            BoxShadow(
-              color: const Color(0x1A000000),
-              offset: Offset(0, 4 * scale),
-            ),
+            const BoxShadow(color: Color(0x1A000000), offset: Offset(0, 4)),
           ],
         ),
         child: Material(
@@ -35,16 +26,16 @@ class TeacherSmallCoralAddButton extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: SizedBox(
-              width: 91 * scale,
-              height: 31 * scale,
+              width: 91,
+              height: 31,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   Positioned.fill(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(12 * scale),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12),
                         ),
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -62,8 +53,8 @@ class TeacherSmallCoralAddButton extends StatelessWidget {
                   ),
                   SvgPicture.asset(
                     'assets/images/teacher_class_add.svg',
-                    width: 12 * scale,
-                    height: 12 * scale,
+                    width: 12,
+                    height: 12,
                   ),
                 ],
               ),

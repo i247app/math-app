@@ -1,5 +1,6 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class StudentJoinGradeChip extends StatelessWidget {
   const StudentJoinGradeChip({
@@ -36,6 +37,7 @@ class StudentJoinGradeChip extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Row(
+              spacing: 4,
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -47,7 +49,7 @@ class StudentJoinGradeChip extends StatelessWidget {
                       maxLines: 1,
                       style: TextStyle(
                         color: selected ? Colors.white : AppColors.textMuted,
-                        fontSize: 14,
+                        fontSize: FontSize.small,
                         fontWeight: FontWeight.w700,
                         height: 1,
                         letterSpacing: 0,
@@ -55,8 +57,7 @@ class StudentJoinGradeChip extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (selected) ...[
-                  const SizedBox(width: 4),
+                if (selected)
                   GestureDetector(
                     onTap: onRemove,
                     child: const Icon(
@@ -65,7 +66,6 @@ class StudentJoinGradeChip extends StatelessWidget {
                       size: 14,
                     ),
                   ),
-                ],
               ],
             ),
           ),

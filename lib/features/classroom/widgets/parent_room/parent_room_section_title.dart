@@ -11,6 +11,7 @@ class _ParentRoomSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 9,
       children: [
         Container(
           width: 31,
@@ -21,7 +22,6 @@ class _ParentRoomSectionTitle extends StatelessWidget {
           ),
           child: Icon(icon, color: const Color(0xFF3265E6), size: 18),
         ),
-        const SizedBox(width: 9),
         Expanded(
           child: Text(
             label,

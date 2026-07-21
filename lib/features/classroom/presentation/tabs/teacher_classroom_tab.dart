@@ -26,7 +26,6 @@ class TeacherClassroomTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.bottomPadding,
-    this.scale = 1,
     this.activeRefreshTick = 0,
     this.isActive = true,
   });
@@ -34,7 +33,6 @@ class TeacherClassroomTab extends StatefulWidget {
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final double bottomPadding;
-  final double scale;
   final int activeRefreshTick;
   final bool isActive;
 
@@ -240,7 +238,6 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
         (cubit) => cubit.owned(profileId),
       );
     }
-    final scale = widget.scale;
     final displayedClassrooms = _classrooms;
     final isInitialLoading =
         _isLoading && _classrooms.isEmpty && !_hasLoadedClassrooms;
@@ -252,23 +249,16 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TeacherClassroomHeader(scale: scale),
+          const TeacherClassroomHeader(),
           Padding(
-            padding: EdgeInsets.fromLTRB(
-              22 * scale,
-              28 * scale,
-              22 * scale,
-              widget.bottomPadding,
-            ),
+            padding: EdgeInsets.fromLTRB(22, 44, 22, widget.bottomPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 16 * scale),
                 if (isInitialLoading)
-                  TeacherClassroomLoadingContent(scale: scale)
+                  const TeacherClassroomLoadingContent()
                 else
                   TeacherClassroomBody(
-                    scale: scale,
                     error: _error,
                     classrooms: _classrooms,
                     displayedClassrooms: displayedClassrooms,

@@ -8,6 +8,7 @@ class ParentRoomLoadingContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      spacing: 14,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         GridView.count(
@@ -23,15 +24,13 @@ class ParentRoomLoadingContent extends StatelessWidget {
             ParentRoomSkeletonBlock(),
           ],
         ),
-        const SizedBox(height: 24),
-        const ParentRoomSkeletonLine(width: 128),
-        const SizedBox(height: 14),
+        const Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: ParentRoomSkeletonLine(width: 128),
+        ),
         const ParentRoomSkeletonBlock(height: 104),
-        const SizedBox(height: 14),
         const ParentRoomSkeletonBlock(height: 104),
-        const SizedBox(height: 14),
         const ParentRoomSkeletonLine(width: 92),
-        const SizedBox(height: 14),
         const ParentRoomSkeletonBlock(height: 104),
       ],
     );

@@ -43,7 +43,6 @@ class ParentRoomTab extends StatefulWidget {
     required this.onOpenClassroomTab,
     required this.onOpenProfileMenu,
     required this.bottomPadding,
-    this.scale = 1,
   });
 
   final LoginUser? user;
@@ -58,7 +57,6 @@ class ParentRoomTab extends StatefulWidget {
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenProfileMenu;
   final double bottomPadding;
-  final double scale;
 
   @override
   State<ParentRoomTab> createState() => _ParentRoomTabState();
@@ -235,7 +233,6 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
 
   @override
   Widget build(BuildContext context) {
-    final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
     final parent = _layout?.parent;
     final entries = roomEntries(parent);
@@ -258,18 +255,13 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           builder: (context, constraints) {
             final contentPadding = isEmptyRoomState
                 ? EdgeInsets.only(bottom: widget.bottomPadding)
-                : EdgeInsets.fromLTRB(
-                    14 * scale,
-                    24 * scale,
-                    14 * scale,
-                    widget.bottomPadding + 24 * scale,
-                  );
+                : EdgeInsets.fromLTRB(14, 24, 14, widget.bottomPadding + 24);
             final minHeight = isEmptyRoomState
                 ? math.max(
                     0.0,
                     constraints.maxHeight -
                         topInset -
-                        60 * scale -
+                        60 -
                         widget.bottomPadding,
                   )
                 : 0.0;
@@ -284,7 +276,6 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                   PageHeader(
                     title: context.getText(AppKeys.parentRoomTitle),
                     topInset: topInset,
-                    scale: scale,
                   ),
                   Padding(
                     padding: contentPadding,
@@ -354,64 +345,80 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           order: 0,
           child: ParentRoomClassGrid(entries: entries, onTap: _openRoomDetail),
         ),
-        const SizedBox(height: 18),
-        _roomFadeIn(
-          order: 1,
-          child: ParentRoomListSection(
-            title: context.formatText(AppKeys.parentTasksCountTitle, {
-              'count': pendingExercises.length + expiredExercises.length,
-            }),
-            onViewAll: widget.onOpenClassroomTab,
-            child: pendingExercises.isEmpty && expiredExercises.isEmpty
-                ? ParentEmptyTaskLine(
-                    icon: Icons.assignment_turned_in_outlined,
-                    text: context.getText(AppKeys.studentNoHomeworkTitle),
-                  )
-                : Column(
-                    children: [
-                      for (final pending in pendingExercises.take(3)) ...[
-                        ParentPendingTaskListItem(pending: pending),
-                        if (pending != pendingExercises.take(3).last ||
-                            expiredExercises.isNotEmpty)
-                          Divider(height: 24, indent: 62, color: colors.border),
+        Padding(
+          padding: const EdgeInsets.only(top: 18),
+          child: _roomFadeIn(
+            order: 1,
+            child: ParentRoomListSection(
+              title: context.formatText(AppKeys.parentTasksCountTitle, {
+                'count': pendingExercises.length + expiredExercises.length,
+              }),
+              onViewAll: widget.onOpenClassroomTab,
+              child: pendingExercises.isEmpty && expiredExercises.isEmpty
+                  ? ParentEmptyTaskLine(
+                      icon: Icons.assignment_turned_in_outlined,
+                      text: context.getText(AppKeys.studentNoHomeworkTitle),
+                    )
+                  : Column(
+                      children: [
+                        for (final pending in pendingExercises.take(3)) ...[
+                          ParentPendingTaskListItem(pending: pending),
+                          if (pending != pendingExercises.take(3).last ||
+                              expiredExercises.isNotEmpty)
+                            Divider(
+                              height: 24,
+                              indent: 62,
+                              color: colors.border,
+                            ),
+                        ],
+                        for (final expired in expiredExercises.take(3)) ...[
+                          ParentPendingTaskListItem(
+                            pending: expired,
+                            isExpired: true,
+                            onTap: () => showExpiredExerciseMessage(context),
+                          ),
+                          if (expired != expiredExercises.take(3).last)
+                            Divider(
+                              height: 24,
+                              indent: 62,
+                              color: colors.border,
+                            ),
+                        ],
                       ],
-                      for (final expired in expiredExercises.take(3)) ...[
-                        ParentPendingTaskListItem(
-                          pending: expired,
-                          isExpired: true,
-                          onTap: () => showExpiredExerciseMessage(context),
-                        ),
-                        if (expired != expiredExercises.take(3).last)
-                          Divider(height: 24, indent: 62, color: colors.border),
-                      ],
-                    ],
-                  ),
+                    ),
+            ),
           ),
         ),
-        const SizedBox(height: 14),
-        _roomFadeIn(
-          order: 2,
-          markOnEnd: true,
-          child: ParentRoomListSection(
-            title: context.getText(AppKeys.assessmentResultTitle),
-            onViewAll: widget.onOpenClassroomTab,
-            child: completions.isEmpty
-                ? ParentEmptyTaskLine(
-                    icon: Icons.fact_check_outlined,
-                    text: context.getText(AppKeys.noCompletedHomeworkTitle),
-                  )
-                : Column(
-                    children: [
-                      for (final completion in completions.take(5)) ...[
-                        ParentCompletedTaskListItem(
-                          completion: completion,
-                          onTap: () => _openCompletionResult(completion),
-                        ),
-                        if (completion != completions.take(5).last)
-                          Divider(height: 24, indent: 62, color: colors.border),
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: _roomFadeIn(
+            order: 2,
+            markOnEnd: true,
+            child: ParentRoomListSection(
+              title: context.getText(AppKeys.assessmentResultTitle),
+              onViewAll: widget.onOpenClassroomTab,
+              child: completions.isEmpty
+                  ? ParentEmptyTaskLine(
+                      icon: Icons.fact_check_outlined,
+                      text: context.getText(AppKeys.noCompletedHomeworkTitle),
+                    )
+                  : Column(
+                      children: [
+                        for (final completion in completions.take(5)) ...[
+                          ParentCompletedTaskListItem(
+                            completion: completion,
+                            onTap: () => _openCompletionResult(completion),
+                          ),
+                          if (completion != completions.take(5).last)
+                            Divider(
+                              height: 24,
+                              indent: 62,
+                              color: colors.border,
+                            ),
+                        ],
                       ],
-                    ],
-                  ),
+                    ),
+            ),
           ),
         ),
       ],
@@ -466,7 +473,6 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
               onRefreshProfiles: widget.onRefreshProfiles,
               onProfileSaved: widget.onProfileSaved,
               bottomPadding: 0,
-              scale: widget.scale,
               initialView: SettingPageView.profile,
               isPushedPage: true,
               openAddProfileOnStart: true,

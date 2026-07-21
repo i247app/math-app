@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -234,27 +232,21 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     return Scaffold(
       backgroundColor: colors.pageBackground,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final scale = math.min(constraints.maxWidth / 390, 1.12);
-            return Column(
-              children: [
-                AppScreenAppBar(
-                  backIconAsset: 'assets/images/teacher_class_back.svg',
-                  title: context.getText(AppKeys.teacherCreateClassTitle),
-                  scale: scale,
-                  onBack: () => Navigator.of(context).maybePop(),
-                ),
-                Expanded(child: _buildContent(scale)),
-              ],
-            );
-          },
+        child: Column(
+          children: [
+            AppScreenAppBar(
+              backIconAsset: 'assets/images/teacher_class_back.svg',
+              title: context.getText(AppKeys.teacherCreateClassTitle),
+              onBack: () => Navigator.of(context).maybePop(),
+            ),
+            Expanded(child: _buildContent()),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildContent(double scale) {
+  Widget _buildContent() {
     if (_isLoadingOptions) {
       return Center(
         child: CircularProgressIndicator(
@@ -267,11 +259,9 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       return TeacherFullScreenError(
         message: optionsError,
         onRetry: () => _loadOptions(forceRefresh: true),
-        scale: scale,
       );
     }
     return TeacherCreateClassForm(
-      scale: scale,
       avatarPath: _avatarPath,
       grades: _grades,
       programs: _programs,

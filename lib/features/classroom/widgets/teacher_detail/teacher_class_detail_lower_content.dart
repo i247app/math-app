@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -9,15 +9,12 @@ import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_det
 class TeacherClassDetailLowerContent extends StatelessWidget {
   const TeacherClassDetailLowerContent({
     super.key,
-    required this.scale,
     required this.memberCount,
     required this.requestCount,
     required this.onOpenAssignments,
     required this.onOpenAssessments,
     required this.onOpenMembers,
   });
-
-  final double scale;
   final int memberCount;
   final int requestCount;
   final VoidCallback onOpenAssignments;
@@ -27,33 +24,35 @@ class TeacherClassDetailLowerContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 40 * scale),
+      padding: const EdgeInsets.only(top: 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TeacherClassDetailMemberManagementCard(
-            scale: scale,
             memberCount: memberCount,
             requestCount: requestCount,
             onTap: onOpenMembers,
           ),
-          SizedBox(height: 27 * scale),
-          Text(
-            context.getText(AppKeys.teacherClassFunctions),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.andika(
-              color: const Color(0xFF1E3A5F),
-              fontSize: 18 * scale,
-              fontWeight: FontWeight.w700,
-              height: 1.55,
+          Padding(
+            padding: const EdgeInsets.only(top: 27),
+            child: Text(
+              context.getText(AppKeys.teacherClassFunctions),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF1E3A5F),
+                fontSize: FontSize.large,
+                fontWeight: FontWeight.w700,
+                height: 1.55,
+              ),
             ),
           ),
-          SizedBox(height: 7 * scale),
-          TeacherClassDetailFunctionGrid(
-            scale: scale,
-            onOpenAssignments: onOpenAssignments,
-            onOpenAssessments: onOpenAssessments,
+          Padding(
+            padding: const EdgeInsets.only(top: 7),
+            child: TeacherClassDetailFunctionGrid(
+              onOpenAssignments: onOpenAssignments,
+              onOpenAssessments: onOpenAssessments,
+            ),
           ),
         ],
       ),

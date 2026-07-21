@@ -11,6 +11,7 @@ class ParentTaskDateLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Row(
+      spacing: 4,
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
@@ -18,7 +19,6 @@ class ParentTaskDateLabel extends StatelessWidget {
           color: colors.textSecondary,
           size: FontSize.xxs,
         ),
-        const SizedBox(width: 4),
         Text(
           date,
           style: TextStyle(

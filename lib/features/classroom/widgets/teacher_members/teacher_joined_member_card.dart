@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_joined_member_avatar.dart';
@@ -6,13 +7,7 @@ import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_h
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_text_block.dart';
 
 class TeacherJoinedMemberCard extends StatelessWidget {
-  const TeacherJoinedMemberCard({
-    super.key,
-    required this.scale,
-    required this.member,
-  });
-
-  final double scale;
+  const TeacherJoinedMemberCard({super.key, required this.member});
   final ClassroomStudent member;
 
   @override
@@ -20,41 +15,43 @@ class TeacherJoinedMemberCard extends StatelessWidget {
     final name = classroomMemberName(context, member);
     final status = classroomMemberStatus(context, member);
     return Container(
-      constraints: BoxConstraints(minHeight: 82 * scale),
-      padding: EdgeInsets.all(13 * scale),
+      constraints: const BoxConstraints(minHeight: 82),
+      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16 * scale),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0x4DC4C6D2)),
         boxShadow: [
-          BoxShadow(
-            color: const Color(0x0D000000),
-            blurRadius: 1 * scale,
-            offset: Offset(0, 1 * scale),
+          const BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 1,
+            offset: Offset(0, 1),
           ),
         ],
       ),
       child: Row(
         children: [
-          TeacherJoinedMemberAvatar(member: member, scale: scale),
-          SizedBox(width: 24 * scale),
+          TeacherJoinedMemberAvatar(member: member),
           Expanded(
-            child: TeacherMemberTextBlock(
-              name: name,
-              status: status,
-              nameFontSize: 14 * scale,
-              statusFontSize: 12 * scale,
-              nameColor: const Color(0xFF181C1E),
-              statusColor: const Color(0xFF747781),
-              letterSpacing: 0.7 * scale,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24),
+              child: TeacherMemberTextBlock(
+                name: name,
+                status: status,
+                nameFontSize: FontSize.small,
+                statusFontSize: FontSize.xxs,
+                nameColor: const Color(0xFF181C1E),
+                statusColor: const Color(0xFF747781),
+                letterSpacing: 0.7,
+              ),
             ),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.more_vert_rounded,
-              color: const Color(0xFFC4C6D2),
-              size: 20 * scale,
+              color: Color(0xFFC4C6D2),
+              size: 20,
             ),
           ),
         ],

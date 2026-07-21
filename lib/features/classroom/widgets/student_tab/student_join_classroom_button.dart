@@ -4,13 +4,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class StudentJoinClassroomButton extends StatelessWidget {
-  const StudentJoinClassroomButton({
-    super.key,
-    required this.scale,
-    required this.onTap,
-  });
-
-  final double scale;
+  const StudentJoinClassroomButton({super.key, required this.onTap});
   final VoidCallback onTap;
 
   @override
@@ -22,20 +16,17 @@ class StudentJoinClassroomButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 16 * scale,
-            vertical: 11 * scale,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
           child: Row(
+            spacing: 6,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.add_rounded, color: Colors.white, size: 18 * scale),
-              SizedBox(width: 6 * scale),
+              const Icon(Icons.add_rounded, color: Colors.white, size: 18),
               Text(
                 context.getText(AppKeys.studentJoinNewClassroom),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
-                  fontSize: FontSize.caption * scale,
+                  fontSize: FontSize.caption,
                   fontWeight: FontWeight.w900,
                   height: 1,
                   letterSpacing: 0,

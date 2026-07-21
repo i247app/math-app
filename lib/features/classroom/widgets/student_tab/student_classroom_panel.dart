@@ -11,15 +11,12 @@ import 'package:numi/shared/widgets/circular_loading_card.dart';
 class StudentClassroomPanel extends StatelessWidget {
   const StudentClassroomPanel({
     super.key,
-    required this.scale,
     required this.classrooms,
     required this.isLoading,
     required this.error,
     required this.onRetry,
     required this.onJoinClassroom,
   });
-
-  final double scale;
   final List<ClassroomModel> classrooms;
   final bool isLoading;
   final String? error;
@@ -33,36 +30,29 @@ class StudentClassroomPanel extends StatelessWidget {
       children: [
         Align(
           alignment: Alignment.centerRight,
-          child: StudentJoinClassroomButton(
-            scale: scale,
-            onTap: onJoinClassroom,
-          ),
+          child: StudentJoinClassroomButton(onTap: onJoinClassroom),
         ),
-        SizedBox(height: 14 * scale),
-        if (isLoading && classrooms.isEmpty)
-          CircularLoadingCard(scale: scale)
-        else if (error != null && classrooms.isEmpty)
-          StudentErrorPanel(message: error!, onRetry: onRetry)
-        else if (classrooms.isEmpty)
-          StudentEmptyPanel(
-            icon: Icons.groups_rounded,
-            title: context.getText(AppKeys.studentNoClassroomsTitle),
-            message: context.getText(AppKeys.studentNoClassroomsMessage),
-          )
-        else
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (var index = 0; index < classrooms.length; index++) ...[
-                StudentClassroomCard(
-                  scale: scale,
-                  classroom: classrooms[index],
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: isLoading && classrooms.isEmpty
+              ? const CircularLoadingCard()
+              : error != null && classrooms.isEmpty
+              ? StudentErrorPanel(message: error!, onRetry: onRetry)
+              : classrooms.isEmpty
+              ? StudentEmptyPanel(
+                  icon: Icons.groups_rounded,
+                  title: context.getText(AppKeys.studentNoClassroomsTitle),
+                  message: context.getText(AppKeys.studentNoClassroomsMessage),
+                )
+              : Column(
+                  spacing: 12,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final classroom in classrooms)
+                      StudentClassroomCard(classroom: classroom),
+                  ],
                 ),
-                if (index != classrooms.length - 1)
-                  SizedBox(height: 12 * scale),
-              ],
-            ],
-          ),
+        ),
       ],
     );
   }

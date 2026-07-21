@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -38,39 +38,39 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
             ),
             Text(
               context.getText(AppKeys.studentClassAll),
-              style: GoogleFonts.andika(
+              style: const TextStyle(
                 color: AppColors.magenta,
-                fontSize: 16,
+                fontSize: FontSize.normal,
                 fontWeight: FontWeight.w700,
                 height: 1.5,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        if (isLoading && upcomingExercises.isEmpty)
-          const SizedBox(
-            height: 72,
-            child: Center(
-              child: CircularProgressIndicator(color: AppColors.teal500),
-            ),
-          )
-        else if (upcomingExercises.isEmpty)
-          StudentClassEmptyPanel(
-            message: context.getText(AppKeys.studentNoHomeworkMessage),
-          )
-        else
-          for (var index = 0; index < upcomingExercises.length; index++)
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: index == upcomingExercises.length - 1 ? 0 : 10,
-              ),
-              child: StudentClassUpcomingDeadlineTile(
-                exercise: upcomingExercises[index],
-                onTap: () =>
-                    _openHomeworkAttempt(context, upcomingExercises[index]),
-              ),
-            ),
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: isLoading && upcomingExercises.isEmpty
+              ? const SizedBox(
+                  height: 72,
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppColors.teal500),
+                  ),
+                )
+              : upcomingExercises.isEmpty
+              ? StudentClassEmptyPanel(
+                  message: context.getText(AppKeys.studentNoHomeworkMessage),
+                )
+              : Column(
+                  spacing: 10,
+                  children: [
+                    for (final exercise in upcomingExercises)
+                      StudentClassUpcomingDeadlineTile(
+                        exercise: exercise,
+                        onTap: () => _openHomeworkAttempt(context, exercise),
+                      ),
+                  ],
+                ),
+        ),
       ],
     );
   }

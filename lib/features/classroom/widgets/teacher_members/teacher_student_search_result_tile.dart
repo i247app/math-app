@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -47,39 +47,40 @@ class TeacherStudentSearchResultTile extends StatelessWidget {
                 avatarKey: profile.avatarKey,
                 avatarUrl: profile.avatarUrl,
               ),
-              const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.andika(
-                        color: const Color(0xFF1E3A5F),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        height: 1.25,
-                      ),
-                    ),
-                    if (subtitle != null)
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12, right: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        subtitle,
+                        name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.andika(
-                          color: AppColors.textCoolMuted,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                        style: const TextStyle(
+                          color: Color(0xFF1E3A5F),
+                          fontSize: FontSize.compact,
+                          fontWeight: FontWeight.w700,
                           height: 1.25,
                         ),
                       ),
-                  ],
+                      if (subtitle != null)
+                        Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.textCoolMuted,
+                            fontSize: FontSize.xxs,
+                            fontWeight: FontWeight.w500,
+                            height: 1.25,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 10),
               Checkbox(
                 value: selected,
                 activeColor: AppColors.teal520,

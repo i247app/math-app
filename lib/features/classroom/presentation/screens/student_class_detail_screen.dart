@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -132,10 +133,9 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                           if (detailState.errorMessage != null &&
                               classroom == null)
                             AppRetryPanel(
-                              scale: 1,
                               padding: 17,
                               borderRadius: 16,
-                              messageFontSize: 14,
+                              messageFontSize: FontSize.small,
                               messageFontWeight: FontWeight.w700,
                               filledAction: true,
                               message: detailState.errorMessage!,
@@ -147,20 +147,24 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                               isLoading:
                                   detailState.isLoading && classroom == null,
                             ),
-                            const SizedBox(height: 26),
-                            StudentClassLearningCategorySection(
-                              classroomId: widget.classroomId,
-                              profileId: widget.profileId,
-                              homeworkCount: _homeworkExercises.length,
-                              isLoadingHomework:
-                                  _isLoadingHomework &&
-                                  _homeworkExercises.isEmpty,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 26),
+                              child: StudentClassLearningCategorySection(
+                                classroomId: widget.classroomId,
+                                profileId: widget.profileId,
+                                homeworkCount: _homeworkExercises.length,
+                                isLoadingHomework:
+                                    _isLoadingHomework &&
+                                    _homeworkExercises.isEmpty,
+                              ),
                             ),
-                            const SizedBox(height: 23),
-                            StudentClassUpcomingDeadlineSection(
-                              profileId: widget.profileId,
-                              exercises: _homeworkExercises,
-                              isLoading: _isLoadingHomework,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 23),
+                              child: StudentClassUpcomingDeadlineSection(
+                                profileId: widget.profileId,
+                                exercises: _homeworkExercises,
+                                isLoading: _isLoadingHomework,
+                              ),
                             ),
                           ],
                         ],

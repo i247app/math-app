@@ -3,13 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_colors.dart';
 
 class TeacherClassroomAddButton extends StatelessWidget {
-  const TeacherClassroomAddButton({
-    super.key,
-    required this.scale,
-    required this.onTap,
-  });
-
-  final double scale;
+  const TeacherClassroomAddButton({super.key, required this.onTap});
   final VoidCallback onTap;
 
   @override
@@ -19,13 +13,13 @@ class TeacherClassroomAddButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: 90 * scale,
-          height: 36 * scale,
+          width: 90,
+          height: 36,
           decoration: BoxDecoration(
             color: AppColors.coralTeacher,
-            borderRadius: BorderRadius.circular(12 * scale),
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(Icons.add, color: Colors.white, size: 24 * scale),
+          child: const Icon(Icons.add, color: Colors.white, size: 24),
         ),
       ),
     );

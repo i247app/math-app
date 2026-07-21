@@ -61,88 +61,95 @@ class ParentRoomDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ParentRoomDetailHero(entry: entry),
-                    const SizedBox(height: 18),
-                    ParentRoomDetailShortcuts(
-                      pendingCount:
-                          pendingExercises.length + expiredExercises.length,
-                      completedCount: completions.length,
-                    ),
-                    const SizedBox(height: 26),
-                    ParentRoomListSection(
-                      title: context.formatText(AppKeys.parentTasksCountTitle, {
-                        'count':
+                    Padding(
+                      padding: const EdgeInsets.only(top: 18),
+                      child: ParentRoomDetailShortcuts(
+                        pendingCount:
                             pendingExercises.length + expiredExercises.length,
-                      }),
-                      onViewAll: () => parentRoomShowComingSoon(context),
-                      child:
-                          pendingExercises.isEmpty && expiredExercises.isEmpty
-                          ? ParentEmptyTaskLine(
-                              icon: Icons.assignment_turned_in_outlined,
-                              text: context.getText(
-                                AppKeys.studentNoHomeworkTitle,
-                              ),
-                            )
-                          : Column(
-                              children: [
-                                for (final pending in pendingExercises) ...[
-                                  ParentPendingTaskListItem(pending: pending),
-                                  if (pending != pendingExercises.last ||
-                                      expiredExercises.isNotEmpty)
-                                    const Divider(
-                                      height: 24,
-                                      indent: 62,
-                                      color: Color(0xFFE9EEF2),
-                                    ),
-                                ],
-                                for (final expired in expiredExercises) ...[
-                                  ParentPendingTaskListItem(
-                                    pending: expired,
-                                    isExpired: true,
-                                    onTap: () =>
-                                        showExpiredExerciseMessage(context),
-                                  ),
-                                  if (expired != expiredExercises.last)
-                                    const Divider(
-                                      height: 24,
-                                      indent: 62,
-                                      color: Color(0xFFE9EEF2),
-                                    ),
-                                ],
-                              ],
-                            ),
+                        completedCount: completions.length,
+                      ),
                     ),
-                    const SizedBox(height: 14),
-                    ParentRoomListSection(
-                      title: context.getText(AppKeys.assessmentResultTitle),
-                      onViewAll: () => parentRoomShowComingSoon(context),
-                      child: completions.isEmpty
-                          ? ParentEmptyTaskLine(
-                              icon: Icons.fact_check_outlined,
-                              text: context.getText(
-                                AppKeys.noCompletedHomeworkTitle,
-                              ),
-                            )
-                          : Column(
-                              children: [
-                                for (final completion in completions) ...[
-                                  ParentCompletedTaskListItem(
-                                    completion: completion,
-                                    onTap: () => _openCompletionResult(
-                                      context,
-                                      completion,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 26),
+                      child: ParentRoomListSection(
+                        title: context
+                            .formatText(AppKeys.parentTasksCountTitle, {
+                              'count':
+                                  pendingExercises.length +
+                                  expiredExercises.length,
+                            }),
+                        onViewAll: () => parentRoomShowComingSoon(context),
+                        child:
+                            pendingExercises.isEmpty && expiredExercises.isEmpty
+                            ? ParentEmptyTaskLine(
+                                icon: Icons.assignment_turned_in_outlined,
+                                text: context.getText(
+                                  AppKeys.studentNoHomeworkTitle,
+                                ),
+                              )
+                            : Column(
+                                children: [
+                                  for (final pending in pendingExercises) ...[
+                                    ParentPendingTaskListItem(pending: pending),
+                                    if (pending != pendingExercises.last ||
+                                        expiredExercises.isNotEmpty)
+                                      const Divider(
+                                        height: 24,
+                                        indent: 62,
+                                        color: Color(0xFFE9EEF2),
+                                      ),
+                                  ],
+                                  for (final expired in expiredExercises) ...[
+                                    ParentPendingTaskListItem(
+                                      pending: expired,
+                                      isExpired: true,
+                                      onTap: () =>
+                                          showExpiredExerciseMessage(context),
                                     ),
-                                  ),
-                                  if (completion != completions.last)
-                                    const Divider(
-                                      height: 24,
-                                      indent: 62,
-                                      color: Color(0xFFE9EEF2),
-                                    ),
+                                    if (expired != expiredExercises.last)
+                                      const Divider(
+                                        height: 24,
+                                        indent: 62,
+                                        color: Color(0xFFE9EEF2),
+                                      ),
+                                  ],
                                 ],
-                              ],
-                            ),
+                              ),
+                      ),
                     ),
-                    const SizedBox(height: 14),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 14, bottom: 14),
+                      child: ParentRoomListSection(
+                        title: context.getText(AppKeys.assessmentResultTitle),
+                        onViewAll: () => parentRoomShowComingSoon(context),
+                        child: completions.isEmpty
+                            ? ParentEmptyTaskLine(
+                                icon: Icons.fact_check_outlined,
+                                text: context.getText(
+                                  AppKeys.noCompletedHomeworkTitle,
+                                ),
+                              )
+                            : Column(
+                                children: [
+                                  for (final completion in completions) ...[
+                                    ParentCompletedTaskListItem(
+                                      completion: completion,
+                                      onTap: () => _openCompletionResult(
+                                        context,
+                                        completion,
+                                      ),
+                                    ),
+                                    if (completion != completions.last)
+                                      const Divider(
+                                        height: 24,
+                                        indent: 62,
+                                        color: Color(0xFFE9EEF2),
+                                      ),
+                                  ],
+                                ],
+                              ),
+                      ),
+                    ),
                   ],
                 ),
               ),

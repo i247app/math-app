@@ -70,54 +70,60 @@ class _ParentRoomPendingCard extends StatelessWidget {
             childName: childName,
             classroomName: classroomName,
           ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF121B42),
-                    fontSize: FontSize.normal,
-                    fontWeight: FontWeight.w900,
-                    height: 1.05,
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFF121B42),
+                      fontSize: FontSize.normal,
+                      fontWeight: FontWeight.w900,
+                      height: 1.05,
+                    ),
                   ),
                 ),
-              ),
-              ParentTaskMetaChip(
-                label: statusLabel,
-                color: accent.badge,
-                textColor: accent.color,
-                fontSize: FontSize.xxs,
-              ),
-            ],
+                ParentTaskMetaChip(
+                  label: statusLabel,
+                  color: accent.badge,
+                  textColor: accent.color,
+                  fontSize: FontSize.xxs,
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 9),
-          const Divider(height: 1, color: Color(0xFFE7E4E4)),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(
-                Icons.calendar_today_outlined,
-                size: 15,
-                color: Color(0xFF5D5D5D),
-              ),
-              const SizedBox(width: 7),
-              Expanded(
-                child: Text(
-                  dueLabel,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF5D5D5D),
-                    fontSize: FontSize.small,
-                    fontWeight: FontWeight.w700,
+          const Padding(
+            padding: EdgeInsets.only(top: 9),
+            child: Divider(height: 1, color: Color(0xFFE7E4E4)),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Row(
+              spacing: 7,
+              children: [
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 15,
+                  color: Color(0xFF5D5D5D),
+                ),
+                Expanded(
+                  child: Text(
+                    dueLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFF5D5D5D),
+                      fontSize: FontSize.small,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

@@ -179,20 +179,22 @@ class _StudentInvitationListScreenState
                     messageKey: AppKeys.studentNoInvitationsMessage,
                   )
                 else
-                  for (var index = 0; index < _invitations.length; index++) ...[
-                    StudentInvitationCard(
-                      invitation: _invitations[index],
-                      isProcessing: _processingClassroomIds.contains(
-                        _invitations[index].stableClassroomId,
-                      ),
-                      onAccept: () =>
-                          _handleInvitation(_invitations[index], accept: true),
-                      onReject: () =>
-                          _handleInvitation(_invitations[index], accept: false),
-                    ),
-                    if (index != _invitations.length - 1)
-                      const SizedBox(height: 12),
-                  ],
+                  Column(
+                    spacing: 12,
+                    children: [
+                      for (final invitation in _invitations)
+                        StudentInvitationCard(
+                          invitation: invitation,
+                          isProcessing: _processingClassroomIds.contains(
+                            invitation.stableClassroomId,
+                          ),
+                          onAccept: () =>
+                              _handleInvitation(invitation, accept: true),
+                          onReject: () =>
+                              _handleInvitation(invitation, accept: false),
+                        ),
+                    ],
+                  ),
               ],
             ),
           ),

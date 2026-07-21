@@ -1,5 +1,6 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -25,7 +26,7 @@ class StudentJoinRetryBanner extends StatelessWidget {
       borderRadius: 10,
       borderColor: const Color(0xFFF4C7AE),
       textColor: const Color(0xFF7E2F0E),
-      fontSize: 12,
+      fontSize: FontSize.xxs,
       textHeight: 1.3,
       leading: const Icon(
         Icons.wifi_off_rounded,

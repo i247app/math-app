@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_number_helpers.dart';
 
 class TeacherClassroomNumberBadge extends StatelessWidget {
   const TeacherClassroomNumberBadge({
     super.key,
-    required this.scale,
     required this.number,
     required this.palette,
   });
-
-  final double scale;
   final String number;
   final TeacherClassroomNumberPalette palette;
 
-  TextStyle get _numberStyle =>
-      TextStyle(fontSize: 50 * scale, fontWeight: FontWeight.w900, height: 1);
+  TextStyle get _numberStyle => const TextStyle(
+    fontSize: FontSize.displayHero,
+    fontWeight: FontWeight.w900,
+    height: 1,
+  );
 
   @override
   Widget build(BuildContext context) {
-    final radius = 16 * scale;
+    const radius = 16.0;
     return Container(
-      width: 76 * scale,
-      height: 76 * scale,
+      width: 76,
+      height: 76,
       decoration: BoxDecoration(
         color: palette.background,
         borderRadius: BorderRadius.circular(radius),
@@ -47,14 +48,14 @@ class TeacherClassroomNumberBadge extends StatelessWidget {
             ),
           ),
           Transform.translate(
-            offset: Offset(3.5 * scale, 5.5 * scale),
+            offset: const Offset(3.5, 5.5),
             child: Text(
               number,
               style: _numberStyle.copyWith(color: palette.shadow),
             ),
           ),
           Transform.translate(
-            offset: Offset(0, 3 * scale),
+            offset: const Offset(0, 3),
             child: Text(
               number,
               style: _numberStyle.copyWith(
@@ -62,8 +63,8 @@ class TeacherClassroomNumberBadge extends StatelessWidget {
                 shadows: [
                   Shadow(
                     color: palette.shadow,
-                    offset: Offset(2 * scale, 2.6 * scale),
-                    blurRadius: 2 * scale,
+                    offset: const Offset(2, 2.6),
+                    blurRadius: 2,
                   ),
                 ],
               ),
@@ -83,13 +84,13 @@ class TeacherClassroomNumberBadge extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 17 * scale,
-            left: 26 * scale,
+            top: 17,
+            left: 26,
             child: Transform.rotate(
               angle: -0.5,
               child: Container(
-                width: 13 * scale,
-                height: 5 * scale,
+                width: 13,
+                height: 5,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.42),
                   borderRadius: BorderRadius.circular(999),

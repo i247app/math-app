@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -40,9 +40,9 @@ class TeacherStudentSearchResultList extends StatelessWidget {
         child: Text(
           context.getText(AppKeys.teacherSearchStudentFailed),
           textAlign: TextAlign.center,
-          style: GoogleFonts.andika(
+          style: const TextStyle(
             color: AppColors.textCoolMuted,
-            fontSize: 14,
+            fontSize: FontSize.small,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -53,28 +53,32 @@ class TeacherStudentSearchResultList extends StatelessWidget {
         child: Text(
           context.getText(AppKeys.teacherNoStudentResults),
           textAlign: TextAlign.center,
-          style: GoogleFonts.andika(
+          style: const TextStyle(
             color: AppColors.textCoolMuted,
-            fontSize: 14,
+            fontSize: FontSize.small,
             fontWeight: FontWeight.w600,
           ),
         ),
       );
     }
 
-    return ListView.separated(
+    return ListView.builder(
       controller: scrollController,
       padding: EdgeInsets.zero,
       itemCount: profiles.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final profile = profiles[index];
         final id = ActiveProfileSession.profileStableId(profile);
         final selected = id != null && selectedProfileIds.contains(id);
-        return TeacherStudentSearchResultTile(
-          profile: profile,
-          selected: selected,
-          onTap: () => onToggle(profile),
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: index == profiles.length - 1 ? 0 : 10,
+          ),
+          child: TeacherStudentSearchResultTile(
+            profile: profile,
+            selected: selected,
+            onTap: () => onToggle(profile),
+          ),
         );
       },
     );

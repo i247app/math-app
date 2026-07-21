@@ -17,7 +17,6 @@ import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_s
 class TeacherClassMembersContent extends StatelessWidget {
   const TeacherClassMembersContent({
     super.key,
-    required this.scale,
     required this.isLoading,
     required this.isSendingInvites,
     required this.error,
@@ -30,8 +29,6 @@ class TeacherClassMembersContent extends StatelessWidget {
     required this.onApprove,
     required this.onReject,
   });
-
-  final double scale;
   final bool isLoading;
   final bool isSendingInvites;
   final String? error;
@@ -51,7 +48,6 @@ class TeacherClassMembersContent extends StatelessWidget {
         AppScreenAppBar(
           backIconAsset: 'assets/images/teacher_class_back.svg',
           title: context.getText(AppKeys.teacherMembersTitle),
-          scale: scale,
           onBack: onBack,
         ),
         Expanded(
@@ -63,10 +59,10 @@ class TeacherClassMembersContent extends StatelessWidget {
                 parent: BouncingScrollPhysics(),
               ),
               padding: EdgeInsets.fromLTRB(
-                15 * scale,
-                31 * scale,
-                15 * scale,
-                MediaQuery.paddingOf(context).bottom + 32 * scale,
+                15,
+                31,
+                15,
+                MediaQuery.paddingOf(context).bottom + 32,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -74,37 +70,32 @@ class TeacherClassMembersContent extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TeacherMemberAddButton(
-                      scale: scale,
                       onTap: isSendingInvites ? null : onOpenStudentSearch,
                     ),
                   ),
-                  SizedBox(height: 15 * scale),
-                  if (isLoading && joinRequests.isEmpty && members.isEmpty)
-                    Padding(
-                      padding: EdgeInsets.only(top: 80 * scale),
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.teal520,
-                        ),
-                      ),
-                    )
-                  else if (error != null &&
-                      joinRequests.isEmpty &&
-                      members.isEmpty)
-                    AppRetryPanel(
-                      scale: scale,
-                      message: error!,
-                      onRetry: onRefresh,
-                    )
-                  else
-                    _TeacherClassMembersLists(
-                      scale: scale,
-                      joinRequests: joinRequests,
-                      members: members,
-                      processingProfileIds: processingProfileIds,
-                      onApprove: onApprove,
-                      onReject: onReject,
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: isLoading && joinRequests.isEmpty && members.isEmpty
+                        ? const Padding(
+                            padding: EdgeInsets.only(top: 80),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.teal520,
+                              ),
+                            ),
+                          )
+                        : error != null &&
+                              joinRequests.isEmpty &&
+                              members.isEmpty
+                        ? AppRetryPanel(message: error!, onRetry: onRefresh)
+                        : _TeacherClassMembersLists(
+                            joinRequests: joinRequests,
+                            members: members,
+                            processingProfileIds: processingProfileIds,
+                            onApprove: onApprove,
+                            onReject: onReject,
+                          ),
+                  ),
                 ],
               ),
             ),
@@ -117,15 +108,12 @@ class TeacherClassMembersContent extends StatelessWidget {
 
 class _TeacherClassMembersLists extends StatelessWidget {
   const _TeacherClassMembersLists({
-    required this.scale,
     required this.joinRequests,
     required this.members,
     required this.processingProfileIds,
     required this.onApprove,
     required this.onReject,
   });
-
-  final double scale;
   final List<ClassroomStudent> joinRequests;
   final List<ClassroomStudent> members;
   final Set<int> processingProfileIds;
@@ -138,37 +126,41 @@ class _TeacherClassMembersLists extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TeacherMemberSectionTitle(
-          scale: scale,
           title: context.formatText(AppKeys.teacherJoinRequests, {
             'count': joinRequests.length,
           }),
         ),
-        SizedBox(height: 10 * scale),
-        TeacherJoinRequestCard(
-          scale: scale,
-          requests: joinRequests,
-          processingProfileIds: processingProfileIds,
-          onApprove: onApprove,
-          onReject: onReject,
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: TeacherJoinRequestCard(
+            requests: joinRequests,
+            processingProfileIds: processingProfileIds,
+            onApprove: onApprove,
+            onReject: onReject,
+          ),
         ),
-        SizedBox(height: 28 * scale),
-        TeacherMemberSectionTitle(
-          scale: scale,
-          title: context.formatText(AppKeys.teacherJoinedStudentsTitle, {
-            'count': members.length,
-          }),
+        Padding(
+          padding: const EdgeInsets.only(top: 28),
+          child: TeacherMemberSectionTitle(
+            title: context.formatText(AppKeys.teacherJoinedStudentsTitle, {
+              'count': members.length,
+            }),
+          ),
         ),
-        SizedBox(height: 8 * scale),
-        if (members.isEmpty)
-          TeacherEmptyMemberText(
-            scale: scale,
-            text: context.getText(AppKeys.teacherNoJoinedStudents),
-          )
-        else
-          for (var index = 0; index < members.length; index++) ...[
-            TeacherJoinedMemberCard(scale: scale, member: members[index]),
-            if (index != members.length - 1) SizedBox(height: 12 * scale),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: members.isEmpty
+              ? TeacherEmptyMemberText(
+                  text: context.getText(AppKeys.teacherNoJoinedStudents),
+                )
+              : Column(
+                  spacing: 12,
+                  children: [
+                    for (final member in members)
+                      TeacherJoinedMemberCard(member: member),
+                  ],
+                ),
+        ),
       ],
     );
   }

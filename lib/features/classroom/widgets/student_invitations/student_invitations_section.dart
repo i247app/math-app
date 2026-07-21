@@ -50,27 +50,33 @@ class StudentInvitationsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (showInvitationPreview) ...[
-            AppSectionHeader(
-              title: context.getText(AppKeys.studentClassInvitations),
-              actionLabel: context.formatText(
-                AppKeys.studentViewAllInvitations,
-                {'count': invitations.length},
+          if (showInvitationPreview)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Column(
+                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AppSectionHeader(
+                    title: context.getText(AppKeys.studentClassInvitations),
+                    actionLabel: context.formatText(
+                      AppKeys.studentViewAllInvitations,
+                      {'count': invitations.length},
+                    ),
+                    onAction: onViewAll,
+                  ),
+                  StudentInvitationCard(
+                    invitation: invitation,
+                    isProcessing: processingClassroomIds.contains(
+                      invitation.stableClassroomId,
+                    ),
+                    compactActions: true,
+                    onAccept: () => onAccept(invitation),
+                    onReject: () => onReject(invitation),
+                  ),
+                ],
               ),
-              onAction: onViewAll,
             ),
-            const SizedBox(height: 10),
-            StudentInvitationCard(
-              invitation: invitation,
-              isProcessing: processingClassroomIds.contains(
-                invitation.stableClassroomId,
-              ),
-              compactActions: true,
-              onAccept: () => onAccept(invitation),
-              onReject: () => onReject(invitation),
-            ),
-            const SizedBox(height: 6),
-          ],
           if (showJoinClassroom) StudentJoinClassCta(onTap: onJoinClassroom),
         ],
       ),

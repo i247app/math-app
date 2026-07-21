@@ -65,76 +65,79 @@ class StudentInvitationCard extends StatelessWidget {
                       width: 36,
                       height: 32,
                     ),
-                    const SizedBox(width: 16),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF181C1E),
-                              fontSize: FontSize.normal,
-                              fontWeight: FontWeight.w700,
-                              height: 1.2,
-                              letterSpacing: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Column(
+                          spacing: 3,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF181C1E),
+                                fontSize: FontSize.normal,
+                                fontWeight: FontWeight.w700,
+                                height: 1.2,
+                                letterSpacing: 0,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            subtitle,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF444650),
-                              fontSize: FontSize.caption,
-                              fontWeight: FontWeight.w700,
-                              height: 1.2,
-                              letterSpacing: 0,
+                            Text(
+                              subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF444650),
+                                fontSize: FontSize.caption,
+                                fontWeight: FontWeight.w700,
+                                height: 1.2,
+                                letterSpacing: 0,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 11),
-                if (isProcessing)
-                  const SizedBox(
-                    height: 27,
-                    child: Center(
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          color: homeTeal,
-                          strokeWidth: 2,
+                Padding(
+                  padding: const EdgeInsets.only(top: 11),
+                  child: isProcessing
+                      ? const SizedBox(
+                          height: 27,
+                          child: Center(
+                            child: SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                color: homeTeal,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Row(
+                          spacing: 12,
+                          children: [
+                            Expanded(
+                              child: StudentInviteButton(
+                                label: context.getText(AppKeys.accept),
+                                color: const Color(0xFF38898C),
+                                onTap: onAccept,
+                              ),
+                            ),
+                            Expanded(
+                              child: StudentInviteButton(
+                                label: context.getText(AppKeys.reject),
+                                color: const Color(0xFFF37850),
+                                onTap: onReject,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                  )
-                else
-                  Row(
-                    children: [
-                      Expanded(
-                        child: StudentInviteButton(
-                          label: context.getText(AppKeys.accept),
-                          color: const Color(0xFF38898C),
-                          onTap: onAccept,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: StudentInviteButton(
-                          label: context.getText(AppKeys.reject),
-                          color: const Color(0xFFF37850),
-                          onTap: onReject,
-                        ),
-                      ),
-                    ],
-                  ),
+                ),
               ],
             ),
     );
@@ -144,38 +147,40 @@ class StudentInvitationCard extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Color(0xFF001741),
-                  fontSize: FontSize.normal,
-                  fontWeight: FontWeight.w700,
-                  height: 1.35,
-                  letterSpacing: 0,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Column(
+              spacing: 2,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF001741),
+                    fontSize: FontSize.normal,
+                    fontWeight: FontWeight.w700,
+                    height: 1.35,
+                    letterSpacing: 0,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: const Color(0xFF001741).withValues(alpha: 0.7),
-                  fontSize: FontSize.caption,
-                  fontWeight: FontWeight.w400,
-                  height: 1.3,
-                  letterSpacing: 0,
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: const Color(0xFF001741).withValues(alpha: 0.7),
+                    fontSize: FontSize.caption,
+                    fontWeight: FontWeight.w400,
+                    height: 1.3,
+                    letterSpacing: 0,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        const SizedBox(width: 12),
         if (isProcessing)
           const SizedBox(
             width: 56,
@@ -192,6 +197,7 @@ class StudentInvitationCard extends StatelessWidget {
           )
         else
           Row(
+            spacing: 8,
             mainAxisSize: MainAxisSize.min,
             children: [
               StudentInviteIconButton(
@@ -199,7 +205,6 @@ class StudentInvitationCard extends StatelessWidget {
                 label: context.getText(AppKeys.accept),
                 onTap: onAccept,
               ),
-              const SizedBox(width: 8),
               StudentInviteIconButton(
                 asset: studentParentHomeRejectIconAsset,
                 label: context.getText(AppKeys.reject),

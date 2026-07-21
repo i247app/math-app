@@ -49,16 +49,18 @@ class ParentRoomDetailHero extends StatelessWidget {
                   size: 34,
                 ),
               ),
-              const SizedBox(width: 16),
               Expanded(
-                child: Text(
-                  className,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontSize: FontSize.xxxl,
-                    fontWeight: FontWeight.w900,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    className,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: FontSize.xxxl,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ),
               ),
@@ -68,17 +70,28 @@ class ParentRoomDetailHero extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 17),
-          ParentRoomDetailMeta(icon: Icons.groups_2_outlined, label: grade),
-          const SizedBox(height: 7),
-          ParentRoomDetailMeta(
-            icon: Icons.workspace_premium_outlined,
-            label: teacherName,
+          Padding(
+            padding: const EdgeInsets.only(top: 17),
+            child: ParentRoomDetailMeta(
+              icon: Icons.groups_2_outlined,
+              label: grade,
+            ),
           ),
-          if (description != null && description.isNotEmpty) ...[
-            const SizedBox(height: 7),
-            ParentRoomDetailMeta(icon: Icons.notes_rounded, label: description),
-          ],
+          Padding(
+            padding: const EdgeInsets.only(top: 7),
+            child: ParentRoomDetailMeta(
+              icon: Icons.workspace_premium_outlined,
+              label: teacherName,
+            ),
+          ),
+          if (description != null && description.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: ParentRoomDetailMeta(
+                icon: Icons.notes_rounded,
+                label: description,
+              ),
+            ),
         ],
       ),
     );

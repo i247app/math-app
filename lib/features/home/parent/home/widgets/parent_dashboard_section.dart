@@ -27,9 +27,9 @@ class ParentTabHostSection extends StatelessWidget {
         border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: colors.shadow.withValues(alpha: 0.20),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
+            color: colors.shadow,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),

@@ -43,35 +43,37 @@ class _ParentRoomEmptyBox extends StatelessWidget {
             ),
             child: Icon(icon, color: colors.brandStrong, size: 22),
           ),
-          const SizedBox(width: 13),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontSize: FontSize.normal,
-                    fontWeight: FontWeight.w900,
-                    height: 1.1,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 13),
+              child: Column(
+                spacing: 5,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: FontSize.normal,
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  message,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colors.textSecondary,
-                    fontSize: FontSize.small,
-                    fontWeight: FontWeight.w600,
-                    height: 1.25,
+                  Text(
+                    message,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: FontSize.small,
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

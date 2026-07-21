@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class StudentJoinClassBadge extends StatelessWidget {
   const StudentJoinClassBadge({
@@ -24,7 +25,7 @@ class StudentJoinClassBadge extends StatelessWidget {
         label,
         style: TextStyle(
           color: textColor,
-          fontSize: 12,
+          fontSize: FontSize.xxs,
           fontWeight: FontWeight.w800,
           height: 1.25,
           letterSpacing: 0.6,

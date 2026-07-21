@@ -50,69 +50,77 @@ class ParentRoomSelectStudentCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Text(
-            context.getText(AppKeys.parentNoStudentTitle),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF001741),
-              fontSize: FontSize.xxxl,
-              fontWeight: FontWeight.w900,
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            context.getText(AppKeys.parentSelectStudentMessage),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF444650),
-              fontSize: FontSize.normal,
-              fontWeight: FontWeight.w400,
-              height: 1.45,
-            ),
-          ),
-          const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: FilledButton(
-              onPressed: onChooseProfile,
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFAA2A6C),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                context.getText(AppKeys.parentSwitchStudentAction),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: FontSize.large,
-                  fontWeight: FontWeight.w400,
-                ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: Text(
+              context.getText(AppKeys.parentNoStudentTitle),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF001741),
+                fontSize: FontSize.xxxl,
+                fontWeight: FontWeight.w900,
+                height: 1.2,
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: TextButton(
-              onPressed: onCreateProfile,
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFAA2A6C),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Text(
+              context.getText(AppKeys.parentSelectStudentMessage),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF444650),
+                fontSize: FontSize.normal,
+                fontWeight: FontWeight.w400,
+                height: 1.45,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 30),
+            child: SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: FilledButton(
+                onPressed: onChooseProfile,
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFAA2A6C),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  context.getText(AppKeys.parentSwitchStudentAction),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: FontSize.large,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
-              child: Text(
-                context.getText(AppKeys.parentCreateStudent),
-                style: const TextStyle(
-                  color: Color(0xFFAA2A6C),
-                  fontSize: FontSize.large,
-                  fontWeight: FontWeight.w400,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: TextButton(
+                onPressed: onCreateProfile,
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFFAA2A6C),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  context.getText(AppKeys.parentCreateStudent),
+                  style: const TextStyle(
+                    color: Color(0xFFAA2A6C),
+                    fontSize: FontSize.large,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ),

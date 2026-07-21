@@ -77,8 +77,7 @@ class ParentRoomListSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          child,
+          Padding(padding: const EdgeInsets.only(top: 10), child: child),
         ],
       ),
     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class TeacherMemberTextBlock extends StatelessWidget {
   const TeacherMemberTextBlock({
@@ -31,7 +30,7 @@ class TeacherMemberTextBlock extends StatelessWidget {
           name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.andika(
+          style: TextStyle(
             color: nameColor,
             fontSize: nameFontSize,
             fontWeight: FontWeight.w700,
@@ -43,7 +42,7 @@ class TeacherMemberTextBlock extends StatelessWidget {
           status,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.andika(
+          style: TextStyle(
             color: statusColor,
             fontSize: statusFontSize,
             fontWeight: FontWeight.w500,

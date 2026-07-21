@@ -25,7 +25,6 @@ class StudentClassroomTab extends StatefulWidget {
   const StudentClassroomTab({
     super.key,
     required this.bottomPadding,
-    this.scale = 1,
     required this.user,
     required this.activeProfile,
     required this.classroomService,
@@ -34,7 +33,6 @@ class StudentClassroomTab extends StatefulWidget {
   });
 
   final double bottomPadding;
-  final double scale;
   final LoginUser? user;
   final StudentProfile? activeProfile;
   final ClassroomService classroomService;
@@ -161,7 +159,6 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
         _isLoading &&
         _classrooms.isEmpty &&
         !_hasLoadedClassrooms;
-    final scale = widget.scale;
     final topInset = MediaQuery.paddingOf(context).top;
 
     return ColoredBox(
@@ -187,14 +184,13 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
                         children: [
                           PageHeader(
                             title: context.getText(AppKeys.studentClassroom),
-                            scale: scale,
                             topInset: topInset,
                           ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(
-                              20 * scale,
-                              20 * scale,
-                              20 * scale,
+                              20,
+                              20,
+                              20,
                               widget.bottomPadding,
                             ),
                             child: Column(
@@ -215,11 +211,10 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
                                   LayoutBuilder(
                                     builder: (context, constraints) {
                                       final cardWidth =
-                                          (constraints.maxWidth - 10 * scale) /
-                                          2;
+                                          (constraints.maxWidth - 10) / 2;
                                       return Wrap(
-                                        spacing: 10 * scale,
-                                        runSpacing: 12 * scale,
+                                        spacing: 10,
+                                        runSpacing: 12,
                                         children: [
                                           for (final classroom in _classrooms)
                                             SizedBox(
@@ -234,16 +229,21 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
                                       );
                                     },
                                   ),
-                                SizedBox(height: 30 * scale),
-                                const StudentJoinAnotherClassroomTitle(),
-                                SizedBox(height: 14 * scale),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 30),
+                                  child: StudentJoinAnotherClassroomTitle(),
+                                ),
                                 if (canLoadContent)
-                                  StudentClassSearchContent(
-                                    profileId: profileId,
-                                    userId: widget.user?.id,
-                                    activeRefreshTick: widget.activeRefreshTick,
-                                    classroomService: _classroomService,
-                                    onJoinRequested: _refreshClassrooms,
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 14),
+                                    child: StudentClassSearchContent(
+                                      profileId: profileId,
+                                      userId: widget.user?.id,
+                                      activeRefreshTick:
+                                          widget.activeRefreshTick,
+                                      classroomService: _classroomService,
+                                      onJoinRequested: _refreshClassrooms,
+                                    ),
                                   ),
                               ],
                             ),

@@ -11,6 +11,7 @@ class StudentJoinAnotherClassroomTitle extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Row(
+        spacing: 12,
         children: [
           Container(
             width: 40,
@@ -25,7 +26,6 @@ class StudentJoinAnotherClassroomTitle extends StatelessWidget {
               size: 22,
             ),
           ),
-          const SizedBox(width: 12),
           Expanded(
             child: Text(
               context.getText(AppKeys.studentJoinAnotherClassroom),

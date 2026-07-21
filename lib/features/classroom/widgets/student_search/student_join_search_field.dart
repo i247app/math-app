@@ -1,6 +1,7 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -28,7 +29,7 @@ class StudentJoinSearchField extends StatelessWidget {
       textInputAction: TextInputAction.search,
       style: const TextStyle(
         color: AppColors.textInkDark,
-        fontSize: 16,
+        fontSize: FontSize.normal,
         fontWeight: FontWeight.w700,
         letterSpacing: 0,
       ),
@@ -36,7 +37,7 @@ class StudentJoinSearchField extends StatelessWidget {
         hintText: context.getText(AppKeys.studentClassCodeHint),
         hintStyle: TextStyle(
           color: const Color(0xFF515F54).withValues(alpha: 0.7),
-          fontSize: 16,
+          fontSize: FontSize.normal,
           fontWeight: FontWeight.w700,
         ),
         filled: true,

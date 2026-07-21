@@ -14,9 +14,9 @@ class ParentRoomDetailMeta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 9,
       children: [
         Icon(icon, size: 18, color: const Color(0xFF4B5563)),
-        const SizedBox(width: 9),
         Expanded(
           child: Text(
             label,

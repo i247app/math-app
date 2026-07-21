@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
@@ -52,44 +52,47 @@ class StudentClassUpcomingDeadlineTile extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      studentClassHomeworkTitle(exercise),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.andika(
-                        color: colors.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        height: 1.5,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        studentClassHomeworkTitle(exercise),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: colors.textPrimary,
+                          fontSize: FontSize.normal,
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
+                        ),
                       ),
-                    ),
-                    Text(
-                      studentClassHomeworkDueDate(context, exercise),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.andika(
-                        color: colors.textSecondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        height: 16 / 12,
+                      Text(
+                        studentClassHomeworkDueDate(context, exercise),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: colors.textSecondary,
+                          fontSize: FontSize.xxs,
+                          fontWeight: FontWeight.w500,
+                          height: 16 / 12,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 12),
-              SvgPicture.asset(
-                'assets/images/student_class_chevron.svg',
-                width: 7,
-                height: 10,
+              Padding(
+                padding: const EdgeInsets.only(right: 28),
+                child: SvgPicture.asset(
+                  'assets/images/student_class_chevron.svg',
+                  width: 7,
+                  height: 10,
+                ),
               ),
-              const SizedBox(width: 28),
             ],
           ),
         ),

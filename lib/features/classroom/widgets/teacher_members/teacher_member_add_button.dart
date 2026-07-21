@@ -4,26 +4,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:numi/core/theme/app_colors.dart';
 
 class TeacherMemberAddButton extends StatelessWidget {
-  const TeacherMemberAddButton({
-    super.key,
-    required this.scale,
-    required this.onTap,
-  });
-
-  final double scale;
+  const TeacherMemberAddButton({super.key, required this.onTap});
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(12 * scale);
+    final radius = BorderRadius.circular(12);
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: radius,
         boxShadow: [
-          BoxShadow(
-            color: const Color(0x1A000000),
-            offset: Offset(0, 4 * scale),
-          ),
+          const BoxShadow(color: Color(0x1A000000), offset: Offset(0, 4)),
         ],
       ),
       child: Material(
@@ -33,16 +24,16 @@ class TeacherMemberAddButton extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: SizedBox(
-            width: 82 * scale,
-            height: 31 * scale,
+            width: 82,
+            height: 31,
             child: Stack(
               alignment: Alignment.center,
               children: [
                 Positioned.fill(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(12 * scale),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12),
                       ),
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
@@ -60,8 +51,8 @@ class TeacherMemberAddButton extends StatelessWidget {
                 ),
                 SvgPicture.asset(
                   'assets/images/teacher_class_add.svg',
-                  width: 12 * scale,
-                  height: 12 * scale,
+                  width: 12,
+                  height: 12,
                 ),
               ],
             ),

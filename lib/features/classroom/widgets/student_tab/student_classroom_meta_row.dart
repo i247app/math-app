@@ -14,9 +14,9 @@ class StudentClassroomMetaRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 7,
       children: [
         Icon(icon, size: 16, color: const Color(0xFF747781)),
-        const SizedBox(width: 7),
         Expanded(
           child: Text(
             label,

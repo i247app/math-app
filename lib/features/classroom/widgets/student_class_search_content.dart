@@ -3,6 +3,7 @@ import 'package:numi/features/classroom/widgets/student_search/student_class_sea
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -423,33 +424,39 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
           onChanged: _onSearchChanged,
           onSubmitted: _search,
         ),
-        const SizedBox(height: 14),
-        StudentJoinFilterPanel(
-          grades: _grades,
-          schools: _schools,
-          selectedGradeIds: _selectedGradeIds,
-          selectedSchoolIds: _selectedSchoolIds,
-          isLoading: _isLoadingFilters,
-          error: _filterError,
-          onRetry: _loadFilterOptions,
-          onGradeTap: _selectGrade,
-          onGradeRemove: _removeGrade,
-          onSchoolTap: _openSchoolPicker,
-          onSchoolRemove: _removeSchool,
-        ),
-        const SizedBox(height: 17),
-        Text(
-          context.getText(AppKeys.studentSearchResults),
-          style: const TextStyle(
-            color: AppColors.textNavy,
-            fontSize: 16,
-            fontWeight: FontWeight.w900,
-            height: 2,
-            letterSpacing: 0,
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: StudentJoinFilterPanel(
+            grades: _grades,
+            schools: _schools,
+            selectedGradeIds: _selectedGradeIds,
+            selectedSchoolIds: _selectedSchoolIds,
+            isLoading: _isLoadingFilters,
+            error: _filterError,
+            onRetry: _loadFilterOptions,
+            onGradeTap: _selectGrade,
+            onGradeRemove: _removeGrade,
+            onSchoolTap: _openSchoolPicker,
+            onSchoolRemove: _removeSchool,
           ),
         ),
-        const SizedBox(height: 10),
-        _buildResults(),
+        Padding(
+          padding: const EdgeInsets.only(top: 17),
+          child: Text(
+            context.getText(AppKeys.studentSearchResults),
+            style: const TextStyle(
+              color: AppColors.textNavy,
+              fontSize: FontSize.normal,
+              fontWeight: FontWeight.w900,
+              height: 2,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: _buildResults(),
+        ),
       ],
     );
   }
@@ -493,26 +500,32 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (_isSearching) ...[
-          const LinearProgressIndicator(
-            minHeight: 3,
-            color: AppColors.teal520,
-            backgroundColor: Color(0xFFDDEDEA),
+        if (_isSearching)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: LinearProgressIndicator(
+              minHeight: 3,
+              color: AppColors.teal520,
+              backgroundColor: Color(0xFFDDEDEA),
+            ),
           ),
-          const SizedBox(height: 10),
-        ],
-        if (_error != null) ...[
-          StudentJoinRetryBanner(message: _error!, onRetry: _search),
-          const SizedBox(height: 10),
-        ],
-        for (var index = 0; index < _results.length; index++) ...[
-          StudentJoinClassCard(
-            classroom: _results[index],
-            isJoining: _joiningClassroomId == (_results[index].stableId ?? -1),
-            onJoin: () => _joinClassroom(_results[index]),
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: StudentJoinRetryBanner(message: _error!, onRetry: _search),
           ),
-          if (index != _results.length - 1) const SizedBox(height: 16),
-        ],
+        Column(
+          spacing: 16,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final classroom in _results)
+              StudentJoinClassCard(
+                classroom: classroom,
+                isJoining: _joiningClassroomId == (classroom.stableId ?? -1),
+                onJoin: () => _joinClassroom(classroom),
+              ),
+          ],
+        ),
       ],
     );
   }

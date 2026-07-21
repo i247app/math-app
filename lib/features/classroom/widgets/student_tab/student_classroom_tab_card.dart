@@ -55,17 +55,21 @@ class StudentClassroomTabCard extends StatelessWidget {
                   height: 1,
                 ),
               ),
-              const SizedBox(height: 14),
-              StudentClassroomMetaRow(
-                icon: Icons.person_rounded,
-                label: teacher,
+              Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: StudentClassroomMetaRow(
+                  icon: Icons.person_rounded,
+                  label: teacher,
+                ),
               ),
-              const SizedBox(height: 7),
-              StudentClassroomMetaRow(
-                icon: Icons.groups_rounded,
-                label: context.formatText(AppKeys.teacherStudentCount, {
-                  'count': classroom.displayStudentCount,
-                }),
+              Padding(
+                padding: const EdgeInsets.only(top: 7),
+                child: StudentClassroomMetaRow(
+                  icon: Icons.groups_rounded,
+                  label: context.formatText(AppKeys.teacherStudentCount, {
+                    'count': classroom.displayStudentCount,
+                  }),
+                ),
               ),
             ],
           ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -12,31 +11,28 @@ class TeacherTextField extends StatelessWidget {
     required this.label,
     required this.hintText,
     required this.controller,
-    required this.scale,
     this.maxLines = 1,
   });
 
   final String label;
   final String hintText;
   final TextEditingController controller;
-  final double scale;
   final int maxLines;
 
   @override
   Widget build(BuildContext context) {
     return TeacherFieldShell(
       label: label,
-      scale: scale,
       child: TextField(
         controller: controller,
         maxLines: maxLines,
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-        style: GoogleFonts.andika(
+        style: const TextStyle(
           color: AppColors.textInkDark,
-          fontSize: FontSize.normal * scale,
+          fontSize: FontSize.normal,
           fontWeight: FontWeight.w400,
         ),
-        decoration: teacherInputDecoration(hintText: hintText, scale: scale),
+        decoration: teacherInputDecoration(hintText: hintText),
       ),
     );
   }

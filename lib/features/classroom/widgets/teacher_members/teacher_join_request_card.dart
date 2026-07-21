@@ -9,14 +9,11 @@ import 'package:numi/features/classroom/widgets/teacher_members/teacher_join_req
 class TeacherJoinRequestCard extends StatelessWidget {
   const TeacherJoinRequestCard({
     super.key,
-    required this.scale,
     required this.requests,
     required this.processingProfileIds,
     required this.onApprove,
     required this.onReject,
   });
-
-  final double scale;
   final List<ClassroomStudent> requests;
   final Set<int> processingProfileIds;
   final ValueChanged<ClassroomStudent> onApprove;
@@ -26,19 +23,15 @@ class TeacherJoinRequestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     if (requests.isEmpty) {
       return TeacherEmptyMemberText(
-        scale: scale,
         text: context.getText(AppKeys.teacherNoJoinRequests),
       );
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 25 * scale,
-        vertical: 16 * scale,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFFF3F4F6)),
       ),
       child: Column(
@@ -46,20 +39,23 @@ class TeacherJoinRequestCard extends StatelessWidget {
         children: [
           for (var index = 0; index < requests.length; index++) ...[
             if (index > 0)
-              Padding(
-                padding: EdgeInsets.only(bottom: 10 * scale),
-                child: const Divider(height: 1, color: Color(0xFFF9FAFB)),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 10),
+                child: Divider(height: 1, color: Color(0xFFF9FAFB)),
               ),
-            TeacherJoinRequestRow(
-              scale: scale,
-              request: requests[index],
-              isProcessing: processingProfileIds.contains(
-                requests[index].profileId,
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: index == requests.length - 1 ? 0 : 16,
               ),
-              onApprove: () => onApprove(requests[index]),
-              onReject: () => onReject(requests[index]),
+              child: TeacherJoinRequestRow(
+                request: requests[index],
+                isProcessing: processingProfileIds.contains(
+                  requests[index].profileId,
+                ),
+                onApprove: () => onApprove(requests[index]),
+                onReject: () => onReject(requests[index]),
+              ),
             ),
-            if (index != requests.length - 1) SizedBox(height: 16 * scale),
           ],
         ],
       ),

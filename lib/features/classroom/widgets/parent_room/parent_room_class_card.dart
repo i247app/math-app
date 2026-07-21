@@ -54,30 +54,34 @@ class ParentRoomClassCard extends StatelessWidget {
                   height: 1,
                 ),
               ),
-              const SizedBox(height: 7),
-              Text(
-                className,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: fg,
-                  fontSize: 34,
-                  fontWeight: FontWeight.w900,
-                  height: 0.9,
+              Padding(
+                padding: const EdgeInsets.only(top: 7),
+                child: Text(
+                  className,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: fg,
+                    fontSize: FontSize.displayMedium,
+                    fontWeight: FontWeight.w900,
+                    height: 0.9,
+                  ),
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                teacherName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: fg,
-                  fontSize: FontSize.caption,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  teacherName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: fg,
+                    fontSize: FontSize.caption,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                  ),
                 ),
               ),
             ],

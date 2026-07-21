@@ -30,31 +30,37 @@ class ParentRoomStateCard extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: const Color(0xFF339395), size: 48),
-          const SizedBox(height: 14),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF17252B),
-              fontSize: FontSize.large,
-              fontWeight: FontWeight.w900,
+          Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF17252B),
+                fontSize: FontSize.large,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF77859A),
-              fontSize: FontSize.small,
-              fontWeight: FontWeight.w600,
-              height: 1.35,
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF77859A),
+                fontSize: FontSize.small,
+                fontWeight: FontWeight.w600,
+                height: 1.35,
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          TextButton(
-            onPressed: onTap,
-            child: Text(context.getText(AppKeys.retry)),
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: TextButton(
+              onPressed: onTap,
+              child: Text(context.getText(AppKeys.retry)),
+            ),
           ),
         ],
       ),

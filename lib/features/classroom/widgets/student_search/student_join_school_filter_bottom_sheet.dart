@@ -1,5 +1,6 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -39,7 +40,7 @@ class StudentJoinSchoolFilterBottomSheet extends StatelessWidget {
                     context.getText(AppKeys.chooseSchool),
                     style: const TextStyle(
                       color: AppColors.textNavy,
-                      fontSize: 18,
+                      fontSize: FontSize.large,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -92,7 +93,7 @@ class StudentJoinSchoolFilterBottomSheet extends StatelessWidget {
                     child: Text(
                       context.getText(AppKeys.continueUpper),
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: FontSize.small,
                         fontWeight: FontWeight.w900,
                       ),
                     ),

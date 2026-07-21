@@ -11,7 +11,6 @@ import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_se
 class TeacherClassroomBody extends StatelessWidget {
   const TeacherClassroomBody({
     super.key,
-    required this.scale,
     required this.error,
     required this.classrooms,
     required this.displayedClassrooms,
@@ -20,8 +19,6 @@ class TeacherClassroomBody extends StatelessWidget {
     required this.onCreateClass,
     required this.onOpenClassDetail,
   });
-
-  final double scale;
   final String? error;
   final List<ClassroomModel> classrooms;
   final List<ClassroomModel> displayedClassrooms;
@@ -38,54 +35,58 @@ class TeacherClassroomBody extends StatelessWidget {
       children: [
         entranceBuilder(
           0,
-          TeacherClassroomAddButton(scale: scale, onTap: onCreateClass),
+          TeacherClassroomAddButton(onTap: onCreateClass),
           false,
         ),
-        SizedBox(height: 16 * scale),
-        entranceBuilder(
-          1,
-          TeacherClassroomSearchField(
-            scale: scale,
-            controller: searchController,
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: entranceBuilder(
+            1,
+            TeacherClassroomSearchField(controller: searchController),
+            false,
           ),
-          false,
         ),
-        SizedBox(height: 24 * scale),
-        if (error != null && classrooms.isEmpty)
-          entranceBuilder(
-            2,
-            TeacherClassroomEmptyState(scale: scale, message: error!),
-            true,
-          )
-        else if (classrooms.isEmpty)
-          entranceBuilder(
-            2,
-            TeacherClassroomEmptyState(
-              scale: scale,
-              message: context.getText(AppKeys.teacherEmptyClassroomList),
-            ),
-            true,
-          )
-        else
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.zero,
-            itemCount: displayedClassrooms.length,
-            separatorBuilder: (_, _) => SizedBox(height: 16 * scale),
-            itemBuilder: (context, index) {
-              final classroom = displayedClassrooms[index];
-              return entranceBuilder(
-                2 + index,
-                TeacherClassroomListCard(
-                  scale: scale,
-                  classroom: classroom,
-                  onTap: () => onOpenClassDetail(classroom),
+        Padding(
+          padding: const EdgeInsets.only(top: 24),
+          child: error != null && classrooms.isEmpty
+              ? entranceBuilder(
+                  2,
+                  TeacherClassroomEmptyState(message: error!),
+                  true,
+                )
+              : classrooms.isEmpty
+              ? entranceBuilder(
+                  2,
+                  TeacherClassroomEmptyState(
+                    message: context.getText(AppKeys.teacherEmptyClassroomList),
+                  ),
+                  true,
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  itemCount: displayedClassrooms.length,
+                  itemBuilder: (context, index) {
+                    final classroom = displayedClassrooms[index];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: index == displayedClassrooms.length - 1
+                            ? 0
+                            : 16,
+                      ),
+                      child: entranceBuilder(
+                        2 + index,
+                        TeacherClassroomListCard(
+                          classroom: classroom,
+                          onTap: () => onOpenClassDetail(classroom),
+                        ),
+                        index == displayedClassrooms.length - 1,
+                      ),
+                    );
+                  },
                 ),
-                index == displayedClassrooms.length - 1,
-              );
-            },
-          ),
+        ),
       ],
     );
   }

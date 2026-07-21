@@ -4,59 +4,37 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_card.dart';
 
 class TeacherClassroomSkeletonCard extends StatelessWidget {
-  const TeacherClassroomSkeletonCard({super.key, required this.scale});
-
-  final double scale;
+  const TeacherClassroomSkeletonCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AppSkeletonCard(
-      scale: scale,
-      padding: EdgeInsets.symmetric(
-        horizontal: 18 * scale,
-        vertical: 18 * scale,
-      ),
+    return const AppSkeletonCard(
+      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       child: Column(
+        spacing: 16,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            spacing: 16,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppSkeletonBlock(
-                width: 76 * scale,
-                height: 76 * scale,
-                radius: 16 * scale,
-              ),
-              SizedBox(width: 16 * scale),
+              AppSkeletonBlock(width: 76, height: 76, radius: 16),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.only(top: 4 * scale),
+                  padding: EdgeInsets.only(top: 4),
                   child: Column(
+                    spacing: 16,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppSkeletonBlock(
-                        width: 128 * scale,
-                        height: 21 * scale,
-                        radius: 10.5 * scale,
-                      ),
-                      SizedBox(height: 16 * scale),
-                      AppSkeletonBlock(
-                        width: 142 * scale,
-                        height: 18 * scale,
-                        radius: 9 * scale,
-                      ),
+                      AppSkeletonBlock(width: 128, height: 21, radius: 10.5),
+                      AppSkeletonBlock(width: 142, height: 18, radius: 9),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16 * scale),
-          AppSkeletonBlock(
-            width: 132 * scale,
-            height: 18 * scale,
-            radius: 9 * scale,
-          ),
+          AppSkeletonBlock(width: 132, height: 18, radius: 9),
         ],
       ),
     );
