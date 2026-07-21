@@ -623,10 +623,9 @@ class _GamesGradeCard extends StatelessWidget {
           border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
-              color: colors.shadow.withValues(alpha: 0.22),
-              blurRadius: 18,
-              spreadRadius: 1,
-              offset: Offset.zero,
+              color: colors.shadow,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),

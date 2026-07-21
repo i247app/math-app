@@ -41,9 +41,9 @@ class AssessmentResultListItemCard extends StatelessWidget {
             border: Border.all(color: colors.border, width: 1.3),
             boxShadow: [
               BoxShadow(
-                color: colors.shadow.withValues(alpha: 0.25),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                color: colors.shadow,
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
