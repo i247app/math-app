@@ -27,6 +27,7 @@ class StudentJoinSearchField extends StatelessWidget {
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       textInputAction: TextInputAction.search,
+      textAlignVertical: TextAlignVertical.center,
       style: const TextStyle(
         color: AppColors.textInkDark,
         fontSize: FontSize.normal,
@@ -42,10 +43,7 @@ class StudentJoinSearchField extends StatelessWidget {
         ),
         filled: true,
         fillColor: const Color(0xFFEBEEF1),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 19,
-          vertical: 12,
-        ),
+        contentPadding: const EdgeInsets.fromLTRB(19, 14, 19, 10),
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 12),
           child: Row(

@@ -25,6 +25,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       textInputAction: TextInputAction.search,
+      textAlignVertical: TextAlignVertical.center,
       style: GoogleFonts.andika(
         color: AppColors.textNavy,
         fontSize: FontSize.normal,
@@ -41,10 +42,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
         ),
         filled: true,
         fillColor: const Color(0xFFEBEEF1),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 19,
-          vertical: 12,
-        ),
+        contentPadding: const EdgeInsets.fromLTRB(19, 14, 19, 10),
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 19, right: 9),
           child: Image.asset(

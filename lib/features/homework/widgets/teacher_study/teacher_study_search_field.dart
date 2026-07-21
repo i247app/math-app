@@ -54,6 +54,7 @@ class TeacherStudySearchField extends StatelessWidget {
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
                 textInputAction: TextInputAction.search,
+                textAlignVertical: TextAlignVertical.center,
                 style: GoogleFonts.andika(
                   color: AppColors.textInkDark,
                   fontSize: FontSize.normal,
@@ -75,7 +76,7 @@ class TeacherStudySearchField extends StatelessWidget {
                   errorBorder: InputBorder.none,
                   focusedErrorBorder: InputBorder.none,
                   isDense: true,
-                  contentPadding: EdgeInsets.zero,
+                  contentPadding: const EdgeInsets.only(top: 4),
                 ),
               ),
             ),

@@ -29,6 +29,7 @@ class ParentAssessmentSearchField extends StatelessWidget {
         controller: controller,
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         textInputAction: TextInputAction.search,
+        textAlignVertical: TextAlignVertical.center,
         style: const TextStyle(
           color: Color(0xFF17252B),
           fontSize: FontSize.normal,
@@ -52,7 +53,7 @@ class ParentAssessmentSearchField extends StatelessWidget {
           ),
           border: InputBorder.none,
           isCollapsed: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 11),
+          contentPadding: const EdgeInsets.fromLTRB(0, 13, 0, 9),
         ),
       ),
     );

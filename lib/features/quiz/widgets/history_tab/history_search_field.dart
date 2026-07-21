@@ -32,6 +32,7 @@ class HistorySearchField extends StatelessWidget {
         controller: controller,
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         textInputAction: TextInputAction.search,
+        textAlignVertical: TextAlignVertical.center,
         style: TextStyle(
           color: colors.textPrimary,
           fontSize: FontSize.normal,
@@ -60,10 +61,7 @@ class HistorySearchField extends StatelessWidget {
           ),
           border: InputBorder.none,
           isCollapsed: true,
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 11,
-            horizontal: 10,
-          ),
+          contentPadding: const EdgeInsets.fromLTRB(10, 13, 10, 9),
         ),
       ),
     );

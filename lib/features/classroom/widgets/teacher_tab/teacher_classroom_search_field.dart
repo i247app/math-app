@@ -37,6 +37,7 @@ class TeacherClassroomSearchField extends StatelessWidget {
                 controller: controller,
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
+                textAlignVertical: TextAlignVertical.center,
                 style: TextStyle(
                   color: colors.textPrimary,
                   fontSize: FontSize.normal,
@@ -55,7 +56,7 @@ class TeacherClassroomSearchField extends StatelessWidget {
                   disabledBorder: InputBorder.none,
                   errorBorder: InputBorder.none,
                   focusedErrorBorder: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
+                  contentPadding: const EdgeInsets.only(top: 4),
                   isDense: true,
                 ),
               ),

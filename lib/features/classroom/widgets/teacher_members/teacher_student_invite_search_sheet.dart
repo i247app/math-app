@@ -168,6 +168,7 @@ class _TeacherStudentInviteSearchSheetState
                   controller: _searchController,
                   autofocus: true,
                   textInputAction: TextInputAction.search,
+                  textAlignVertical: TextAlignVertical.center,
                   onChanged: _onSearchChanged,
                   onSubmitted: _searchProfiles,
                   decoration: InputDecoration(
@@ -184,10 +185,7 @@ class _TeacherStudentInviteSearchSheetState
                           ),
                     filled: true,
                     fillColor: colors.inputSurface,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(color: colors.border),
