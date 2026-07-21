@@ -67,10 +67,19 @@ class SubmitQuizAnswer {
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class QuizListRequest {
-  const QuizListRequest({this.userId, this.profileId});
+  const QuizListRequest({
+    this.userId,
+    this.profileId,
+    this.page,
+    this.size,
+    this.takeAll,
+  });
 
   final int? userId;
   final int? profileId;
+  final int? page;
+  final int? size;
+  final bool? takeAll;
 
   factory QuizListRequest.fromJson(Map<String, dynamic> json) =>
       _$QuizListRequestFromJson(json);

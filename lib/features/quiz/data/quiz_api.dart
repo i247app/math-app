@@ -23,6 +23,14 @@ abstract class QuizService {
 
   Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId});
 
+  Future<QuizListResponse> listQuizPage({
+    int? userId,
+    int? profileId,
+    required int page,
+    required int size,
+    bool takeAll = false,
+  });
+
   Future<GeneratedQuiz> submitQuiz({
     required int quizId,
     required List<SubmitQuizAnswer> answers,
@@ -103,6 +111,34 @@ class QuizApi implements QuizService {
 
   @override
   Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId}) async {
+    final response = await _listQuizzes(userId: userId, profileId: profileId);
+    return response.quizzes;
+  }
+
+  @override
+  Future<QuizListResponse> listQuizPage({
+    int? userId,
+    int? profileId,
+    required int page,
+    required int size,
+    bool takeAll = false,
+  }) {
+    return _listQuizzes(
+      userId: userId,
+      profileId: profileId,
+      page: page,
+      size: size,
+      takeAll: takeAll,
+    );
+  }
+
+  Future<QuizListResponse> _listQuizzes({
+    int? userId,
+    int? profileId,
+    int? page,
+    int? size,
+    bool? takeAll,
+  }) async {
     if (userId == null && profileId == null) {
       throw QuizException(
         AppStrings.current(AppKeys.missingUserOrProfileForHistory),
@@ -112,11 +148,17 @@ class QuizApi implements QuizService {
     final QuizListResponse response;
     response = await _runQuizRequest(
       () => _networkApi.listQuizzes(
-        QuizListRequest(userId: userId, profileId: profileId),
+        QuizListRequest(
+          userId: userId,
+          profileId: profileId,
+          page: page,
+          size: size,
+          takeAll: takeAll,
+        ),
       ),
     );
 
-    return response.quizzes;
+    return response;
   }
 
   @override

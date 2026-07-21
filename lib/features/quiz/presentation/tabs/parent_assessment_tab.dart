@@ -25,6 +25,7 @@ import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_p
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_search_field.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_empty_poster.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_state_card.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_practice_tab_banner.dart';
 
@@ -55,9 +56,13 @@ class ParentAssessmentTab extends StatefulWidget {
 }
 
 class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
+  static const _pageSize = 5;
+
   final TextEditingController _searchController = TextEditingController();
 
   List<ParentAssessmentEntry> _entries = const <ParentAssessmentEntry>[];
+  List<ParentAssessmentEntry> _allEntries = const <ParentAssessmentEntry>[];
+  QuizPagination? _pagination;
   bool _isLoading = true;
   bool _hasPlayedInitialEntrance = false;
   String? _errorMessage;
@@ -85,7 +90,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     }
     if (_profileSourceKey(oldWidget.user, oldWidget.activeProfile) !=
         _profileSourceKey(widget.user, widget.activeProfile)) {
-      _loadAssessments();
+      _pagination = null;
+      _allEntries = const <ParentAssessmentEntry>[];
+      _loadAssessments(page: 1);
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       _loadAssessments(forceRefresh: true);
     }
@@ -121,8 +128,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         '${ActiveProfileSession.profileStableId(activeProfile)}';
   }
 
-  Future<void> _loadAssessments({bool forceRefresh = false}) async {
+  Future<void> _loadAssessments({bool forceRefresh = false, int? page}) async {
     final requestId = ++_loadRequestId;
+    final targetPage = page ?? _pagination?.page ?? 1;
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
@@ -131,11 +139,8 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     final cachedSnapshot = profileId == null
         ? null
         : cache.getParent(profileId);
-    if (!forceRefresh && cachedSnapshot != null) {
+    if (!forceRefresh && targetPage == 1 && cachedSnapshot != null) {
       setState(() => _applyCachedAssessments(cachedSnapshot));
-      if (!cachedSnapshot.isStale) {
-        return;
-      }
     }
 
     setState(() {
@@ -144,18 +149,26 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     });
 
     final entries = <ParentAssessmentEntry>[];
+    List<ParentAssessmentEntry>? loadedAllEntries;
+    QuizPagination? loadedPagination;
     var failed = false;
 
     if ((profileId != null && profileId > 0) ||
         (userId != null && userId > 0)) {
       try {
-        final quizzes = await loadCompletedParentAssessments(
+        final result = await loadCompletedParentAssessments(
           quizService: widget.quizService,
           profileId: profileId,
           userId: userId,
+          page: targetPage,
+          size: _pageSize,
         );
+        loadedPagination = result.pagination;
+        loadedAllEntries = result.allQuizzes
+            .map((quiz) => ParentAssessmentEntry(quiz: quiz))
+            .toList(growable: false);
         entries.addAll(
-          quizzes.map((quiz) => ParentAssessmentEntry(quiz: quiz)),
+          result.quizzes.map((quiz) => ParentAssessmentEntry(quiz: quiz)),
         );
       } catch (_) {
         failed = true;
@@ -167,9 +180,12 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     }
 
     entries.sort((a, b) => quizDate(b.quiz).compareTo(quizDate(a.quiz)));
+    final pageEntries = entries.take(_pageSize).toList(growable: false);
     setState(() {
       if (!failed || entries.isNotEmpty || _entries.isEmpty) {
-        _entries = entries;
+        _entries = pageEntries;
+        _allEntries = loadedAllEntries ?? pageEntries;
+        _pagination = loadedPagination;
       }
       _isLoading = false;
       _errorMessage = failed && _entries.isEmpty
@@ -179,12 +195,13 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     if (!failed &&
         profileId != null &&
         profileId > 0 &&
-        cachedSnapshot != null) {
+        cachedSnapshot != null &&
+        targetPage == 1) {
       cache.putParent(
         ParentHomeSnapshot(
           profileId: profileId,
           homeLayout: cachedSnapshot.homeLayout,
-          completedAssessments: entries
+          completedAssessments: pageEntries
               .map((entry) => entry.quiz)
               .toList(growable: false),
           cachedAt: DateTime.now(),
@@ -194,13 +211,66 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   }
 
   void _applyCachedAssessments(ParentHomeSnapshot snapshot) {
-    _entries =
+    final cachedEntries =
         snapshot.completedAssessments
             .map((quiz) => ParentAssessmentEntry(quiz: quiz))
             .toList(growable: false)
           ..sort((a, b) => quizDate(b.quiz).compareTo(quizDate(a.quiz)));
+    _entries = cachedEntries.take(_pageSize).toList(growable: false);
+    _allEntries = _entries;
     _isLoading = false;
     _errorMessage = null;
+  }
+
+  void _selectPage(int page) {
+    final totalPages = _pagination?.totalPages ?? 1;
+    final currentPage = _pagination?.page ?? 1;
+    if (_isLoading || page == currentPage || page < 1 || page > totalPages) {
+      return;
+    }
+    final start = (page - 1) * _pageSize;
+    final pageEntries = _allEntries
+        .skip(start)
+        .take(_pageSize)
+        .toList(growable: false);
+    setState(() {
+      _entries = pageEntries;
+      _pagination = QuizPagination(
+        page: page,
+        size: _pageSize,
+        totalCount: _allEntries.length,
+        totalPages: totalPages,
+        hasNext: page < totalPages,
+        hasPrevious: page > 1,
+      );
+    });
+  }
+
+  Widget? _buildPagination({double topPadding = 0}) {
+    final pagination = _pagination;
+    if (pagination == null ||
+        _searchController.text.trim().isNotEmpty ||
+        (pagination.totalCount ?? 0) <= 0) {
+      return null;
+    }
+
+    final currentPage = pagination.page ?? 1;
+    final reportedTotalPages = pagination.totalPages ?? 1;
+    final totalPages = reportedTotalPages < 1 ? 1 : reportedTotalPages;
+    final paginationControl = ParentAssessmentPagination(
+      currentPage: currentPage,
+      totalPages: totalPages,
+      hasPrevious: pagination.hasPrevious ?? currentPage > 1,
+      hasNext: pagination.hasNext ?? currentPage < totalPages,
+      isLoading: _isLoading,
+      onPageSelected: _selectPage,
+    );
+    return topPadding == 0
+        ? paginationControl
+        : Padding(
+            padding: EdgeInsets.only(top: topPadding),
+            child: paginationControl,
+          );
   }
 
   List<ParentAssessmentEntry> get _filteredEntries {
@@ -208,7 +278,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     if (query.isEmpty) {
       return _entries;
     }
-    return _entries
+    return _allEntries
         .where((entry) {
           final searchable = <String>[
             homeQuizTitle(context, entry.quiz),
@@ -260,7 +330,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       ),
     );
     if (mounted) {
-      await _loadAssessments(forceRefresh: true);
+      await _loadAssessments(forceRefresh: true, page: 1);
     }
   }
 
@@ -318,7 +388,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     required bool shouldShowFullSkeleton,
   }) {
     final colors = context.themeColors;
-    final shouldShowProgressChart = _entries.length > 1;
+    final shouldShowProgressChart = _allEntries.length > 1;
 
     if (shouldShowFullSkeleton) {
       return [const ParentAssessmentFullSkeleton()];
@@ -352,7 +422,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           ),
         ),
         ParentAssessmentProgressChart(
-          entries: _entries.take(5).toList().reversed.toList(),
+          entries: _allEntries.take(5).toList().reversed.toList(),
         ),
       ],
       if (_errorMessage != null && _entries.isEmpty)
@@ -371,11 +441,17 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: _initialFadeIn(
-            child: ParentAssessmentStateCard(
-              icon: Icons.assignment_turned_in_outlined,
-              title: context.getText(AppKeys.noHistoryTitle),
-              message: context.getText(AppKeys.noHistoryMessage),
-              onTap: _loadAssessments,
+            child: Column(
+              spacing: 14,
+              children: [
+                ParentAssessmentStateCard(
+                  icon: Icons.assignment_turned_in_outlined,
+                  title: context.getText(AppKeys.noHistoryTitle),
+                  message: context.getText(AppKeys.noHistoryMessage),
+                  onTap: _loadAssessments,
+                ),
+                ?_buildPagination(),
+              ],
             ),
           ),
         )
@@ -385,14 +461,15 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           child: _initialFadeIn(
             child: Column(
               spacing: 14,
-              children: entries
-                  .map(
-                    (entry) => AssessmentResultListItemCard(
-                      quiz: entry.quiz,
-                      onTap: () => _openQuizReview(entry.quiz),
-                    ),
-                  )
-                  .toList(growable: false),
+              children: [
+                ...entries.map(
+                  (entry) => AssessmentResultListItemCard(
+                    quiz: entry.quiz,
+                    onTap: () => _openQuizReview(entry.quiz),
+                  ),
+                ),
+                ?_buildPagination(topPadding: 6),
+              ],
             ),
           ),
         ),
