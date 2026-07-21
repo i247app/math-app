@@ -394,7 +394,10 @@ class _SettingTabState extends State<SettingTab>
             child: DefaultTextStyle.merge(
               style: GoogleFonts.andika(letterSpacing: 0),
               child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+                physics:
+                    widget._isPushedPage && _view == SettingPageView.profile
+                    ? const ClampingScrollPhysics()
+                    : const BouncingScrollPhysics(),
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: EdgeInsets.only(
