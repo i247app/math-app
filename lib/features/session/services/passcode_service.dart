@@ -35,7 +35,7 @@ class SecurePasscodeService implements PasscodeService {
   }) : _storage = storage;
 
   static const _keyPrefix = 'local_passcode_v1_user_';
-  static const _phoneKeyPrefix = 'local_passcode_v1_phone_user_';
+  static const _loginNameKeyPrefix = 'local_passcode_v1_login_name_user_';
   static const _lastUserIdKey = 'local_passcode_v1_last_user_id';
 
   final FlutterSecureStorage _storage;
@@ -60,11 +60,13 @@ class SecurePasscodeService implements PasscodeService {
     if (userId == null || userId <= 0 || !await hasPasscode(userId)) {
       return null;
     }
-    final phone = (await _storage.read(key: _phoneStorageKey(userId)))?.trim();
-    if (phone == null || phone.isEmpty) {
+    final loginName = (await _storage.read(
+      key: _loginNameStorageKey(userId),
+    ))?.trim();
+    if (loginName == null || loginName.isEmpty) {
       return null;
     }
-    return PasscodeLoginAccount(userId: userId, phone: phone);
+    return PasscodeLoginAccount(userId: userId, phone: loginName);
   }
 
   @override
@@ -80,11 +82,14 @@ class SecurePasscodeService implements PasscodeService {
     required int userId,
     required String phone,
   }) async {
-    final normalizedPhone = phone.trim();
-    if (userId <= 0 || normalizedPhone.isEmpty) {
+    final normalizedLoginName = phone.trim();
+    if (userId <= 0 || normalizedLoginName.isEmpty) {
       throw const PasscodeException('Missing login account information.');
     }
-    await _storage.write(key: _phoneStorageKey(userId), value: normalizedPhone);
+    await _storage.write(
+      key: _loginNameStorageKey(userId),
+      value: normalizedLoginName,
+    );
     await _storage.write(key: _lastUserIdKey, value: '$userId');
   }
 
@@ -156,5 +161,6 @@ class SecurePasscodeService implements PasscodeService {
   }
 
   static String _storageKey(int userId) => '$_keyPrefix$userId';
-  static String _phoneStorageKey(int userId) => '$_phoneKeyPrefix$userId';
+  static String _loginNameStorageKey(int userId) =>
+      '$_loginNameKeyPrefix$userId';
 }
