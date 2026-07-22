@@ -14,36 +14,38 @@ class LoginScreen extends StatelessWidget {
     super.key,
     required this.controller,
     required this.region,
+    required this.showPhoneRegion,
     required this.onRegionChanged,
     required this.onBack,
     required this.onSendOtp,
     required this.actionLabel,
     required this.isSignupEntry,
     required this.isSendingOtp,
-    required this.isCheckingAuthPhone,
+    required this.isCheckingLoginName,
     required this.canSendOtp,
     required this.canLoginWithPin,
     required this.onLoginWithPin,
     required this.onSwitchEntryMode,
-    required this.onPhoneChanged,
-    this.phoneErrorText,
+    required this.onLoginNameChanged,
+    this.loginNameErrorText,
   });
 
   final TextEditingController controller;
   final PhoneRegion region;
+  final bool showPhoneRegion;
   final ValueChanged<PhoneRegion> onRegionChanged;
   final VoidCallback onBack;
   final VoidCallback onSendOtp;
   final String actionLabel;
   final bool isSignupEntry;
   final bool isSendingOtp;
-  final bool isCheckingAuthPhone;
+  final bool isCheckingLoginName;
   final bool canSendOtp;
   final bool canLoginWithPin;
   final VoidCallback onLoginWithPin;
   final VoidCallback onSwitchEntryMode;
-  final ValueChanged<String> onPhoneChanged;
-  final String? phoneErrorText;
+  final ValueChanged<String> onLoginNameChanged;
+  final String? loginNameErrorText;
 
   @override
   Widget build(BuildContext context) {
@@ -60,16 +62,18 @@ class LoginScreen extends StatelessWidget {
             child: LoginCard(
               controller: controller,
               region: region,
+              isSignupEntry: isSignupEntry,
+              showPhoneRegion: showPhoneRegion,
               onRegionChanged: onRegionChanged,
               onSendOtp: onSendOtp,
               actionLabel: actionLabel,
               isSendingOtp: isSendingOtp,
-              isCheckingAuthPhone: isCheckingAuthPhone,
+              isCheckingLoginName: isCheckingLoginName,
               canSendOtp: canSendOtp,
               canLoginWithPin: canLoginWithPin,
               onLoginWithPin: onLoginWithPin,
-              onPhoneChanged: onPhoneChanged,
-              phoneErrorText: phoneErrorText,
+              onLoginNameChanged: onLoginNameChanged,
+              loginNameErrorText: loginNameErrorText,
             ),
           ),
           const Spacer(),

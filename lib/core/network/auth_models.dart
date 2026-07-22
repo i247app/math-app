@@ -40,10 +40,10 @@ class UpdateUserRequest {
 
 @JsonSerializable()
 class LoginRequest {
-  const LoginRequest({required this.phone});
+  const LoginRequest({required this.loginName});
 
   @JsonKey(name: 'login_name')
-  final String phone;
+  final String loginName;
 
   factory LoginRequest.fromJson(Map<String, dynamic> json) =>
       _$LoginRequestFromJson(json);

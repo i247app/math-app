@@ -102,14 +102,16 @@ class StartupBootstrap {
 
   Future<void> _rememberAuthenticatedAccount(LoginUser user) async {
     final phone = user.phone?.trim();
-    if (user.id <= 0 || phone == null || phone.isEmpty) {
+    final email = user.email?.trim();
+    final loginName = phone != null && phone.isNotEmpty ? phone : email;
+    if (user.id <= 0 || loginName == null || loginName.isEmpty) {
       return;
     }
 
     try {
       await _passcodeService.rememberLoginAccount(
         userId: user.id,
-        phone: phone,
+        loginName: loginName,
       );
     } catch (_) {
       // Remembered PIN login is optional and must not block app startup.

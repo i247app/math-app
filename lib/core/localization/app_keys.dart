@@ -32,12 +32,14 @@ class AppKeys {
   static const phoneLoginSubtitle = 'phone_login_subtitle';
   static const phoneNumberUpper = 'phone_number_upper';
   static const phoneHint = 'phone_hint';
+  static const loginNameHint = 'login_name_hint';
   static const chooseCountry = 'choose_country';
   static const continueLabel = 'continue';
   static const creatingAccount = 'creating_account';
   static const checking = 'checking';
   static const phoneRequired = 'phone_required';
   static const invalidPhone = 'invalid_phone';
+  static const invalidEmail = 'invalid_email';
   static const phoneTooShort = 'phone_too_short';
   static const restoringSession = 'restoring_session';
   static const newAccountPrompt = 'new_account_prompt';
@@ -713,6 +715,8 @@ class AppKeys {
   static const practiceUpper = 'practice_upper';
   static const authPhoneCheckFailed = 'auth_phone_check_failed';
   static const loginPhoneNotRegistered = 'login_phone_not_registered';
+  static const authLoginNameCheckFailed = 'auth_login_name_check_failed';
+  static const loginNameNotRegistered = 'login_name_not_registered';
   static const signupPhoneAlreadyRegistered = 'signup_phone_already_registered';
   static const signupOtpFailed = 'signup_otp_failed';
   static const loginOtpFailed = 'login_otp_failed';

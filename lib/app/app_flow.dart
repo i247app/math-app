@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/data/session_scoped_repository_registry.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/utils/phone/phone_number_validator.dart';
+import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/features/session/application/app_session_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
@@ -34,96 +34,104 @@ class AppFlow extends StatefulWidget {
 }
 
 class _AppFlowState extends State<AppFlow> {
-  final phoneController = TextEditingController();
-  bool _phoneHasInput = false;
-  String? _lastLookupPhone;
+  final loginNameController = TextEditingController();
+  bool _loginNameHasInput = false;
+  LoginNameKind? _loginNameKind;
+  bool _loginNameSubmitAttempted = false;
 
-  String get _phoneDigits => phoneController.text.replaceAll(RegExp(r'\D'), '');
-
-  PhoneValidationResult _normalizedPhoneInput(PhoneRegion region) {
-    final digits = _phoneDigits;
-    if (digits.isEmpty) {
-      return const PhoneValidationResult.empty();
-    }
-
-    return normalizePhoneInput(region, digits);
+  LoginNameValidationResult _normalizedLoginNameInput(
+    PhoneRegion region,
+    AuthEntryMode mode,
+  ) {
+    return normalizeLoginNameInput(
+      region,
+      loginNameController.text,
+      phoneOnly: mode == AuthEntryMode.signup,
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    phoneController.addListener(_trackPhoneInput);
+    loginNameController.addListener(_trackLoginNameInput);
   }
 
   @override
   void dispose() {
-    phoneController.removeListener(_trackPhoneInput);
-    phoneController.dispose();
+    loginNameController.removeListener(_trackLoginNameInput);
+    loginNameController.dispose();
     super.dispose();
   }
 
-  void _trackPhoneInput() {
-    final hasInput = _phoneDigits.isNotEmpty;
-    if (_phoneHasInput == hasInput) {
+  void _trackLoginNameInput() {
+    final hasInput = loginNameController.text.trim().isNotEmpty;
+    if (_loginNameHasInput == hasInput) {
       return;
     }
 
     setState(() {
-      _phoneHasInput = hasInput;
+      _loginNameHasInput = hasInput;
+      if (!hasInput) {
+        _loginNameKind = null;
+      }
     });
   }
 
-  void clearLoginPhoneInput() {
-    _lastLookupPhone = null;
-    if (phoneController.text.isEmpty && !_phoneHasInput) {
+  void clearLoginNameInput() {
+    if (loginNameController.text.isEmpty &&
+        !_loginNameHasInput &&
+        !_loginNameSubmitAttempted) {
       return;
     }
 
-    phoneController.clear();
+    loginNameController.clear();
     setState(() {
-      _phoneHasInput = false;
+      _loginNameHasInput = false;
+      _loginNameKind = null;
+      _loginNameSubmitAttempted = false;
     });
   }
 
-  void handlePhoneInputChanged(
+  void handleLoginNameInputChanged(
     AuthFlowCubit cubit,
-    PhoneRegion region,
+    AuthEntryMode mode,
     String value,
   ) {
-    final digits = value.replaceAll(RegExp(r'\D'), '');
-    final normalized = normalizePhoneInput(region, digits);
-    final hasInput = digits.isNotEmpty;
-    if (_phoneHasInput != hasInput) {
+    final hasInput = value.trim().isNotEmpty;
+    final kind = detectLoginNameKind(
+      value,
+      phoneOnly: mode == AuthEntryMode.signup,
+    );
+    if (_loginNameHasInput != hasInput ||
+        _loginNameKind != kind ||
+        _loginNameSubmitAttempted) {
       setState(() {
-        _phoneHasInput = hasInput;
+        _loginNameHasInput = hasInput;
+        _loginNameKind = kind;
+        _loginNameSubmitAttempted = false;
       });
     }
-
-    if (!normalized.isValid) {
-      _lastLookupPhone = null;
-      cubit.clearPhoneLookup();
-      return;
-    }
-
-    FocusScope.of(context).unfocus();
-
-    if (_lastLookupPhone == normalized.phone) {
-      return;
-    }
-
-    _lastLookupPhone = normalized.phone;
-    cubit.lookupLoginPhone(normalized.phone!);
+    cubit.clearLoginLookup();
   }
 
-  void sendOtp(AuthFlowCubit cubit, PhoneRegion region) {
-    final normalized = _normalizedPhoneInput(region);
+  void submitLoginName(
+    AuthFlowCubit cubit,
+    PhoneRegion region,
+    AuthEntryMode mode,
+  ) {
+    if (!_loginNameSubmitAttempted) {
+      setState(() {
+        _loginNameSubmitAttempted = true;
+      });
+    }
+    final normalized = _normalizedLoginNameInput(region, mode);
     if (!normalized.isValid) {
       HapticFeedback.selectionClick();
       return;
     }
 
     FocusScope.of(context).unfocus();
-    cubit.submitLoginPhone(normalized.phone!);
+    cubit.submitLoginName(normalized.loginName!);
   }
 
   @override
@@ -227,12 +235,13 @@ class _AppFlowState extends State<AppFlow> {
                         scaffoldState.screen != AppScreen.otp &&
                         scaffoldState.screen != AppScreen.passcode,
                     body: AppScreenRouter(
-                      phoneController: phoneController,
-                      phoneHasInput: _phoneHasInput,
-                      clearLoginPhoneInput: clearLoginPhoneInput,
-                      normalizedPhoneInput: _normalizedPhoneInput,
-                      handlePhoneInputChanged: handlePhoneInputChanged,
-                      sendOtp: sendOtp,
+                      loginNameController: loginNameController,
+                      loginNameHasInput: _loginNameHasInput,
+                      loginNameSubmitAttempted: _loginNameSubmitAttempted,
+                      clearLoginNameInput: clearLoginNameInput,
+                      normalizedLoginNameInput: _normalizedLoginNameInput,
+                      handleLoginNameInputChanged: handleLoginNameInputChanged,
+                      submitLoginName: submitLoginName,
                     ),
                   ),
                 ),

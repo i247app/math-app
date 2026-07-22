@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 
 class _FakePasscodeService implements PasscodeService {
@@ -19,7 +21,7 @@ class _FakePasscodeService implements PasscodeService {
   @override
   Future<void> rememberLoginAccount({
     required int userId,
-    required String phone,
+    required String loginName,
   }) async {}
 
   @override
@@ -33,6 +35,96 @@ class _FakePasscodeService implements PasscodeService {
     required int userId,
     required String passcode,
   }) async => false;
+}
+
+class _FakeAuthService implements AuthService {
+  _FakeAuthService({this.accountExists = true});
+
+  final bool accountExists;
+  String? lookedUpLoginName;
+  String? sentOtpLoginName;
+  String? verifiedOtpLoginName;
+  AuthOtpKind? sentOtpKind;
+
+  @override
+  Future<AuthLoginLookupResult> lookupLoginName(String loginName) async {
+    lookedUpLoginName = loginName;
+    return AuthLoginLookupResult(
+      loginName: loginName,
+      exists: accountExists,
+      user: accountExists
+          ? LoginUser(
+              id: 7,
+              email: loginName.contains('@') ? loginName : null,
+              phone: loginName.contains('@') ? null : loginName,
+            )
+          : null,
+    );
+  }
+
+  @override
+  Future<SendOtpResult> sendOtp({
+    required String loginName,
+    required AuthOtpKind kind,
+  }) async {
+    sentOtpLoginName = loginName;
+    sentOtpKind = kind;
+    return const SendOtpResult(expiresIn: 30);
+  }
+
+  @override
+  Future<VerifyOtpResult> verifyOtp({
+    required String loginName,
+    required String otpCode,
+    required AuthOtpKind kind,
+  }) async {
+    verifiedOtpLoginName = loginName;
+    return const VerifyOtpResult(isValid: false);
+  }
+
+  @override
+  Future<void> clearPendingLogin(String loginName) async {}
+
+  @override
+  Future<void> logout() async {}
+
+  @override
+  Future<LoginUser?> restoreSession() async => null;
+
+  @override
+  Future<LoginUser> signupWithPhone({
+    required String phone,
+    required String name,
+    required String role,
+    String? email,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<LoginUser> updateUser({
+    required int userId,
+    required String name,
+    String? phone,
+    String? email,
+    String? avatarPath,
+  }) {
+    throw UnimplementedError();
+  }
+}
+
+AuthFlowCubit _buildCubit({
+  AuthService? authService,
+  AuthFlowState? initialState,
+}) {
+  return AuthFlowCubit(
+    authService: authService,
+    initialState: initialState,
+    passcodeService: _FakePasscodeService(),
+    onAuthenticated: (_) {},
+    onSessionCleared: () {},
+    onSessionRestoreStarted: () {},
+  );
 }
 
 void main() {
@@ -55,6 +147,76 @@ void main() {
       await cubit.close();
     },
   );
+
+  test('uses an email login_name for login lookup and OTP', () async {
+    final authService = _FakeAuthService();
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(screen: AppScreen.login),
+    );
+
+    await cubit.submitLoginName('learner@example.com');
+
+    expect(authService.lookedUpLoginName, 'learner@example.com');
+    expect(authService.sentOtpLoginName, 'learner@example.com');
+    expect(authService.sentOtpKind, AuthOtpKind.login);
+    expect(cubit.state.loginName, 'learner@example.com');
+    expect(cubit.state.screen, AppScreen.otp);
+    await cubit.close();
+  });
+
+  test('uses the same email login_name when verifying OTP', () async {
+    final authService = _FakeAuthService();
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AppScreen.otp,
+        loginName: 'learner@example.com',
+      ),
+    );
+
+    await cubit.verifyOtp('1234');
+
+    expect(authService.verifiedOtpLoginName, 'learner@example.com');
+    await cubit.close();
+  });
+
+  test('checks a signup phone before sending register OTP', () async {
+    final authService = _FakeAuthService(accountExists: false);
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AppScreen.login,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
+
+    await cubit.submitLoginName('+84901234567');
+
+    expect(authService.lookedUpLoginName, '+84901234567');
+    expect(authService.sentOtpLoginName, '+84901234567');
+    expect(authService.sentOtpKind, AuthOtpKind.signup);
+    expect(cubit.state.screen, AppScreen.otp);
+    await cubit.close();
+  });
+
+  test('does not accept an email in the phone-only signup flow', () async {
+    final authService = _FakeAuthService(accountExists: false);
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AppScreen.login,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
+
+    await cubit.submitLoginName('learner@example.com');
+
+    expect(authService.lookedUpLoginName, isNull);
+    expect(authService.sentOtpLoginName, isNull);
+    expect(cubit.state.screen, AppScreen.login);
+    await cubit.close();
+  });
 
   test(
     'handles Back for state-driven auth screens before leaving the app',

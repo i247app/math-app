@@ -17,13 +17,13 @@ class AuthFlowState {
     this.screen = AppScreen.welcome,
     this.phoneRegion = PhoneRegion.vn,
     this.isRestoringSession = false,
-    this.phoneNumber,
-    this.checkedPhone,
-    this.isCheckingAuthPhone = false,
-    this.phoneExists,
-    this.phoneLookupUser,
-    this.phoneLookupError,
-    this.phoneLookupErrorStatus,
+    this.loginName,
+    this.checkedLoginName,
+    this.isCheckingLoginName = false,
+    this.loginNameExists,
+    this.loginLookupUser,
+    this.loginLookupError,
+    this.loginLookupErrorStatus,
     this.isSendingOtp = false,
     this.isVerifyingOtp = false,
     this.isSigningUp = false,
@@ -55,13 +55,13 @@ class AuthFlowState {
   final AppScreen screen;
   final PhoneRegion phoneRegion;
   final bool isRestoringSession;
-  final String? phoneNumber;
-  final String? checkedPhone;
-  final bool isCheckingAuthPhone;
-  final bool? phoneExists;
-  final LoginUser? phoneLookupUser;
-  final String? phoneLookupError;
-  final int? phoneLookupErrorStatus;
+  final String? loginName;
+  final String? checkedLoginName;
+  final bool isCheckingLoginName;
+  final bool? loginNameExists;
+  final LoginUser? loginLookupUser;
+  final String? loginLookupError;
+  final int? loginLookupErrorStatus;
   final bool isSendingOtp;
   final bool isVerifyingOtp;
   final bool isSigningUp;
@@ -93,13 +93,13 @@ class AuthFlowState {
     AppScreen? screen,
     PhoneRegion? phoneRegion,
     bool? isRestoringSession,
-    String? phoneNumber,
-    String? checkedPhone,
-    bool? isCheckingAuthPhone,
-    bool? phoneExists,
-    LoginUser? phoneLookupUser,
-    String? phoneLookupError,
-    int? phoneLookupErrorStatus,
+    String? loginName,
+    String? checkedLoginName,
+    bool? isCheckingLoginName,
+    bool? loginNameExists,
+    LoginUser? loginLookupUser,
+    String? loginLookupError,
+    int? loginLookupErrorStatus,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
@@ -130,11 +130,12 @@ class AuthFlowState {
     bool clearDevOtp = false,
     bool clearOtpError = false,
     bool clearOtpExpiry = false,
-    bool clearPhoneLookup = false,
-    bool clearPhoneExists = false,
-    bool clearPhoneLookupUser = false,
-    bool clearPhoneLookupError = false,
-    bool clearPhoneLookupErrorStatus = false,
+    bool clearLoginName = false,
+    bool clearLoginLookup = false,
+    bool clearLoginNameExists = false,
+    bool clearLoginLookupUser = false,
+    bool clearLoginLookupError = false,
+    bool clearLoginLookupErrorStatus = false,
     bool clearPasscodeError = false,
     bool clearPinLogin = false,
     bool clearPinLoginUser = false,
@@ -146,21 +147,23 @@ class AuthFlowState {
       screen: screen ?? this.screen,
       phoneRegion: phoneRegion ?? this.phoneRegion,
       isRestoringSession: isRestoringSession ?? this.isRestoringSession,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      checkedPhone: clearPhoneLookup ? null : checkedPhone ?? this.checkedPhone,
-      isCheckingAuthPhone: isCheckingAuthPhone ?? this.isCheckingAuthPhone,
-      phoneExists: clearPhoneLookup || clearPhoneExists
+      loginName: clearLoginName ? null : loginName ?? this.loginName,
+      checkedLoginName: clearLoginLookup
           ? null
-          : phoneExists ?? this.phoneExists,
-      phoneLookupUser: clearPhoneLookup || clearPhoneLookupUser
+          : checkedLoginName ?? this.checkedLoginName,
+      isCheckingLoginName: isCheckingLoginName ?? this.isCheckingLoginName,
+      loginNameExists: clearLoginLookup || clearLoginNameExists
           ? null
-          : phoneLookupUser ?? this.phoneLookupUser,
-      phoneLookupError: clearPhoneLookup || clearPhoneLookupError
+          : loginNameExists ?? this.loginNameExists,
+      loginLookupUser: clearLoginLookup || clearLoginLookupUser
           ? null
-          : phoneLookupError ?? this.phoneLookupError,
-      phoneLookupErrorStatus: clearPhoneLookup || clearPhoneLookupErrorStatus
+          : loginLookupUser ?? this.loginLookupUser,
+      loginLookupError: clearLoginLookup || clearLoginLookupError
           ? null
-          : phoneLookupErrorStatus ?? this.phoneLookupErrorStatus,
+          : loginLookupError ?? this.loginLookupError,
+      loginLookupErrorStatus: clearLoginLookup || clearLoginLookupErrorStatus
+          ? null
+          : loginLookupErrorStatus ?? this.loginLookupErrorStatus,
       isSendingOtp: isSendingOtp ?? this.isSendingOtp,
       isVerifyingOtp: isVerifyingOtp ?? this.isVerifyingOtp,
       isSigningUp: isSigningUp ?? this.isSigningUp,

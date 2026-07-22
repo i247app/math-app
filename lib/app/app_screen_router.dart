@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/utils/phone/phone_number_validator.dart';
+import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
@@ -21,21 +21,32 @@ import 'package:numi/shared/widgets/loading_screen.dart';
 class AppScreenRouter extends StatelessWidget {
   const AppScreenRouter({
     super.key,
-    required this.phoneController,
-    required this.phoneHasInput,
-    required this.clearLoginPhoneInput,
-    required this.normalizedPhoneInput,
-    required this.handlePhoneInputChanged,
-    required this.sendOtp,
+    required this.loginNameController,
+    required this.loginNameHasInput,
+    required this.loginNameSubmitAttempted,
+    required this.clearLoginNameInput,
+    required this.normalizedLoginNameInput,
+    required this.handleLoginNameInputChanged,
+    required this.submitLoginName,
   });
 
-  final TextEditingController phoneController;
-  final bool phoneHasInput;
-  final VoidCallback clearLoginPhoneInput;
-  final PhoneValidationResult Function(PhoneRegion region) normalizedPhoneInput;
-  final void Function(AuthFlowCubit cubit, PhoneRegion region, String value)
-  handlePhoneInputChanged;
-  final void Function(AuthFlowCubit cubit, PhoneRegion region) sendOtp;
+  final TextEditingController loginNameController;
+  final bool loginNameHasInput;
+  final bool loginNameSubmitAttempted;
+  final VoidCallback clearLoginNameInput;
+  final LoginNameValidationResult Function(
+    PhoneRegion region,
+    AuthEntryMode mode,
+  )
+  normalizedLoginNameInput;
+  final void Function(AuthFlowCubit cubit, AuthEntryMode mode, String value)
+  handleLoginNameInputChanged;
+  final void Function(
+    AuthFlowCubit cubit,
+    PhoneRegion region,
+    AuthEntryMode mode,
+  )
+  submitLoginName;
 
   static bool _isInlineSignupUsernameError(AuthFlowState state) {
     if (state.screen != AppScreen.signup) {
@@ -67,7 +78,7 @@ class AppScreenRouter extends StatelessWidget {
       },
       listener: (context, state) {
         if (state.screen != AppScreen.login) {
-          clearLoginPhoneInput();
+          clearLoginNameInput();
         }
 
         final authError = state.authError;
@@ -79,28 +90,34 @@ class AppScreenRouter extends StatelessWidget {
       },
       builder: (context, state) {
         final cubit = context.read<AuthFlowCubit>();
-        final normalizedPhone = normalizedPhoneInput(state.phoneRegion);
         final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
-        final lookupMatchesPhone = state.checkedPhone == normalizedPhone.phone;
-        final blocksPhoneAction =
-            lookupMatchesPhone &&
-            ((isSignupEntry && state.phoneExists == true) ||
-                (!isSignupEntry && state.phoneLookupErrorStatus == 4006));
-        final phoneComplete = normalizedPhone.isValid && !blocksPhoneAction;
-        final phoneInputErrorKey =
-            normalizedPhone.errorKey == AppKeys.phoneTooShort
+        final normalizedLoginName = normalizedLoginNameInput(
+          state.phoneRegion,
+          state.authEntryMode,
+        );
+        final lookupMatchesLoginName =
+            state.checkedLoginName == normalizedLoginName.loginName;
+        final canSubmitLoginName = isSignupEntry
+            ? normalizedLoginName.isValid
+            : loginNameHasInput;
+        final validationErrorKey = normalizedLoginName.errorKey;
+        final delaysValidationError =
+            validationErrorKey == AppKeys.invalidEmail ||
+            validationErrorKey == AppKeys.phoneTooShort;
+        final loginNameInputErrorKey =
+            delaysValidationError && !loginNameSubmitAttempted
             ? null
-            : normalizedPhone.errorKey;
-        final phoneErrorText = !phoneHasInput
+            : validationErrorKey;
+        final loginNameErrorText = !loginNameHasInput
             ? null
-            : phoneInputErrorKey != null
-            ? context.getText(phoneInputErrorKey)
-            : _phoneLookupErrorText(
+            : loginNameInputErrorKey != null
+            ? context.getText(loginNameInputErrorKey)
+            : _loginLookupErrorText(
                 context: context,
                 isSignupEntry: isSignupEntry,
-                lookupMatchesPhone: lookupMatchesPhone,
-                phoneExists: state.phoneExists,
-                phoneLookupError: state.phoneLookupError,
+                lookupMatchesLoginName: lookupMatchesLoginName,
+                loginNameExists: state.loginNameExists,
+                loginLookupError: state.loginLookupError,
               );
         final actionLabel = context.getText(
           isSignupEntry ? AppKeys.signup : AppKeys.login,
@@ -128,28 +145,44 @@ class AppScreenRouter extends StatelessWidget {
                 ),
                 AppScreen.login => LoginScreen(
                   key: const ValueKey('login'),
-                  controller: phoneController,
+                  controller: loginNameController,
                   region: state.phoneRegion,
+                  showPhoneRegion:
+                      isSignupEntry ||
+                      (normalizedLoginName.kind == LoginNameKind.phone &&
+                          RegExp(r'\d').hasMatch(loginNameController.text)),
                   onRegionChanged: (region) {
-                    clearLoginPhoneInput();
-                    cubit.clearPhoneLookup();
+                    clearLoginNameInput();
+                    cubit.clearLoginLookup();
                     cubit.selectPhoneRegion(region);
                   },
                   onBack: cubit.openWelcomeDetails,
-                  onSendOtp: () => sendOtp(cubit, state.phoneRegion),
+                  onSendOtp: () => submitLoginName(
+                    cubit,
+                    state.phoneRegion,
+                    state.authEntryMode,
+                  ),
                   actionLabel: actionLabel,
                   isSignupEntry: isSignupEntry,
                   isSendingOtp: state.isSendingOtp,
-                  isCheckingAuthPhone: state.isCheckingAuthPhone,
-                  canSendOtp: phoneComplete,
+                  isCheckingLoginName: state.isCheckingLoginName,
+                  canSendOtp: canSubmitLoginName,
                   canLoginWithPin: state.canLoginWithPin,
                   onLoginWithPin: cubit.openPinLogin,
-                  onSwitchEntryMode: () => cubit.switchAuthEntryMode(
-                    isSignupEntry ? AuthEntryMode.login : AuthEntryMode.signup,
+                  onSwitchEntryMode: () {
+                    clearLoginNameInput();
+                    cubit.switchAuthEntryMode(
+                      isSignupEntry
+                          ? AuthEntryMode.login
+                          : AuthEntryMode.signup,
+                    );
+                  },
+                  onLoginNameChanged: (value) => handleLoginNameInputChanged(
+                    cubit,
+                    state.authEntryMode,
+                    value,
                   ),
-                  onPhoneChanged: (value) =>
-                      handlePhoneInputChanged(cubit, state.phoneRegion, value),
-                  phoneErrorText: phoneErrorText,
+                  loginNameErrorText: loginNameErrorText,
                 ),
                 AppScreen.otp => OtpScreen(
                   key: const ValueKey('otp'),
@@ -269,18 +302,19 @@ class _LoginScreenWarmupState extends State<_LoginScreenWarmup> {
             child: LoginScreen(
               controller: _controller,
               region: widget.region,
+              showPhoneRegion: true,
               onRegionChanged: (_) {},
               onBack: () {},
               onSendOtp: () {},
               actionLabel: widget.actionLabel,
               isSignupEntry: widget.isSignupEntry,
               isSendingOtp: false,
-              isCheckingAuthPhone: false,
+              isCheckingLoginName: false,
               canSendOtp: false,
               canLoginWithPin: false,
               onLoginWithPin: () {},
               onSwitchEntryMode: () {},
-              onPhoneChanged: (_) {},
+              onLoginNameChanged: (_) {},
             ),
           ),
         ),
@@ -289,30 +323,30 @@ class _LoginScreenWarmupState extends State<_LoginScreenWarmup> {
   }
 }
 
-String? _phoneLookupErrorText({
+String? _loginLookupErrorText({
   required BuildContext context,
   required bool isSignupEntry,
-  required bool lookupMatchesPhone,
-  required bool? phoneExists,
-  required String? phoneLookupError,
+  required bool lookupMatchesLoginName,
+  required bool? loginNameExists,
+  required String? loginLookupError,
 }) {
-  if (!lookupMatchesPhone) {
+  if (!lookupMatchesLoginName) {
     return null;
   }
 
-  if (isSignupEntry && phoneExists == true) {
+  if (isSignupEntry && loginNameExists == true) {
     return context.getText(AppKeys.signupPhoneAlreadyRegistered);
   }
 
-  if (isSignupEntry && phoneExists == false) {
+  if (isSignupEntry && loginNameExists == false) {
     return null;
   }
 
-  if (!isSignupEntry && phoneExists == false) {
-    return phoneLookupError ?? context.getText(AppKeys.loginPhoneNotRegistered);
+  if (!isSignupEntry && loginNameExists == false) {
+    return loginLookupError ?? context.getText(AppKeys.loginNameNotRegistered);
   }
 
-  return phoneLookupError;
+  return loginLookupError;
 }
 
 class _AppScreenSlideSwitcher extends StatefulWidget {

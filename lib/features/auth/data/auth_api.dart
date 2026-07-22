@@ -8,12 +8,13 @@ import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
 
 extension on AuthUser {
-  LoginUser toLoginUser({String? fallbackPhone}) {
+  LoginUser toLoginUser({String? fallbackLoginName}) {
+    final fallbackIsEmail = fallbackLoginName?.contains('@') == true;
     return LoginUser(
       id: userId ?? id ?? 0,
-      email: email,
+      email: email ?? (fallbackIsEmail ? fallbackLoginName : null),
       name: name,
-      phone: phone ?? fallbackPhone,
+      phone: phone ?? (fallbackIsEmail ? null : fallbackLoginName),
       avatarUrl: avatarUrl,
       role: role,
       createDt: createDt,
@@ -23,7 +24,7 @@ extension on AuthUser {
 }
 
 abstract class AuthService {
-  Future<AuthPhoneLookupResult> lookupLoginPhone(String phone);
+  Future<AuthLoginLookupResult> lookupLoginName(String loginName);
 
   Future<LoginUser?> restoreSession();
 
@@ -43,17 +44,17 @@ abstract class AuthService {
   });
 
   Future<SendOtpResult> sendOtp({
-    required String phone,
+    required String loginName,
     required AuthOtpKind kind,
   });
 
   Future<VerifyOtpResult> verifyOtp({
-    required String phone,
+    required String loginName,
     required String otpCode,
     required AuthOtpKind kind,
   });
 
-  Future<void> clearPendingLogin(String phone);
+  Future<void> clearPendingLogin(String loginName);
 
   Future<void> logout();
 }
@@ -88,15 +89,15 @@ class AuthApi implements AuthService {
   }
 
   @override
-  Future<AuthPhoneLookupResult> lookupLoginPhone(String phone) async {
+  Future<AuthLoginLookupResult> lookupLoginName(String loginName) async {
     final AuthResponse response;
     try {
-      response = await _networkApi.login(LoginRequest(phone: phone));
+      response = await _networkApi.login(LoginRequest(loginName: loginName));
     } on NetworkException catch (error) {
       if (isAuthUserNotFoundStatus(error.status)) {
-        _loginUsers.remove(phone);
-        return AuthPhoneLookupResult(
-          phone: phone,
+        _loginUsers.remove(loginName);
+        return AuthLoginLookupResult(
+          loginName: loginName,
           exists: false,
           message: error.message,
           status: error.status,
@@ -106,14 +107,14 @@ class AuthApi implements AuthService {
       throw AuthException(error.message, status: error.status);
     }
 
-    final user = response.user?.toLoginUser(fallbackPhone: phone);
+    final user = response.user?.toLoginUser(fallbackLoginName: loginName);
     if (user == null) {
       throw AuthException(AppStrings.current(AppKeys.missingOtpUser));
     }
 
-    _loginUsers[phone] = user;
-    return AuthPhoneLookupResult(
-      phone: phone,
+    _loginUsers[loginName] = user;
+    return AuthLoginLookupResult(
+      loginName: loginName,
       exists: true,
       user: user,
       requiredOtp: response.requiredOtp ?? true,
@@ -123,12 +124,12 @@ class AuthApi implements AuthService {
 
   @override
   Future<SendOtpResult> sendOtp({
-    required String phone,
+    required String loginName,
     required AuthOtpKind kind,
   }) async {
     final response = await _request(
       () => _networkApi.sendOtp(
-        SendOtpRequest(otpType: kind.apiType, identifier: phone),
+        SendOtpRequest(otpType: kind.apiType, identifier: loginName),
       ),
     );
 
@@ -184,7 +185,7 @@ class AuthApi implements AuthService {
     );
 
     final user =
-        response.user?.toLoginUser(fallbackPhone: phone) ??
+        response.user?.toLoginUser(fallbackLoginName: phone) ??
         LoginUser(id: userId, name: name, phone: phone, email: email);
     final userPhone = user.phone?.trim();
     if (userPhone != null && userPhone.isNotEmpty) {
@@ -195,7 +196,7 @@ class AuthApi implements AuthService {
 
   @override
   Future<VerifyOtpResult> verifyOtp({
-    required String phone,
+    required String loginName,
     required String otpCode,
     required AuthOtpKind kind,
   }) async {
@@ -203,16 +204,17 @@ class AuthApi implements AuthService {
       () => _networkApi.verifyOtp(
         VerifyOtpRequest(
           otpType: kind.apiType,
-          identifier: phone,
+          identifier: loginName,
           otpCode: otpCode,
         ),
       ),
     );
 
     final user =
-        response.user?.toLoginUser(fallbackPhone: phone) ?? _loginUsers[phone];
+        response.user?.toLoginUser(fallbackLoginName: loginName) ??
+        _loginUsers[loginName];
     if (response.verified && user != null) {
-      _loginUsers[phone] = user;
+      _loginUsers[loginName] = user;
     }
 
     final currentUser = response.verified ? await _currentUserOrNull() : null;
@@ -225,8 +227,8 @@ class AuthApi implements AuthService {
   }
 
   @override
-  Future<void> clearPendingLogin(String phone) async {
-    _loginUsers.remove(phone);
+  Future<void> clearPendingLogin(String loginName) async {
+    _loginUsers.remove(loginName);
   }
 
   static int? _expiresInFrom(String? expiresAt) {

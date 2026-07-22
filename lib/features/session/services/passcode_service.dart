@@ -10,10 +10,10 @@ class PasscodeException implements Exception {
 }
 
 class PasscodeLoginAccount {
-  const PasscodeLoginAccount({required this.userId, required this.phone});
+  const PasscodeLoginAccount({required this.userId, required this.loginName});
 
   final int userId;
-  final String phone;
+  final String loginName;
 }
 
 abstract class PasscodeService {
@@ -22,7 +22,7 @@ abstract class PasscodeService {
   Future<bool> hasPasscode(int userId);
   Future<void> rememberLoginAccount({
     required int userId,
-    required String phone,
+    required String loginName,
   });
   Future<void> setPasscode({required int userId, required String passcode});
   Future<bool> verifyPasscode({required int userId, required String passcode});
@@ -66,7 +66,7 @@ class SecurePasscodeService implements PasscodeService {
     if (loginName == null || loginName.isEmpty) {
       return null;
     }
-    return PasscodeLoginAccount(userId: userId, phone: loginName);
+    return PasscodeLoginAccount(userId: userId, loginName: loginName);
   }
 
   @override
@@ -80,9 +80,9 @@ class SecurePasscodeService implements PasscodeService {
   @override
   Future<void> rememberLoginAccount({
     required int userId,
-    required String phone,
+    required String loginName,
   }) async {
-    final normalizedLoginName = phone.trim();
+    final normalizedLoginName = loginName.trim();
     if (userId <= 0 || normalizedLoginName.isEmpty) {
       throw const PasscodeException('Missing login account information.');
     }

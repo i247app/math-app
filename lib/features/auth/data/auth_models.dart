@@ -44,9 +44,9 @@ class LoginUser {
   final String? modifyDt;
 }
 
-class AuthPhoneLookupResult {
-  const AuthPhoneLookupResult({
-    required this.phone,
+class AuthLoginLookupResult {
+  const AuthLoginLookupResult({
+    required this.loginName,
     required this.exists,
     this.user,
     this.message,
@@ -55,7 +55,7 @@ class AuthPhoneLookupResult {
     this.isTrusted,
   });
 
-  final String phone;
+  final String loginName;
   final bool exists;
   final LoginUser? user;
   final String? message;

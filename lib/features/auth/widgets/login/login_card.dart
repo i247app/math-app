@@ -5,6 +5,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/utils/auth/login_name_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/widgets/login/login_action_button.dart';
@@ -15,30 +16,34 @@ class LoginCard extends StatelessWidget {
     super.key,
     required this.controller,
     required this.region,
+    required this.isSignupEntry,
+    required this.showPhoneRegion,
     required this.onRegionChanged,
     required this.onSendOtp,
     required this.actionLabel,
     required this.isSendingOtp,
-    required this.isCheckingAuthPhone,
+    required this.isCheckingLoginName,
     required this.canSendOtp,
     required this.canLoginWithPin,
     required this.onLoginWithPin,
-    required this.onPhoneChanged,
-    this.phoneErrorText,
+    required this.onLoginNameChanged,
+    this.loginNameErrorText,
   });
 
   final TextEditingController controller;
   final PhoneRegion region;
+  final bool isSignupEntry;
+  final bool showPhoneRegion;
   final ValueChanged<PhoneRegion> onRegionChanged;
   final VoidCallback onSendOtp;
   final String actionLabel;
   final bool isSendingOtp;
-  final bool isCheckingAuthPhone;
+  final bool isCheckingLoginName;
   final bool canSendOtp;
   final bool canLoginWithPin;
   final VoidCallback onLoginWithPin;
-  final ValueChanged<String> onPhoneChanged;
-  final String? phoneErrorText;
+  final ValueChanged<String> onLoginNameChanged;
+  final String? loginNameErrorText;
 
   @override
   Widget build(BuildContext context) {
@@ -57,29 +62,39 @@ class LoginCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              PhoneRegionMenu(region: region, onChanged: onRegionChanged),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Container(width: 1, height: 24, color: colors.border),
-              ),
+              if (showPhoneRegion) ...[
+                PhoneRegionMenu(region: region, onChanged: onRegionChanged),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Container(width: 1, height: 24, color: colors.border),
+                ),
+              ],
               Expanded(
                 child: TextField(
-                  key: ValueKey(region),
+                  key: ValueKey(
+                    '${region.name}-${isSignupEntry ? 'signup' : 'login'}',
+                  ),
                   controller: controller,
-                  keyboardType: TextInputType.phone,
+                  keyboardType: isSignupEntry
+                      ? TextInputType.phone
+                      : TextInputType.emailAddress,
                   autofillHints: null,
                   autocorrect: false,
                   enableSuggestions: false,
                   enableIMEPersonalizedLearning: false,
                   smartDashesType: SmartDashesType.disabled,
                   smartQuotesType: SmartQuotesType.disabled,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    PhoneInputFormatter(region),
-                  ],
-                  onChanged: onPhoneChanged,
+                  inputFormatters: isSignupEntry
+                      ? <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly,
+                          PhoneInputFormatter(region),
+                        ]
+                      : <TextInputFormatter>[LoginNameInputFormatter(region)],
+                  onChanged: onLoginNameChanged,
                   decoration: InputDecoration(
-                    hintText: region.hint,
+                    hintText: isSignupEntry
+                        ? region.hint
+                        : context.getText(AppKeys.loginNameHint),
                     hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: colors.inputHint,
                       fontWeight: FontWeight.w500,
@@ -108,12 +123,13 @@ class LoginCard extends StatelessWidget {
         ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
-          child: phoneErrorText == null
+          child: loginNameErrorText == null
               ? const SizedBox(height: 24)
               : Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 16),
                   child: Text(
-                    phoneErrorText!,
+                    loginNameErrorText!,
+                    key: const ValueKey('login-name-error'),
                     style: TextStyle(
                       color: colors.error,
                       fontSize: FontSize.xs,
@@ -125,10 +141,10 @@ class LoginCard extends StatelessWidget {
         ),
         LoginActionButton(
           label: actionLabel,
-          onPressed: canSendOtp && !isCheckingAuthPhone && !isSendingOtp
+          onPressed: canSendOtp && !isCheckingLoginName && !isSendingOtp
               ? onSendOtp
               : null,
-          isBusy: canSendOtp && (isCheckingAuthPhone || isSendingOtp),
+          isBusy: canSendOtp && (isCheckingLoginName || isSendingOtp),
         ),
         SizedBox(
           height: 76,
