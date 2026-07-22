@@ -42,6 +42,7 @@ class UpdateUserRequest {
 class LoginRequest {
   const LoginRequest({required this.phone});
 
+  @JsonKey(name: 'login_name')
   final String phone;
 
   factory LoginRequest.fromJson(Map<String, dynamic> json) =>
