@@ -5,7 +5,4 @@ void exitToGradeSelection(BuildContext context) {
   if (navigator.canPop()) {
     navigator.pop();
   }
-  if (navigator.canPop()) {
-    navigator.pop();
-  }
 }

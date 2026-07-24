@@ -111,15 +111,39 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       return;
     }
 
-    Navigator.of(context).push(
+    final navigator = Navigator.of(context);
+    final quizService = _controller.quizService;
+    final fallbackPurpose = widget.purpose;
+    final fallbackTypeOfQuiz = widget.typeOfQuiz;
+    final gradeLabel = widget.gradeLabel;
+    final profileId = widget.profileId;
+    final onResultBack = widget.onResultBack;
+
+    navigator.pushReplacement(
       MaterialPageRoute<void>(
-        builder: (_) => AssessmentResultScreen(
-          quiz: result.quiz,
-          quizService: _controller.quizService,
-          profileId: widget.profileId,
-          onTestAgainGenerated: openGeneratedQuiz,
-          onBack: widget.onResultBack,
-        ),
+        builder: (resultContext) {
+          return AssessmentResultScreen(
+            quiz: result.quiz,
+            quizService: quizService,
+            profileId: profileId,
+            onTestAgainGenerated: (generatedQuiz) {
+              Navigator.of(resultContext).pushReplacement(
+                MaterialPageRoute<void>(
+                  builder: (_) => AiAssessmentScreen(
+                    quizService: quizService,
+                    initialQuiz: generatedQuiz,
+                    purpose: generatedQuiz.purpose ?? fallbackPurpose,
+                    typeOfQuiz: generatedQuiz.typeOfQuiz ?? fallbackTypeOfQuiz,
+                    gradeLabel: gradeLabel,
+                    profileId: profileId,
+                    onResultBack: onResultBack,
+                  ),
+                ),
+              );
+            },
+            onBack: onResultBack,
+          );
+        },
       ),
     );
   }
@@ -129,31 +153,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       AssessmentRetryAction.submit => submitCurrentQuiz(),
       _ => generateQuiz(),
     };
-  }
-
-  void openGeneratedQuiz(GeneratedQuiz generatedQuiz) {
-    if (!mounted) {
-      return;
-    }
-
-    final navigator = Navigator.of(context);
-    if (navigator.canPop()) {
-      navigator.pop();
-    }
-
-    navigator.pushReplacement(
-      MaterialPageRoute<void>(
-        builder: (_) => AiAssessmentScreen(
-          quizService: _controller.quizService,
-          initialQuiz: generatedQuiz,
-          purpose: generatedQuiz.purpose ?? widget.purpose,
-          typeOfQuiz: generatedQuiz.typeOfQuiz ?? widget.typeOfQuiz,
-          gradeLabel: widget.gradeLabel,
-          profileId: widget.profileId,
-          onResultBack: widget.onResultBack,
-        ),
-      ),
-    );
   }
 
   Future<bool> showUnansweredSubmitDialog() async {
