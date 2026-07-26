@@ -245,7 +245,11 @@ class _AppFlowState extends State<AppFlow> {
                 canPop: !handlesSystemBack,
                 onPopInvokedWithResult: (didPop, result) {
                   if (!didPop) {
-                    context.read<AuthFlowCubit>().handleSystemBack();
+                    final cubit = context.read<AuthFlowCubit>();
+                    if (cubit.backFromLoginSwitchesEntryMode) {
+                      clearLoginNameInput();
+                    }
+                    cubit.handleSystemBack();
                   }
                 },
                 child: AnnotatedRegion<SystemUiOverlayStyle>(

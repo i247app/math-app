@@ -168,7 +168,12 @@ class AppScreenRouter extends StatelessWidget {
                     cubit.clearLoginLookup();
                     cubit.selectPhoneRegion(region);
                   },
-                  onBack: cubit.openWelcomeDetails,
+                  onBack: () {
+                    if (cubit.backFromLoginSwitchesEntryMode) {
+                      clearLoginNameInput();
+                    }
+                    cubit.backFromLogin();
+                  },
                   onSendOtp: () => submitLoginName(
                     cubit,
                     state.phoneRegion,

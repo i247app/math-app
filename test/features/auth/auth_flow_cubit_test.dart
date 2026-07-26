@@ -274,4 +274,33 @@ void main() {
       await otpCubit.close();
     },
   );
+
+  test('returns login to the screen that opened it', () async {
+    final cubit = _buildCubit();
+
+    cubit.openLogin();
+    expect(cubit.state.screen, AppScreen.login);
+
+    cubit.switchAuthEntryMode(AuthEntryMode.signup);
+    expect(cubit.handleSystemBack(), isTrue);
+    expect(cubit.state.screen, AppScreen.login);
+    expect(cubit.state.authEntryMode, AuthEntryMode.login);
+
+    expect(cubit.handleSystemBack(), isTrue);
+    expect(cubit.state.screen, AppScreen.welcome);
+
+    cubit.openWelcomeDetails();
+    cubit.openSignupEntry();
+    expect(cubit.state.screen, AppScreen.login);
+
+    cubit.switchAuthEntryMode(AuthEntryMode.login);
+    expect(cubit.handleSystemBack(), isTrue);
+    expect(cubit.state.screen, AppScreen.login);
+    expect(cubit.state.authEntryMode, AuthEntryMode.signup);
+
+    expect(cubit.handleSystemBack(), isTrue);
+    expect(cubit.state.screen, AppScreen.welcomeDetails);
+
+    await cubit.close();
+  });
 }

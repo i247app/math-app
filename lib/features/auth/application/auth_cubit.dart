@@ -78,7 +78,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         openWelcome();
         return true;
       case AppScreen.login:
-        openWelcomeDetails();
+        backFromLogin();
         return true;
       case AppScreen.otp:
         openLogin();
@@ -93,11 +93,70 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
   }
 
+  AppScreen _loginBackScreenForCurrentFlow() {
+    return switch (state.screen) {
+      AppScreen.login ||
+      AppScreen.otp ||
+      AppScreen.signup ||
+      AppScreen.passcode => state.loginBackScreen,
+      final screen => screen,
+    };
+  }
+
+  AuthEntryMode _loginEntryModeForCurrentFlow(AuthEntryMode nextMode) {
+    return switch (state.screen) {
+      AppScreen.login ||
+      AppScreen.otp ||
+      AppScreen.signup ||
+      AppScreen.passcode => state.loginEntryMode,
+      AppScreen.welcome ||
+      AppScreen.welcomeDetails ||
+      AppScreen.home => nextMode,
+    };
+  }
+
+  bool get backFromLoginSwitchesEntryMode =>
+      state.screen == AppScreen.login &&
+      state.authEntryMode != state.loginEntryMode;
+
+  void backFromLogin() {
+    if (state.screen != AppScreen.login) {
+      return;
+    }
+
+    if (backFromLoginSwitchesEntryMode) {
+      switchAuthEntryMode(state.loginEntryMode);
+      return;
+    }
+
+    final target = switch (state.loginBackScreen) {
+      AppScreen.login ||
+      AppScreen.otp ||
+      AppScreen.signup ||
+      AppScreen.passcode => AppScreen.welcomeDetails,
+      final screen => screen,
+    };
+    emit(
+      state.copyWith(
+        screen: target,
+        isCheckingLoginName: false,
+        isSendingOtp: false,
+        clearLoginName: true,
+        clearLoginLookup: true,
+        clearAuthError: true,
+        clearOtpError: true,
+      ),
+    );
+  }
+
   void openLogin({AuthEntryMode? mode}) {
+    final nextMode = mode ?? state.authEntryMode;
     emit(
       state.copyWith(
         screen: AppScreen.login,
-        authEntryMode: mode ?? state.authEntryMode,
+        loginBackScreen: _loginBackScreenForCurrentFlow(),
+        loginEntryMode: _loginEntryModeForCurrentFlow(nextMode),
+        authEntryMode: nextMode,
         clearOtpError: true,
       ),
     );
@@ -112,6 +171,8 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     emit(
       state.copyWith(
         screen: AppScreen.login,
+        loginBackScreen: _loginBackScreenForCurrentFlow(),
+        loginEntryMode: AuthEntryMode.signup,
         authEntryMode: AuthEntryMode.signup,
         clearAuthError: true,
         clearOtpError: true,
@@ -155,6 +216,8 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     emit(
       state.copyWith(
         authEntryMode: AuthEntryMode.login,
+        loginBackScreen: _loginBackScreenForCurrentFlow(),
+        loginEntryMode: AuthEntryMode.login,
         isCheckingPinLogin: true,
         clearAuthError: true,
         clearOtpError: true,
@@ -246,6 +309,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       emit(
         state.copyWith(
           screen: AppScreen.login,
+          loginBackScreen: AppScreen.welcome,
+          loginEntryMode: AuthEntryMode.login,
+          authEntryMode: AuthEntryMode.login,
           clearLoginName: true,
           clearLoginLookup: true,
           clearAuthError: true,

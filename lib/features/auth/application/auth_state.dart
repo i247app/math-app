@@ -15,6 +15,8 @@ enum PasscodeFlow { setup, unlock }
 class AuthFlowState {
   const AuthFlowState({
     this.screen = AppScreen.welcome,
+    this.loginBackScreen = AppScreen.welcomeDetails,
+    this.loginEntryMode = AuthEntryMode.login,
     this.phoneRegion = PhoneRegion.vn,
     this.isRestoringSession = false,
     this.loginName,
@@ -53,6 +55,8 @@ class AuthFlowState {
   });
 
   final AppScreen screen;
+  final AppScreen loginBackScreen;
+  final AuthEntryMode loginEntryMode;
   final PhoneRegion phoneRegion;
   final bool isRestoringSession;
   final String? loginName;
@@ -91,6 +95,8 @@ class AuthFlowState {
 
   AuthFlowState copyWith({
     AppScreen? screen,
+    AppScreen? loginBackScreen,
+    AuthEntryMode? loginEntryMode,
     PhoneRegion? phoneRegion,
     bool? isRestoringSession,
     String? loginName,
@@ -145,6 +151,8 @@ class AuthFlowState {
   }) {
     return AuthFlowState(
       screen: screen ?? this.screen,
+      loginBackScreen: loginBackScreen ?? this.loginBackScreen,
+      loginEntryMode: loginEntryMode ?? this.loginEntryMode,
       phoneRegion: phoneRegion ?? this.phoneRegion,
       isRestoringSession: isRestoringSession ?? this.isRestoringSession,
       loginName: clearLoginName ? null : loginName ?? this.loginName,
