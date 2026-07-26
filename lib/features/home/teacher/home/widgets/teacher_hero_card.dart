@@ -12,7 +12,7 @@ class TeacherHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 92,
-      padding: const EdgeInsets.fromLTRB(14, 12, 112, 18),
+      padding: const EdgeInsets.fromLTRB(14, 12, 84, 18),
       decoration: BoxDecoration(
         color: AppColors.teal400,
         borderRadius: BorderRadius.circular(24),
@@ -30,14 +30,15 @@ class TeacherHeroCard extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Positioned(
-            right: -112,
-            bottom: -27,
+            right: -84,
+            bottom: -18,
             child: Opacity(
               opacity: 0.90,
               child: Image.asset(
+                key: const ValueKey('teacher-hero-mascot'),
                 'assets/images/numi-mascot.png',
-                width: 118,
-                height: 118,
+                width: 92,
+                height: 92,
                 fit: BoxFit.contain,
               ),
             ),
@@ -47,15 +48,18 @@ class TeacherHeroCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 3,
             children: [
-              Text(
-                context.getText(AppKeys.teacherHeroTitle),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.andika(
-                  color: Colors.white,
-                  fontSize: FontSize.large,
-                  fontWeight: FontWeight.w900,
-                  height: 1.25,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  context.getText(AppKeys.teacherHeroTitle),
+                  maxLines: 1,
+                  style: GoogleFonts.andika(
+                    color: Colors.white,
+                    fontSize: FontSize.large,
+                    fontWeight: FontWeight.w900,
+                    height: 1.25,
+                  ),
                 ),
               ),
               Text(
