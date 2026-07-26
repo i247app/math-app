@@ -741,6 +741,7 @@ class AppKeys {
   static const apiBadCertificate = 'api_bad_certificate';
   static const apiRequestCanceled = 'api_request_canceled';
   static const apiConnectionFailed = 'api_connection_failed';
+  static const checkInternetConnection = 'check_internet_connection';
   static const welcomeTaglineMath = 'welcome_tagline_math';
   static const welcomeTaglineStudyAssessment =
       'welcome_tagline_study_assessment';
