@@ -20,6 +20,7 @@ import 'package:numi/features/homework/widgets/student_attempt/student_homework_
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/homework/widgets/student_result/student_homework_result_helpers.dart';
 import 'package:numi/features/quiz/widgets/shared/quiz_wave_loader.dart';
+import 'package:numi/features/quiz/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 
 class StudentHomeworkAttemptScreen extends StatefulWidget {
@@ -51,6 +52,8 @@ class _StudentHomeworkAttemptScreenState
   final Map<int, String> _selectedAnswerLabels = <int, String>{};
   bool _isLoading = false;
   bool _isSubmitting = false;
+  bool _allowPop = false;
+  bool _isExitDialogOpen = false;
   String? _errorMessage;
   VoidCallback? _errorRetryAction;
 
@@ -275,14 +278,50 @@ class _StudentHomeworkAttemptScreenState
     if (!mounted) {
       return;
     }
-    Navigator.of(context).maybePop();
+    await _popAttempt();
+  }
+
+  Future<void> _requestExit() async {
+    if (!mounted ||
+        _allowPop ||
+        _isExitDialogOpen ||
+        _isLoading ||
+        _isSubmitting) {
+      return;
+    }
+
+    if (_selectedAnswerLabels.isEmpty) {
+      await Navigator.of(context).maybePop();
+      return;
+    }
+
+    _isExitDialogOpen = true;
+    final shouldExit = await showAttemptExitDialog(context);
+    _isExitDialogOpen = false;
+    if (shouldExit && mounted) {
+      await _popAttempt();
+    }
+  }
+
+  Future<void> _popAttempt() async {
+    if (!mounted) {
+      return;
+    }
+    setState(() => _allowPop = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    return Scaffold(
+    final hasProgress = _selectedAnswerLabels.isNotEmpty;
+    final isBusy = _isLoading || _isSubmitting;
+
+    final screen = Scaffold(
       backgroundColor: colors.pageBackground,
       body: SafeArea(
         bottom: false,
@@ -392,11 +431,13 @@ class _StudentHomeworkAttemptScreenState
                       ),
                     ),
                     if (!_isLoading && !_isSubmitting)
-                      const Positioned(
+                      Positioned(
                         left: 0,
                         right: 0,
                         top: 0,
-                        child: StudentHomeworkAttemptHeader(),
+                        child: StudentHomeworkAttemptHeader(
+                          onClose: _requestExit,
+                        ),
                       ),
                     if (isQuestionContentVisible)
                       Positioned(
@@ -419,6 +460,16 @@ class _StudentHomeworkAttemptScreenState
           ),
         ),
       ),
+    );
+
+    return PopScope(
+      canPop: _allowPop || (!hasProgress && !isBusy),
+      onPopInvokedWithResult: (didPop, _) async {
+        if (!didPop) {
+          await _requestExit();
+        }
+      },
+      child: screen,
     );
   }
 }

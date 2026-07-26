@@ -10,7 +10,9 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
 
 class AssessmentHeader extends StatelessWidget {
-  const AssessmentHeader({super.key});
+  const AssessmentHeader({super.key, required this.onClose});
+
+  final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class AssessmentHeader extends StatelessWidget {
                 icon: Icons.close_rounded,
                 color: colors.brandStrong,
                 circle: true,
-                onTap: () => Navigator.of(context).maybePop(),
+                onTap: onClose,
               ),
               Expanded(
                 child: Padding(

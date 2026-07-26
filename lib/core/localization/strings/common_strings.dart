@@ -17,6 +17,10 @@ const commonStrings = <String, Map<String, String>>{
     AppKeys.back: 'Quay lại',
     AppKeys.skipUpper: 'BỎ QUA',
     AppKeys.continueUpper: 'TIẾP TỤC',
+    AppKeys.attemptExitTitle: 'Thoát bài đang làm?',
+    AppKeys.attemptExitMessage:
+        'Các câu trả lời đã chọn sẽ bị mất. Bạn có chắc muốn thoát không?',
+    AppKeys.exitUpper: 'THOÁT',
     AppKeys.language: 'Ngôn ngữ',
     AppKeys.languageTitle: 'Ngôn Ngữ',
     AppKeys.languageMenuSubtitle: 'Đổi ngôn ngữ hiển thị',
@@ -41,6 +45,10 @@ const commonStrings = <String, Map<String, String>>{
     AppKeys.back: 'Back',
     AppKeys.skipUpper: 'SKIP',
     AppKeys.continueUpper: 'CONTINUE',
+    AppKeys.attemptExitTitle: 'Leave this attempt?',
+    AppKeys.attemptExitMessage:
+        'Your selected answers will be lost. Are you sure you want to leave?',
+    AppKeys.exitUpper: 'LEAVE',
     AppKeys.language: 'Language',
     AppKeys.languageTitle: 'Language',
     AppKeys.languageMenuSubtitle: 'Change display language',

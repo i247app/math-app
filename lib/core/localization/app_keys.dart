@@ -14,6 +14,9 @@ class AppKeys {
   static const back = 'back';
   static const skipUpper = 'skip_upper';
   static const continueUpper = 'continue_upper';
+  static const attemptExitTitle = 'attempt_exit_title';
+  static const attemptExitMessage = 'attempt_exit_message';
+  static const exitUpper = 'exit_upper';
   static const language = 'language';
   static const languageTitle = 'language_title';
   static const languageMenuSubtitle = 'language_menu_subtitle';

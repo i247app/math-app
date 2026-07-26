@@ -14,6 +14,7 @@ import 'package:numi/features/quiz/widgets/assessment/assessment_generating_load
 import 'package:numi/features/quiz/widgets/assessment/assessment_header.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_progress_section.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_question_card.dart';
+import 'package:numi/features/quiz/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 enum AiAssessmentResult { generationFailed }
@@ -46,6 +47,8 @@ class AiAssessmentScreen extends StatefulWidget {
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   late final AssessmentController _controller;
+  bool _allowPop = false;
+  bool _isExitDialogOpen = false;
 
   @override
   void initState() {
@@ -155,6 +158,39 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     };
   }
 
+  Future<void> _requestExit() async {
+    if (!mounted ||
+        _allowPop ||
+        _isExitDialogOpen ||
+        _controller.isGeneratingQuestion ||
+        _controller.isSubmittingQuiz) {
+      return;
+    }
+
+    if (_controller.selectedAnswerLabels.isEmpty) {
+      await Navigator.of(context).maybePop();
+      return;
+    }
+
+    _isExitDialogOpen = true;
+    final shouldExit = await showAttemptExitDialog(context);
+    _isExitDialogOpen = false;
+    if (shouldExit && mounted) {
+      await _popAttempt();
+    }
+  }
+
+  Future<void> _popAttempt() async {
+    if (!mounted) {
+      return;
+    }
+    setState(() => _allowPop = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
   Future<bool> showUnansweredSubmitDialog() async {
     final result = await showDialog<bool>(
       context: context,
@@ -235,11 +271,13 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final errorMessage = _controller.errorMessage;
           final isGeneratingQuestion = _controller.isGeneratingQuestion;
           final isSubmittingQuiz = _controller.isSubmittingQuiz;
+          final hasProgress = _controller.selectedAnswerLabels.isNotEmpty;
+          final isBusy = isGeneratingQuestion || isSubmittingQuiz;
           final backgroundColor = isGeneratingQuestion
               ? colors.surface
               : colors.pageBackground;
 
-          return Scaffold(
+          final screen = Scaffold(
             backgroundColor: backgroundColor,
             body: SafeArea(
               child: Center(
@@ -316,11 +354,11 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                         ),
                       ),
                       if (!isGeneratingQuestion && !isSubmittingQuiz)
-                        const Positioned(
+                        Positioned(
                           left: 0,
                           right: 0,
                           top: 0,
-                          child: AssessmentHeader(),
+                          child: AssessmentHeader(onClose: _requestExit),
                         ),
                       if (!isGeneratingQuestion &&
                           !isSubmittingQuiz &&
@@ -342,6 +380,16 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                 ),
               ),
             ),
+          );
+
+          return PopScope(
+            canPop: _allowPop || (!hasProgress && !isBusy),
+            onPopInvokedWithResult: (didPop, _) async {
+              if (!didPop) {
+                await _requestExit();
+              }
+            },
+            child: screen,
           );
         },
       ),
