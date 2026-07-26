@@ -401,6 +401,93 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     );
   }
 
+  Future<void> lookupSignupPhone(String phone) async {
+    if (state.authEntryMode != AuthEntryMode.signup ||
+        (state.isCheckingLoginName && state.checkedLoginName == phone)) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        loginName: phone,
+        checkedLoginName: phone,
+        isCheckingLoginName: true,
+        clearLoginNameExists: true,
+        clearLoginLookupUser: true,
+        clearLoginLookupError: true,
+        clearLoginLookupErrorStatus: true,
+        clearAuthError: true,
+      ),
+    );
+
+    try {
+      final result = await _authService.lookupLoginName(phone);
+      if (isClosed ||
+          state.authEntryMode != AuthEntryMode.signup ||
+          state.checkedLoginName != phone) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          loginName: phone,
+          checkedLoginName: phone,
+          isCheckingLoginName: false,
+          loginNameExists: result.exists,
+          loginLookupUser: result.user,
+          loginLookupError: result.exists ? null : result.message,
+          loginLookupErrorStatus: result.exists ? null : result.status,
+          otpFlow: OtpFlow.signup,
+          clearAuthError: true,
+          clearLoginLookupError: result.exists,
+          clearLoginLookupErrorStatus: result.exists,
+          clearDevOtp: true,
+          clearOtpExpiry: true,
+          clearOtpError: true,
+        ),
+      );
+    } on AuthException catch (error) {
+      if (isClosed || state.checkedLoginName != phone) {
+        return;
+      }
+
+      if (isAuthUserNotFoundStatus(error.status)) {
+        emit(
+          state.copyWith(
+            loginName: phone,
+            checkedLoginName: phone,
+            isCheckingLoginName: false,
+            loginNameExists: false,
+            loginLookupError: error.message,
+            loginLookupErrorStatus: error.status,
+            clearAuthError: true,
+          ),
+        );
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          isCheckingLoginName: false,
+          authError: error.message,
+          clearLoginLookup: true,
+        ),
+      );
+    } catch (_) {
+      if (isClosed || state.checkedLoginName != phone) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          isCheckingLoginName: false,
+          authError: AppStrings.current(AppKeys.authLoginNameCheckFailed),
+          clearLoginLookup: true,
+        ),
+      );
+    }
+  }
+
   Future<void> submitLoginName(String loginName) async {
     if (state.isSendingOtp) {
       return;
@@ -411,6 +498,44 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       emit(state.copyWith(authError: AppStrings.current(AppKeys.invalidPhone)));
       return;
     }
+
+    if (isSignupEntry) {
+      if (state.loginNameExists == true &&
+          state.checkedLoginName == loginName) {
+        emit(
+          state.copyWith(
+            authError: AppStrings.current(AppKeys.signupPhoneAlreadyRegistered),
+          ),
+        );
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          loginName: loginName,
+          isCheckingLoginName: false,
+          isSendingOtp: true,
+          clearAuthError: true,
+        ),
+      );
+
+      try {
+        final otp = await _authService.sendOtp(
+          loginName: loginName,
+          kind: AuthOtpKind.signup,
+        );
+        _emitOtpSent(loginName: loginName, otp: otp, flow: OtpFlow.signup);
+      } on AuthException catch (error) {
+        _emitAuthError(error.message, isSendingOtp: false);
+      } catch (_) {
+        _emitAuthError(
+          AppStrings.current(AppKeys.signupOtpFailed),
+          isSendingOtp: false,
+        );
+      }
+      return;
+    }
+
     emit(
       state.copyWith(
         loginName: loginName,
@@ -443,27 +568,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
           clearLoginLookupErrorStatus: result.exists,
         ),
       );
-
-      if (isSignupEntry) {
-        if (result.exists) {
-          emit(
-            state.copyWith(
-              isSendingOtp: false,
-              authError: AppStrings.current(
-                AppKeys.signupPhoneAlreadyRegistered,
-              ),
-            ),
-          );
-          return;
-        }
-
-        final otp = await _authService.sendOtp(
-          loginName: loginName,
-          kind: AuthOtpKind.signup,
-        );
-        _emitOtpSent(loginName: loginName, otp: otp, flow: OtpFlow.signup);
-        return;
-      }
 
       if (!result.exists) {
         emit(
@@ -544,11 +648,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       );
     } catch (_) {
       _emitAuthError(
-        AppStrings.current(
-          isSignupEntry
-              ? AppKeys.signupOtpFailed
-              : AppKeys.authLoginNameCheckFailed,
-        ),
+        AppStrings.current(AppKeys.authLoginNameCheckFailed),
         isCheckingLoginName: false,
         isSendingOtp: false,
       );

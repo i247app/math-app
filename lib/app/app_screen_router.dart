@@ -39,7 +39,12 @@ class AppScreenRouter extends StatelessWidget {
     AuthEntryMode mode,
   )
   normalizedLoginNameInput;
-  final void Function(AuthFlowCubit cubit, AuthEntryMode mode, String value)
+  final void Function(
+    AuthFlowCubit cubit,
+    PhoneRegion region,
+    AuthEntryMode mode,
+    String value,
+  )
   handleLoginNameInputChanged;
   final void Function(
     AuthFlowCubit cubit,
@@ -97,15 +102,22 @@ class AppScreenRouter extends StatelessWidget {
         );
         final lookupMatchesLoginName =
             state.checkedLoginName == normalizedLoginName.loginName;
+        final blocksSignupPhoneAction =
+            isSignupEntry &&
+            lookupMatchesLoginName &&
+            state.loginNameExists == true;
         final canSubmitLoginName = isSignupEntry
-            ? normalizedLoginName.isValid
+            ? normalizedLoginName.isValid && !blocksSignupPhoneAction
             : loginNameHasInput;
         final validationErrorKey = normalizedLoginName.errorKey;
         final delaysValidationError =
             validationErrorKey == AppKeys.invalidEmail ||
             validationErrorKey == AppKeys.phoneTooShort;
-        final loginNameInputErrorKey =
-            delaysValidationError && !loginNameSubmitAttempted
+        final loginNameInputErrorKey = isSignupEntry
+            ? validationErrorKey == AppKeys.phoneTooShort
+                  ? null
+                  : validationErrorKey
+            : delaysValidationError && !loginNameSubmitAttempted
             ? null
             : validationErrorKey;
         final loginNameErrorText = !loginNameHasInput
@@ -179,6 +191,7 @@ class AppScreenRouter extends StatelessWidget {
                   },
                   onLoginNameChanged: (value) => handleLoginNameInputChanged(
                     cubit,
+                    state.phoneRegion,
                     state.authEntryMode,
                     value,
                   ),

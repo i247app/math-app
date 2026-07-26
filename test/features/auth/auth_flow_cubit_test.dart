@@ -191,9 +191,32 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('+84901234567');
+    await cubit.lookupSignupPhone('+84901234567');
 
     expect(authService.lookedUpLoginName, '+84901234567');
+    expect(cubit.state.loginNameExists, isFalse);
+
+    await cubit.submitLoginName('+84901234567');
+
+    expect(authService.sentOtpLoginName, '+84901234567');
+    expect(authService.sentOtpKind, AuthOtpKind.signup);
+    expect(cubit.state.screen, AppScreen.otp);
+    await cubit.close();
+  });
+
+  test('signup submit does not depend on the login lookup', () async {
+    final authService = _FakeAuthService(accountExists: false);
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AppScreen.login,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
+
+    await cubit.submitLoginName('+84901234567');
+
+    expect(authService.lookedUpLoginName, isNull);
     expect(authService.sentOtpLoginName, '+84901234567');
     expect(authService.sentOtpKind, AuthOtpKind.signup);
     expect(cubit.state.screen, AppScreen.otp);
