@@ -3,6 +3,7 @@ import '../../app_keys.dart';
 const teacherClassroomStrings = <String, Map<String, String>>{
   'vi': {
     AppKeys.teacherClassOpenFailed: 'Không mở được lớp học này.',
+    AppKeys.teacherClassroomTitle: 'Lớp Học',
     AppKeys.teacherClassFallback: 'Lớp học',
     AppKeys.teacherStudentCount: '{count} Học sinh',
     AppKeys.teacherCreateClassTitle: 'Tạo Lớp',
@@ -48,6 +49,7 @@ const teacherClassroomStrings = <String, Map<String, String>>{
   },
   'en': {
     AppKeys.teacherClassOpenFailed: 'Could not open this class.',
+    AppKeys.teacherClassroomTitle: 'Classroom',
     AppKeys.teacherClassFallback: 'Class',
     AppKeys.teacherStudentCount: '{count} students',
     AppKeys.teacherCreateClassTitle: 'Create Class',

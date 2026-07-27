@@ -10,7 +10,7 @@ class TeacherClassroomHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageHeader(
-      title: context.getText(AppKeys.studentClassroom),
+      title: context.getText(AppKeys.teacherClassroomTitle),
       actionWidth: 40,
       horizontalPadding: 18,
       verticalPadding: 6,

@@ -433,6 +433,7 @@ class AppKeys {
   static const teacherFallback = 'teacher_fallback';
   static const teacherMissingProfileId = 'teacher_missing_profile_id';
   static const teacherClassOpenFailed = 'teacher_class_open_failed';
+  static const teacherClassroomTitle = 'teacher_classroom_title';
   static const teacherWelcomeBack = 'teacher_welcome_back';
   static const teacherHeroTitle = 'teacher_hero_title';
   static const teacherHeroSubtitle = 'teacher_hero_subtitle';

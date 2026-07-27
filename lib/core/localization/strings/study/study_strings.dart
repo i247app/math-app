@@ -44,7 +44,7 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.noHistoryMessage: 'Đổi từ khóa để xem các bài khác.',
     AppKeys.missingQuizId: 'Bài kiểm tra này thiếu quiz_id.',
     AppKeys.testAgain: 'Làm Lại',
-    AppKeys.teacherStudyTitle: 'HỌC',
+    AppKeys.teacherStudyTitle: 'Học',
     AppKeys.teacherStudyAllClasses: 'Tất cả',
     AppKeys.teacherStudyLoadFailed:
         'Tải danh sách bài tập và đánh giá thất bại.',
@@ -102,7 +102,7 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.noHistoryMessage: 'Change the keyword to view other items.',
     AppKeys.missingQuizId: 'This test is missing quiz_id.',
     AppKeys.testAgain: 'Try Again',
-    AppKeys.teacherStudyTitle: 'STUDY',
+    AppKeys.teacherStudyTitle: 'Study',
     AppKeys.teacherStudyAllClasses: 'All',
     AppKeys.teacherStudyLoadFailed:
         'Failed to load assignments and assessments.',
