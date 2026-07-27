@@ -21,6 +21,7 @@ import 'package:numi/features/homework/presentation/screens/teacher_homework_det
 import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 
 import 'package:numi/features/home/teacher/home/helpers/teacher_home_helpers.dart';
@@ -378,10 +379,14 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
     }
   }
 
+  Future<void> _openProfileCompletion() async {
+    HapticFeedback.selectionClick();
+    await widget.onCompleteProfile();
+  }
+
   Future<void> _handleClassCreateAction() async {
     if (!isTeacherProfileComplete(widget.activeProfile)) {
-      HapticFeedback.selectionClick();
-      await widget.onCompleteProfile();
+      await _openProfileCompletion();
       return;
     }
 
@@ -487,7 +492,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
           const TeacherLoadingPanel()
         else if (_error != null && _classrooms.isEmpty)
           AppRetryPanel(message: _error!, onRetry: _refreshClassrooms)
-        else if (_classrooms.isEmpty)
+        else if (_classrooms.isEmpty && isProfileComplete)
           Column(
             children: [
               TeacherNoClassPanel(
@@ -496,6 +501,8 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
               ),
             ],
           )
+        else if (_classrooms.isEmpty)
+          const SizedBox.shrink()
         else
           Column(
             children: [
@@ -580,11 +587,33 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
                           : const TeacherHeroCard(),
                     ),
                   ),
+                  if (!isProfileComplete)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: _homeEntrance(
+                        id: '$_teacherHomeProfileKey-complete-profile',
+                        order: 2,
+                        child: SettingsActionCard(
+                          icon: Icons.person_outline_rounded,
+                          iconColor: const Color(0xFF008A52),
+                          iconBackground: const Color(0xFFD6FFE3),
+                          title: context.getText(
+                            AppKeys.teacherCompleteProfile,
+                          ),
+                          subtitle: context.getText(
+                            AppKeys.teacherCompleteProfileDescription,
+                          ),
+                          showLeadingIcon: false,
+                          subtitleMaxLines: 2,
+                          onTap: _openProfileCompletion,
+                        ),
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.only(top: 28),
                     child: _homeEntrance(
                       id: _classroomEntranceId,
-                      order: 2,
+                      order: isProfileComplete ? 2 : 3,
                       child: _buildClassroomSection(
                         isProfileComplete: isProfileComplete,
                       ),
@@ -594,7 +623,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
                     padding: const EdgeInsets.only(top: 30),
                     child: _homeEntrance(
                       id: _assignmentsEntranceId,
-                      order: 3,
+                      order: isProfileComplete ? 3 : 4,
                       child: _buildRecentAssignmentsSection(),
                     ),
                   ),

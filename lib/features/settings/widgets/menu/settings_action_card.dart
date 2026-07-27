@@ -14,6 +14,8 @@ class SettingsActionCard extends StatelessWidget {
     required this.subtitle,
     required this.onTap,
     this.isDestructive = false,
+    this.showLeadingIcon = true,
+    this.subtitleMaxLines = 1,
   });
 
   final IconData icon;
@@ -23,6 +25,8 @@ class SettingsActionCard extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
   final bool isDestructive;
+  final bool showLeadingIcon;
+  final int subtitleMaxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -52,18 +56,19 @@ class SettingsActionCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 14),
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: iconBackground,
-                    shape: BoxShape.circle,
+              if (showLeadingIcon)
+                Padding(
+                  padding: const EdgeInsets.only(right: 14),
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: iconBackground,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: iconColor, size: 22),
                   ),
-                  child: Icon(icon, color: iconColor, size: 22),
                 ),
-              ),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -86,7 +91,7 @@ class SettingsActionCard extends StatelessWidget {
                     ),
                     Text(
                       subtitle,
-                      maxLines: 1,
+                      maxLines: subtitleMaxLines,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.andika(
                         color: colors.textMuted,

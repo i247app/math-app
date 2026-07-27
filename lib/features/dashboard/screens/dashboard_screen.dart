@@ -30,6 +30,7 @@ import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/settings/helpers/setting_page_builders.dart';
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
+import 'package:numi/features/settings/navigation/settings_depth_route.dart';
 
 enum _RoleTabDestination {
   home,
@@ -463,7 +464,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       return;
     }
     final didSave = await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
+      SettingsDepthRoute<bool>(
         builder: (routeContext) => Material(
           color: routeContext.themeColors.pageBackground,
           child: SafeArea(

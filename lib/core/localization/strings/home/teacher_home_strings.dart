@@ -11,6 +11,8 @@ const teacherHomeStrings = <String, Map<String, String>>{
     AppKeys.teacherRecentlyAssigned: 'Bài tập vừa giao',
     AppKeys.teacherCreateNewClass: 'Tạo Lớp Học Mới',
     AppKeys.teacherCompleteProfile: 'Hoàn Thành Hồ Sơ',
+    AppKeys.teacherCompleteProfileDescription:
+        'Hồ sơ chưa hoàn tất. Nhấn để bổ sung thông tin.',
     AppKeys.teacherEnterClass: 'Vào Lớp',
     AppKeys.teacherReportTitle: 'Báo Cáo',
     AppKeys.teacherReportComingSoon: 'Báo cáo lớp học sẽ sớm có mặt',
@@ -34,6 +36,8 @@ const teacherHomeStrings = <String, Map<String, String>>{
     AppKeys.teacherRecentlyAssigned: 'Recently assigned homework',
     AppKeys.teacherCreateNewClass: 'Create New Class',
     AppKeys.teacherCompleteProfile: 'Complete Profile',
+    AppKeys.teacherCompleteProfileDescription:
+        'Your profile is incomplete. Tap to add the missing details.',
     AppKeys.teacherEnterClass: 'Enter Class',
     AppKeys.teacherReportTitle: 'Report',
     AppKeys.teacherReportComingSoon: 'Class reports are coming soon',

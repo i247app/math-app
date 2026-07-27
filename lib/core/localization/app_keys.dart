@@ -440,6 +440,8 @@ class AppKeys {
   static const teacherRecentlyAssigned = 'teacher_recently_assigned';
   static const teacherCreateNewClass = 'teacher_create_new_class';
   static const teacherCompleteProfile = 'teacher_complete_profile';
+  static const teacherCompleteProfileDescription =
+      'teacher_complete_profile_description';
   static const teacherClassFallback = 'teacher_class_fallback';
   static const teacherStudentCount = 'teacher_student_count';
   static const teacherEnterClass = 'teacher_enter_class';
