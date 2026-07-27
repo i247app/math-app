@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/features/auth/errors/auth_error_messages.dart';
 import 'package:numi/features/auth/models/signup_form_data.dart';
 import 'package:numi/features/auth/models/signup_gender.dart';
@@ -14,12 +15,14 @@ class SignupScreen extends StatefulWidget {
     required this.onBack,
     required this.onContinue,
     required this.isSigningUp,
+    this.initialForm,
     this.authError,
   });
 
   final VoidCallback onBack;
   final ValueChanged<SignupFormData> onContinue;
   final bool isSigningUp;
+  final SignupFormData? initialForm;
   final String? authError;
 
   @override
@@ -40,18 +43,27 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   void initState() {
     super.initState();
-    _usernameController.addListener(_rebuildForUsername);
+    final initialForm = widget.initialForm;
+    if (initialForm != null) {
+      _usernameController.text = initialForm.name;
+      _emailController.text = initialForm.email ?? '';
+      _selectedRole = initialForm.role;
+      _selectedGender = initialForm.gender;
+    }
+    _usernameController.addListener(_rebuildForFormInput);
+    _emailController.addListener(_rebuildForFormInput);
   }
 
   @override
   void dispose() {
-    _usernameController.removeListener(_rebuildForUsername);
+    _usernameController.removeListener(_rebuildForFormInput);
+    _emailController.removeListener(_rebuildForFormInput);
     _usernameController.dispose();
     _emailController.dispose();
     super.dispose();
   }
 
-  void _rebuildForUsername() => setState(() {});
+  void _rebuildForFormInput() => setState(() {});
 
   void _selectRole(SignupRole role) {
     setState(() {
@@ -87,9 +99,14 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
     final isUsernameValid = _isValidName(username);
+    final isEmailValid = email.isEmpty || isValidEmailInput(email);
     final isFormValid =
-        isUsernameValid && _selectedRole != null && _selectedGender != null;
+        isUsernameValid &&
+        isEmailValid &&
+        _selectedRole != null &&
+        _selectedGender != null;
     final localUsernameError = username.isNotEmpty && !isUsernameValid
         ? context.getText(AppKeys.signupNameInvalid)
         : null;
@@ -98,6 +115,9 @@ class _SignupScreenState extends State<SignupScreen> {
         (isSignupUsernameExistsError(widget.authError)
             ? context.getText(AppKeys.signupUsernameExists)
             : null);
+    final emailError = email.isNotEmpty && !isEmailValid
+        ? context.getText(AppKeys.invalidEmail)
+        : null;
 
     return SignupComposition(
       usernameController: _usernameController,
@@ -105,6 +125,7 @@ class _SignupScreenState extends State<SignupScreen> {
       role: _selectedRole,
       gender: _selectedGender,
       usernameErrorText: usernameError,
+      emailErrorText: emailError,
       isFormValid: isFormValid,
       isSigningUp: widget.isSigningUp,
       onBack: widget.onBack,

@@ -204,7 +204,7 @@ class AppScreenRouter extends StatelessWidget {
                 ),
                 AppScreen.otp => OtpScreen(
                   key: const ValueKey('otp'),
-                  onBack: cubit.openLogin,
+                  onBack: cubit.backFromOtp,
                   onConfirm: cubit.verifyOtp,
                   onResend: cubit.resendLoginOtp,
                   isVerifyingOtp: state.isVerifyingOtp || state.isSendingOtp,
@@ -219,6 +219,7 @@ class AppScreenRouter extends StatelessWidget {
                   key: const ValueKey('signup'),
                   onBack: cubit.cancelSignupToLogin,
                   isSigningUp: state.isSigningUp,
+                  initialForm: cubit.pendingSignupForm,
                   authError: state.authError,
                   onContinue: (form) {
                     HapticFeedback.mediumImpact();

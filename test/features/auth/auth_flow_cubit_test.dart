@@ -3,6 +3,9 @@ import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/models/signup_form_data.dart';
+import 'package:numi/features/auth/models/signup_gender.dart';
+import 'package:numi/features/auth/models/signup_role.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 
 class _FakePasscodeService implements PasscodeService {
@@ -38,12 +41,15 @@ class _FakePasscodeService implements PasscodeService {
 }
 
 class _FakeAuthService implements AuthService {
-  _FakeAuthService({this.accountExists = true});
+  _FakeAuthService({this.accountExists = true, this.verifyOtpIsValid = false});
 
   final bool accountExists;
+  final bool verifyOtpIsValid;
   String? lookedUpLoginName;
   String? sentOtpLoginName;
   String? verifiedOtpLoginName;
+  String? signupPhone;
+  String? signupEmail;
   AuthOtpKind? sentOtpKind;
 
   @override
@@ -79,7 +85,7 @@ class _FakeAuthService implements AuthService {
     required AuthOtpKind kind,
   }) async {
     verifiedOtpLoginName = loginName;
-    return const VerifyOtpResult(isValid: false);
+    return VerifyOtpResult(isValid: verifyOtpIsValid);
   }
 
   @override
@@ -97,8 +103,10 @@ class _FakeAuthService implements AuthService {
     required String name,
     required String role,
     String? email,
-  }) {
-    throw UnimplementedError();
+  }) async {
+    signupPhone = phone;
+    signupEmail = email;
+    return LoginUser(id: 0, phone: phone, email: email, name: name, role: role);
   }
 
   @override
@@ -181,7 +189,7 @@ void main() {
     await cubit.close();
   });
 
-  test('checks a signup phone before sending register OTP', () async {
+  test('checks a signup phone before opening the signup form', () async {
     final authService = _FakeAuthService(accountExists: false);
     final cubit = _buildCubit(
       authService: authService,
@@ -198,9 +206,8 @@ void main() {
 
     await cubit.submitLoginName('+84901234567');
 
-    expect(authService.sentOtpLoginName, '+84901234567');
-    expect(authService.sentOtpKind, AuthOtpKind.signup);
-    expect(cubit.state.screen, AppScreen.otp);
+    expect(authService.sentOtpLoginName, isNull);
+    expect(cubit.state.screen, AppScreen.signup);
     await cubit.close();
   });
 
@@ -217,9 +224,101 @@ void main() {
     await cubit.submitLoginName('+84901234567');
 
     expect(authService.lookedUpLoginName, isNull);
-    expect(authService.sentOtpLoginName, '+84901234567');
-    expect(authService.sentOtpKind, AuthOtpKind.signup);
-    expect(cubit.state.screen, AppScreen.otp);
+    expect(authService.sentOtpLoginName, isNull);
+    expect(cubit.state.screen, AppScreen.signup);
+    await cubit.close();
+  });
+
+  test('signup without email creates the account and opens home', () async {
+    final authService = _FakeAuthService(accountExists: false);
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AppScreen.login,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
+
+    await cubit.submitLoginName('+84901234567');
+    await cubit.submitSignup(
+      const SignupFormData(
+        name: 'Learner',
+        role: SignupRole.student,
+        gender: SignupGender.studentMale,
+      ),
+    );
+
+    expect(authService.sentOtpLoginName, isNull);
+    expect(authService.signupPhone, '+84901234567');
+    expect(authService.signupEmail, isNull);
+    expect(cubit.state.screen, AppScreen.home);
+    await cubit.close();
+  });
+
+  test(
+    'signup with email verifies email OTP before creating account',
+    () async {
+      final authService = _FakeAuthService(
+        accountExists: false,
+        verifyOtpIsValid: true,
+      );
+      final cubit = _buildCubit(
+        authService: authService,
+        initialState: const AuthFlowState(
+          screen: AppScreen.login,
+          authEntryMode: AuthEntryMode.signup,
+        ),
+      );
+
+      await cubit.submitLoginName('+84901234567');
+      await cubit.submitSignup(
+        const SignupFormData(
+          name: 'Learner',
+          email: 'learner@example.com',
+          role: SignupRole.student,
+          gender: SignupGender.studentMale,
+        ),
+      );
+
+      expect(authService.sentOtpLoginName, 'learner@example.com');
+      expect(authService.sentOtpKind, AuthOtpKind.signup);
+      expect(authService.signupPhone, isNull);
+      expect(cubit.state.screen, AppScreen.otp);
+
+      await cubit.verifyOtp('1234');
+
+      expect(authService.verifiedOtpLoginName, 'learner@example.com');
+      expect(authService.signupPhone, '+84901234567');
+      expect(authService.signupEmail, 'learner@example.com');
+      expect(cubit.state.screen, AppScreen.home);
+      await cubit.close();
+    },
+  );
+
+  test('back from signup OTP restores the signup form and phone', () async {
+    final authService = _FakeAuthService(accountExists: false);
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AppScreen.login,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
+
+    await cubit.submitLoginName('+84901234567');
+    await cubit.submitSignup(
+      const SignupFormData(
+        name: 'Learner',
+        email: 'learner@example.com',
+        role: SignupRole.student,
+        gender: SignupGender.studentMale,
+      ),
+    );
+    cubit.backFromOtp();
+
+    expect(cubit.state.screen, AppScreen.signup);
+    expect(cubit.state.loginName, '+84901234567');
+    expect(cubit.pendingSignupForm?.email, 'learner@example.com');
     await cubit.close();
   });
 

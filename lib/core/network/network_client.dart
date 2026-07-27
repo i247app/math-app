@@ -260,6 +260,7 @@ class NetworkApi {
       );
     }
 
+    await _storeAccessToken(authResponse.accessToken);
     return authResponse;
   }
 

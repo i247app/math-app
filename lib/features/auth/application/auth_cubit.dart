@@ -7,6 +7,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/notifications/notification_ping_service.dart';
+import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
@@ -57,6 +58,10 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   final void Function(AuthenticatedSession session) _onAuthenticated;
   final VoidCallback _onSessionCleared;
   final VoidCallback _onSessionRestoreStarted;
+  SignupFormData? _pendingSignupForm;
+  String? _pendingSignupPhone;
+
+  SignupFormData? get pendingSignupForm => _pendingSignupForm;
 
   void openWelcome() => emit(state.copyWith(screen: AppScreen.welcome));
 
@@ -81,7 +86,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         backFromLogin();
         return true;
       case AppScreen.otp:
-        openLogin();
+        backFromOtp();
         return true;
       case AppScreen.signup:
         cancelSignupToLogin();
@@ -161,6 +166,39 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       ),
     );
     unawaited(checkPinLoginAvailability());
+  }
+
+  void backFromOtp() {
+    if (state.screen != AppScreen.otp) {
+      return;
+    }
+
+    final signupPhone = _pendingSignupPhone;
+    if (state.otpFlow == OtpFlow.signup &&
+        signupPhone != null &&
+        _pendingSignupForm != null) {
+      final otpIdentifier = state.loginName?.trim();
+      if (otpIdentifier != null && otpIdentifier.isNotEmpty) {
+        unawaited(_authService.clearPendingLogin(otpIdentifier));
+      }
+      emit(
+        state.copyWith(
+          screen: AppScreen.signup,
+          loginName: signupPhone,
+          isSendingOtp: false,
+          isVerifyingOtp: false,
+          isSigningUp: false,
+          otpFlow: OtpFlow.signup,
+          clearAuthError: true,
+          clearDevOtp: true,
+          clearOtpExpiry: true,
+          clearOtpError: true,
+        ),
+      );
+      return;
+    }
+
+    openLogin();
   }
 
   void openLoginFromWelcome() {
@@ -283,6 +321,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     if (loginName != null && loginName.isNotEmpty) {
       unawaited(_authService.clearPendingLogin(loginName));
     }
+    _clearPendingSignup();
 
     emit(
       state.copyWith(
@@ -303,6 +342,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   }
 
   Future<void> logout() async {
+    _clearPendingSignup();
     _onSessionCleared();
     await _authService.logout();
     if (!isClosed) {
@@ -576,29 +616,21 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         return;
       }
 
+      _pendingSignupPhone = loginName;
+      _pendingSignupForm = null;
       emit(
         state.copyWith(
+          screen: AppScreen.signup,
           loginName: loginName,
           isCheckingLoginName: false,
-          isSendingOtp: true,
+          isSendingOtp: false,
+          otpFlow: OtpFlow.signup,
           clearAuthError: true,
+          clearDevOtp: true,
+          clearOtpExpiry: true,
+          clearOtpError: true,
         ),
       );
-
-      try {
-        final otp = await _authService.sendOtp(
-          loginName: loginName,
-          kind: AuthOtpKind.signup,
-        );
-        _emitOtpSent(loginName: loginName, otp: otp, flow: OtpFlow.signup);
-      } on AuthException catch (error) {
-        _emitAuthError(error.message, isSendingOtp: false);
-      } catch (_) {
-        _emitAuthError(
-          AppStrings.current(AppKeys.signupOtpFailed),
-          isSendingOtp: false,
-        );
-      }
       return;
     }
 
@@ -727,7 +759,48 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       return;
     }
 
+    if (state.otpFlow == OtpFlow.signup) {
+      await _sendSignupOtp(loginName);
+      return;
+    }
+
     await _sendLoginOtp(loginName);
+  }
+
+  Future<void> _sendSignupOtp(String email) async {
+    emit(
+      state.copyWith(
+        isSendingOtp: true,
+        clearAuthError: true,
+        clearOtpError: true,
+      ),
+    );
+
+    try {
+      final otp = await _authService.sendOtp(
+        loginName: email,
+        kind: AuthOtpKind.signup,
+      );
+      if (state.loginName != email || state.otpFlow != OtpFlow.signup) {
+        return;
+      }
+
+      _emitOtpSent(loginName: email, otp: otp, flow: OtpFlow.signup);
+    } on AuthException catch (error) {
+      if (state.loginName != email || state.otpFlow != OtpFlow.signup) {
+        return;
+      }
+      _emitAuthError(error.message, isSendingOtp: false, isSigningUp: false);
+    } catch (_) {
+      if (state.loginName != email || state.otpFlow != OtpFlow.signup) {
+        return;
+      }
+      _emitAuthError(
+        AppStrings.current(AppKeys.signupOtpFailed),
+        isSendingOtp: false,
+        isSigningUp: false,
+      );
+    }
   }
 
   Future<void> _sendLoginOtp(String loginName) async {
@@ -794,6 +867,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         otpPreviewId: state.otpPreviewId + 1,
         otpFlow: flow,
         isSendingOtp: false,
+        isSigningUp: false,
         clearAuthError: true,
         clearDevOtp: otp.otpCode == null,
         clearOtpExpiry: otp.expiresAt == null,
@@ -839,14 +913,31 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       }
 
       if (otpFlow == OtpFlow.signup) {
-        emit(
-          state.copyWith(
-            screen: AppScreen.signup,
+        final signupPhone = _pendingSignupPhone;
+        final signupForm = _pendingSignupForm;
+        if (signupPhone == null || signupForm == null) {
+          emit(
+            state.copyWith(
+              isVerifyingOtp: false,
+              otpError: AppStrings.current(AppKeys.signupFailed),
+              otpErrorId: state.otpErrorId + 1,
+              clearAuthError: true,
+            ),
+          );
+          return;
+        }
+
+        try {
+          await _completeSignup(
+            phone: signupPhone,
+            form: signupForm,
             isVerifyingOtp: false,
-            clearAuthError: true,
-            clearOtpError: true,
-          ),
-        );
+          );
+        } on AuthException catch (error) {
+          _returnToSignupAfterOtp(error.message);
+        } catch (_) {
+          _returnToSignupAfterOtp(AppStrings.current(AppKeys.signupFailed));
+        }
         return;
       }
 
@@ -896,10 +987,12 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   }
 
   Future<void> submitSignup(SignupFormData form) async {
-    final phone = state.loginName;
+    final phone = _pendingSignupPhone ?? state.loginName;
     final trimmedName = form.name.trim();
-    final trimmedEmail = form.email?.trim();
-    final role = form.role.apiValue;
+    final emailValue = form.email?.trim();
+    final trimmedEmail = emailValue == null || emailValue.isEmpty
+        ? null
+        : emailValue;
     if (state.isSigningUp || phone == null) {
       return;
     }
@@ -912,21 +1005,43 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       );
       return;
     }
+
+    if (trimmedEmail != null && !isValidEmailInput(trimmedEmail)) {
+      emit(state.copyWith(authError: AppStrings.current(AppKeys.invalidEmail)));
+      return;
+    }
+
+    final normalizedForm = SignupFormData(
+      name: trimmedName,
+      email: trimmedEmail,
+      role: form.role,
+      gender: form.gender,
+    );
+    _pendingSignupPhone = phone;
+    _pendingSignupForm = normalizedForm;
+
+    if (trimmedEmail != null) {
+      emit(
+        state.copyWith(
+          loginName: trimmedEmail,
+          isSigningUp: true,
+          otpFlow: OtpFlow.signup,
+          clearAuthError: true,
+          clearDevOtp: true,
+          clearOtpExpiry: true,
+          clearOtpError: true,
+        ),
+      );
+      await _sendSignupOtp(trimmedEmail);
+      return;
+    }
+
     emit(state.copyWith(isSigningUp: true, clearAuthError: true));
 
     try {
-      final user = await _authService.signupWithPhone(
+      await _completeSignup(
         phone: phone,
-        name: trimmedName,
-        role: role,
-        email: trimmedEmail?.isEmpty == true ? null : trimmedEmail,
-      );
-      final profileResolution = await _profileResolver.resolveForUserId(
-        user.id,
-      );
-      await _emitHomeOrPasscodeSetup(
-        user: user,
-        profileResolution: profileResolution,
+        form: normalizedForm,
         isSigningUp: false,
       );
     } on AuthException catch (error) {
@@ -939,6 +1054,49 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         ),
       );
     }
+  }
+
+  Future<void> _completeSignup({
+    required String phone,
+    required SignupFormData form,
+    bool? isVerifyingOtp,
+    bool? isSigningUp,
+  }) async {
+    final user = await _authService.signupWithPhone(
+      phone: phone,
+      name: form.name,
+      role: form.role.apiValue,
+      email: form.email,
+    );
+    final profileResolution = await _profileResolver.resolveForUserId(user.id);
+    _clearPendingSignup();
+    await _emitAuthenticatedHome(
+      user,
+      profileResolution,
+      isVerifyingOtp: isVerifyingOtp,
+      isSigningUp: isSigningUp,
+    );
+  }
+
+  void _returnToSignupAfterOtp(String message) {
+    final signupPhone = _pendingSignupPhone;
+    emit(
+      state.copyWith(
+        screen: AppScreen.signup,
+        loginName: signupPhone,
+        isVerifyingOtp: false,
+        isSigningUp: false,
+        authError: message,
+        clearDevOtp: true,
+        clearOtpExpiry: true,
+        clearOtpError: true,
+      ),
+    );
+  }
+
+  void _clearPendingSignup() {
+    _pendingSignupPhone = null;
+    _pendingSignupForm = null;
   }
 
   Future<void> submitPasscode(String passcode) async {
@@ -1140,8 +1298,10 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
   Future<void> _emitAuthenticatedHome(
     LoginUser user,
-    ProfileSessionResolution profileResolution,
-  ) async {
+    ProfileSessionResolution profileResolution, {
+    bool? isVerifyingOtp,
+    bool? isSigningUp,
+  }) async {
     if (!await _completeAuthenticatedSession(user, profileResolution)) {
       return;
     }
@@ -1149,6 +1309,8 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       state.copyWith(
         screen: AppScreen.home,
         isRestoringSession: false,
+        isVerifyingOtp: isVerifyingOtp,
+        isSigningUp: isSigningUp,
         clearAuthError: true,
         clearPendingSession: true,
         clearPasscodeError: true,

@@ -4,6 +4,12 @@ import 'package:numi/core/utils/phone/phone_region.dart';
 
 enum LoginNameKind { phone, email }
 
+final RegExp _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+
+bool isValidEmailInput(String rawValue) {
+  return _emailPattern.hasMatch(rawValue.trim());
+}
+
 class LoginNameValidationResult {
   const LoginNameValidationResult({
     required this.loginName,
@@ -48,7 +54,7 @@ LoginNameValidationResult normalizeLoginNameInput(
   }
 
   if (kind == LoginNameKind.email) {
-    final isValidEmail = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(value);
+    final isValidEmail = isValidEmailInput(value);
     return LoginNameValidationResult(
       loginName: isValidEmail ? value : null,
       kind: kind,

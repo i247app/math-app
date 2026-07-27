@@ -36,7 +36,7 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupNameLabel: 'Tên',
     AppKeys.signupNameInvalid: 'Tên chỉ được gồm chữ, số và khoảng trắng.',
     AppKeys.signupUsernameExists: 'Tên này đã tồn tại. Vui lòng chọn tên khác.',
-    AppKeys.signupEmailLabel: 'Email',
+    AppKeys.signupEmailLabel: 'Email (không bắt buộc)',
     AppKeys.signupRoleLabel: 'Bạn là',
     AppKeys.signupRoleStudent: 'Học Sinh',
     AppKeys.signupRoleParent: 'Phụ huynh',
@@ -112,7 +112,7 @@ const authStrings = <String, Map<String, String>>{
         'First name can only include letters, numbers, and spaces.',
     AppKeys.signupUsernameExists:
         'This name already exists. Please choose another name.',
-    AppKeys.signupEmailLabel: 'Email',
+    AppKeys.signupEmailLabel: 'Email (optional)',
     AppKeys.signupRoleLabel: 'You are',
     AppKeys.signupRoleStudent: 'Student',
     AppKeys.signupRoleParent: 'Parent',

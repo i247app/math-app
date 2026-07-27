@@ -24,6 +24,7 @@ class SignupComposition extends StatelessWidget {
     required this.role,
     required this.gender,
     required this.usernameErrorText,
+    required this.emailErrorText,
     required this.isFormValid,
     required this.isSigningUp,
     required this.onBack,
@@ -37,6 +38,7 @@ class SignupComposition extends StatelessWidget {
   final SignupRole? role;
   final SignupGender? gender;
   final String? usernameErrorText;
+  final String? emailErrorText;
   final bool isFormValid;
   final bool isSigningUp;
   final VoidCallback onBack;
@@ -133,6 +135,7 @@ class SignupComposition extends StatelessWidget {
                           prefixIcon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.done,
+                          errorText: emailErrorText,
                         ),
                         SizedBox(height: compact ? 20 : 24),
                         SignupActionButton(

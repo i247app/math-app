@@ -161,6 +161,10 @@ class AuthApi implements AuthService {
       fallbackEmail: email,
     );
     _loginUsers[phone] = user;
+    final userEmail = user.email?.trim();
+    if (userEmail != null && userEmail.isNotEmpty) {
+      _loginUsers[userEmail] = user;
+    }
     return user;
   }
 
