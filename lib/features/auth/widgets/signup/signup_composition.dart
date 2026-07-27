@@ -51,6 +51,10 @@ class SignupComposition extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
     final compact = size.height < 760;
     final tight = size.width < 370;
+    final heroTopGap = compact ? 10.0 : 14.0;
+    final frameHorizontalPadding = ScreenFrame.horizontalPaddingForWidth(
+      size.width,
+    );
     final genderChoices = _genderChoicesForRole(role);
     final nameLabelKey = _nameLabelKey(role, gender);
 
@@ -70,13 +74,15 @@ class SignupComposition extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: compact ? 10 : 14),
+                  SizedBox(height: heroTopGap),
                   SignupHeroBanner(
                     title: context.getText(AppKeys.signup),
                     titleFontSize: tight
                         ? FontSize.displaySmall
                         : FontSize.displayMedium,
                     onBack: onBack,
+                    frameHorizontalPadding: frameHorizontalPadding,
+                    topGap: heroTopGap,
                   ),
                   SignupSectionCard(
                     child: Column(

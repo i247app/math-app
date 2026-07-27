@@ -10,11 +10,15 @@ class ScreenFrame extends StatelessWidget {
   final Widget child;
   final ScrollViewKeyboardDismissBehavior keyboardDismissBehavior;
 
+  static double horizontalPaddingForWidth(double width) {
+    return width < 370 ? 24 : 32;
+  }
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final width = media.size.width;
-    final horizontalPadding = width < 370 ? 24.0 : 32.0;
+    final horizontalPadding = horizontalPaddingForWidth(width);
 
     return LayoutBuilder(
       builder: (context, constraints) => SizedBox(

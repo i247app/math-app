@@ -10,11 +10,15 @@ class SignupHeroBanner extends StatelessWidget {
     required this.title,
     required this.titleFontSize,
     required this.onBack,
+    required this.frameHorizontalPadding,
+    required this.topGap,
   });
 
   final String title;
   final double titleFontSize;
   final VoidCallback onBack;
+  final double frameHorizontalPadding;
+  final double topGap;
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +55,9 @@ class SignupHeroBanner extends StatelessWidget {
             ),
           ),
           Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
+            left: -frameHorizontalPadding,
+            right: -frameHorizontalPadding,
+            top: -topGap,
             child: PageHeader(
               scale: 1,
               topInset: 0,
