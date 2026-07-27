@@ -4,12 +4,14 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/features/home/teacher/home/teacher_home_tab.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_hero_card.dart';
-import 'package:numi/features/home/teacher/home/widgets/teacher_no_class_panel.dart';
+import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
 import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/shared/widgets/app_section_header.dart';
 
 class _EmptyTeacherHomeService implements HomeLayoutService {
   const _EmptyTeacherHomeService();
@@ -67,7 +69,33 @@ void main() {
       final profileAction = find.byType(SettingsActionCard);
       expect(hero, findsOneWidget);
       expect(profileAction, findsOneWidget);
-      expect(find.byType(TeacherNoClassPanel), findsNothing);
+      expect(find.text('Chưa có lớp học nào.'), findsOneWidget);
+      final emptyStates = find.byType(TeacherEmptyAssignmentsPanel);
+      expect(emptyStates, findsNWidgets(2));
+      expect(
+        tester.getSize(emptyStates.at(1)).width,
+        tester.getSize(emptyStates.at(0)).width,
+      );
+      final sectionTitles = <String>['Lớp học của bạn', 'Bài tập vừa giao'];
+      for (final title in sectionTitles) {
+        final titleWidget = tester.widget<Text>(find.text(title));
+        expect(titleWidget.style?.fontSize, FontSize.xl);
+        expect(titleWidget.style?.fontWeight, FontWeight.w600);
+      }
+      final viewAllLabels = tester.widgetList<Text>(find.text('Xem tất cả'));
+      expect(viewAllLabels, hasLength(2));
+      for (final label in viewAllLabels) {
+        expect(label.style?.fontSize, FontSize.caption);
+        expect(label.style?.fontWeight, FontWeight.w800);
+        expect(label.style?.decoration, isNull);
+      }
+      expect(
+        find.descendant(
+          of: find.byType(AppSectionHeader),
+          matching: find.byIcon(Icons.chevron_right_rounded),
+        ),
+        findsNWidgets(2),
+      );
       expect(
         find.descendant(
           of: profileAction,

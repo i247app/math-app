@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
@@ -34,7 +36,6 @@ import 'package:numi/features/home/teacher/home/widgets/teacher_home_hero_skelet
 import 'package:numi/features/home/teacher/home/widgets/teacher_home_section_header_skeleton.dart';
 import 'package:numi/shared/widgets/app_section_header.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_loading_panel.dart';
-import 'package:numi/features/home/teacher/home/widgets/teacher_no_class_panel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_recent_assignment_carousel.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_top_bar.dart';
 
@@ -484,7 +485,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
           const TeacherAppSectionHeaderSkeleton()
         else
           TeacherClassSectionHeader(
-            hasClasses: _classrooms.isNotEmpty,
+            showAddButton: isProfileComplete,
             onAdd: _handleClassCreateAction,
             onViewAll: widget.onOpenClassroomTab,
           ),
@@ -492,17 +493,10 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
           const TeacherLoadingPanel()
         else if (_error != null && _classrooms.isEmpty)
           AppRetryPanel(message: _error!, onRetry: _refreshClassrooms)
-        else if (_classrooms.isEmpty && isProfileComplete)
-          Column(
-            children: [
-              TeacherNoClassPanel(
-                isProfileComplete: isProfileComplete,
-                onCreate: _handleClassCreateAction,
-              ),
-            ],
-          )
         else if (_classrooms.isEmpty)
-          const SizedBox.shrink()
+          TeacherEmptyAssignmentsPanel(
+            message: context.getText(AppKeys.teacherEmptyClassroomList),
+          )
         else
           Column(
             children: [
@@ -526,18 +520,25 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
         else
           AppSectionHeader(
             title: context.getText(AppKeys.teacherRecentlyAssigned),
-            actionLabel: context.getText(AppKeys.viewAllUpper),
+            actionLabel: context.getText(AppKeys.viewAll),
+            actionIcon: Icons.chevron_right_rounded,
             onAction: widget.onOpenStudyTab,
+            titleStyle: TextStyle(
+              color: context.themeColors.textPrimary,
+              fontSize: FontSize.xl,
+              fontWeight: FontWeight.w600,
+            ),
+            actionStyle: TextStyle(
+              color: context.themeColors.info,
+              fontSize: FontSize.caption,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         if (_isInitialAssignmentsLoading)
           const TeacherAssignmentsLoadingPanel()
         else if (_recentAssignments.isEmpty)
-          Column(
-            children: [
-              TeacherEmptyAssignmentsPanel(
-                message: context.getText(AppKeys.teacherNoAssignments),
-              ),
-            ],
+          TeacherEmptyAssignmentsPanel(
+            message: context.getText(AppKeys.teacherNoAssignments),
           )
         else ...[
           TeacherRecentAssignmentCarousel(

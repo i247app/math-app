@@ -17,6 +17,7 @@ class AppSectionHeader extends StatelessWidget {
     this.scale = 1.0,
     this.titleStyle,
     this.actionStyle,
+    this.actionIcon,
     this.trailing,
     this.useHaptic = true,
     this.bottom,
@@ -29,6 +30,7 @@ class AppSectionHeader extends StatelessWidget {
   final double scale;
   final TextStyle? titleStyle;
   final TextStyle? actionStyle;
+  final IconData? actionIcon;
   final Widget? trailing;
   final bool useHaptic;
   final Widget? bottom;
@@ -61,11 +63,24 @@ class AppSectionHeader extends StatelessWidget {
     final action =
         trailing ??
         (label != null
-            ? Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: effectiveActionStyle,
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: effectiveActionStyle,
+                  ),
+                  if (actionIcon != null) ...[
+                    SizedBox(width: 2 * scale),
+                    Icon(
+                      actionIcon,
+                      color: effectiveActionStyle.color,
+                      size: 18 * scale,
+                    ),
+                  ],
+                ],
               )
             : null);
 
