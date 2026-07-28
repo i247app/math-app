@@ -80,6 +80,11 @@ class DebugRequestMetricsInterceptor extends Interceptor {
 class NetworkLogInterceptor extends Interceptor {
   const NetworkLogInterceptor();
 
+  // Android and terminal tooling can impose different per-entry limits. Keep
+  // chunks deliberately small and count UTF-8 bytes rather than Dart UTF-16
+  // code units so non-ASCII response data is not truncated.
+  static const _maxLogChunkBytes = 800;
+
   // Temporary diagnostic switch. Set this back to false after verifying the
   // JWT copied into request metadata.
   static const _showSensitiveValuesInDebugLogs = true;
@@ -93,7 +98,7 @@ class NetworkLogInterceptor extends Interceptor {
       _log('headers: ${_formatHeaders(options.headers)}');
     }
     _log('data:');
-    _log(_formatData(options.data));
+    _logPayload(_formatData(options.data));
     handler.next(options);
   }
 
@@ -106,7 +111,7 @@ class NetworkLogInterceptor extends Interceptor {
     _log('uri: ${response.requestOptions.uri}');
     _log('statusCode: ${response.statusCode}');
     _log('Response Text:');
-    _log(_formatData(response.data));
+    _logPayload(_formatData(response.data));
     handler.next(response);
   }
 
@@ -120,7 +125,7 @@ class NetworkLogInterceptor extends Interceptor {
     if (response != null) {
       _log('statusCode: ${response.statusCode}');
       _log('Response Text:');
-      _log(_formatData(response.data));
+      _logPayload(_formatData(response.data));
     }
     handler.next(err);
   }
@@ -221,6 +226,46 @@ class NetworkLogInterceptor extends Interceptor {
   }
 
   static void _log(String message) => debugPrint(message);
+
+  static void _logPayload(String message) {
+    final chunks = _utf8Chunks(message);
+    for (var index = 0; index < chunks.length; index++) {
+      debugPrint('[chunk ${index + 1}/${chunks.length}] ${chunks[index]}');
+    }
+  }
+
+  static List<String> _utf8Chunks(String message) {
+    if (message.isEmpty) {
+      return const <String>[''];
+    }
+
+    final chunks = <String>[];
+    var chunk = StringBuffer();
+    var chunkBytes = 0;
+
+    for (final rune in message.runes) {
+      final runeBytes = switch (rune) {
+        <= 0x7F => 1,
+        <= 0x7FF => 2,
+        <= 0xFFFF => 3,
+        _ => 4,
+      };
+
+      if (chunkBytes + runeBytes > _maxLogChunkBytes && chunkBytes > 0) {
+        chunks.add(chunk.toString());
+        chunk = StringBuffer();
+        chunkBytes = 0;
+      }
+
+      chunk.writeCharCode(rune);
+      chunkBytes += runeBytes;
+    }
+
+    if (chunkBytes > 0) {
+      chunks.add(chunk.toString());
+    }
+    return chunks;
+  }
 }
 
 class MetadataInterceptor extends QueuedInterceptor {
