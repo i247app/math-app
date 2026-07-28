@@ -2,7 +2,16 @@ import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 
-enum AppScreen { welcome, welcomeDetails, login, otp, signup, passcode, home }
+enum AppScreen {
+  welcome,
+  welcomeDetails,
+  login,
+  deviceVerification,
+  otp,
+  signup,
+  passcode,
+  home,
+}
 
 enum OtpFlow { login, signup }
 
@@ -26,6 +35,10 @@ class AuthFlowState {
     this.loginLookupUser,
     this.loginLookupError,
     this.loginLookupErrorStatus,
+    this.trustedDevices = const <AuthTrustedDevice>[],
+    this.selectedTrustedDeviceId,
+    this.isLoadingTrustedDevices = false,
+    this.trustedDeviceError,
     this.isSendingOtp = false,
     this.isVerifyingOtp = false,
     this.isSigningUp = false,
@@ -66,6 +79,10 @@ class AuthFlowState {
   final LoginUser? loginLookupUser;
   final String? loginLookupError;
   final int? loginLookupErrorStatus;
+  final List<AuthTrustedDevice> trustedDevices;
+  final int? selectedTrustedDeviceId;
+  final bool isLoadingTrustedDevices;
+  final String? trustedDeviceError;
   final bool isSendingOtp;
   final bool isVerifyingOtp;
   final bool isSigningUp;
@@ -106,6 +123,10 @@ class AuthFlowState {
     LoginUser? loginLookupUser,
     String? loginLookupError,
     int? loginLookupErrorStatus,
+    List<AuthTrustedDevice>? trustedDevices,
+    int? selectedTrustedDeviceId,
+    bool? isLoadingTrustedDevices,
+    String? trustedDeviceError,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
@@ -142,6 +163,9 @@ class AuthFlowState {
     bool clearLoginLookupUser = false,
     bool clearLoginLookupError = false,
     bool clearLoginLookupErrorStatus = false,
+    bool clearTrustedDeviceState = false,
+    bool clearSelectedTrustedDevice = false,
+    bool clearTrustedDeviceError = false,
     bool clearPasscodeError = false,
     bool clearPinLogin = false,
     bool clearPinLoginUser = false,
@@ -172,6 +196,19 @@ class AuthFlowState {
       loginLookupErrorStatus: clearLoginLookup || clearLoginLookupErrorStatus
           ? null
           : loginLookupErrorStatus ?? this.loginLookupErrorStatus,
+      trustedDevices: clearTrustedDeviceState
+          ? const <AuthTrustedDevice>[]
+          : trustedDevices ?? this.trustedDevices,
+      selectedTrustedDeviceId:
+          clearTrustedDeviceState || clearSelectedTrustedDevice
+          ? null
+          : selectedTrustedDeviceId ?? this.selectedTrustedDeviceId,
+      isLoadingTrustedDevices: clearTrustedDeviceState
+          ? false
+          : isLoadingTrustedDevices ?? this.isLoadingTrustedDevices,
+      trustedDeviceError: clearTrustedDeviceState || clearTrustedDeviceError
+          ? null
+          : trustedDeviceError ?? this.trustedDeviceError,
       isSendingOtp: isSendingOtp ?? this.isSendingOtp,
       isVerifyingOtp: isVerifyingOtp ?? this.isVerifyingOtp,
       isSigningUp: isSigningUp ?? this.isSigningUp,

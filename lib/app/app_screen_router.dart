@@ -9,6 +9,7 @@ import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/errors/auth_error_messages.dart';
+import 'package:numi/features/auth/presentation/device_verification_screen.dart';
 import 'package:numi/features/auth/presentation/login_screen.dart';
 import 'package:numi/features/auth/presentation/otp_screen.dart';
 import 'package:numi/features/auth/presentation/passcode_screen.dart';
@@ -202,6 +203,18 @@ class AppScreenRouter extends StatelessWidget {
                   ),
                   loginNameErrorText: loginNameErrorText,
                 ),
+                AppScreen.deviceVerification => DeviceVerificationScreen(
+                  key: const ValueKey('device-verification'),
+                  devices: state.trustedDevices,
+                  selectedDeviceId: state.selectedTrustedDeviceId,
+                  isLoading: state.isLoadingTrustedDevices,
+                  isSending: state.isSendingOtp,
+                  errorText: state.trustedDeviceError,
+                  onBack: cubit.backFromDeviceVerification,
+                  onRetry: cubit.reloadTrustedDevices,
+                  onSelectDevice: cubit.selectTrustedDevice,
+                  onSend: cubit.sendOtpToTrustedDevice,
+                ),
                 AppScreen.otp => OtpScreen(
                   key: const ValueKey('otp'),
                   onBack: cubit.backFromOtp,
@@ -211,7 +224,9 @@ class AppScreenRouter extends StatelessWidget {
                   resendSeconds: state.otpExpiresIn ?? 0,
                   resendResetId: state.otpPreviewId,
                   autoFocusCode: state.otpFlow == OtpFlow.signup,
-                  devOtpCode: state.devOtpCode,
+                  devOtpCode: state.otpFlow == OtpFlow.signup
+                      ? state.devOtpCode
+                      : null,
                   otpError: state.otpError,
                   otpErrorId: state.otpErrorId,
                 ),
@@ -541,10 +556,11 @@ class _AppScreenSlideSwitcherState extends State<_AppScreenSlideSwitcher>
       AppScreen.welcome => 0,
       AppScreen.welcomeDetails => 1,
       AppScreen.login => 2,
-      AppScreen.otp => 3,
-      AppScreen.signup => 4,
-      AppScreen.passcode => 5,
-      AppScreen.home => 6,
+      AppScreen.deviceVerification => 3,
+      AppScreen.otp => 4,
+      AppScreen.signup => 5,
+      AppScreen.passcode => 6,
+      AppScreen.home => 7,
     };
   }
 }

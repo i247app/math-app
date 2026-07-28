@@ -231,6 +231,7 @@ class _AppFlowState extends State<AppFlow> {
                   switch (scaffoldState.screen) {
                     AppScreen.welcomeDetails ||
                     AppScreen.login ||
+                    AppScreen.deviceVerification ||
                     AppScreen.otp ||
                     AppScreen.signup => true,
                     AppScreen.welcome ||

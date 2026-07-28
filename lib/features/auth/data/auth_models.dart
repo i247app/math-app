@@ -44,6 +44,20 @@ class LoginUser {
   final String? modifyDt;
 }
 
+class AuthTrustedDevice {
+  const AuthTrustedDevice({
+    required this.deviceId,
+    required this.deviceName,
+    this.deviceUuid,
+    this.platform,
+  });
+
+  final int deviceId;
+  final String deviceName;
+  final String? deviceUuid;
+  final String? platform;
+}
+
 class AuthLoginLookupResult {
   const AuthLoginLookupResult({
     required this.loginName,

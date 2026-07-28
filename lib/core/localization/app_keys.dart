@@ -51,6 +51,12 @@ class AppKeys {
   static const loginWithPin = 'login_with_pin';
   static const authSwitchToSignupPrompt = 'auth_switch_to_signup_prompt';
   static const authSwitchToLoginPrompt = 'auth_switch_to_login_prompt';
+  static const trustedDeviceTitle = 'trusted_device_title';
+  static const trustedDeviceSubtitle = 'trusted_device_subtitle';
+  static const trustedDeviceSend = 'trusted_device_send';
+  static const trustedDeviceSending = 'trusted_device_sending';
+  static const trustedDeviceEmpty = 'trusted_device_empty';
+  static const trustedDeviceLoadFailed = 'trusted_device_load_failed';
   static const otpWithin30Seconds = 'otp_within_30_seconds';
   static const otpTitle = 'otp_title';
   static const otpSentMessage = 'otp_sent_message';

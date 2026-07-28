@@ -51,12 +51,19 @@ class LoginRequest {
   Map<String, dynamic> toJson() => _$LoginRequestToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class SendOtpRequest {
-  const SendOtpRequest({required this.otpType, required this.identifier});
+  const SendOtpRequest({
+    required this.otpType,
+    required this.identifier,
+    this.userId,
+    this.targetDeviceId,
+  });
 
   final String otpType;
   final String identifier;
+  final int? userId;
+  final int? targetDeviceId;
 
   factory SendOtpRequest.fromJson(Map<String, dynamic> json) =>
       _$SendOtpRequestFromJson(json);

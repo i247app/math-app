@@ -24,6 +24,15 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.loginWithPin: 'Đăng nhập với PIN',
     AppKeys.authSwitchToSignupPrompt: 'Chưa có tài khoản?',
     AppKeys.authSwitchToLoginPrompt: 'Đã có tài khoản?',
+    AppKeys.trustedDeviceTitle: 'Xác minh thiết bị mới',
+    AppKeys.trustedDeviceSubtitle:
+        'Chọn một thiết bị tin cậy để phê duyệt lần đăng nhập này.',
+    AppKeys.trustedDeviceSend: 'Gửi mã',
+    AppKeys.trustedDeviceSending: 'Đang gửi...',
+    AppKeys.trustedDeviceEmpty:
+        'Không tìm thấy thiết bị đã xác minh cho tài khoản này.',
+    AppKeys.trustedDeviceLoadFailed:
+        'Không thể tải danh sách thiết bị. Vui lòng thử lại.',
     AppKeys.otpWithin30Seconds: 'Bạn sẽ nhận được mã trong vòng 30 giây',
     AppKeys.otpTitle: 'MÃ XÁC NHẬN',
     AppKeys.otpSentMessage: 'Mã OTP vừa gửi: {code}',
@@ -98,6 +107,15 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.loginWithPin: 'Login with PIN',
     AppKeys.authSwitchToSignupPrompt: "Don't have an account?",
     AppKeys.authSwitchToLoginPrompt: 'Already have an account?',
+    AppKeys.trustedDeviceTitle: 'Verify your new device',
+    AppKeys.trustedDeviceSubtitle:
+        'Choose a trusted device to approve this login.',
+    AppKeys.trustedDeviceSend: 'Send code',
+    AppKeys.trustedDeviceSending: 'Sending...',
+    AppKeys.trustedDeviceEmpty:
+        'No verified devices were found for this account.',
+    AppKeys.trustedDeviceLoadFailed:
+        'Could not load trusted devices. Please try again.',
     AppKeys.otpWithin30Seconds: 'You will receive a code within 30 seconds',
     AppKeys.otpTitle: 'VERIFICATION CODE',
     AppKeys.otpSentMessage: 'OTP code sent: {code}',

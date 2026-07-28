@@ -85,6 +85,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       case AppScreen.login:
         backFromLogin();
         return true;
+      case AppScreen.deviceVerification:
+        backFromDeviceVerification();
+        return true;
       case AppScreen.otp:
         backFromOtp();
         return true;
@@ -101,6 +104,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   AppScreen _loginBackScreenForCurrentFlow() {
     return switch (state.screen) {
       AppScreen.login ||
+      AppScreen.deviceVerification ||
       AppScreen.otp ||
       AppScreen.signup ||
       AppScreen.passcode => state.loginBackScreen,
@@ -111,6 +115,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   AuthEntryMode _loginEntryModeForCurrentFlow(AuthEntryMode nextMode) {
     return switch (state.screen) {
       AppScreen.login ||
+      AppScreen.deviceVerification ||
       AppScreen.otp ||
       AppScreen.signup ||
       AppScreen.passcode => state.loginEntryMode,
@@ -136,6 +141,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
     final target = switch (state.loginBackScreen) {
       AppScreen.login ||
+      AppScreen.deviceVerification ||
       AppScreen.otp ||
       AppScreen.signup ||
       AppScreen.passcode => AppScreen.welcomeDetails,
@@ -148,6 +154,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         isSendingOtp: false,
         clearLoginName: true,
         clearLoginLookup: true,
+        clearTrustedDeviceState: true,
         clearAuthError: true,
         clearOtpError: true,
       ),
@@ -198,7 +205,42 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       return;
     }
 
+    if (state.otpFlow == OtpFlow.login &&
+        state.selectedTrustedDeviceId != null &&
+        state.trustedDevices.isNotEmpty) {
+      emit(
+        state.copyWith(
+          screen: AppScreen.deviceVerification,
+          isSendingOtp: false,
+          isVerifyingOtp: false,
+          clearAuthError: true,
+          clearDevOtp: true,
+          clearOtpExpiry: true,
+          clearOtpError: true,
+          clearTrustedDeviceError: true,
+        ),
+      );
+      return;
+    }
+
     openLogin();
+  }
+
+  void backFromDeviceVerification() {
+    if (state.screen != AppScreen.deviceVerification) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        screen: AppScreen.login,
+        isLoadingTrustedDevices: false,
+        isSendingOtp: false,
+        clearAuthError: true,
+        clearOtpError: true,
+        clearTrustedDeviceState: true,
+      ),
+    );
   }
 
   void openLoginFromWelcome() {
@@ -216,6 +258,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         clearOtpError: true,
         clearLoginName: true,
         clearLoginLookup: true,
+        clearTrustedDeviceState: true,
         clearPinLogin: true,
       ),
     );
@@ -237,6 +280,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         isSendingOtp: false,
         clearLoginName: true,
         clearLoginLookup: true,
+        clearTrustedDeviceState: true,
         clearPinLogin: mode == AuthEntryMode.signup,
       ),
     );
@@ -261,6 +305,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         clearOtpError: true,
         clearLoginName: true,
         clearLoginLookup: true,
+        clearTrustedDeviceState: true,
         clearPinLogin: true,
       ),
     );
@@ -335,6 +380,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         clearOtpExpiry: true,
         clearOtpError: true,
         clearLoginLookup: true,
+        clearTrustedDeviceState: true,
         clearPendingSession: true,
       ),
     );
@@ -354,6 +400,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
           authEntryMode: AuthEntryMode.login,
           clearLoginName: true,
           clearLoginLookup: true,
+          clearTrustedDeviceState: true,
           clearAuthError: true,
           clearPendingSession: true,
           clearPasscodeError: true,
@@ -522,6 +569,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         clearLoginLookupUser: true,
         clearLoginLookupError: true,
         clearLoginLookupErrorStatus: true,
+        clearTrustedDeviceState: true,
         clearAuthError: true,
       ),
     );
@@ -644,6 +692,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         clearLoginLookupUser: true,
         clearLoginLookupError: true,
         clearLoginLookupErrorStatus: true,
+        clearTrustedDeviceState: true,
         clearAuthError: true,
       ),
     );
@@ -692,6 +741,11 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
             authError: AppStrings.current(AppKeys.missingOtpUser),
           ),
         );
+        return;
+      }
+
+      if (result.isTrusted == false) {
+        await _openDeviceVerification(user);
         return;
       }
 
@@ -753,6 +807,126 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
   }
 
+  Future<void> _openDeviceVerification(LoginUser user) async {
+    emit(
+      state.copyWith(
+        screen: AppScreen.deviceVerification,
+        isCheckingLoginName: false,
+        isSendingOtp: false,
+        isLoadingTrustedDevices: true,
+        trustedDevices: const <AuthTrustedDevice>[],
+        clearSelectedTrustedDevice: true,
+        clearTrustedDeviceError: true,
+        clearAuthError: true,
+        clearDevOtp: true,
+        clearOtpExpiry: true,
+        clearOtpError: true,
+      ),
+    );
+    await _loadTrustedDevices(user);
+  }
+
+  Future<void> reloadTrustedDevices() async {
+    final user = state.loginLookupUser;
+    if (state.isLoadingTrustedDevices ||
+        state.isSendingOtp ||
+        state.screen != AppScreen.deviceVerification ||
+        user == null ||
+        user.id <= 0) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isLoadingTrustedDevices: true,
+        trustedDevices: const <AuthTrustedDevice>[],
+        clearSelectedTrustedDevice: true,
+        clearTrustedDeviceError: true,
+      ),
+    );
+    await _loadTrustedDevices(user);
+  }
+
+  Future<void> _loadTrustedDevices(LoginUser user) async {
+    try {
+      final devices = await _authService.listTrustedDevices(userId: user.id);
+      if (isClosed ||
+          state.screen != AppScreen.deviceVerification ||
+          state.loginLookupUser?.id != user.id) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          trustedDevices: devices,
+          isLoadingTrustedDevices: false,
+          clearSelectedTrustedDevice: true,
+          clearTrustedDeviceError: true,
+        ),
+      );
+    } on AuthException catch (error) {
+      if (isClosed || state.screen != AppScreen.deviceVerification) {
+        return;
+      }
+      emit(
+        state.copyWith(
+          isLoadingTrustedDevices: false,
+          trustedDeviceError: error.message,
+          clearSelectedTrustedDevice: true,
+        ),
+      );
+    } catch (_) {
+      if (isClosed || state.screen != AppScreen.deviceVerification) {
+        return;
+      }
+      emit(
+        state.copyWith(
+          isLoadingTrustedDevices: false,
+          trustedDeviceError: AppStrings.current(
+            AppKeys.trustedDeviceLoadFailed,
+          ),
+          clearSelectedTrustedDevice: true,
+        ),
+      );
+    }
+  }
+
+  void selectTrustedDevice(int deviceId) {
+    if (state.screen != AppScreen.deviceVerification ||
+        state.isLoadingTrustedDevices ||
+        state.isSendingOtp ||
+        !state.trustedDevices.any((device) => device.deviceId == deviceId)) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        selectedTrustedDeviceId: deviceId,
+        clearTrustedDeviceError: true,
+      ),
+    );
+  }
+
+  Future<void> sendOtpToTrustedDevice() async {
+    final loginName = state.loginName;
+    final user = state.loginLookupUser;
+    final targetDeviceId = state.selectedTrustedDeviceId;
+    if (state.screen != AppScreen.deviceVerification ||
+        state.isSendingOtp ||
+        loginName == null ||
+        user == null ||
+        user.id <= 0 ||
+        targetDeviceId == null) {
+      return;
+    }
+
+    await _sendLoginOtp(
+      loginName,
+      userId: user.id,
+      targetDeviceId: targetDeviceId,
+    );
+  }
+
   Future<void> resendLoginOtp() async {
     final loginName = state.loginName;
     if (state.isSendingOtp || loginName == null || loginName.trim().isEmpty) {
@@ -803,12 +977,22 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
   }
 
-  Future<void> _sendLoginOtp(String loginName) async {
+  Future<void> _sendLoginOtp(
+    String loginName, {
+    int? userId,
+    int? targetDeviceId,
+  }) async {
+    final resolvedTargetDeviceId =
+        targetDeviceId ?? state.selectedTrustedDeviceId;
+    final resolvedUserId =
+        userId ??
+        (resolvedTargetDeviceId == null ? null : state.loginLookupUser?.id);
     emit(
       state.copyWith(
         isSendingOtp: true,
         clearAuthError: true,
         clearOtpError: true,
+        clearTrustedDeviceError: true,
       ),
     );
 
@@ -816,6 +1000,8 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       final otp = await _authService.sendOtp(
         loginName: loginName,
         kind: AuthOtpKind.login,
+        userId: resolvedUserId,
+        targetDeviceId: resolvedTargetDeviceId,
       );
       if (state.loginName != loginName || state.checkedLoginName != loginName) {
         return;
@@ -827,28 +1013,36 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         return;
       }
 
-      emit(
-        state.copyWith(
-          isSendingOtp: false,
-          otpError: error.message,
-          otpErrorId: state.otpErrorId + 1,
-          clearAuthError: true,
-        ),
-      );
+      _emitLoginOtpSendError(error.message);
     } catch (_) {
       if (state.loginName != loginName || state.checkedLoginName != loginName) {
         return;
       }
 
+      _emitLoginOtpSendError(AppStrings.current(AppKeys.loginOtpFailed));
+    }
+  }
+
+  void _emitLoginOtpSendError(String message) {
+    if (state.screen == AppScreen.deviceVerification) {
       emit(
         state.copyWith(
           isSendingOtp: false,
-          otpError: AppStrings.current(AppKeys.loginOtpFailed),
-          otpErrorId: state.otpErrorId + 1,
+          trustedDeviceError: message,
           clearAuthError: true,
         ),
       );
+      return;
     }
+
+    emit(
+      state.copyWith(
+        isSendingOtp: false,
+        otpError: message,
+        otpErrorId: state.otpErrorId + 1,
+        clearAuthError: true,
+      ),
+    );
   }
 
   void _emitOtpSent({
@@ -856,20 +1050,21 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     required SendOtpResult otp,
     required OtpFlow flow,
   }) {
+    final exposesOtpPreview = flow == OtpFlow.signup;
     emit(
       state.copyWith(
         screen: AppScreen.otp,
         loginName: loginName,
         otpExpiresAt: otp.expiresAt,
         otpExpiresIn: otp.expiresIn,
-        devOtpCode: otp.otpCode,
-        devOtpPurpose: otp.purpose,
+        devOtpCode: exposesOtpPreview ? otp.otpCode : null,
+        devOtpPurpose: exposesOtpPreview ? otp.purpose : null,
         otpPreviewId: state.otpPreviewId + 1,
         otpFlow: flow,
         isSendingOtp: false,
         isSigningUp: false,
         clearAuthError: true,
-        clearDevOtp: otp.otpCode == null,
+        clearDevOtp: !exposesOtpPreview || otp.otpCode == null,
         clearOtpExpiry: otp.expiresAt == null,
         clearOtpError: true,
       ),
@@ -956,9 +1151,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       final profileResolution = await _profileResolver.resolveForUserId(
         result.user!.id,
       );
-      await _emitHomeOrPasscodeSetup(
-        user: result.user!,
-        profileResolution: profileResolution,
+      await _emitAuthenticatedHome(
+        result.user!,
+        profileResolution,
         isVerifyingOtp: false,
       );
     } on AuthException catch (error) {

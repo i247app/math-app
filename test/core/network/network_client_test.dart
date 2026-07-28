@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/network/auth_models.dart';
 import 'package:numi/core/network/device_models.dart';
 import 'package:numi/core/network/network_client.dart';
 
@@ -127,5 +128,52 @@ void main() {
     expect(requestPath, '/devices/list');
     expect(requestBody, <String, dynamic>{'user_id': 21, 'is_verified': true});
     expect(response.devices.single.deviceId, 4);
+  });
+
+  test('sendOtp posts the selected trusted device for login 2FA', () async {
+    String? requestPath;
+    Object? requestBody;
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requestPath = options.path;
+            requestBody = options.data;
+            handler.resolve(
+              Response<Object?>(
+                requestOptions: options,
+                statusCode: 200,
+                data: const <String, dynamic>{
+                  'expires_at': '2026-07-28T09:24:21.275751Z',
+                  'mstatus': 200,
+                  'otp_code': '',
+                  'otp_type': 'LOGIN_2FA',
+                  'status': 'Success',
+                },
+              ),
+            );
+          },
+        ),
+      );
+    final api = NetworkApi(
+      networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
+    );
+
+    await api.sendOtp(
+      const SendOtpRequest(
+        otpType: 'LOGIN_2FA',
+        identifier: '+84905666666',
+        userId: 21,
+        targetDeviceId: 4,
+      ),
+    );
+
+    expect(requestPath, '/otps/send');
+    expect(requestBody, <String, dynamic>{
+      'otp_type': 'LOGIN_2FA',
+      'identifier': '+84905666666',
+      'user_id': 21,
+      'target_device_id': 4,
+    });
   });
 }

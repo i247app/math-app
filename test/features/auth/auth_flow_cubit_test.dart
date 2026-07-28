@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
@@ -7,6 +8,8 @@ import 'package:numi/features/auth/models/signup_form_data.dart';
 import 'package:numi/features/auth/models/signup_gender.dart';
 import 'package:numi/features/auth/models/signup_role.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
+import 'package:numi/features/session/models/profile_session_resolution.dart';
+import 'package:numi/features/session/services/profile_session_resolver.dart';
 
 class _FakePasscodeService implements PasscodeService {
   @override
@@ -40,17 +43,42 @@ class _FakePasscodeService implements PasscodeService {
   }) async => false;
 }
 
+class _FakeProfileSessionResolver implements ProfileSessionResolver {
+  @override
+  Future<ProfileSessionResolution> resolveForUserId(int userId) async {
+    return const ProfileSessionResolution.empty();
+  }
+
+  @override
+  Future<void> rememberActiveProfile({
+    required int userId,
+    required StudentProfile profile,
+  }) async {}
+}
+
 class _FakeAuthService implements AuthService {
-  _FakeAuthService({this.accountExists = true, this.verifyOtpIsValid = false});
+  _FakeAuthService({
+    this.accountExists = true,
+    this.verifyOtpIsValid = false,
+    this.isTrusted,
+    this.trustedDevices = const <AuthTrustedDevice>[],
+    this.sentOtpCode,
+  });
 
   final bool accountExists;
   final bool verifyOtpIsValid;
+  final bool? isTrusted;
+  final List<AuthTrustedDevice> trustedDevices;
+  final String? sentOtpCode;
   String? lookedUpLoginName;
   String? sentOtpLoginName;
   String? verifiedOtpLoginName;
   String? signupPhone;
   String? signupEmail;
   AuthOtpKind? sentOtpKind;
+  int? sentOtpUserId;
+  int? sentOtpTargetDeviceId;
+  int? listedDeviceUserId;
 
   @override
   Future<AuthLoginLookupResult> lookupLoginName(String loginName) async {
@@ -65,17 +93,34 @@ class _FakeAuthService implements AuthService {
               phone: loginName.contains('@') ? null : loginName,
             )
           : null,
+      isTrusted: isTrusted,
     );
+  }
+
+  @override
+  Future<List<AuthTrustedDevice>> listTrustedDevices({
+    required int userId,
+  }) async {
+    listedDeviceUserId = userId;
+    return trustedDevices;
   }
 
   @override
   Future<SendOtpResult> sendOtp({
     required String loginName,
     required AuthOtpKind kind,
+    int? userId,
+    int? targetDeviceId,
   }) async {
     sentOtpLoginName = loginName;
     sentOtpKind = kind;
-    return const SendOtpResult(expiresIn: 30);
+    sentOtpUserId = userId;
+    sentOtpTargetDeviceId = targetDeviceId;
+    return SendOtpResult(
+      expiresIn: 30,
+      otpCode: sentOtpCode,
+      purpose: kind.previewPurpose,
+    );
   }
 
   @override
@@ -85,7 +130,16 @@ class _FakeAuthService implements AuthService {
     required AuthOtpKind kind,
   }) async {
     verifiedOtpLoginName = loginName;
-    return VerifyOtpResult(isValid: verifyOtpIsValid);
+    return VerifyOtpResult(
+      isValid: verifyOtpIsValid,
+      user: verifyOtpIsValid
+          ? LoginUser(
+              id: 7,
+              email: loginName.contains('@') ? loginName : null,
+              phone: loginName.contains('@') ? null : loginName,
+            )
+          : null,
+    );
   }
 
   @override
@@ -129,6 +183,7 @@ AuthFlowCubit _buildCubit({
     authService: authService,
     initialState: initialState,
     passcodeService: _FakePasscodeService(),
+    profileResolver: _FakeProfileSessionResolver(),
     onAuthenticated: (_) {},
     onSessionCleared: () {},
     onSessionRestoreStarted: () {},
@@ -173,6 +228,42 @@ void main() {
     await cubit.close();
   });
 
+  test('untrusted login requires selecting a verified device', () async {
+    final authService = _FakeAuthService(
+      isTrusted: false,
+      trustedDevices: const <AuthTrustedDevice>[
+        AuthTrustedDevice(
+          deviceId: 4,
+          deviceName: 'TECNO SPARK Go 1',
+          platform: 'android',
+        ),
+      ],
+      sentOtpCode: '1234',
+    );
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(screen: AppScreen.login),
+    );
+
+    await cubit.submitLoginName('+84905666666');
+
+    expect(authService.listedDeviceUserId, 7);
+    expect(authService.sentOtpLoginName, isNull);
+    expect(cubit.state.screen, AppScreen.deviceVerification);
+    expect(cubit.state.trustedDevices.single.deviceId, 4);
+
+    cubit.selectTrustedDevice(4);
+    await cubit.sendOtpToTrustedDevice();
+
+    expect(authService.sentOtpLoginName, '+84905666666');
+    expect(authService.sentOtpKind, AuthOtpKind.login);
+    expect(authService.sentOtpUserId, 7);
+    expect(authService.sentOtpTargetDeviceId, 4);
+    expect(cubit.state.screen, AppScreen.otp);
+    expect(cubit.state.devOtpCode, isNull);
+    await cubit.close();
+  });
+
   test('uses the same email login_name when verifying OTP', () async {
     final authService = _FakeAuthService();
     final cubit = _buildCubit(
@@ -186,6 +277,23 @@ void main() {
     await cubit.verifyOtp('1234');
 
     expect(authService.verifiedOtpLoginName, 'learner@example.com');
+    await cubit.close();
+  });
+
+  test('valid login OTP opens home directly', () async {
+    final authService = _FakeAuthService(verifyOtpIsValid: true);
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AppScreen.otp,
+        loginName: 'learner@example.com',
+        otpFlow: OtpFlow.login,
+      ),
+    );
+
+    await cubit.verifyOtp('1234');
+
+    expect(cubit.state.screen, AppScreen.home);
     await cubit.close();
   });
 

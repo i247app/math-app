@@ -2,6 +2,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/errors/http_status.dart';
 import 'package:numi/core/network/auth_models.dart';
+import 'package:numi/core/network/device_models.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
@@ -46,7 +47,11 @@ abstract class AuthService {
   Future<SendOtpResult> sendOtp({
     required String loginName,
     required AuthOtpKind kind,
+    int? userId,
+    int? targetDeviceId,
   });
+
+  Future<List<AuthTrustedDevice>> listTrustedDevices({required int userId});
 
   Future<VerifyOtpResult> verifyOtp({
     required String loginName,
@@ -126,10 +131,17 @@ class AuthApi implements AuthService {
   Future<SendOtpResult> sendOtp({
     required String loginName,
     required AuthOtpKind kind,
+    int? userId,
+    int? targetDeviceId,
   }) async {
     final response = await _request(
       () => _networkApi.sendOtp(
-        SendOtpRequest(otpType: kind.apiType, identifier: loginName),
+        SendOtpRequest(
+          otpType: kind.apiType,
+          identifier: loginName,
+          userId: userId,
+          targetDeviceId: targetDeviceId,
+        ),
       ),
     );
 
@@ -139,6 +151,29 @@ class AuthApi implements AuthService {
       expiresAt: response.expiresAt,
       expiresIn: _expiresInFrom(response.expiresAt) ?? 0,
     );
+  }
+
+  @override
+  Future<List<AuthTrustedDevice>> listTrustedDevices({
+    required int userId,
+  }) async {
+    final response = await _request(
+      () => _networkApi.listDevices(
+        DeviceListRequest(userId: userId, isVerified: true),
+      ),
+    );
+
+    return response.devices
+        .where((device) => device.deviceId != null)
+        .map(
+          (device) => AuthTrustedDevice(
+            deviceId: device.deviceId!,
+            deviceName: _deviceName(device),
+            deviceUuid: device.deviceUuid,
+            platform: device.platform,
+          ),
+        )
+        .toList(growable: false);
   }
 
   @override
@@ -268,6 +303,22 @@ class AuthApi implements AuthService {
       createDt: user?.createDt ?? profile?.createDt,
       modifyDt: user?.modifyDt ?? profile?.modifyDt,
     );
+  }
+
+  static String _deviceName(DeviceModel device) {
+    final name = device.deviceName?.trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+
+    final platform = device.platform?.trim();
+    if (platform != null &&
+        platform.isNotEmpty &&
+        platform.toUpperCase() != 'UNKNOWN') {
+      return platform;
+    }
+
+    return 'Device ${device.deviceId}';
   }
 
   Future<LoginUser?> _currentUserOrNull() async {
