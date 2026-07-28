@@ -8,6 +8,7 @@ class AppStaggeredEntrance extends StatefulWidget {
     this.initialScale = 0.94,
     this.delayStep = const Duration(milliseconds: 55),
     this.maxOrder = 8,
+    this.initiallyVisible = false,
     this.onFinished,
   });
 
@@ -16,6 +17,7 @@ class AppStaggeredEntrance extends StatefulWidget {
   final double initialScale;
   final Duration delayStep;
   final int maxOrder;
+  final bool initiallyVisible;
   final VoidCallback? onFinished;
 
   @override
@@ -23,12 +25,16 @@ class AppStaggeredEntrance extends StatefulWidget {
 }
 
 class _AppStaggeredEntranceState extends State<AppStaggeredEntrance> {
-  bool _isVisible = false;
+  late bool _isVisible;
   bool _hasNotifiedFinished = false;
 
   @override
   void initState() {
     super.initState();
+    _isVisible = widget.initiallyVisible;
+    if (_isVisible) {
+      return;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final multiplier = widget.order.clamp(0, widget.maxOrder);
       await Future<void>.delayed(widget.delayStep * multiplier);

@@ -421,7 +421,10 @@ class _AppScreenSlideSwitcherState extends State<_AppScreenSlideSwitcher>
       _transition = _transitionFor(from: oldWidget.screen, to: widget.screen);
     });
 
-    if (MediaQuery.disableAnimationsOf(context)) {
+    // Home dashboards own their entrance animations. Running the app-level
+    // fade as well makes their first entrance look like a second reload.
+    if (widget.screen == AppScreen.home ||
+        MediaQuery.disableAnimationsOf(context)) {
       _previousChild = null;
       _controller.value = 1;
       return;

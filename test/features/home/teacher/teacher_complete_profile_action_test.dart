@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
@@ -9,9 +11,11 @@ import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/features/home/teacher/home/teacher_home_tab.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_hero_card.dart';
+import 'package:numi/features/home/teacher/home/widgets/teacher_home_hero_skeleton.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
 import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
 import 'package:numi/shared/widgets/app_section_header.dart';
+import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 
 class _EmptyTeacherHomeService implements HomeLayoutService {
   const _EmptyTeacherHomeService();
@@ -22,7 +26,74 @@ class _EmptyTeacherHomeService implements HomeLayoutService {
   }
 }
 
+class _DeferredTeacherHomeService implements HomeLayoutService {
+  final Completer<HomeLayout> completer = Completer<HomeLayout>();
+
+  @override
+  Future<HomeLayout> getLayout({required int profileId}) => completer.future;
+}
+
 void main() {
+  testWidgets(
+    'preserves teacher home entrance state when loading becomes ready',
+    (tester) async {
+      const profileId = 912346;
+      HomeProfileCache.instance.invalidateProfile(profileId);
+      addTearDown(() => HomeProfileCache.instance.invalidateProfile(profileId));
+
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      final homeService = _DeferredTeacherHomeService();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: LingoScope(
+            lingo: lingo,
+            child: MediaQuery(
+              data: const MediaQueryData(size: Size(390, 844)),
+              child: Scaffold(
+                body: TeacherHomeTab(
+                  user: null,
+                  activeProfile: const StudentProfile(
+                    profileId: profileId,
+                    name: 'Teacher',
+                    role: 'TEACHER',
+                    profileStatus: 'ACTIVE',
+                  ),
+                  bottomPadding: 0,
+                  homeLayoutService: homeService,
+                  onCompleteProfile: () async {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final loadingEntrance = find.ancestor(
+        of: find.byType(TeacherHomeHeroSkeleton),
+        matching: find.byType(AppStaggeredEntrance),
+      );
+      expect(loadingEntrance, findsOneWidget);
+      final loadingEntranceState = tester.state(loadingEntrance);
+
+      homeService.completer.complete(const HomeLayout(role: 'TEACHER'));
+      await tester.pump();
+
+      final readyEntrance = find.ancestor(
+        of: find.byType(TeacherHeroCard),
+        matching: find.byType(AppStaggeredEntrance),
+      );
+      expect(readyEntrance, findsOneWidget);
+      expect(tester.state(readyEntrance), same(loadingEntranceState));
+
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      expect(readyEntrance, findsOneWidget);
+    },
+  );
+
   testWidgets(
     'shows the settings-style profile action below the teacher banner',
     (tester) async {

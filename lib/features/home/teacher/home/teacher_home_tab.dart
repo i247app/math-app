@@ -89,10 +89,6 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
 
   List<ClassroomModel> get _classrooms => _layoutClassrooms;
 
-  bool get _isLoading => _isLoadingHomeLayout;
-
-  bool get _hasLoadedClassrooms => _hasLoadedHomeLayout;
-
   bool get _isInitialHomeLoading =>
       _isLoadingHomeLayout && !_hasLoadedHomeLayout && _classrooms.isEmpty;
 
@@ -119,43 +115,15 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
   }
 
   String get _classroomEntranceId {
-    final phase = _teacherClassroomSectionPhase();
-    return '$_teacherHomeProfileKey-classrooms-$phase';
+    return '$_teacherHomeProfileKey-classrooms';
   }
 
   String get _heroEntranceId {
-    final phase = _isInitialHomeLoading ? 'loading' : 'ready';
-    return '$_teacherHomeProfileKey-hero-$phase';
+    return '$_teacherHomeProfileKey-hero';
   }
 
   String get _assignmentsEntranceId {
-    final phase = _teacherAssignmentsSectionPhase();
-    return '$_teacherHomeProfileKey-assignments-$phase';
-  }
-
-  String _teacherClassroomSectionPhase() {
-    if (_isLoading && _classrooms.isEmpty && !_hasLoadedClassrooms) {
-      return 'loading';
-    }
-    if (_error != null && _classrooms.isEmpty) {
-      return 'error';
-    }
-    if (_classrooms.isEmpty) {
-      return 'empty';
-    }
-    return 'ready-${_classrooms.length}';
-  }
-
-  String _teacherAssignmentsSectionPhase() {
-    if (_isLoadingAssignments &&
-        _recentAssignments.isEmpty &&
-        !_hasLoadedAssignments) {
-      return 'loading';
-    }
-    if (_recentAssignments.isEmpty) {
-      return 'empty';
-    }
-    return 'ready-${_recentAssignments.length}';
+    return '$_teacherHomeProfileKey-assignments';
   }
 
   @override
@@ -331,13 +299,10 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
     required int order,
     required Widget child,
   }) {
-    if (_playedHomeEntrances.contains(id)) {
-      return child;
-    }
-
     return AppStaggeredEntrance(
       key: ValueKey<String>('teacher-home-entrance-$id'),
       order: order,
+      initiallyVisible: _playedHomeEntrances.contains(id),
       onFinished: () => _markHomeEntrancePlayed(id),
       child: child,
     );
