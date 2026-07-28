@@ -27,8 +27,8 @@ class GradeBottomBar extends StatelessWidget {
               flex: 9,
               child: PillActionButton(
                 label: context.getText(AppKeys.skipUpper),
-                background: AppColors.peachSoft,
-                foreground: AppColors.rust,
+                background: AppColors.brandOrangeSolid,
+                foreground: Colors.white,
                 onPressed: onSkip,
               ),
             ),
@@ -36,11 +36,8 @@ class GradeBottomBar extends StatelessWidget {
               flex: 10,
               child: PillActionButton(
                 label: context.getText(AppKeys.continueUpper),
-                background: AppColors.teal700,
+                background: AppColors.brandTealSolid,
                 foreground: Colors.white,
-                gradient: const LinearGradient(
-                  colors: [AppColors.teal700, Color(0xFF55E0D6)],
-                ),
                 onPressed: onContinue,
               ),
             ),
