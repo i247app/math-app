@@ -10,7 +10,6 @@ class PillActionButton extends StatelessWidget {
     required this.background,
     required this.foreground,
     required this.onPressed,
-    this.icon,
     this.gradient,
   });
 
@@ -18,7 +17,6 @@ class PillActionButton extends StatelessWidget {
   final Color background;
   final Color foreground;
   final VoidCallback onPressed;
-  final IconData? icon;
   final Gradient? gradient;
 
   @override
@@ -45,16 +43,16 @@ class PillActionButton extends StatelessWidget {
           style: TextButton.styleFrom(
             foregroundColor: foreground,
             shape: const StadiumBorder(),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.zero,
           ),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 8,
-              children: [
-                Text(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
                   label,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: FontSize.xxs,
                     fontWeight: FontWeight.w900,
@@ -62,8 +60,7 @@ class PillActionButton extends StatelessWidget {
                     letterSpacing: 0.8,
                   ),
                 ),
-                if (icon != null) Icon(icon, size: 18),
-              ],
+              ),
             ),
           ),
         ),
