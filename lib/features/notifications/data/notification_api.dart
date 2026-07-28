@@ -1,15 +1,6 @@
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/network/notification_models.dart';
-
-class NotificationListException implements Exception {
-  const NotificationListException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
+import 'package:numi/features/notifications/errors/notification_list_exception.dart';
 
 abstract class NotificationListService {
   Future<List<NotificationModel>> listNotifications();
