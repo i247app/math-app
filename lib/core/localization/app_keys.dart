@@ -116,6 +116,34 @@ class AppKeys {
   static const parentAssessmentTitle = 'parent_assessment_title';
   static const parentAssessmentSubtitle = 'parent_assessment_subtitle';
   static const parentLearningProgress = 'parent_learning_progress';
+  static const learningProgressTitle = 'learning_progress_title';
+  static const learningProgressAllAssessments =
+      'learning_progress_all_assessments';
+  static const learningProgressFilterTime = 'learning_progress_filter_time';
+  static const learningProgressFilter = 'learning_progress_filter';
+  static const learningProgressScoreTitle = 'learning_progress_score_title';
+  static const learningProgressAssessmentCount =
+      'learning_progress_assessment_count';
+  static const learningProgressAverageScore = 'learning_progress_average_score';
+  static const learningProgressPeriodAll = 'learning_progress_period_all';
+  static const learningProgressPeriod30Days =
+      'learning_progress_period_30_days';
+  static const learningProgressPeriod90Days =
+      'learning_progress_period_90_days';
+  static const learningProgressImprovingTitle =
+      'learning_progress_improving_title';
+  static const learningProgressImprovingMessage =
+      'learning_progress_improving_message';
+  static const learningProgressDecliningTitle =
+      'learning_progress_declining_title';
+  static const learningProgressDecliningMessage =
+      'learning_progress_declining_message';
+  static const learningProgressStableTitle = 'learning_progress_stable_title';
+  static const learningProgressStableMessage =
+      'learning_progress_stable_message';
+  static const learningProgressNoData = 'learning_progress_no_data';
+  static const learningProgressShare = 'learning_progress_share';
+  static const learningProgressShared = 'learning_progress_shared';
   static const parentRoadmapTitle = 'parent_roadmap_title';
   static const parentRoadmapSubtitle = 'parent_roadmap_subtitle';
   static const parentJoinRoomTitle = 'parent_join_room_title';

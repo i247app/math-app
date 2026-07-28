@@ -18,6 +18,7 @@ import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
+import 'package:numi/features/quiz/presentation/screens/learning_progress_screen.dart';
 import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
@@ -302,6 +303,17 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     );
   }
 
+  void _openLearningProgress() {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => LearningProgressScreen(
+          entries: List<ParentAssessmentEntry>.unmodifiable(_allEntries),
+        ),
+      ),
+    );
+  }
+
   Future<void> _openAssessment() async {
     HapticFeedback.lightImpact();
     final assessmentTabRoute = ModalRoute.of(context);
@@ -423,6 +435,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         ),
         ParentAssessmentProgressChart(
           entries: _allEntries.take(5).toList().reversed.toList(),
+          onTap: _openLearningProgress,
         ),
       ],
       if (_errorMessage != null && _entries.isEmpty)
