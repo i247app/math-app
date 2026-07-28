@@ -34,65 +34,64 @@ class _DeferredTeacherHomeService implements HomeLayoutService {
 }
 
 void main() {
-  testWidgets(
-    'preserves teacher home entrance state when loading becomes ready',
-    (tester) async {
-      const profileId = 912346;
-      HomeProfileCache.instance.invalidateProfile(profileId);
-      addTearDown(() => HomeProfileCache.instance.invalidateProfile(profileId));
+  testWidgets('starts teacher home entrance after initial loading completes', (
+    tester,
+  ) async {
+    const profileId = 912346;
+    HomeProfileCache.instance.invalidateProfile(profileId);
+    addTearDown(() => HomeProfileCache.instance.invalidateProfile(profileId));
 
-      final lingo = LingoProvider();
-      addTearDown(lingo.dispose);
-      final homeService = _DeferredTeacherHomeService();
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final homeService = _DeferredTeacherHomeService();
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.light(),
-          home: LingoScope(
-            lingo: lingo,
-            child: MediaQuery(
-              data: const MediaQueryData(size: Size(390, 844)),
-              child: Scaffold(
-                body: TeacherHomeTab(
-                  user: null,
-                  activeProfile: const StudentProfile(
-                    profileId: profileId,
-                    name: 'Teacher',
-                    role: 'TEACHER',
-                    profileStatus: 'ACTIVE',
-                  ),
-                  bottomPadding: 0,
-                  homeLayoutService: homeService,
-                  onCompleteProfile: () async {},
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: LingoScope(
+          lingo: lingo,
+          child: MediaQuery(
+            data: const MediaQueryData(size: Size(390, 844)),
+            child: Scaffold(
+              body: TeacherHomeTab(
+                user: null,
+                activeProfile: const StudentProfile(
+                  profileId: profileId,
+                  name: 'Teacher',
+                  role: 'TEACHER',
+                  profileStatus: 'ACTIVE',
                 ),
+                bottomPadding: 0,
+                homeLayoutService: homeService,
+                onCompleteProfile: () async {},
               ),
             ),
           ),
         ),
-      );
+      ),
+    );
 
-      final loadingEntrance = find.ancestor(
-        of: find.byType(TeacherHomeHeroSkeleton),
-        matching: find.byType(AppStaggeredEntrance),
-      );
-      expect(loadingEntrance, findsOneWidget);
-      final loadingEntranceState = tester.state(loadingEntrance);
+    final loadingEntrance = find.ancestor(
+      of: find.byType(TeacherHomeHeroSkeleton),
+      matching: find.byType(AppStaggeredEntrance),
+    );
+    expect(loadingEntrance, findsNothing);
 
-      homeService.completer.complete(const HomeLayout(role: 'TEACHER'));
-      await tester.pump();
+    homeService.completer.complete(const HomeLayout(role: 'TEACHER'));
+    await tester.pump();
 
-      final readyEntrance = find.ancestor(
-        of: find.byType(TeacherHeroCard),
-        matching: find.byType(AppStaggeredEntrance),
-      );
-      expect(readyEntrance, findsOneWidget);
-      expect(tester.state(readyEntrance), same(loadingEntranceState));
+    final readyEntrance = find.ancestor(
+      of: find.byType(TeacherHeroCard),
+      matching: find.byType(AppStaggeredEntrance),
+    );
+    expect(readyEntrance, findsOneWidget);
+    final readyEntranceState = tester.state(readyEntrance);
 
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
-      expect(readyEntrance, findsOneWidget);
-    },
-  );
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(readyEntrance, findsOneWidget);
+    expect(tester.state(readyEntrance), same(readyEntranceState));
+  });
 
   testWidgets(
     'shows the settings-style profile action below the teacher banner',

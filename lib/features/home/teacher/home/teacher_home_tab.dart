@@ -530,13 +530,9 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _homeEntrance(
-              id: '$_teacherHomeProfileKey-top-bar',
-              order: 0,
-              child: TeacherTopBar(
-                profile: widget.activeProfile,
-                topPadding: MediaQuery.paddingOf(context).top,
-              ),
+            TeacherTopBar(
+              profile: widget.activeProfile,
+              topPadding: MediaQuery.paddingOf(context).top,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -545,20 +541,20 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 22),
-                    child: _homeEntrance(
-                      id: _heroEntranceId,
-                      order: 1,
-                      child: _isInitialHomeLoading
-                          ? const TeacherHomeHeroSkeleton()
-                          : const TeacherHeroCard(),
-                    ),
+                    child: _isInitialHomeLoading
+                        ? const TeacherHomeHeroSkeleton()
+                        : _homeEntrance(
+                            id: _heroEntranceId,
+                            order: 0,
+                            child: const TeacherHeroCard(),
+                          ),
                   ),
-                  if (!isProfileComplete)
+                  if (!isProfileComplete && !_isInitialHomeLoading)
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
                       child: _homeEntrance(
                         id: '$_teacherHomeProfileKey-complete-profile',
-                        order: 2,
+                        order: 1,
                         child: SettingsActionCard(
                           icon: Icons.person_outline_rounded,
                           iconColor: const Color(0xFF008A52),
@@ -577,21 +573,27 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
                     ),
                   Padding(
                     padding: const EdgeInsets.only(top: 28),
-                    child: _homeEntrance(
-                      id: _classroomEntranceId,
-                      order: isProfileComplete ? 2 : 3,
-                      child: _buildClassroomSection(
-                        isProfileComplete: isProfileComplete,
-                      ),
-                    ),
+                    child: _isInitialHomeLoading
+                        ? _buildClassroomSection(
+                            isProfileComplete: isProfileComplete,
+                          )
+                        : _homeEntrance(
+                            id: _classroomEntranceId,
+                            order: isProfileComplete ? 1 : 2,
+                            child: _buildClassroomSection(
+                              isProfileComplete: isProfileComplete,
+                            ),
+                          ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 30),
-                    child: _homeEntrance(
-                      id: _assignmentsEntranceId,
-                      order: isProfileComplete ? 3 : 4,
-                      child: _buildRecentAssignmentsSection(),
-                    ),
+                    child: _isInitialAssignmentsLoading
+                        ? _buildRecentAssignmentsSection()
+                        : _homeEntrance(
+                            id: _assignmentsEntranceId,
+                            order: isProfileComplete ? 2 : 3,
+                            child: _buildRecentAssignmentsSection(),
+                          ),
                   ),
                 ],
               ),
