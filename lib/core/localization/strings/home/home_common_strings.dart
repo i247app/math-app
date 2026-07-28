@@ -38,7 +38,7 @@ const homeCommonStrings = <String, Map<String, String>>{
     AppKeys.navStudy: 'STUDY',
     AppKeys.navMembers: 'MEMBERS',
     AppKeys.navReview: 'PRACTICE',
-    AppKeys.navAssessment: 'ASSESSMENT',
+    AppKeys.navAssessment: 'ASSESS',
     AppKeys.navRoom: 'ROOM',
     AppKeys.navProgram: 'PROGRAM',
     AppKeys.navGames: 'GAMES',
