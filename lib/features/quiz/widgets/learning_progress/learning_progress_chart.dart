@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
 import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
 
@@ -99,7 +100,7 @@ class LearningProgressChartPainter extends CustomPainter {
         '$value',
         Offset(left - 16, y),
         color: mutedTextColor,
-        fontSize: 11,
+        fontSize: FontSize.xxxs,
         alignment: Alignment.center,
       );
     }
@@ -172,7 +173,7 @@ class LearningProgressChartPainter extends CustomPainter {
         _scoreLabel(score),
         Offset(point.dx, point.dy - 17),
         color: textColor,
-        fontSize: 12,
+        fontSize: FontSize.xxs,
         fontWeight: FontWeight.w800,
         alignment: Alignment.center,
       );
@@ -187,7 +188,7 @@ class LearningProgressChartPainter extends CustomPainter {
         dateLabel,
         Offset(point.dx, bottom + 26),
         color: textColor,
-        fontSize: 11,
+        fontSize: FontSize.xxxs,
         fontWeight: FontWeight.w700,
         alignment: Alignment.center,
       );
