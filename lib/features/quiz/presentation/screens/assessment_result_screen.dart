@@ -15,11 +15,12 @@ import 'package:numi/features/quiz/widgets/assessment_result/ai_review_card.dart
 import 'package:numi/features/quiz/widgets/assessment_result/assessment_result_review_text.dart';
 import 'package:numi/features/quiz/widgets/assessment_result/exit_to_grade_selection.dart';
 import 'package:numi/features/quiz/widgets/assessment_result/result_bottom_bar.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/result_header.dart';
 import 'package:numi/features/quiz/helpers/result_level_for_score.dart';
 import 'package:numi/features/quiz/widgets/assessment_result/score_out_of10.dart';
 import 'package:numi/features/quiz/widgets/assessment_result/score_ring.dart';
 import 'package:numi/features/quiz/widgets/assessment_result/test_again_loader.dart';
+import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 class AssessmentResultScreen extends StatefulWidget {
   const AssessmentResultScreen({
@@ -161,7 +162,8 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
       child: Scaffold(
         backgroundColor: colors.pageBackground,
         body: SafeArea(
-          child: Center(
+          child: Align(
+            alignment: Alignment.topCenter,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 430),
               child: isGeneratingAgain
@@ -184,7 +186,21 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AssessmentResultHeader(onBack: exitResult),
+          PageHeader(
+            title: context.getText(AppKeys.assessmentResultTitle),
+            topInset: 0,
+            actionWidth: 40,
+            horizontalPadding: 20,
+            titleFontSize: 25,
+            leading: QuizHeaderIconButton(
+              icon: Icons.arrow_back_rounded,
+              color: context.themeColors.brandStrong,
+              size: 40,
+              iconSize: 23,
+              borderRadius: 12,
+              onTap: exitResult,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 51),
             child: AssessmentScoreRing(

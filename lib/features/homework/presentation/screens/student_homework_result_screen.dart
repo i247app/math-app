@@ -29,7 +29,8 @@ class StudentHomeworkResultScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: colors.pageBackground,
         body: SafeArea(
-          child: Center(
+          child: Align(
+            alignment: Alignment.topCenter,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 430),
               child: SingleChildScrollView(
