@@ -33,7 +33,7 @@ const teacherHomeStrings = <String, Map<String, String>>{
     AppKeys.teacherHeroTitle: 'Ready for a new day',
     AppKeys.teacherHeroSubtitle: 'prepared to learn more',
     AppKeys.teacherYourClasses: 'Your classes',
-    AppKeys.teacherRecentlyAssigned: 'Recently assigned homework',
+    AppKeys.teacherRecentlyAssigned: 'Recently homework',
     AppKeys.teacherCreateNewClass: 'Create New Class',
     AppKeys.teacherCompleteProfile: 'Complete Profile',
     AppKeys.teacherCompleteProfileDescription:
