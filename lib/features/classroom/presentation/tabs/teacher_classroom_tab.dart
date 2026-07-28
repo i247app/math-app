@@ -16,6 +16,7 @@ import 'package:numi/features/classroom/presentation/screens/teacher_class_detai
 import 'package:numi/features/classroom/presentation/screens/teacher_create_class_screen.dart';
 import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_body.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_header.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_loading_content.dart';
@@ -251,7 +252,12 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
         children: [
           const TeacherClassroomHeader(),
           Padding(
-            padding: EdgeInsets.fromLTRB(22, 44, 22, widget.bottomPadding),
+            padding: EdgeInsets.fromLTRB(
+              teacherTabContentHorizontalPadding,
+              teacherTabContentTopPadding,
+              teacherTabContentHorizontalPadding,
+              widget.bottomPadding,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

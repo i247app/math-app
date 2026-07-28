@@ -24,6 +24,7 @@ import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assign
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 
 import 'package:numi/features/home/teacher/home/helpers/teacher_home_helpers.dart';
@@ -535,7 +536,9 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
               topPadding: MediaQuery.paddingOf(context).top,
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(
+                horizontal: teacherTabContentHorizontalPadding,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

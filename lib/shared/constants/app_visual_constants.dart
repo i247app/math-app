@@ -41,3 +41,5 @@ const studentParentHomeJoinIconAsset =
 const homeTeacherAvatarOneAsset = 'assets/images/student_home_avatar.png';
 const homeTeacherAvatarTwoAsset = 'assets/images/student_class_teacher.png';
 const homeFadeInDuration = Duration(milliseconds: 900);
+const teacherTabContentHorizontalPadding = 18.0;
+const teacherTabContentTopPadding = 18.0;

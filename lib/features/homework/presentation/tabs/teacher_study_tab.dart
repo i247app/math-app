@@ -15,6 +15,8 @@ import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_add_button.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_create_homework_screen.dart';
@@ -22,7 +24,6 @@ import 'package:numi/features/homework/presentation/screens/teacher_homework_det
 import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_add_button.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
@@ -408,16 +409,16 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
             children: [
               PageHeader(title: context.getText(AppKeys.teacherStudyTitle)),
               Padding(
-                padding: EdgeInsets.fromLTRB(19, 18, 19, widget.bottomPadding),
+                padding: EdgeInsets.fromLTRB(
+                  teacherTabContentHorizontalPadding,
+                  teacherTabContentTopPadding,
+                  teacherTabContentHorizontalPadding,
+                  widget.bottomPadding,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TeacherHomeworkAddButton(
-                        onTap: _openCreateExercise,
-                      ),
-                    ),
+                    TeacherClassroomAddButton(onTap: _openCreateExercise),
                     Padding(
                       padding: const EdgeInsets.only(top: 18),
                       child: TeacherStudySearchField(
