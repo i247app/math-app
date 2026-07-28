@@ -12,6 +12,7 @@ import 'classroom_exercise_models.dart';
 import 'classroom_models.dart';
 import 'grade_models.dart';
 import 'network_interceptors.dart';
+import 'notification_models.dart';
 import 'profile_models.dart';
 import 'school_models.dart';
 import 'program_models.dart';
@@ -385,6 +386,29 @@ class NetworkApi {
     if (mstatus is int && mstatus != 200) {
       throw NetworkException(_apiErrorMessage(responseJson), status: mstatus);
     }
+  }
+
+  Future<NotificationListResponse> listNotifications([
+    NotificationListRequest request = const NotificationListRequest(),
+  ]) async {
+    final responseJson = await _networkClient.postJson(
+      '/notifications/list',
+      request.toJson(),
+    );
+    final notificationResponse = NotificationListResponse.fromJson(
+      responseJson,
+    );
+    if (notificationResponse.mstatus != 200) {
+      throw NetworkException(
+        notificationResponse.mmessage ??
+            notificationResponse.debug ??
+            notificationResponse.status ??
+            'Request failed.',
+        status: notificationResponse.mstatus,
+      );
+    }
+
+    return notificationResponse;
   }
 
   Future<SubmitQuizResponse> submitQuiz(SubmitQuizRequest request) async {
