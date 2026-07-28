@@ -10,6 +10,7 @@ import 'auth_token_store.dart';
 import 'chapter_models.dart';
 import 'classroom_exercise_models.dart';
 import 'classroom_models.dart';
+import 'device_models.dart';
 import 'grade_models.dart';
 import 'network_interceptors.dart';
 import 'notification_models.dart';
@@ -386,6 +387,25 @@ class NetworkApi {
     if (mstatus is int && mstatus != 200) {
       throw NetworkException(_apiErrorMessage(responseJson), status: mstatus);
     }
+  }
+
+  Future<DeviceListResponse> listDevices(DeviceListRequest request) async {
+    final responseJson = await _networkClient.postJson(
+      '/devices/list',
+      request.toJson(),
+    );
+    final deviceResponse = DeviceListResponse.fromJson(responseJson);
+    if (deviceResponse.mstatus != 200) {
+      throw NetworkException(
+        deviceResponse.mmessage ??
+            deviceResponse.debug ??
+            deviceResponse.status ??
+            'Request failed.',
+        status: deviceResponse.mstatus,
+      );
+    }
+
+    return deviceResponse;
   }
 
   Future<NotificationListResponse> listNotifications([
