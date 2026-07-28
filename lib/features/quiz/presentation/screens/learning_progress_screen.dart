@@ -13,8 +13,6 @@ import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
 import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_chart.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
-enum LearningProgressPeriod { all, last30Days, last90Days }
-
 class LearningProgressScreen extends StatefulWidget {
   const LearningProgressScreen({super.key, required this.entries});
 
@@ -25,7 +23,7 @@ class LearningProgressScreen extends StatefulWidget {
 }
 
 class _LearningProgressScreenState extends State<LearningProgressScreen> {
-  LearningProgressPeriod _period = LearningProgressPeriod.all;
+  DateTimeRange? _dateRange;
 
   List<ParentAssessmentEntry> get _orderedEntries {
     final entries = List<ParentAssessmentEntry>.of(widget.entries);
@@ -35,76 +33,74 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
 
   List<ParentAssessmentEntry> get _filteredEntries {
     final entries = _orderedEntries;
-    final days = switch (_period) {
-      LearningProgressPeriod.all => null,
-      LearningProgressPeriod.last30Days => 30,
-      LearningProgressPeriod.last90Days => 90,
-    };
-    if (days == null) {
+    final range = _dateRange;
+    if (range == null) {
       return entries;
     }
-    final cutoff = DateTime.now().subtract(Duration(days: days));
+    final start = _startOfDay(range.start);
+    final endExclusive = _startOfDay(range.end).add(const Duration(days: 1));
     return entries
-        .where((entry) => !quizDate(entry.quiz).isBefore(cutoff))
+        .where((entry) {
+          final date = quizDate(entry.quiz).toLocal();
+          return !date.isBefore(start) && date.isBefore(endExclusive);
+        })
         .toList(growable: false);
   }
 
-  String _periodLabel(BuildContext context, LearningProgressPeriod period) {
-    final key = switch (period) {
-      LearningProgressPeriod.all => AppKeys.learningProgressPeriodAll,
-      LearningProgressPeriod.last30Days => AppKeys.learningProgressPeriod30Days,
-      LearningProgressPeriod.last90Days => AppKeys.learningProgressPeriod90Days,
-    };
-    return context.getText(key);
+  DateTime _startOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day);
   }
 
-  Future<void> _choosePeriod() async {
+  String _dateLabel(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  DateTimeRange _initialDialogRange() {
+    final selected = _dateRange;
+    if (selected != null) {
+      return selected;
+    }
+    final validDates = _orderedEntries
+        .map((entry) => quizDate(entry.quiz).toLocal())
+        .where((date) => date.millisecondsSinceEpoch != 0)
+        .toList(growable: false);
+    if (validDates.isNotEmpty) {
+      return DateTimeRange(
+        start: _startOfDay(validDates.first),
+        end: _startOfDay(validDates.last),
+      );
+    }
+    final today = _startOfDay(DateTime.now());
+    return DateTimeRange(
+      start: today.subtract(const Duration(days: 30)),
+      end: today,
+    );
+  }
+
+  Future<void> _showDateFilter() async {
     HapticFeedback.selectionClick();
-    final selected = await showModalBottomSheet<LearningProgressPeriod>(
+    final initialRange = _initialDialogRange();
+    final today = _startOfDay(DateTime.now());
+    final firstDate = initialRange.start.isBefore(DateTime(2000))
+        ? initialRange.start
+        : DateTime(2000);
+    final lastDate = initialRange.end.isAfter(today) ? initialRange.end : today;
+    final result = await showDialog<_DateFilterResult>(
       context: context,
-      useSafeArea: true,
-      showDragHandle: true,
-      backgroundColor: context.themeColors.elevatedSurface,
-      builder: (sheetContext) {
-        final colors = sheetContext.themeColors;
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final period in LearningProgressPeriod.values)
-                ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  leading: Icon(
-                    period == _period
-                        ? Icons.radio_button_checked_rounded
-                        : Icons.radio_button_unchecked_rounded,
-                    color: period == _period
-                        ? AppColors.brandTeal
-                        : colors.textMuted,
-                  ),
-                  title: Text(
-                    _periodLabel(sheetContext, period),
-                    style: TextStyle(
-                      color: colors.textPrimary,
-                      fontWeight: period == _period
-                          ? FontWeight.w800
-                          : FontWeight.w600,
-                    ),
-                  ),
-                  onTap: () => Navigator.of(sheetContext).pop(period),
-                ),
-            ],
-          ),
+      barrierColor: context.themeColors.scrim,
+      builder: (dialogContext) {
+        return _LearningProgressDateFilterDialog(
+          initialRange: initialRange,
+          firstDate: firstDate,
+          lastDate: lastDate,
         );
       },
     );
-    if (!mounted || selected == null || selected == _period) {
+    if (!mounted || result == null) {
       return;
     }
-    setState(() => _period = selected);
+    setState(() => _dateRange = result.range);
   }
 
   Future<void> _shareProgress() async {
@@ -194,13 +190,14 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
                           Expanded(
                             child: _ProgressFilterControl(
                               icon: Icons.date_range_outlined,
-                              label: _period == LearningProgressPeriod.all
+                              label: _dateRange == null
                                   ? context.getText(
                                       AppKeys.learningProgressFilterTime,
                                     )
-                                  : _periodLabel(context, _period),
+                                  : '${_dateLabel(_dateRange!.start)} – '
+                                        '${_dateLabel(_dateRange!.end)}',
                               color: AppColors.textTeal,
-                              onTap: _choosePeriod,
+                              onTap: _showDateFilter,
                             ),
                           ),
                         ],
@@ -208,7 +205,7 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
                       const SizedBox(height: 18),
                       _ProgressChartCard(
                         entries: entries,
-                        onFilter: _choosePeriod,
+                        onFilter: _showDateFilter,
                       ),
                       const SizedBox(height: 16),
                       _ProgressInsightCard(entries: entries),
@@ -220,6 +217,277 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DateFilterResult {
+  const _DateFilterResult(this.range);
+
+  final DateTimeRange? range;
+}
+
+class _LearningProgressDateFilterDialog extends StatefulWidget {
+  const _LearningProgressDateFilterDialog({
+    required this.initialRange,
+    required this.firstDate,
+    required this.lastDate,
+  });
+
+  final DateTimeRange initialRange;
+  final DateTime firstDate;
+  final DateTime lastDate;
+
+  @override
+  State<_LearningProgressDateFilterDialog> createState() =>
+      _LearningProgressDateFilterDialogState();
+}
+
+class _LearningProgressDateFilterDialogState
+    extends State<_LearningProgressDateFilterDialog> {
+  late DateTime _startDate;
+  late DateTime _endDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _startDate = widget.initialRange.start;
+    _endDate = widget.initialRange.end;
+  }
+
+  String _dateLabel(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  Future<DateTime?> _pickDate({
+    required DateTime initialDate,
+    required DateTime firstDate,
+  }) {
+    return showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: widget.lastDate,
+      builder: (pickerContext, child) {
+        final theme = Theme.of(pickerContext);
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: AppColors.brandTealSolid,
+              onPrimary: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+  }
+
+  Future<void> _pickStartDate() async {
+    final picked = await _pickDate(
+      initialDate: _startDate,
+      firstDate: widget.firstDate,
+    );
+    if (!mounted || picked == null) {
+      return;
+    }
+    setState(() {
+      _startDate = picked;
+      if (_endDate.isBefore(picked)) {
+        _endDate = picked;
+      }
+    });
+  }
+
+  Future<void> _pickEndDate() async {
+    final picked = await _pickDate(
+      initialDate: _endDate.isBefore(_startDate) ? _startDate : _endDate,
+      firstDate: _startDate,
+    );
+    if (!mounted || picked == null) {
+      return;
+    }
+    setState(() => _endDate = picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final primaryText = Theme.of(context).brightness == Brightness.dark
+        ? AppColors.white87
+        : AppColors.black87;
+
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+      backgroundColor: colors.elevatedSurface,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 18, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 44),
+                    child: Text(
+                      context.getText(AppKeys.learningProgressFilterTime),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: primaryText,
+                        fontSize: FontSize.large,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close_rounded),
+                      color: colors.textSecondary,
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).closeButtonTooltip,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _ProgressDateField(
+                label: context.getText(AppKeys.learningProgressFromDate),
+                value: _dateLabel(_startDate),
+                onTap: _pickStartDate,
+              ),
+              const SizedBox(height: 14),
+              _ProgressDateField(
+                label: context.getText(AppKeys.learningProgressToDate),
+                value: _dateLabel(_endDate),
+                onTap: _pickEndDate,
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                height: 48,
+                child: FilledButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(
+                      _DateFilterResult(
+                        DateTimeRange(start: _startDate, end: _endDate),
+                      ),
+                    );
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.brandTealSolid,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: FontSize.medium,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  child: Text(
+                    context.getText(AppKeys.learningProgressApplyFilter),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(const _DateFilterResult(null));
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.textTeal,
+                  textStyle: const TextStyle(
+                    fontSize: FontSize.small,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                child: Text(
+                  context.getText(AppKeys.learningProgressClearFilter),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressDateField extends StatelessWidget {
+  const _ProgressDateField({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final primaryText = Theme.of(context).brightness == Brightness.dark
+        ? AppColors.white87
+        : AppColors.black87;
+    final radius = BorderRadius.circular(10);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: primaryText,
+            fontSize: FontSize.caption,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 7),
+        Material(
+          color: colors.inputSurface,
+          borderRadius: radius,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: radius,
+            child: Container(
+              height: 48,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                border: Border.all(color: colors.border),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_month_outlined,
+                    color: AppColors.brandTealSolid,
+                    size: 21,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      color: primaryText,
+                      fontSize: FontSize.small,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

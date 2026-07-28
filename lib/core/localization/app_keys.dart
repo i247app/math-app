@@ -125,11 +125,10 @@ class AppKeys {
   static const learningProgressAssessmentCount =
       'learning_progress_assessment_count';
   static const learningProgressAverageScore = 'learning_progress_average_score';
-  static const learningProgressPeriodAll = 'learning_progress_period_all';
-  static const learningProgressPeriod30Days =
-      'learning_progress_period_30_days';
-  static const learningProgressPeriod90Days =
-      'learning_progress_period_90_days';
+  static const learningProgressFromDate = 'learning_progress_from_date';
+  static const learningProgressToDate = 'learning_progress_to_date';
+  static const learningProgressApplyFilter = 'learning_progress_apply_filter';
+  static const learningProgressClearFilter = 'learning_progress_clear_filter';
   static const learningProgressImprovingTitle =
       'learning_progress_improving_title';
   static const learningProgressImprovingMessage =
