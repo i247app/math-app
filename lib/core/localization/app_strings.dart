@@ -12,6 +12,7 @@ import 'strings/classroom/student_classroom_strings.dart';
 import 'strings/classroom/teacher_classroom_strings.dart';
 import 'strings/homework/student_homework_strings.dart';
 import 'strings/homework/teacher_homework_strings.dart';
+import 'strings/notification_strings.dart';
 import 'strings/profile/profile_strings.dart';
 import 'strings/settings/settings_strings.dart';
 import 'strings/study/study_strings.dart';
@@ -33,6 +34,7 @@ class AppStrings {
       ...teacherClassroomStrings['vi']!,
       ...studentHomeworkStrings['vi']!,
       ...teacherHomeworkStrings['vi']!,
+      ...notificationStrings['vi']!,
       ...profileStrings['vi']!,
       ...settingsStrings['vi']!,
       ...studyStrings['vi']!,
@@ -52,6 +54,7 @@ class AppStrings {
       ...teacherClassroomStrings['en']!,
       ...studentHomeworkStrings['en']!,
       ...teacherHomeworkStrings['en']!,
+      ...notificationStrings['en']!,
       ...profileStrings['en']!,
       ...settingsStrings['en']!,
       ...studyStrings['en']!,

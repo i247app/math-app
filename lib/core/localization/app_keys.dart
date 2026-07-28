@@ -102,6 +102,20 @@ class AppKeys {
   static const navReport = 'nav_report';
   static const navSettings = 'nav_settings';
 
+  static const notificationTitle = 'notification_title';
+  static const notificationToday = 'notification_today';
+  static const notificationEarlier = 'notification_earlier';
+  static const notificationEmptyTitle = 'notification_empty_title';
+  static const notificationEmptyMessage = 'notification_empty_message';
+  static const notificationLoadFailed = 'notification_load_failed';
+  static const notificationFallbackTitle = 'notification_fallback_title';
+  static const notificationFallbackMessage = 'notification_fallback_message';
+  static const notificationJustNow = 'notification_just_now';
+  static const notificationMinutesAgo = 'notification_minutes_ago';
+  static const notificationHoursAgo = 'notification_hours_ago';
+  static const notificationYesterday = 'notification_yesterday';
+  static const notificationDaysAgo = 'notification_days_ago';
+
   static const student = 'student';
   static const assessment = 'assessment';
   static const assessmentDescription = 'assessment_description';

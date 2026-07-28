@@ -12,6 +12,7 @@ import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/notifications/presentation/notification_screen.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/dashboard/application/dashboard_profile_controller.dart';
 import 'package:numi/features/dashboard/application/role_tab_cubit.dart';
@@ -266,6 +267,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       canSwitchProfile: switchableProfiles.isNotEmpty,
                       isProfileMenuOpen: isMenuOpen,
                       parentStreakCount: _parentStreakCount,
+                      onNotificationTap: _openNotifications,
                       onProfileTap: switchableProfiles.isEmpty
                           ? null
                           : () {
@@ -444,6 +446,10 @@ class _DashboardScreenState extends State<DashboardScreen>
       }
       setState(() => _parentStreakCount = nextCount);
     });
+  }
+
+  void _openNotifications() {
+    Navigator.of(context).push<void>(NotificationScreen.route());
   }
 
   String _displayProfileName(

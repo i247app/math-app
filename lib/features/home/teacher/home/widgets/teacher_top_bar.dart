@@ -14,10 +14,12 @@ class TeacherTopBar extends StatelessWidget {
     super.key,
     required this.profile,
     required this.topPadding,
+    required this.onNotificationTap,
   });
 
   final StudentProfile? profile;
   final double topPadding;
+  final VoidCallback onNotificationTap;
 
   @override
   Widget build(BuildContext context) {
@@ -66,25 +68,26 @@ class TeacherTopBar extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
+          Tooltip(
+            message: context.getText(AppKeys.notificationTitle),
+            child: Material(
               color: colors.elevatedSurface,
-              shape: BoxShape.circle,
-              border: Border.all(color: colors.border),
-              boxShadow: [
-                BoxShadow(
-                  color: colors.shadow,
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
+              elevation: 1,
+              shadowColor: colors.shadow,
+              shape: CircleBorder(side: BorderSide(color: colors.border)),
+              child: InkWell(
+                onTap: onNotificationTap,
+                customBorder: const CircleBorder(),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(
+                    Icons.notifications_none_rounded,
+                    color: colors.brandStrong,
+                    size: 22,
+                  ),
                 ),
-              ],
-            ),
-            child: Icon(
-              Icons.notifications_none_rounded,
-              color: colors.brandStrong,
-              size: 22,
+              ),
             ),
           ),
         ],

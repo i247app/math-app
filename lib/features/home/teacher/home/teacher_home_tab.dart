@@ -19,6 +19,7 @@ import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/features/home/teacher/data/cache/teacher_home_snapshot.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/notifications/presentation/notification_screen.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
@@ -442,6 +443,11 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
     context.showErrorDialog(message);
   }
 
+  void _openNotifications() {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push<void>(NotificationScreen.route());
+  }
+
   Widget _buildClassroomSection({required bool isProfileComplete}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -534,6 +540,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
             TeacherTopBar(
               profile: widget.activeProfile,
               topPadding: MediaQuery.paddingOf(context).top,
+              onNotificationTap: _openNotifications,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(

@@ -30,6 +30,7 @@ class DashboardHeaderBar extends StatelessWidget {
     required this.isProfileMenuOpen,
     required this.parentStreakCount,
     required this.onProfileTap,
+    required this.onNotificationTap,
   });
 
   final double topInset;
@@ -40,6 +41,7 @@ class DashboardHeaderBar extends StatelessWidget {
   final bool isProfileMenuOpen;
   final int parentStreakCount;
   final VoidCallback? onProfileTap;
+  final VoidCallback onNotificationTap;
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +136,7 @@ class DashboardHeaderBar extends StatelessWidget {
                 child: DashboardParentFireBadge(count: parentStreakCount),
               ),
             ],
-            const DashboardNotificationButton(),
+            DashboardNotificationButton(onTap: onNotificationTap),
           ],
         ),
       ),
@@ -250,7 +252,9 @@ class DashboardProfileAvatar extends StatelessWidget {
 }
 
 class DashboardNotificationButton extends StatelessWidget {
-  const DashboardNotificationButton({super.key});
+  const DashboardNotificationButton({super.key, required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -261,7 +265,10 @@ class DashboardNotificationButton extends StatelessWidget {
       elevation: 2,
       borderRadius: BorderRadius.circular(11),
       child: InkWell(
-        onTap: HapticFeedback.selectionClick,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
         borderRadius: BorderRadius.circular(11),
         child: SizedBox(
           width: 30,

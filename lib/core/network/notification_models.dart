@@ -111,19 +111,66 @@ class NotificationModel {
   final String? modifyDt;
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    final payload = json['data'] ?? json['payload'];
     return NotificationModel(
       rawJson: json,
       id: _intFromJson(json['id']),
       notificationId: _intFromJson(json['notification_id']),
-      title: _stringFromJson(json['title']),
-      message: _stringFromJson(json['message']),
-      body: _stringFromJson(json['body']),
-      type: _stringFromJson(json['type']),
+      title: _stringFromJson(
+        json['title'] ??
+            json['subject'] ??
+            _nestedValue(payload, 'title') ??
+            _nestedValue(payload, 'subject'),
+      ),
+      message: _stringFromJson(
+        json['message'] ??
+            json['description'] ??
+            json['content'] ??
+            json['short_text'] ??
+            _nestedValue(payload, 'message') ??
+            _nestedValue(payload, 'description') ??
+            _nestedValue(payload, 'content') ??
+            _nestedValue(payload, 'short_text'),
+      ),
+      body: _stringFromJson(
+        json['body'] ??
+            json['text'] ??
+            _nestedValue(payload, 'body') ??
+            _nestedValue(payload, 'text'),
+      ),
+      type: _stringFromJson(
+        json['type'] ??
+            json['notification_type'] ??
+            _nestedValue(payload, 'type'),
+      ),
       status: _stringFromJson(json['status']),
-      isRead: _boolFromJson(json['is_read']),
-      readAt: _stringFromJson(json['read_at']),
-      createDt: _stringFromJson(json['create_dt'] ?? json['created_at']),
-      modifyDt: _stringFromJson(json['modify_dt'] ?? json['updated_at']),
+      isRead: _boolFromJson(
+        json['is_read'] ??
+            json['read'] ??
+            json['read_status'] ??
+            json['status'],
+      ),
+      readAt: _stringFromJson(
+        json['read_at'] ?? _nestedValue(payload, 'read_at'),
+      ),
+      createDt: _stringFromJson(
+        json['create_dt'] ??
+            json['created_at'] ??
+            json['notification_dt'] ??
+            json['sent_at'] ??
+            json['timestamp'] ??
+            _nestedValue(payload, 'create_dt') ??
+            _nestedValue(payload, 'created_at') ??
+            _nestedValue(payload, 'notification_dt') ??
+            _nestedValue(payload, 'sent_at') ??
+            _nestedValue(payload, 'timestamp'),
+      ),
+      modifyDt: _stringFromJson(
+        json['modify_dt'] ??
+            json['updated_at'] ??
+            _nestedValue(payload, 'modify_dt') ??
+            _nestedValue(payload, 'updated_at'),
+      ),
     );
   }
 
@@ -188,10 +235,20 @@ bool? _boolFromJson(Object? value) {
   }
 
   return switch (value?.toString().trim().toLowerCase()) {
-    'true' || '1' => true,
-    'false' || '0' => false,
+    'true' || '1' || 'read' => true,
+    'false' || '0' || 'unread' || 'new' => false,
     _ => null,
   };
 }
 
 String? _stringFromJson(Object? value) => value?.toString();
+
+Object? _nestedValue(Object? value, String key) {
+  if (value case final Map<String, dynamic> json) {
+    return json[key];
+  }
+  if (value case final Map<Object?, Object?> json) {
+    return json[key];
+  }
+  return null;
+}
