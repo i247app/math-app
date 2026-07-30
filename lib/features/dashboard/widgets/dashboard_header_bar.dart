@@ -7,6 +7,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/notifications/widgets/notification_unread_dot.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
@@ -31,6 +32,7 @@ class DashboardHeaderBar extends StatelessWidget {
     required this.parentStreakCount,
     required this.onProfileTap,
     required this.onNotificationTap,
+    this.hasUnreadNotifications = false,
   });
 
   final double topInset;
@@ -42,6 +44,7 @@ class DashboardHeaderBar extends StatelessWidget {
   final int parentStreakCount;
   final VoidCallback? onProfileTap;
   final VoidCallback onNotificationTap;
+  final bool hasUnreadNotifications;
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +139,10 @@ class DashboardHeaderBar extends StatelessWidget {
                 child: DashboardParentFireBadge(count: parentStreakCount),
               ),
             ],
-            DashboardNotificationButton(onTap: onNotificationTap),
+            DashboardNotificationButton(
+              onTap: onNotificationTap,
+              hasUnreadNotifications: hasUnreadNotifications,
+            ),
           ],
         ),
       ),
@@ -252,9 +258,14 @@ class DashboardProfileAvatar extends StatelessWidget {
 }
 
 class DashboardNotificationButton extends StatelessWidget {
-  const DashboardNotificationButton({super.key, required this.onTap});
+  const DashboardNotificationButton({
+    super.key,
+    required this.onTap,
+    this.hasUnreadNotifications = false,
+  });
 
   final VoidCallback onTap;
+  final bool hasUnreadNotifications;
 
   @override
   Widget build(BuildContext context) {
@@ -273,12 +284,26 @@ class DashboardNotificationButton extends StatelessWidget {
         child: SizedBox(
           width: 30,
           height: 30,
-          child: Center(
-            child: SvgPicture.asset(
-              studentHomeBellAsset,
-              width: 12,
-              height: 15,
-            ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Center(
+                child: SvgPicture.asset(
+                  studentHomeBellAsset,
+                  width: 12,
+                  height: 15,
+                ),
+              ),
+              if (hasUnreadNotifications)
+                Positioned(
+                  top: 2,
+                  right: 2,
+                  child: NotificationUnreadDot(
+                    borderColor: colors.elevatedSurface,
+                    size: 8,
+                  ),
+                ),
+            ],
           ),
         ),
       ),

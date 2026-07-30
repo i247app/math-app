@@ -6,6 +6,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/notifications/widgets/notification_unread_dot.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 import 'package:numi/shared/helpers/teacher_display_helpers.dart';
 
@@ -15,11 +16,13 @@ class TeacherTopBar extends StatelessWidget {
     required this.profile,
     required this.topPadding,
     required this.onNotificationTap,
+    this.hasUnreadNotifications = false,
   });
 
   final StudentProfile? profile;
   final double topPadding;
   final VoidCallback onNotificationTap;
+  final bool hasUnreadNotifications;
 
   @override
   Widget build(BuildContext context) {
@@ -81,10 +84,23 @@ class TeacherTopBar extends StatelessWidget {
                 child: SizedBox(
                   width: 40,
                   height: 40,
-                  child: Icon(
-                    Icons.notifications_none_rounded,
-                    color: colors.brandStrong,
-                    size: 22,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Icon(
+                        Icons.notifications_none_rounded,
+                        color: colors.brandStrong,
+                        size: 22,
+                      ),
+                      if (hasUnreadNotifications)
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: NotificationUnreadDot(
+                            borderColor: colors.elevatedSurface,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),

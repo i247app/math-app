@@ -24,6 +24,8 @@ class TeacherTabHost extends StatelessWidget {
         exerciseService: args.assignmentService,
         activeRefreshTick: args.activeRefreshTick,
         isActive: args.isActive,
+        hasUnreadNotifications: args.hasUnreadNotifications,
+        onNotificationTap: args.onNotificationTap,
       );
     }
 

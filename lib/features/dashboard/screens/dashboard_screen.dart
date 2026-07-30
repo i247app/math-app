@@ -6,6 +6,7 @@ import 'package:numi/core/debug/home_tab_performance_monitor.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/core/notifications/notification_service.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
@@ -13,6 +14,8 @@ import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/features/notifications/navigation/notification_route.dart';
+import 'package:numi/features/notifications/application/notification_badge_controller.dart';
+import 'package:numi/features/notifications/data/notification_api.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/dashboard/application/dashboard_profile_controller.dart';
 import 'package:numi/features/dashboard/application/role_tab_cubit.dart';
@@ -61,10 +64,14 @@ class DashboardScreen extends StatefulWidget {
     ClassroomService? classroomService,
     ClassroomExerciseService? assignmentService,
     QuizService? quizService,
+    NotificationListService? notificationService,
+    Stream<Object?>? notificationMessages,
   }) : _gradeService = gradeService,
        _classroomService = classroomService,
        _assignmentService = assignmentService,
-       _quizService = quizService;
+       _quizService = quizService,
+       _notificationService = notificationService,
+       _notificationMessages = notificationMessages;
 
   final LoginUser? user;
   final List<StudentProfile> profiles;
@@ -79,6 +86,8 @@ class DashboardScreen extends StatefulWidget {
   final ClassroomService? _classroomService;
   final ClassroomExerciseService? _assignmentService;
   final QuizService? _quizService;
+  final NotificationListService? _notificationService;
+  final Stream<Object?>? _notificationMessages;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -91,6 +100,14 @@ class _DashboardScreenState extends State<DashboardScreen>
   late final ClassroomExerciseService _assignmentService =
       widget._assignmentService ?? ClassroomExerciseApi();
   late final QuizService _quizService = widget._quizService ?? QuizApi();
+  late final NotificationListService _notificationService =
+      widget._notificationService ?? NotificationApi();
+  late final NotificationBadgeController _notificationBadgeController =
+      NotificationBadgeController(
+        service: _notificationService,
+        incomingMessages:
+            widget._notificationMessages ?? NotificationService.messages,
+      );
   final ParentRoleTabCubit _parentTabCubit = ParentRoleTabCubit();
   final StudentRoleTabCubit _studentTabCubit = StudentRoleTabCubit();
   final TeacherRoleTabCubit _teacherTabCubit = TeacherRoleTabCubit();
@@ -113,6 +130,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       _parentHomeEntranceController.forward();
     }
     _profileController.prefetchGrades(widget.user?.id);
+    _notificationBadgeController.start();
   }
 
   @override
@@ -219,6 +237,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     _studentTabCubit.close();
     _teacherTabCubit.close();
     _tabPerformanceMonitor.dispose();
+    _notificationBadgeController.dispose();
     super.dispose();
   }
 
@@ -226,7 +245,10 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget build(BuildContext context) {
     final roleTabCubit = _roleTabCubitFor(widget.activeRole);
     return ListenableBuilder(
-      listenable: _profileController,
+      listenable: Listenable.merge([
+        _profileController,
+        _notificationBadgeController,
+      ]),
       builder: (context, _) {
         final profileState = _profileController.state;
         return BlocBuilder<RoleTabCubit, RoleTabState>(
@@ -268,6 +290,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                       isProfileMenuOpen: isMenuOpen,
                       parentStreakCount: _parentStreakCount,
                       onNotificationTap: _openNotifications,
+                      hasUnreadNotifications:
+                          _notificationBadgeController.hasUnread,
                       onProfileTap: switchableProfiles.isEmpty
                           ? null
                           : () {
@@ -351,6 +375,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                     },
                     parentHomeEntrance: _parentHomeEntranceController,
                     bottomPadding: navHeight + 14,
+                    hasUnreadNotifications:
+                        _notificationBadgeController.hasUnread,
+                    onNotificationTap: _openNotifications,
                     homeHeader: homeHeader,
                   ),
                 ),
@@ -449,7 +476,10 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   void _openNotifications() {
-    Navigator.of(context).push<void>(NotificationRoute());
+    _notificationBadgeController.markViewed();
+    Navigator.of(
+      context,
+    ).push<void>(NotificationRoute(notificationService: _notificationService));
   }
 
   String _displayProfileName(

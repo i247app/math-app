@@ -54,6 +54,8 @@ class TeacherHomeTab extends StatefulWidget {
     HomeLayoutService? homeLayoutService,
     this.activeRefreshTick = 0,
     this.isActive = true,
+    this.hasUnreadNotifications = false,
+    this.onNotificationTap,
   }) : _exerciseService = exerciseService,
        _homeLayoutService = homeLayoutService;
 
@@ -65,6 +67,8 @@ class TeacherHomeTab extends StatefulWidget {
   final VoidCallback? onOpenStudyTab;
   final int activeRefreshTick;
   final bool isActive;
+  final bool hasUnreadNotifications;
+  final VoidCallback? onNotificationTap;
   final ClassroomExerciseService? _exerciseService;
   final HomeLayoutService? _homeLayoutService;
 
@@ -540,7 +544,8 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
             TeacherTopBar(
               profile: widget.activeProfile,
               topPadding: MediaQuery.paddingOf(context).top,
-              onNotificationTap: _openNotifications,
+              onNotificationTap: widget.onNotificationTap ?? _openNotifications,
+              hasUnreadNotifications: widget.hasUnreadNotifications,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(

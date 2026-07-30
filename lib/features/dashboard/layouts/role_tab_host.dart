@@ -43,6 +43,8 @@ class RoleTabHost extends StatefulWidget {
     required this.parentHomeEntrance,
     required this.profileResetSignal,
     required this.bottomPadding,
+    required this.hasUnreadNotifications,
+    required this.onNotificationTap,
     this.homeHeader,
   });
 
@@ -73,6 +75,8 @@ class RoleTabHost extends StatefulWidget {
   final Animation<double> parentHomeEntrance;
   final int profileResetSignal;
   final double bottomPadding;
+  final bool hasUnreadNotifications;
+  final VoidCallback onNotificationTap;
   final Widget? homeHeader;
 
   @override
@@ -135,9 +139,10 @@ class RoleTabHostState extends State<RoleTabHost> {
 
     if (_requiresAllTabsRebuild(oldWidget, widget)) {
       _tabChildren.clear();
-    } else if (oldWidget.homeHeader != widget.homeHeader) {
+    } else if (oldWidget.homeHeader != widget.homeHeader ||
+        oldWidget.hasUnreadNotifications != widget.hasUnreadNotifications) {
       // The header only belongs to the Home tab and can change when the
-      // profile menu opens or closes.
+      // profile menu opens or the unread notification state changes.
       _tabChildren.remove(0);
     }
   }
@@ -196,6 +201,8 @@ class RoleTabHostState extends State<RoleTabHost> {
       parentHomeEntrance: widget.parentHomeEntrance,
       activeRefreshTick: _activationTicks[tab] ?? 0,
       bottomPadding: widget.bottomPadding,
+      hasUnreadNotifications: widget.hasUnreadNotifications,
+      onNotificationTap: widget.onNotificationTap,
       homeHeader: tab == 0 ? widget.homeHeader : null,
     );
 

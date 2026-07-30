@@ -36,6 +36,8 @@ class DashboardTabArgs {
     required this.parentHomeEntrance,
     required this.activeRefreshTick,
     required this.bottomPadding,
+    required this.hasUnreadNotifications,
+    required this.onNotificationTap,
     this.homeHeader,
   });
 
@@ -65,6 +67,8 @@ class DashboardTabArgs {
   final Animation<double> parentHomeEntrance;
   final int activeRefreshTick;
   final double bottomPadding;
+  final bool hasUnreadNotifications;
+  final VoidCallback onNotificationTap;
   final Widget? homeHeader;
 
   EdgeInsets get contentPadding => EdgeInsets.only(
