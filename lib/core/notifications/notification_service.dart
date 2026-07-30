@@ -180,7 +180,7 @@ class NotificationService {
     await _requestPermission();
     await _initializeLocalNotifications();
     await _requestLocalNotificationPermission();
-    await _disableFirebaseForegroundPresentation();
+    await _configureFirebaseForegroundPresentation();
     _listenForTokenRefresh();
     await _loadInitialToken();
     _listenForForegroundMessages();
@@ -285,14 +285,14 @@ class NotificationService {
     }
   }
 
-  /// Avoids duplicate foreground banners on Apple platforms. Foreground FCM
-  /// messages are surfaced through flutter_local_notifications instead.
-  Future<void> _disableFirebaseForegroundPresentation() async {
+  /// Lets Apple platforms present FCM notification payloads while the app is
+  /// in the foreground. Data-only messages still use the local fallback below.
+  Future<void> _configureFirebaseForegroundPresentation() async {
     try {
       await _firebaseMessaging.setForegroundNotificationPresentationOptions(
-        alert: false,
-        badge: false,
-        sound: false,
+        alert: true,
+        badge: true,
+        sound: true,
       );
     } catch (error, stackTrace) {
       _logNotificationError('foreground presentation', error, stackTrace);
@@ -320,10 +320,12 @@ class NotificationService {
       (message) {
         _messageController.add(message);
         logRemoteMessage(message, source: 'foreground');
-        // Foreground remote notifications are displayed through local
-        // notifications on mobile so Android and iOS use the same path.
+        // Apple displays notification payloads through the native presentation
+        // options above. Keep the local fallback for Android and for iOS
+        // data-only messages that contain title/body fields.
         if (defaultTargetPlatform == TargetPlatform.android ||
-            defaultTargetPlatform == TargetPlatform.iOS) {
+            (defaultTargetPlatform == TargetPlatform.iOS &&
+                message.notification == null)) {
           unawaited(_showForegroundNotification(message));
         }
       },
