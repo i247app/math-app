@@ -39,7 +39,7 @@ class WelcomeDetailsHeader extends StatelessWidget {
             height: isTablet ? 340 : 280,
             width: double.infinity,
             child: Transform.translate(
-              offset: const Offset(-32, 0),
+              offset: const Offset(-32, 48),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 540),
