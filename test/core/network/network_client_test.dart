@@ -84,6 +84,89 @@ void main() {
     );
   });
 
+  test('sendOtp skips blank error fields for a logical API error', () async {
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.resolve(
+              Response<Object?>(
+                requestOptions: options,
+                statusCode: 200,
+                data: const <String, dynamic>{
+                  'mstatus': 429,
+                  'mmessage': '   ',
+                  'debug': 'OTP request limit reached.',
+                  'status': 'Error',
+                },
+              ),
+            );
+          },
+        ),
+      );
+    final api = NetworkApi(
+      networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
+    );
+
+    await expectLater(
+      api.sendOtp(
+        const SendOtpRequest(
+          otpType: 'REGISTER',
+          identifier: 'learner@example.com',
+        ),
+      ),
+      throwsA(
+        isA<NetworkException>().having(
+          (error) => error.message,
+          'message',
+          'OTP request limit reached.',
+        ),
+      ),
+    );
+  });
+
+  test('signup uses a localized fallback for a blank API error', () async {
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.resolve(
+              Response<Object?>(
+                requestOptions: options,
+                statusCode: 200,
+                data: const <String, dynamic>{
+                  'mstatus': 422,
+                  'mmessage': '   ',
+                  'debug': '',
+                  'status': ' ',
+                },
+              ),
+            );
+          },
+        ),
+      );
+    final api = NetworkApi(
+      networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
+    );
+
+    await expectLater(
+      api.signup(
+        const SignupRequest(
+          phone: '+84901234567',
+          name: 'Learner',
+          role: 'STUDENT',
+        ),
+      ),
+      throwsA(
+        isA<NetworkException>().having(
+          (error) => error.message,
+          'message',
+          'Invalid server response.',
+        ),
+      ),
+    );
+  });
+
   test('listDevices posts the request and parses the response', () async {
     String? requestPath;
     Object? requestBody;

@@ -254,10 +254,7 @@ class NetworkApi {
     final authResponse = AuthResponse.fromJson(responseJson);
     if (authResponse.mstatus != 200) {
       throw NetworkException(
-        authResponse.mmessage ??
-            authResponse.debug ??
-            authResponse.status ??
-            'Request failed.',
+        _apiErrorMessage(responseJson),
         status: authResponse.mstatus,
       );
     }
@@ -285,10 +282,7 @@ class NetworkApi {
     final authResponse = AuthResponse.fromJson(responseJson);
     if (authResponse.mstatus != 200) {
       throw NetworkException(
-        authResponse.mmessage ??
-            authResponse.debug ??
-            authResponse.status ??
-            'Request failed.',
+        _apiErrorMessage(responseJson),
         status: authResponse.mstatus,
       );
     }
@@ -316,10 +310,7 @@ class NetworkApi {
     final sendResponse = SendOtpResponse.fromJson(responseJson);
     if (sendResponse.mstatus != 200) {
       throw NetworkException(
-        sendResponse.mmessage ??
-            sendResponse.debug ??
-            sendResponse.status ??
-            'Request failed.',
+        _apiErrorMessage(responseJson),
         status: sendResponse.mstatus,
       );
     }
@@ -335,10 +326,7 @@ class NetworkApi {
     final verifyResponse = VerifyOtpResponse.fromJson(responseJson);
     if (verifyResponse.mstatus != 200) {
       throw NetworkException(
-        verifyResponse.mmessage ??
-            verifyResponse.debug ??
-            verifyResponse.status ??
-            'Request failed.',
+        _apiErrorMessage(responseJson),
         status: verifyResponse.mstatus,
       );
     }
@@ -1132,10 +1120,7 @@ class NetworkApi {
     final authResponse = AuthResponse.fromJson(responseJson);
     if (authResponse.mstatus != 200) {
       throw NetworkException(
-        authResponse.mmessage ??
-            authResponse.debug ??
-            authResponse.status ??
-            'Request failed.',
+        _apiErrorMessage(responseJson),
         status: authResponse.mstatus,
       );
     }
@@ -1199,11 +1184,13 @@ class NetworkApi {
   }
 
   static String _apiErrorMessage(Map<String, dynamic> json) {
-    final message = json['mmessage'] ?? json['debug'] ?? json['status'];
-    if (message is String && message.trim().isNotEmpty) {
-      return message;
+    for (final key in const ['mmessage', 'debug', 'status']) {
+      final message = json[key];
+      if (message is String && message.trim().isNotEmpty) {
+        return message.trim();
+      }
     }
 
-    return 'Request failed.';
+    return AppStrings.current(AppKeys.invalidServerResponse);
   }
 }

@@ -12,8 +12,12 @@ bool isSignupUsernameExistsError(String? message) {
 }
 
 String localizedAuthError(BuildContext context, String message) {
-  if (isSignupUsernameExistsError(message)) {
+  final normalized = message.trim();
+  if (normalized.isEmpty) {
+    return context.getText(AppKeys.invalidServerResponse);
+  }
+  if (isSignupUsernameExistsError(normalized)) {
     return context.getText(AppKeys.signupUsernameExists);
   }
-  return message;
+  return normalized;
 }
