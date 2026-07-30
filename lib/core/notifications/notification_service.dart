@@ -45,6 +45,8 @@ class NotificationService {
         description: 'Notifications shown while NUMI is open.',
         importance: Importance.high,
       );
+  static const int _apnsTokenLoadAttempts = 40;
+  static const Duration _apnsTokenRetryDelay = Duration(milliseconds: 250);
 
   static bool _initialized = false;
   static String? _latestToken;
@@ -77,7 +79,12 @@ class NotificationService {
         await Firebase.initializeApp();
       }
 
-      final token = await FirebaseMessaging.instance.getToken();
+      final messaging = FirebaseMessaging.instance;
+      final token = await resolveMessagingToken(
+        requiresApnsToken: _requiresApnsToken,
+        getApnsToken: messaging.getAPNSToken,
+        getFcmToken: messaging.getToken,
+      );
       if (token == null || token.isEmpty) {
         debugPrint('[Notification] FCM token is not available yet.');
         return null;
@@ -91,6 +98,56 @@ class NotificationService {
       return null;
     }
   }
+
+  /// Waits for APNs registration before asking Firebase for an FCM token.
+  ///
+  /// Recent Firebase Messaging SDKs require the APNs token to be available
+  /// before Apple-platform FCM API calls. The wait is bounded so notification
+  /// startup cannot hang indefinitely when APNs registration is unavailable.
+  @visibleForTesting
+  static Future<String?> resolveMessagingToken({
+    required bool requiresApnsToken,
+    required Future<String?> Function() getApnsToken,
+    required Future<String?> Function() getFcmToken,
+    int apnsTokenLoadAttempts = _apnsTokenLoadAttempts,
+    Duration apnsTokenRetryDelay = _apnsTokenRetryDelay,
+    Future<void> Function(Duration)? delay,
+  }) async {
+    if (requiresApnsToken) {
+      var apnsTokenAvailable = false;
+      for (var attempt = 0; attempt < apnsTokenLoadAttempts; attempt++) {
+        final apnsToken = (await getApnsToken())?.trim();
+        if (apnsToken != null && apnsToken.isNotEmpty) {
+          apnsTokenAvailable = true;
+          break;
+        }
+
+        final hasAnotherAttempt = attempt + 1 < apnsTokenLoadAttempts;
+        if (hasAnotherAttempt) {
+          if (delay != null) {
+            await delay(apnsTokenRetryDelay);
+          } else {
+            await Future<void>.delayed(apnsTokenRetryDelay);
+          }
+        }
+      }
+
+      if (!apnsTokenAvailable) {
+        debugPrint(
+          '[Notification] APNs token is not available yet; '
+          'deferring FCM token load.',
+        );
+        return null;
+      }
+    }
+
+    return getFcmToken();
+  }
+
+  static bool get _requiresApnsToken =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS);
 
   static void _emitToken(String token) {
     _latestToken = token;
@@ -124,8 +181,8 @@ class NotificationService {
     await _initializeLocalNotifications();
     await _requestLocalNotificationPermission();
     await _disableFirebaseForegroundPresentation();
-    await _loadInitialToken();
     _listenForTokenRefresh();
+    await _loadInitialToken();
     _listenForForegroundMessages();
     _listenForOpenedMessages();
     await _handleInitialMessage();
