@@ -4,6 +4,8 @@ import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('AppThemeColors', () {
     test('provides semantic state tokens for light and dark themes', () {
       for (final colors in [AppThemeColors.light, AppThemeColors.dark]) {
