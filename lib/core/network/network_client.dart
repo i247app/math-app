@@ -202,25 +202,23 @@ class NetworkClient {
   }
 
   static String _dioErrorMessage(DioException error) {
-    final type = error.type;
-    if (type == DioExceptionType.connectionTimeout ||
-        type == DioExceptionType.sendTimeout ||
-        type == DioExceptionType.receiveTimeout ||
-        type.name == 'transformTimeout' ||
-        type == DioExceptionType.connectionError) {
-      return AppStrings.current(AppKeys.checkInternetConnection);
-    }
-    if (type == DioExceptionType.badCertificate) {
-      return AppStrings.current(AppKeys.apiBadCertificate);
-    }
-    if (type == DioExceptionType.cancel) {
-      return AppStrings.current(AppKeys.apiRequestCanceled);
-    }
-    if (error.response == null) {
-      return AppStrings.current(AppKeys.checkInternetConnection);
-    }
-
-    return error.message ?? AppStrings.current(AppKeys.apiConnectionFailed);
+    return switch (error.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout ||
+      DioExceptionType.transformTimeout ||
+      DioExceptionType.connectionError => AppStrings.current(
+        AppKeys.checkInternetConnection,
+      ),
+      DioExceptionType.badCertificate => AppStrings.current(
+        AppKeys.apiBadCertificate,
+      ),
+      DioExceptionType.cancel => AppStrings.current(AppKeys.apiRequestCanceled),
+      DioExceptionType.badResponse || DioExceptionType.unknown =>
+        error.response == null
+            ? AppStrings.current(AppKeys.checkInternetConnection)
+            : error.message ?? AppStrings.current(AppKeys.apiConnectionFailed),
+    };
   }
 }
 
