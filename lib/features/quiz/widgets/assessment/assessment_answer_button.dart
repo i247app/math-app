@@ -57,35 +57,52 @@ class AssessmentAnswerButton extends StatelessWidget {
                     ),
                   ],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                answer.content,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: FontSize.displaySmall,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  letterSpacing: 0,
-                ),
-              ),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                width: selected ? 8 : 0,
-                height: selected ? 12 : 0,
-                padding: const EdgeInsets.only(top: 4),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: colors.brandStrong,
-                    shape: BoxShape.circle,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    answer.content,
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: _fontSizeFor(answer.content),
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                      letterSpacing: 0,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  width: selected ? 8 : 0,
+                  height: selected ? 12 : 0,
+                  padding: const EdgeInsets.only(top: 4),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colors.brandStrong,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  double _fontSizeFor(String value) {
+    final length = value.trim().length;
+    if (length <= 5) return FontSize.displaySmall;
+    if (length <= 12) return 30;
+    if (length <= 24) return 24;
+    if (length <= 48) return 20;
+    return 18;
   }
 }

@@ -11,27 +11,44 @@ class AssessmentQuestionCard extends StatelessWidget {
     final colors = context.themeColors;
     return Container(
       height: 356,
-      alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 26),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(32),
         border: Border.all(color: colors.border),
       ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          question,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: colors.textPrimary,
-            fontSize: 72,
-            fontWeight: FontWeight.w900,
-            height: 1,
-            letterSpacing: 0,
-          ),
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: Text(
+                  question,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: _fontSizeFor(question),
+                    fontWeight: FontWeight.w900,
+                    height: 1.2,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
+  }
+
+  double _fontSizeFor(String value) {
+    final length = value.trim().length;
+    if (length <= 18) return 52;
+    if (length <= 45) return 40;
+    if (length <= 90) return 30;
+    if (length <= 160) return 24;
+    return 20;
   }
 }
