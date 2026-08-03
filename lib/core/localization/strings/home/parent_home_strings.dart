@@ -81,7 +81,7 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentRoomAssignmentsTitle: 'Bài tập, kiểm tra',
   },
   'en': {
-    AppKeys.parentAssessmentTabTitle: 'Review',
+    AppKeys.parentAssessmentTabTitle: 'Assessment',
     AppKeys.parentLearningStreak: 'Learning streak',
     AppKeys.parentAssessmentTitle: 'Assessment',
     AppKeys.parentAssessmentSubtitle:

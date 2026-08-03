@@ -65,6 +65,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   List<ParentAssessmentEntry> _allEntries = const <ParentAssessmentEntry>[];
   QuizPagination? _pagination;
   bool _isLoading = true;
+  bool _hasLoaded = false;
   bool _hasPlayedInitialEntrance = false;
   String? _errorMessage;
   int _loadRequestId = 0;
@@ -93,6 +94,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         _profileSourceKey(widget.user, widget.activeProfile)) {
       _pagination = null;
       _allEntries = const <ParentAssessmentEntry>[];
+      _hasLoaded = false;
       _loadAssessments(page: 1);
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       _loadAssessments(forceRefresh: true);
@@ -142,6 +144,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         : cache.getParent(profileId);
     if (!forceRefresh && targetPage == 1 && cachedSnapshot != null) {
       setState(() => _applyCachedAssessments(cachedSnapshot));
+      if (!cachedSnapshot.isStale) {
+        return;
+      }
     }
 
     setState(() {
@@ -189,6 +194,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
         _pagination = loadedPagination;
       }
       _isLoading = false;
+      _hasLoaded = true;
       _errorMessage = failed && _entries.isEmpty
           ? context.readText(AppKeys.parentQuizLoadFailed)
           : null;
@@ -220,6 +226,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     _entries = cachedEntries.take(_pageSize).toList(growable: false);
     _allEntries = _entries;
     _isLoading = false;
+    _hasLoaded = true;
     _errorMessage = null;
   }
 
@@ -350,9 +357,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   Widget build(BuildContext context) {
     final topInset = MediaQuery.paddingOf(context).top;
     final entries = _filteredEntries;
-    final shouldShowFullSkeleton = _isLoading && _entries.isEmpty;
+    final shouldShowFullSkeleton = _isLoading && !_hasLoaded;
     final hasNoAssessments =
-        !_isLoading && _errorMessage == null && _entries.isEmpty;
+        _hasLoaded && _errorMessage == null && _entries.isEmpty;
 
     final colors = context.themeColors;
     return ColoredBox(
