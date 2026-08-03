@@ -3,8 +3,8 @@ import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_skeleton_pulse.dart';
 
-class ParentPracticeTabBanner extends StatelessWidget {
-  const ParentPracticeTabBanner({super.key, required this.onTap});
+class ParentAssessmentTabBanner extends StatelessWidget {
+  const ParentAssessmentTabBanner({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -19,9 +19,9 @@ class ParentPracticeTabBanner extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: AspectRatio(
-          aspectRatio: 3.21,
+          aspectRatio: 1280 / 497,
           child: Image.asset(
-            'assets/images/review_tab_banner.jpg',
+            'assets/images/assessment_tab_banner.jpg',
             fit: BoxFit.cover,
             frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
               if (wasSynchronouslyLoaded) {

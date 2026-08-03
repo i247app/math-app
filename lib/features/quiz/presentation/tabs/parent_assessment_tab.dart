@@ -28,7 +28,7 @@ import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_e
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_state_card.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_practice_tab_banner.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_banner.dart';
 
 class ParentAssessmentTab extends StatefulWidget {
   const ParentAssessmentTab({
@@ -417,7 +417,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     return [
       Padding(
         padding: const EdgeInsets.only(bottom: 13),
-        child: ParentPracticeTabBanner(onTap: _openAssessment),
+        child: ParentAssessmentTabBanner(onTap: _openAssessment),
       ),
       ParentAssessmentSearchField(controller: _searchController),
       if (shouldShowProgressChart) ...[
