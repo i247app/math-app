@@ -20,6 +20,7 @@ import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/profile/data/school_api.dart';
 import 'package:numi/shared/layouts/app_screen_app_bar.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_choice_chip.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_summary.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_date_field.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
@@ -69,6 +70,8 @@ class TeacherCreateHomeworkScreen extends StatefulWidget {
 
 class _TeacherCreateHomeworkScreenState
     extends State<TeacherCreateHomeworkScreen> {
+  static const List<int> _questionCountOptions = <int>[5, 10, 15, 20];
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _chapterController = TextEditingController();
   final TextEditingController _lessonController = TextEditingController();
@@ -86,6 +89,7 @@ class _TeacherCreateHomeworkScreenState
   int? _selectedProgramId;
   DateTime? _startDate;
   DateTime? _endDate;
+  int _selectedQuestionCount = _questionCountOptions.first;
   List<ClassroomModel> _classrooms = const <ClassroomModel>[];
   List<GradeModel> _grades = const <GradeModel>[];
   List<ProgramModel> _programs = const <ProgramModel>[];
@@ -130,7 +134,7 @@ class _TeacherCreateHomeworkScreenState
         programId: _selectedProgramId!,
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
-        numQuestions: 4,
+        numQuestions: _selectedQuestionCount,
         chapterName: trimOrDefault(
           _chapterController.text,
           context.readText(AppKeys.teacherAssignmentDefaultChapter),
@@ -373,6 +377,11 @@ class _TeacherCreateHomeworkScreenState
     setState(() => _selectedProgramId = selected.id);
   }
 
+  void _selectQuestionCount(int count) {
+    HapticFeedback.selectionClick();
+    setState(() => _selectedQuestionCount = count);
+  }
+
   Future<void> _openDatePicker({required bool isStart}) async {
     _dismissKeyboard();
     final now = DateTime.now();
@@ -544,6 +553,30 @@ class _TeacherCreateHomeworkScreenState
                               iconWidth: 12,
                               iconHeight: 8,
                               onTap: _openProgramSelector,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 18),
+                            child: CreateHomeworkLabel(
+                              context.getText(
+                                AppKeys.teacherAssignmentQuestionCountLabel,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 9),
+                            child: Row(
+                              spacing: 8,
+                              children: [
+                                for (final count in _questionCountOptions)
+                                  Expanded(
+                                    child: CreateHomeworkChoiceChip(
+                                      label: '$count',
+                                      selected: count == _selectedQuestionCount,
+                                      onTap: () => _selectQuestionCount(count),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                           Padding(
