@@ -7,6 +7,10 @@ import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
 extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
   Widget buildCompletedState() {
+    const promoActionGap = 7.0;
+    const stackedPromoActionHeight =
+        (parentHomePromoActionHeight - promoActionGap) / 2;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 8,
@@ -26,16 +30,16 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
             children: [
               Expanded(
                 child: Column(
-                  spacing: 7,
+                  spacing: promoActionGap,
                   children: [
                     HomeImageAction(
                       asset: parentHomeRaceAsset,
-                      height: 83,
+                      height: stackedPromoActionHeight,
                       onTap: widget.onOpenPracticeTab,
                     ),
                     HomeImageAction(
                       asset: parentHomeShopAsset,
-                      height: 83,
+                      height: stackedPromoActionHeight,
                       onTap: widget.onOpenPracticeTab,
                     ),
                   ],
@@ -44,7 +48,7 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
               Expanded(
                 child: HomeImageAction(
                   asset: parentHomeClassroomAsset,
-                  height: 173,
+                  height: parentHomePromoActionHeight,
                   onTap: showClassroomMessage,
                 ),
               ),

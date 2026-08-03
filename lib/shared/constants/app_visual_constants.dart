@@ -30,6 +30,7 @@ const parentHomeAfterReviewBannerAsset =
 const parentHomeClassroomAsset = 'assets/images/join_classroom.jpg';
 const parentHomeRaceAsset = 'assets/images/parent_home_race.png';
 const parentHomeShopAsset = 'assets/images/parent_home_shop.png';
+const parentHomePromoActionHeight = 160.0;
 const studentParentHomeClassThumbAsset =
     'assets/images/student_parent_home_class_thumb.png';
 const studentParentHomeAcceptIconAsset =

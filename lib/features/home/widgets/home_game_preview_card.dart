@@ -4,18 +4,20 @@ class HomeGamePreviewCard extends StatelessWidget {
   const HomeGamePreviewCard({
     super.key,
     required this.background,
+    this.height = 150,
     this.asset,
     this.child,
   });
 
   final String? asset;
   final Color background;
+  final double height;
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
+      height: height,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
