@@ -328,12 +328,10 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     }
 
     if (entries.isEmpty) {
-      return _roomFadeIn(
-        markOnEnd: true,
-        child: ParentRoomSelectStudentCard(
-          onChooseProfile: widget.onOpenProfileMenu,
-          onCreateProfile: _openCreateStudentProfile,
-        ),
+      return ParentRoomSelectStudentCard(
+        key: const ValueKey('room-empty'),
+        onChooseProfile: widget.onOpenProfileMenu,
+        onCreateProfile: _openCreateStudentProfile,
       );
     }
 
