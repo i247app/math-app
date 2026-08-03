@@ -264,6 +264,37 @@ void main() {
     await cubit.close();
   });
 
+  test(
+    'untrusted login without verified devices sends and displays OTP directly',
+    () async {
+      final authService = _FakeAuthService(
+        isTrusted: false,
+        sentOtpCode: '1234',
+        verifyOtpIsValid: true,
+      );
+      final cubit = _buildCubit(
+        authService: authService,
+        initialState: const AuthFlowState(screen: AppScreen.login),
+      );
+
+      await cubit.submitLoginName('+84905666666');
+
+      expect(authService.listedDeviceUserId, 7);
+      expect(authService.sentOtpLoginName, '+84905666666');
+      expect(authService.sentOtpKind, AuthOtpKind.login);
+      expect(authService.sentOtpUserId, isNull);
+      expect(authService.sentOtpTargetDeviceId, isNull);
+      expect(cubit.state.screen, AppScreen.otp);
+      expect(cubit.state.devOtpCode, '1234');
+      expect(cubit.state.showDevOtpPreview, isTrue);
+
+      await cubit.verifyOtp('1234');
+
+      expect(cubit.state.screen, AppScreen.home);
+      await cubit.close();
+    },
+  );
+
   test('uses the same email login_name when verifying OTP', () async {
     final authService = _FakeAuthService();
     final cubit = _buildCubit(
