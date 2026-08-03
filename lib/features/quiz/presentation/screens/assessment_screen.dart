@@ -46,9 +46,13 @@ class AiAssessmentScreen extends StatefulWidget {
 }
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
+  static const double _backSwipeTriggerDistance = 48;
+  static const double _backSwipeTriggerVelocity = 350;
+
   late final AssessmentController _controller;
   bool _allowPop = false;
   bool _isExitDialogOpen = false;
+  double _backSwipeDistance = 0;
 
   @override
   void initState() {
@@ -167,7 +171,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       return;
     }
 
-    if (_controller.selectedAnswerLabels.isEmpty) {
+    final hasActiveAttempt = _controller.quiz?.questions.isNotEmpty ?? false;
+    if (!hasActiveAttempt) {
       await Navigator.of(context).maybePop();
       return;
     }
@@ -189,6 +194,29 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     if (mounted) {
       Navigator.of(context).pop();
     }
+  }
+
+  void _handleBackSwipeStart(DragStartDetails _) {
+    _backSwipeDistance = 0;
+  }
+
+  void _handleBackSwipeUpdate(DragUpdateDetails details) {
+    _backSwipeDistance += details.primaryDelta ?? 0;
+  }
+
+  void _handleBackSwipeEnd(DragEndDetails details) {
+    final velocity = details.primaryVelocity ?? 0;
+    final shouldRequestExit =
+        _backSwipeDistance >= _backSwipeTriggerDistance ||
+        velocity >= _backSwipeTriggerVelocity;
+    _backSwipeDistance = 0;
+    if (shouldRequestExit) {
+      _requestExit();
+    }
+  }
+
+  void _handleBackSwipeCancel() {
+    _backSwipeDistance = 0;
   }
 
   Future<bool> showUnansweredSubmitDialog() async {
@@ -271,8 +299,12 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final errorMessage = _controller.errorMessage;
           final isGeneratingQuestion = _controller.isGeneratingQuestion;
           final isSubmittingQuiz = _controller.isSubmittingQuiz;
-          final hasProgress = _controller.selectedAnswerLabels.isNotEmpty;
+          final hasActiveAttempt = questions.isNotEmpty;
           final isBusy = isGeneratingQuestion || isSubmittingQuiz;
+          final needsIosBackSwipeDetector =
+              Theme.of(context).platform == TargetPlatform.iOS &&
+              hasActiveAttempt &&
+              !isBusy;
           final backgroundColor = isGeneratingQuestion
               ? colors.surface
               : colors.pageBackground;
@@ -375,6 +407,21 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                             onContinue: goToNextQuestion,
                           ),
                         ),
+                      if (needsIosBackSwipeDetector)
+                        Positioned(
+                          left: 0,
+                          top: 0,
+                          bottom: 0,
+                          width: 24,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            excludeFromSemantics: true,
+                            onHorizontalDragStart: _handleBackSwipeStart,
+                            onHorizontalDragUpdate: _handleBackSwipeUpdate,
+                            onHorizontalDragEnd: _handleBackSwipeEnd,
+                            onHorizontalDragCancel: _handleBackSwipeCancel,
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -383,7 +430,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           );
 
           return PopScope(
-            canPop: _allowPop || (!hasProgress && !isBusy),
+            canPop: _allowPop || (!hasActiveAttempt && !isBusy),
             onPopInvokedWithResult: (didPop, _) async {
               if (!didPop) {
                 await _requestExit();
