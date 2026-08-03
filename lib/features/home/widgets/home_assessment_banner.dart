@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
-class HomeInitialAssessmentBanner extends StatelessWidget {
-  const HomeInitialAssessmentBanner({super.key, required this.onTap});
+class HomeAssessmentBanner extends StatelessWidget {
+  const HomeAssessmentBanner({
+    super.key,
+    required this.asset,
+    required this.onTap,
+    this.alignment = Alignment.center,
+  });
 
+  static const double aspectRatio = 1280 / 852;
+
+  final String asset;
   final VoidCallback onTap;
+  final Alignment alignment;
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +39,11 @@ class HomeInitialAssessmentBanner extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: AspectRatio(
-            aspectRatio: 1280 / 852,
+            aspectRatio: aspectRatio,
             child: Ink.image(
-              image: const AssetImage(homeInitialAssessmentBannerAsset),
+              image: AssetImage(asset),
               fit: BoxFit.cover,
+              alignment: alignment,
               child: const SizedBox.expand(),
             ),
           ),

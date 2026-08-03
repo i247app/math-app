@@ -30,7 +30,7 @@ import 'package:numi/features/home/student/shared/widgets/student_home_sections_
 import 'package:numi/features/classroom/presentation/screens/student_class_detail_screen.dart';
 import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
-import 'package:numi/features/home/widgets/home_initial_assessment_banner.dart';
+import 'package:numi/features/home/widgets/home_assessment_banner.dart';
 import 'package:numi/features/home/widgets/home_start_guide_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_class_summary_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_homework_preview_card.dart';
@@ -616,7 +616,8 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
       children: [
         _studentHomeEntrance(
           order: 0,
-          child: HomeInitialAssessmentBanner(
+          child: HomeAssessmentBanner(
+            asset: homeInitialAssessmentBannerAsset,
             onTap: () => _openGradeSelection(quizPurposeAssessment),
           ),
         ),

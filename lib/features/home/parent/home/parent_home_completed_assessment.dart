@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/features/home/widgets/home_assessment_banner.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_card.dart';
@@ -12,9 +13,8 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
       children: [
         completedAssessmentFadeIn(
           order: 1,
-          child: HomeImageAction(
+          child: HomeAssessmentBanner(
             asset: parentHomeAfterReviewBannerAsset,
-            height: 214,
             onTap: widget.onOpenPracticeTab,
           ),
         ),
