@@ -22,7 +22,22 @@ class LoginNameInputFormatter extends TextInputFormatter {
     final text = newValue.text.replaceAll(RegExp(r'\s'), '');
     return TextEditingValue(
       text: text,
-      selection: TextSelection.collapsed(offset: text.length),
+      selection: _selectionWithoutWhitespace(newValue.selection, newValue.text),
+    );
+  }
+
+  TextSelection _selectionWithoutWhitespace(
+    TextSelection selection,
+    String value,
+  ) {
+    int offsetFor(int offset) => value
+        .substring(0, offset.clamp(0, value.length))
+        .replaceAll(RegExp(r'\s'), '')
+        .length;
+
+    return selection.copyWith(
+      baseOffset: offsetFor(selection.baseOffset),
+      extentOffset: offsetFor(selection.extentOffset),
     );
   }
 }
