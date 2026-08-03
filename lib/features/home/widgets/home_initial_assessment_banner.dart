@@ -30,11 +30,13 @@ class HomeInitialAssessmentBanner extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
-          child: Ink.image(
-            image: const AssetImage(homeInitialAssessmentBannerAsset),
-            height: 225,
-            fit: BoxFit.cover,
-            child: const SizedBox(width: double.infinity),
+          child: AspectRatio(
+            aspectRatio: 1280 / 852,
+            child: Ink.image(
+              image: const AssetImage(homeInitialAssessmentBannerAsset),
+              fit: BoxFit.cover,
+              child: const SizedBox.expand(),
+            ),
           ),
         ),
       ),
