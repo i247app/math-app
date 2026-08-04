@@ -31,7 +31,8 @@ import 'package:numi/features/classroom/presentation/screens/student_class_detai
 import 'package:numi/shared/widgets/app_staggered_entrance.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
 import 'package:numi/features/home/widgets/home_assessment_banner.dart';
-import 'package:numi/features/home/widgets/home_start_guide_card.dart';
+import 'package:numi/features/home/widgets/guide_list/guide_list.dart';
+import 'package:numi/features/home/widgets/initial_assessment_guide_items.dart';
 import 'package:numi/features/home/student/home/widgets/student_class_summary_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_homework_preview_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_game_suggestions_section.dart';
@@ -652,10 +653,21 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           child: _studentHomeEntrance(
             order: 2,
             markOnEnd: true,
-            child: HomeStartGuideCard(
-              onAssessmentTap: () => _openGradeSelection(quizPurposeAssessment),
-              onRoadmapTap: widget.onOpenPracticeTab,
-              onClassroomTap: widget.onOpenClassroomTab,
+            child: GuideListCard(
+              items: initialAssessmentGuideItems(context),
+              onItemTap: (itemId) {
+                switch (itemId) {
+                  case InitialAssessmentGuideItemId.assessment:
+                    _openGradeSelection(quizPurposeAssessment);
+                    return;
+                  case InitialAssessmentGuideItemId.roadmap:
+                    widget.onOpenPracticeTab();
+                    return;
+                  case InitialAssessmentGuideItemId.classroom:
+                    widget.onOpenClassroomTab();
+                    return;
+                }
+              },
             ),
           ),
         ),
