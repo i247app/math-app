@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/widgets/home_assessment_banner.dart';
-import 'package:numi/features/home/widgets/home_image_action.dart';
+import 'package:numi/features/home/widgets/promo_actions/promo_actions.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
 extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
   Widget buildCompletedState() {
-    const promoActionGap = 7.0;
-    const stackedPromoActionHeight =
-        (parentHomePromoActionHeight - promoActionGap) / 2;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 8,
@@ -24,31 +20,29 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
         ),
         completedAssessmentFadeIn(
           order: 2,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 10,
+          child: PromoActionsSection(
             children: [
-              Expanded(
-                child: Column(
-                  spacing: promoActionGap,
-                  children: [
-                    HomeImageAction(
-                      asset: parentHomeRaceAsset,
-                      height: stackedPromoActionHeight,
+              PromoActionGroup(
+                direction: Axis.vertical,
+                spacing: 7,
+                children: [
+                  PromoActionCard(
+                    data: PromoActionData(
+                      image: const AssetImage(parentHomeRaceAsset),
                       onTap: widget.onOpenPracticeTab,
                     ),
-                    HomeImageAction(
-                      asset: parentHomeShopAsset,
-                      height: stackedPromoActionHeight,
+                  ),
+                  PromoActionCard(
+                    data: PromoActionData(
+                      image: const AssetImage(parentHomeShopAsset),
                       onTap: widget.onOpenPracticeTab,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: HomeImageAction(
-                  asset: parentHomeClassroomAsset,
-                  height: parentHomePromoActionHeight,
+              PromoActionCard(
+                data: PromoActionData(
+                  image: const AssetImage(parentHomeClassroomAsset),
                   onTap: showClassroomMessage,
                 ),
               ),

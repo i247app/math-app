@@ -8,10 +8,11 @@ import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_he
 import 'package:numi/features/home/parent/home/models/parent_home_entrance_builder.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_child_class_summary_card.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_dashboard_section.dart';
-import 'package:numi/features/home/parent/home/widgets/parent_game_suggestions_row.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_error_card.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_refresh_label.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
+import 'package:numi/features/home/widgets/home_math_squadron_preview_artwork.dart';
+import 'package:numi/features/home/widgets/promo_actions/promo_actions.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
 
@@ -26,6 +27,7 @@ class ParentChildOverviewContent extends StatelessWidget {
     required this.onViewTasks,
     required this.onViewResults,
     required this.onViewMessages,
+    required this.onPromoActionTap,
     required this.isRefreshing,
     required this.errorMessage,
     required this.onRetry,
@@ -39,6 +41,7 @@ class ParentChildOverviewContent extends StatelessWidget {
   final VoidCallback onViewTasks;
   final VoidCallback onViewResults;
   final VoidCallback onViewMessages;
+  final VoidCallback onPromoActionTap;
   final bool isRefreshing;
   final String? errorMessage;
   final VoidCallback onRetry;
@@ -140,7 +143,27 @@ class ParentChildOverviewContent extends StatelessWidget {
             child: entranceBuilder(
               order: 4,
               markOnEnd: true,
-              child: const ParentGameSuggestionsRow(),
+              child: PromoActionsSection(
+                spacing: 12,
+                children: [
+                  PromoActionCard(
+                    data: PromoActionData(
+                      image: const AssetImage(
+                        'assets/images/game_numi_farm_banner.png',
+                      ),
+                      backgroundColor: const Color(0xFFDDF3EE),
+                      onTap: onPromoActionTap,
+                    ),
+                  ),
+                  PromoActionCard(
+                    data: PromoActionData(
+                      child: const HomeMathSquadronPreviewArtwork(),
+                      backgroundColor: const Color(0xFF111C4B),
+                      onTap: onPromoActionTap,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         if (isRefreshing)

@@ -52,6 +52,7 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
                         onViewTasks: widget.onOpenClassroomTab,
                         onViewResults: widget.onOpenClassroomTab,
                         onViewMessages: widget.onOpenClassroomTab,
+                        onPromoActionTap: widget.onOpenPracticeTab,
                         isRefreshing: isLoading && hasLoadedHome,
                         errorMessage: errorMessage,
                         onRetry: loadHome,

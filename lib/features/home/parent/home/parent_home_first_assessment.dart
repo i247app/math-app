@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/widgets/home_assessment_banner.dart';
-import 'package:numi/features/home/widgets/home_image_action.dart';
 import 'package:numi/features/home/widgets/home_start_guide_card.dart';
+import 'package:numi/features/home/widgets/promo_actions/promo_actions.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
@@ -20,22 +20,18 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
         ),
         initialAssessmentFadeIn(
           order: 2,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 10,
+          child: PromoActionsSection(
             children: [
-              Expanded(
-                child: HomeImageAction(
-                  asset: parentHomeAfterReviewBannerAsset,
-                  height: parentHomePromoActionHeight,
+              PromoActionCard(
+                data: PromoActionData(
+                  image: const AssetImage(parentHomeAfterReviewBannerAsset),
                   alignment: Alignment.centerLeft,
                   onTap: widget.onOpenPracticeTab,
                 ),
               ),
-              Expanded(
-                child: HomeImageAction(
-                  asset: parentHomeClassroomAsset,
-                  height: parentHomePromoActionHeight,
+              PromoActionCard(
+                data: PromoActionData(
+                  image: const AssetImage(parentHomeClassroomAsset),
                   onTap: showClassroomMessage,
                 ),
               ),
