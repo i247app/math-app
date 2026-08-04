@@ -15,7 +15,7 @@ import 'package:numi/features/home/teacher/home/widgets/teacher_home_hero_skelet
 import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
 import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
 import 'package:numi/shared/widgets/app_section_header.dart';
-import 'package:numi/shared/widgets/app_staggered_entrance.dart';
+import 'package:numi/core/animations/app_staggered_entrance.dart';
 
 class _EmptyTeacherHomeService implements HomeLayoutService {
   const _EmptyTeacherHomeService();

@@ -12,7 +12,7 @@ import 'package:numi/features/games/presentation/numi_farm_stage_screen.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/practice/practice_catalog.dart';
 import 'package:numi/features/practice/presentation/practice_chapter_screen.dart';
-import 'package:numi/shared/widgets/app_staggered_entrance.dart';
+import 'package:numi/core/animations/app_staggered_entrance.dart';
 
 const _gamesTeal = Color(0xFF006762);
 const _gamesOrange = Color(0xFFFF7B54);

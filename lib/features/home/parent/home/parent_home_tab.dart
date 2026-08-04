@@ -21,7 +21,7 @@ import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
-import 'package:numi/shared/widgets/app_staggered_entrance.dart';
+import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/home/parent_home_child_dashboard.dart';
 import 'package:numi/features/home/parent/home/parent_home_completed_assessment.dart';
@@ -77,6 +77,12 @@ class ParentHomeContent extends StatefulWidget {
   State<ParentHomeContent> createState() => ParentHomeContentState();
 }
 
+enum ParentHomeEntranceMode {
+  initialAssessment,
+  completedAssessment,
+  childOverview,
+}
+
 class ParentHomeContentState extends State<ParentHomeContent> {
   late final HomeLayoutService _homeLayoutService = HomeLayoutApi();
   bool isLoading = true;
@@ -86,9 +92,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   List<GeneratedQuiz> completedAssessments = const <GeneratedQuiz>[];
   List<ParentChildSummary> childSummaries = const <ParentChildSummary>[];
   int _childLoadRequestId = 0;
-  bool _hasPlayedInitialAssessmentEntrance = false;
-  bool _hasPlayedCompletedAssessmentEntrance = false;
-  bool _hasPlayedClassroomOverviewEntrance = false;
+  final Set<ParentHomeEntranceMode> _playedEntrances = {};
 
   @override
   void initState() {
@@ -135,9 +139,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   }
 
   void _resetModeEntrances() {
-    _hasPlayedInitialAssessmentEntrance = false;
-    _hasPlayedCompletedAssessmentEntrance = false;
-    _hasPlayedClassroomOverviewEntrance = false;
+    _playedEntrances.clear();
   }
 
   List<StudentProfile> get _children {
@@ -278,73 +280,28 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     completedAssessments = snapshot.completedAssessments;
   }
 
-  Widget initialAssessmentFadeIn({
+  Widget homeEntrance({
+    required ParentHomeEntranceMode mode,
     required Widget child,
     int order = 0,
     bool markOnEnd = false,
   }) {
-    if (_hasPlayedInitialAssessmentEntrance) {
+    if (_playedEntrances.contains(mode)) {
       return child;
     }
 
     return AppStaggeredEntrance(
       order: order,
-      onFinished: markOnEnd ? _markInitialAssessmentEntrancePlayed : null,
+      onFinished: markOnEnd ? () => _markEntrancePlayed(mode) : null,
       child: child,
     );
   }
 
-  void _markInitialAssessmentEntrancePlayed() {
-    if (!mounted || _hasPlayedInitialAssessmentEntrance) {
+  void _markEntrancePlayed(ParentHomeEntranceMode mode) {
+    if (!mounted || _playedEntrances.contains(mode)) {
       return;
     }
-    setState(() => _hasPlayedInitialAssessmentEntrance = true);
-  }
-
-  Widget completedAssessmentFadeIn({
-    required Widget child,
-    int order = 0,
-    bool markOnEnd = false,
-  }) {
-    if (_hasPlayedCompletedAssessmentEntrance) {
-      return child;
-    }
-
-    return AppStaggeredEntrance(
-      order: order,
-      onFinished: markOnEnd ? _markCompletedAssessmentEntrancePlayed : null,
-      child: child,
-    );
-  }
-
-  void _markCompletedAssessmentEntrancePlayed() {
-    if (!mounted || _hasPlayedCompletedAssessmentEntrance) {
-      return;
-    }
-    setState(() => _hasPlayedCompletedAssessmentEntrance = true);
-  }
-
-  Widget childOverviewFadeIn({
-    required Widget child,
-    int order = 0,
-    bool markOnEnd = false,
-  }) {
-    if (_hasPlayedClassroomOverviewEntrance) {
-      return child;
-    }
-
-    return AppStaggeredEntrance(
-      order: order,
-      onFinished: markOnEnd ? _markChildOverviewEntrancePlayed : null,
-      child: child,
-    );
-  }
-
-  void _markChildOverviewEntrancePlayed() {
-    if (!mounted || _hasPlayedClassroomOverviewEntrance) {
-      return;
-    }
-    setState(() => _hasPlayedClassroomOverviewEntrance = true);
+    setState(() => _playedEntrances.add(mode));
   }
 
   @override
@@ -379,14 +336,16 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (!isLoading && !hasCompletedAssessment)
-                    initialAssessmentFadeIn(
+                    homeEntrance(
+                      mode: ParentHomeEntranceMode.initialAssessment,
                       order: 0,
                       child: ParentLearningStreakCard(
                         hasCompletedAssessment: hasCompletedAssessment,
                       ),
                     )
                   else if (!isLoading && hasCompletedAssessment)
-                    completedAssessmentFadeIn(
+                    homeEntrance(
+                      mode: ParentHomeEntranceMode.completedAssessment,
                       order: 0,
                       child: ParentLearningStreakCard(
                         hasCompletedAssessment: hasCompletedAssessment,

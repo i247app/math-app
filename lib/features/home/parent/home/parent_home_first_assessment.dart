@@ -12,14 +12,16 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 8,
       children: [
-        initialAssessmentFadeIn(
+        homeEntrance(
+          mode: ParentHomeEntranceMode.initialAssessment,
           order: 1,
           child: HomeAssessmentBanner(
             asset: homeInitialAssessmentBannerAsset,
             onTap: openAssessment,
           ),
         ),
-        initialAssessmentFadeIn(
+        homeEntrance(
+          mode: ParentHomeEntranceMode.initialAssessment,
           order: 2,
           child: PromoActionsSection(
             children: [
@@ -41,7 +43,8 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: initialAssessmentFadeIn(
+          child: homeEntrance(
+            mode: ParentHomeEntranceMode.initialAssessment,
             order: 3,
             markOnEnd: true,
             child: GuideListCard(

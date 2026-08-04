@@ -47,7 +47,14 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
                         completions:
                             parent?.recentCompletions ??
                             const <HomeLayoutRecentCompletion>[],
-                        entranceBuilder: childOverviewFadeIn,
+                        entranceBuilder:
+                            ({required child, order = 0, markOnEnd = false}) =>
+                                homeEntrance(
+                                  mode: ParentHomeEntranceMode.childOverview,
+                                  child: child,
+                                  order: order,
+                                  markOnEnd: markOnEnd,
+                                ),
                         onCompletionTap: openCompletionResult,
                         onViewTasks: widget.onOpenClassroomTab,
                         onViewResults: widget.onOpenClassroomTab,

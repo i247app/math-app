@@ -11,14 +11,16 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 8,
       children: [
-        completedAssessmentFadeIn(
+        homeEntrance(
+          mode: ParentHomeEntranceMode.completedAssessment,
           order: 1,
           child: HomeAssessmentBanner(
             asset: parentHomeAfterReviewBannerAsset,
             onTap: widget.onOpenPracticeTab,
           ),
         ),
-        completedAssessmentFadeIn(
+        homeEntrance(
+          mode: ParentHomeEntranceMode.completedAssessment,
           order: 2,
           child: PromoActionsSection(
             children: [
@@ -55,7 +57,8 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
             spacing: 8,
             children: [
               for (final entry in completedAssessments.take(2).indexed)
-                completedAssessmentFadeIn(
+                homeEntrance(
+                  mode: ParentHomeEntranceMode.completedAssessment,
                   order: 3 + entry.$1,
                   markOnEnd:
                       entry.$1 == 1 ||

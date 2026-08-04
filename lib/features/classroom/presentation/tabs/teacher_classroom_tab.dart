@@ -17,7 +17,7 @@ import 'package:numi/features/classroom/presentation/screens/teacher_create_clas
 import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_body.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
-import 'package:numi/shared/widgets/app_staggered_entrance.dart';
+import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_header.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_loading_content.dart';
 

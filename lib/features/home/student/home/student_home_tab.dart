@@ -28,7 +28,7 @@ import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/home/student/shared/widgets/student_home_sections_loading.dart';
 import 'package:numi/features/classroom/presentation/screens/student_class_detail_screen.dart';
-import 'package:numi/shared/widgets/app_staggered_entrance.dart';
+import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
 import 'package:numi/features/home/widgets/home_assessment_banner.dart';
 import 'package:numi/features/home/widgets/guide_list/guide_list.dart';
