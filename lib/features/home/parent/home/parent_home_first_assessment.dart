@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/widgets/home_assessment_banner.dart';
-import 'package:numi/features/home/widgets/guide_list/guide_list.dart';
+import 'package:numi/features/home/widgets/sections/banner/banner.dart';
+import 'package:numi/features/home/widgets/sections/guide_list/guide_list.dart';
 import 'package:numi/features/home/widgets/initial_assessment_guide_items.dart';
-import 'package:numi/features/home/widgets/promo_actions/promo_actions.dart';
+import 'package:numi/features/home/widgets/sections/promo_actions/promo_actions.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
@@ -15,9 +15,11 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
         homeEntrance(
           mode: ParentHomeEntranceMode.initialAssessment,
           order: 1,
-          child: HomeAssessmentBanner(
-            asset: homeInitialAssessmentBannerAsset,
-            onTap: openAssessment,
+          child: HomeBanner(
+            data: HomeBannerData(
+              image: const AssetImage(homeInitialAssessmentBannerAsset),
+              onTap: openAssessment,
+            ),
           ),
         ),
         homeEntrance(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/home/widgets/guide_list/guide_item_data.dart';
+import 'package:numi/features/home/widgets/sections/guide_list/guide_item_data.dart';
 
 class GuideListItem extends StatelessWidget {
   const GuideListItem({super.key, required this.data, required this.onTap});

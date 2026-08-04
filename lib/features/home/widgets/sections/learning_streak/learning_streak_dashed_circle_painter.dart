@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-class ParentDashedCirclePainter extends CustomPainter {
-  const ParentDashedCirclePainter({required this.color});
+class LearningStreakDashedCirclePainter extends CustomPainter {
+  const LearningStreakDashedCirclePainter({required this.color});
 
   final Color color;
 
@@ -26,6 +26,6 @@ class ParentDashedCirclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant ParentDashedCirclePainter oldDelegate) =>
+  bool shouldRepaint(covariant LearningStreakDashedCirclePainter oldDelegate) =>
       color != oldDelegate.color;
 }

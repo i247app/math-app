@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/widgets/guide_list/guide_item_data.dart';
-import 'package:numi/features/home/widgets/guide_list/guide_list_item.dart';
+import 'package:numi/features/home/widgets/sections/guide_list/guide_item_data.dart';
+import 'package:numi/features/home/widgets/sections/guide_list/guide_list_item.dart';
 
 class GuideListCard extends StatelessWidget {
   const GuideListCard({

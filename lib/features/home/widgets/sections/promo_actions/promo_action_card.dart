@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/widgets/promo_actions/promo_action_data.dart';
+import 'package:numi/features/home/widgets/sections/promo_actions/promo_action_data.dart';
 
 class PromoActionCard extends StatelessWidget {
   const PromoActionCard({

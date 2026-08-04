@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/widgets/home_assessment_banner.dart';
-import 'package:numi/features/home/widgets/promo_actions/promo_actions.dart';
+import 'package:numi/features/home/widgets/sections/assessment_list/assessment_list.dart';
+import 'package:numi/features/home/widgets/sections/banner/banner.dart';
+import 'package:numi/features/home/widgets/sections/promo_actions/promo_actions.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
 extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
@@ -14,9 +14,11 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
         homeEntrance(
           mode: ParentHomeEntranceMode.completedAssessment,
           order: 1,
-          child: HomeAssessmentBanner(
-            asset: parentHomeAfterReviewBannerAsset,
-            onTap: widget.onOpenPracticeTab,
+          child: HomeBanner(
+            data: HomeBannerData(
+              image: const AssetImage(parentHomeAfterReviewBannerAsset),
+              onTap: widget.onOpenPracticeTab,
+            ),
           ),
         ),
         homeEntrance(
@@ -53,22 +55,15 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Column(
-            spacing: 8,
-            children: [
-              for (final entry in completedAssessments.take(2).indexed)
-                homeEntrance(
-                  mode: ParentHomeEntranceMode.completedAssessment,
-                  order: 3 + entry.$1,
-                  markOnEnd:
-                      entry.$1 == 1 ||
-                      entry.$1 == completedAssessments.take(2).length - 1,
-                  child: AssessmentResultListItemCard(
-                    quiz: entry.$2,
-                    onTap: () => openParentAssessmentResult(entry.$2),
-                  ),
-                ),
-            ],
+          child: AssessmentListSection(
+            assessments: completedAssessments,
+            onAssessmentTap: openParentAssessmentResult,
+            itemWrapper: (child, index, itemCount) => homeEntrance(
+              mode: ParentHomeEntranceMode.completedAssessment,
+              order: 3 + index,
+              markOnEnd: index == itemCount - 1,
+              child: child,
+            ),
           ),
         ),
       ],

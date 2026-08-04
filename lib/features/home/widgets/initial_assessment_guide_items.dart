@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/widgets/guide_list/guide_list.dart';
+import 'package:numi/features/home/widgets/sections/guide_list/guide_list.dart';
 
 abstract final class InitialAssessmentGuideItemId {
   static const assessment = 'assessment';

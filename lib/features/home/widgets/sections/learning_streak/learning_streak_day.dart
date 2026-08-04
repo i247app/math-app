@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/parent/home/widgets/parent_dashed_circle_painter.dart';
-import 'package:numi/features/home/parent/home/widgets/parent_streak_day_state.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak_dashed_circle_painter.dart';
+import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak_day_data.dart';
+import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak_day_state.dart';
 
-class ParentStreakDay extends StatelessWidget {
-  const ParentStreakDay({super.key, required this.label, required this.state});
+class LearningStreakDay extends StatelessWidget {
+  const LearningStreakDay({super.key, required this.data});
 
-  final String label;
-  final ParentStreakDayState state;
+  final LearningStreakDayData data;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class ParentStreakDay extends StatelessWidget {
       spacing: 4,
       children: [
         Text(
-          label,
+          data.label,
           style: TextStyle(
             color: colors.textMuted,
             fontSize: FontSize.xxxs,
@@ -28,8 +28,8 @@ class ParentStreakDay extends StatelessWidget {
         SizedBox(
           width: 31,
           height: 31,
-          child: switch (state) {
-            ParentStreakDayState.done => DecoratedBox(
+          child: switch (data.state) {
+            LearningStreakDayState.done => DecoratedBox(
               decoration: BoxDecoration(
                 color: colors.success,
                 shape: BoxShape.circle,
@@ -40,7 +40,7 @@ class ParentStreakDay extends StatelessWidget {
                 size: 19,
               ),
             ),
-            ParentStreakDayState.current => DecoratedBox(
+            LearningStreakDayState.current => DecoratedBox(
               decoration: BoxDecoration(
                 color: colors.accent,
                 shape: BoxShape.circle,
@@ -51,11 +51,13 @@ class ParentStreakDay extends StatelessWidget {
                 size: 21,
               ),
             ),
-            ParentStreakDayState.upcoming => CustomPaint(
-              painter: ParentDashedCirclePainter(color: colors.borderStrong),
+            LearningStreakDayState.upcoming => CustomPaint(
+              painter: LearningStreakDashedCirclePainter(
+                color: colors.borderStrong,
+              ),
               child: Center(
                 child: Text(
-                  '5',
+                  data.upcomingValue,
                   style: TextStyle(
                     color: colors.textMuted,
                     fontSize: FontSize.caption,

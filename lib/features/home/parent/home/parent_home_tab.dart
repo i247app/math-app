@@ -23,13 +23,14 @@ import 'package:numi/features/home/parent/home/models/parent_child_summary.dart'
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
+import 'package:numi/features/home/parent/home/parent_learning_streak_content.dart';
 import 'package:numi/features/home/parent/home/parent_home_child_dashboard.dart';
 import 'package:numi/features/home/parent/home/parent_home_completed_assessment.dart';
 import 'package:numi/features/home/parent/home/parent_home_first_assessment.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_error_card.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_loading_card.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_refresh_label.dart';
-import 'package:numi/features/home/parent/home/widgets/parent_learning_streak_card.dart';
+import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_profile_dialog_action.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_select_student_dialog.dart';
 
@@ -339,21 +340,30 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                     homeEntrance(
                       mode: ParentHomeEntranceMode.initialAssessment,
                       order: 0,
-                      child: ParentLearningStreakCard(
-                        hasCompletedAssessment: hasCompletedAssessment,
+                      child: LearningStreakCard(
+                        data: parentLearningStreakContent(
+                          context,
+                          hasCompletedAssessment: hasCompletedAssessment,
+                        ),
                       ),
                     )
                   else if (!isLoading && hasCompletedAssessment)
                     homeEntrance(
                       mode: ParentHomeEntranceMode.completedAssessment,
                       order: 0,
-                      child: ParentLearningStreakCard(
-                        hasCompletedAssessment: hasCompletedAssessment,
+                      child: LearningStreakCard(
+                        data: parentLearningStreakContent(
+                          context,
+                          hasCompletedAssessment: hasCompletedAssessment,
+                        ),
                       ),
                     )
                   else
-                    ParentLearningStreakCard(
-                      hasCompletedAssessment: hasCompletedAssessment,
+                    LearningStreakCard(
+                      data: parentLearningStreakContent(
+                        context,
+                        hasCompletedAssessment: hasCompletedAssessment,
+                      ),
                     ),
                   Padding(
                     padding: const EdgeInsets.only(top: 12),

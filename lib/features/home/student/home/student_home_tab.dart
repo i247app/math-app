@@ -30,15 +30,15 @@ import 'package:numi/features/home/student/shared/widgets/student_home_sections_
 import 'package:numi/features/classroom/presentation/screens/student_class_detail_screen.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/widgets/home_image_action.dart';
-import 'package:numi/features/home/widgets/home_assessment_banner.dart';
-import 'package:numi/features/home/widgets/guide_list/guide_list.dart';
+import 'package:numi/features/home/widgets/sections/assessment_list/assessment_list.dart';
+import 'package:numi/features/home/widgets/sections/banner/banner.dart';
+import 'package:numi/features/home/widgets/sections/guide_list/guide_list.dart';
 import 'package:numi/features/home/widgets/initial_assessment_guide_items.dart';
 import 'package:numi/features/home/student/home/widgets/student_class_summary_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_homework_preview_card.dart';
 import 'package:numi/features/home/student/home/widgets/student_game_suggestions_section.dart';
 import 'package:numi/features/homework/presentation/screens/student_homework_attempt_screen.dart';
 import 'package:numi/features/homework/helpers/student_homework_open_guard.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 
@@ -617,9 +617,11 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
       children: [
         _studentHomeEntrance(
           order: 0,
-          child: HomeAssessmentBanner(
-            asset: homeInitialAssessmentBannerAsset,
-            onTap: () => _openGradeSelection(quizPurposeAssessment),
+          child: HomeBanner(
+            data: HomeBannerData(
+              image: const AssetImage(homeInitialAssessmentBannerAsset),
+              onTap: () => _openGradeSelection(quizPurposeAssessment),
+            ),
           ),
         ),
         _studentHomeEntrance(
@@ -723,21 +725,14 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Column(
-            spacing: 8,
-            children: [
-              for (final entry in _completedAssessments.take(2).indexed)
-                _studentHomeEntrance(
-                  order: 2 + entry.$1,
-                  markOnEnd:
-                      entry.$1 == 1 ||
-                      entry.$1 == _completedAssessments.take(2).length - 1,
-                  child: AssessmentResultListItemCard(
-                    quiz: entry.$2,
-                    onTap: () => _openStudentAssessmentResult(entry.$2),
-                  ),
-                ),
-            ],
+          child: AssessmentListSection(
+            assessments: _completedAssessments,
+            onAssessmentTap: _openStudentAssessmentResult,
+            itemWrapper: (child, index, itemCount) => _studentHomeEntrance(
+              order: 2 + index,
+              markOnEnd: index == itemCount - 1,
+              child: child,
+            ),
           ),
         ),
       ],
