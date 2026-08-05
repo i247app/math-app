@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/features/quiz/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_score_badge.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_meta_item.dart';
@@ -12,10 +13,12 @@ class AssessmentResultListItemCard extends StatelessWidget {
     super.key,
     required this.quiz,
     required this.onTap,
+    this.useCardShadow = false,
   });
 
   final GeneratedQuiz quiz;
   final VoidCallback onTap;
+  final bool useCardShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +42,15 @@ class AssessmentResultListItemCard extends StatelessWidget {
             color: colors.elevatedSurface,
             borderRadius: radius,
             border: Border.all(color: colors.border, width: 1.3),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow,
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            boxShadow: useCardShadow
+                ? AppShadows.card(colors)
+                : [
+                    BoxShadow(
+                      color: colors.shadow,
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,

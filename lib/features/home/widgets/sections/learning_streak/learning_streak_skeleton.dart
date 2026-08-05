@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_line.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
@@ -18,13 +19,7 @@ class LearningStreakSkeleton extends StatelessWidget {
           color: colors.elevatedSurface,
           borderRadius: BorderRadius.circular(17),
           border: Border.all(color: colors.border),
-          boxShadow: [
-            BoxShadow(
-              color: colors.shadow,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: AppShadows.card(colors),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

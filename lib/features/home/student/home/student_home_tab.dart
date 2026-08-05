@@ -618,6 +618,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
         _studentHomeEntrance(
           order: 0,
           child: HomeBanner(
+            useCardShadow: true,
             data: HomeBannerData(
               image: const AssetImage(homeInitialAssessmentBannerAsset),
               onTap: () => _openGradeSelection(quizPurposeAssessment),
@@ -635,6 +636,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
                   asset: parentHomeAfterReviewBannerAsset,
                   height: 160,
                   alignment: Alignment.centerLeft,
+                  useCardShadow: true,
                   onTap: widget.onOpenPracticeTab,
                 ),
               ),
@@ -642,6 +644,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
                 child: HomeImageAction(
                   asset: parentHomeClassroomAsset,
                   height: 160,
+                  useCardShadow: true,
                   onTap: widget.activeRole == ProfileRole.student
                       ? widget.onOpenClassroomTab
                       : _handleParentClassroomEntry,
@@ -657,6 +660,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
             markOnEnd: true,
             child: GuideListCard(
               items: initialAssessmentGuideItems(context),
+              useCardShadow: true,
               onItemTap: (itemId) {
                 switch (itemId) {
                   case InitialAssessmentGuideItemId.assessment:
@@ -687,6 +691,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           child: HomeImageAction(
             asset: parentHomeAfterReviewBannerAsset,
             height: 214,
+            useCardShadow: true,
             onTap: widget.onOpenPracticeTab,
           ),
         ),
@@ -703,11 +708,13 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
                     HomeImageAction(
                       asset: parentHomeRaceAsset,
                       height: 83,
+                      useCardShadow: true,
                       onTap: widget.onOpenPracticeTab,
                     ),
                     HomeImageAction(
                       asset: parentHomeShopAsset,
                       height: 83,
+                      useCardShadow: true,
                       onTap: widget.onOpenPracticeTab,
                     ),
                   ],
@@ -717,6 +724,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
                 child: HomeImageAction(
                   asset: parentHomeClassroomAsset,
                   height: 173,
+                  useCardShadow: true,
                   onTap: widget.onOpenClassroomTab,
                 ),
               ),
@@ -728,6 +736,7 @@ class _StudentHomeContentState extends State<StudentHomeContent> {
           child: AssessmentListSection(
             assessments: _completedAssessments,
             onAssessmentTap: _openStudentAssessmentResult,
+            useCardShadow: true,
             itemWrapper: (child, index, itemCount) => _studentHomeEntrance(
               order: 2 + index,
               markOnEnd: index == itemCount - 1,

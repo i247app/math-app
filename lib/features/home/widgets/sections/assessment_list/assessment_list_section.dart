@@ -13,6 +13,7 @@ class AssessmentListSection extends StatelessWidget {
     this.maxVisibleItems = 2,
     this.spacing = 8,
     this.itemWrapper,
+    this.useCardShadow = false,
   });
 
   final List<GeneratedQuiz> assessments;
@@ -20,6 +21,7 @@ class AssessmentListSection extends StatelessWidget {
   final int maxVisibleItems;
   final double spacing;
   final AssessmentListItemWrapper? itemWrapper;
+  final bool useCardShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,7 @@ class AssessmentListSection extends StatelessWidget {
             AssessmentResultListItemCard(
               quiz: entry.$2,
               onTap: () => onAssessmentTap(entry.$2),
+              useCardShadow: useCardShadow,
             ),
             entry.$1,
             visibleAssessments.length,

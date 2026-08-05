@@ -16,7 +16,7 @@ class StudentTabHost extends StatelessWidget {
   Widget build(BuildContext context) {
     if (args.activeTab == 0) {
       return StudentHomeContent(
-        padding: EdgeInsets.fromLTRB(14, 0, 14, args.bottomPadding),
+        padding: EdgeInsets.fromLTRB(14, 14, 14, args.bottomPadding),
         user: args.user,
         profiles: args.profiles,
         activeProfile: args.activeProfile,
