@@ -27,7 +27,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   void initState() {
     super.initState();
-    _controller.load();
+    _controller.load(showLoading: !_controller.state.hasLoaded);
   }
 
   @override

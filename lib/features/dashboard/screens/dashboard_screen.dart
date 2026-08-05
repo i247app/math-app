@@ -15,6 +15,7 @@ import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/features/notifications/navigation/notification_route.dart';
 import 'package:numi/features/notifications/application/notification_badge_controller.dart';
+import 'package:numi/features/notifications/data/cache/notification_cache.dart';
 import 'package:numi/features/notifications/data/notification_api.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/dashboard/application/dashboard_profile_controller.dart';
@@ -327,10 +328,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     classroomService: _classroomService,
                     assignmentService: _assignmentService,
                     quizService: _quizService,
-                    onLogout: () {
-                      HomeProfileCache.instance.invalidateAll();
-                      widget.onLogout();
-                    },
+                    onLogout: _handleLogout,
                     onAddProfileFromPractice: () {
                       HapticFeedback.selectionClick();
                       _profileController.requestAddProfile();
@@ -482,6 +480,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     ).push<void>(NotificationRoute(notificationService: _notificationService));
   }
 
+  void _handleLogout() {
+    HomeProfileCache.instance.invalidateAll();
+    NotificationCache.invalidate();
+    widget.onLogout();
+  }
+
   String _displayProfileName(
     BuildContext context,
     StudentProfile? profile,
@@ -511,7 +515,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 profiles: widget.profiles,
                 activeProfile: widget.activeProfile,
                 profileLoadError: widget.profileLoadError,
-                onLogout: widget.onLogout,
+                onLogout: _handleLogout,
                 onActivateProfile: widget.onActivateProfile,
                 onRefreshProfiles: widget.onRefreshProfiles,
                 onProfileSaved: () => Navigator.of(routeContext).pop(true),

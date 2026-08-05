@@ -2,16 +2,18 @@ import 'package:flutter/foundation.dart';
 
 import 'package:numi/core/network/notification_models.dart';
 import 'package:numi/features/notifications/application/notification_state.dart';
+import 'package:numi/features/notifications/data/cache/notification_cache.dart';
 import 'package:numi/features/notifications/data/notification_api.dart';
 import 'package:numi/features/notifications/errors/notification_list_exception.dart';
 
 class NotificationController extends ChangeNotifier {
   NotificationController({required NotificationListService service})
-    : _service = service;
+    : _service = service,
+      _state = _initialState();
 
   final NotificationListService _service;
 
-  NotificationState _state = const NotificationState();
+  NotificationState _state;
   NotificationState get state => _state;
 
   int _requestRevision = 0;
@@ -24,7 +26,10 @@ class NotificationController extends ChangeNotifier {
     }
 
     try {
-      final notifications = await _service.listNotifications();
+      final notifications = await NotificationCache.load(
+        service: _service,
+        forceRefresh: true,
+      );
       if (_disposed || requestRevision != _requestRevision) {
         return;
       }
@@ -43,6 +48,18 @@ class NotificationController extends ChangeNotifier {
   }
 
   Future<void> refresh() => load(showLoading: false);
+
+  static NotificationState _initialState() {
+    final cached = NotificationCache.peek();
+    if (cached == null) {
+      return const NotificationState();
+    }
+    return NotificationState(
+      notifications: cached,
+      isLoading: false,
+      hasLoaded: true,
+    );
+  }
 
   void _handleFailure(int requestRevision, String message) {
     if (_disposed || requestRevision != _requestRevision) {

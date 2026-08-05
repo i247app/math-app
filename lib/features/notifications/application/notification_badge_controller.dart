@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'package:numi/core/network/notification_models.dart';
+import 'package:numi/features/notifications/data/cache/notification_cache.dart';
 import 'package:numi/features/notifications/data/notification_api.dart';
 
 class NotificationBadgeController extends ChangeNotifier {
@@ -28,6 +29,10 @@ class NotificationBadgeController extends ChangeNotifier {
       return;
     }
     _started = true;
+    final cached = NotificationCache.peek();
+    if (cached != null) {
+      _updateHasUnread(cached.any(_isUnread));
+    }
     _messageSubscription = _incomingMessages?.listen((_) {
       _requestRevision++;
       _updateHasUnread(true);
@@ -38,7 +43,10 @@ class NotificationBadgeController extends ChangeNotifier {
   Future<void> refresh() async {
     final requestRevision = ++_requestRevision;
     try {
-      final notifications = await _service.listNotifications();
+      final notifications = await NotificationCache.load(
+        service: _service,
+        forceRefresh: true,
+      );
       if (_disposed || requestRevision != _requestRevision) {
         return;
       }

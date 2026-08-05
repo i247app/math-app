@@ -4,9 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:numi/core/network/notification_models.dart';
 import 'package:numi/features/notifications/application/notification_badge_controller.dart';
+import 'package:numi/features/notifications/data/cache/notification_cache.dart';
 import 'package:numi/features/notifications/data/notification_api.dart';
 
 void main() {
+  setUp(NotificationCache.invalidate);
+
   test(
     'shows the badge when the API contains an unread notification',
     () async {
