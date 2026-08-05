@@ -27,6 +27,13 @@ class ParentChildClassSummaryCard extends StatelessWidget {
         color: colors.infoSurface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: colors.info.withValues(alpha: 0.22)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
