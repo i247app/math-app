@@ -18,7 +18,6 @@ import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/data/home_layout_mappers.dart';
 import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_class_grid.dart';
 import 'package:numi/features/classroom/presentation/screens/parent_room_detail_screen.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_loading.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_select_student_card.dart';
@@ -26,7 +25,10 @@ import 'package:numi/features/classroom/widgets/parent_room/parent_room_state_ca
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
+import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
+import 'package:numi/shared/widgets/app_responsive_card_group.dart';
+import 'package:numi/shared/widgets/app_summary_card.dart';
 
 class ParentRoomTab extends StatefulWidget {
   const ParentRoomTab({
@@ -341,7 +343,17 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       children: [
         _roomFadeIn(
           order: 0,
-          child: ParentRoomClassGrid(entries: entries, onTap: _openRoomDetail),
+          child: AppResponsiveCardGroup(
+            children: [
+              for (final entry in entries)
+                AppSummaryCard(
+                  label: profileDisplayName(context, entry.child),
+                  title: roomClassName(context, entry.classroom),
+                  description: roomTeacherName(context, entry),
+                  onTap: () => _openRoomDetail(entry),
+                ),
+            ],
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 18),

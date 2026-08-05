@@ -3,9 +3,8 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_classroom_card.dart';
-import 'package:numi/shared/widgets/student/student_empty_panel.dart';
-import 'package:numi/shared/widgets/student/student_error_panel.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_join_classroom_button.dart';
+import 'package:numi/shared/widgets/app_state_panel.dart';
 import 'package:numi/shared/widgets/circular_loading_card.dart';
 
 class StudentClassroomPanel extends StatelessWidget {
@@ -37,9 +36,15 @@ class StudentClassroomPanel extends StatelessWidget {
           child: isLoading && classrooms.isEmpty
               ? const CircularLoadingCard()
               : error != null && classrooms.isEmpty
-              ? StudentErrorPanel(message: error!, onRetry: onRetry)
+              ? AppStatePanel(
+                  icon: Icons.wifi_off_rounded,
+                  title: error!,
+                  message: context.getText(AppKeys.retry),
+                  actionLabel: context.getText(AppKeys.retryUpper),
+                  onAction: onRetry,
+                )
               : classrooms.isEmpty
-              ? StudentEmptyPanel(
+              ? AppStatePanel(
                   icon: Icons.groups_rounded,
                   title: context.getText(AppKeys.studentNoClassroomsTitle),
                   message: context.getText(AppKeys.studentNoClassroomsMessage),

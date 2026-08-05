@@ -5,8 +5,8 @@ import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';
-import 'package:numi/shared/widgets/student/student_inline_error_panel.dart';
-import 'package:numi/shared/widgets/student/student_state_card.dart';
+import 'package:numi/features/classroom/widgets/student_tab/student_inline_error_panel.dart';
+import 'package:numi/features/classroom/widgets/student_tab/student_state_card.dart';
 import 'package:numi/features/classroom/widgets/student_invitations/student_invitation_card.dart';
 
 class StudentInvitationListScreen extends StatefulWidget {

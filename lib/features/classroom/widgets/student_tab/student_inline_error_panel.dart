@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:flutter/material.dart';
 import 'package:numi/shared/widgets/app_inline_retry_banner.dart';
 
 class StudentInlineErrorPanel extends StatelessWidget {

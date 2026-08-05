@@ -15,8 +15,8 @@ import 'package:numi/features/classroom/presentation/screens/student_class_detai
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/classroom/widgets/student_class_search_content.dart';
-import 'package:numi/shared/widgets/student/student_inline_error_panel.dart';
-import 'package:numi/shared/widgets/student/student_state_card.dart';
+import 'package:numi/features/classroom/widgets/student_tab/student_inline_error_panel.dart';
+import 'package:numi/features/classroom/widgets/student_tab/student_state_card.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_classroom_tab_card.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_join_another_classroom_title.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_classroom_loading_region.dart';
