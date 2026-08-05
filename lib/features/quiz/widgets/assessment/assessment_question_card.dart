@@ -9,39 +9,24 @@ class AssessmentQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final mathQuestion = _mathQuestionParts(question);
+
     return Container(
-      height: 356,
-      padding: const EdgeInsets.symmetric(horizontal: 26),
+      constraints: const BoxConstraints(minHeight: 260),
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(32),
         border: Border.all(color: colors.border),
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final mathQuestion = _mathQuestionParts(question);
-          final questionContent = mathQuestion != null
-              ? _AssessmentMathQuestion(
-                  prefix: mathQuestion.prefix,
-                  expression: mathQuestion.expression,
-                  color: colors.textPrimary,
-                )
-              : _questionText(colors);
-
-          return SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: SizedBox(
-                width: constraints.maxWidth,
-                child: mathQuestion != null
-                    ? questionContent
-                    : Center(child: questionContent),
-              ),
-            ),
-          );
-        },
-      ),
+      child: mathQuestion != null
+          ? _AssessmentMathQuestion(
+              prefix: mathQuestion.prefix,
+              expression: mathQuestion.expression,
+              color: colors.textPrimary,
+            )
+          : _questionText(colors),
     );
   }
 

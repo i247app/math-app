@@ -16,19 +16,15 @@ class AssessmentAnswerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasLongAnswer = answers.any(
-      (answer) => answer.content.trim().length > 12,
-    );
-
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: answers.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
-        mainAxisExtent: hasLongAnswer ? 112 : 88,
+        mainAxisExtent: 96,
       ),
       itemBuilder: (context, index) {
         final answer = answers[index];

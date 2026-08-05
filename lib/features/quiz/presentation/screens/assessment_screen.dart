@@ -312,6 +312,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final screen = Scaffold(
             backgroundColor: backgroundColor,
             body: SafeArea(
+              bottom: false,
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 430),
