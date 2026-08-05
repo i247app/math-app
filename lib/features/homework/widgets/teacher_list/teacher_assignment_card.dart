@@ -124,7 +124,7 @@ class TeacherAssignmentCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
                 child: SvgPicture.asset(
-                  'assets/images/teacher_homework_more.svg',
+                  'assets/icons/teacher-homework-more.svg',
                   width: 20,
                   height: 20,
                 ),

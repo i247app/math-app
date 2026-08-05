@@ -75,7 +75,7 @@ class TeacherAnswerOption extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 8),
               child: SvgPicture.asset(
-                'assets/images/teacher_homework_detail_check.svg',
+                'assets/icons/teacher-homework-detail-check.svg',
                 width: 20,
                 height: 20,
               ),

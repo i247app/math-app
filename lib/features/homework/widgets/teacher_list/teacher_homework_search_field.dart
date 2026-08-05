@@ -31,7 +31,7 @@ class TeacherHomeworkSearchField extends StatelessWidget {
       child: Row(
         children: [
           SvgPicture.asset(
-            'assets/images/teacher_homework_search.svg',
+            'assets/icons/teacher-homework-search.svg',
             width: 18,
             height: 18,
           ),
@@ -54,7 +54,7 @@ class TeacherHomeworkSearchField extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 8),
             child: SvgPicture.asset(
-              'assets/images/teacher_homework_filter.svg',
+              'assets/icons/teacher-homework-filter.svg',
               width: 18,
               height: 18,
             ),

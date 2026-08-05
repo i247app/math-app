@@ -465,7 +465,7 @@ class _TeacherCreateHomeworkScreenState
           child: Column(
             children: [
               AppScreenAppBar(
-                backIconAsset: 'assets/images/teacher_class_back.svg',
+                backIconAsset: 'assets/icons/teacher-class-back.svg',
                 title: context.getText(
                   teacherExerciseCopy(widget.purpose).createTitleKey,
                 ),
@@ -499,7 +499,7 @@ class _TeacherCreateHomeworkScreenState
                             fontWeight: FontWeight.w500,
                             textOpacity: 1,
                             iconAsset:
-                                'assets/images/teacher_homework_dropdown.svg',
+                                'assets/icons/teacher-homework-dropdown.svg',
                             iconWidth: 12,
                             iconHeight: 8,
                             onTap: _openClassSelector,
@@ -549,7 +549,7 @@ class _TeacherCreateHomeworkScreenState
                               borderColor: const Color(0xFFC4C6D2),
                               borderWidth: 1,
                               iconAsset:
-                                  'assets/images/teacher_homework_dropdown.svg',
+                                  'assets/icons/teacher-homework-dropdown.svg',
                               iconWidth: 12,
                               iconHeight: 8,
                               onTap: _openProgramSelector,

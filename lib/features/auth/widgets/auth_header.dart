@@ -17,7 +17,7 @@ class AuthHeader extends StatelessWidget {
   final String? title;
   final Widget? titleWidget;
 
-  static const _backIconAsset = 'assets/images/pin_figma_back.svg';
+  static const _backIconAsset = 'assets/icons/pin-figma-back.svg';
   static const _mascotAsset = 'assets/images/numi-mascot.png';
 
   @override

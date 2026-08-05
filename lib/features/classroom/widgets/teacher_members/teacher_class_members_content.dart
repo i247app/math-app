@@ -46,7 +46,7 @@ class TeacherClassMembersContent extends StatelessWidget {
     return Column(
       children: [
         AppScreenAppBar(
-          backIconAsset: 'assets/images/teacher_class_back.svg',
+          backIconAsset: 'assets/icons/teacher-class-back.svg',
           title: context.getText(AppKeys.teacherMembersTitle),
           onBack: onBack,
         ),

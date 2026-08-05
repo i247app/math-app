@@ -85,7 +85,7 @@ class ParentInfoCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                         onTap: onEdit,
                         child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_edit.svg',
+                          'assets/icons/parent-profile-manage-edit.svg',
                           width: 19,
                           height: 19,
                         ),
@@ -99,7 +99,7 @@ class ParentInfoCard extends StatelessWidget {
                       spacing: 8,
                       children: [
                         SvgPicture.asset(
-                          'assets/images/parent_profile_manage_mail.svg',
+                          'assets/icons/parent-profile-manage-mail.svg',
                           width: 16,
                           height: 16,
                         ),

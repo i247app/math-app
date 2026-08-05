@@ -457,7 +457,7 @@ class _FarmOrderCard extends StatelessWidget {
               width: compact ? 62 : 76,
               height: compact ? 62 : 76,
               child: Image.asset(
-                'assets/images/welcome_numi_character.png',
+                'assets/images/welcome-numi-character.png',
                 fit: BoxFit.contain,
               ),
             ),
@@ -1070,7 +1070,7 @@ class _FarmChoicePrompt extends StatelessWidget {
             width: 54,
             height: 54,
             child: Image.asset(
-              'assets/images/welcome_numi_character.png',
+              'assets/images/welcome-numi-character.png',
               fit: BoxFit.contain,
             ),
           ),
@@ -1419,7 +1419,7 @@ class _FarmStageCompleteDialog extends StatelessWidget {
               width: 108,
               height: 108,
               child: Image.asset(
-                'assets/images/welcome_numi_character.png',
+                'assets/images/welcome-numi-character.png',
                 fit: BoxFit.contain,
               ),
             ),

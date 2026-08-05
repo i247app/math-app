@@ -13,9 +13,9 @@ class WelcomeComposition extends StatelessWidget {
   final VoidCallback onStart;
   final VoidCallback onLogin;
 
-  static const _mascotAsset = 'assets/images/welcome_figma_mascot.png';
-  static const _wavesAsset = 'assets/images/welcome_figma_waves.png';
-  static const _booksAsset = 'assets/images/welcome_figma_books.png';
+  static const _mascotAsset = 'assets/images/welcome-figma-mascot.png';
+  static const _wavesAsset = 'assets/images/welcome-figma-waves.png';
+  static const _booksAsset = 'assets/images/welcome-figma-books.png';
 
   const WelcomeComposition({
     super.key,

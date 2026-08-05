@@ -68,7 +68,7 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: SvgPicture.asset(
-                          'assets/images/teacher_class_graduation.svg',
+                          'assets/icons/teacher-class-graduation.svg',
                           width: 40,
                           height: 40,
                         ),
@@ -104,7 +104,7 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                         ),
                       ),
                       CreateHomeworkClassMeta(
-                        iconAsset: 'assets/images/teacher_class_grade.png',
+                        iconAsset: 'assets/icons/teacher-class-grade.png',
                         label: createHomeworkGradeName(
                           context,
                           classroom,
@@ -112,7 +112,7 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                         ),
                       ),
                       CreateHomeworkClassMeta(
-                        iconAsset: 'assets/images/teacher_class_program.png',
+                        iconAsset: 'assets/icons/teacher-class-program.png',
                         label: createHomeworkProgramName(
                           context,
                           classroom,
@@ -120,8 +120,7 @@ class CreateHomeworkClassSummary extends StatelessWidget {
                         ),
                       ),
                       CreateHomeworkClassMeta(
-                        iconAsset:
-                            'assets/images/teacher_class_description.png',
+                        iconAsset: 'assets/icons/teacher-class-description.png',
                         label: createHomeworkSchoolName(
                           context,
                           classroom,

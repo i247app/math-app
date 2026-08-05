@@ -101,7 +101,7 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                               ),
                               alignment: Alignment.center,
                               child: SvgPicture.asset(
-                                'assets/images/teacher_class_graduation.svg',
+                                'assets/icons/teacher-class-graduation.svg',
                                 width: 40,
                                 height: 40,
                               ),
@@ -135,7 +135,7 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                                         child: Padding(
                                           padding: const EdgeInsets.all(4),
                                           child: Image.asset(
-                                            'assets/images/teacher_class_share.png',
+                                            'assets/icons/teacher-class-share.png',
                                             width: 23,
                                             height: 23,
                                           ),
@@ -179,17 +179,17 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                                         children: [
                                           TeacherClassDetailMetaRow(
                                             iconAsset:
-                                                'assets/images/teacher_class_grade.png',
+                                                'assets/icons/teacher-class-grade.png',
                                             text: grade,
                                           ),
                                           TeacherClassDetailMetaRow(
                                             iconAsset:
-                                                'assets/images/teacher_class_program.png',
+                                                'assets/icons/teacher-class-program.png',
                                             text: program,
                                           ),
                                           TeacherClassDetailMetaRow(
                                             iconAsset:
-                                                'assets/images/teacher_class_description.png',
+                                                'assets/icons/teacher-class-description.png',
                                             text: schoolName,
                                           ),
                                         ],
@@ -214,7 +214,7 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                               ),
                               const Spacer(),
                               Image.asset(
-                                'assets/images/teacher_class_qr.png',
+                                'assets/icons/teacher-class-qr.png',
                                 width: 18,
                                 height: 18,
                               ),
@@ -255,7 +255,7 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.all(2),
                                   child: SvgPicture.asset(
-                                    'assets/images/teacher_class_copy.svg',
+                                    'assets/icons/teacher-class-copy.svg',
                                     width: 20,
                                     height: 20,
                                   ),

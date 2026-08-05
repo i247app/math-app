@@ -36,7 +36,7 @@ class SignupHeroBanner extends StatelessWidget {
             height: 218,
             child: IgnorePointer(
               child: Image.asset(
-                'assets/images/signup_screen/clourd_background.png',
+                'assets/images/signup-cloud-background.png',
                 fit: BoxFit.cover,
                 alignment: Alignment.topRight,
               ),
@@ -47,7 +47,7 @@ class SignupHeroBanner extends StatelessWidget {
             top: 8,
             child: IgnorePointer(
               child: Image.asset(
-                'assets/images/signup_screen/rocket_transparent.png',
+                'assets/images/signup-rocket.png',
                 width: 148,
                 height: 122,
                 fit: BoxFit.contain,

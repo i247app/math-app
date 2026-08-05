@@ -15,7 +15,7 @@ class HomeGamePreviewRow extends StatelessWidget {
       children: [
         Expanded(
           child: HomeGamePreviewCard(
-            asset: 'assets/images/game_numi_farm_banner.png',
+            asset: 'assets/images/game-numi-farm-banner.png',
             background: const Color(0xFFDDF3EE),
             height: height,
           ),

@@ -109,7 +109,7 @@ class StudentHomeworkAssignmentCard extends StatelessWidget {
                   spacing: 8,
                   children: [
                     SvgPicture.asset(
-                      'assets/images/student_homework_calendar.svg',
+                      'assets/icons/student-homework-calendar.svg',
                       width: 12,
                       height: 13.33,
                     ),

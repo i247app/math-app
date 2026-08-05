@@ -146,7 +146,7 @@ class ParentChildOverviewContent extends StatelessWidget {
                   PromoActionCard(
                     data: PromoActionData(
                       image: const AssetImage(
-                        'assets/images/game_numi_farm_banner.png',
+                        'assets/images/game-numi-farm-banner.png',
                       ),
                       backgroundColor: const Color(0xFFDDF3EE),
                       onTap: onPromoActionTap,

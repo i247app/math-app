@@ -46,7 +46,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 19, right: 9),
           child: Image.asset(
-            'assets/images/student_homework_search.png',
+            'assets/icons/student-homework-search.png',
             width: 19,
             height: 19,
             opacity: const AlwaysStoppedAnimation<double>(0.7),

@@ -5,41 +5,41 @@ const homeMuted = AppColors.textSubtle;
 const homeDeepInk = AppColors.textPrimary;
 const homeMintBackground = AppColors.appBackground;
 
-const studentHomeBellAsset = 'assets/images/student_home_bell.svg';
-const studentHomeNavHomeAsset = 'assets/images/student_home_nav_home.svg';
-const studentHomeNavClassAsset = 'assets/images/student_home_nav_class.svg';
-const studentHomeNavReportAsset = 'assets/images/student_home_nav_report.svg';
-const studentHomeNavMessageAsset = 'assets/images/student_home_nav_message.svg';
+const studentHomeBellAsset = 'assets/icons/student-home-bell.svg';
+const studentHomeNavHomeAsset = 'assets/icons/student-home-nav-home.svg';
+const studentHomeNavClassAsset = 'assets/icons/student-home-nav-class.svg';
+const studentHomeNavReportAsset = 'assets/icons/student-home-nav-report.svg';
+const studentHomeNavMessageAsset = 'assets/icons/student-home-nav-message.svg';
 const studentHomeNavSettingsAsset =
-    'assets/images/student_home_nav_settings.svg';
+    'assets/icons/student-home-nav-settings.svg';
 
-const parentHomeNavHomeAsset = 'assets/images/home_navbar_icon.svg';
-const parentHomeNavAssessmentAsset = 'assets/images/assessment_navbar_icon.svg';
-const parentHomeNavRoomAsset = 'assets/images/room_navbar_icon.svg';
-const parentHomeNavGameAsset = 'assets/images/game_navbar_icon.svg';
-const parentHomeNavSettingsAsset = 'assets/images/setting_navbar_icon.svg';
+const parentHomeNavHomeAsset = 'assets/icons/home-navbar-icon.svg';
+const parentHomeNavAssessmentAsset = 'assets/icons/assessment-navbar-icon.svg';
+const parentHomeNavRoomAsset = 'assets/icons/room-navbar-icon.svg';
+const parentHomeNavGameAsset = 'assets/icons/game-navbar-icon.svg';
+const parentHomeNavSettingsAsset = 'assets/icons/setting-navbar-icon.svg';
 
 const homeInitialAssessmentBannerAsset =
-    'assets/images/parent_home_mode1_assessment_banner.jpg';
+    'assets/images/parent-home-mode1-assessment-banner.jpg';
 const parentReviewEmptyAssessmentAsset =
-    'assets/images/parent_review_empty_assessment.jpg';
+    'assets/images/parent-review-empty-assessment.jpg';
 const parentNoStudentMascotAsset = 'assets/images/numi-mascot.png';
-const studentHomeInviteAsset = 'assets/images/student_home_invite.svg';
+const studentHomeInviteAsset = 'assets/icons/student-home-invite.svg';
 const parentHomeAfterReviewBannerAsset =
-    'assets/images/parent_banner_after_review.jpg';
-const parentHomeClassroomAsset = 'assets/images/join_classroom.jpg';
-const parentHomeRaceAsset = 'assets/images/parent_home_race.png';
-const parentHomeShopAsset = 'assets/images/parent_home_shop.png';
+    'assets/images/parent-banner-after-review.jpg';
+const parentHomeClassroomAsset = 'assets/images/join-classroom.jpg';
+const parentHomeRaceAsset = 'assets/images/parent-home-race.png';
+const parentHomeShopAsset = 'assets/images/parent-home-shop.png';
 const studentParentHomeClassThumbAsset =
-    'assets/images/student_parent_home_class_thumb.png';
+    'assets/images/student-parent-home-class-thumb.png';
 const studentParentHomeAcceptIconAsset =
-    'assets/images/student_parent_home_accept.png';
+    'assets/icons/student-parent-home-accept.png';
 const studentParentHomeRejectIconAsset =
-    'assets/images/student_parent_home_reject.png';
+    'assets/icons/student-parent-home-reject.png';
 const studentParentHomeJoinIconAsset =
-    'assets/images/student_parent_home_join_icon.svg';
-const homeTeacherAvatarOneAsset = 'assets/images/student_home_avatar.png';
-const homeTeacherAvatarTwoAsset = 'assets/images/student_class_teacher.png';
+    'assets/icons/student-parent-home-join-icon.svg';
+const homeTeacherAvatarOneAsset = 'assets/images/student-home-avatar.png';
+const homeTeacherAvatarTwoAsset = 'assets/images/student-class-teacher.png';
 const homeFadeInDuration = Duration(milliseconds: 900);
 const teacherTabContentHorizontalPadding = 18.0;
 const teacherTabContentTopPadding = 18.0;

@@ -7,7 +7,7 @@ class AppBackButton extends StatelessWidget {
   const AppBackButton({
     super.key,
     required this.onPressed,
-    this.iconAsset = 'assets/images/pin_figma_back.svg',
+    this.iconAsset = 'assets/icons/pin-figma-back.svg',
     this.size = 44,
     this.iconSize = 16,
     this.color,

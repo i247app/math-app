@@ -25,12 +25,12 @@ class TeacherClassDetailFunctionGrid extends StatelessWidget {
       padding: EdgeInsets.zero,
       children: [
         TeacherClassDetailFunctionTile(
-          iconAsset: 'assets/images/classroom_homework.png',
+          iconAsset: 'assets/icons/classroom-homework.png',
           label: context.getText(AppKeys.teacherAssignments),
           onTap: onOpenAssignments,
         ),
         TeacherClassDetailFunctionTile(
-          iconAsset: 'assets/images/teacher_class_assignment.png',
+          iconAsset: 'assets/icons/teacher-class-assignment.png',
           label: context.getText(AppKeys.teacherAssessments),
           onTap: onOpenAssessments,
         ),

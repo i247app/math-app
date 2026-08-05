@@ -51,7 +51,7 @@ class TeacherClassDetailCodeChip extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(2),
               child: SvgPicture.asset(
-                'assets/images/teacher_class_link_copy.svg',
+                'assets/icons/teacher-class-link-copy.svg',
                 width: 20,
                 height: 20,
               ),

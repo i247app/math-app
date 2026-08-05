@@ -41,7 +41,7 @@ class StudentClassLearningCategorySection extends StatelessWidget {
             children: [
               StudentClassCategoryTile(
                 backgroundColor: const Color(0xFFFDF0F5),
-                iconAsset: 'assets/images/student_class_assignment.svg',
+                iconAsset: 'assets/icons/student-class-assignment.svg',
                 title: context.getText(AppKeys.studentClassAssignments),
                 subtitle: isLoadingHomework && homeworkCount == 0
                     ? ''
@@ -60,13 +60,13 @@ class StudentClassLearningCategorySection extends StatelessWidget {
               ),
               StudentClassCategoryTile(
                 backgroundColor: const Color(0xFFFDF4EE),
-                iconAsset: 'assets/images/student_class_quiz.svg',
+                iconAsset: 'assets/icons/student-class-quiz.svg',
                 title: context.getText(AppKeys.studentClassQuizzes),
                 subtitle: context.getText(AppKeys.studentClassQuizzesSubtitle),
               ),
               StudentClassCategoryTile(
                 backgroundColor: const Color(0xFFF0F4FF),
-                iconAsset: 'assets/images/student_class_resources.svg',
+                iconAsset: 'assets/icons/student-class-resources.svg',
                 title: context.getText(AppKeys.studentClassMaterials),
                 subtitle: context.getText(
                   AppKeys.studentClassMaterialsSubtitle,
@@ -74,7 +74,7 @@ class StudentClassLearningCategorySection extends StatelessWidget {
               ),
               StudentClassCategoryTile(
                 backgroundColor: const Color(0xFFEDFBF3),
-                iconAsset: 'assets/images/student_class_grades.svg',
+                iconAsset: 'assets/icons/student-class-grades.svg',
                 title: context.getText(AppKeys.studentClassGrades),
                 subtitle: context.getText(AppKeys.studentClassGradesSubtitle),
               ),

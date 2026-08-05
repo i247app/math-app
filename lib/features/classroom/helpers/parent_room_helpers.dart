@@ -298,7 +298,7 @@ roomPurposeListAccent(String? purpose) {
       color: const Color(0xFFBD1C21),
       background: const Color(0xFFFFEFF1),
       icon: Icons.analytics_outlined,
-      asset: 'assets/images/parent_room_assessment.svg',
+      asset: 'assets/icons/parent-room-assessment.svg',
     );
   }
   return (

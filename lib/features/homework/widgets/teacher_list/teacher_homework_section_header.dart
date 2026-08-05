@@ -31,7 +31,7 @@ class TeacherHomeworkSectionHeader extends StatelessWidget {
         spacing: 4,
         children: [
           SvgPicture.asset(
-            'assets/images/teacher_homework_sort.svg',
+            'assets/icons/teacher-homework-sort.svg',
             width: 16,
             height: 16,
           ),

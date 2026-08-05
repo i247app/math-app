@@ -62,12 +62,12 @@ class TeacherJoinRequestRow extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               TeacherRequestActionIcon(
-                asset: 'assets/images/teacher_member_accept.png',
+                asset: 'assets/icons/teacher-member-accept.png',
                 size: 25,
                 onTap: request.profileId == null ? null : onApprove,
               ),
               TeacherRequestActionIcon(
-                asset: 'assets/images/teacher_member_reject.png',
+                asset: 'assets/icons/teacher-member-reject.png',
                 size: 23,
                 onTap: request.profileId == null ? null : onReject,
               ),

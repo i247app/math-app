@@ -52,7 +52,7 @@ class TeacherHomeworkAddButton extends StatelessWidget {
               ),
               Center(
                 child: SvgPicture.asset(
-                  'assets/images/teacher_homework_add.svg',
+                  'assets/icons/teacher-homework-add.svg',
                   width: 12,
                   height: 12,
                 ),

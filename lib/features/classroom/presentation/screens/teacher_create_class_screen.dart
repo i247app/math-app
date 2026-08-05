@@ -235,7 +235,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         child: Column(
           children: [
             AppScreenAppBar(
-              backIconAsset: 'assets/images/teacher_class_back.svg',
+              backIconAsset: 'assets/icons/teacher-class-back.svg',
               title: context.getText(AppKeys.teacherCreateClassTitle),
               onBack: () => Navigator.of(context).maybePop(),
             ),

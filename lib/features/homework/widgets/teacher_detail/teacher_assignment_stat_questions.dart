@@ -16,7 +16,7 @@ class TeacherAssignmentStatQuestions extends StatelessWidget {
   Widget build(BuildContext context) {
     return TeacherAssignmentStat(
       label: context.getText(AppKeys.teacherAssignmentQuestionCountLabel),
-      iconAsset: 'assets/images/teacher_homework_detail_questions.svg',
+      iconAsset: 'assets/icons/teacher-homework-detail-questions.svg',
       value: teacherExerciseQuestionCount(context, exercise),
       valueFontSize: FontSize.normal,
     );

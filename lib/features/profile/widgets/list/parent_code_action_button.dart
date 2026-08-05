@@ -29,12 +29,12 @@ class ParentCodeActionButton extends StatelessWidget {
             spacing: 6,
             children: [
               SvgPicture.asset(
-                'assets/images/parent_profile_manage_copy.svg',
+                'assets/icons/parent-profile-manage-copy.svg',
                 width: 15,
                 height: 15,
               ),
               SvgPicture.asset(
-                'assets/images/parent_profile_manage_qr.svg',
+                'assets/icons/parent-profile-manage-qr.svg',
                 width: 15,
                 height: 15,
               ),

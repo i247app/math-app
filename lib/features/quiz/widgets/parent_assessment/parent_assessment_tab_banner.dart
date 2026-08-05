@@ -21,7 +21,7 @@ class ParentAssessmentTabBanner extends StatelessWidget {
         child: AspectRatio(
           aspectRatio: 1280 / 497,
           child: Image.asset(
-            'assets/images/assessment_tab_banner.jpg',
+            'assets/images/assessment-tab-banner.jpg',
             fit: BoxFit.cover,
             frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
               if (wasSynchronouslyLoaded) {

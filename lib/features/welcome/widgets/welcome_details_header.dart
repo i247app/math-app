@@ -13,9 +13,9 @@ class WelcomeDetailsHeader extends StatelessWidget {
   final VoidCallback onBack;
   final bool isTablet;
 
-  static const _assetPrefix = 'assets/images/welcome_screen/';
-  static const _heroAsset = '${_assetPrefix}welcome_hero_math_friends.png';
-  static const _mascotLogoAsset = '${_assetPrefix}welcome_logo_mascot.png';
+  static const _assetPrefix = 'assets/images/';
+  static const _heroAsset = '${_assetPrefix}welcome-hero-math-friends.png';
+  static const _mascotLogoAsset = '${_assetPrefix}welcome-logo-mascot.png';
 
   @override
   Widget build(BuildContext context) {

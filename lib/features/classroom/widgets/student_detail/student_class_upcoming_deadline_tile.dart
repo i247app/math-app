@@ -88,7 +88,7 @@ class StudentClassUpcomingDeadlineTile extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 28),
                 child: SvgPicture.asset(
-                  'assets/images/student_class_chevron.svg',
+                  'assets/icons/student-class-chevron.svg',
                   width: 7,
                   height: 10,
                 ),

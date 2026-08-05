@@ -8,13 +8,13 @@ import 'package:numi/core/theme/font_size.dart';
 class WelcomeDetailsFeatureGrid extends StatelessWidget {
   const WelcomeDetailsFeatureGrid({super.key});
 
-  static const _assetPrefix = 'assets/images/welcome_screen/';
-  static const _assessmentAsset = '${_assetPrefix}welcome_card_assessment.png';
+  static const _assetPrefix = 'assets/images/';
+  static const _assessmentAsset = '${_assetPrefix}welcome-card-assessment.png';
   static const _teacherAsset =
-      '${_assetPrefix}welcome_card_teacher_support.png';
+      '${_assetPrefix}welcome-card-teacher-support.png';
   static const _progressAsset =
-      '${_assetPrefix}welcome_card_progress_tracking.png';
-  static const _gameAsset = '${_assetPrefix}welcome_card_game_learning.png';
+      '${_assetPrefix}welcome-card-progress-tracking.png';
+  static const _gameAsset = '${_assetPrefix}welcome-card-game-learning.png';
 
   @override
   Widget build(BuildContext context) {

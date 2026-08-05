@@ -53,7 +53,7 @@ class TeacherAssignmentInfoCard extends StatelessWidget {
               Row(
                 children: [
                   SvgPicture.asset(
-                    'assets/images/teacher_homework_detail_class.svg',
+                    'assets/icons/teacher-homework-detail-class.svg',
                     width: 17,
                     height: 14,
                   ),

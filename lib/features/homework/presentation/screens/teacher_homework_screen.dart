@@ -170,7 +170,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
         child: Column(
           children: [
             AppScreenAppBar(
-              backIconAsset: 'assets/images/teacher_class_back.svg',
+              backIconAsset: 'assets/icons/teacher-class-back.svg',
               title: context.getText(
                 teacherExerciseCopy(widget.purpose).titleKey,
               ),

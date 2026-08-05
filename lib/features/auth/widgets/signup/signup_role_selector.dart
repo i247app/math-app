@@ -44,9 +44,9 @@ class SignupRoleSelector extends StatelessWidget {
 
   static String _imagePath(SignupRole role) {
     return switch (role) {
-      SignupRole.student => 'assets/images/student-icon.png',
-      SignupRole.parent => 'assets/images/parent-icon.png',
-      SignupRole.teacher => 'assets/images/teacher-icon.png',
+      SignupRole.student => 'assets/icons/student-role.png',
+      SignupRole.parent => 'assets/icons/parent-role.png',
+      SignupRole.teacher => 'assets/icons/teacher-role.png',
     };
   }
 }

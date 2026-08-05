@@ -46,7 +46,7 @@ class TeacherClassDetailMemberManagementCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Image.asset(
-                    'assets/images/teacher_class_members.png',
+                    'assets/icons/teacher-class-members.png',
                     width: 28,
                     height: 28,
                   ),
@@ -91,7 +91,7 @@ class TeacherClassDetailMemberManagementCard extends StatelessWidget {
                   ),
                 ),
                 SvgPicture.asset(
-                  'assets/images/teacher_class_chevron.svg',
+                  'assets/icons/teacher-class-chevron.svg',
                   width: 20,
                   height: 20,
                 ),

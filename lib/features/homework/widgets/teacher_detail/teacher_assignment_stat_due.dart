@@ -16,7 +16,7 @@ class TeacherAssignmentStatDue extends StatelessWidget {
   Widget build(BuildContext context) {
     return TeacherAssignmentStat(
       label: context.getText(AppKeys.teacherAssignmentDueLabel),
-      iconAsset: 'assets/images/teacher_homework_detail_calendar.svg',
+      iconAsset: 'assets/icons/teacher-homework-detail-calendar.svg',
       value: teacherExerciseDueDate(context, exercise),
       valueFontSize: FontSize.xs,
     );

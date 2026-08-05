@@ -43,7 +43,7 @@ class StudentHomeworkTopBar extends StatelessWidget {
                 height: 40,
                 child: Center(
                   child: SvgPicture.asset(
-                    'assets/images/student_join_back.svg',
+                    'assets/icons/student-join-back.svg',
                     width: 16,
                     height: 16,
                   ),

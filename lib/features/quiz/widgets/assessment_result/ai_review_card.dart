@@ -60,7 +60,7 @@ class AssessmentAiReviewCard extends StatelessWidget {
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    'assets/images/onboarding_splash_mascot.png',
+                    'assets/images/onboarding-splash-mascot.png',
                     fit: BoxFit.cover,
                     alignment: Alignment.topCenter,
                   ),

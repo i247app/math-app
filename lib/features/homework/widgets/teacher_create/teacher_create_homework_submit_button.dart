@@ -55,7 +55,7 @@ class CreateHomeworkSubmitButton extends StatelessWidget {
                     ),
                   ),
                   SvgPicture.asset(
-                    'assets/images/teacher_homework_create_arrow.svg',
+                    'assets/icons/teacher-homework-create-arrow.svg',
                     width: 14,
                     height: 14,
                   ),

@@ -121,7 +121,7 @@ class ParentChildProfileCard extends StatelessWidget {
                         width: 18,
                         height: 18,
                         child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_grade.svg',
+                          'assets/icons/parent-profile-manage-grade.svg',
                         ),
                       ),
                       label: context.getText(AppKeys.grade),
@@ -138,7 +138,7 @@ class ParentChildProfileCard extends StatelessWidget {
                         width: 18,
                         height: 18,
                         child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_program.svg',
+                          'assets/icons/parent-profile-manage-program.svg',
                         ),
                       ),
                       label: context.getText(AppKeys.learningProgram),
@@ -161,7 +161,7 @@ class ParentChildProfileCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                           onTap: onEdit,
                           child: SvgPicture.asset(
-                            'assets/images/parent_profile_manage_edit.svg',
+                            'assets/icons/parent-profile-manage-edit.svg',
                             width: 20,
                             height: 20,
                           ),
@@ -173,7 +173,7 @@ class ParentChildProfileCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                           onTap: onDelete,
                           child: SvgPicture.asset(
-                            'assets/images/parent_profile_manage_delete.svg',
+                            'assets/icons/parent-profile-manage-delete.svg',
                             width: 20,
                             height: 20,
                           ),

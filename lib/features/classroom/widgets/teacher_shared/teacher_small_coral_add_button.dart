@@ -52,7 +52,7 @@ class TeacherSmallCoralAddButton extends StatelessWidget {
                     ),
                   ),
                   SvgPicture.asset(
-                    'assets/images/teacher_class_add.svg',
+                    'assets/icons/teacher-class-add.svg',
                     width: 12,
                     height: 12,
                   ),

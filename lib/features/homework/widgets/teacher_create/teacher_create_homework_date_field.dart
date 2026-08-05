@@ -19,7 +19,7 @@ class CreateHomeworkDateField extends StatelessWidget {
     return CreateHomeworkSelectField(
       valueKey: hintKey,
       valueText: valueText,
-      iconAsset: 'assets/images/teacher_homework_create_calendar.svg',
+      iconAsset: 'assets/icons/teacher-homework-create-calendar.svg',
       iconWidth: 18,
       iconHeight: 20,
       onTap: onTap,

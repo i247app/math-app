@@ -125,7 +125,7 @@ class TeacherStudyExerciseCard extends StatelessWidget {
                   spacing: 7,
                   children: [
                     SvgPicture.asset(
-                      'assets/images/teacher_homework_detail_calendar.svg',
+                      'assets/icons/teacher-homework-detail-calendar.svg',
                       width: 15,
                       height: 15,
                       colorFilter: const ColorFilter.mode(

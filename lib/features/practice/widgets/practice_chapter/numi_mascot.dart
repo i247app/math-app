@@ -38,7 +38,7 @@ class _NumiMascot extends StatelessWidget {
               ),
             ),
             Image.asset(
-              'assets/images/welcome_numi_character.png',
+              'assets/images/welcome-numi-character.png',
               fit: BoxFit.contain,
             ),
           ],
