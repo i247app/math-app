@@ -1,5 +1,6 @@
 import 'package:numi/features/profile/models/profile_id_type_option.dart';
 import 'package:numi/features/settings/application/settings_constants.dart';
+import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,7 +30,6 @@ import 'package:numi/features/settings/application/settings_passcode_controller.
 import 'package:numi/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi/features/settings/helpers/settings_profile_helpers.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
-import 'package:numi/features/settings/navigation/settings_depth_route.dart';
 import 'package:numi/features/settings/navigation/settings_passcode_flow.dart';
 import 'package:numi/features/settings/presentation/setting_account_screen.dart';
 import 'package:numi/features/profile/widgets/profile_form_panel.dart';
@@ -209,7 +209,7 @@ class _SettingTabState extends State<SettingTab>
     );
     final route =
         view == SettingPageView.account || view == SettingPageView.profile
-        ? SettingsDepthRoute<bool>(builder: (_) => screen)
+        ? CupertinoPageRoute<bool>(builder: (_) => screen)
         : MaterialPageRoute<bool>(builder: (_) => screen);
     final didSave = await Navigator.of(context).push<bool>(route);
 
