@@ -7,7 +7,6 @@ import 'package:numi/features/home/parent/home/models/parent_child_summary.dart'
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/home/models/parent_home_entrance_builder.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_child_class_summary_card.dart';
-import 'package:numi/features/home/parent/home/widgets/parent_dashboard_section.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_error_card.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_refresh_label.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
@@ -15,6 +14,7 @@ import 'package:numi/features/home/widgets/home_math_squadron_preview_artwork.da
 import 'package:numi/features/home/widgets/sections/promo_actions/promo_actions.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
+import 'package:numi/shared/widgets/app_content_section.dart';
 
 class ParentChildOverviewContent extends StatelessWidget {
   const ParentChildOverviewContent({
@@ -75,7 +75,7 @@ class ParentChildOverviewContent extends StatelessWidget {
             padding: const EdgeInsets.only(top: 12),
             child: entranceBuilder(
               order: 1,
-              child: ParentTabHostSection(
+              child: AppContentSection(
                 title: context.getText(AppKeys.parentTasksTitle),
                 onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
                 child: Column(
@@ -102,7 +102,7 @@ class ParentChildOverviewContent extends StatelessWidget {
             padding: const EdgeInsets.only(top: 14),
             child: entranceBuilder(
               order: 2,
-              child: ParentTabHostSection(
+              child: AppContentSection(
                 title: context.getText(AppKeys.assessmentResultTitle),
                 onViewAll: completions.length > 2 ? onViewResults : null,
                 child: Column(
@@ -130,7 +130,7 @@ class ParentChildOverviewContent extends StatelessWidget {
           child: entranceBuilder(
             order: 3,
             markOnEnd: !showGameSuggestions,
-            child: ParentTabHostSection(
+            child: AppContentSection(
               title: context.getText(AppKeys.parentMessagesTitle),
               onViewAll: onViewMessages,
               child: ParentTeacherMessagesList(summaries: summaries),

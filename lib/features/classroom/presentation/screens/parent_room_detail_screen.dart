@@ -12,10 +12,10 @@ import 'package:numi/features/classroom/models/parent_room_entry.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_detail_hero.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_detail_shortcuts.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_detail_top_bar.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_list_section.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
+import 'package:numi/shared/widgets/app_content_section.dart';
 
 class ParentRoomDetailScreen extends StatelessWidget {
   const ParentRoomDetailScreen({
@@ -71,7 +71,7 @@ class ParentRoomDetailScreen extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 26),
-                      child: ParentRoomListSection(
+                      child: AppContentSection(
                         title: context
                             .formatText(AppKeys.parentTasksCountTitle, {
                               'count':
@@ -119,7 +119,7 @@ class ParentRoomDetailScreen extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 14, bottom: 14),
-                      child: ParentRoomListSection(
+                      child: AppContentSection(
                         title: context.getText(AppKeys.assessmentResultTitle),
                         onViewAll: () => parentRoomShowComingSoon(context),
                         child: completions.isEmpty

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
-class ParentTabHostSection extends StatelessWidget {
-  const ParentTabHostSection({
+class AppContentSection extends StatelessWidget {
+  const AppContentSection({
     super.key,
     required this.title,
     required this.child,
@@ -19,6 +19,7 @@ class ParentTabHostSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       decoration: BoxDecoration(

@@ -20,13 +20,13 @@ import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_class_grid.dart';
 import 'package:numi/features/classroom/presentation/screens/parent_room_detail_screen.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_list_section.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_loading.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_select_student_card.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_state_card.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
+import 'package:numi/shared/widgets/app_content_section.dart';
 
 class ParentRoomTab extends StatefulWidget {
   const ParentRoomTab({
@@ -347,7 +347,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           padding: const EdgeInsets.only(top: 18),
           child: _roomFadeIn(
             order: 1,
-            child: ParentRoomListSection(
+            child: AppContentSection(
               title: context.formatText(AppKeys.parentTasksCountTitle, {
                 'count': pendingExercises.length + expiredExercises.length,
               }),
@@ -392,7 +392,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           child: _roomFadeIn(
             order: 2,
             markOnEnd: true,
-            child: ParentRoomListSection(
+            child: AppContentSection(
               title: context.getText(AppKeys.assessmentResultTitle),
               onViewAll: widget.onOpenClassroomTab,
               child: completions.isEmpty
