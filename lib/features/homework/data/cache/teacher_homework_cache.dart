@@ -36,7 +36,8 @@ class TeacherHomeworkCache {
       return pending;
     }
 
-    final request = service
+    late final Future<List<ClassroomExercise>> request;
+    request = service
         .listExercises(
           classroomId: classroomId,
           profileId: profileId,
@@ -59,7 +60,11 @@ class TeacherHomeworkCache {
           }
           return cachedExercises;
         })
-        .whenComplete(() => _pendingLists.remove(key));
+        .whenComplete(() {
+          if (identical(_pendingLists[key], request)) {
+            _pendingLists.remove(key);
+          }
+        });
     _pendingLists[key] = request;
     return request;
   }
@@ -94,13 +99,18 @@ class TeacherHomeworkCache {
       return pending;
     }
 
-    final request = service
+    late final Future<ClassroomExercise?> request;
+    request = service
         .getExerciseDetail(exerciseId: exerciseId, profileId: profileId)
         .then((exercise) {
           _details[key] = exercise;
           return exercise;
         })
-        .whenComplete(() => _pendingDetails.remove(key));
+        .whenComplete(() {
+          if (identical(_pendingDetails[key], request)) {
+            _pendingDetails.remove(key);
+          }
+        });
     _pendingDetails[key] = request;
     return request;
   }

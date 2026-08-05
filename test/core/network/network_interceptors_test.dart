@@ -47,4 +47,28 @@ void main() {
       expect(utf8.encode(chunk).length, lessThan(900));
     }
   });
+
+  test('redacts authentication and push tokens from request logs', () {
+    const accessToken = 'Bearer secret-access-token';
+    const pushToken = 'secret-push-token';
+    final request = RequestOptions(
+      path: '/sensitive-request',
+      data: <String, dynamic>{
+        'metadata': <String, dynamic>{
+          'authorization': accessToken,
+          'device_push_token': pushToken,
+        },
+      },
+    );
+
+    const NetworkLogInterceptor().onRequest(
+      request,
+      RequestInterceptorHandler(),
+    );
+
+    final output = logs.join('\n');
+    expect(output, isNot(contains(accessToken)));
+    expect(output, isNot(contains(pushToken)));
+    expect(output, contains('<redacted>'));
+  });
 }

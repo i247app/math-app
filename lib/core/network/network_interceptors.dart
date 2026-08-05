@@ -85,9 +85,8 @@ class NetworkLogInterceptor extends Interceptor {
   // code units so non-ASCII response data is not truncated.
   static const _maxLogChunkBytes = 800;
 
-  // Temporary diagnostic switch. Set this back to false after verifying the
-  // JWT copied into request metadata.
-  static const _showSensitiveValuesInDebugLogs = true;
+  // Sensitive values stay redacted even in debug builds.
+  static const _showSensitiveValuesInDebugLogs = false;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -186,7 +185,10 @@ class NetworkLogInterceptor extends Interceptor {
       'access_token' ||
       'accesstoken' ||
       'refresh_token' ||
-      'refreshtoken' => true,
+      'refreshtoken' ||
+      'device_push_token' ||
+      'fcm_token' ||
+      'push_token' => true,
       _ => false,
     };
   }

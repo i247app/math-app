@@ -30,9 +30,11 @@ class _StudentHomeworkAttemptLoadingSkeletonState
       animation: _controller,
       builder: (context, child) {
         final progress = _controller.value;
-        return Padding(
+        return SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(24, 56, 24, 24),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(

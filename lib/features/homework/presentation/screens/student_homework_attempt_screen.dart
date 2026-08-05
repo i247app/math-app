@@ -282,11 +282,7 @@ class _StudentHomeworkAttemptScreenState
   }
 
   Future<void> _requestExit() async {
-    if (!mounted ||
-        _allowPop ||
-        _isExitDialogOpen ||
-        _isLoading ||
-        _isSubmitting) {
+    if (!mounted || _allowPop || _isExitDialogOpen || _isSubmitting) {
       return;
     }
 
@@ -319,8 +315,6 @@ class _StudentHomeworkAttemptScreenState
     final colors = context.themeColors;
 
     final hasProgress = _selectedAnswerLabels.isNotEmpty;
-    final isBusy = _isLoading || _isSubmitting;
-
     final screen = Scaffold(
       backgroundColor: colors.pageBackground,
       body: SafeArea(
@@ -430,7 +424,7 @@ class _StudentHomeworkAttemptScreenState
                               ),
                       ),
                     ),
-                    if (!_isLoading && !_isSubmitting)
+                    if (!_isSubmitting)
                       Positioned(
                         left: 0,
                         right: 0,
@@ -463,7 +457,7 @@ class _StudentHomeworkAttemptScreenState
     );
 
     return PopScope(
-      canPop: _allowPop || (!hasProgress && !isBusy),
+      canPop: _allowPop || (!hasProgress && !_isSubmitting),
       onPopInvokedWithResult: (didPop, _) async {
         if (!didPop) {
           await _requestExit();
