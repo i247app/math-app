@@ -336,7 +336,9 @@ class ParentHomeContentState extends State<ParentHomeContent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (!isLoading && !hasCompletedAssessment)
+                  if (isLoading && !hasLoadedHome)
+                    const LearningStreakSkeleton()
+                  else if (!hasCompletedAssessment)
                     homeEntrance(
                       mode: ParentHomeEntranceMode.initialAssessment,
                       order: 0,
@@ -347,7 +349,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                         ),
                       ),
                     )
-                  else if (!isLoading && hasCompletedAssessment)
+                  else
                     homeEntrance(
                       mode: ParentHomeEntranceMode.completedAssessment,
                       order: 0,
@@ -356,13 +358,6 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                           context,
                           hasCompletedAssessment: hasCompletedAssessment,
                         ),
-                      ),
-                    )
-                  else
-                    LearningStreakCard(
-                      data: parentLearningStreakContent(
-                        context,
-                        hasCompletedAssessment: hasCompletedAssessment,
                       ),
                     ),
                   Padding(

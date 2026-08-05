@@ -43,7 +43,7 @@ class _ParentChildOverviewSkeletonState
             AppSkeletonBlock(
               height: 104,
               radius: 14,
-              color: colors.infoSurface,
+              color: colors.elevatedSurface,
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

@@ -29,7 +29,9 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (!isLoading)
+                  if (isLoading && !hasLoadedHome)
+                    const LearningStreakSkeleton()
+                  else if (!isLoading)
                     homeEntrance(
                       mode: ParentHomeEntranceMode.childOverview,
                       order: 0,
