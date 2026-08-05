@@ -38,7 +38,7 @@ class LoadingScreen extends StatelessWidget {
                   width: mascotSize,
                   height: mascotSize,
                   child: Image.asset(
-                    'assets/images/onboarding-splash-mascot.png',
+                    'assets/images/numi-mascot-hero.png',
                     fit: BoxFit.cover,
                   ),
                 ),

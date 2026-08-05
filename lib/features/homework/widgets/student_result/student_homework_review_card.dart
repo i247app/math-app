@@ -59,7 +59,7 @@ class StudentHomeworkReviewCard extends StatelessWidget {
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    'assets/images/onboarding-splash-mascot.png',
+                    'assets/images/numi-mascot-hero.png',
                     fit: BoxFit.cover,
                     alignment: Alignment.topCenter,
                   ),
