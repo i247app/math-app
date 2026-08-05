@@ -12,10 +12,9 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
-import 'package:numi/features/home/data/cache/home_profile_cache.dart';
-import 'package:numi/features/home/parent/data/cache/parent_home_snapshot.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
+import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
 import 'package:numi/features/quiz/presentation/screens/learning_progress_screen.dart';
@@ -25,7 +24,7 @@ import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_progress_chart.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_search_field.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_empty_poster.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_list_skeleton.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_state_card.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_banner.dart';
@@ -138,15 +137,12 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       widget.activeProfile,
     );
     final userId = widget.user?.id;
-    final cache = HomeProfileCache.instance;
-    final cachedSnapshot = profileId == null
-        ? null
-        : cache.getParent(profileId);
-    if (!forceRefresh && targetPage == 1 && cachedSnapshot != null) {
-      setState(() => _applyCachedAssessments(cachedSnapshot));
-      if (!cachedSnapshot.isStale) {
-        return;
-      }
+    final cachedAssessments = QuizCache.peekList(
+      userId: userId,
+      profileId: profileId,
+    );
+    if (!forceRefresh && targetPage == 1 && cachedAssessments != null) {
+      setState(() => _applyCachedAssessments(cachedAssessments));
     }
 
     setState(() {
@@ -155,6 +151,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     });
 
     final entries = <ParentAssessmentEntry>[];
+    List<GeneratedQuiz>? loadedAllQuizzes;
     List<ParentAssessmentEntry>? loadedAllEntries;
     QuizPagination? loadedPagination;
     var failed = false;
@@ -170,6 +167,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           size: _pageSize,
         );
         loadedPagination = result.pagination;
+        loadedAllQuizzes = result.allQuizzes;
         loadedAllEntries = result.allQuizzes
             .map((quiz) => ParentAssessmentEntry(quiz: quiz))
             .toList(growable: false);
@@ -199,32 +197,35 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           ? context.readText(AppKeys.parentQuizLoadFailed)
           : null;
     });
-    if (!failed &&
-        profileId != null &&
-        profileId > 0 &&
-        cachedSnapshot != null &&
-        targetPage == 1) {
-      cache.putParent(
-        ParentHomeSnapshot(
-          profileId: profileId,
-          homeLayout: cachedSnapshot.homeLayout,
-          completedAssessments: pageEntries
-              .map((entry) => entry.quiz)
-              .toList(growable: false),
-          cachedAt: DateTime.now(),
-        ),
+    if (!failed && loadedAllQuizzes != null) {
+      QuizCache.seedList(
+        quizzes: loadedAllQuizzes,
+        userId: userId,
+        profileId: profileId,
       );
     }
   }
 
-  void _applyCachedAssessments(ParentHomeSnapshot snapshot) {
+  void _applyCachedAssessments(List<GeneratedQuiz> quizzes) {
     final cachedEntries =
-        snapshot.completedAssessments
+        quizzes
             .map((quiz) => ParentAssessmentEntry(quiz: quiz))
             .toList(growable: false)
           ..sort((a, b) => quizDate(b.quiz).compareTo(quizDate(a.quiz)));
+    final totalCount = cachedEntries.length;
+    final totalPages = totalCount == 0
+        ? 1
+        : (totalCount + _pageSize - 1) ~/ _pageSize;
     _entries = cachedEntries.take(_pageSize).toList(growable: false);
-    _allEntries = _entries;
+    _allEntries = cachedEntries;
+    _pagination = QuizPagination(
+      page: 1,
+      size: _pageSize,
+      totalCount: totalCount,
+      totalPages: totalPages,
+      hasNext: totalPages > 1,
+      hasPrevious: false,
+    );
     _isLoading = false;
     _hasLoaded = true;
     _errorMessage = null;
@@ -357,9 +358,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   Widget build(BuildContext context) {
     final topInset = MediaQuery.paddingOf(context).top;
     final entries = _filteredEntries;
-    final shouldShowFullSkeleton = _isLoading && !_hasLoaded;
+    final shouldShowListSkeleton = _isLoading && _entries.isEmpty;
     final hasNoAssessments =
-        _hasLoaded && _errorMessage == null && _entries.isEmpty;
+        _hasLoaded && !_isLoading && _errorMessage == null && _entries.isEmpty;
 
     final colors = context.themeColors;
     return ColoredBox(
@@ -390,7 +391,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                   _buildAssessmentChildren(
                     entries: entries,
                     hasNoAssessments: hasNoAssessments,
-                    shouldShowFullSkeleton: shouldShowFullSkeleton,
+                    shouldShowListSkeleton: shouldShowListSkeleton,
                   ),
                 ),
               ),
@@ -404,14 +405,10 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   List<Widget> _buildAssessmentChildren({
     required List<ParentAssessmentEntry> entries,
     required bool hasNoAssessments,
-    required bool shouldShowFullSkeleton,
+    required bool shouldShowListSkeleton,
   }) {
     final colors = context.themeColors;
     final shouldShowProgressChart = _allEntries.length > 1;
-
-    if (shouldShowFullSkeleton) {
-      return [const ParentAssessmentFullSkeleton()];
-    }
 
     if (hasNoAssessments) {
       return [
@@ -445,7 +442,12 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           onTap: _openLearningProgress,
         ),
       ],
-      if (_errorMessage != null && _entries.isEmpty)
+      if (shouldShowListSkeleton)
+        const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: ParentAssessmentListSkeleton(),
+        )
+      else if (_errorMessage != null && _entries.isEmpty)
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: _initialFadeIn(

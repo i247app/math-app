@@ -62,6 +62,20 @@ class QuizCache {
     return _lists[_QuizListKey(userId: userId, profileId: profileId)];
   }
 
+  static void seedList({
+    required List<GeneratedQuiz> quizzes,
+    int? userId,
+    int? profileId,
+  }) {
+    final key = _QuizListKey(userId: userId, profileId: profileId);
+    final cachedQuizzes = List<GeneratedQuiz>.unmodifiable(quizzes);
+    _lists[key] = cachedQuizzes;
+    _listLoadedAt[key] = DateTime.now();
+    for (final quiz in cachedQuizzes) {
+      seedDetail(quiz);
+    }
+  }
+
   static bool isListFresh({
     int? userId,
     int? profileId,
