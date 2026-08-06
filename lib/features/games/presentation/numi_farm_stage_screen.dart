@@ -9,6 +9,8 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/games/numi_farm/numi_farm_data.dart';
+import 'package:numi/shared/widgets/exit_confirmation_dialog.dart';
+import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 const _farmGreen = Color(0xFF38898B);
 const _farmDeepGreen = Color(0xFF176B55);
@@ -24,6 +26,8 @@ const _incorrectSound = 'sounds/effects/incorrect.wav';
 mixin _FarmSessionMixin<T extends StatefulWidget> on State<T> {
   final AudioPlayer _effectPlayer = AudioPlayer();
   final Stopwatch _stopwatch = Stopwatch();
+  final GuardedExitController<bool> farmExitController =
+      GuardedExitController<bool>();
   Timer? _clockTimer;
   Duration _elapsed = Duration.zero;
 
@@ -50,6 +54,21 @@ mixin _FarmSessionMixin<T extends StatefulWidget> on State<T> {
   Future<void> playCorrectSound() => _playEffect(_correctSound);
 
   Future<void> playIncorrectSound() => _playEffect(_incorrectSound);
+
+  Future<bool> confirmFarmExit(BuildContext context) async {
+    stopFarmSession();
+    final shouldExit = await showExitConfirmationDialog(
+      context,
+      titleKey: AppKeys.gamesSquadronExitTitle,
+      messageKey: AppKeys.gamesSquadronExitMessage,
+      stayActionKey: AppKeys.gamesSquadronKeepPlaying,
+      exitActionKey: AppKeys.gamesFarmBackToMap,
+    );
+    if (!shouldExit && mounted) {
+      startFarmSession();
+    }
+    return shouldExit;
+  }
 
   Future<void> _playEffect(String assetPath) async {
     try {
@@ -195,7 +214,7 @@ class _NumiFarmHarvestStageScreenState extends State<NumiFarmHarvestStageScreen>
       ),
     );
     if (completed == true && mounted) {
-      Navigator.of(context).pop(true);
+      await farmExitController.exitWithResult(true);
     }
   }
 
@@ -206,7 +225,7 @@ class _NumiFarmHarvestStageScreenState extends State<NumiFarmHarvestStageScreen>
   @override
   Widget build(BuildContext context) {
     final progress = (_roundIndex + 1) / _rounds.length;
-    return Scaffold(
+    final screen = Scaffold(
       backgroundColor: _farmCream,
       body: SafeArea(
         child: LayoutBuilder(
@@ -222,7 +241,7 @@ class _NumiFarmHarvestStageScreenState extends State<NumiFarmHarvestStageScreen>
                     progress: progress,
                     stageTitleKey: numiFarmStage(widget.stage).titleKey,
                     elapsed: elapsed,
-                    onBack: () => Navigator.of(context).maybePop(),
+                    onBack: farmExitController.requestExit,
                   ),
                   SizedBox(height: compact ? 10 : 14),
                   _FarmOrderCard(
@@ -254,6 +273,14 @@ class _NumiFarmHarvestStageScreenState extends State<NumiFarmHarvestStageScreen>
           },
         ),
       ),
+    );
+
+    return GuardedExitScope<bool>(
+      controller: farmExitController,
+      shouldConfirm: true,
+      confirmExit: confirmFarmExit,
+      exitResult: false,
+      child: screen,
     );
   }
 }
@@ -925,7 +952,7 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
       ),
     );
     if (completed == true && mounted) {
-      Navigator.of(context).pop(true);
+      await farmExitController.exitWithResult(true);
     }
   }
 
@@ -942,7 +969,7 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
   @override
   Widget build(BuildContext context) {
     final progress = (_roundIndex + 1) / _rounds.length;
-    return Scaffold(
+    final screen = Scaffold(
       backgroundColor: _farmCream,
       body: SafeArea(
         child: LayoutBuilder(
@@ -958,7 +985,7 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
                     progress: progress,
                     stageTitleKey: numiFarmStage(widget.stage).titleKey,
                     elapsed: elapsed,
-                    onBack: () => Navigator.of(context).maybePop(),
+                    onBack: farmExitController.requestExit,
                   ),
                   SizedBox(height: compact ? 12 : 18),
                   _FarmChoicePrompt(
@@ -1028,6 +1055,14 @@ class _NumiFarmChoiceStageScreenState extends State<NumiFarmChoiceStageScreen>
           },
         ),
       ),
+    );
+
+    return GuardedExitScope<bool>(
+      controller: farmExitController,
+      shouldConfirm: true,
+      confirmExit: confirmFarmExit,
+      exitResult: false,
+      child: screen,
     );
   }
 }

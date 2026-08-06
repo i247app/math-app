@@ -16,6 +16,7 @@ import 'package:numi/features/quiz/widgets/assessment/assessment_progress_sectio
 import 'package:numi/features/quiz/widgets/assessment/assessment_question_card.dart';
 import 'package:numi/features/quiz/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 enum AiAssessmentResult { generationFailed }
 
@@ -46,13 +47,9 @@ class AiAssessmentScreen extends StatefulWidget {
 }
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
-  static const double _backSwipeTriggerDistance = 48;
-  static const double _backSwipeTriggerVelocity = 350;
-
   late final AssessmentController _controller;
-  bool _allowPop = false;
-  bool _isExitDialogOpen = false;
-  double _backSwipeDistance = 0;
+  final GuardedExitController<AiAssessmentResult> _exitController =
+      GuardedExitController<AiAssessmentResult>();
 
   @override
   void initState() {
@@ -162,63 +159,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     };
   }
 
-  Future<void> _requestExit() async {
-    if (!mounted ||
-        _allowPop ||
-        _isExitDialogOpen ||
-        _controller.isGeneratingQuestion ||
-        _controller.isSubmittingQuiz) {
-      return;
-    }
-
-    final hasActiveAttempt = _controller.quiz?.questions.isNotEmpty ?? false;
-    if (!hasActiveAttempt) {
-      await Navigator.of(context).maybePop();
-      return;
-    }
-
-    _isExitDialogOpen = true;
-    final shouldExit = await showAttemptExitDialog(context);
-    _isExitDialogOpen = false;
-    if (shouldExit && mounted) {
-      await _popAttempt();
-    }
-  }
-
-  Future<void> _popAttempt() async {
-    if (!mounted) {
-      return;
-    }
-    setState(() => _allowPop = true);
-    await WidgetsBinding.instance.endOfFrame;
-    if (mounted) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  void _handleBackSwipeStart(DragStartDetails _) {
-    _backSwipeDistance = 0;
-  }
-
-  void _handleBackSwipeUpdate(DragUpdateDetails details) {
-    _backSwipeDistance += details.primaryDelta ?? 0;
-  }
-
-  void _handleBackSwipeEnd(DragEndDetails details) {
-    final velocity = details.primaryVelocity ?? 0;
-    final shouldRequestExit =
-        _backSwipeDistance >= _backSwipeTriggerDistance ||
-        velocity >= _backSwipeTriggerVelocity;
-    _backSwipeDistance = 0;
-    if (shouldRequestExit) {
-      _requestExit();
-    }
-  }
-
-  void _handleBackSwipeCancel() {
-    _backSwipeDistance = 0;
-  }
-
   Future<bool> showUnansweredSubmitDialog() async {
     final result = await showDialog<bool>(
       context: context,
@@ -301,10 +241,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final isSubmittingQuiz = _controller.isSubmittingQuiz;
           final hasActiveAttempt = questions.isNotEmpty;
           final isBusy = isGeneratingQuestion || isSubmittingQuiz;
-          final needsIosBackSwipeDetector =
-              Theme.of(context).platform == TargetPlatform.iOS &&
-              hasActiveAttempt &&
-              !isBusy;
           final backgroundColor = isGeneratingQuestion
               ? colors.surface
               : colors.pageBackground;
@@ -391,7 +327,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                           left: 0,
                           right: 0,
                           top: 0,
-                          child: AssessmentHeader(onClose: _requestExit),
+                          child: AssessmentHeader(
+                            onClose: _exitController.requestExit,
+                          ),
                         ),
                       if (!isGeneratingQuestion &&
                           !isSubmittingQuiz &&
@@ -408,21 +346,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                             onContinue: goToNextQuestion,
                           ),
                         ),
-                      if (needsIosBackSwipeDetector)
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          bottom: 0,
-                          width: 24,
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            excludeFromSemantics: true,
-                            onHorizontalDragStart: _handleBackSwipeStart,
-                            onHorizontalDragUpdate: _handleBackSwipeUpdate,
-                            onHorizontalDragEnd: _handleBackSwipeEnd,
-                            onHorizontalDragCancel: _handleBackSwipeCancel,
-                          ),
-                        ),
                     ],
                   ),
                 ),
@@ -430,13 +353,11 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             ),
           );
 
-          return PopScope(
-            canPop: _allowPop || (!hasActiveAttempt && !isBusy),
-            onPopInvokedWithResult: (didPop, _) async {
-              if (!didPop) {
-                await _requestExit();
-              }
-            },
+          return GuardedExitScope<AiAssessmentResult>(
+            controller: _exitController,
+            shouldConfirm: hasActiveAttempt,
+            isExitBlocked: isBusy,
+            confirmExit: showAttemptExitDialog,
             child: screen,
           );
         },

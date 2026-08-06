@@ -21,6 +21,10 @@ const commonStrings = <String, Map<String, String>>{
     AppKeys.attemptExitMessage:
         'Các câu trả lời đã chọn sẽ bị mất. Bạn có chắc muốn thoát không?',
     AppKeys.exitUpper: 'THOÁT',
+    AppKeys.unsavedChangesExitTitle: 'Bỏ nội dung đang nhập?',
+    AppKeys.unsavedChangesExitMessage:
+        'Các thay đổi chưa lưu sẽ bị mất. Bạn có chắc muốn thoát không?',
+    AppKeys.discardChangesUpper: 'BỎ THAY ĐỔI',
     AppKeys.language: 'Ngôn ngữ',
     AppKeys.languageTitle: 'Ngôn Ngữ',
     AppKeys.languageMenuSubtitle: 'Đổi ngôn ngữ hiển thị',
@@ -49,6 +53,10 @@ const commonStrings = <String, Map<String, String>>{
     AppKeys.attemptExitMessage:
         'Your selected answers will be lost. Are you sure you want to leave?',
     AppKeys.exitUpper: 'LEAVE',
+    AppKeys.unsavedChangesExitTitle: 'Discard your changes?',
+    AppKeys.unsavedChangesExitMessage:
+        'Your unsaved changes will be lost. Are you sure you want to leave?',
+    AppKeys.discardChangesUpper: 'DISCARD',
     AppKeys.language: 'Language',
     AppKeys.languageTitle: 'Language',
     AppKeys.languageMenuSubtitle: 'Change display language',

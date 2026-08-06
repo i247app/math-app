@@ -32,6 +32,8 @@ import 'package:numi/features/homework/widgets/teacher_create/teacher_create_hom
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_select_field.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_submit_button.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
+import 'package:numi/shared/widgets/exit_confirmation_dialog.dart';
+import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 class TeacherCreateHomeworkScreen extends StatefulWidget {
   const TeacherCreateHomeworkScreen({
@@ -76,6 +78,8 @@ class _TeacherCreateHomeworkScreenState
   final TextEditingController _chapterController = TextEditingController();
   final TextEditingController _lessonController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final GuardedExitController<bool> _exitController =
+      GuardedExitController<bool>();
   late final ClassroomExerciseService _exerciseService =
       widget._exerciseService ?? ClassroomExerciseApi();
   late final ClassroomService _classroomService =
@@ -99,16 +103,25 @@ class _TeacherCreateHomeworkScreenState
   bool _isLoadingLookups = false;
   String _visibility = 'PUBLIC';
   bool _isSubmitting = false;
+  bool _isDraftDirty = false;
 
   @override
   void initState() {
     super.initState();
+    _titleController.addListener(_markDraftDirty);
+    _chapterController.addListener(_markDraftDirty);
+    _lessonController.addListener(_markDraftDirty);
+    _descriptionController.addListener(_markDraftDirty);
     _loadClassrooms();
     _loadLookupOptions();
   }
 
   @override
   void dispose() {
+    _titleController.removeListener(_markDraftDirty);
+    _chapterController.removeListener(_markDraftDirty);
+    _lessonController.removeListener(_markDraftDirty);
+    _descriptionController.removeListener(_markDraftDirty);
     _titleController.dispose();
     _chapterController.dispose();
     _lessonController.dispose();
@@ -151,7 +164,7 @@ class _TeacherCreateHomeworkScreenState
       if (!mounted) {
         return;
       }
-      Navigator.of(context).pop(true);
+      await _exitController.exitWithResult(true);
     } on ClassroomExerciseException catch (error) {
       if (!mounted) {
         return;
@@ -175,6 +188,12 @@ class _TeacherCreateHomeworkScreenState
 
   void _dismissKeyboard() {
     FocusManager.instance.primaryFocus?.unfocus();
+  }
+
+  void _markDraftDirty() {
+    if (!_isDraftDirty && mounted) {
+      setState(() => _isDraftDirty = true);
+    }
   }
 
   bool _validateCreateHomeworkForm() {
@@ -341,6 +360,7 @@ class _TeacherCreateHomeworkScreenState
     setState(() {
       _selectedClassroom = selected;
       _selectedProgramId = null;
+      _isDraftDirty = true;
     });
     await _loadSelectedClassroomDetail();
   }
@@ -374,12 +394,21 @@ class _TeacherCreateHomeworkScreenState
     if (selected == null || !mounted) {
       return;
     }
-    setState(() => _selectedProgramId = selected.id);
+    setState(() {
+      _selectedProgramId = selected.id;
+      _isDraftDirty = true;
+    });
   }
 
   void _selectQuestionCount(int count) {
+    if (_selectedQuestionCount == count) {
+      return;
+    }
     HapticFeedback.selectionClick();
-    setState(() => _selectedQuestionCount = count);
+    setState(() {
+      _selectedQuestionCount = count;
+      _isDraftDirty = true;
+    });
   }
 
   Future<void> _openDatePicker({required bool isStart}) async {
@@ -444,6 +473,7 @@ class _TeacherCreateHomeworkScreenState
       } else {
         _endDate = selected;
       }
+      _isDraftDirty = true;
     });
   }
 
@@ -455,7 +485,7 @@ class _TeacherCreateHomeworkScreenState
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    return GestureDetector(
+    final screen = GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: _dismissKeyboard,
       child: Scaffold(
@@ -469,7 +499,7 @@ class _TeacherCreateHomeworkScreenState
                 title: context.getText(
                   teacherExerciseCopy(widget.purpose).createTitleKey,
                 ),
-                onBack: () => Navigator.of(context).maybePop(),
+                onBack: _exitController.requestExit,
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -656,11 +686,12 @@ class _TeacherCreateHomeworkScreenState
                             child: CreateHomeworkPublishSwitch(
                               isPublished: _visibility == 'PUBLIC',
                               onChanged: (isPublished) {
-                                setState(
-                                  () => _visibility = isPublished
+                                setState(() {
+                                  _visibility = isPublished
                                       ? 'PUBLIC'
-                                      : 'PRIVATE',
-                                );
+                                      : 'PRIVATE';
+                                  _isDraftDirty = true;
+                                });
                               },
                             ),
                           ),
@@ -683,6 +714,14 @@ class _TeacherCreateHomeworkScreenState
           ),
         ),
       ),
+    );
+
+    return GuardedExitScope<bool>(
+      controller: _exitController,
+      shouldConfirm: _isDraftDirty,
+      isExitBlocked: _isSubmitting,
+      confirmExit: showUnsavedChangesExitDialog,
+      child: screen,
     );
   }
 }

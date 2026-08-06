@@ -17,6 +17,9 @@ class AppKeys {
   static const attemptExitTitle = 'attempt_exit_title';
   static const attemptExitMessage = 'attempt_exit_message';
   static const exitUpper = 'exit_upper';
+  static const unsavedChangesExitTitle = 'unsaved_changes_exit_title';
+  static const unsavedChangesExitMessage = 'unsaved_changes_exit_message';
+  static const discardChangesUpper = 'discard_changes_upper';
   static const language = 'language';
   static const languageTitle = 'language_title';
   static const languageMenuSubtitle = 'language_menu_subtitle';

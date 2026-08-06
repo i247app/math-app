@@ -22,6 +22,7 @@ import 'package:numi/features/homework/widgets/student_result/student_homework_r
 import 'package:numi/features/quiz/widgets/shared/quiz_wave_loader.dart';
 import 'package:numi/features/quiz/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
+import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 class StudentHomeworkAttemptScreen extends StatefulWidget {
   const StudentHomeworkAttemptScreen({
@@ -46,14 +47,14 @@ class _StudentHomeworkAttemptScreenState
     extends State<StudentHomeworkAttemptScreen> {
   late final ClassroomExerciseService _exerciseService =
       widget._exerciseService ?? ClassroomExerciseApi();
+  final GuardedExitController<bool> _exitController =
+      GuardedExitController<bool>();
 
   ClassroomExercise? _exercise;
   int _questionIndex = 0;
   final Map<int, String> _selectedAnswerLabels = <int, String>{};
   bool _isLoading = false;
   bool _isSubmitting = false;
-  bool _allowPop = false;
-  bool _isExitDialogOpen = false;
   String? _errorMessage;
   VoidCallback? _errorRetryAction;
 
@@ -278,43 +279,16 @@ class _StudentHomeworkAttemptScreenState
     if (!mounted) {
       return;
     }
-    await _popAttempt();
-  }
-
-  Future<void> _requestExit() async {
-    if (!mounted || _allowPop || _isExitDialogOpen || _isSubmitting) {
-      return;
-    }
-
-    if (_selectedAnswerLabels.isEmpty) {
-      await Navigator.of(context).maybePop();
-      return;
-    }
-
-    _isExitDialogOpen = true;
-    final shouldExit = await showAttemptExitDialog(context);
-    _isExitDialogOpen = false;
-    if (shouldExit && mounted) {
-      await _popAttempt();
-    }
-  }
-
-  Future<void> _popAttempt() async {
-    if (!mounted) {
-      return;
-    }
-    setState(() => _allowPop = true);
-    await WidgetsBinding.instance.endOfFrame;
-    if (mounted) {
-      Navigator.of(context).pop();
-    }
+    await _exitController.exit();
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    final hasProgress = _selectedAnswerLabels.isNotEmpty;
+    final hasActiveAttempt = studentHomeworkAttemptQuestions(
+      _exercise,
+    ).isNotEmpty;
     final screen = Scaffold(
       backgroundColor: colors.pageBackground,
       body: SafeArea(
@@ -430,7 +404,7 @@ class _StudentHomeworkAttemptScreenState
                         right: 0,
                         top: 0,
                         child: StudentHomeworkAttemptHeader(
-                          onClose: _requestExit,
+                          onClose: _exitController.requestExit,
                         ),
                       ),
                     if (isQuestionContentVisible)
@@ -456,13 +430,12 @@ class _StudentHomeworkAttemptScreenState
       ),
     );
 
-    return PopScope(
-      canPop: _allowPop || (!hasProgress && !_isSubmitting),
-      onPopInvokedWithResult: (didPop, _) async {
-        if (!didPop) {
-          await _requestExit();
-        }
-      },
+    return GuardedExitScope<bool>(
+      controller: _exitController,
+      shouldConfirm: hasActiveAttempt,
+      isExitBlocked: _isSubmitting,
+      confirmExit: showAttemptExitDialog,
+      exitResult: false,
       child: screen,
     );
   }

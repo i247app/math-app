@@ -24,6 +24,8 @@ import 'package:numi/features/classroom/data/cache/teacher_classroom_lookup_cach
 import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_form.dart';
 import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_full_screen_error.dart';
+import 'package:numi/shared/widgets/exit_confirmation_dialog.dart';
+import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 class TeacherCreateClassScreen extends StatefulWidget {
   const TeacherCreateClassScreen({
@@ -67,6 +69,8 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final GuardedExitController<TeacherCreateClassResult> _exitController =
+      GuardedExitController<TeacherCreateClassResult>();
 
   bool _isLoadingOptions = true;
   bool _isSubmitting = false;
@@ -78,15 +82,20 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
   GradeModel? _selectedGrade;
   List<ProgramModel> _selectedPrograms = const <ProgramModel>[];
   SchoolModel? _selectedSchool;
+  bool _isDraftDirty = false;
 
   @override
   void initState() {
     super.initState();
+    _nameController.addListener(_markDraftDirty);
+    _descriptionController.addListener(_markDraftDirty);
     _loadOptions();
   }
 
   @override
   void dispose() {
+    _nameController.removeListener(_markDraftDirty);
+    _descriptionController.removeListener(_markDraftDirty);
     _nameController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -165,7 +174,10 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       if (!mounted || avatarPath == null || avatarPath.isEmpty) {
         return;
       }
-      setState(() => _avatarPath = avatarPath);
+      setState(() {
+        _avatarPath = avatarPath;
+        _isDraftDirty = true;
+      });
     } catch (_) {
       _showError(context.readText(AppKeys.imagePickFailed));
     }
@@ -211,7 +223,9 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         return;
       }
       context.read<ClassroomCubit>().invalidateOwned(profileId);
-      Navigator.of(context).pop(TeacherCreateClassResult(classroom: classroom));
+      await _exitController.exitWithResult(
+        TeacherCreateClassResult(classroom: classroom),
+      );
     } on ClassroomException catch (error) {
       _showError(error.message);
     } finally {
@@ -225,11 +239,17 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     context.showErrorDialog(message);
   }
 
+  void _markDraftDirty() {
+    if (!_isDraftDirty && mounted) {
+      setState(() => _isDraftDirty = true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    return Scaffold(
+    final screen = Scaffold(
       backgroundColor: colors.pageBackground,
       body: SafeArea(
         child: Column(
@@ -237,12 +257,20 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
             AppScreenAppBar(
               backIconAsset: 'assets/icons/teacher-class-back.svg',
               title: context.getText(AppKeys.teacherCreateClassTitle),
-              onBack: () => Navigator.of(context).maybePop(),
+              onBack: _exitController.requestExit,
             ),
             Expanded(child: _buildContent()),
           ],
         ),
       ),
+    );
+
+    return GuardedExitScope<TeacherCreateClassResult>(
+      controller: _exitController,
+      shouldConfirm: _isDraftDirty,
+      isExitBlocked: _isSubmitting,
+      confirmExit: showUnsavedChangesExitDialog,
+      child: screen,
     );
   }
 
@@ -273,9 +301,24 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
       descriptionController: _descriptionController,
       isSubmitting: _isSubmitting,
       onPickAvatar: _pickAvatar,
-      onGradeChanged: (value) => setState(() => _selectedGrade = value),
-      onProgramsChanged: (values) => setState(() => _selectedPrograms = values),
-      onSchoolChanged: (value) => setState(() => _selectedSchool = value),
+      onGradeChanged: (value) {
+        setState(() {
+          _selectedGrade = value;
+          _isDraftDirty = true;
+        });
+      },
+      onProgramsChanged: (values) {
+        setState(() {
+          _selectedPrograms = values;
+          _isDraftDirty = true;
+        });
+      },
+      onSchoolChanged: (value) {
+        setState(() {
+          _selectedSchool = value;
+          _isDraftDirty = true;
+        });
+      },
       onSubmit: _submit,
     );
   }

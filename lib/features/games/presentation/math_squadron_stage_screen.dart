@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/games/math_squadron/math_squadron_data.dart';
+import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 const _spaceTop = Color(0xFF060D2D);
 const _spaceBottom = Color(0xFF111C52);
@@ -82,6 +83,8 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
   late final MathSquadronLevelConfig _config;
   late final math.Random _random;
   final AudioPlayer _effectsPlayer = AudioPlayer();
+  final GuardedExitController<bool> _exitController =
+      GuardedExitController<bool>();
 
   Timer? _gameTimer;
   DateTime _lastTick = DateTime.now();
@@ -117,7 +120,6 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
   bool _lastShotCorrect = false;
   Offset? _shotTarget;
   bool _finishing = false;
-  bool _allowPop = false;
   bool _paused = false;
 
   @override
@@ -596,14 +598,7 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
       setState(_startMission);
       return;
     }
-    await _popWithResult(won);
-  }
-
-  Future<void> _popWithResult(bool result) async {
-    if (!mounted) return;
-    setState(() => _allowPop = true);
-    await WidgetsBinding.instance.endOfFrame;
-    if (mounted) Navigator.of(context).pop(result);
+    await _exitController.exitWithResult(won);
   }
 
   Future<bool> _confirmExit() async {
@@ -656,97 +651,93 @@ class _MathSquadronStageScreenState extends State<MathSquadronStageScreen> {
   @override
   Widget build(BuildContext context) {
     final accent = Color(_config.accentValue);
-    return PopScope(
-      canPop: _allowPop,
-      onPopInvokedWithResult: (didPop, _) async {
-        if (!didPop && await _confirmExit() && context.mounted) {
-          await _popWithResult(false);
-        }
-      },
-      child: Scaffold(
-        backgroundColor: _spaceTop,
-        body: DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [_spaceTop, _spaceBottom],
-            ),
+    final screen = Scaffold(
+      backgroundColor: _spaceTop,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [_spaceTop, _spaceBottom],
           ),
-          child: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final compact = constraints.maxHeight < 700;
-                return Column(
-                  children: [
-                    _MissionHud(
-                      level: _config.level,
-                      phase: _phase,
-                      shields: _shields,
-                      maxShields: _config.shields,
-                      score: _score,
-                      combo: _combo,
-                      progress: _phase == _MissionPhase.wave
-                          ? _spawned / _waveSize
-                          : _bossParts.isEmpty
-                          ? 0
-                          : _bossParts.where((part) => part.alive).length /
-                                _bossParts.length,
-                      accent: accent,
-                      onBack: () async {
-                        if (await _confirmExit() && context.mounted) {
-                          await _popWithResult(false);
-                        }
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxHeight < 700;
+              return Column(
+                children: [
+                  _MissionHud(
+                    level: _config.level,
+                    phase: _phase,
+                    shields: _shields,
+                    maxShields: _config.shields,
+                    score: _score,
+                    combo: _combo,
+                    progress: _phase == _MissionPhase.wave
+                        ? _spawned / _waveSize
+                        : _bossParts.isEmpty
+                        ? 0
+                        : _bossParts.where((part) => part.alive).length /
+                              _bossParts.length,
+                    accent: accent,
+                    onBack: _exitController.requestExit,
+                  ),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, arenaConstraints) {
+                        final size = Size(
+                          arenaConstraints.maxWidth,
+                          arenaConstraints.maxHeight,
+                        );
+                        return GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onPanUpdate: (details) => _moveShip(details, size),
+                          child: _GameArena(
+                            size: size,
+                            phase: _phase,
+                            level: widget.level,
+                            worldTime: _worldTime,
+                            meteors: _meteors,
+                            bossParts: _bossParts,
+                            missiles: _missiles,
+                            shipPosition: _shipPosition,
+                            shipDamaged: _damageImmunity > 0,
+                            shotFlashing: _shotFlashing,
+                            lastShotCorrect: _lastShotCorrect,
+                            shotTarget: _shotTarget,
+                            laserWarning: _laserWarning,
+                            laserActive: _laserActive,
+                            laserLane: _laserLane,
+                            compact: compact,
+                          ),
+                        );
                       },
                     ),
-                    Expanded(
-                      child: LayoutBuilder(
-                        builder: (context, arenaConstraints) {
-                          final size = Size(
-                            arenaConstraints.maxWidth,
-                            arenaConstraints.maxHeight,
-                          );
-                          return GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onPanUpdate: (details) => _moveShip(details, size),
-                            child: _GameArena(
-                              size: size,
-                              phase: _phase,
-                              level: widget.level,
-                              worldTime: _worldTime,
-                              meteors: _meteors,
-                              bossParts: _bossParts,
-                              missiles: _missiles,
-                              shipPosition: _shipPosition,
-                              shipDamaged: _damageImmunity > 0,
-                              shotFlashing: _shotFlashing,
-                              lastShotCorrect: _lastShotCorrect,
-                              shotTarget: _shotTarget,
-                              laserWarning: _laserWarning,
-                              laserActive: _laserActive,
-                              laserLane: _laserLane,
-                              compact: compact,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    _AmmoPanel(
-                      currentAmmo: _currentAmmo,
-                      nextAmmo: _nextAmmo,
-                      reloading: _reloadRemaining > 0,
-                      reloadProgress:
-                          1 - (_reloadRemaining / _reloadDuration).clamp(0, 1),
-                      compact: compact,
-                      onFire: _fire,
-                    ),
-                  ],
-                );
-              },
-            ),
+                  ),
+                  _AmmoPanel(
+                    currentAmmo: _currentAmmo,
+                    nextAmmo: _nextAmmo,
+                    reloading: _reloadRemaining > 0,
+                    reloadProgress:
+                        1 - (_reloadRemaining / _reloadDuration).clamp(0, 1),
+                    compact: compact,
+                    onFire: _fire,
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
+    );
+
+    return GuardedExitScope<bool>(
+      controller: _exitController,
+      shouldConfirm: true,
+      confirmExit: (_) => _confirmExit(),
+      exitResult: false,
+      child: screen,
     );
   }
 }
