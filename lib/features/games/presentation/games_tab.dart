@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -252,7 +254,6 @@ class _GamesTabState extends State<GamesTab> {
           grades: _grades,
           isLoading: _isLoadingGrades,
           errorMessage: _gradeError,
-          bottomPadding: widget.bottomPadding,
           onRetry: _loadGrades,
           onSelected: _selectGrade,
         ),
@@ -289,7 +290,6 @@ class _GamesGradeSelection extends StatelessWidget {
     required this.grades,
     required this.isLoading,
     required this.errorMessage,
-    required this.bottomPadding,
     required this.onRetry,
     required this.onSelected,
   });
@@ -297,7 +297,6 @@ class _GamesGradeSelection extends StatelessWidget {
   final List<GradeModel> grades;
   final bool isLoading;
   final String? errorMessage;
-  final double bottomPadding;
   final VoidCallback onRetry;
   final ValueChanged<GradeModel> onSelected;
 
@@ -309,92 +308,192 @@ class _GamesGradeSelection extends StatelessWidget {
           ..sort(
             (a, b) => (a.displayOrder ?? 0).compareTo(b.displayOrder ?? 0),
           );
+    final kindergartenGrade = visibleGrades
+        .where((grade) => _isKindergartenLabel(grade.label))
+        .firstOrNull;
+    final pathGrades = <GradeModel>[
+      kindergartenGrade ?? _kindergartenGrade,
+      ...visibleGrades.where((grade) => !_isKindergartenLabel(grade.label)),
+    ];
 
-    return ColoredBox(
-      color: colors.pageBackground,
-      child: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(24, 32, 24, bottomPadding + 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AppStaggeredEntrance(
-                order: 0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _GamesEyebrow(label: context.getText(AppKeys.navGames)),
-                    const SizedBox(height: 16),
-                    Text(
-                      context.getText(AppKeys.gamesGradeTitle),
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: 31,
-                        fontWeight: FontWeight.w900,
-                        height: 1.08,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+        systemStatusBarContrastEnforced: false,
+      ),
+      child: ColoredBox(
+        color: colors.pageBackground,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            const sourceSize = Size(593, 1280);
+            final fittedSizes = applyBoxFit(
+              BoxFit.cover,
+              sourceSize,
+              constraints.biggest,
+            );
+            final imageScale =
+                fittedSizes.destination.width / fittedSizes.source.width;
+            final renderedImageWidth = sourceSize.width * imageScale;
+            final imageOffsetX =
+                (constraints.maxWidth - renderedImageWidth) / 2;
+
+            return ClipRect(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    'assets/images/game-grade-selection-background.jpg',
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                  ),
+                  if (isLoading)
+                    Positioned(
+                      top: 350 * imageScale,
+                      left: 0,
+                      right: 0,
+                      child: const Center(child: _GradePathLoading()),
+                    )
+                  else if (errorMessage != null)
+                    Positioned(
+                      top: 240 * imageScale,
+                      left: 24,
+                      right: 24,
+                      child: AppStaggeredEntrance(
+                        order: 0,
+                        child: _GamesMessageCard(
+                          icon: Icons.cloud_off_rounded,
+                          message: errorMessage!,
+                          actionLabel: context.getText(AppKeys.retryUpper),
+                          onAction: onRetry,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      context.getText(AppKeys.gamesGradeSubtitle),
-                      style: TextStyle(
-                        color: colors.textSecondary,
-                        fontSize: FontSize.normal,
-                        fontWeight: FontWeight.w700,
-                        height: 1.35,
+                    )
+                  else if (visibleGrades.isEmpty)
+                    Positioned(
+                      top: 240 * imageScale,
+                      left: 24,
+                      right: 24,
+                      child: AppStaggeredEntrance(
+                        order: 0,
+                        child: _GamesMessageCard(
+                          icon: Icons.school_outlined,
+                          message: context.getText(AppKeys.noGrades),
+                          actionLabel: context.getText(AppKeys.retryUpper),
+                          onAction: onRetry,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    )
+                  else
+                    for (
+                      var index = 0;
+                      index <
+                          math.min(pathGrades.length, _gradePathStops.length);
+                      index++
+                    )
+                      _GradePathPositionedButton(
+                        stop: _gradePathStops[index],
+                        scale: imageScale,
+                        offsetX: imageOffsetX,
+                        order: index,
+                        child: _GamesGradeCard(
+                          grade: pathGrades[index],
+                          index: math.max(0, index - 1),
+                          onTap: () => onSelected(pathGrades[index]),
+                        ),
+                      ),
+                ],
               ),
-              const SizedBox(height: 28),
-              if (isLoading)
-                const _GamesGradeLoading()
-              else if (errorMessage != null)
-                AppStaggeredEntrance(
-                  order: 1,
-                  child: _GamesMessageCard(
-                    icon: Icons.cloud_off_rounded,
-                    message: errorMessage!,
-                    actionLabel: context.getText(AppKeys.retryUpper),
-                    onAction: onRetry,
-                  ),
-                )
-              else if (visibleGrades.isEmpty)
-                AppStaggeredEntrance(
-                  order: 1,
-                  child: _GamesMessageCard(
-                    icon: Icons.school_outlined,
-                    message: context.getText(AppKeys.noGrades),
-                    actionLabel: context.getText(AppKeys.retryUpper),
-                    onAction: onRetry,
-                  ),
-                )
-              else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: visibleGrades.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    childAspectRatio: 1,
-                  ),
-                  itemBuilder: (context, index) => AppStaggeredEntrance(
-                    order: index + 1,
-                    child: _GamesGradeCard(
-                      grade: visibleGrades[index],
-                      index: index,
-                      onTap: () => onSelected(visibleGrades[index]),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+            );
+          },
         ),
+      ),
+    );
+  }
+}
+
+const _kindergartenGrade = GradeModel(
+  label: 'Mẫu giáo',
+  description: 'Mẫu giáo',
+  displayOrder: 0,
+);
+
+bool _isKindergartenLabel(String? label) {
+  final normalized = label?.trim().toLowerCase() ?? '';
+  return normalized.contains('mẫu giáo') || normalized.contains('kindergarten');
+}
+
+const _gradePathStops = <_GradePathStop>[
+  _GradePathStop(x: 194, y: 1056, width: 126),
+  _GradePathStop(x: 389, y: 874, width: 118),
+  _GradePathStop(x: 242, y: 752, width: 110),
+  _GradePathStop(x: 402, y: 657, width: 102),
+  _GradePathStop(x: 289, y: 562, width: 94),
+  _GradePathStop(x: 411, y: 491, width: 84),
+];
+
+class _GradePathStop {
+  const _GradePathStop({required this.x, required this.y, required this.width});
+
+  final double x;
+  final double y;
+  final double width;
+}
+
+class _GradePathPositionedButton extends StatelessWidget {
+  const _GradePathPositionedButton({
+    required this.stop,
+    required this.scale,
+    required this.offsetX,
+    required this.order,
+    required this.child,
+  });
+
+  final _GradePathStop stop;
+  final double scale;
+  final double offsetX;
+  final int order;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = stop.width * scale;
+    final height = width / 0.72;
+    return Positioned(
+      left: offsetX + (stop.x * scale) - (width / 2),
+      top: (stop.y * scale) - (height * 0.868),
+      width: width,
+      height: height,
+      child: AppStaggeredEntrance(order: order, child: child),
+    );
+  }
+}
+
+class _GradePathLoading extends StatelessWidget {
+  const _GradePathLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    return Container(
+      width: 58,
+      height: 58,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface.withValues(alpha: 0.86),
+        shape: BoxShape.circle,
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x3D155A54),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: CircularProgressIndicator(
+        color: colors.brandStrong,
+        strokeWidth: 3,
       ),
     );
   }
@@ -576,137 +675,406 @@ class _GamesGradeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    const palettes = <_GradeNumberPalette>[
-      _GradeNumberPalette(
-        top: Color(0xFFFFDA17),
-        bottom: Color(0xFFFFA800),
-        depth: Color(0xFFF06B17),
-        shadow: Color(0x55384350),
+    const kindergartenPalette = _GradePlaquePalette(
+      top: Color(0xFFFFDB3D),
+      bottom: Color(0xFFFFA51F),
+      edge: Color(0xFFE06B08),
+      flag: Color(0xFFFFB622),
+      ornament: Color(0xFFFFF6DE),
+    );
+    const palettes = <_GradePlaquePalette>[
+      _GradePlaquePalette(
+        top: Color(0xFFFFBE30),
+        bottom: Color(0xFFFF7A12),
+        edge: Color(0xFFD94B0A),
+        flag: Color(0xFFFF7414),
+        ornament: Color(0xFFFFD523),
       ),
-      _GradeNumberPalette(
-        top: Color(0xFFA9DD35),
-        bottom: Color(0xFF71BD26),
-        depth: Color(0xFF2A8B22),
-        shadow: Color(0x55384350),
+      _GradePlaquePalette(
+        top: Color(0xFFFF5C91),
+        bottom: Color(0xFFE91D68),
+        edge: Color(0xFFB10B4A),
+        flag: Color(0xFFF53B6C),
+        ornament: Color(0xFFFF648D),
       ),
-      _GradeNumberPalette(
-        top: Color(0xFF20C8ED),
-        bottom: Color(0xFF0794D3),
-        depth: Color(0xFF075FB3),
-        shadow: Color(0x55384350),
+      _GradePlaquePalette(
+        top: Color(0xFFAC5AF2),
+        bottom: Color(0xFF7026D5),
+        edge: Color(0xFF4E17A8),
+        flag: Color(0xFF8D36E8),
+        ornament: Color(0xFFB767F5),
       ),
-      _GradeNumberPalette(
-        top: Color(0xFFFF514B),
-        bottom: Color(0xFFF01422),
-        depth: Color(0xFFB8071C),
-        shadow: Color(0x55384350),
+      _GradePlaquePalette(
+        top: Color(0xFF43BDF4),
+        bottom: Color(0xFF1478DF),
+        edge: Color(0xFF0754B2),
+        flag: Color(0xFF238DEA),
+        ornament: Color(0xFF42C8FF),
       ),
-      _GradeNumberPalette(
-        top: Color(0xFF76DCCB),
-        bottom: Color(0xFF3DB9A5),
-        depth: Color(0xFF168A7C),
-        shadow: Color(0x55384350),
+      _GradePlaquePalette(
+        top: Color(0xFF9DDF2D),
+        bottom: Color(0xFF4EBA1E),
+        edge: Color(0xFF288812),
+        flag: Color(0xFF58C723),
+        ornament: Color(0xFFFFC928),
       ),
     ];
     final label = grade.label?.trim() ?? '';
-    final number = _gradeNumber(grade, index);
-    final palette = palettes[index % palettes.length];
+    final isKindergarten = _isKindergartenLabel(label);
+    final display = _GradeDisplay.fromGrade(grade);
+    final palette = isKindergarten
+        ? kindergartenPalette
+        : palettes[index % palettes.length];
 
     return Semantics(
       button: true,
       label: label,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.elevatedSurface,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: colors.border),
-          boxShadow: [
-            BoxShadow(
-              color: colors.shadow,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+      child: Tooltip(
+        message: label,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _GradePlaqueArtwork(
+              display: display,
+              palette: palette,
+              ornament: _gradeOrnament(index),
+              isKindergarten: isKindergarten,
             ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(28),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(28),
-            child: Center(
-              child: Transform.translate(
-                offset: const Offset(0, -12),
-                child: _ThreeDimensionalNumber(
-                  number: number,
-                  palette: palette,
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(36),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: onTap,
+                  borderRadius: BorderRadius.circular(36),
+                  splashColor: Colors.white24,
+                  highlightColor: Colors.white10,
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _ThreeDimensionalNumber extends StatelessWidget {
-  const _ThreeDimensionalNumber({required this.number, required this.palette});
+class _GradePlaqueArtwork extends StatelessWidget {
+  const _GradePlaqueArtwork({
+    required this.display,
+    required this.palette,
+    required this.ornament,
+    required this.isKindergarten,
+  });
 
-  final String number;
-  final _GradeNumberPalette palette;
-
-  TextStyle get _numberStyle => const TextStyle(
-    fontSize: 76,
-    fontWeight: FontWeight.w900,
-    height: 1,
-    letterSpacing: -3,
-  );
+  final _GradeDisplay display;
+  final _GradePlaquePalette palette;
+  final IconData ornament;
+  final bool isKindergarten;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 98,
-      height: 104,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Transform.translate(
-            offset: const Offset(7, 12),
-            child: Text(
-              number,
-              style: _numberStyle.copyWith(color: palette.shadow),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = constraints.maxHeight;
+        final ornamentSize = width * 0.27;
+
+        return Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            if (isKindergarten)
+              Positioned(
+                top: height * 0.005,
+                child: CustomPaint(
+                  size: Size.square(width * 0.37),
+                  painter: const _KindergartenStarPainter(),
+                ),
+              )
+            else
+              Positioned(
+                top: 0,
+                left: width * 0.43,
+                child: CustomPaint(
+                  size: Size(width * 0.43, height * 0.26),
+                  painter: _GradeFlagPainter(palette),
+                ),
+              ),
+            Positioned(
+              top: height * 0.13,
+              left: width * 0.06,
+              right: width * 0.06,
+              bottom: height * 0.08,
+              child: CustomPaint(painter: _GradePlaquePainter(palette)),
             ),
-          ),
-          Transform.translate(
-            offset: const Offset(0, 9),
-            child: Text(
-              number,
-              style: _numberStyle.copyWith(
-                color: palette.depth,
-                shadows: [
-                  Shadow(
-                    color: palette.shadow,
-                    offset: const Offset(3, 4),
-                    blurRadius: 3,
+            Positioned(
+              top: height * 0.29,
+              left: width * 0.16,
+              right: width * 0.16,
+              bottom: height * 0.18,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _OutlinedGradeText(
+                    display.caption,
+                    fontSize: width * (display.number == null ? 0.225 : 0.155),
+                    outlineColor: palette.edge,
+                    maxLines: display.number == null ? 2 : 1,
                   ),
+                  if (display.number != null) ...[
+                    SizedBox(height: height * 0.01),
+                    _OutlinedGradeText(
+                      display.number!,
+                      fontSize: width * 0.43,
+                      outlineColor: palette.edge,
+                    ),
+                  ],
                 ],
               ),
             ),
+            Positioned(
+              left: 0,
+              bottom: height * 0.07,
+              child: _GradeLeaves(size: width * 0.37),
+            ),
+            Positioned(
+              right: 0,
+              bottom: height * 0.07,
+              child: _GradeLeaves(size: width * 0.37, mirrored: true),
+            ),
+            Positioned(
+              bottom: height * 0.035,
+              child: isKindergarten
+                  ? CustomPaint(
+                      size: Size.square(ornamentSize),
+                      painter: const _KindergartenFlowerPainter(),
+                    )
+                  : Container(
+                      width: ornamentSize,
+                      height: ornamentSize,
+                      decoration: BoxDecoration(
+                        color: palette.ornament,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white70,
+                          width: math.max(1, width * 0.013),
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x520B5B1C),
+                            blurRadius: 7,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        ornament,
+                        color: palette.edge,
+                        size: ornamentSize * 0.65,
+                      ),
+                    ),
+            ),
+            Positioned(
+              top: height * 0.16,
+              right: width * 0.03,
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                color: const Color(0xFFFFE166),
+                size: width * 0.12,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _KindergartenStarPainter extends CustomPainter {
+  const _KindergartenStarPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final star = Path();
+    for (var point = 0; point < 10; point++) {
+      final radius = point.isEven ? size.width * 0.48 : size.width * 0.25;
+      final angle = -math.pi / 2 + point * math.pi / 5;
+      final offset = Offset(
+        center.dx + math.cos(angle) * radius,
+        center.dy + math.sin(angle) * radius,
+      );
+      if (point == 0) {
+        star.moveTo(offset.dx, offset.dy);
+      } else {
+        star.lineTo(offset.dx, offset.dy);
+      }
+    }
+    star.close();
+
+    canvas.drawShadow(
+      star,
+      const Color(0x660D4831),
+      math.max(1.5, size.width * 0.08),
+      true,
+    );
+    canvas.drawPath(
+      star,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFF163), Color(0xFFFFBE18)],
+        ).createShader(Offset.zero & size),
+    );
+    canvas.drawPath(
+      star,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(1, size.width * 0.06)
+        ..strokeJoin = StrokeJoin.round
+        ..color = Colors.white.withValues(alpha: 0.9),
+    );
+
+    final facePaint = Paint()
+      ..color = const Color(0xFF7A4900)
+      ..strokeCap = StrokeCap.round;
+    final eyeRadius = size.width * 0.035;
+    canvas.drawCircle(
+      Offset(center.dx - size.width * 0.11, center.dy - size.height * 0.015),
+      eyeRadius,
+      facePaint,
+    );
+    canvas.drawCircle(
+      Offset(center.dx + size.width * 0.11, center.dy - size.height * 0.015),
+      eyeRadius,
+      facePaint,
+    );
+    canvas.drawArc(
+      Rect.fromCenter(
+        center: Offset(center.dx, center.dy + size.height * 0.015),
+        width: size.width * 0.27,
+        height: size.height * 0.2,
+      ),
+      0.18,
+      math.pi - 0.36,
+      false,
+      facePaint
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(1, size.width * 0.045),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_KindergartenStarPainter oldDelegate) => false;
+}
+
+class _KindergartenFlowerPainter extends CustomPainter {
+  const _KindergartenFlowerPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final petalRadius = size.width * 0.17;
+    final petalDistance = size.width * 0.23;
+    final flower = Path();
+    for (var petal = 0; petal < 6; petal++) {
+      final angle = -math.pi / 2 + petal * math.pi / 3;
+      flower.addOval(
+        Rect.fromCircle(
+          center: Offset(
+            center.dx + math.cos(angle) * petalDistance,
+            center.dy + math.sin(angle) * petalDistance,
           ),
-          ShaderMask(
-            blendMode: BlendMode.srcIn,
-            shaderCallback: (bounds) => LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [palette.top, palette.bottom],
-              stops: const [0.12, 0.88],
-            ).createShader(bounds),
-            child: Text(
-              number,
-              style: _numberStyle.copyWith(color: Colors.white),
+          radius: petalRadius,
+        ),
+      );
+    }
+    canvas.drawShadow(
+      flower,
+      const Color(0x590D4831),
+      math.max(1, size.width * 0.08),
+      true,
+    );
+    canvas.drawPath(flower, Paint()..color = const Color(0xFFFFFBF4));
+    canvas.drawPath(
+      flower,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(0.7, size.width * 0.03)
+        ..color = const Color(0xFFE7DED0),
+    );
+    canvas.drawCircle(
+      center,
+      size.width * 0.16,
+      Paint()
+        ..shader =
+            const RadialGradient(
+              colors: [Color(0xFFFFEA55), Color(0xFFFFA818)],
+            ).createShader(
+              Rect.fromCircle(center: center, radius: size.width * 0.16),
+            ),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_KindergartenFlowerPainter oldDelegate) => false;
+}
+
+class _OutlinedGradeText extends StatelessWidget {
+  const _OutlinedGradeText(
+    this.text, {
+    required this.fontSize,
+    required this.outlineColor,
+    this.maxLines = 1,
+  });
+
+  final String text;
+  final double fontSize;
+  final Color outlineColor;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    final baseStyle = TextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w900,
+      height: 0.95,
+      letterSpacing: -0.8,
+    );
+
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Text(
+            text.toUpperCase(),
+            maxLines: maxLines,
+            textAlign: TextAlign.center,
+            style: baseStyle.copyWith(
+              foreground: Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = math.max(1.3, fontSize * 0.12)
+                ..strokeJoin = StrokeJoin.round
+                ..color = outlineColor,
+            ),
+          ),
+          Text(
+            text.toUpperCase(),
+            maxLines: maxLines,
+            textAlign: TextAlign.center,
+            style: baseStyle.copyWith(
+              color: Colors.white,
+              shadows: const [
+                Shadow(
+                  color: Color(0x4D411300),
+                  offset: Offset(0, 2),
+                  blurRadius: 2,
+                ),
+              ],
             ),
           ),
         ],
@@ -715,24 +1083,295 @@ class _ThreeDimensionalNumber extends StatelessWidget {
   }
 }
 
-class _GradeNumberPalette {
-  const _GradeNumberPalette({
+class _GradeLeaves extends StatelessWidget {
+  const _GradeLeaves({required this.size, this.mirrored = false});
+
+  final double size;
+  final bool mirrored;
+
+  @override
+  Widget build(BuildContext context) {
+    final leaves = SizedBox(
+      width: size,
+      height: size * 0.78,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            bottom: 0,
+            child: Transform.rotate(
+              angle: -0.58,
+              child: Icon(
+                Icons.eco_rounded,
+                color: const Color(0xFF257F19),
+                size: size * 0.67,
+              ),
+            ),
+          ),
+          Positioned(
+            left: size * 0.33,
+            bottom: size * 0.07,
+            child: Transform.rotate(
+              angle: -0.28,
+              child: Icon(
+                Icons.eco_rounded,
+                color: const Color(0xFF65B91F),
+                size: size * 0.62,
+              ),
+            ),
+          ),
+          Positioned(
+            left: size * 0.62,
+            bottom: size * 0.13,
+            child: Transform.rotate(
+              angle: -0.05,
+              child: Icon(
+                Icons.eco_rounded,
+                color: const Color(0xFF8AD42A),
+                size: size * 0.51,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return Transform.flip(flipX: mirrored, child: leaves);
+  }
+}
+
+class _GradePlaquePainter extends CustomPainter {
+  const _GradePlaquePainter(this.palette);
+
+  final _GradePlaquePalette palette;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final plaque = _plaquePath(rect);
+    canvas.drawShadow(
+      plaque,
+      const Color(0x730D4831),
+      math.max(2, size.width * 0.06),
+      true,
+    );
+
+    final fill = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [palette.top, palette.bottom],
+      ).createShader(rect);
+    canvas.drawPath(plaque, fill);
+    canvas.drawPath(
+      plaque,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(1, size.width * 0.027)
+        ..color = palette.edge,
+    );
+    canvas.drawPath(
+      plaque,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(0.7, size.width * 0.013)
+        ..color = Colors.white.withValues(alpha: 0.6),
+    );
+
+    final stitchedPath = _plaquePath(rect.deflate(size.width * 0.053));
+    final stitchPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(0.65, size.width * 0.011)
+      ..strokeCap = StrokeCap.round
+      ..color = Colors.white.withValues(alpha: 0.62);
+    final dash = math.max(2.5, size.width * 0.04);
+    final stride = math.max(4.5, size.width * 0.073);
+    for (final metric in stitchedPath.computeMetrics()) {
+      for (double distance = 0; distance < metric.length; distance += stride) {
+        canvas.drawPath(
+          metric.extractPath(
+            distance,
+            math.min(distance + dash, metric.length),
+          ),
+          stitchPaint,
+        );
+      }
+    }
+  }
+
+  Path _plaquePath(Rect rect) {
+    final width = rect.width;
+    final height = rect.height;
+    final shoulder = rect.top + height * 0.28;
+    final radius = math.min(22.0, width * 0.14);
+    return Path()
+      ..moveTo(rect.left, shoulder)
+      ..cubicTo(
+        rect.left,
+        rect.top + height * 0.08,
+        rect.left + width * 0.2,
+        rect.top,
+        rect.center.dx,
+        rect.top,
+      )
+      ..cubicTo(
+        rect.right - width * 0.2,
+        rect.top,
+        rect.right,
+        rect.top + height * 0.08,
+        rect.right,
+        shoulder,
+      )
+      ..lineTo(rect.right, rect.bottom - radius)
+      ..quadraticBezierTo(
+        rect.right,
+        rect.bottom,
+        rect.right - radius,
+        rect.bottom,
+      )
+      ..lineTo(rect.left + radius, rect.bottom)
+      ..quadraticBezierTo(
+        rect.left,
+        rect.bottom,
+        rect.left,
+        rect.bottom - radius,
+      )
+      ..close();
+  }
+
+  @override
+  bool shouldRepaint(_GradePlaquePainter oldDelegate) =>
+      oldDelegate.palette != palette;
+}
+
+class _GradeFlagPainter extends CustomPainter {
+  const _GradeFlagPainter(this.palette);
+
+  final _GradePlaquePalette palette;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final poleX = size.width * 0.14;
+    final poleWidth = math.max(1.2, size.width * 0.08);
+    final capRadius = math.max(1.5, size.width * 0.08);
+    canvas.drawLine(
+      Offset(poleX, capRadius),
+      Offset(poleX, size.height),
+      Paint()
+        ..color = palette.edge
+        ..strokeWidth = poleWidth
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawCircle(
+      Offset(poleX, capRadius),
+      capRadius,
+      Paint()
+        ..shader =
+            const RadialGradient(
+              colors: [Color(0xFFFFE1A0), Color(0xFF854014)],
+            ).createShader(
+              Rect.fromCircle(
+                center: Offset(poleX, capRadius),
+                radius: capRadius,
+              ),
+            ),
+    );
+
+    final flag = Path()
+      ..moveTo(poleX + (poleWidth * 0.5), size.height * 0.17)
+      ..cubicTo(
+        size.width * 0.46,
+        size.height * 0.04,
+        size.width * 0.62,
+        size.height * 0.17,
+        size.width * 0.94,
+        size.height * 0.12,
+      )
+      ..cubicTo(
+        size.width * 0.77,
+        size.height * 0.45,
+        size.width * 0.53,
+        size.height * 0.32,
+        poleX + 3,
+        size.height * 0.45,
+      )
+      ..close();
+    canvas.drawShadow(
+      flag,
+      const Color(0x55000000),
+      math.max(1, size.width * 0.06),
+      true,
+    );
+    canvas.drawPath(
+      flag,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [palette.flag.withValues(alpha: 0.72), palette.flag],
+        ).createShader(Offset.zero & size),
+    );
+    canvas.drawPath(
+      flag,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(0.65, size.width * 0.025)
+        ..color = Colors.white70,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_GradeFlagPainter oldDelegate) =>
+      oldDelegate.palette != palette;
+}
+
+class _GradePlaquePalette {
+  const _GradePlaquePalette({
     required this.top,
     required this.bottom,
-    required this.depth,
-    required this.shadow,
+    required this.edge,
+    required this.flag,
+    required this.ornament,
   });
 
   final Color top;
   final Color bottom;
-  final Color depth;
-  final Color shadow;
+  final Color edge;
+  final Color flag;
+  final Color ornament;
 }
 
-String _gradeNumber(GradeModel grade, int index) {
-  final match = RegExp(r'\d+').firstMatch(grade.label ?? '');
-  return match?.group(0) ?? '${grade.displayOrder ?? index + 1}';
+class _GradeDisplay {
+  const _GradeDisplay({required this.caption, this.number});
+
+  factory _GradeDisplay.fromGrade(GradeModel grade) {
+    final label = grade.label?.trim() ?? '';
+    final numberMatch = RegExp(r'\d+').firstMatch(label);
+    if (numberMatch == null) {
+      return _GradeDisplay(caption: label.replaceFirst(RegExp(r'\s+'), '\n'));
+    }
+
+    final caption = label
+        .replaceRange(numberMatch.start, numberMatch.end, '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    return _GradeDisplay(
+      caption: caption.isEmpty ? label : caption,
+      number: numberMatch.group(0),
+    );
+  }
+
+  final String caption;
+  final String? number;
 }
+
+IconData _gradeOrnament(int index) => switch (index % 5) {
+  0 => Icons.star_rounded,
+  1 => Icons.local_florist_rounded,
+  2 => Icons.auto_awesome_rounded,
+  3 => Icons.diamond_rounded,
+  _ => Icons.workspace_premium_rounded,
+};
 
 class _GradeChip extends StatelessWidget {
   const _GradeChip({required this.label, required this.onTap});
@@ -878,32 +1517,6 @@ class _GamePreviewCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GamesGradeLoading extends StatelessWidget {
-  const _GamesGradeLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 4,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 14,
-        crossAxisSpacing: 14,
-        childAspectRatio: 1.1,
-      ),
-      itemBuilder: (_, _) => Container(
-        decoration: BoxDecoration(
-          color: colors.elevatedSurface.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(28),
         ),
       ),
     );
