@@ -15,6 +15,8 @@ class CreateHomeworkInput extends StatelessWidget {
     this.radius = 16,
     this.maxLines = 1,
     this.textAlignVertical = TextAlignVertical.center,
+    this.focusNode,
+    this.errorText,
   });
 
   final TextEditingController controller;
@@ -23,44 +25,76 @@ class CreateHomeworkInput extends StatelessWidget {
   final double radius;
   final int maxLines;
   final TextAlignVertical textAlignVertical;
+  final FocusNode? focusNode;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        textAlignVertical: textAlignVertical,
-        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-        style: GoogleFonts.andika(
-          color: AppColors.textInkDark,
-          fontSize: FontSize.small,
-          fontWeight: FontWeight.w400,
+    final hasError = errorText != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: height,
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            maxLines: maxLines,
+            textAlignVertical: textAlignVertical,
+            onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+            style: GoogleFonts.andika(
+              color: AppColors.textInkDark,
+              fontSize: FontSize.small,
+              fontWeight: FontWeight.w400,
+            ),
+            decoration: InputDecoration(
+              hintText: context.getText(hintKey),
+              hintStyle: GoogleFonts.andika(
+                color: AppColors.textInkDark.withValues(alpha: 0.7),
+                fontSize: FontSize.small,
+                fontWeight: FontWeight.w400,
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 17,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(radius),
+                borderSide: BorderSide(
+                  color: hasError
+                      ? Theme.of(context).colorScheme.error
+                      : const Color(0xFFDDE4E6),
+                  width: 2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(radius),
+                borderSide: BorderSide(
+                  color: hasError
+                      ? Theme.of(context).colorScheme.error
+                      : AppColors.teal520,
+                  width: 2,
+                ),
+              ),
+            ),
+          ),
         ),
-        decoration: InputDecoration(
-          hintText: context.getText(hintKey),
-          hintStyle: GoogleFonts.andika(
-            color: AppColors.textInkDark.withValues(alpha: 0.7),
-            fontSize: FontSize.small,
-            fontWeight: FontWeight.w400,
+        if (errorText case final error?)
+          Padding(
+            padding: const EdgeInsets.only(left: 4, top: 6),
+            child: Text(
+              error,
+              style: GoogleFonts.andika(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: FontSize.xxs,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 18,
-            vertical: 17,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(radius),
-            borderSide: const BorderSide(color: Color(0xFFDDE4E6), width: 2),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(radius),
-            borderSide: const BorderSide(color: AppColors.teal520, width: 2),
-          ),
-        ),
-      ),
+      ],
     );
   }
 }

@@ -12,6 +12,7 @@ class TeacherExerciseCopy {
     required this.createTitleKey,
     required this.createdMessageKey,
     required this.titleHintKey,
+    required this.titleRequiredKey,
     required this.descriptionHintKey,
   });
 
@@ -24,6 +25,7 @@ class TeacherExerciseCopy {
   final String createTitleKey;
   final String createdMessageKey;
   final String titleHintKey;
+  final String titleRequiredKey;
   final String descriptionHintKey;
 }
 
@@ -39,6 +41,7 @@ TeacherExerciseCopy teacherExerciseCopy(String purpose) {
       createTitleKey: AppKeys.teacherCreateAssessmentTitle,
       createdMessageKey: AppKeys.teacherAssessmentCreated,
       titleHintKey: AppKeys.teacherAssessmentTitleHint,
+      titleRequiredKey: AppKeys.teacherAssessmentTitleRequired,
       descriptionHintKey: AppKeys.teacherAssessmentDescriptionHint,
     );
   }
@@ -53,6 +56,7 @@ TeacherExerciseCopy teacherExerciseCopy(String purpose) {
     createTitleKey: AppKeys.teacherCreateAssignmentTitle,
     createdMessageKey: AppKeys.teacherAssignmentCreated,
     titleHintKey: AppKeys.teacherAssignmentTitleHint,
+    titleRequiredKey: AppKeys.teacherAssignmentTitleRequired,
     descriptionHintKey: AppKeys.teacherAssignmentDescriptionHint,
   );
 }

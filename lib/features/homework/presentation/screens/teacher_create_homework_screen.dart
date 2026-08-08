@@ -78,6 +78,7 @@ class _TeacherCreateHomeworkScreenState
   final TextEditingController _chapterController = TextEditingController();
   final TextEditingController _lessonController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final FocusNode _titleFocusNode = FocusNode();
   final GuardedExitController<bool> _exitController =
       GuardedExitController<bool>();
   late final ClassroomExerciseService _exerciseService =
@@ -104,11 +105,12 @@ class _TeacherCreateHomeworkScreenState
   String _visibility = 'PUBLIC';
   bool _isSubmitting = false;
   bool _isDraftDirty = false;
+  String? _titleErrorText;
 
   @override
   void initState() {
     super.initState();
-    _titleController.addListener(_markDraftDirty);
+    _titleController.addListener(_handleTitleChanged);
     _chapterController.addListener(_markDraftDirty);
     _lessonController.addListener(_markDraftDirty);
     _descriptionController.addListener(_markDraftDirty);
@@ -118,7 +120,7 @@ class _TeacherCreateHomeworkScreenState
 
   @override
   void dispose() {
-    _titleController.removeListener(_markDraftDirty);
+    _titleController.removeListener(_handleTitleChanged);
     _chapterController.removeListener(_markDraftDirty);
     _lessonController.removeListener(_markDraftDirty);
     _descriptionController.removeListener(_markDraftDirty);
@@ -126,6 +128,7 @@ class _TeacherCreateHomeworkScreenState
     _chapterController.dispose();
     _lessonController.dispose();
     _descriptionController.dispose();
+    _titleFocusNode.dispose();
     super.dispose();
   }
 
@@ -196,7 +199,24 @@ class _TeacherCreateHomeworkScreenState
     }
   }
 
+  void _handleTitleChanged() {
+    _markDraftDirty();
+    if (_titleErrorText != null && _titleController.text.trim().isNotEmpty) {
+      setState(() => _titleErrorText = null);
+    }
+  }
+
   bool _validateCreateHomeworkForm() {
+    if (_titleController.text.trim().isEmpty) {
+      setState(() {
+        _titleErrorText = context.readText(
+          teacherExerciseCopy(widget.purpose).titleRequiredKey,
+        );
+      });
+      _titleFocusNode.requestFocus();
+      return false;
+    }
+
     final now = DateTime.now();
     if (_selectedProgramId == null) {
       _showError(context.readText(AppKeys.teacherAssignmentProgramRequired));
@@ -551,6 +571,8 @@ class _TeacherCreateHomeworkScreenState
                             padding: const EdgeInsets.only(top: 22),
                             child: CreateHomeworkInput(
                               controller: _titleController,
+                              focusNode: _titleFocusNode,
+                              errorText: _titleErrorText,
                               hintKey: teacherExerciseCopy(
                                 widget.purpose,
                               ).titleHintKey,

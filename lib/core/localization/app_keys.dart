@@ -610,6 +610,10 @@ class AppKeys {
   static const teacherAssignmentVolumeTwo = 'teacher_assignment_volume_two';
   static const teacherAssignmentTitleHint = 'teacher_assignment_title_hint';
   static const teacherAssessmentTitleHint = 'teacher_assessment_title_hint';
+  static const teacherAssignmentTitleRequired =
+      'teacher_assignment_title_required';
+  static const teacherAssessmentTitleRequired =
+      'teacher_assessment_title_required';
   static const teacherAssignmentProgramLabel =
       'teacher_assignment_program_label';
   static const teacherAssignmentProgramValue =
