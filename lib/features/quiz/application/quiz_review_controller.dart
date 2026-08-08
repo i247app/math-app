@@ -14,20 +14,20 @@ class QuizReviewController extends ChangeNotifier {
     required QuizDetailLoader loadDetail,
     GeneratedQuiz? initialQuiz,
     QuizReviewMode initialMode = QuizReviewMode.retry,
-    int? cacheId,
+    Object? cacheKey,
   }) : _loadDetail = loadDetail,
-       _cacheId = cacheId ?? quizId,
+       _cacheKey = cacheKey ?? quizId,
        _quiz = initialQuiz {
     _mode = initialMode;
     _seedSubmittedAnswers(initialQuiz);
     if (initialQuiz != null) {
-      QuizCache.seedDetail(initialQuiz, fallbackQuizId: _cacheId);
+      QuizCache.seedDetail(initialQuiz, fallbackCacheKey: _cacheKey);
     }
   }
 
   final int quizId;
   final QuizDetailLoader _loadDetail;
-  final int _cacheId;
+  final Object _cacheKey;
 
   GeneratedQuiz? _quiz;
   bool _isLoading = true;
@@ -51,8 +51,10 @@ class QuizReviewController extends ChangeNotifier {
 
   Future<void> loadQuizDetail({bool forceRefresh = false}) async {
     final requestId = ++_loadRequestId;
-    final cachedQuiz = QuizCache.peekDetail(_cacheId);
-    if (cachedQuiz != null && _quiz == null) {
+    final cachedQuiz = QuizCache.peekDetail(_cacheKey);
+    final initialQuizHasDetail = _quiz?.questions.isNotEmpty == true;
+    final cachedQuizHasDetail = cachedQuiz?.questions.isNotEmpty == true;
+    if (cachedQuiz != null && (!initialQuizHasDetail && cachedQuizHasDetail)) {
       _quiz = cachedQuiz;
       _seedSubmittedAnswers(cachedQuiz);
     }
@@ -65,7 +67,7 @@ class QuizReviewController extends ChangeNotifier {
     _errorMessage = null;
     _notifyIfAlive();
 
-    final shouldRefresh = forceRefresh || !QuizCache.isDetailFresh(_cacheId);
+    final shouldRefresh = forceRefresh || !QuizCache.isDetailFresh(_cacheKey);
     if (!shouldRefresh) {
       _isLoading = false;
       _notifyIfAlive();
@@ -75,7 +77,7 @@ class QuizReviewController extends ChangeNotifier {
     try {
       final quiz = await QuizCache.loadDetail(
         loadDetail: _loadDetail,
-        quizId: _cacheId,
+        cacheKey: _cacheKey,
         serviceQuizId: quizId,
         forceRefresh: forceRefresh || hasVisibleDetail,
       );

@@ -14,10 +14,10 @@ class QuizCache {
       <_QuizListKey, DateTime>{};
   static final Map<_QuizListKey, Future<List<GeneratedQuiz>>> _pendingLists =
       <_QuizListKey, Future<List<GeneratedQuiz>>>{};
-  static final Map<int, GeneratedQuiz> _details = <int, GeneratedQuiz>{};
-  static final Map<int, DateTime> _detailLoadedAt = <int, DateTime>{};
-  static final Map<int, Future<GeneratedQuiz>> _pendingDetails =
-      <int, Future<GeneratedQuiz>>{};
+  static final Map<Object, GeneratedQuiz> _details = <Object, GeneratedQuiz>{};
+  static final Map<Object, DateTime> _detailLoadedAt = <Object, DateTime>{};
+  static final Map<Object, Future<GeneratedQuiz>> _pendingDetails =
+      <Object, Future<GeneratedQuiz>>{};
 
   static Future<List<GeneratedQuiz>> loadList({
     required QuizService service,
@@ -88,34 +88,33 @@ class QuizCache {
 
   static Future<GeneratedQuiz> loadDetail({
     required QuizDetailLoader loadDetail,
-    required int quizId,
-    int? serviceQuizId,
+    required Object cacheKey,
+    required int serviceQuizId,
     bool forceRefresh = false,
   }) {
     if (!forceRefresh) {
-      final cached = _details[quizId];
+      final cached = _details[cacheKey];
       if (cached != null && _hasUsefulDetail(cached)) {
         return Future<GeneratedQuiz>.value(cached);
       }
-      final pending = _pendingDetails[quizId];
+      final pending = _pendingDetails[cacheKey];
       if (pending != null) {
         return pending;
       }
     }
 
     late final Future<GeneratedQuiz> request;
-    request =
-        _loadDetailWithEmptyResponseRetry(loadDetail, serviceQuizId ?? quizId)
-            .then((quiz) {
-              seedDetail(quiz, fallbackQuizId: quizId);
-              return quiz;
-            })
-            .whenComplete(() {
-              if (identical(_pendingDetails[quizId], request)) {
-                _pendingDetails.remove(quizId);
-              }
-            });
-    _pendingDetails[quizId] = request;
+    request = _loadDetailWithEmptyResponseRetry(loadDetail, serviceQuizId)
+        .then((quiz) {
+          seedDetail(quiz, fallbackCacheKey: cacheKey);
+          return quiz;
+        })
+        .whenComplete(() {
+          if (identical(_pendingDetails[cacheKey], request)) {
+            _pendingDetails.remove(cacheKey);
+          }
+        });
+    _pendingDetails[cacheKey] = request;
     return request;
   }
 
@@ -135,35 +134,35 @@ class QuizCache {
     return loadDetail(quizId);
   }
 
-  static GeneratedQuiz? peekDetail(int quizId) {
-    return _details[quizId];
+  static GeneratedQuiz? peekDetail(Object cacheKey) {
+    return _details[cacheKey];
   }
 
   static bool isDetailFresh(
-    int quizId, {
+    Object cacheKey, {
     Duration maxAge = const Duration(seconds: 45),
   }) {
-    final loadedAt = _detailLoadedAt[quizId];
-    final cached = _details[quizId];
+    final loadedAt = _detailLoadedAt[cacheKey];
+    final cached = _details[cacheKey];
     return loadedAt != null &&
         cached != null &&
         _hasUsefulDetail(cached) &&
         DateTime.now().difference(loadedAt) <= maxAge;
   }
 
-  static void seedDetail(GeneratedQuiz quiz, {int? fallbackQuizId}) {
-    final quizId = quiz.quizId ?? quiz.id ?? fallbackQuizId;
-    if (quizId == null) {
+  static void seedDetail(GeneratedQuiz quiz, {Object? fallbackCacheKey}) {
+    final cacheKey = quiz.quizId ?? quiz.id ?? fallbackCacheKey;
+    if (cacheKey == null) {
       return;
     }
-    final existing = _details[quizId];
+    final existing = _details[cacheKey];
     if (existing != null &&
         _hasUsefulDetail(existing) &&
         !_hasUsefulDetail(quiz)) {
       return;
     }
-    _details[quizId] = quiz;
-    _detailLoadedAt[quizId] = DateTime.now();
+    _details[cacheKey] = quiz;
+    _detailLoadedAt[cacheKey] = DateTime.now();
   }
 
   static void markSubmitted({

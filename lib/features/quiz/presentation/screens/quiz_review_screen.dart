@@ -19,14 +19,14 @@ class ReviewDetailScreen extends StatefulWidget {
     required this.detailLoader,
     this.initialDetail,
     this.allowRetry = true,
-    this.cacheId,
+    this.cacheKey,
   });
 
   final int detailId;
   final QuizDetailLoader detailLoader;
   final GeneratedQuiz? initialDetail;
   final bool allowRetry;
-  final int? cacheId;
+  final Object? cacheKey;
 
   @override
   State<ReviewDetailScreen> createState() => _ReviewDetailScreenState();
@@ -45,7 +45,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
       initialMode: widget.allowRetry
           ? QuizReviewMode.retry
           : QuizReviewMode.result,
-      cacheId: widget.cacheId,
+      cacheKey: widget.cacheKey,
     );
     _controller.loadQuizDetail();
   }

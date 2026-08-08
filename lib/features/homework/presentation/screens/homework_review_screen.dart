@@ -33,9 +33,9 @@ class HomeworkReviewScreen extends StatelessWidget {
           ? null
           : HomeworkQuizReviewService.toGeneratedQuiz(initialExercise!),
       allowRetry: false,
-      // Classroom exercise and quiz ids share numeric ranges, so use a
-      // separate cache namespace while preserving the real request id.
-      cacheId: -exerciseId,
+      // Homework detail and submitted answers are profile-specific. A record
+      // also keeps this namespace separate from integer quiz cache keys.
+      cacheKey: (profileId: profileId, exerciseId: exerciseId),
     );
   }
 }
