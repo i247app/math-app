@@ -24,7 +24,7 @@ import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_progress_chart.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_search_field.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_empty_poster.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_list_skeleton.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_state_card.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_banner.dart';
@@ -91,9 +91,11 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     }
     if (_profileSourceKey(oldWidget.user, oldWidget.activeProfile) !=
         _profileSourceKey(widget.user, widget.activeProfile)) {
+      _entries = const <ParentAssessmentEntry>[];
       _pagination = null;
       _allEntries = const <ParentAssessmentEntry>[];
       _hasLoaded = false;
+      _errorMessage = null;
       _loadAssessments(page: 1);
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       _loadAssessments(forceRefresh: true);
@@ -360,9 +362,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   Widget build(BuildContext context) {
     final topInset = MediaQuery.paddingOf(context).top;
     final entries = _filteredEntries;
-    final shouldShowListSkeleton = _isLoading && _entries.isEmpty;
+    final shouldShowFullSkeleton = _isLoading && !_hasLoaded;
     final hasNoAssessments =
-        _hasLoaded && !_isLoading && _errorMessage == null && _entries.isEmpty;
+        _hasLoaded && _errorMessage == null && _entries.isEmpty;
 
     final colors = context.themeColors;
     return ColoredBox(
@@ -393,7 +395,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                   _buildAssessmentChildren(
                     entries: entries,
                     hasNoAssessments: hasNoAssessments,
-                    shouldShowListSkeleton: shouldShowListSkeleton,
+                    shouldShowFullSkeleton: shouldShowFullSkeleton,
                   ),
                 ),
               ),
@@ -407,10 +409,14 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   List<Widget> _buildAssessmentChildren({
     required List<ParentAssessmentEntry> entries,
     required bool hasNoAssessments,
-    required bool shouldShowListSkeleton,
+    required bool shouldShowFullSkeleton,
   }) {
     final colors = context.themeColors;
     final shouldShowProgressChart = _allEntries.length > 1;
+
+    if (shouldShowFullSkeleton) {
+      return const [ParentAssessmentFullSkeleton()];
+    }
 
     if (hasNoAssessments) {
       return [
@@ -444,12 +450,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           onTap: _openLearningProgress,
         ),
       ],
-      if (shouldShowListSkeleton)
-        const Padding(
-          padding: EdgeInsets.only(top: 16),
-          child: ParentAssessmentListSkeleton(),
-        )
-      else if (_errorMessage != null && _entries.isEmpty)
+      if (_errorMessage != null && _entries.isEmpty)
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: _initialFadeIn(
