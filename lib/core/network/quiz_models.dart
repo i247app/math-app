@@ -87,6 +87,24 @@ class QuizListRequest {
   Map<String, dynamic> toJson() => _$QuizListRequestToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
+class QuizProgressRequest {
+  const QuizProgressRequest({
+    required this.profileId,
+    required this.fromDt,
+    required this.toDt,
+  });
+
+  final int profileId;
+  final DateTime fromDt;
+  final DateTime toDt;
+
+  factory QuizProgressRequest.fromJson(Map<String, dynamic> json) =>
+      _$QuizProgressRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuizProgressRequestToJson(this);
+}
+
 @JsonSerializable(explicitToJson: true)
 class GenerateQuizResponse {
   const GenerateQuizResponse({
@@ -175,6 +193,106 @@ class QuizDetailResponse {
       _$QuizDetailResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$QuizDetailResponseToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+class QuizProgressResponse {
+  const QuizProgressResponse({
+    required this.mstatus,
+    this.profileId,
+    this.fromDt,
+    this.toDt,
+    this.limit,
+    this.purpose,
+    this.series = const <QuizProgressPoint>[],
+    this.summary,
+    this.status,
+    this.tz,
+    this.mmessage,
+    this.debug,
+  });
+
+  final int mstatus;
+  final int? profileId;
+  final DateTime? fromDt;
+  final DateTime? toDt;
+  final int? limit;
+  final String? purpose;
+  final List<QuizProgressPoint> series;
+  final QuizProgressSummary? summary;
+  final String? status;
+  final String? tz;
+  final String? mmessage;
+  final String? debug;
+
+  factory QuizProgressResponse.fromJson(Map<String, dynamic> json) =>
+      _$QuizProgressResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuizProgressResponseToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class QuizProgressPoint {
+  const QuizProgressPoint({
+    required this.completedDt,
+    required this.correctNumber,
+    required this.quizId,
+    required this.score,
+    required this.scorePct,
+    required this.sequence,
+    required this.totalQuestions,
+    this.purpose,
+    this.shortText,
+    this.title,
+    this.typeOfQuiz,
+  });
+
+  final DateTime completedDt;
+  final int correctNumber;
+  final int quizId;
+  final double score;
+  final double scorePct;
+  final int sequence;
+  final int totalQuestions;
+  final String? purpose;
+  final String? shortText;
+  final String? title;
+  final String? typeOfQuiz;
+
+  factory QuizProgressPoint.fromJson(Map<String, dynamic> json) =>
+      _$QuizProgressPointFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuizProgressPointToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class QuizProgressSummary {
+  const QuizProgressSummary({
+    required this.averageDelta,
+    required this.averageScore,
+    required this.averageScorePct,
+    required this.count,
+    required this.highestScore,
+    required this.highestScorePct,
+    required this.lowestScore,
+    required this.trend,
+    this.highestQuizId,
+  });
+
+  final double averageDelta;
+  final double averageScore;
+  final double averageScorePct;
+  final int count;
+  final int? highestQuizId;
+  final double highestScore;
+  final double highestScorePct;
+  final double lowestScore;
+  final String trend;
+
+  factory QuizProgressSummary.fromJson(Map<String, dynamic> json) =>
+      _$QuizProgressSummaryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuizProgressSummaryToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)

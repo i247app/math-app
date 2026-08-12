@@ -85,9 +85,6 @@ class NetworkLogInterceptor extends Interceptor {
   // code units so non-ASCII response data is not truncated.
   static const _maxLogChunkBytes = 800;
 
-  // Sensitive values stay redacted even in debug builds.
-  static const _showSensitiveValuesInDebugLogs = false;
-
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     _log('*** Request ***');
@@ -130,17 +127,10 @@ class NetworkLogInterceptor extends Interceptor {
   }
 
   static String _formatHeaders(Map<String, dynamic> headers) {
-    if (kDebugMode && _showSensitiveValuesInDebugLogs) {
-      return _jsonOrString(headers);
-    }
-
     final redacted = <String, dynamic>{};
     for (final entry in headers.entries) {
       final key = entry.key;
-      final lowerKey = key.toLowerCase();
-      redacted[key] = lowerKey == 'authorization' || lowerKey == 'x-auth-token'
-          ? '<redacted>'
-          : entry.value;
+      redacted[key] = _shouldRedactValue(key) ? '<redacted>' : entry.value;
     }
     return _jsonOrString(redacted);
   }
@@ -154,10 +144,6 @@ class NetworkLogInterceptor extends Interceptor {
       return _formatFormData(data);
     }
 
-    if (kDebugMode && _showSensitiveValuesInDebugLogs) {
-      return _jsonOrString(data);
-    }
-
     return _jsonOrString(_redactSensitiveData(data));
   }
 
@@ -165,7 +151,7 @@ class NetworkLogInterceptor extends Interceptor {
     if (value is Map) {
       return <String, Object?>{
         for (final entry in value.entries)
-          entry.key.toString(): _isSensitiveKey(entry.key.toString())
+          entry.key.toString(): _shouldRedactValue(entry.key.toString())
               ? '<redacted>'
               : _redactSensitiveData(entry.value),
       };
@@ -191,6 +177,12 @@ class NetworkLogInterceptor extends Interceptor {
       'push_token' => true,
       _ => false,
     };
+  }
+
+  // Expose sensitive values only when diagnosing requests in debug builds.
+  // Profile and release builds always keep them redacted.
+  static bool _shouldRedactValue(String key) {
+    return !kDebugMode && _isSensitiveKey(key);
   }
 
   static String _formatFormData(FormData formData) {

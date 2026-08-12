@@ -31,6 +31,12 @@ abstract class QuizService {
     bool takeAll = false,
   });
 
+  Future<QuizProgressResponse> getQuizProgress({
+    required int profileId,
+    required DateTime fromDt,
+    required DateTime toDt,
+  });
+
   Future<GeneratedQuiz> submitQuiz({
     required int quizId,
     required List<SubmitQuizAnswer> answers,
@@ -129,6 +135,32 @@ class QuizApi implements QuizService {
       page: page,
       size: size,
       takeAll: takeAll,
+    );
+  }
+
+  @override
+  Future<QuizProgressResponse> getQuizProgress({
+    required int profileId,
+    required DateTime fromDt,
+    required DateTime toDt,
+  }) async {
+    if (profileId <= 0) {
+      throw QuizException(
+        AppStrings.current(AppKeys.missingUserOrProfileForHistory),
+      );
+    }
+    if (toDt.isBefore(fromDt)) {
+      throw QuizException(AppStrings.current(AppKeys.invalidServerResponse));
+    }
+
+    return _runQuizRequest(
+      () => _networkApi.getQuizProgress(
+        QuizProgressRequest(
+          profileId: profileId,
+          fromDt: fromDt.toUtc(),
+          toDt: toDt.toUtc(),
+        ),
+      ),
     );
   }
 

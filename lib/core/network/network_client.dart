@@ -456,6 +456,27 @@ class NetworkApi {
     return quizResponse;
   }
 
+  Future<QuizProgressResponse> getQuizProgress(
+    QuizProgressRequest request,
+  ) async {
+    final responseJson = await _networkClient.postJson(
+      '/quizzes/analytics/progress',
+      request.toJson(),
+    );
+    final progressResponse = QuizProgressResponse.fromJson(responseJson);
+    if (progressResponse.mstatus != 200) {
+      throw NetworkException(
+        progressResponse.mmessage ??
+            progressResponse.debug ??
+            progressResponse.status ??
+            'Request failed.',
+        status: progressResponse.mstatus,
+      );
+    }
+
+    return progressResponse;
+  }
+
   Future<QuizDetailResponse> getQuizDetail(int quizId) async {
     final responseJson = await _networkClient.postJson(
       '/quizzes/detail',

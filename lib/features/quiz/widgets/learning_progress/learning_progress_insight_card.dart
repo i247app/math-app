@@ -7,18 +7,23 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
+import 'package:numi/core/network/quiz_models.dart';
 
 class LearningProgressInsightCard extends StatelessWidget {
-  const LearningProgressInsightCard({super.key, required this.entries});
+  const LearningProgressInsightCard({
+    super.key,
+    required this.points,
+    this.summary,
+  });
 
-  final List<ParentAssessmentEntry> entries;
+  final List<QuizProgressPoint> points;
+  final QuizProgressSummary? summary;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final trend = _trendFor(entries);
+    final trend = _trendFor(points, summary);
     final titleKey = trend.direction > 0
         ? AppKeys.learningProgressImprovingTitle
         : trend.direction < 0
@@ -108,8 +113,23 @@ class LearningProgressInsightCard extends StatelessWidget {
   }
 
   ({int direction, double delta}) _trendFor(
-    List<ParentAssessmentEntry> values,
+    List<QuizProgressPoint> values,
+    QuizProgressSummary? summary,
   ) {
+    if (summary != null) {
+      final delta = summary.averageDelta;
+      final normalizedTrend = summary.trend.trim().toUpperCase();
+      final direction = delta > 0.05
+          ? 1
+          : delta < -0.05
+          ? -1
+          : switch (normalizedTrend) {
+              'IMPROVING' || 'UP' => 1,
+              'NEED_TO_TRY' || 'DECLINING' || 'DOWN' => -1,
+              _ => 0,
+            };
+      return (direction: direction, delta: delta);
+    }
     if (values.length < 2) {
       return (direction: 0, delta: 0);
     }
@@ -134,7 +154,5 @@ class LearningProgressInsightCard extends StatelessWidget {
     );
   }
 
-  double _score(ParentAssessmentEntry entry) {
-    return ((entry.quiz.grading?.scorePercentage ?? 0) / 10).clamp(0, 10);
-  }
+  double _score(QuizProgressPoint point) => point.score.clamp(0, 10);
 }

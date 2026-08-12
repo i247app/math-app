@@ -164,6 +164,7 @@ class AppKeys {
   static const learningProgressStableMessage =
       'learning_progress_stable_message';
   static const learningProgressNoData = 'learning_progress_no_data';
+  static const learningProgressLoadFailed = 'learning_progress_load_failed';
   static const learningProgressShare = 'learning_progress_share';
   static const learningProgressShared = 'learning_progress_shared';
   static const parentRoadmapTitle = 'parent_roadmap_title';

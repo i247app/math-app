@@ -29,6 +29,8 @@ const parentHomeStrings = <String, Map<String, String>>{
         'Điểm trung bình không thay đổi nhiều so với giai đoạn trước.',
     AppKeys.learningProgressNoData:
         'Chưa có bài đánh giá trong khoảng thời gian này.',
+    AppKeys.learningProgressLoadFailed:
+        'Chưa tải được dữ liệu tiến độ học tập.',
     AppKeys.learningProgressShare: 'Chia sẻ tiến độ',
     AppKeys.learningProgressShared: 'Đã sao chép tóm tắt tiến độ.',
     AppKeys.parentRoadmapTitle: 'Game road map',
@@ -109,6 +111,8 @@ const parentHomeStrings = <String, Map<String, String>>{
         'The average score is holding steady compared with the previous period.',
     AppKeys.learningProgressNoData:
         'There are no assessments in this time period.',
+    AppKeys.learningProgressLoadFailed:
+        'Could not load learning progress data.',
     AppKeys.learningProgressShare: 'Share progress',
     AppKeys.learningProgressShared: 'Progress summary copied.',
     AppKeys.parentRoadmapTitle: 'Game road map',

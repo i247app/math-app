@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
 import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
 import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_chart_card.dart';
@@ -13,11 +15,19 @@ import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_d
 import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_filter_control.dart';
 import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_insight_card.dart';
 import 'package:numi/shared/layouts/page_header.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
 
 class LearningProgressScreen extends StatefulWidget {
-  const LearningProgressScreen({super.key, required this.entries});
+  const LearningProgressScreen({
+    super.key,
+    required this.profileId,
+    required this.quizService,
+    this.initialEntries = const <ParentAssessmentEntry>[],
+  });
 
-  final List<ParentAssessmentEntry> entries;
+  final int? profileId;
+  final QuizService quizService;
+  final List<ParentAssessmentEntry> initialEntries;
 
   @override
   State<LearningProgressScreen> createState() => _LearningProgressScreenState();
@@ -25,27 +35,46 @@ class LearningProgressScreen extends StatefulWidget {
 
 class _LearningProgressScreenState extends State<LearningProgressScreen> {
   DateTimeRange? _dateRange;
+  QuizProgressResponse? _progress;
+  bool _isLoading = true;
+  String? _errorMessage;
+  int _requestId = 0;
 
-  List<ParentAssessmentEntry> get _orderedEntries {
-    final entries = List<ParentAssessmentEntry>.of(widget.entries);
+  List<ParentAssessmentEntry> get _orderedInitialEntries {
+    final entries = List<ParentAssessmentEntry>.of(widget.initialEntries);
     entries.sort((a, b) => quizDate(a.quiz).compareTo(quizDate(b.quiz)));
     return entries;
   }
 
-  List<ParentAssessmentEntry> get _filteredEntries {
-    final entries = _orderedEntries;
-    final range = _dateRange;
-    if (range == null) {
-      return entries;
+  List<QuizProgressPoint> get _points {
+    final points = List<QuizProgressPoint>.of(
+      _progress?.series ?? const <QuizProgressPoint>[],
+    );
+    points.sort((a, b) {
+      final sequenceComparison = a.sequence.compareTo(b.sequence);
+      return sequenceComparison != 0
+          ? sequenceComparison
+          : a.completedDt.compareTo(b.completedDt);
+    });
+    return points;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadProgress();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant LearningProgressScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.profileId != widget.profileId ||
+        oldWidget.quizService != widget.quizService) {
+      _progress = null;
+      _loadProgress();
     }
-    final start = _startOfDay(range.start);
-    final endExclusive = _startOfDay(range.end).add(const Duration(days: 1));
-    return entries
-        .where((entry) {
-          final date = quizDate(entry.quiz).toLocal();
-          return !date.isBefore(start) && date.isBefore(endExclusive);
-        })
-        .toList(growable: false);
   }
 
   DateTimeRange _initialDialogRange() {
@@ -53,21 +82,72 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
     if (selected != null) {
       return selected;
     }
-    final validDates = _orderedEntries
+    return _defaultRange();
+  }
+
+  DateTimeRange _defaultRange() {
+    final validDates = _orderedInitialEntries
         .map((entry) => quizDate(entry.quiz).toLocal())
         .where((date) => date.millisecondsSinceEpoch != 0)
         .toList(growable: false);
+    final today = _startOfDay(DateTime.now());
     if (validDates.isNotEmpty) {
       return DateTimeRange(
         start: _startOfDay(validDates.first),
-        end: _startOfDay(validDates.last),
+        end: validDates.last.isAfter(today)
+            ? _startOfDay(validDates.last)
+            : today,
       );
     }
-    final today = _startOfDay(DateTime.now());
     return DateTimeRange(
-      start: today.subtract(const Duration(days: 30)),
+      start: DateTime(today.year - 1, today.month, today.day),
       end: today,
     );
+  }
+
+  Future<void> _loadProgress() async {
+    final requestId = ++_requestId;
+    final profileId = widget.profileId;
+    if (profileId == null || profileId <= 0) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = context.getText(AppKeys.learningProgressLoadFailed);
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    final range = _dateRange ?? _defaultRange();
+    final fromDt = _startOfDay(range.start);
+    final toDt = _startOfDay(
+      range.end,
+    ).add(const Duration(days: 1)).subtract(const Duration(microseconds: 1));
+
+    try {
+      final progress = await widget.quizService.getQuizProgress(
+        profileId: profileId,
+        fromDt: fromDt,
+        toDt: toDt,
+      );
+      if (!mounted || requestId != _requestId) return;
+      setState(() {
+        _progress = progress;
+        _isLoading = false;
+      });
+    } catch (error) {
+      if (!mounted || requestId != _requestId) return;
+      final message = error.toString().trim();
+      setState(() {
+        _isLoading = false;
+        _errorMessage = message.isEmpty
+            ? context.getText(AppKeys.learningProgressLoadFailed)
+            : message;
+      });
+    }
   }
 
   Future<void> _showDateFilter() async {
@@ -93,21 +173,25 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
       return;
     }
     setState(() => _dateRange = result.range);
+    await _loadProgress();
   }
 
   Future<void> _shareProgress() async {
     HapticFeedback.selectionClick();
-    final entries = _filteredEntries;
-    final average = entries.isEmpty
-        ? 0.0
-        : entries.map(_score).reduce((value, score) => value + score) /
-              entries.length;
+    final points = _points;
+    final average =
+        _progress?.summary?.averageScore ??
+        (points.isEmpty
+            ? 0.0
+            : points.map((point) => point.score).reduce((a, b) => a + b) /
+                  points.length);
+    final count = _progress?.summary?.count ?? points.length;
     final summary = <String>[
       context.getText(AppKeys.learningProgressTitle),
       context.formatText(AppKeys.learningProgressAssessmentCount, {
-        'count': entries.length,
+        'count': count,
       }),
-      if (entries.isNotEmpty)
+      if (points.isNotEmpty)
         context.formatText(AppKeys.learningProgressAverageScore, {
           'score': average.toStringAsFixed(1),
         }),
@@ -128,7 +212,7 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final entries = _filteredEntries;
+    final points = _points;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
@@ -147,60 +231,74 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
               tooltip: context.getText(AppKeys.back),
             ),
             trailing: IconButton(
-              onPressed: _shareProgress,
+              onPressed: _progress == null ? null : _shareProgress,
               icon: const Icon(Icons.ios_share_rounded),
               color: colors.brandStrong,
               tooltip: context.getText(AppKeys.learningProgressShare),
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.fromLTRB(16, 18, 16, 24 + bottomInset),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 720),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: 16,
-                    children: [
-                      Row(
-                        spacing: 12,
-                        children: [
-                          Expanded(
-                            child: LearningProgressFilterControl(
-                              icon: Icons.calendar_month_outlined,
-                              label: context.getText(
-                                AppKeys.learningProgressAllAssessments,
+            child: _isLoading && _progress == null
+                ? const Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.fromLTRB(16, 18, 16, 24 + bottomInset),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 720),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          spacing: 16,
+                          children: [
+                            if (_isLoading) const LinearProgressIndicator(),
+                            if (_errorMessage != null)
+                              AppRetryPanel(
+                                message: _errorMessage!,
+                                onRetry: _loadProgress,
+                                filledAction: true,
                               ),
-                              color: AppColors.textTeal,
+                            Row(
+                              spacing: 12,
+                              children: [
+                                Expanded(
+                                  child: LearningProgressFilterControl(
+                                    icon: Icons.calendar_month_outlined,
+                                    label: context.getText(
+                                      AppKeys.learningProgressAllAssessments,
+                                    ),
+                                    color: AppColors.textTeal,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: LearningProgressFilterControl(
+                                    icon: Icons.date_range_outlined,
+                                    label: _dateRange == null
+                                        ? context.getText(
+                                            AppKeys.learningProgressFilterTime,
+                                          )
+                                        : '${_dateLabel(_dateRange!.start)} – '
+                                              '${_dateLabel(_dateRange!.end)}',
+                                    color: AppColors.textTeal,
+                                    onTap: _showDateFilter,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          Expanded(
-                            child: LearningProgressFilterControl(
-                              icon: Icons.date_range_outlined,
-                              label: _dateRange == null
-                                  ? context.getText(
-                                      AppKeys.learningProgressFilterTime,
-                                    )
-                                  : '${_dateLabel(_dateRange!.start)} – '
-                                        '${_dateLabel(_dateRange!.end)}',
-                              color: AppColors.textTeal,
-                              onTap: _showDateFilter,
+                            LearningProgressChartCard(
+                              points: points,
+                              entryCount: _progress?.summary?.count,
+                              onFilter: _showDateFilter,
                             ),
-                          ),
-                        ],
+                            if (points.isNotEmpty)
+                              LearningProgressInsightCard(
+                                points: points,
+                                summary: _progress?.summary,
+                              ),
+                          ],
+                        ),
                       ),
-                      LearningProgressChartCard(
-                        entries: entries,
-                        onFilter: _showDateFilter,
-                      ),
-                      LearningProgressInsightCard(entries: entries),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
           ),
         ],
       ),
@@ -214,9 +312,5 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
   String _dateLabel(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/'
         '${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-  double _score(ParentAssessmentEntry entry) {
-    return ((entry.quiz.grading?.scorePercentage ?? 0) / 10).clamp(0, 10);
   }
 }

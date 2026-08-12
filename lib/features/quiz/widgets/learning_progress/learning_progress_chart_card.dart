@@ -5,18 +5,20 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
+import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_chart.dart';
 
 class LearningProgressChartCard extends StatelessWidget {
   const LearningProgressChartCard({
     super.key,
-    required this.entries,
+    required this.points,
     required this.onFilter,
+    this.entryCount,
   });
 
-  final List<ParentAssessmentEntry> entries;
+  final List<QuizProgressPoint> points;
   final VoidCallback onFilter;
+  final int? entryCount;
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +42,11 @@ class LearningProgressChartCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 10,
         children: [
-          _ChartCardHeader(entryCount: entries.length, onFilter: onFilter),
-          if (entries.isEmpty)
+          _ChartCardHeader(
+            entryCount: entryCount ?? points.length,
+            onFilter: onFilter,
+          ),
+          if (points.isEmpty)
             ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 280),
               child: Center(
@@ -60,7 +65,7 @@ class LearningProgressChartCard extends StatelessWidget {
               ),
             )
           else
-            LearningProgressChart(entries: entries),
+            LearningProgressChart(points: points),
         ],
       ),
     );

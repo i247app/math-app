@@ -5,13 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
-import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
+import 'package:numi/core/network/quiz_models.dart';
 
 class LearningProgressChart extends StatelessWidget {
-  const LearningProgressChart({super.key, required this.entries});
+  const LearningProgressChart({super.key, required this.points});
 
-  final List<ParentAssessmentEntry> entries;
+  final List<QuizProgressPoint> points;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class LearningProgressChart extends StatelessWidget {
       builder: (context, constraints) {
         final chartWidth = math.max(
           constraints.maxWidth,
-          54.0 + math.max(0, entries.length - 1) * 54,
+          54.0 + math.max(0, points.length - 1) * 54,
         );
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -35,7 +34,7 @@ class LearningProgressChart extends StatelessWidget {
               return CustomPaint(
                 size: Size(chartWidth, 350),
                 painter: LearningProgressChartPainter(
-                  entries: entries,
+                  points: points,
                   progress: progress,
                   lineColor: AppColors.brandTeal,
                   pointColor: AppColors.brandTealSolid,
@@ -55,7 +54,7 @@ class LearningProgressChart extends StatelessWidget {
 
 class LearningProgressChartPainter extends CustomPainter {
   const LearningProgressChartPainter({
-    required this.entries,
+    required this.points,
     required this.progress,
     required this.lineColor,
     required this.pointColor,
@@ -65,7 +64,7 @@ class LearningProgressChartPainter extends CustomPainter {
     required this.mutedTextColor,
   });
 
-  final List<ParentAssessmentEntry> entries;
+  final List<QuizProgressPoint> points;
   final double progress;
   final Color lineColor;
   final Color pointColor;
@@ -105,38 +104,37 @@ class LearningProgressChartPainter extends CustomPainter {
       );
     }
 
-    if (entries.isEmpty) {
+    if (points.isEmpty) {
       return;
     }
 
-    final spacing = entries.length == 1
-        ? 0.0
-        : chartWidth / (entries.length - 1);
-    final points = <Offset>[
-      for (var index = 0; index < entries.length; index++)
+    final spacing = points.length == 1 ? 0.0 : chartWidth / (points.length - 1);
+    final chartPoints = <Offset>[
+      for (var index = 0; index < points.length; index++)
         Offset(
-          entries.length == 1 ? left + chartWidth / 2 : left + spacing * index,
+          points.length == 1 ? left + chartWidth / 2 : left + spacing * index,
           bottom -
               chartHeight *
-                  (_score(entries[index]) / 10).clamp(0.0, 1.0) *
+                  (_score(points[index]) / 10).clamp(0.0, 1.0) *
                   progress,
         ),
     ];
 
     final fillPath = Path()
-      ..moveTo(points.first.dx, bottom)
-      ..lineTo(points.first.dx, points.first.dy);
-    for (final point in points.skip(1)) {
+      ..moveTo(chartPoints.first.dx, bottom)
+      ..lineTo(chartPoints.first.dx, chartPoints.first.dy);
+    for (final point in chartPoints.skip(1)) {
       fillPath.lineTo(point.dx, point.dy);
     }
     fillPath
-      ..lineTo(points.last.dx, bottom)
+      ..lineTo(chartPoints.last.dx, bottom)
       ..close();
     canvas.drawPath(fillPath, Paint()..color = fillColor);
 
-    if (points.length > 1) {
-      final linePath = Path()..moveTo(points.first.dx, points.first.dy);
-      for (final point in points.skip(1)) {
+    if (chartPoints.length > 1) {
+      final linePath = Path()
+        ..moveTo(chartPoints.first.dx, chartPoints.first.dy);
+      for (final point in chartPoints.skip(1)) {
         linePath.lineTo(point.dx, point.dy);
       }
       canvas.drawPath(
@@ -150,9 +148,9 @@ class LearningProgressChartPainter extends CustomPainter {
       );
     }
 
-    for (var index = 0; index < points.length; index++) {
-      final point = points[index];
-      final score = _score(entries[index]);
+    for (var index = 0; index < chartPoints.length; index++) {
+      final point = chartPoints[index];
+      final score = _score(points[index]);
       canvas.drawCircle(
         point,
         5,
@@ -178,11 +176,10 @@ class LearningProgressChartPainter extends CustomPainter {
         alignment: Alignment.center,
       );
 
-      final date = quizDate(entries[index].quiz).toLocal();
-      final dateLabel = date.millisecondsSinceEpoch == 0
-          ? '--/--'
-          : '${date.day.toString().padLeft(2, '0')}/'
-                '${date.month.toString().padLeft(2, '0')}';
+      final date = points[index].completedDt.toLocal();
+      final dateLabel =
+          '${date.day.toString().padLeft(2, '0')}/'
+          '${date.month.toString().padLeft(2, '0')}';
       _paintText(
         canvas,
         dateLabel,
@@ -195,9 +192,7 @@ class LearningProgressChartPainter extends CustomPainter {
     }
   }
 
-  double _score(ParentAssessmentEntry entry) {
-    return ((entry.quiz.grading?.scorePercentage ?? 0) / 10).clamp(0, 10);
-  }
+  double _score(QuizProgressPoint point) => point.score.clamp(0, 10);
 
   String _scoreLabel(double score) {
     return score == score.roundToDouble()
@@ -250,7 +245,7 @@ class LearningProgressChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant LearningProgressChartPainter oldDelegate) {
-    return oldDelegate.entries != entries ||
+    return oldDelegate.points != points ||
         oldDelegate.progress != progress ||
         oldDelegate.lineColor != lineColor ||
         oldDelegate.pointColor != pointColor ||

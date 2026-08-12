@@ -316,7 +316,9 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => LearningProgressScreen(
-          entries: List<ParentAssessmentEntry>.unmodifiable(_allEntries),
+          profileId: ActiveProfileSession.profileStableId(widget.activeProfile),
+          quizService: widget.quizService,
+          initialEntries: List<ParentAssessmentEntry>.unmodifiable(_allEntries),
         ),
       ),
     );

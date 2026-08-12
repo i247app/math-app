@@ -48,15 +48,19 @@ void main() {
     }
   });
 
-  test('redacts authentication and push tokens from request logs', () {
+  test('shows sensitive body and header values in debug logs', () {
     const accessToken = 'Bearer secret-access-token';
     const pushToken = 'secret-push-token';
+    const refreshToken = 'secret-refresh-token';
+    const responseToken = 'secret-response-token';
     final request = RequestOptions(
       path: '/sensitive-request',
+      headers: <String, dynamic>{'X-Auth-Token': responseToken},
       data: <String, dynamic>{
         'metadata': <String, dynamic>{
           'authorization': accessToken,
           'device_push_token': pushToken,
+          'refresh_token': refreshToken,
         },
       },
     );
@@ -67,8 +71,10 @@ void main() {
     );
 
     final output = logs.join('\n');
-    expect(output, isNot(contains(accessToken)));
-    expect(output, isNot(contains(pushToken)));
-    expect(output, contains('<redacted>'));
+    expect(output, contains(accessToken));
+    expect(output, contains(pushToken));
+    expect(output, contains(refreshToken));
+    expect(output, contains(responseToken));
+    expect(output, isNot(contains('<redacted>')));
   });
 }
