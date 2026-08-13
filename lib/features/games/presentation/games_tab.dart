@@ -848,7 +848,7 @@ class _GradeButtonContent extends StatelessWidget {
       children: [
         _OutlinedGradeText(
           display.number ?? '',
-          fontSize: size * 0.39,
+          fontSize: size * 0.55,
           outlineColor: const Color(0x4D173E62),
         ),
         SizedBox(height: size * 0.005),
