@@ -55,28 +55,30 @@ void main() {
       isA<AssetImage>().having(
         (image) => image.assetName,
         'asset name',
-        'assets/images/game-grade-selection-background-2.jpg',
+        'assets/images/game-grade-selection-road-map.png',
       ),
     );
-    expect(find.byTooltip('Mẫu giáo'), findsNothing);
-    const sourceCenters = <int, Offset>{
-      1: Offset(320, 1043),
-      2: Offset(266, 809),
-      3: Offset(329, 604),
-      4: Offset(290, 396),
-      5: Offset(288, 189),
+    expect(find.byTooltip('Mẫu giáo'), findsOneWidget);
+    const sourceCenters = <String, Offset>{
+      'Mẫu giáo': Offset(440, 1512),
+      'Lớp 1': Offset(412, 1241),
+      'Lớp 2': Offset(450, 970),
+      'Lớp 3': Offset(423, 728),
+      'Lớp 4': Offset(454, 486),
+      'Lớp 5': Offset(416, 258),
     };
-    const sourceSizes = <int, Size>{
-      1: Size(170, 156),
-      2: Size(154, 138),
-      3: Size(149, 127),
-      4: Size(142, 118),
-      5: Size(136, 109),
+    const sourceSizes = <String, Size>{
+      'Mẫu giáo': Size(151, 142),
+      'Lớp 1': Size(149, 137),
+      'Lớp 2': Size(143, 131),
+      'Lớp 3': Size(144, 127),
+      'Lớp 4': Size(138, 120),
+      'Lớp 5': Size(137, 120),
     };
-    const imageScale = 852 / 1280;
-    const imageOffsetX = (393 - (592 * imageScale)) / 2;
+    const imageScale = 852 / 1844;
+    const imageOffsetX = (393 - (853 * imageScale)) / 2;
     for (final entry in sourceCenters.entries) {
-      final button = find.byTooltip('Lớp ${entry.key}');
+      final button = find.byTooltip(entry.key);
       expect(button, findsOneWidget);
 
       final actualCenter = tester.getCenter(button);

@@ -59,9 +59,9 @@ mixin _FarmSessionMixin<T extends StatefulWidget> on State<T> {
     stopFarmSession();
     final shouldExit = await showExitConfirmationDialog(
       context,
-      titleKey: AppKeys.gamesSquadronExitTitle,
-      messageKey: AppKeys.gamesSquadronExitMessage,
-      stayActionKey: AppKeys.gamesSquadronKeepPlaying,
+      titleKey: AppKeys.gamesExitTitle,
+      messageKey: AppKeys.gamesExitMessage,
+      stayActionKey: AppKeys.gamesKeepPlaying,
       exitActionKey: AppKeys.gamesFarmBackToMap,
     );
     if (!shouldExit && mounted) {

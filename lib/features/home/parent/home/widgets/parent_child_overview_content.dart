@@ -10,7 +10,7 @@ import 'package:numi/features/home/parent/home/widgets/parent_home_error_card.da
 import 'package:numi/features/home/parent/home/widgets/parent_home_refresh_label.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
-import 'package:numi/features/home/widgets/home_math_squadron_preview_artwork.dart';
+import 'package:numi/features/home/widgets/home_monster_rescue_preview_artwork.dart';
 import 'package:numi/features/home/widgets/sections/promo_actions/promo_actions.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
@@ -154,8 +154,8 @@ class ParentChildOverviewContent extends StatelessWidget {
                   ),
                   PromoActionCard(
                     data: PromoActionData(
-                      child: const HomeMathSquadronPreviewArtwork(),
-                      backgroundColor: const Color(0xFF111C4B),
+                      child: const HomeMonsterRescuePreviewArtwork(),
+                      backgroundColor: const Color(0xFFDDF6E7),
                       onTap: onPromoActionTap,
                     ),
                   ),

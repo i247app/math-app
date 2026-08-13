@@ -8,8 +8,8 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/grade_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/games/math_squadron/math_squadron_data.dart';
-import 'package:numi/features/games/presentation/math_squadron_stage_screen.dart';
+import 'package:numi/features/games/monster_rescue/monster_rescue_data.dart';
+import 'package:numi/features/games/presentation/monster_rescue_stage_screen.dart';
 import 'package:numi/features/games/presentation/numi_farm_stage_screen.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/practice/practice_catalog.dart';
@@ -51,7 +51,7 @@ class _GamesTabState extends State<GamesTab> {
   bool _isLoadingGrades = false;
   String? _gradeError;
   int _farmCompletedStages = 0;
-  int _squadronCompletedStages = 0;
+  int _rescueCompletedStages = 0;
 
   _GamesStep get _step {
     if (_selectedGrade == null) {
@@ -81,7 +81,7 @@ class _GamesTabState extends State<GamesTab> {
       _selectedGrade = _preferredGrade(_grades);
       _selectedGame = null;
       _farmCompletedStages = 0;
-      _squadronCompletedStages = 0;
+      _rescueCompletedStages = 0;
       if (_grades.isEmpty) {
         _loadGrades();
       }
@@ -165,7 +165,7 @@ class _GamesTabState extends State<GamesTab> {
       _selectedGrade = grade;
       _selectedGame = null;
       _farmCompletedStages = 0;
-      _squadronCompletedStages = 0;
+      _rescueCompletedStages = 0;
     });
   }
 
@@ -206,18 +206,18 @@ class _GamesTabState extends State<GamesTab> {
       return;
     }
 
-    if (_selectedGame?.id == 'math-squadron' &&
+    if (_selectedGame?.id == 'monster-rescue' &&
         lesson.number >= 1 &&
-        lesson.number <= mathSquadronLevels.length) {
+        lesson.number <= monsterRescueLevels.length) {
       final completed = await Navigator.of(context).push<bool>(
         MaterialPageRoute<bool>(
-          builder: (_) => MathSquadronStageScreen(level: lesson.number),
+          builder: (_) => MonsterRescueStageScreen(level: lesson.number),
         ),
       );
       if (completed == true &&
           mounted &&
-          _squadronCompletedStages < lesson.number) {
-        setState(() => _squadronCompletedStages = lesson.number);
+          _rescueCompletedStages < lesson.number) {
+        setState(() => _rescueCompletedStages = lesson.number);
       }
       return;
     }
@@ -266,13 +266,13 @@ class _GamesTabState extends State<GamesTab> {
         ),
         _GamesStep.map => _GamesMap(
           key: ValueKey(
-            'games-map-${_selectedGame!.id}-$_farmCompletedStages-$_squadronCompletedStages',
+            'games-map-${_selectedGame!.id}-$_farmCompletedStages-$_rescueCompletedStages',
           ),
           game: _selectedGame!,
           grade: _selectedGrade!,
           completedStages: switch (_selectedGame!.id) {
             'journey-1' => _farmCompletedStages,
-            'math-squadron' => _squadronCompletedStages,
+            'monster-rescue' => _rescueCompletedStages,
             _ => 0,
           },
           bottomPadding: widget.bottomPadding,
@@ -304,17 +304,17 @@ class _GamesGradeSelection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final visibleGrades =
-        grades
-            .where(
-              (grade) =>
-                  grade.label?.trim().isNotEmpty == true &&
-                  !_isKindergartenLabel(grade.label),
-            )
-            .toList()
+        grades.where((grade) => grade.label?.trim().isNotEmpty == true).toList()
           ..sort(
             (a, b) => (a.displayOrder ?? 0).compareTo(b.displayOrder ?? 0),
           );
-    final pathGrades = visibleGrades;
+    final kindergartenGrade = visibleGrades
+        .where((grade) => _isKindergartenLabel(grade.label))
+        .firstOrNull;
+    final pathGrades = <GradeModel>[
+      kindergartenGrade ?? _kindergartenGrade,
+      ...visibleGrades.where((grade) => !_isKindergartenLabel(grade.label)),
+    ];
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -327,7 +327,7 @@ class _GamesGradeSelection extends StatelessWidget {
         color: colors.pageBackground,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            const sourceSize = Size(592, 1280);
+            const sourceSize = Size(853, 1844);
             final fittedSizes = applyBoxFit(
               BoxFit.cover,
               sourceSize,
@@ -344,7 +344,7 @@ class _GamesGradeSelection extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   Image.asset(
-                    'assets/images/game-grade-selection-background-2.jpg',
+                    'assets/images/game-grade-selection-road-map.png',
                     fit: BoxFit.cover,
                     alignment: Alignment.topCenter,
                   ),
@@ -418,15 +418,21 @@ bool _isKindergartenLabel(String? label) {
   return normalized.contains('mẫu giáo') || normalized.contains('kindergarten');
 }
 
+const _kindergartenGrade = GradeModel(
+  label: 'Mẫu giáo',
+  description: 'Mẫu giáo',
+  displayOrder: 0,
+);
+
 const _gradePathStops = <_GradePathStop>[
-  // Measured from the five cream pedestals in the 592 x 1280 artwork. The
-  // buttons are slightly inset so the pedestal rim remains visible, matching
-  // the reference composition while keeping the kindergarten stop omitted.
-  _GradePathStop(x: 320, y: 1043, width: 170, height: 156),
-  _GradePathStop(x: 266, y: 809, width: 154, height: 138),
-  _GradePathStop(x: 329, y: 604, width: 149, height: 127),
-  _GradePathStop(x: 290, y: 396, width: 142, height: 118),
-  _GradePathStop(x: 288, y: 189, width: 136, height: 109),
+  // Measured from the six inner cream circles in the 853 x 1844 artwork.
+  // Stops run from the bottom pedestal (kindergarten) to grade 5 at the top.
+  _GradePathStop(x: 440, y: 1512, width: 151, height: 142),
+  _GradePathStop(x: 412, y: 1241, width: 149, height: 137),
+  _GradePathStop(x: 450, y: 970, width: 143, height: 131),
+  _GradePathStop(x: 423, y: 728, width: 144, height: 127),
+  _GradePathStop(x: 454, y: 486, width: 138, height: 120),
+  _GradePathStop(x: 416, y: 258, width: 137, height: 120),
 ];
 
 class _GradePathStop {
@@ -630,7 +636,7 @@ class _GamesMap extends StatelessWidget {
       description: grade.label,
       lessons: lessons,
       completedLessons: completedStages,
-      icon: game.id == 'math-squadron' ? '🚀' : '🎮',
+      icon: game.id == 'monster-rescue' ? '🐾' : '🎮',
     );
 
     return PracticeChapterScreen(
@@ -721,8 +727,8 @@ class _GradeOvalButton extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
-        final buttonWidth = isKindergarten ? width * 0.8 : width;
-        final buttonHeight = isKindergarten ? height * 0.8 : height;
+        final buttonWidth = width;
+        final buttonHeight = height;
         final contentSize = math.min(buttonWidth, buttonHeight);
         final buttonBorderRadius = BorderRadius.all(
           Radius.elliptical(buttonWidth / 2, buttonHeight / 2),
@@ -822,42 +828,7 @@ class _GradeOvalButton extends StatelessWidget {
           ),
         );
 
-        if (!isKindergarten) {
-          return button;
-        }
-
-        return Stack(
-          alignment: Alignment.topCenter,
-          clipBehavior: Clip.none,
-          children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: width * 0.01,
-              height: height * 0.82,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.elliptical(width / 2, height * 0.41),
-                  ),
-                  color: const Color(0xFFFFF5DD),
-                  border: Border.all(
-                    color: const Color(0xFFE7D6B8),
-                    width: math.max(1.5, contentSize * 0.018),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x4A5C4E31),
-                      blurRadius: 12,
-                      offset: Offset(0, 7),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            button,
-          ],
-        );
+        return button;
       },
     );
   }
@@ -1216,9 +1187,7 @@ class _GamePreviewCard extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(26),
-                  child: game.id == 'math-squadron'
-                      ? const _MathSquadronPreviewArtwork()
-                      : Image.asset(game.assetPath, fit: BoxFit.cover),
+                  child: Image.asset(game.assetPath, fit: BoxFit.cover),
                 ),
               ),
             ],
@@ -1301,13 +1270,13 @@ List<_GamePreview> _gamePreviews(
   if (gradeNumber == 3) {
     return [
       _GamePreview(
-        id: 'math-squadron',
-        title: context.getText(AppKeys.gamesSquadronTitle),
-        assetPath: '',
-        background: const Color(0xFFDDEBFF),
-        accent: const Color(0xFF335BC5),
-        levelCount: mathSquadronLevels.length,
-        levelTitleKeys: mathSquadronLevels
+        id: 'monster-rescue',
+        title: context.getText(AppKeys.gamesRescueTitle),
+        assetPath: 'assets/images/game-numi-electric-rescue.png',
+        background: const Color(0xFFDDF6E7),
+        accent: const Color(0xFF007D77),
+        levelCount: monsterRescueLevels.length,
+        levelTitleKeys: monsterRescueLevels
             .map((level) => level.titleKey)
             .toList(growable: false),
       ),
@@ -1359,83 +1328,4 @@ int? _selectedGradeNumber(GradeModel grade) {
   }
   final order = grade.displayOrder;
   return order != null && order >= 1 && order <= 12 ? order : null;
-}
-
-class _MathSquadronPreviewArtwork extends StatelessWidget {
-  const _MathSquadronPreviewArtwork();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF111C4B), Color(0xFF335BC5)],
-        ),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          const Positioned(
-            top: 10,
-            right: 12,
-            child: Icon(Icons.star_rounded, color: Color(0xFFFFD95A), size: 15),
-          ),
-          const Positioned(
-            top: 28,
-            left: 12,
-            child: Icon(Icons.circle, color: Colors.white24, size: 6),
-          ),
-          Positioned(
-            top: 13,
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF625F),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white54, width: 2),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x99FF625F), blurRadius: 14),
-                ],
-              ),
-              child: const Center(
-                child: Text(
-                  '× 7',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const Positioned(
-            bottom: 12,
-            child: Icon(
-              Icons.flight_rounded,
-              color: Color(0xFF61DAFF),
-              size: 45,
-            ),
-          ),
-          Positioned(
-            bottom: 48,
-            child: Container(
-              width: 3,
-              height: 25,
-              decoration: BoxDecoration(
-                color: const Color(0xFF61DAFF),
-                borderRadius: BorderRadius.circular(99),
-                boxShadow: const [
-                  BoxShadow(color: Color(0xFF61DAFF), blurRadius: 9),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
