@@ -4,6 +4,62 @@ import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/network/quiz_models.dart';
 
 void main() {
+  test('quiz progress accepts a null average delta', () {
+    final response = QuizProgressResponse.fromJson(<String, dynamic>{
+      'from_dt': '2026-08-13T17:00:00.000Z',
+      'limit': 10,
+      'mstatus': 200,
+      'profile_id': 153,
+      'purpose': null,
+      'series': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'completed_dt': '2026-08-14T10:05:32.716344Z',
+          'correct_number': 2,
+          'purpose': 'ASSESSMENT',
+          'quiz_id': 107,
+          'score': 4,
+          'score_pct': 40,
+          'sequence': 1,
+          'short_text': 'Grade 2 assessment',
+          'title': 'Grade 2 - Level 1',
+          'total_questions': 5,
+          'type_of_quiz': 'GENERAL',
+        },
+        <String, dynamic>{
+          'completed_dt': '2026-08-14T10:07:16.946980Z',
+          'correct_number': 2,
+          'purpose': 'ASSESSMENT',
+          'quiz_id': 108,
+          'score': 4,
+          'score_pct': 40,
+          'sequence': 2,
+          'short_text': 'Grade 4 assessment',
+          'title': 'Grade 4 - Level 2',
+          'total_questions': 5,
+          'type_of_quiz': 'GENERAL',
+        },
+      ],
+      'status': 'Success',
+      'summary': <String, dynamic>{
+        'average_delta': null,
+        'average_score': 4,
+        'average_score_pct': 40,
+        'count': 2,
+        'highest_quiz_id': 108,
+        'highest_score': 4,
+        'highest_score_pct': 40,
+        'lowest_score': 4,
+        'trend': 'NEED_TO_TRY',
+      },
+      'to_dt': '2026-08-14T16:59:59.999999Z',
+      'tz': '+07:00',
+    });
+
+    expect(response.series, hasLength(2));
+    expect(response.summary?.averageDelta, isNull);
+    expect(response.summary?.count, 2);
+  });
+
   test('quiz progress posts the date range and parses analytics', () async {
     String? requestPath;
     Map<String, dynamic>? requestBody;

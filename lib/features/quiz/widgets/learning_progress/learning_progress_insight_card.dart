@@ -118,17 +118,19 @@ class LearningProgressInsightCard extends StatelessWidget {
   ) {
     if (summary != null) {
       final delta = summary.averageDelta;
-      final normalizedTrend = summary.trend.trim().toUpperCase();
-      final direction = delta > 0.05
-          ? 1
-          : delta < -0.05
-          ? -1
-          : switch (normalizedTrend) {
-              'IMPROVING' || 'UP' => 1,
-              'NEED_TO_TRY' || 'DECLINING' || 'DOWN' => -1,
-              _ => 0,
-            };
-      return (direction: direction, delta: delta);
+      if (delta != null) {
+        final normalizedTrend = summary.trend.trim().toUpperCase();
+        final direction = delta > 0.05
+            ? 1
+            : delta < -0.05
+            ? -1
+            : switch (normalizedTrend) {
+                'IMPROVING' || 'UP' => 1,
+                'NEED_TO_TRY' || 'DECLINING' || 'DOWN' => -1,
+                _ => 0,
+              };
+        return (direction: direction, delta: delta);
+      }
     }
     if (values.length < 2) {
       return (direction: 0, delta: 0);

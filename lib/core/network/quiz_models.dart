@@ -279,7 +279,7 @@ class QuizProgressSummary {
     this.highestQuizId,
   });
 
-  final double averageDelta;
+  final double? averageDelta;
   final double averageScore;
   final double averageScorePct;
   final int count;
