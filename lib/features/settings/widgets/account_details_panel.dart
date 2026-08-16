@@ -70,6 +70,7 @@ class AccountDetailsPanel extends StatelessWidget {
                   label: context.getText(AppKeys.username),
                   controller: usernameController,
                   isEditing: isEditing,
+                  hintText: context.getText(AppKeys.accountNotUpdated),
                   trailing: const Icon(
                     Icons.check_circle_rounded,
                     color: Color(0xFF087A40),
@@ -83,6 +84,7 @@ class AccountDetailsPanel extends StatelessWidget {
                   label: context.getText(AppKeys.phoneNumber),
                   controller: phoneController,
                   isEditing: isEditing,
+                  hintText: context.getText(AppKeys.accountNotUpdated),
                 ),
               ),
               Padding(
@@ -92,6 +94,7 @@ class AccountDetailsPanel extends StatelessWidget {
                   controller: emailController,
                   isEditing: isEditing,
                   keyboardType: TextInputType.emailAddress,
+                  hintText: context.getText(AppKeys.accountNotUpdated),
                 ),
               ),
               if (isEditing)

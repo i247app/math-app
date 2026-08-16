@@ -11,10 +11,11 @@ String settingsFallbackUsername(LoginUser? user) {
     return email.split('@').first;
   }
 
-  return 'alex_parent';
+  final phone = settingsDisplayPhone(user?.phone);
+  return phone;
 }
 
-String settingsDisplayPhone(String? value, {String fallback = '090 123 4567'}) {
+String settingsDisplayPhone(String? value, {String fallback = ''}) {
   final phone = value?.trim();
   if (phone == null || phone.isEmpty) {
     return fallback;

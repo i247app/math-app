@@ -72,7 +72,7 @@ class SettingsMenuPanel extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 14),
                   child: Text(
-                    _displayName(),
+                    _displayName(context),
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -188,11 +188,14 @@ class SettingsMenuPanel extends StatelessWidget {
     );
   }
 
-  String _displayName() {
+  String _displayName(BuildContext context) {
     final name = activeProfile?.name?.trim();
     if (name != null && name.isNotEmpty) {
       return name;
     }
-    return username;
+    final accountName = username.trim();
+    return accountName.isEmpty
+        ? context.getText(AppKeys.accountNotUpdated)
+        : accountName;
   }
 }

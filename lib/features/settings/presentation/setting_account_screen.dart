@@ -78,7 +78,7 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
   }
 
   void _applyUser(LoginUser? user) {
-    _usernameController.text = settingsFallbackUsername(user);
+    _usernameController.text = user?.name?.trim() ?? '';
     _phoneController.text = settingsDisplayPhone(user?.phone);
     _emailController.text = user?.email?.trim() ?? '';
   }

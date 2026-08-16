@@ -11,12 +11,14 @@ class PlainAccountTextField extends StatelessWidget {
     required this.enabled,
     this.keyboardType,
     this.textStyle,
+    this.hintText,
   });
 
   final TextEditingController controller;
   final bool enabled;
   final TextInputType? keyboardType;
   final TextStyle? textStyle;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,12 @@ class PlainAccountTextField extends StatelessWidget {
       textInputAction: TextInputAction.done,
       onTapOutside: (_) => FocusScope.of(context).unfocus(),
       style: style,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: style.copyWith(
+          color: style.color?.withValues(alpha: 0.45),
+          fontWeight: FontWeight.w500,
+        ),
         filled: false,
         isCollapsed: true,
         border: InputBorder.none,

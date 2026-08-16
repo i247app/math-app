@@ -12,11 +12,13 @@ class AccountPhoneField extends StatelessWidget {
     required this.label,
     required this.controller,
     required this.isEditing,
+    this.hintText,
   });
 
   final String label;
   final TextEditingController controller;
   final bool isEditing;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +63,7 @@ class AccountPhoneField extends StatelessWidget {
               controller: controller,
               enabled: isEditing,
               keyboardType: TextInputType.phone,
+              hintText: hintText,
               textStyle: GoogleFonts.andika(
                 color: Colors.black,
                 fontSize: FontSize.xxxl,

@@ -11,6 +11,7 @@ class AccountTextField extends StatelessWidget {
     required this.isEditing,
     this.trailing,
     this.keyboardType,
+    this.hintText,
   });
 
   final String label;
@@ -18,6 +19,7 @@ class AccountTextField extends StatelessWidget {
   final bool isEditing;
   final Widget? trailing;
   final TextInputType? keyboardType;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,7 @@ class AccountTextField extends StatelessWidget {
         controller: controller,
         enabled: isEditing,
         keyboardType: keyboardType,
+        hintText: hintText,
       ),
     );
   }

@@ -437,6 +437,7 @@ class AppKeys {
   static const passcodeRemoved = 'passcode_removed';
   static const missingAccount = 'missing_account';
   static const accountNameRequired = 'account_name_required';
+  static const accountNotUpdated = 'account_not_updated';
   static const accountUpdated = 'account_updated';
   static const accountUpdateFailed = 'account_update_failed';
   static const imagePickFailed = 'image_pick_failed';
