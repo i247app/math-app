@@ -62,6 +62,10 @@ class TeacherClassroomBody extends StatelessWidget {
                   ),
                   true,
                 )
+              : displayedClassrooms.isEmpty
+              ? TeacherClassroomEmptyState(
+                  message: context.getText(AppKeys.teacherStudyNoResults),
+                )
               : ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

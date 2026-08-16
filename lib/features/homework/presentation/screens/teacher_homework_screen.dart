@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/network/classroom_exercise_models.dart';
 import 'package:numi/core/network/classroom_models.dart';
@@ -47,6 +48,7 @@ class TeacherHomeworkScreen extends StatefulWidget {
 class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
   late final ClassroomExerciseService _exerciseService =
       widget._exerciseService ?? ClassroomExerciseApi();
+  final TextEditingController _searchController = TextEditingController();
 
   bool _isLoading = false;
   String? _error;
@@ -56,6 +58,39 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
   void initState() {
     super.initState();
     _loadExercises();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String _) {
+    setState(() {});
+  }
+
+  List<ClassroomExercise> get _visibleExercises {
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isEmpty) {
+      return _exercises;
+    }
+
+    return _exercises
+        .where((exercise) {
+          final searchable = <String>[
+            exercise.title ?? '',
+            exercise.description ?? '',
+            exercise.shortText ?? '',
+            exercise.chapterName ?? '',
+            exercise.lessonName ?? '',
+            exercise.status ?? '',
+            exercise.visibility ?? '',
+            exercise.stableId?.toString() ?? '',
+          ].join(' ').toLowerCase();
+          return searchable.contains(query);
+        })
+        .toList(growable: false);
   }
 
   Future<void> _loadExercises({bool forceRefresh = false}) async {
@@ -162,6 +197,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final visibleExercises = _visibleExercises;
 
     return Scaffold(
       backgroundColor: colors.pageBackground,
@@ -199,9 +235,12 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                           onTap: _openCreateHomework,
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 33),
-                        child: TeacherHomeworkSearchField(),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 33),
+                        child: TeacherHomeworkSearchField(
+                          controller: _searchController,
+                          onChanged: _onSearchChanged,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 24),
@@ -231,10 +270,16 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
                                   teacherExerciseCopy(widget.purpose).emptyKey,
                                 ),
                               )
+                            : visibleExercises.isEmpty
+                            ? TeacherEmptyAssignmentsPanel(
+                                message: context.getText(
+                                  AppKeys.teacherStudyNoResults,
+                                ),
+                              )
                             : Column(
                                 spacing: 10,
                                 children: [
-                                  for (final exercise in _exercises)
+                                  for (final exercise in visibleExercises)
                                     TeacherAssignmentCard(
                                       exercise: exercise,
                                       onTap: () =>

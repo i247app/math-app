@@ -28,40 +28,55 @@ class HistorySearchField extends StatelessWidget {
           ),
         ],
       ),
-      child: TextField(
-        controller: controller,
-        onTapOutside: (_) => FocusScope.of(context).unfocus(),
-        textInputAction: TextInputAction.search,
-        textAlignVertical: TextAlignVertical.center,
-        style: TextStyle(
-          color: colors.textPrimary,
-          fontSize: FontSize.normal,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0,
-        ),
-        decoration: InputDecoration(
-          hintText: context.getText(AppKeys.searchHint),
-          hintStyle: TextStyle(
-            color: colors.inputHint,
+      child: ValueListenableBuilder<TextEditingValue>(
+        valueListenable: controller,
+        builder: (context, value, _) => TextField(
+          controller: controller,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          textInputAction: TextInputAction.search,
+          textAlignVertical: TextAlignVertical.center,
+          style: TextStyle(
+            color: colors.textPrimary,
             fontSize: FontSize.normal,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
           ),
-          prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 14, right: 6),
-            child: Icon(
-              Icons.search_rounded,
-              color: colors.brandStrong,
-              size: 22,
+          decoration: InputDecoration(
+            hintText: context.getText(AppKeys.searchHint),
+            hintStyle: TextStyle(
+              color: colors.inputHint,
+              fontSize: FontSize.normal,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0,
             ),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 14, right: 6),
+              child: Icon(
+                Icons.search_rounded,
+                color: colors.brandStrong,
+                size: 22,
+              ),
+            ),
+            suffixIcon: value.text.isEmpty
+                ? null
+                : IconButton(
+                    onPressed: () {
+                      HapticFeedback.selectionClick();
+                      controller.clear();
+                    },
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).closeButtonTooltip,
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: colors.brandStrong,
+                      size: 20,
+                    ),
+                  ),
+            border: InputBorder.none,
+            isCollapsed: true,
+            contentPadding: const EdgeInsets.fromLTRB(10, 13, 10, 9),
           ),
-          suffixIcon: IconButton(
-            onPressed: HapticFeedback.selectionClick,
-            icon: Icon(Icons.tune_rounded, color: colors.brandStrong, size: 22),
-          ),
-          border: InputBorder.none,
-          isCollapsed: true,
-          contentPadding: const EdgeInsets.fromLTRB(10, 13, 10, 9),
         ),
       ),
     );

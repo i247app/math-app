@@ -73,6 +73,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(_onSearchChanged);
     if (widget.isActive) {
       _loadClassrooms();
     }
@@ -101,8 +102,39 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _searchController
+      ..removeListener(_onSearchChanged)
+      ..dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  List<ClassroomModel> get _displayedClassrooms {
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isEmpty) {
+      return _classrooms;
+    }
+
+    return _classrooms
+        .where((classroom) {
+          final searchable = <String>[
+            classroom.name ?? '',
+            classroom.description ?? '',
+            classroom.classroomCode ?? '',
+            classroom.teacherName ?? '',
+            classroom.programName ?? '',
+            classroom.schoolName ?? '',
+            classroom.stableId?.toString() ?? '',
+            ...classroom.students.map((student) => student.name ?? ''),
+          ].join(' ').toLowerCase();
+          return searchable.contains(query);
+        })
+        .toList(growable: false);
   }
 
   Future<void> _loadClassrooms({bool forceRefresh = false}) async {
@@ -239,7 +271,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
         (cubit) => cubit.owned(profileId),
       );
     }
-    final displayedClassrooms = _classrooms;
+    final displayedClassrooms = _displayedClassrooms;
     final isInitialLoading =
         _isLoading && _classrooms.isEmpty && !_hasLoadedClassrooms;
 
