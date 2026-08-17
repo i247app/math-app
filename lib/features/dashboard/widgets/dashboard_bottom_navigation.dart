@@ -99,39 +99,7 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
           widget.user,
         ),
       ],
-      ProfileRole.student => [
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navHome),
-          null,
-          assetPath: studentHomeNavHomeAsset,
-        ),
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navClassroom),
-          null,
-          assetPath: studentHomeNavClassAsset,
-        ),
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navReview),
-          null,
-          assetPath: studentHomeNavReportAsset,
-        ),
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navHistory),
-          null,
-          assetPath: studentHomeNavMessageAsset,
-        ),
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navSettings),
-          null,
-          assetPath: studentHomeNavSettingsAsset,
-        ),
-      ],
-      ProfileRole.parent => [
+      ProfileRole.student || ProfileRole.parent => [
         DashboardNavItemData(
           null,
           context.getText(AppKeys.navHome),

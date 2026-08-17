@@ -44,7 +44,6 @@ enum _RoleTabDestination {
   room,
   assessment,
   practice,
-  history,
   study,
   members,
   settings,
@@ -197,9 +196,9 @@ class _DashboardScreenState extends State<DashboardScreen>
         _ => _RoleTabDestination.home,
       },
       ProfileRole.student => switch (currentIndex) {
-        1 => _RoleTabDestination.classroom,
-        2 => _RoleTabDestination.practice,
-        3 => _RoleTabDestination.history,
+        1 => _RoleTabDestination.assessment,
+        2 => _RoleTabDestination.room,
+        3 => _RoleTabDestination.practice,
         4 => _RoleTabDestination.settings,
         _ => _RoleTabDestination.home,
       },
@@ -221,9 +220,9 @@ class _DashboardScreenState extends State<DashboardScreen>
         _ => 0,
       },
       ProfileRole.student => switch (destination) {
-        _RoleTabDestination.classroom || _RoleTabDestination.room => 1,
-        _RoleTabDestination.practice => 2,
-        _RoleTabDestination.history => 3,
+        _RoleTabDestination.assessment => 1,
+        _RoleTabDestination.room || _RoleTabDestination.classroom => 2,
+        _RoleTabDestination.practice => 3,
         _RoleTabDestination.settings => 4,
         _ => 0,
       },
@@ -363,13 +362,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                     onCompleteTeacherProfile: _openTeacherProfileForm,
                     onOpenClassroomTab: () => _selectTab(
                       roleTabCubit,
-                      widget.activeRole == ProfileRole.parent ? 2 : 1,
+                      widget.activeRole == ProfileRole.teacher ? 1 : 2,
                     ),
                     onOpenPracticeTab: () {
                       HapticFeedback.lightImpact();
                       _selectTab(
                         roleTabCubit,
-                        widget.activeRole == ProfileRole.parent ? 3 : 2,
+                        widget.activeRole == ProfileRole.teacher ? 2 : 3,
                       );
                     },
                     onOpenHistoryTab: () => _selectTab(roleTabCubit, 3),
