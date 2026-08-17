@@ -122,6 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       DashboardProfileController(gradeService: widget._gradeService);
   final HomeTabPerformanceMonitor _tabPerformanceMonitor =
       HomeTabPerformanceMonitor();
+  final ValueNotifier<double?> _tabSwipePosition = ValueNotifier(null);
   bool _returnToPracticeAfterProfileSave = false;
   int _parentStreakCount = 1;
 
@@ -153,6 +154,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       _profileController.prefetchGrades(widget.user?.id);
     }
     if (oldWidget.activeRole != widget.activeRole) {
+      _tabSwipePosition.value = null;
       final oldTab = _roleTabCubitFor(oldWidget.activeRole).state.activeTab;
       final targetCubit = _roleTabCubitFor(widget.activeRole);
       _selectTab(
@@ -243,6 +245,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     _studentTabCubit.close();
     _teacherTabCubit.close();
     _tabPerformanceMonitor.dispose();
+    _tabSwipePosition.dispose();
     _notificationBadgeController.dispose();
     super.dispose();
   }
@@ -389,6 +392,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                     homeHeader: homeHeader,
                     showChildProfileDialogOnStart:
                         widget.showChildProfileDialogOnStart,
+                    onSwipeToTab: (index) {
+                      if (widget.activeRole == ProfileRole.parent &&
+                          index != navigation.activeTab &&
+                          index == 0) {
+                        _playParentHomeEntrance();
+                      }
+                      HapticFeedback.selectionClick();
+                      _selectTab(roleTabCubit, index);
+                    },
+                    onSwipePositionChanged: (position) {
+                      _tabSwipePosition.value = position;
+                    },
+                    onSwipeInteractionEnded: () {
+                      _tabSwipePosition.value = null;
+                    },
                     onChildProfileDialogShown: widget.onChildProfileDialogShown,
                   ),
                 ),
@@ -435,6 +453,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       activeIndex: navigation.activeTab,
                       activeRole: widget.activeRole,
                       user: widget.user,
+                      swipePosition: _tabSwipePosition,
                       onTabSelected: (index) {
                         if (widget.activeRole == ProfileRole.parent &&
                             index != navigation.activeTab &&

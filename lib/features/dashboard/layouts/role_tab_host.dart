@@ -46,6 +46,9 @@ class RoleTabHost extends StatefulWidget {
     required this.hasUnreadNotifications,
     required this.onNotificationTap,
     required this.showChildProfileDialogOnStart,
+    required this.onSwipeToTab,
+    required this.onSwipePositionChanged,
+    required this.onSwipeInteractionEnded,
     this.onChildProfileDialogShown,
     this.homeHeader,
   });
@@ -80,6 +83,9 @@ class RoleTabHost extends StatefulWidget {
   final bool hasUnreadNotifications;
   final VoidCallback onNotificationTap;
   final bool showChildProfileDialogOnStart;
+  final ValueChanged<int> onSwipeToTab;
+  final ValueChanged<double> onSwipePositionChanged;
+  final VoidCallback onSwipeInteractionEnded;
   final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
 
@@ -87,17 +93,73 @@ class RoleTabHost extends StatefulWidget {
   State<RoleTabHost> createState() => RoleTabHostState();
 }
 
-class RoleTabHostState extends State<RoleTabHost> {
+class RoleTabHostState extends State<RoleTabHost>
+    with SingleTickerProviderStateMixin {
+  static const _tabTransitionDuration = Duration(milliseconds: 240);
+
   late final Set<int> _visitedTabs = <int>{widget.activeTab};
   final Map<int, int> _activationTicks = <int, int>{};
   final Map<int, Widget> _tabChildren = <int, Widget>{};
+  late final AnimationController _tabTransitionController;
+  late int _transitionFromTab = widget.activeTab;
+  late int _transitionToTab = widget.activeTab;
   late int _lastProfileResetSignal = widget.profileResetSignal;
+  bool _isDragging = false;
+  bool _isSettlingDrag = false;
+  bool _dragCompletesSelection = false;
+  double _dragOffset = 0;
+  double _dragWidth = 1;
+  double _dragSettleStartProgress = 0;
+  int? _dragNeighborTab;
+  int? _pendingDragTarget;
 
   @override
   void initState() {
     super.initState();
+    _tabTransitionController =
+        AnimationController(
+            vsync: this,
+            duration: _tabTransitionDuration,
+            value: 1,
+          )
+          ..addListener(_handleTabTransitionTick)
+          ..addStatusListener(_handleTabTransitionStatus);
     _activationTicks[widget.activeTab] = 1;
     WidgetsBinding.instance.addPostFrameCallback((_) => _prewarmTabs());
+  }
+
+  @override
+  void dispose() {
+    _tabTransitionController.removeListener(_handleTabTransitionTick);
+    _tabTransitionController.removeStatusListener(_handleTabTransitionStatus);
+    _tabTransitionController.dispose();
+    super.dispose();
+  }
+
+  void _handleTabTransitionTick() {
+    if (!_isSettlingDrag) {
+      return;
+    }
+    final progress = _resolvedTransitionProgress();
+    widget.onSwipePositionChanged(
+      _transitionFromTab + (_transitionToTab - _transitionFromTab) * progress,
+    );
+  }
+
+  void _handleTabTransitionStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed && mounted) {
+      setState(() {
+        // Keep the outgoing widget completely unchanged while it slides away.
+        // Rebuild it only after it is offstage so removing the Home header
+        // cannot make the content jump upward during the transition.
+        _tabChildren.remove(_transitionFromTab);
+      });
+      if (_isSettlingDrag) {
+        _isSettlingDrag = false;
+        _tabTransitionController.duration = _tabTransitionDuration;
+        widget.onSwipeInteractionEnded();
+      }
+    }
   }
 
   Future<void> _prewarmTabs() async {
@@ -123,13 +185,29 @@ class RoleTabHostState extends State<RoleTabHost> {
   @override
   void didUpdateWidget(covariant RoleTabHost oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.activeTab != widget.activeTab) {
+    final activeTabChanged = oldWidget.activeTab != widget.activeTab;
+    if (activeTabChanged) {
+      final continuesDragTransition =
+          _pendingDragTarget == widget.activeTab &&
+          _transitionFromTab == oldWidget.activeTab;
+      _pendingDragTarget = null;
+      if (!continuesDragTransition) {
+        if (_isDragging || _isSettlingDrag) {
+          _isDragging = false;
+          _isSettlingDrag = false;
+          widget.onSwipeInteractionEnded();
+        }
+        _transitionFromTab = oldWidget.activeTab;
+        _transitionToTab = widget.activeTab;
+      }
       _visitedTabs.add(widget.activeTab);
-      // Only the outgoing and incoming tabs need new [isActive] args. Keeping
-      // the other widget instances identical lets Flutter skip their build
-      // work while the Offstage wrappers change selection.
-      _tabChildren.remove(oldWidget.activeTab);
+      // Rebuild the incoming tab immediately. The outgoing tab stays intact
+      // until the transition completes so its layout cannot change mid-swipe.
       _tabChildren.remove(widget.activeTab);
+      if (!continuesDragTransition) {
+        _tabTransitionController.duration = _tabTransitionDuration;
+        _tabTransitionController.forward(from: 0);
+      }
     }
 
     if (widget.profileResetSignal != _lastProfileResetSignal) {
@@ -143,8 +221,10 @@ class RoleTabHostState extends State<RoleTabHost> {
 
     if (_requiresAllTabsRebuild(oldWidget, widget)) {
       _tabChildren.clear();
-    } else if (oldWidget.homeHeader != widget.homeHeader ||
-        oldWidget.hasUnreadNotifications != widget.hasUnreadNotifications) {
+    } else if ((!activeTabChanged || _transitionFromTab != 0) &&
+        (oldWidget.homeHeader != widget.homeHeader ||
+            oldWidget.hasUnreadNotifications !=
+                widget.hasUnreadNotifications)) {
       // The header only belongs to the Home tab and can change when the
       // profile menu opens or the unread notification state changes.
       _tabChildren.remove(0);
@@ -154,27 +234,207 @@ class RoleTabHostState extends State<RoleTabHost> {
   @override
   Widget build(BuildContext context) {
     const maxTabIndex = 4;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        for (var tab = 0; tab <= maxTabIndex; tab++)
-          if (_visitedTabs.contains(tab))
-            Offstage(
-              key: ValueKey('home-tab-$tab'),
-              offstage: tab != widget.activeTab,
-              child: TickerMode(
-                enabled: tab == widget.activeTab,
-                child: KeyedSubtree(
-                  key: ValueKey('home-dashboard-content-$tab'),
-                  child: _tabChildren.putIfAbsent(
-                    tab,
-                    () => _buildTab(context, tab),
-                  ),
-                ),
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _dragWidth = constraints.maxWidth;
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onHorizontalDragStart: _handleHorizontalDragStart,
+          onHorizontalDragUpdate: _handleHorizontalDragUpdate,
+          onHorizontalDragEnd: _handleHorizontalDragEnd,
+          onHorizontalDragCancel: _handleHorizontalDragCancel,
+          child: ClipRect(
+            child: AnimatedBuilder(
+              animation: _tabTransitionController,
+              builder: (context, _) {
+                final isTransitioning = _tabTransitionController.isAnimating;
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    for (var tab = 0; tab <= maxTabIndex; tab++)
+                      if (_visitedTabs.contains(tab))
+                        Offstage(
+                          key: ValueKey('home-tab-$tab'),
+                          offstage: !_isTabVisible(tab, isTransitioning),
+                          child: TickerMode(
+                            enabled: _isTabVisible(tab, isTransitioning),
+                            child: IgnorePointer(
+                              ignoring:
+                                  _isDragging ||
+                                  isTransitioning ||
+                                  tab != widget.activeTab,
+                              child: FractionalTranslation(
+                                translation: Offset(
+                                  _horizontalOffsetFor(tab, isTransitioning),
+                                  0,
+                                ),
+                                child: KeyedSubtree(
+                                  key: ValueKey('home-dashboard-content-$tab'),
+                                  child: _tabChildren.putIfAbsent(
+                                    tab,
+                                    () => _buildTab(context, tab),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                  ],
+                );
+              },
             ),
-      ],
+          ),
+        );
+      },
     );
+  }
+
+  bool _isTabVisible(int tab, bool isTransitioning) {
+    if (_isDragging) {
+      return tab == widget.activeTab || tab == _dragNeighborTab;
+    }
+    if (!isTransitioning) {
+      return tab == widget.activeTab;
+    }
+    return tab == _transitionFromTab || tab == _transitionToTab;
+  }
+
+  double _horizontalOffsetFor(int tab, bool isTransitioning) {
+    if (_isDragging) {
+      if (tab == widget.activeTab) {
+        return _dragOffset;
+      }
+      if (tab == _dragNeighborTab) {
+        return _dragOffset < 0 ? 1 + _dragOffset : _dragOffset - 1;
+      }
+      return 0;
+    }
+    if (!isTransitioning) {
+      return 0;
+    }
+
+    final progress = _resolvedTransitionProgress();
+    final movesForward = _transitionToTab > _transitionFromTab;
+    if (tab == _transitionFromTab) {
+      return movesForward ? -progress : progress;
+    }
+    if (tab == _transitionToTab) {
+      return movesForward ? 1 - progress : progress - 1;
+    }
+    return 0;
+  }
+
+  double _resolvedTransitionProgress() {
+    final animationProgress = Curves.easeOutCubic.transform(
+      _tabTransitionController.value,
+    );
+    if (!_isSettlingDrag) {
+      return animationProgress;
+    }
+    return _dragSettleStartProgress +
+        ((_dragCompletesSelection ? 1.0 : 0.0) - _dragSettleStartProgress) *
+            animationProgress;
+  }
+
+  void _handleHorizontalDragStart(DragStartDetails details) {
+    if (_tabTransitionController.isAnimating) {
+      return;
+    }
+    _isDragging = true;
+    _dragOffset = 0;
+    _dragNeighborTab = null;
+  }
+
+  void _handleHorizontalDragUpdate(DragUpdateDetails details) {
+    if (!_isDragging || _dragWidth <= 0) {
+      return;
+    }
+
+    var nextOffset = _dragOffset + details.delta.dx / _dragWidth;
+    final isAtStartBoundary = widget.activeTab == 0 && nextOffset > 0;
+    final isAtEndBoundary = widget.activeTab == 4 && nextOffset < 0;
+    if (isAtStartBoundary || isAtEndBoundary) {
+      nextOffset = 0;
+    } else {
+      nextOffset = nextOffset.clamp(-1.0, 1.0).toDouble();
+    }
+
+    final neighbor = nextOffset < 0
+        ? widget.activeTab + 1
+        : nextOffset > 0
+        ? widget.activeTab - 1
+        : null;
+    final validNeighbor = neighbor != null && neighbor >= 0 && neighbor <= 4
+        ? neighbor
+        : null;
+
+    setState(() {
+      _dragOffset = nextOffset;
+      _dragNeighborTab = validNeighbor;
+      if (validNeighbor != null) {
+        _visitedTabs.add(validNeighbor);
+      }
+    });
+    widget.onSwipePositionChanged(widget.activeTab - _dragOffset);
+  }
+
+  void _handleHorizontalDragEnd(DragEndDetails details) {
+    _settleHorizontalDrag(details.velocity.pixelsPerSecond.dx);
+  }
+
+  void _handleHorizontalDragCancel() {
+    _settleHorizontalDrag(0, forceCancel: true);
+  }
+
+  void _settleHorizontalDrag(
+    double horizontalVelocity, {
+    bool forceCancel = false,
+  }) {
+    if (!_isDragging) {
+      return;
+    }
+
+    final neighbor = _dragNeighborTab;
+    final progress = _dragOffset.abs().clamp(0.0, 1.0);
+    final velocityFollowsDrag =
+        horizontalVelocity.abs() >= 650 &&
+        horizontalVelocity.sign == _dragOffset.sign;
+    final completesSelection =
+        !forceCancel &&
+        neighbor != null &&
+        (progress >= 0.24 || velocityFollowsDrag);
+
+    setState(() {
+      _isDragging = false;
+      _isSettlingDrag = neighbor != null && progress > 0;
+      _dragCompletesSelection = completesSelection;
+      _dragSettleStartProgress = progress;
+      if (neighbor != null) {
+        _transitionFromTab = widget.activeTab;
+        _transitionToTab = neighbor;
+      }
+    });
+
+    if (!_isSettlingDrag) {
+      widget.onSwipeInteractionEnded();
+      return;
+    }
+
+    final remainingFraction = completesSelection ? 1 - progress : progress;
+    final settleMilliseconds = (240 * remainingFraction)
+        .round()
+        .clamp(80, 240)
+        .toInt();
+    _tabTransitionController.duration = Duration(
+      milliseconds: settleMilliseconds,
+    );
+    if (completesSelection) {
+      _pendingDragTarget = neighbor;
+    }
+    _tabTransitionController.forward(from: 0);
+    if (completesSelection) {
+      widget.onSwipeToTab(neighbor);
+    }
   }
 
   Widget _buildTab(BuildContext context, int tab) {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,6 +19,7 @@ class DashboardBottomNavigation extends StatefulWidget {
     required this.activeIndex,
     required this.activeRole,
     required this.user,
+    required this.swipePosition,
     required this.onTabSelected,
   });
 
@@ -25,6 +27,7 @@ class DashboardBottomNavigation extends StatefulWidget {
   final int activeIndex;
   final ProfileRole activeRole;
   final LoginUser? user;
+  final ValueListenable<double?> swipePosition;
   final ValueChanged<int> onTabSelected;
 
   @override
@@ -33,6 +36,8 @@ class DashboardBottomNavigation extends StatefulWidget {
 }
 
 class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
+  static const _indicatorDuration = Duration(milliseconds: 240);
+
   int? _pendingActiveIndex;
 
   int get _activeIndex => _pendingActiveIndex ?? widget.activeIndex;
@@ -182,17 +187,81 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
           ),
         ],
       ),
-      child: Row(
-        children: List.generate(items.length, (index) {
-          return Expanded(
-            child: DashboardAnimatedNavItem(
-              data: items[index],
-              active: _activeIndex == index,
-              teacherStyle: widget.activeRole == ProfileRole.teacher,
-              onTap: () => _selectTab(index),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final itemWidth = constraints.maxWidth / items.length;
+          return ValueListenableBuilder<double?>(
+            valueListenable: widget.swipePosition,
+            child: Row(
+              children: List.generate(items.length, (index) {
+                return Expanded(
+                  child: DashboardAnimatedNavItem(
+                    data: items[index],
+                    active: _activeIndex == index,
+                    onTap: () => _selectTab(index),
+                  ),
+                );
+              }),
             ),
+            builder: (context, swipePosition, navigationItems) {
+              final indicatorPosition = (swipePosition ?? _activeIndex)
+                  .clamp(0.0, items.length - 1.0)
+                  .toDouble();
+              return Stack(
+                fit: StackFit.expand,
+                clipBehavior: Clip.none,
+                children: [
+                  AnimatedPositioned(
+                    duration: swipePosition == null
+                        ? _indicatorDuration
+                        : Duration.zero,
+                    curve: Curves.easeOutCubic,
+                    left: itemWidth * indicatorPosition,
+                    top: 0,
+                    bottom: 0,
+                    width: itemWidth,
+                    child: _DashboardActiveIndicator(
+                      teacherStyle: widget.activeRole == ProfileRole.teacher,
+                    ),
+                  ),
+                  navigationItems!,
+                ],
+              );
+            },
           );
-        }),
+        },
+      ),
+    );
+  }
+}
+
+class _DashboardActiveIndicator extends StatelessWidget {
+  const _DashboardActiveIndicator({required this.teacherStyle});
+
+  final bool teacherStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: colors.brandStrong,
+        borderRadius: BorderRadius.circular(48),
+        boxShadow: teacherStyle
+            ? null
+            : [
+                BoxShadow(
+                  color: colors.brand.withValues(alpha: 0.20),
+                  blurRadius: 15,
+                  offset: const Offset(0, 10),
+                ),
+                BoxShadow(
+                  color: colors.brand.withValues(alpha: 0.20),
+                  blurRadius: 6,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
     );
   }
@@ -203,19 +272,16 @@ class DashboardAnimatedNavItem extends StatelessWidget {
     super.key,
     required this.data,
     required this.active,
-    required this.teacherStyle,
     required this.onTap,
   });
 
   final DashboardNavItemData data;
   final bool active;
-  final bool teacherStyle;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final activeColor = colors.brandStrong;
     final inactiveColor = colors.textSecondary.withValues(alpha: 0.68);
     final foregroundColor = active
         ? Theme.of(context).colorScheme.onPrimary
@@ -233,51 +299,41 @@ class DashboardAnimatedNavItem extends StatelessWidget {
             height: 60,
             margin: const EdgeInsets.symmetric(horizontal: 2),
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
-            decoration: BoxDecoration(
-              color: active ? activeColor : Colors.transparent,
-              borderRadius: BorderRadius.circular(48),
-              boxShadow: active && !teacherStyle
-                  ? [
-                      BoxShadow(
-                        color: colors.brand.withValues(alpha: 0.20),
-                        blurRadius: 15,
-                        offset: const Offset(0, 10),
-                      ),
-                      BoxShadow(
-                        color: colors.brand.withValues(alpha: 0.20),
-                        blurRadius: 6,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 4,
-              children: [
-                SizedBox.square(
-                  dimension: 22,
-                  child: Center(child: _buildIcon(foregroundColor)),
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      data.label,
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.andika(
-                        color: foregroundColor,
-                        fontSize: FontSize.caption * 0.77,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                        letterSpacing: 0.5,
+            child: TweenAnimationBuilder<Color?>(
+              duration: _DashboardBottomNavigationState._indicatorDuration,
+              curve: Curves.easeOutCubic,
+              tween: ColorTween(begin: foregroundColor, end: foregroundColor),
+              builder: (context, color, _) {
+                final resolvedColor = color ?? foregroundColor;
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 4,
+                  children: [
+                    SizedBox.square(
+                      dimension: 22,
+                      child: Center(child: _buildIcon(resolvedColor)),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          data.label,
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.andika(
+                            color: resolvedColor,
+                            fontSize: FontSize.caption * 0.77,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             ),
           ),
         ),
