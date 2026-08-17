@@ -445,7 +445,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
           child: Text(
             context.getText(AppKeys.studentSearchResults),
             style: const TextStyle(
-              color: AppColors.textNavy,
+              color: AppColors.textTeal,
               fontSize: FontSize.normal,
               fontWeight: FontWeight.w900,
               height: 2,
@@ -493,6 +493,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
       return const StudentJoinStateCard(
         assetPath: studentJoinSearchIcon,
         titleKey: AppKeys.studentEnterClassCodeTitle,
+        titleColor: AppColors.black87,
         messageKey: AppKeys.studentEnterClassCodeMessage,
       );
     }

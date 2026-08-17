@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class StudentJoinAnotherClassroomTitle extends StatelessWidget {
-  const StudentJoinAnotherClassroomTitle({super.key});
+  const StudentJoinAnotherClassroomTitle({
+    super.key,
+    required this.hasJoinedClassrooms,
+  });
+
+  final bool hasJoinedClassrooms;
 
   @override
   Widget build(BuildContext context) {
@@ -17,20 +23,24 @@ class StudentJoinAnotherClassroomTitle extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: const BoxDecoration(
-              color: Color(0xFFF1EBFA),
+              color: AppColors.tealLightSurface,
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.person_add_alt_1_rounded,
-              color: Color(0xFF6647E8),
+              color: AppColors.brandTeal,
               size: 22,
             ),
           ),
           Expanded(
             child: Text(
-              context.getText(AppKeys.studentJoinAnotherClassroom),
+              context.getText(
+                hasJoinedClassrooms
+                    ? AppKeys.studentJoinAnotherClassroom
+                    : AppKeys.studentJoinClassroom,
+              ),
               style: const TextStyle(
-                color: Color(0xFF002B6A),
+                color: AppColors.textTeal,
                 fontSize: FontSize.large,
                 fontWeight: FontWeight.w900,
                 height: 1.1,

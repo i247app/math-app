@@ -12,6 +12,7 @@ class StudentJoinStateCard extends StatelessWidget {
     this.isSvg = false,
     this.titleKey,
     this.title,
+    this.titleColor = AppColors.textNavy,
     required this.messageKey,
     this.actionLabelKey,
     this.onAction,
@@ -21,6 +22,7 @@ class StudentJoinStateCard extends StatelessWidget {
   final bool isSvg;
   final String? titleKey;
   final String? title;
+  final Color titleColor;
   final String messageKey;
   final String? actionLabelKey;
   final VoidCallback? onAction;
@@ -45,8 +47,8 @@ class StudentJoinStateCard extends StatelessWidget {
             child: Text(
               title ?? context.getText(titleKey!),
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.textNavy,
+              style: TextStyle(
+                color: titleColor,
                 fontSize: FontSize.normal,
                 fontWeight: FontWeight.w900,
               ),

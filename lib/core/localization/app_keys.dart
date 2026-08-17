@@ -209,6 +209,7 @@ class AppKeys {
   static const studentNoClassroomsMessage = 'student_no_classrooms_message';
   static const studentJoinNewClassroom = 'student_join_new_classroom';
   static const studentJoinAnotherClassroom = 'student_join_another_classroom';
+  static const studentJoinClassroom = 'student_join_classroom';
   static const studentJoinClassroomSoon = 'student_join_classroom_soon';
   static const studentClassroomLoadFailed = 'student_classroom_load_failed';
   static const studentMissingProfileId = 'student_missing_profile_id';

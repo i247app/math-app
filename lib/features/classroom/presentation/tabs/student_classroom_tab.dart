@@ -16,7 +16,6 @@ import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/classroom/widgets/student_class_search_content.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_inline_error_panel.dart';
-import 'package:numi/features/classroom/widgets/student_tab/student_state_card.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_classroom_tab_card.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_join_another_classroom_title.dart';
 import 'package:numi/features/classroom/widgets/student_tab/student_classroom_loading_region.dart';
@@ -159,6 +158,9 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
         _isLoading &&
         _classrooms.isEmpty &&
         !_hasLoadedClassrooms;
+    final classroomError = _error;
+    final hasClassroomSectionContent =
+        classroomError != null || _classrooms.isNotEmpty;
     final topInset = MediaQuery.paddingOf(context).top;
 
     return ColoredBox(
@@ -196,18 +198,13 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                if (_error != null && _classrooms.isEmpty)
+                                if (classroomError != null &&
+                                    _classrooms.isEmpty)
                                   StudentInlineErrorPanel(
-                                    message: _error!,
+                                    message: classroomError,
                                     onRetry: _refreshClassrooms,
                                   )
-                                else if (_classrooms.isEmpty)
-                                  const StudentStateCard(
-                                    titleKey: AppKeys.studentNoClassroomsTitle,
-                                    messageKey:
-                                        AppKeys.studentNoClassroomsMessage,
-                                  )
-                                else
+                                else if (_classrooms.isNotEmpty)
                                   LayoutBuilder(
                                     builder: (context, constraints) {
                                       final cardWidth =
@@ -229,9 +226,13 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
                                       );
                                     },
                                   ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 30),
-                                  child: StudentJoinAnotherClassroomTitle(),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    top: hasClassroomSectionContent ? 30 : 0,
+                                  ),
+                                  child: StudentJoinAnotherClassroomTitle(
+                                    hasJoinedClassrooms: _classrooms.isNotEmpty,
+                                  ),
                                 ),
                                 if (canLoadContent)
                                   Padding(
