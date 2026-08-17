@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/application/app_session_cubit.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
@@ -55,6 +56,36 @@ void main() {
         expect(firstEpoch, greaterThan(0));
         expect(loggedOutEpoch, greaterThan(firstEpoch));
         expect(cubit.state.sessionEpoch, greaterThan(loggedOutEpoch));
+        await cubit.close();
+      },
+    );
+
+    test(
+      'offers the child-profile dialog only for a new parent account',
+      () async {
+        final cubit = AppSessionCubit();
+
+        cubit.authenticate(
+          const AuthenticatedSession(
+            user: LoginUser(id: 8, role: 'PARENT'),
+            isNewlyRegistered: true,
+          ),
+        );
+        expect(cubit.state.shouldShowChildProfileDialog, isTrue);
+
+        cubit.consumeChildProfileDialog();
+        expect(cubit.state.shouldShowChildProfileDialog, isFalse);
+
+        cubit.authenticate(
+          const AuthenticatedSession(
+            user: LoginUser(id: 8, role: 'PARENT'),
+            profiles: [
+              StudentProfile(profileId: 81, role: 'STUDENT', name: 'Child'),
+            ],
+          ),
+        );
+        expect(cubit.state.shouldShowChildProfileDialog, isFalse);
+
         await cubit.close();
       },
     );

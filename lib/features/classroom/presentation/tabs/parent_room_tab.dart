@@ -26,6 +26,7 @@ import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_ta
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
+import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
 import 'package:numi/shared/widgets/app_responsive_card_group.dart';
 import 'package:numi/shared/widgets/app_summary_card.dart';
@@ -246,6 +247,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[];
     final isEmptyRoomState =
         !_isLoading && _errorMessage == null && entries.isEmpty;
+    final hideHeader = studentProfiles(widget.profiles).isEmpty;
 
     final colors = context.themeColors;
     return ColoredBox(
@@ -258,13 +260,11 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             final contentPadding = isEmptyRoomState
                 ? EdgeInsets.only(bottom: widget.bottomPadding)
                 : EdgeInsets.fromLTRB(14, 24, 14, widget.bottomPadding + 24);
+            final headerHeight = hideHeader ? 0.0 : topInset + 60;
             final minHeight = isEmptyRoomState
                 ? math.max(
                     0.0,
-                    constraints.maxHeight -
-                        topInset -
-                        60 -
-                        widget.bottomPadding,
+                    constraints.maxHeight - headerHeight - widget.bottomPadding,
                   )
                 : 0.0;
 
@@ -275,10 +275,11 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  PageHeader(
-                    title: context.getText(AppKeys.parentRoomTitle),
-                    topInset: topInset,
-                  ),
+                  if (!hideHeader)
+                    PageHeader(
+                      title: context.getText(AppKeys.parentRoomTitle),
+                      topInset: topInset,
+                    ),
                   Padding(
                     padding: contentPadding,
                     child: ConstrainedBox(

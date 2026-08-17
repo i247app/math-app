@@ -33,6 +33,8 @@ class ParentTabHost extends StatelessWidget {
         onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
         bottomPadding: args.bottomPadding,
         homeHeader: args.homeHeader,
+        showChildProfileDialogOnStart: args.showChildProfileDialogOnStart,
+        onChildProfileDialogShown: args.onChildProfileDialogShown,
       );
     }
 

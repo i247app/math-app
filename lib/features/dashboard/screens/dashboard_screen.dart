@@ -18,6 +18,7 @@ import 'package:numi/features/notifications/application/notification_badge_contr
 import 'package:numi/features/notifications/data/cache/notification_cache.dart';
 import 'package:numi/features/notifications/data/notification_api.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
+import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 import 'package:numi/features/dashboard/application/dashboard_profile_controller.dart';
 import 'package:numi/features/dashboard/application/role_tab_cubit.dart';
 import 'package:numi/features/dashboard/layouts/role_tab_host.dart';
@@ -61,6 +62,8 @@ class DashboardScreen extends StatefulWidget {
     required this.onActivateProfile,
     required this.onBack,
     required this.onLogout,
+    this.showChildProfileDialogOnStart = false,
+    this.onChildProfileDialogShown,
     GradeService? gradeService,
     ClassroomService? classroomService,
     ClassroomExerciseService? assignmentService,
@@ -83,6 +86,8 @@ class DashboardScreen extends StatefulWidget {
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onBack;
   final VoidCallback onLogout;
+  final bool showChildProfileDialogOnStart;
+  final VoidCallback? onChildProfileDialogShown;
   final GradeService? _gradeService;
   final ClassroomService? _classroomService;
   final ClassroomExerciseService? _assignmentService;
@@ -264,6 +269,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 widget.activeRole,
               ),
             );
+            final hasMissingChildProfileNotice =
+                widget.activeRole == ProfileRole.parent &&
+                studentProfiles(widget.profiles).isEmpty;
 
             final navHeight = 88 + bottomInset;
             final headerHeight = 64 + topInset;
@@ -292,7 +300,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                       parentStreakCount: _parentStreakCount,
                       onNotificationTap: _openNotifications,
                       hasUnreadNotifications:
-                          _notificationBadgeController.hasUnread,
+                          _notificationBadgeController.hasUnread ||
+                          hasMissingChildProfileNotice,
                       onProfileTap: switchableProfiles.isEmpty
                           ? null
                           : () {
@@ -374,9 +383,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                     parentHomeEntrance: _parentHomeEntranceController,
                     bottomPadding: navHeight + 14,
                     hasUnreadNotifications:
-                        _notificationBadgeController.hasUnread,
+                        _notificationBadgeController.hasUnread ||
+                        hasMissingChildProfileNotice,
                     onNotificationTap: _openNotifications,
                     homeHeader: homeHeader,
+                    showChildProfileDialogOnStart:
+                        widget.showChildProfileDialogOnStart,
+                    onChildProfileDialogShown: widget.onChildProfileDialogShown,
                   ),
                 ),
                 if (isMenuOpen)
@@ -473,11 +486,22 @@ class _DashboardScreenState extends State<DashboardScreen>
     });
   }
 
-  void _openNotifications() {
+  Future<void> _openNotifications() async {
     _notificationBadgeController.markViewed();
-    Navigator.of(
-      context,
-    ).push<void>(NotificationRoute(notificationService: _notificationService));
+    final shouldCreateProfile = await Navigator.of(context).push<bool>(
+      NotificationRoute(
+        notificationService: _notificationService,
+        showMissingChildProfileNotice:
+            widget.activeRole == ProfileRole.parent &&
+            studentProfiles(widget.profiles).isEmpty,
+      ),
+    );
+    if (!mounted || shouldCreateProfile != true) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    _profileController.requestAddProfile();
+    _selectTab(_roleTabCubitFor(widget.activeRole), 4);
   }
 
   void _handleLogout() {

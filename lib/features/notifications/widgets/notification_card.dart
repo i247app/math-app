@@ -8,6 +8,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/notifications/helpers/notification_display_helpers.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
@@ -150,6 +151,114 @@ class NotificationMascotAvatar extends StatelessWidget {
         'assets/images/numi-mascot.png',
         fit: BoxFit.contain,
         filterQuality: FilterQuality.high,
+      ),
+    );
+  }
+}
+
+class MissingChildProfileNotificationCard extends StatelessWidget {
+  const MissingChildProfileNotificationCard({
+    super.key,
+    required this.title,
+    required this.message,
+    this.onTap,
+  });
+
+  final String title;
+  final String message;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final radius = BorderRadius.circular(14);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow,
+            blurRadius: 18,
+            offset: const Offset(0, 7),
+          ),
+        ],
+      ),
+      child: Material(
+        color: colors.elevatedSurface,
+        borderRadius: radius,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(width: 4, color: colors.accent),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 16, 12, 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 14,
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: colors.brandStrong.withValues(alpha: 0.08),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Image.asset(
+                            parentNoStudentMascotAsset,
+                            fit: BoxFit.contain,
+                            filterQuality: FilterQuality.high,
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 3,
+                            children: [
+                              Text(
+                                title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.andika(
+                                  color: colors.textPrimary,
+                                  fontSize: FontSize.normal,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.2,
+                                ),
+                              ),
+                              Text(
+                                message,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.andika(
+                                  color: colors.textSecondary,
+                                  fontSize: FontSize.compact,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.45,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          color: colors.accent,
+                          size: 24,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/core/network/profile_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
 
@@ -28,6 +29,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
                  profiles: initialSession.profiles,
                  activeProfile: initialSession.activeProfile,
                  profileLoadError: initialSession.profileLoadError,
+                 shouldShowChildProfileDialog: false,
                ),
        );
 
@@ -50,6 +52,12 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     if (startsNewSession) {
       _sessionEpoch++;
     }
+    final hasChildProfile = session.profiles.any(
+      (profile) => ProfileRole.fromProfile(profile) == ProfileRole.student,
+    );
+    final isNewParentAccount =
+        session.isNewlyRegistered &&
+        ProfileRole.fromRole(session.user.role) == ProfileRole.parent;
     emit(
       AppSessionState(
         status: SessionStatus.authenticated,
@@ -58,8 +66,18 @@ class AppSessionCubit extends Cubit<AppSessionState> {
         profiles: session.profiles,
         activeProfile: session.activeProfile,
         profileLoadError: session.profileLoadError,
+        shouldShowChildProfileDialog:
+            !hasChildProfile &&
+            (isNewParentAccount || state.shouldShowChildProfileDialog),
       ),
     );
+  }
+
+  void consumeChildProfileDialog() {
+    if (isClosed || !state.shouldShowChildProfileDialog) {
+      return;
+    }
+    emit(state.copyWith(shouldShowChildProfileDialog: false));
   }
 
   void clear() {

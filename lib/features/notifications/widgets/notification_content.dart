@@ -15,20 +15,26 @@ class NotificationContent extends StatelessWidget {
     required this.state,
     required this.onRetry,
     required this.onRefresh,
+    this.showMissingChildProfileNotice = false,
+    this.onCreateChildProfile,
   });
 
   final NotificationState state;
   final VoidCallback onRetry;
   final RefreshCallback onRefresh;
+  final bool showMissingChildProfileNotice;
+  final VoidCallback? onCreateChildProfile;
 
   @override
   Widget build(BuildContext context) {
-    if (state.isLoading && !state.hasLoaded) {
+    if (state.isLoading && !state.hasLoaded && !showMissingChildProfileNotice) {
       return const NotificationLoadingView();
     }
 
     final error = state.errorMessage;
-    if (error != null && state.notifications.isEmpty) {
+    if (error != null &&
+        state.notifications.isEmpty &&
+        !showMissingChildProfileNotice) {
       return NotificationStatusView(
         icon: Icons.notifications_off_outlined,
         title: context.getText(AppKeys.notificationLoadFailed),
@@ -38,7 +44,7 @@ class NotificationContent extends StatelessWidget {
       );
     }
 
-    if (state.notifications.isEmpty) {
+    if (state.notifications.isEmpty && !showMissingChildProfileNotice) {
       return NotificationStatusView(
         icon: Icons.notifications_none_rounded,
         title: context.getText(AppKeys.notificationEmptyTitle),
@@ -49,6 +55,11 @@ class NotificationContent extends StatelessWidget {
 
     final groups = groupNotifications(state.notifications);
     final sections = <Widget>[
+      if (showMissingChildProfileNotice)
+        MissingChildProfileNotificationSection(
+          title: context.getText(AppKeys.notificationToday),
+          onCreateProfile: onCreateChildProfile,
+        ),
       if (groups.today.isNotEmpty)
         NotificationSection(
           title: context.getText(AppKeys.notificationToday),

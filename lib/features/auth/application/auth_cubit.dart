@@ -1323,6 +1323,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       profileResolution,
       isVerifyingOtp: isVerifyingOtp,
       isSigningUp: isSigningUp,
+      isNewlyRegistered: true,
     );
   }
 
@@ -1549,8 +1550,13 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     ProfileSessionResolution profileResolution, {
     bool? isVerifyingOtp,
     bool? isSigningUp,
+    bool isNewlyRegistered = false,
   }) async {
-    if (!await _completeAuthenticatedSession(user, profileResolution)) {
+    if (!await _completeAuthenticatedSession(
+      user,
+      profileResolution,
+      isNewlyRegistered: isNewlyRegistered,
+    )) {
       return;
     }
     emit(
@@ -1608,6 +1614,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     LoginUser user,
     ProfileSessionResolution profileResolution, {
     bool rememberAccount = true,
+    bool isNewlyRegistered = false,
   }) async {
     if (rememberAccount) {
       await _rememberAuthenticatedAccount(user);
@@ -1616,7 +1623,11 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
       return false;
     }
     _pingNotificationsAfterAuth(user);
-    _handoffAuthenticatedSession(user, profileResolution);
+    _handoffAuthenticatedSession(
+      user,
+      profileResolution,
+      isNewlyRegistered: isNewlyRegistered,
+    );
     return !isClosed;
   }
 
@@ -1646,8 +1657,9 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
   void _handoffAuthenticatedSession(
     LoginUser user,
-    ProfileSessionResolution profileResolution,
-  ) {
+    ProfileSessionResolution profileResolution, {
+    bool isNewlyRegistered = false,
+  }) {
     if (isClosed) {
       return;
     }
@@ -1657,6 +1669,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
         profiles: profileResolution.profiles,
         activeProfile: profileResolution.activeProfile,
         profileLoadError: profileResolution.errorMessage,
+        isNewlyRegistered: isNewlyRegistered,
       ),
     );
   }

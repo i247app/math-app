@@ -38,6 +38,8 @@ class DashboardTabArgs {
     required this.bottomPadding,
     required this.hasUnreadNotifications,
     required this.onNotificationTap,
+    required this.showChildProfileDialogOnStart,
+    this.onChildProfileDialogShown,
     this.homeHeader,
   });
 
@@ -69,6 +71,8 @@ class DashboardTabArgs {
   final double bottomPadding;
   final bool hasUnreadNotifications;
   final VoidCallback onNotificationTap;
+  final bool showChildProfileDialogOnStart;
+  final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
 
   EdgeInsets get contentPadding => EdgeInsets.only(

@@ -53,6 +53,8 @@ class ParentHomeContent extends StatefulWidget {
     required this.onOpenPracticeTab,
     required this.onParentAssessmentStateChanged,
     required this.bottomPadding,
+    this.showChildProfileDialogOnStart = false,
+    this.onChildProfileDialogShown,
     this.homeHeader,
   });
 
@@ -72,6 +74,8 @@ class ParentHomeContent extends StatefulWidget {
   final VoidCallback onOpenPracticeTab;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final double bottomPadding;
+  final bool showChildProfileDialogOnStart;
+  final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
 
   @override
@@ -94,6 +98,8 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   List<ParentChildSummary> childSummaries = const <ParentChildSummary>[];
   int _childLoadRequestId = 0;
   final Set<ParentHomeEntranceMode> _playedEntrances = {};
+  bool _hasOfferedMissingStudentProfile = false;
+  bool _isMissingStudentDialogVisible = false;
 
   @override
   void initState() {
@@ -312,6 +318,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     );
     final isInitialChildDashboardLoad =
         _children.isNotEmpty && !hasLoadedHome && isLoading;
+    _scheduleMissingStudentDialogIfNeeded();
     if (_children.isNotEmpty &&
         (hasJoinedClassroom || isInitialChildDashboardLoad)) {
       return buildChildDashboard();
@@ -434,14 +441,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   Future<void> showClassroomMessage() async {
     HapticFeedback.selectionClick();
     if (_children.isEmpty) {
-      final shouldCreate = await showDialog<bool>(
-        context: context,
-        barrierColor: context.themeColors.shadow.withValues(alpha: 0.48),
-        builder: (_) => const HomeMissingStudentDialog(),
-      );
-      if (shouldCreate == true && mounted) {
-        await _openCreateStudentProfile();
-      }
+      await _showMissingStudentDialog();
       return;
     }
 
@@ -462,6 +462,45 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         return;
       case null:
         return;
+    }
+  }
+
+  void _scheduleMissingStudentDialogIfNeeded() {
+    if (_hasOfferedMissingStudentProfile ||
+        !widget.showChildProfileDialogOnStart ||
+        !widget.isActive ||
+        !hasLoadedHome ||
+        _children.isNotEmpty) {
+      return;
+    }
+
+    _hasOfferedMissingStudentProfile = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !widget.isActive || _children.isNotEmpty) {
+        return;
+      }
+      widget.onChildProfileDialogShown?.call();
+      _showMissingStudentDialog();
+    });
+  }
+
+  Future<void> _showMissingStudentDialog() async {
+    if (_isMissingStudentDialogVisible || !mounted) {
+      return;
+    }
+
+    _isMissingStudentDialogVisible = true;
+    try {
+      final shouldCreate = await showDialog<bool>(
+        context: context,
+        barrierColor: context.themeColors.scrim.withValues(alpha: 0.58),
+        builder: (_) => const HomeMissingStudentDialog(),
+      );
+      if (shouldCreate == true && mounted) {
+        await _openCreateStudentProfile();
+      }
+    } finally {
+      _isMissingStudentDialogVisible = false;
     }
   }
 

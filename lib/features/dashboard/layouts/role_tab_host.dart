@@ -45,6 +45,8 @@ class RoleTabHost extends StatefulWidget {
     required this.bottomPadding,
     required this.hasUnreadNotifications,
     required this.onNotificationTap,
+    required this.showChildProfileDialogOnStart,
+    this.onChildProfileDialogShown,
     this.homeHeader,
   });
 
@@ -77,6 +79,8 @@ class RoleTabHost extends StatefulWidget {
   final double bottomPadding;
   final bool hasUnreadNotifications;
   final VoidCallback onNotificationTap;
+  final bool showChildProfileDialogOnStart;
+  final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
 
   @override
@@ -203,6 +207,8 @@ class RoleTabHostState extends State<RoleTabHost> {
       bottomPadding: widget.bottomPadding,
       hasUnreadNotifications: widget.hasUnreadNotifications,
       onNotificationTap: widget.onNotificationTap,
+      showChildProfileDialogOnStart: widget.showChildProfileDialogOnStart,
+      onChildProfileDialogShown: widget.onChildProfileDialogShown,
       homeHeader: tab == 0 ? widget.homeHeader : null,
     );
 

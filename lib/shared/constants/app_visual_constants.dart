@@ -23,7 +23,7 @@ const homeInitialAssessmentBannerAsset =
     'assets/images/parent-home-mode1-assessment-banner.jpg';
 const parentReviewEmptyAssessmentAsset =
     'assets/images/parent-review-empty-assessment.jpg';
-const parentNoStudentMascotAsset = 'assets/images/numi-mascot.png';
+const parentNoStudentMascotAsset = 'assets/images/no-profile-mascot.png';
 const studentHomeInviteAsset = 'assets/icons/student-home-invite.svg';
 const parentHomeAfterReviewBannerAsset =
     'assets/images/parent-banner-after-review.jpg';

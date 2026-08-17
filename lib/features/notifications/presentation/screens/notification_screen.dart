@@ -10,10 +10,14 @@ import 'package:numi/features/notifications/widgets/notification_content.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 class NotificationScreen extends StatefulWidget {
-  NotificationScreen({super.key, NotificationListService? notificationService})
-    : notificationService = notificationService ?? NotificationApi();
+  NotificationScreen({
+    super.key,
+    NotificationListService? notificationService,
+    this.showMissingChildProfileNotice = false,
+  }) : notificationService = notificationService ?? NotificationApi();
 
   final NotificationListService notificationService;
+  final bool showMissingChildProfileNotice;
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -64,6 +68,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   state: _controller.state,
                   onRetry: () => _controller.load(),
                   onRefresh: _controller.refresh,
+                  showMissingChildProfileNotice:
+                      widget.showMissingChildProfileNotice,
+                  onCreateChildProfile: () => Navigator.of(context).pop(true),
                 );
               },
             ),

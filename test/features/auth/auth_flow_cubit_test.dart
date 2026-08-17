@@ -8,6 +8,7 @@ import 'package:numi/features/auth/models/signup_form_data.dart';
 import 'package:numi/features/auth/models/signup_gender.dart';
 import 'package:numi/features/auth/models/signup_role.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
+import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
 
@@ -178,13 +179,14 @@ class _FakeAuthService implements AuthService {
 AuthFlowCubit _buildCubit({
   AuthService? authService,
   AuthFlowState? initialState,
+  void Function(AuthenticatedSession)? onAuthenticated,
 }) {
   return AuthFlowCubit(
     authService: authService,
     initialState: initialState,
     passcodeService: _FakePasscodeService(),
     profileResolver: _FakeProfileSessionResolver(),
-    onAuthenticated: (_) {},
+    onAuthenticated: onAuthenticated ?? (_) {},
     onSessionCleared: () {},
     onSessionRestoreStarted: () {},
   );
@@ -370,8 +372,10 @@ void main() {
 
   test('signup without email creates the account and opens home', () async {
     final authService = _FakeAuthService(accountExists: false);
+    AuthenticatedSession? authenticatedSession;
     final cubit = _buildCubit(
       authService: authService,
+      onAuthenticated: (session) => authenticatedSession = session,
       initialState: const AuthFlowState(
         screen: AppScreen.login,
         authEntryMode: AuthEntryMode.signup,
@@ -391,6 +395,7 @@ void main() {
     expect(authService.signupPhone, '+84901234567');
     expect(authService.signupEmail, isNull);
     expect(cubit.state.screen, AppScreen.home);
+    expect(authenticatedSession?.isNewlyRegistered, isTrue);
     await cubit.close();
   });
 

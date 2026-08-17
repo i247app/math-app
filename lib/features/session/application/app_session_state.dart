@@ -10,12 +10,14 @@ class AuthenticatedSession {
     this.profiles = const <StudentProfile>[],
     this.activeProfile,
     this.profileLoadError,
+    this.isNewlyRegistered = false,
   });
 
   final LoginUser user;
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
   final String? profileLoadError;
+  final bool isNewlyRegistered;
 }
 
 class AppSessionState {
@@ -26,6 +28,7 @@ class AppSessionState {
     this.profiles = const <StudentProfile>[],
     this.activeProfile,
     this.profileLoadError,
+    this.shouldShowChildProfileDialog = false,
   });
 
   final SessionStatus status;
@@ -34,6 +37,7 @@ class AppSessionState {
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
   final String? profileLoadError;
+  final bool shouldShowChildProfileDialog;
 
   ProfileRole get activeRole {
     if (activeProfile != null) {
@@ -51,6 +55,7 @@ class AppSessionState {
     List<StudentProfile>? profiles,
     StudentProfile? activeProfile,
     String? profileLoadError,
+    bool? shouldShowChildProfileDialog,
     bool clearUser = false,
     bool clearActiveProfile = false,
     bool clearProfileLoadError = false,
@@ -71,6 +76,9 @@ class AppSessionState {
       profileLoadError: clearsSession || clearProfileLoadError
           ? null
           : profileLoadError ?? this.profileLoadError,
+      shouldShowChildProfileDialog: clearsSession
+          ? false
+          : shouldShowChildProfileDialog ?? this.shouldShowChildProfileDialog,
     );
   }
 }

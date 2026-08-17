@@ -449,7 +449,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
 
   void _openNotifications() {
     HapticFeedback.selectionClick();
-    Navigator.of(context).push<void>(NotificationRoute());
+    Navigator.of(context).push<bool>(NotificationRoute());
   }
 
   Widget _buildClassroomSection({required bool isProfileComplete}) {

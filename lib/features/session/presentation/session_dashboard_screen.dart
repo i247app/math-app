@@ -25,7 +25,9 @@ class SessionDashboardScreen extends StatelessWidget {
     return previous.user != current.user ||
         previous.profiles != current.profiles ||
         previous.activeProfile != current.activeProfile ||
-        previous.profileLoadError != current.profileLoadError;
+        previous.profileLoadError != current.profileLoadError ||
+        previous.shouldShowChildProfileDialog !=
+            current.shouldShowChildProfileDialog;
   }
 
   @override
@@ -40,6 +42,8 @@ class SessionDashboardScreen extends StatelessWidget {
           activeProfile: session.activeProfile,
           activeRole: session.activeRole,
           profileLoadError: session.profileLoadError,
+          showChildProfileDialogOnStart: session.shouldShowChildProfileDialog,
+          onChildProfileDialogShown: sessionCubit.consumeChildProfileDialog,
           onRefreshProfiles: sessionCubit.refreshProfiles,
           onActivateProfile: sessionCubit.activateProfile,
           onBack: onBack,

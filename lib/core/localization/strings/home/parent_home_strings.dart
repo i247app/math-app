@@ -72,11 +72,11 @@ const parentHomeStrings = <String, Map<String, String>>{
         'Nhắc nhở: Ngày mai henry có buổi dã ngoại, phụ huynh nhớ chuẩn bị thêm...',
     AppKeys.parentNoStudentTitle: 'Chưa có hồ sơ',
     AppKeys.parentNoStudentMessage:
-        'Quý phụ huynh cần tạo hồ sơ cho con để tham gia vào các lớp phù hợp.',
+        'Cần tạo hồ sơ cho bé để tham gia vào các lớp phù hợp.',
     AppKeys.parentCreateStudentNow: 'Tạo hồ sơ ngay',
     AppKeys.parentCreateStudentLater: 'Để sau',
     AppKeys.parentSelectStudentMessage:
-        'Quý phụ huynh cần chọn hồ sơ hoặc tạo hồ sơ cho bé để tham gia vào các lớp phù hợp.',
+        'Cần chọn hồ sơ hoặc tạo hồ sơ cho bé để tham gia vào các lớp phù hợp.',
     AppKeys.parentCreateStudent: 'Tạo hồ sơ',
     AppKeys.parentInfoTitle: 'Hồ sơ',
     AppKeys.parentChildrenCount: 'Thành viên ({count})',
