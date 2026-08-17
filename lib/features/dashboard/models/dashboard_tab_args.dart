@@ -30,10 +30,8 @@ class DashboardTabArgs {
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
     required this.onOpenPracticeTab,
-    required this.onOpenHistoryTab,
     required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
-    required this.parentHomeEntrance,
     required this.activeRefreshTick,
     required this.bottomPadding,
     required this.hasUnreadNotifications,
@@ -63,10 +61,8 @@ class DashboardTabArgs {
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenPracticeTab;
-  final VoidCallback onOpenHistoryTab;
   final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
-  final Animation<double> parentHomeEntrance;
   final int activeRefreshTick;
   final double bottomPadding;
   final bool hasUnreadNotifications;

@@ -1,5 +1,4 @@
 import 'package:numi/features/home/parent/data/cache/parent_home_snapshot.dart';
-import 'package:numi/features/home/student/data/cache/student_home_snapshot.dart';
 import 'package:numi/features/home/teacher/data/cache/teacher_home_snapshot.dart';
 import 'package:numi/features/home/data/home_api.dart';
 
@@ -19,7 +18,6 @@ class HomeProfileCache {
 
   static final HomeProfileCache instance = HomeProfileCache._();
 
-  final Map<int, StudentHomeSnapshot> _student = {};
   final Map<int, ParentHomeSnapshot> _parent = {};
   final Map<int, TeacherHomeSnapshot> _teacher = {};
   final Map<int, Future<HomeLayout>> _pendingLayouts = {};
@@ -48,14 +46,6 @@ class HomeProfileCache {
     return request;
   }
 
-  // ── Student ─────────────────────────────────────────────────────────────────
-
-  StudentHomeSnapshot? getStudent(int profileId) => _student[profileId];
-
-  void putStudent(StudentHomeSnapshot snapshot) {
-    _student[snapshot.profileId] = snapshot;
-  }
-
   // ── Parent ──────────────────────────────────────────────────────────────────
 
   ParentHomeSnapshot? getParent(int profileId) => _parent[profileId];
@@ -76,7 +66,6 @@ class HomeProfileCache {
 
   /// Removes all cached snapshots. Call this on logout.
   void invalidateAll() {
-    _student.clear();
     _parent.clear();
     _teacher.clear();
     _pendingLayouts.clear();
@@ -84,7 +73,6 @@ class HomeProfileCache {
 
   /// Removes cached data for a single profile across all roles.
   void invalidateProfile(int profileId) {
-    _student.remove(profileId);
     _parent.remove(profileId);
     _teacher.remove(profileId);
     _pendingLayouts.remove(profileId);

@@ -37,10 +37,8 @@ class RoleTabHost extends StatefulWidget {
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
     required this.onOpenPracticeTab,
-    required this.onOpenHistoryTab,
     required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
-    required this.parentHomeEntrance,
     required this.profileResetSignal,
     required this.bottomPadding,
     required this.hasUnreadNotifications,
@@ -74,10 +72,8 @@ class RoleTabHost extends StatefulWidget {
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenPracticeTab;
-  final VoidCallback onOpenHistoryTab;
   final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
-  final Animation<double> parentHomeEntrance;
   final int profileResetSignal;
   final double bottomPadding;
   final bool hasUnreadNotifications;
@@ -459,10 +455,8 @@ class RoleTabHostState extends State<RoleTabHost>
       onCompleteTeacherProfile: widget.onCompleteTeacherProfile,
       onOpenClassroomTab: widget.onOpenClassroomTab,
       onOpenPracticeTab: widget.onOpenPracticeTab,
-      onOpenHistoryTab: widget.onOpenHistoryTab,
       onOpenProfileMenu: widget.onOpenProfileMenu,
       onParentAssessmentStateChanged: widget.onParentAssessmentStateChanged,
-      parentHomeEntrance: widget.parentHomeEntrance,
       activeRefreshTick: _activationTicks[tab] ?? 0,
       bottomPadding: widget.bottomPadding,
       hasUnreadNotifications: widget.hasUnreadNotifications,

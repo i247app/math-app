@@ -29,7 +29,6 @@ import 'package:numi/features/dashboard/widgets/dashboard_background.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_bottom_navigation.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_header_bar.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_profile_menu.dart';
-import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
@@ -98,8 +97,7 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen>
-    with SingleTickerProviderStateMixin {
+class _DashboardScreenState extends State<DashboardScreen> {
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
   late final ClassroomExerciseService _assignmentService =
@@ -116,7 +114,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   final ParentRoleTabCubit _parentTabCubit = ParentRoleTabCubit();
   final StudentRoleTabCubit _studentTabCubit = StudentRoleTabCubit();
   final TeacherRoleTabCubit _teacherTabCubit = TeacherRoleTabCubit();
-  late final AnimationController _parentHomeEntranceController;
   late final DashboardProfileController _profileController =
       DashboardProfileController(gradeService: widget._gradeService);
   final HomeTabPerformanceMonitor _tabPerformanceMonitor =
@@ -128,13 +125,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void initState() {
     super.initState();
-    _parentHomeEntranceController = AnimationController(
-      vsync: this,
-      duration: homeFadeInDuration,
-    );
-    if (widget.activeRole == ProfileRole.parent) {
-      _parentHomeEntranceController.forward();
-    }
     _profileController.prefetchGrades(widget.user?.id);
     _notificationBadgeController.start();
   }
@@ -142,12 +132,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void didUpdateWidget(covariant DashboardScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final oldProfileId = ActiveProfileSession.profileStableId(
-      oldWidget.activeProfile,
-    );
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
     if (oldWidget.user?.id != widget.user?.id) {
       _profileController.invalidateGrades();
       _profileController.prefetchGrades(widget.user?.id);
@@ -165,21 +149,6 @@ class _DashboardScreenState extends State<DashboardScreen>
         ),
       );
     }
-    if (oldWidget.activeRole != widget.activeRole &&
-        widget.activeRole == ProfileRole.parent) {
-      _playParentHomeEntrance();
-    }
-    if (oldProfileId != profileId) {
-      if (widget.activeRole == ProfileRole.parent) {
-        _playParentHomeEntrance();
-      }
-    }
-  }
-
-  void _playParentHomeEntrance() {
-    _parentHomeEntranceController
-      ..reset()
-      ..forward();
   }
 
   int _tabIndexAfterRoleChange({
@@ -238,7 +207,6 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   void dispose() {
-    _parentHomeEntranceController.dispose();
     _profileController.dispose();
     _parentTabCubit.close();
     _studentTabCubit.close();
@@ -371,7 +339,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                         widget.activeRole == ProfileRole.teacher ? 2 : 3,
                       );
                     },
-                    onOpenHistoryTab: () => _selectTab(roleTabCubit, 3),
                     onOpenProfileMenu: () {
                       if (switchableProfiles.isEmpty || isMenuOpen) {
                         return;
@@ -382,7 +349,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                     onParentAssessmentStateChanged: (hasAssessment) {
                       _updateParentStreak(hasAssessment ? 4 : 1);
                     },
-                    parentHomeEntrance: _parentHomeEntranceController,
                     bottomPadding: navHeight + 14,
                     hasUnreadNotifications:
                         _notificationBadgeController.hasUnread ||
@@ -392,11 +358,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                     showChildProfileDialogOnStart:
                         widget.showChildProfileDialogOnStart,
                     onSwipeToTab: (index) {
-                      if (widget.activeRole == ProfileRole.parent &&
-                          index != navigation.activeTab &&
-                          index == 0) {
-                        _playParentHomeEntrance();
-                      }
                       HapticFeedback.selectionClick();
                       _selectTab(roleTabCubit, index);
                     },
@@ -454,11 +415,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                       user: widget.user,
                       swipePosition: _tabSwipePosition,
                       onTabSelected: (index) {
-                        if (widget.activeRole == ProfileRole.parent &&
-                            index != navigation.activeTab &&
-                            index == 0) {
-                          _playParentHomeEntrance();
-                        }
                         _selectTab(roleTabCubit, index);
                       },
                     ),
