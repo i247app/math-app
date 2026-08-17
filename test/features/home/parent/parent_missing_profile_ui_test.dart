@@ -38,8 +38,12 @@ void main() {
     final image = tester.widget<Image>(find.byType(Image));
     expect((image.image as AssetImage).assetName, parentNoStudentMascotAsset);
     expect(find.text('Chưa có hồ sơ'), findsOneWidget);
-    expect(find.widgetWithText(FilledButton, 'Chọn hồ sơ'), findsOneWidget);
-    expect(find.widgetWithText(OutlinedButton, 'Tạo hồ sơ'), findsOneWidget);
+    final chooseButton = find.widgetWithText(FilledButton, 'Chọn hồ sơ');
+    final createButton = find.widgetWithText(OutlinedButton, 'Tạo hồ sơ');
+    expect(chooseButton, findsOneWidget);
+    expect(createButton, findsOneWidget);
+    expect(tester.getSize(chooseButton).width, 228);
+    expect(tester.getSize(createButton).width, 228);
   });
 
   testWidgets('room hides its header when no child profile exists', (

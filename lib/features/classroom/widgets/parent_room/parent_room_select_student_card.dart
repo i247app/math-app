@@ -60,26 +60,29 @@ class ParentRoomSelectStudentCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 32),
-            child: SizedBox(
-              width: double.infinity,
-              height: 58,
-              child: FilledButton(
-                onPressed: onChooseProfile,
-                style: FilledButton.styleFrom(
-                  backgroundColor: colors.accent,
-                  foregroundColor: colors.onAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 228),
+              child: SizedBox(
+                width: double.infinity,
+                height: 58,
+                child: FilledButton(
+                  onPressed: onChooseProfile,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colors.accent,
+                    foregroundColor: colors.onAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    elevation: 5,
+                    shadowColor: colors.accent.withValues(alpha: 0.32),
                   ),
-                  elevation: 5,
-                  shadowColor: colors.accent.withValues(alpha: 0.32),
-                ),
-                child: Text(
-                  context.getText(AppKeys.parentSwitchStudentAction),
-                  style: TextStyle(
-                    color: colors.onAccent,
-                    fontSize: FontSize.large,
-                    fontWeight: FontWeight.w400,
+                  child: Text(
+                    context.getText(AppKeys.parentSwitchStudentAction),
+                    style: TextStyle(
+                      color: colors.onAccent,
+                      fontSize: FontSize.large,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
@@ -87,24 +90,27 @@ class ParentRoomSelectStudentCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 12),
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: OutlinedButton(
-                onPressed: onCreateProfile,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: colors.brandStrong,
-                  side: BorderSide(color: colors.brandStrong),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 228),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton(
+                  onPressed: onCreateProfile,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: colors.brandStrong,
+                    side: BorderSide(color: colors.brandStrong),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
-                ),
-                child: Text(
-                  context.getText(AppKeys.parentCreateStudent),
-                  style: TextStyle(
-                    color: colors.brandStrong,
-                    fontSize: FontSize.large,
-                    fontWeight: FontWeight.w400,
+                  child: Text(
+                    context.getText(AppKeys.parentCreateStudent),
+                    style: TextStyle(
+                      color: colors.brandStrong,
+                      fontSize: FontSize.large,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
