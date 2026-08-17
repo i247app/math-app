@@ -40,6 +40,7 @@ class ParentAssessmentTab extends StatefulWidget {
     required this.gradeService,
     required this.quizService,
     required this.bottomPadding,
+    this.useActiveStudentProfileData = false,
   });
 
   final LoginUser? user;
@@ -50,6 +51,7 @@ class ParentAssessmentTab extends StatefulWidget {
   final GradeService gradeService;
   final QuizService quizService;
   final double bottomPadding;
+  final bool useActiveStudentProfileData;
 
   @override
   State<ParentAssessmentTab> createState() => _ParentAssessmentTabState();
@@ -89,8 +91,16 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     if (!widget.isActive) {
       return;
     }
-    if (_profileSourceKey(oldWidget.user, oldWidget.activeProfile) !=
-        _profileSourceKey(widget.user, widget.activeProfile)) {
+    if (_profileSourceKey(
+          oldWidget.user,
+          oldWidget.activeProfile,
+          oldWidget.useActiveStudentProfileData,
+        ) !=
+        _profileSourceKey(
+          widget.user,
+          widget.activeProfile,
+          widget.useActiveStudentProfileData,
+        )) {
       _entries = const <ParentAssessmentEntry>[];
       _pagination = null;
       _allEntries = const <ParentAssessmentEntry>[];
@@ -127,9 +137,14 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     });
   }
 
-  String _profileSourceKey(LoginUser? user, StudentProfile? activeProfile) {
+  String _profileSourceKey(
+    LoginUser? user,
+    StudentProfile? activeProfile,
+    bool useActiveStudentProfileData,
+  ) {
     return '${user?.id}|'
-        '${ActiveProfileSession.profileStableId(activeProfile)}';
+        '${ActiveProfileSession.profileStableId(activeProfile)}|'
+        '$useActiveStudentProfileData';
   }
 
   Future<void> _loadAssessments({bool forceRefresh = false, int? page}) async {
@@ -138,7 +153,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
-    final userId = widget.user?.id;
+    final userId = widget.useActiveStudentProfileData ? null : widget.user?.id;
     final cachedAssessments = QuizCache.peekList(
       userId: userId,
       profileId: profileId,
@@ -167,6 +182,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           userId: userId,
           page: targetPage,
           size: _pageSize,
+          allowUserFallback: !widget.useActiveStudentProfileData,
         );
         loadedPagination = result.pagination;
         loadedAllQuizzes = result.allQuizzes;

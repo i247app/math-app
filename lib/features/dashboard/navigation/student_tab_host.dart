@@ -21,6 +21,6 @@ class StudentTabHost extends StatelessWidget {
       );
     }
 
-    return ParentTabHost(args: args);
+    return ParentTabHost(args: args, useActiveStudentProfileData: true);
   }
 }

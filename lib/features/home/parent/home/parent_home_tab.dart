@@ -56,6 +56,7 @@ class ParentHomeContent extends StatefulWidget {
     this.showChildProfileDialogOnStart = false,
     this.onChildProfileDialogShown,
     this.homeHeader,
+    this.useActiveStudentProfileData = false,
   });
 
   final LoginUser? user;
@@ -77,6 +78,7 @@ class ParentHomeContent extends StatefulWidget {
   final bool showChildProfileDialogOnStart;
   final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
+  final bool useActiveStudentProfileData;
 
   @override
   State<ParentHomeContent> createState() => ParentHomeContentState();
@@ -125,7 +127,10 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       widget.profiles,
     ).map(ActiveProfileSession.profileStableId).join(',');
     final shouldForceRefresh =
-        oldWidget.user?.id != widget.user?.id || oldChildIds != childIds;
+        oldWidget.user?.id != widget.user?.id ||
+        oldChildIds != childIds ||
+        oldWidget.useActiveStudentProfileData !=
+            widget.useActiveStudentProfileData;
     if (oldProfileId != profileId || shouldForceRefresh) {
       hasLoadedHome = false;
       _resetModeEntrances();
@@ -150,6 +155,11 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   }
 
   List<StudentProfile> get _children {
+    if (widget.useActiveStudentProfileData) {
+      final profile = homeLayout?.profile ?? widget.activeProfile;
+      return profile == null ? const <StudentProfile>[] : [profile];
+    }
+
     final layoutChildren = homeLayout?.parent?.children;
     if (layoutChildren != null &&
         (hasLoadedHome || layoutChildren.isNotEmpty)) {
@@ -213,8 +223,10 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         return;
       }
       final parent = layout.parent;
-      final summaries = summariesFromLayout(parent);
       final completedAssessments = quizzesFromLayoutQuizzes(layout.quizzes);
+      final summaries = widget.useActiveStudentProfileData
+          ? _studentSummariesFromLayout(layout, completedAssessments)
+          : summariesFromLayout(parent);
       setState(() {
         isLoading = false;
         hasLoadedHome = true;
@@ -283,8 +295,34 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     hasLoadedHome = true;
     errorMessage = null;
     homeLayout = snapshot.homeLayout;
-    childSummaries = summariesFromLayout(parent);
+    childSummaries = widget.useActiveStudentProfileData
+        ? _studentSummariesFromLayout(
+            snapshot.homeLayout,
+            snapshot.completedAssessments,
+          )
+        : summariesFromLayout(parent);
     completedAssessments = snapshot.completedAssessments;
+  }
+
+  List<ParentChildSummary> _studentSummariesFromLayout(
+    HomeLayout layout,
+    List<GeneratedQuiz> assessments,
+  ) {
+    final profile = layout.profile ?? widget.activeProfile;
+    if (profile == null) {
+      return const <ParentChildSummary>[];
+    }
+
+    final classrooms = layout.rooms.isNotEmpty
+        ? layout.rooms
+        : layout.student?.classrooms ?? const <HomeLayoutClassroom>[];
+    return <ParentChildSummary>[
+      ParentChildSummary(
+        profile: profile,
+        classroom: classrooms.isEmpty ? null : classrooms.first.classroom,
+        assessments: assessments,
+      ),
+    ];
   }
 
   Widget homeEntrance({
@@ -440,6 +478,11 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
   Future<void> showClassroomMessage() async {
     HapticFeedback.selectionClick();
+    if (widget.useActiveStudentProfileData) {
+      widget.onOpenClassroomTab();
+      return;
+    }
+
     if (_children.isEmpty) {
       await _showMissingStudentDialog();
       return;
@@ -466,7 +509,8 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   }
 
   void _scheduleMissingStudentDialogIfNeeded() {
-    if (_hasOfferedMissingStudentProfile ||
+    if (widget.useActiveStudentProfileData ||
+        _hasOfferedMissingStudentProfile ||
         !widget.showChildProfileDialogOnStart ||
         !widget.isActive ||
         !hasLoadedHome ||

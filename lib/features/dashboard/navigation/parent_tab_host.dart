@@ -8,9 +8,14 @@ import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 import 'package:numi/features/classroom/presentation/tabs/parent_room_tab.dart';
 
 class ParentTabHost extends StatelessWidget {
-  const ParentTabHost({super.key, required this.args});
+  const ParentTabHost({
+    super.key,
+    required this.args,
+    this.useActiveStudentProfileData = false,
+  });
 
   final DashboardTabArgs args;
+  final bool useActiveStudentProfileData;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +40,7 @@ class ParentTabHost extends StatelessWidget {
         homeHeader: args.homeHeader,
         showChildProfileDialogOnStart: args.showChildProfileDialogOnStart,
         onChildProfileDialogShown: args.onChildProfileDialogShown,
+        useActiveStudentProfileData: useActiveStudentProfileData,
       );
     }
 
@@ -48,6 +54,7 @@ class ParentTabHost extends StatelessWidget {
         gradeService: args.gradeService,
         quizService: args.quizService,
         bottomPadding: args.bottomPadding,
+        useActiveStudentProfileData: useActiveStudentProfileData,
       );
     }
 

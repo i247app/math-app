@@ -30,6 +30,7 @@ Future<CompletedParentAssessmentPage> loadCompletedParentAssessments({
   required int? userId,
   required int page,
   required int size,
+  bool allowUserFallback = true,
 }) async {
   List<GeneratedQuiz> completed(List<GeneratedQuiz> quizzes) {
     return quizzes.where(isCompletedAssessment).toList(growable: false)
@@ -103,7 +104,7 @@ Future<CompletedParentAssessmentPage> loadCompletedParentAssessments({
       profileError = error;
     }
   }
-  if (userId != null && userId > 0) {
+  if (allowUserFallback && userId != null && userId > 0) {
     try {
       return paginate(await loadAll(userId: userId));
     } catch (_) {

@@ -11,6 +11,13 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
   Widget buildChildDashboard() {
     final colors = context.themeColors;
     final parent = homeLayout?.parent;
+    final student = homeLayout?.student;
+    final pendingExercises = widget.useActiveStudentProfileData
+        ? student?.pendingExercises ?? const <HomeLayoutPendingExercise>[]
+        : parent?.pendingExercises ?? const <HomeLayoutPendingExercise>[];
+    final completions = widget.useActiveStudentProfileData
+        ? student?.recentCompletions ?? const <HomeLayoutRecentCompletion>[]
+        : parent?.recentCompletions ?? const <HomeLayoutRecentCompletion>[];
     final padding = EdgeInsets.fromLTRB(14, 10, 14, widget.bottomPadding + 18);
 
     return RefreshIndicator(
@@ -56,12 +63,8 @@ extension ParentHomeChildDashboardView on ParentHomeContentState {
                         ? const ParentChildOverviewSkeleton()
                         : ParentChildOverviewContent(
                             summaries: childSummaries,
-                            pendingExercises:
-                                parent?.pendingExercises ??
-                                const <HomeLayoutPendingExercise>[],
-                            completions:
-                                parent?.recentCompletions ??
-                                const <HomeLayoutRecentCompletion>[],
+                            pendingExercises: pendingExercises,
+                            completions: completions,
                             entranceBuilder:
                                 ({
                                   required child,
