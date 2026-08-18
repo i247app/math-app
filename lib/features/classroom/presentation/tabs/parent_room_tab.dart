@@ -22,6 +22,7 @@ import 'package:numi/features/classroom/presentation/screens/parent_room_detail_
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_loading.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_select_student_card.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_state_card.dart';
+import 'package:numi/features/classroom/widgets/parent_room/parent_room_utilities_section.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
@@ -404,7 +405,6 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
           padding: const EdgeInsets.only(top: 14),
           child: _roomFadeIn(
             order: 2,
-            markOnEnd: true,
             child: AppContentSection(
               title: context.getText(AppKeys.assessmentResultTitle),
               onViewAll: widget.onOpenClassroomTab,
@@ -429,6 +429,16 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                         ],
                       ],
                     ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: _roomFadeIn(
+            order: 3,
+            markOnEnd: true,
+            child: ParentRoomUtilitiesSection(
+              onUtilityTap: () => parentRoomShowComingSoon(context),
             ),
           ),
         ),

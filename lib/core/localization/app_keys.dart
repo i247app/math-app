@@ -764,6 +764,11 @@ class AppKeys {
   static const homeworkDueSoon = 'homework_due_soon';
   static const homeworkFailed = 'homework_failed';
   static const parentRoomAssignmentsTitle = 'parent_room_assignments_title';
+  static const parentRoomUtilitiesTitle = 'parent_room_utilities_title';
+  static const parentRoomUtilityMessages = 'parent_room_utility_messages';
+  static const parentRoomUtilityHomework = 'parent_room_utility_homework';
+  static const parentRoomUtilityTests = 'parent_room_utility_tests';
+  static const parentRoomUtilityDocuments = 'parent_room_utility_documents';
   static const excellentResultMessage = 'excellent_result_message';
   static const generatingNewQuiz = 'generating_new_quiz';
   static const assessmentResultTitle = 'assessment_result_title';

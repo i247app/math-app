@@ -81,6 +81,11 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentInfoTitle: 'Hồ sơ',
     AppKeys.parentChildrenCount: 'Thành viên ({count})',
     AppKeys.parentRoomAssignmentsTitle: 'Bài tập, kiểm tra',
+    AppKeys.parentRoomUtilitiesTitle: 'Tiện ích',
+    AppKeys.parentRoomUtilityMessages: 'Tin nhắn',
+    AppKeys.parentRoomUtilityHomework: 'Bài Tập',
+    AppKeys.parentRoomUtilityTests: 'Kiểm Tra',
+    AppKeys.parentRoomUtilityDocuments: 'Tài Liệu',
   },
   'en': {
     AppKeys.parentAssessmentTabTitle: 'Assessment',
@@ -163,5 +168,10 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentInfoTitle: 'Profile',
     AppKeys.parentChildrenCount: 'Members ({count})',
     AppKeys.parentRoomAssignmentsTitle: 'Assignments, tests',
+    AppKeys.parentRoomUtilitiesTitle: 'Utilities',
+    AppKeys.parentRoomUtilityMessages: 'Messages',
+    AppKeys.parentRoomUtilityHomework: 'Homework',
+    AppKeys.parentRoomUtilityTests: 'Tests',
+    AppKeys.parentRoomUtilityDocuments: 'Documents',
   },
 };
