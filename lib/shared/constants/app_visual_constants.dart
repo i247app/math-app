@@ -6,12 +6,6 @@ const homeDeepInk = AppColors.textPrimary;
 const homeMintBackground = AppColors.appBackground;
 
 const studentHomeBellAsset = 'assets/icons/student-home-bell.svg';
-const studentHomeNavHomeAsset = 'assets/icons/student-home-nav-home.svg';
-const studentHomeNavClassAsset = 'assets/icons/student-home-nav-class.svg';
-const studentHomeNavReportAsset = 'assets/icons/student-home-nav-report.svg';
-const studentHomeNavMessageAsset = 'assets/icons/student-home-nav-message.svg';
-const studentHomeNavSettingsAsset =
-    'assets/icons/student-home-nav-settings.svg';
 
 const parentHomeNavHomeAsset = 'assets/icons/home-navbar-icon.svg';
 const parentHomeNavAssessmentAsset = 'assets/icons/assessment-navbar-icon.svg';
