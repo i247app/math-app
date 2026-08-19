@@ -23,6 +23,7 @@ import 'package:numi/features/classroom/widgets/parent_room/parent_room_loading.
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_select_student_card.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_state_card.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_utilities_section.dart';
+import 'package:numi/features/classroom/widgets/room_class_summary_card.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
@@ -30,7 +31,6 @@ import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
 import 'package:numi/shared/widgets/app_responsive_card_group.dart';
-import 'package:numi/shared/widgets/app_summary_card.dart';
 
 class ParentRoomTab extends StatefulWidget {
   const ParentRoomTab({
@@ -346,12 +346,13 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         _roomFadeIn(
           order: 0,
           child: AppResponsiveCardGroup(
+            maxColumns: 1,
             children: [
               for (final entry in entries)
-                AppSummaryCard(
-                  label: profileDisplayName(context, entry.child),
-                  title: roomClassName(context, entry.classroom),
-                  description: roomTeacherName(context, entry),
+                RoomClassSummaryCard(
+                  studentName: profileDisplayName(context, entry.child),
+                  className: roomClassName(context, entry.classroom),
+                  teacherName: roomTeacherName(context, entry),
                   onTap: () => _openRoomDetail(entry),
                 ),
             ],
