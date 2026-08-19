@@ -25,7 +25,6 @@ import 'package:numi/features/classroom/widgets/parent_room/parent_room_state_ca
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_utilities_section.dart';
 import 'package:numi/features/classroom/widgets/room_class_summary_card.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
@@ -358,81 +357,61 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 18),
-          child: _roomFadeIn(
-            order: 1,
-            child: AppContentSection(
-              title: context.formatText(AppKeys.parentTasksCountTitle, {
-                'count': pendingExercises.length + expiredExercises.length,
-              }),
-              onViewAll: widget.onOpenClassroomTab,
-              child: pendingExercises.isEmpty && expiredExercises.isEmpty
-                  ? ParentEmptyTaskLine(
-                      icon: Icons.assignment_turned_in_outlined,
-                      text: context.getText(AppKeys.studentNoHomeworkTitle),
-                    )
-                  : Column(
-                      children: [
-                        for (final pending in pendingExercises.take(3)) ...[
-                          ParentPendingTaskListItem(pending: pending),
-                          if (pending != pendingExercises.take(3).last ||
-                              expiredExercises.isNotEmpty)
-                            Divider(
-                              height: 24,
-                              indent: 62,
-                              color: colors.border,
-                            ),
-                        ],
-                        for (final expired in expiredExercises.take(3)) ...[
-                          ParentPendingTaskListItem(
-                            pending: expired,
-                            isExpired: true,
-                            onTap: () => showExpiredExerciseMessage(context),
-                          ),
-                          if (expired != expiredExercises.take(3).last)
-                            Divider(
-                              height: 24,
-                              indent: 62,
-                              color: colors.border,
-                            ),
-                        ],
-                      ],
-                    ),
+        if (pendingExercises.isNotEmpty || expiredExercises.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 18),
+            child: _roomFadeIn(
+              order: 1,
+              child: AppContentSection(
+                title: context.formatText(AppKeys.parentTasksCountTitle, {
+                  'count': pendingExercises.length + expiredExercises.length,
+                }),
+                onViewAll: widget.onOpenClassroomTab,
+                child: Column(
+                  children: [
+                    for (final pending in pendingExercises.take(3)) ...[
+                      ParentPendingTaskListItem(pending: pending),
+                      if (pending != pendingExercises.take(3).last ||
+                          expiredExercises.isNotEmpty)
+                        Divider(height: 24, indent: 62, color: colors.border),
+                    ],
+                    for (final expired in expiredExercises.take(3)) ...[
+                      ParentPendingTaskListItem(
+                        pending: expired,
+                        isExpired: true,
+                        onTap: () => showExpiredExerciseMessage(context),
+                      ),
+                      if (expired != expiredExercises.take(3).last)
+                        Divider(height: 24, indent: 62, color: colors.border),
+                    ],
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 14),
-          child: _roomFadeIn(
-            order: 2,
-            child: AppContentSection(
-              title: context.getText(AppKeys.assessmentResultTitle),
-              onViewAll: widget.onOpenClassroomTab,
-              child: completions.isEmpty
-                  ? ParentEmptyTaskLine(
-                      icon: Icons.fact_check_outlined,
-                      text: context.getText(AppKeys.noCompletedHomeworkTitle),
-                    )
-                  : Column(
-                      children: [
-                        for (final completion in completions.take(5)) ...[
-                          ParentCompletedTaskListItem(
-                            completion: completion,
-                            onTap: () => _openCompletionResult(completion),
-                          ),
-                          if (completion != completions.take(5).last)
-                            Divider(
-                              height: 24,
-                              indent: 62,
-                              color: colors.border,
-                            ),
-                        ],
-                      ],
-                    ),
+        if (completions.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: _roomFadeIn(
+              order: 2,
+              child: AppContentSection(
+                title: context.getText(AppKeys.assessmentResultTitle),
+                onViewAll: widget.onOpenClassroomTab,
+                child: Column(
+                  children: [
+                    for (final completion in completions.take(5)) ...[
+                      ParentCompletedTaskListItem(
+                        completion: completion,
+                        onTap: () => _openCompletionResult(completion),
+                      ),
+                      if (completion != completions.take(5).last)
+                        Divider(height: 24, indent: 62, color: colors.border),
+                    ],
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
         Padding(
           padding: const EdgeInsets.only(top: 14),
           child: _roomFadeIn(
