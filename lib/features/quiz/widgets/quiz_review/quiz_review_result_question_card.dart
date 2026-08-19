@@ -67,8 +67,6 @@ class QuizReviewResultQuestionCard extends StatelessWidget {
                     ),
                     Text(
                       question.questionName,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: colors.textPrimary,
                         fontSize: 23,

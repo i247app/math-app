@@ -15,7 +15,7 @@ class QuizReviewQuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Container(
-      height: 146,
+      constraints: const BoxConstraints(minHeight: 146),
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
@@ -28,7 +28,9 @@ class QuizReviewQuestionCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Stack(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Align(
             alignment: Alignment.topLeft,
@@ -38,19 +40,16 @@ class QuizReviewQuestionCard extends StatelessWidget {
               textColor: AppColors.teal600,
             ),
           ),
-          Center(
-            child: Text(
-              question.questionName,
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: colors.textPrimary,
-                fontSize: quizReviewQuestionFontSize(question.questionName),
-                fontWeight: FontWeight.w900,
-                height: 1.08,
-                letterSpacing: 0,
-              ),
+          const SizedBox(height: 8),
+          Text(
+            question.questionName,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: quizReviewQuestionFontSize(question.questionName),
+              fontWeight: FontWeight.w900,
+              height: 1.08,
+              letterSpacing: 0,
             ),
           ),
         ],
