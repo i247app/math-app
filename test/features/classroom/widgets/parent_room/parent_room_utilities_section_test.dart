@@ -12,7 +12,8 @@ void main() {
   ) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
-    var tapCount = 0;
+    var messageTapCount = 0;
+    var utilityTapCount = 0;
 
     await tester.pumpWidget(
       LingoScope(
@@ -22,7 +23,10 @@ void main() {
           home: Scaffold(
             body: SizedBox(
               width: 360,
-              child: ParentRoomUtilitiesSection(onUtilityTap: () => tapCount++),
+              child: ParentRoomUtilitiesSection(
+                onMessageTap: () => messageTapCount++,
+                onUtilityTap: () => utilityTapCount++,
+              ),
             ),
           ),
         ),
@@ -55,6 +59,7 @@ void main() {
     expect(inkDecoration.boxShadow, isNull);
 
     await tester.tap(first);
-    expect(tapCount, 1);
+    expect(messageTapCount, 1);
+    expect(utilityTapCount, 0);
   });
 }

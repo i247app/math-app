@@ -19,6 +19,7 @@ import 'package:numi/features/home/data/home_layout_mappers.dart';
 import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
 import 'package:numi/features/classroom/presentation/screens/parent_room_detail_screen.dart';
+import 'package:numi/features/classroom/presentation/screens/parent_messages_screen.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_loading.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_select_student_card.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_state_card.dart';
@@ -418,6 +419,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             order: 3,
             markOnEnd: true,
             child: ParentRoomUtilitiesSection(
+              onMessageTap: () => _openMessages(entries.first),
               onUtilityTap: () => parentRoomShowComingSoon(context),
             ),
           ),
@@ -436,6 +438,18 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
+      ),
+    );
+  }
+
+  void _openMessages(ParentRoomEntry entry) {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ParentMessagesScreen(
+          className: roomClassName(context, entry.classroom),
+          teacherName: roomTeacherName(context, entry),
+        ),
       ),
     );
   }

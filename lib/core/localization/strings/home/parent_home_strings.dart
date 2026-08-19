@@ -70,6 +70,16 @@ const parentHomeStrings = <String, Map<String, String>>{
         'Chào chị Jenny, em gửi nhận xét tuần này của bé uyenvo. Bé đã hoàn thành',
     AppKeys.homeMessageBodyTwo:
         'Nhắc nhở: Ngày mai henry có buổi dã ngoại, phụ huynh nhớ chuẩn bị thêm...',
+    AppKeys.parentMessagesGroupPreview:
+        'Chúc mừng cả lớp đã hoàn thành tốt hoạt động hôm nay!',
+    AppKeys.parentMessagesTeacherThree: 'Cô Tuyết Mai',
+    AppKeys.parentMessagesTeacherFour: 'Thầy Hoàng Nam',
+    AppKeys.parentMessagesBodyThree:
+        'Bạn ơi, đừng quên lịch họp phụ huynh cuối tuần này nhé.',
+    AppKeys.parentMessagesBodyFour:
+        'Đã nhận được học phí tháng 10. Cảm ơn gia đình.',
+    AppKeys.parentMessagesTimeThree: '2 ngày trước',
+    AppKeys.parentMessagesTimeFour: '05/10',
     AppKeys.parentNoStudentTitle: 'Chưa có hồ sơ',
     AppKeys.parentNoStudentMessage:
         'Cần tạo hồ sơ cho bé để tham gia vào các lớp phù hợp.',
@@ -157,6 +167,16 @@ const parentHomeStrings = <String, Map<String, String>>{
         "Hi Jenny, here is uyenvo's feedback for this week. They have completed",
     AppKeys.homeMessageBodyTwo:
         'Reminder: Henry has a field trip tomorrow. Please remember to prepare...',
+    AppKeys.parentMessagesGroupPreview:
+        'Congratulations to the class for completing today’s activity!',
+    AppKeys.parentMessagesTeacherThree: 'Ms. Tuyet Mai',
+    AppKeys.parentMessagesTeacherFour: 'Mr. Hoang Nam',
+    AppKeys.parentMessagesBodyThree:
+        'Please remember the parent meeting scheduled for this weekend.',
+    AppKeys.parentMessagesBodyFour:
+        'The October tuition payment has been received. Thank you.',
+    AppKeys.parentMessagesTimeThree: '2 days ago',
+    AppKeys.parentMessagesTimeFour: '10/05',
     AppKeys.parentNoStudentTitle: 'No profile selected',
     AppKeys.parentNoStudentMessage:
         'Create a child profile to join suitable classrooms.',

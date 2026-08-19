@@ -6,8 +6,13 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentRoomUtilitiesSection extends StatelessWidget {
-  const ParentRoomUtilitiesSection({super.key, required this.onUtilityTap});
+  const ParentRoomUtilitiesSection({
+    super.key,
+    required this.onMessageTap,
+    required this.onUtilityTap,
+  });
 
+  final VoidCallback onMessageTap;
   final VoidCallback onUtilityTap;
 
   @override
@@ -41,7 +46,7 @@ class ParentRoomUtilitiesSection extends StatelessWidget {
               key: const ValueKey('parent-room-utility-message'),
               asset: 'assets/icons/message-icon.svg',
               label: context.getText(AppKeys.parentRoomUtilityMessages),
-              onTap: onUtilityTap,
+              onTap: onMessageTap,
             ),
             _ParentRoomUtilityTile(
               key: const ValueKey('parent-room-utility-homework'),

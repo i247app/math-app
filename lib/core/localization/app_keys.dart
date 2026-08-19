@@ -203,6 +203,13 @@ class AppKeys {
   static const homeMessageStudentTwo = 'home_message_student_two';
   static const homeMessageBodyOne = 'home_message_body_one';
   static const homeMessageBodyTwo = 'home_message_body_two';
+  static const parentMessagesGroupPreview = 'parent_messages_group_preview';
+  static const parentMessagesTeacherThree = 'parent_messages_teacher_three';
+  static const parentMessagesTeacherFour = 'parent_messages_teacher_four';
+  static const parentMessagesBodyThree = 'parent_messages_body_three';
+  static const parentMessagesBodyFour = 'parent_messages_body_four';
+  static const parentMessagesTimeThree = 'parent_messages_time_three';
+  static const parentMessagesTimeFour = 'parent_messages_time_four';
   static const studentNoHomeworkTitle = 'student_no_homework_title';
   static const studentNoHomeworkMessage = 'student_no_homework_message';
   static const studentNoClassroomsTitle = 'student_no_classrooms_title';
