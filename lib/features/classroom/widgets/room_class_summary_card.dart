@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class RoomClassSummaryCard extends StatelessWidget {
@@ -8,36 +7,25 @@ class RoomClassSummaryCard extends StatelessWidget {
     required this.studentName,
     required this.className,
     required this.teacherName,
+    required this.backgroundColor,
     required this.onTap,
   });
 
   final String studentName;
   final String className;
   final String teacherName;
+  final Color backgroundColor;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final radius = BorderRadius.circular(26);
-    final gradient = isDark
-        ? LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [colors.infoSurface, colors.elevatedSurface],
-          )
-        : const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFE1F5F3), Color(0xFFCBEDEB)],
-          );
+    final radius = BorderRadius.circular(28);
 
     return Semantics(
       button: true,
       label: '$studentName, $className, $teacherName',
       child: DecoratedBox(
-        decoration: BoxDecoration(gradient: gradient, borderRadius: radius),
+        decoration: BoxDecoration(color: backgroundColor, borderRadius: radius),
         child: Material(
           color: Colors.transparent,
           borderRadius: radius,
@@ -55,29 +43,32 @@ class RoomClassSummaryCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      studentName,
+                      studentName.toUpperCase(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: FontSize.normal,
-                        fontWeight: FontWeight.w400,
-                        height: 1.15,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: FontSize.xxs,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 2,
+                        height: 1.1,
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3),
-                      child: Text(
-                        className,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: colors.brandStrong,
-                          fontSize: FontSize.displayMedium,
-                          fontWeight: FontWeight.w600,
-                          height: 1.05,
+                      padding: const EdgeInsets.symmetric(vertical: 7),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          className,
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: FontSize.displayHero,
+                            fontWeight: FontWeight.w700,
+                            height: 1,
+                          ),
                         ),
                       ),
                     ),
@@ -86,10 +77,10 @@ class RoomClassSummaryCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: colors.textSecondary,
-                        fontSize: FontSize.normal,
-                        fontWeight: FontWeight.w400,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: FontSize.small,
+                        fontWeight: FontWeight.w600,
                         height: 1.15,
                       ),
                     ),

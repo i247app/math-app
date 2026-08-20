@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/classroom/widgets/room_class_summary_card.dart';
 
@@ -21,6 +22,7 @@ void main() {
                   studentName: 'Yến Nhi',
                   className: '1A4',
                   teacherName: 'Thầy An',
+                  backgroundColor: AppColors.brandTeal,
                   onTap: () => tapCount++,
                 ),
               ),
@@ -30,7 +32,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Yến Nhi'), findsOneWidget);
+    expect(find.text('YẾN NHI'), findsOneWidget);
     expect(find.text('1A4'), findsOneWidget);
     expect(find.text('Thầy An'), findsOneWidget);
     expect(tester.getSize(find.byType(RoomClassSummaryCard)).height, 132);
@@ -42,8 +44,8 @@ void main() {
       ),
     );
     final boxDecoration = decoration.decoration as BoxDecoration;
-    expect(boxDecoration.gradient, isA<LinearGradient>());
-    expect(boxDecoration.borderRadius, BorderRadius.circular(26));
+    expect(boxDecoration.color, AppColors.brandTeal);
+    expect(boxDecoration.borderRadius, BorderRadius.circular(28));
 
     await tester.tap(find.byType(RoomClassSummaryCard));
     expect(tapCount, 1);
