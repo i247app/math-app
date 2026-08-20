@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -48,12 +51,14 @@ class AiAssessmentScreen extends StatefulWidget {
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   late final AssessmentController _controller;
+  late final AudioPlayer _answerFeedbackPlayer;
   final GuardedExitController<AiAssessmentResult> _exitController =
       GuardedExitController<AiAssessmentResult>();
 
   @override
   void initState() {
     super.initState();
+    _answerFeedbackPlayer = AudioPlayer();
     _controller = AssessmentController(
       quizService: widget.quizService ?? QuizApi(),
       initialQuiz: widget.initialQuiz,
@@ -70,6 +75,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
   @override
   void dispose() {
+    unawaited(_answerFeedbackPlayer.dispose());
     _controller.dispose();
     super.dispose();
   }
@@ -90,12 +96,38 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     _controller.selectAnswer(answer);
   }
 
+  Future<void> _playAnswerFeedback(bool isCorrect) async {
+    try {
+      await _answerFeedbackPlayer.stop();
+      await _answerFeedbackPlayer.play(
+        AssetSource(
+          isCorrect
+              ? 'sounds/effects/correct.wav'
+              : 'sounds/effects/incorrect.wav',
+        ),
+        mode: PlayerMode.lowLatency,
+      );
+    } catch (_) {
+      // Audio feedback must never interrupt answering the assessment.
+    }
+  }
+
   void goToPreviousQuestion() {
     HapticFeedback.selectionClick();
     _controller.goToPreviousQuestion();
   }
 
   void goToNextQuestion() {
+    if (!_controller.canContinue) {
+      HapticFeedback.selectionClick();
+      return;
+    }
+
+    final isCorrect = _controller.isSelectedAnswerCorrect;
+    if (isCorrect != null) {
+      unawaited(_playAnswerFeedback(isCorrect));
+    }
+
     if (_controller.isLastQuestion) {
       submitCurrentQuiz();
       return;
@@ -340,6 +372,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                           bottom: 0,
                           child: AssessmentBottomBar(
                             canGoBack: _controller.questionIndex > 0,
+                            canContinue: _controller.canContinue,
                             isLastQuestion: _controller.isLastQuestion,
                             isSubmitting: isSubmittingQuiz,
                             onBack: goToPreviousQuestion,

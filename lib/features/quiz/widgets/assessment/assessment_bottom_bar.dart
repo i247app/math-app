@@ -12,12 +12,14 @@ class AssessmentBottomBar extends StatelessWidget {
   const AssessmentBottomBar({
     super.key,
     required this.canGoBack,
+    required this.canContinue,
     required this.isLastQuestion,
     required this.isSubmitting,
     required this.onBack,
     required this.onContinue,
   });
   final bool canGoBack;
+  final bool canContinue;
   final bool isLastQuestion;
   final bool isSubmitting;
   final VoidCallback onBack;
@@ -61,7 +63,7 @@ class AssessmentBottomBar extends StatelessWidget {
                       ? Icons.check_rounded
                       : Icons.arrow_forward_rounded,
                   foreground: const Color(0xFFBEFFF9),
-                  onTap: isSubmitting ? null : onContinue,
+                  onTap: isSubmitting || !canContinue ? null : onContinue,
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,

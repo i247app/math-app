@@ -83,6 +83,42 @@ class AssessmentController extends ChangeNotifier {
 
   String? get selectedAnswerLabel => _selectedAnswerLabels[_questionIndex];
 
+  bool get canContinue => selectedAnswerLabel != null;
+
+  bool? get isSelectedAnswerCorrect {
+    final question = currentQuestion;
+    final selectedLabel = selectedAnswerLabel;
+    if (question == null || selectedLabel == null) {
+      return null;
+    }
+
+    for (final answer in question.answers) {
+      if (_normalizedAnswerValue(answer.label) ==
+          _normalizedAnswerValue(selectedLabel)) {
+        return isAnswerCorrect(answer);
+      }
+    }
+    return null;
+  }
+
+  bool? isAnswerCorrect(QuizAnswer answer) {
+    final question = currentQuestion;
+    if (question == null) {
+      return null;
+    }
+
+    final correctValues = <String?>[
+      question.rightAnswer,
+      question.correctAnswer,
+    ].map(_normalizedAnswerValue).whereType<String>().toSet();
+    if (correctValues.isEmpty) {
+      return null;
+    }
+
+    return correctValues.contains(_normalizedAnswerValue(answer.label)) ||
+        correctValues.contains(_normalizedAnswerValue(answer.content));
+  }
+
   bool get isGeneratingQuestion {
     return (_isGeneratingQuiz || currentQuestion == null) &&
         _errorMessage == null;
@@ -158,7 +194,7 @@ class AssessmentController extends ChangeNotifier {
 
   bool goToNextQuestion() {
     final questions = _quiz?.questions ?? const <QuizQuestion>[];
-    if (_questionIndex >= questions.length - 1) {
+    if (!canContinue || _questionIndex >= questions.length - 1) {
       return false;
     }
 
@@ -241,5 +277,10 @@ class AssessmentController extends ChangeNotifier {
       }
     }
     return null;
+  }
+
+  String? _normalizedAnswerValue(String? value) {
+    final normalized = value?.trim().toUpperCase();
+    return normalized == null || normalized.isEmpty ? null : normalized;
   }
 }
