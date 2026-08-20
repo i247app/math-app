@@ -14,6 +14,8 @@ import 'package:numi/features/settings/widgets/account/account_screen_skeleton.d
 import 'package:numi/features/settings/widgets/account_details_panel.dart';
 import 'package:numi/features/settings/widgets/setting_header.dart';
 import 'package:numi/features/settings/widgets/setting_safe_screen.dart';
+import 'package:numi/shared/widgets/exit_confirmation_dialog.dart';
+import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 class SettingAccountScreen extends StatefulWidget {
   const SettingAccountScreen({super.key, required this.args});
@@ -31,6 +33,8 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final GuardedExitController<bool> _exitController =
+      GuardedExitController<bool>();
 
   LoginUser? _user;
   bool _isEditing = false;
@@ -53,6 +57,9 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
   @override
   void initState() {
     super.initState();
+    _usernameController.addListener(_onDraftChanged);
+    _phoneController.addListener(_onDraftChanged);
+    _emailController.addListener(_onDraftChanged);
     _user = widget.args.user;
     if (_user != null) {
       _applyUser(_user);
@@ -70,9 +77,15 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _phoneController.dispose();
-    _emailController.dispose();
+    _usernameController
+      ..removeListener(_onDraftChanged)
+      ..dispose();
+    _phoneController
+      ..removeListener(_onDraftChanged)
+      ..dispose();
+    _emailController
+      ..removeListener(_onDraftChanged)
+      ..dispose();
     _entranceController.dispose();
     super.dispose();
   }
@@ -117,15 +130,33 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
     });
   }
 
+  void _onDraftChanged() {
+    if (mounted && _isEditing) {
+      setState(() {});
+    }
+  }
+
+  bool get _hasUnsavedChanges {
+    if (!_isEditing) {
+      return false;
+    }
+    return _usernameController.text != _snapshotUsername ||
+        _phoneController.text != _snapshotPhone ||
+        _emailController.text != _snapshotEmail ||
+        _draftAvatarPath != _snapshotAvatarPath;
+  }
+
   void _cancelEditing() {
     HapticFeedback.selectionClick();
     setState(() {
+      // Disable draft tracking before restoring controller values because
+      // controller listeners run synchronously.
+      _isEditing = false;
       _usernameController.text = _snapshotUsername ?? _usernameController.text;
       _phoneController.text = _snapshotPhone ?? _phoneController.text;
       _emailController.text = _snapshotEmail ?? _emailController.text;
       _localAvatarPath = _snapshotAvatarPath;
       _draftAvatarPath = null;
-      _isEditing = false;
       _isSaving = false;
       _isPickingAvatar = false;
     });
@@ -218,19 +249,18 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
   void _close() {
     FocusManager.instance.primaryFocus?.unfocus();
     HapticFeedback.selectionClick();
-    Navigator.of(context).pop(_didSave);
+    _exitController.requestExit();
   }
 
   @override
   Widget build(BuildContext context) {
     final scale = widget.args.scale;
-    final screen = PopScope(
-      canPop: !_isSaving,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) {
-          FocusManager.instance.primaryFocus?.unfocus();
-        }
-      },
+    final screen = GuardedExitScope<bool>(
+      controller: _exitController,
+      shouldConfirm: _hasUnsavedChanges,
+      isExitBlocked: _isSaving || _isPickingAvatar,
+      confirmExit: showUnsavedChangesExitDialog,
+      exitResult: _didSave,
       child: SettingSafeScreen(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),

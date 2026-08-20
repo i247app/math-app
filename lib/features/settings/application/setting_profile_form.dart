@@ -2,6 +2,8 @@ part of 'setting_tab.dart';
 
 mixin _SettingProfileFormMixin
     on State<SettingTab>, _SettingProfileManagementMixin {
+  final GuardedExitController<bool> _profileExitController =
+      GuardedExitController<bool>();
   final ProfileService _formProfileService = ProfileApi();
   final GradeService _gradeService = GradeApi();
   final SchoolService _schoolService = SchoolApi();
@@ -14,6 +16,8 @@ mixin _SettingProfileFormMixin
   bool _isLoadingProfileOptions = false;
   bool _isSavingProfile = false;
   bool _isUpdatingProfile = false;
+  bool _suppressProfileDraftTracking = false;
+  String? _profileDraftBaseline;
   String? _profileOptionsError;
   String? _profileCreateError;
   String? _selectedProfileAvatarKey;
@@ -29,7 +33,11 @@ mixin _SettingProfileFormMixin
   String? _selectedProfileIdType;
 
   void _initializeProfileFormState() {
-    _profileNameController.addListener(_onProfileNameChanged);
+    _suppressProfileDraftTracking = true;
+    _profileNameController.addListener(_onProfileDraftFieldChanged);
+    _profilePhoneController.addListener(_onProfileDraftFieldChanged);
+    _profileEmailController.addListener(_onProfileDraftFieldChanged);
+    _profileIdController.addListener(_onProfileDraftFieldChanged);
     final initialEditingProfile = widget._initialEditingProfile;
     if (initialEditingProfile != null) {
       _editingProfile = initialEditingProfile;
@@ -41,6 +49,8 @@ mixin _SettingProfileFormMixin
         _applyProfileIdFields(initialEditingProfile);
       }
     }
+    _suppressProfileDraftTracking = false;
+    _captureProfileDraftBaseline();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
@@ -86,23 +96,60 @@ mixin _SettingProfileFormMixin
   }
 
   void _disposeProfileFormState() {
-    _profileNameController.removeListener(_onProfileNameChanged);
-    _profileNameController.dispose();
-    _profilePhoneController.dispose();
-    _profileEmailController.dispose();
-    _profileIdController.dispose();
+    _profileNameController
+      ..removeListener(_onProfileDraftFieldChanged)
+      ..dispose();
+    _profilePhoneController
+      ..removeListener(_onProfileDraftFieldChanged)
+      ..dispose();
+    _profileEmailController
+      ..removeListener(_onProfileDraftFieldChanged)
+      ..dispose();
+    _profileIdController
+      ..removeListener(_onProfileDraftFieldChanged)
+      ..dispose();
   }
 
-  void _onProfileNameChanged() {
-    if (!mounted || _view != SettingPageView.addProfile) {
+  void _onProfileDraftFieldChanged() {
+    if (!mounted ||
+        _view != SettingPageView.addProfile ||
+        _suppressProfileDraftTracking) {
       return;
     }
     setState(() {});
   }
 
+  bool get _isProfileDraftDirty {
+    final baseline = _profileDraftBaseline;
+    return baseline != null && _profileDraftFingerprint() != baseline;
+  }
+
+  String _profileDraftFingerprint() {
+    return <Object?>[
+      _profileNameController.text,
+      _profilePhoneController.text,
+      _profileEmailController.text,
+      _profileIdController.text,
+      _selectedProfileAvatarKey,
+      _selectedSchool?.schoolId,
+      _selectedGrade?.gradeId,
+      _selectedProgram?.programId,
+      _selectedProfileIdType,
+    ].map((value) => value?.toString() ?? '').join('\u001f');
+  }
+
+  void _captureProfileDraftBaseline() {
+    _profileDraftBaseline = _profileDraftFingerprint();
+  }
+
   void _cancelAddProfile() {
-    _resetCreateProfileForm();
-    _returnToProfileList();
+    _requestProfileFormExit();
+  }
+
+  void _requestProfileFormExit() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    HapticFeedback.selectionClick();
+    _profileExitController.requestExit();
   }
 
   bool get _hasProfileOptions {
@@ -452,6 +499,7 @@ mixin _SettingProfileFormMixin
       setState(() {
         _isSavingProfile = false;
         _isUpdatingProfile = false;
+        _captureProfileDraftBaseline();
       });
       widget.onProfileSaved?.call();
       return;
@@ -483,6 +531,7 @@ mixin _SettingProfileFormMixin
   }
 
   void _resetCreateProfileForm() {
+    _suppressProfileDraftTracking = true;
     _profileNameController.clear();
     _profilePhoneController.clear();
     _profileEmailController.clear();
@@ -497,9 +546,13 @@ mixin _SettingProfileFormMixin
     _selectedSemester = _semesterOptions.isEmpty
         ? null
         : _semesterOptions.first;
+    _suppressProfileDraftTracking = false;
+    _captureProfileDraftBaseline();
   }
 
   void _selectOptionsForProfile(StudentProfile profile) {
+    final hadUnsavedChanges = _isProfileDraftDirty;
+    _suppressProfileDraftTracking = true;
     _selectedSchool = settingsFirstWhereOrNull(
       _schoolOptions,
       (school) => school.schoolId == profile.schoolId,
@@ -518,15 +571,21 @@ mixin _SettingProfileFormMixin
     );
     _selectedProfileAvatarKey = profile.avatarKey?.trim();
     _applyProfileIdFields(profile);
+    _suppressProfileDraftTracking = false;
+    if (!hadUnsavedChanges) {
+      _captureProfileDraftBaseline();
+    }
   }
 
   void _applyParentContactFields() {
+    _suppressProfileDraftTracking = true;
     final user = widget.user;
     _profilePhoneController.text = settingsDisplayPhone(
       user?.phone,
       fallback: '',
     );
     _profileEmailController.text = user?.email?.trim() ?? '';
+    _suppressProfileDraftTracking = false;
   }
 
   bool get _canSaveProfileForm {

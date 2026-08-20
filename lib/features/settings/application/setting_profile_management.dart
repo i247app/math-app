@@ -92,17 +92,6 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
     _pushView(SettingPageView.addProfile, editingProfile: profile);
   }
 
-  void _returnToProfileList() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    if (widget._isPushedPage) {
-      HapticFeedback.selectionClick();
-      Navigator.of(context).maybePop();
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-  }
-
   Future<void> _loadProfiles() async {
     final userId = widget.user?.id;
     if (userId == null || userId <= 0) {

@@ -23,6 +23,8 @@ import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/profile/data/profile_exception.dart';
 import 'package:numi/features/profile/data/school_api.dart';
 import 'package:numi/shared/widgets/loading_screen.dart';
+import 'package:numi/shared/widgets/exit_confirmation_dialog.dart';
+import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/profile/data/profile_options_cache.dart';
@@ -386,8 +388,13 @@ class _SettingTabState extends State<SettingTab>
     final backgroundColor = context.themeColors.pageBackground;
     final lingo = LingoScope.of(context);
 
-    return PopScope(
-      canPop: !_isSwitchingProfile && !_isUpdatingProfile,
+    return GuardedExitScope<bool>(
+      controller: _profileExitController,
+      shouldConfirm:
+          _view == SettingPageView.addProfile && _isProfileDraftDirty,
+      isExitBlocked:
+          _isSavingProfile || _isSwitchingProfile || _isUpdatingProfile,
+      confirmExit: showUnsavedChangesExitDialog,
       child: Stack(
         children: [
           ColoredBox(
@@ -414,7 +421,7 @@ class _SettingTabState extends State<SettingTab>
                       title: headerTitle,
                       canGoBack: canGoBack,
                       onBack: _view == SettingPageView.addProfile
-                          ? _returnToProfileList
+                          ? _requestProfileFormExit
                           : _returnToSettings,
                       backgroundColor: backgroundColor,
                       topInset: topInset,
