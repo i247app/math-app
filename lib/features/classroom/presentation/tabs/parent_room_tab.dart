@@ -19,12 +19,10 @@ import 'package:numi/features/home/data/home_layout_mappers.dart';
 import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
 import 'package:numi/features/classroom/presentation/screens/parent_room_detail_screen.dart';
-import 'package:numi/features/classroom/presentation/screens/parent_messages_screen.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_loading.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_class_grid.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_select_student_card.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_state_card.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_utilities_section.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
@@ -343,6 +341,10 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       children: [
         _roomFadeIn(
           order: 0,
+          markOnEnd:
+              pendingExercises.isEmpty &&
+              expiredExercises.isEmpty &&
+              completions.isEmpty,
           child: ParentRoomClassGrid(entries: entries, onOpen: _openRoomDetail),
         ),
         if (pendingExercises.isNotEmpty || expiredExercises.isNotEmpty)
@@ -350,6 +352,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             padding: const EdgeInsets.only(top: 18),
             child: _roomFadeIn(
               order: 1,
+              markOnEnd: completions.isEmpty,
               child: AppContentSection(
                 title: context.formatText(AppKeys.parentTasksCountTitle, {
                   'count': pendingExercises.length + expiredExercises.length,
@@ -382,6 +385,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
             padding: const EdgeInsets.only(top: 14),
             child: _roomFadeIn(
               order: 2,
+              markOnEnd: true,
               child: AppContentSection(
                 title: context.getText(AppKeys.assessmentResultTitle),
                 onViewAll: widget.onOpenClassroomTab,
@@ -400,17 +404,17 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
               ),
             ),
           ),
+        // Section "Tiện ích" tạm thời được ẩn. Bỏ comment và khôi phục các
+        // import liên quan khi cần hiển thị lại.
+        /*
         Padding(
           padding: const EdgeInsets.only(top: 14),
-          child: _roomFadeIn(
-            order: 3,
-            markOnEnd: true,
-            child: ParentRoomUtilitiesSection(
-              onMessageTap: () => _openMessages(entries.first),
-              onUtilityTap: () => parentRoomShowComingSoon(context),
-            ),
+          child: ParentRoomUtilitiesSection(
+            onMessageTap: () => _openMessages(entries.first),
+            onUtilityTap: () => parentRoomShowComingSoon(context),
           ),
         ),
+        */
       ],
     );
   }
@@ -429,6 +433,8 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     );
   }
 
+  // Dùng lại cùng section "Tiện ích" khi tính năng được bật lại.
+  /*
   void _openMessages(ParentRoomEntry entry) {
     HapticFeedback.selectionClick();
     Navigator.of(context).push<void>(
@@ -440,6 +446,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       ),
     );
   }
+  */
 
   void _openRoomDetail(ParentRoomEntry entry) {
     HapticFeedback.selectionClick();
