@@ -32,6 +32,7 @@ import 'package:numi/features/homework/models/teacher_study_exercise_batch.dart'
 import 'package:numi/features/homework/widgets/teacher_study/teacher_study_class_filters.dart';
 import 'package:numi/features/homework/widgets/teacher_study/teacher_study_exercise_card.dart';
 import 'package:numi/features/homework/widgets/teacher_study/teacher_study_loading_indicator.dart';
+import 'package:numi/features/homework/widgets/teacher_study/teacher_study_load_more_button.dart';
 import 'package:numi/features/homework/widgets/teacher_study/teacher_study_purpose_filters.dart';
 import 'package:numi/features/homework/widgets/teacher_study/teacher_study_search_field.dart';
 
@@ -61,6 +62,8 @@ class TeacherStudyTab extends StatefulWidget {
 }
 
 class _TeacherStudyTabState extends State<TeacherStudyTab> {
+  static const int _exercisePageSize = 10;
+
   late final ClassroomService _classroomService =
       widget._classroomService ?? ClassroomApi();
   late final ClassroomExerciseService _exerciseService =
@@ -76,6 +79,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   bool _hasCompletedInitialLoad = false;
   String? _error;
   List<ClassroomExercise> _exercises = const <ClassroomExercise>[];
+  int _visibleExerciseCount = _exercisePageSize;
 
   ClassroomCollectionState get _classroomCollection {
     final profileId = ActiveProfileSession.profileStableId(
@@ -140,6 +144,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       setState(() {
         _loadedProfileId = null;
         _exercises = const <ClassroomExercise>[];
+        _visibleExerciseCount = _exercisePageSize;
         _error = context.readText(AppKeys.teacherMissingProfileId);
         _isLoadingExercises = false;
         _hasCompletedInitialLoad = true;
@@ -154,6 +159,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
         _hasCompletedInitialLoad = false;
         _exercises = const <ClassroomExercise>[];
       }
+      _visibleExerciseCount = _exercisePageSize;
       _error = null;
     });
 
@@ -176,6 +182,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     if (collection.errorMessage != null && collection.classrooms.isEmpty) {
       setState(() {
         _exercises = const <ClassroomExercise>[];
+        _visibleExerciseCount = _exercisePageSize;
         _error = collection.errorMessage!.trim().isEmpty
             ? context.readText(AppKeys.teacherStudyLoadFailed)
             : collection.errorMessage;
@@ -222,6 +229,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     setState(() {
       _isLoadingExercises = true;
       _error = null;
+      _visibleExerciseCount = _exercisePageSize;
     });
 
     final search = _searchController.text.trim();
@@ -251,6 +259,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
 
     setState(() {
       _exercises = deduplicateTeacherStudyExercises(exercises);
+      _visibleExerciseCount = _exercisePageSize;
       _error = exercises.isEmpty ? firstError : null;
       _isLoadingExercises = false;
       _hasCompletedInitialLoad = true;
@@ -283,6 +292,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
 
   void _onSearchChanged(String _) {
     _searchDebounce?.cancel();
+    if (_visibleExerciseCount != _exercisePageSize) {
+      setState(() => _visibleExerciseCount = _exercisePageSize);
+    }
     _searchDebounce = Timer(const Duration(milliseconds: 350), _loadExercises);
   }
 
@@ -291,7 +303,10 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       return;
     }
     HapticFeedback.selectionClick();
-    setState(() => _selectedClassroomId = classroomId);
+    setState(() {
+      _selectedClassroomId = classroomId;
+      _visibleExerciseCount = _exercisePageSize;
+    });
     _loadExercises();
   }
 
@@ -300,8 +315,24 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       return;
     }
     HapticFeedback.selectionClick();
-    setState(() => _selectedPurpose = purpose);
+    setState(() {
+      _selectedPurpose = purpose;
+      _visibleExerciseCount = _exercisePageSize;
+    });
     _loadExercises();
+  }
+
+  void _showMoreExercises() {
+    if (_visibleExerciseCount >= _exercises.length) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() {
+      _visibleExerciseCount = (_visibleExerciseCount + _exercisePageSize).clamp(
+        0,
+        _exercises.length,
+      );
+    });
   }
 
   Future<void> _openCreateExercise() async {
@@ -392,7 +423,13 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
         (cubit) => cubit.owned(profileId),
       );
     }
-    final visibleExercises = _exercises.take(10).toList(growable: false);
+    final visibleExercises = _exercises
+        .take(_visibleExerciseCount)
+        .toList(growable: false);
+    final remainingExerciseCount = _exercises.length - visibleExercises.length;
+    final nextExerciseBatchCount = remainingExerciseCount > _exercisePageSize
+        ? _exercisePageSize
+        : remainingExerciseCount;
     return ColoredBox(
       color: context.themeColors.pageBackground,
       child: RefreshIndicator(
@@ -490,6 +527,11 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                                             exercise: exercise,
                                             onTap: () =>
                                                 _openExerciseDetail(exercise),
+                                          ),
+                                        if (remainingExerciseCount > 0)
+                                          TeacherStudyLoadMoreButton(
+                                            loadCount: nextExerciseBatchCount,
+                                            onTap: _showMoreExercises,
                                           ),
                                       ],
                                     ),

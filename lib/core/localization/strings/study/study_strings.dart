@@ -49,6 +49,7 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.teacherStudyLoadFailed:
         'Tải danh sách bài tập và đánh giá thất bại.',
     AppKeys.teacherStudyNoResults: 'Không tìm thấy nội dung phù hợp.',
+    AppKeys.teacherStudyShowMore: 'Xem thêm {count} bài',
     AppKeys.teacherStudyDueDate: 'Hạn nộp: {date}',
     AppKeys.teacherStudyMonth: 'TH{month}',
     AppKeys.testAgainCreateMissingQuiz: 'Không tìm thấy bài test trước đó.',
@@ -107,6 +108,7 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.teacherStudyLoadFailed:
         'Failed to load assignments and assessments.',
     AppKeys.teacherStudyNoResults: 'No matching content found.',
+    AppKeys.teacherStudyShowMore: 'Show {count} more',
     AppKeys.teacherStudyDueDate: 'Due: {date}',
     AppKeys.teacherStudyMonth: 'M{month}',
     AppKeys.testAgainCreateMissingQuiz: 'Could not find the previous test.',

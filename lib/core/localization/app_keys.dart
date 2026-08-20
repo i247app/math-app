@@ -565,6 +565,7 @@ class AppKeys {
   static const teacherStudyAllClasses = 'teacher_study_all_classes';
   static const teacherStudyLoadFailed = 'teacher_study_load_failed';
   static const teacherStudyNoResults = 'teacher_study_no_results';
+  static const teacherStudyShowMore = 'teacher_study_show_more';
   static const teacherStudyDueDate = 'teacher_study_due_date';
   static const teacherStudyMonth = 'teacher_study_month';
   static const teacherAssignments = 'teacher_assignments';
