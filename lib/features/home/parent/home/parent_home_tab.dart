@@ -320,6 +320,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       ParentChildSummary(
         profile: profile,
         classroom: classrooms.isEmpty ? null : classrooms.first.classroom,
+        classrooms: [for (final classroom in classrooms) classroom.classroom],
         assessments: assessments,
       ),
     ];

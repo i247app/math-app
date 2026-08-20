@@ -25,6 +25,7 @@ List<ParentChildSummary> summariesFromLayout(ParentHomeLayout? parent) {
   return children
       .map((child) {
         final childId = ActiveProfileSession.profileStableId(child);
+        final classrooms = _classroomsForLayoutChild(parent, child);
         final assessments = <GeneratedQuiz>[
           for (final completion
               in parent?.recentCompletions ??
@@ -35,30 +36,30 @@ List<ParentChildSummary> summariesFromLayout(ParentHomeLayout? parent) {
 
         return ParentChildSummary(
           profile: child,
-          classroom: _classroomForLayoutChild(parent, child),
+          classroom: classrooms.isEmpty ? null : classrooms.first,
+          classrooms: classrooms,
           assessments: assessments,
         );
       })
       .toList(growable: false);
 }
 
-ClassroomModel? _classroomForLayoutChild(
+List<ClassroomModel> _classroomsForLayoutChild(
   ParentHomeLayout? parent,
   StudentProfile child,
 ) {
   if (parent == null) {
-    return null;
+    return const <ClassroomModel>[];
   }
 
   final childId = ActiveProfileSession.profileStableId(child);
-  for (final classroom in parent.classrooms) {
-    if (classroom.memberProfileId == childId) {
-      return classroom.classroom;
-    }
-  }
+  final classrooms = <ClassroomModel>[];
 
-  if (parent.children.length == 1 && parent.classrooms.length == 1) {
-    return parent.classrooms.first.classroom;
+  for (final layoutClassroom in parent.classrooms) {
+    if (layoutClassroom.memberProfileId == childId ||
+        parent.children.length == 1) {
+      _addClassroomIfMissing(classrooms, layoutClassroom.classroom);
+    }
   }
 
   for (final completion in parent.recentCompletions) {
@@ -67,10 +68,10 @@ ClassroomModel? _classroomForLayoutChild(
       final classroomId =
           completion.classroomId ?? completion.exercise?.classroomId;
       final matchingClassroom = _layoutClassroomById(parent, classroomId);
-      if (matchingClassroom != null) {
-        return matchingClassroom;
-      }
-      return completion.classroom;
+      _addClassroomIfMissing(
+        classrooms,
+        matchingClassroom ?? completion.classroom!,
+      );
     }
   }
 
@@ -78,10 +79,10 @@ ClassroomModel? _classroomForLayoutChild(
     if (layoutChildId(pending.child) == childId && pending.classroom != null) {
       final classroomId = pending.classroomId ?? pending.exercise?.classroomId;
       final matchingClassroom = _layoutClassroomById(parent, classroomId);
-      if (matchingClassroom != null) {
-        return matchingClassroom;
-      }
-      return pending.classroom;
+      _addClassroomIfMissing(
+        classrooms,
+        matchingClassroom ?? pending.classroom!,
+      );
     }
   }
 
@@ -89,14 +90,37 @@ ClassroomModel? _classroomForLayoutChild(
     if (layoutChildId(expired.child) == childId && expired.classroom != null) {
       final classroomId = expired.classroomId ?? expired.exercise?.classroomId;
       final matchingClassroom = _layoutClassroomById(parent, classroomId);
-      if (matchingClassroom != null) {
-        return matchingClassroom;
-      }
-      return expired.classroom;
+      _addClassroomIfMissing(
+        classrooms,
+        matchingClassroom ?? expired.classroom!,
+      );
     }
   }
 
-  return null;
+  return List<ClassroomModel>.unmodifiable(classrooms);
+}
+
+void _addClassroomIfMissing(
+  List<ClassroomModel> classrooms,
+  ClassroomModel classroom,
+) {
+  final stableId = classroom.stableId;
+  final classroomCode = classroom.classroomCode?.trim();
+
+  final alreadyAdded = classrooms.any((existing) {
+    if (stableId != null && existing.stableId != null) {
+      return stableId == existing.stableId;
+    }
+    if (classroomCode?.isNotEmpty == true) {
+      return classroomCode == existing.classroomCode?.trim();
+    }
+    return classroom.name?.trim() == existing.name?.trim() &&
+        classroom.teacherName?.trim() == existing.teacherName?.trim();
+  });
+
+  if (!alreadyAdded) {
+    classrooms.add(classroom);
+  }
 }
 
 ClassroomModel? _layoutClassroomById(

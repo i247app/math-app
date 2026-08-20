@@ -88,6 +88,49 @@ void main() {
     expect(find.byKey(const ValueKey('parent-class-page-dot-0')), findsNothing);
   });
 
+  testWidgets('fits exactly two classes side by side without a carousel', (
+    tester,
+  ) async {
+    const availableWidth = 332.0;
+    const gap = 16.0;
+    const summaries = <ParentChildSummary>[
+      ParentChildSummary(
+        profile: StudentProfile(name: 'An'),
+        classroom: ClassroomModel(name: '2A5', teacherName: 'Thầy An'),
+        classrooms: [
+          ClassroomModel(name: '2A5', teacherName: 'Thầy An'),
+          ClassroomModel(name: '3B1', teacherName: 'Cô Ngân'),
+        ],
+      ),
+    ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: const Scaffold(
+          body: SizedBox(
+            width: availableWidth,
+            child: ParentClassCarousel(summaries: summaries, onTap: _noOp),
+          ),
+        ),
+      ),
+    );
+
+    const expectedCardWidth = (availableWidth - gap) / 2;
+    expect(
+      tester.getSize(find.byKey(const ValueKey('parent-class-card-0'))).width,
+      expectedCardWidth,
+    );
+    expect(
+      tester.getSize(find.byKey(const ValueKey('parent-class-card-1'))).width,
+      expectedCardWidth,
+    );
+    expect(find.text('2A5'), findsOneWidget);
+    expect(find.text('3B1'), findsOneWidget);
+    expect(find.byType(ListView), findsNothing);
+    expect(find.byKey(const ValueKey('parent-class-page-dot-0')), findsNothing);
+  });
+
   testWidgets('shows all parent classes with alternating brand colors', (
     tester,
   ) async {
@@ -100,6 +143,10 @@ void main() {
       ParentChildSummary(
         profile: StudentProfile(name: 'Bình'),
         classroom: ClassroomModel(name: '3B1', teacherName: 'Cô Ngân'),
+      ),
+      ParentChildSummary(
+        profile: StudentProfile(name: 'Chi'),
+        classroom: ClassroomModel(name: '4C2', teacherName: 'Cô Mai'),
       ),
     ];
 
@@ -128,6 +175,10 @@ void main() {
     );
     expect(
       find.byKey(const ValueKey('parent-class-page-dot-1')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('parent-class-page-dot-2')),
       findsOneWidget,
     );
 

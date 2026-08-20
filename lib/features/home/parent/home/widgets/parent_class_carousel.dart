@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/classroom_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
@@ -29,9 +30,16 @@ class _ParentClassCarouselState extends State<ParentClassCarousel> {
 
   int _activeIndex = 0;
 
-  List<ParentChildSummary> get _joinedClassSummaries => widget.summaries
-      .where((summary) => summary.classroom != null)
-      .toList(growable: false);
+  List<ParentChildSummary> get _joinedClassSummaries {
+    return <ParentChildSummary>[
+      for (final summary in widget.summaries)
+        for (final classroom
+            in summary.classrooms.isNotEmpty
+                ? summary.classrooms
+                : <ClassroomModel>[?summary.classroom])
+          ParentChildSummary(profile: summary.profile, classroom: classroom),
+    ];
+  }
 
   @override
   void didUpdateWidget(covariant ParentClassCarousel oldWidget) {
@@ -52,19 +60,33 @@ class _ParentClassCarouselState extends State<ParentClassCarousel> {
 
     if (joinedClassSummaries.length == 1) {
       final summary = joinedClassSummaries.first;
-      final teacherName = summary.classroom?.teacherName?.trim();
 
       return SizedBox(
         height: _cardHeight,
-        child: _ParentClassCard(
-          key: const ValueKey('parent-class-card-0'),
-          studentName: profileDisplayName(context, summary.profile),
-          className: parentClassroomName(context, summary),
-          teacherName: teacherName?.isNotEmpty == true
-              ? teacherName!
-              : context.getText(AppKeys.parentNoTeacher),
-          backgroundColor: AppColors.brandTeal,
-          onTap: widget.onTap,
+        child: _buildClassCard(context, summary: summary, index: 0),
+      );
+    }
+
+    if (joinedClassSummaries.length == 2) {
+      return SizedBox(
+        height: _cardHeight,
+        child: Row(
+          children: [
+            for (
+              var index = 0;
+              index < joinedClassSummaries.length;
+              index++
+            ) ...[
+              if (index > 0) const SizedBox(width: _cardGap),
+              Expanded(
+                child: _buildClassCard(
+                  context,
+                  summary: joinedClassSummaries[index],
+                  index: index,
+                ),
+              ),
+            ],
+          ],
         ),
       );
     }
@@ -97,25 +119,12 @@ class _ParentClassCarouselState extends State<ParentClassCarousel> {
                   itemCount: joinedClassSummaries.length,
                   separatorBuilder: (_, _) => const SizedBox(width: _cardGap),
                   itemBuilder: (context, index) {
-                    final summary = joinedClassSummaries[index];
-                    final teacherName = summary.classroom?.teacherName?.trim();
-
                     return SizedBox(
                       width: cardWidth,
-                      child: _ParentClassCard(
-                        key: ValueKey('parent-class-card-$index'),
-                        studentName: profileDisplayName(
-                          context,
-                          summary.profile,
-                        ),
-                        className: parentClassroomName(context, summary),
-                        teacherName: teacherName?.isNotEmpty == true
-                            ? teacherName!
-                            : context.getText(AppKeys.parentNoTeacher),
-                        backgroundColor: index.isEven
-                            ? AppColors.brandTeal
-                            : AppColors.brandOrange,
-                        onTap: widget.onTap,
+                      child: _buildClassCard(
+                        context,
+                        summary: joinedClassSummaries[index],
+                        index: index,
                       ),
                     );
                   },
@@ -151,6 +160,27 @@ class _ParentClassCarouselState extends State<ParentClassCarousel> {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildClassCard(
+    BuildContext context, {
+    required ParentChildSummary summary,
+    required int index,
+  }) {
+    final teacherName = summary.classroom?.teacherName?.trim();
+
+    return _ParentClassCard(
+      key: ValueKey('parent-class-card-$index'),
+      studentName: profileDisplayName(context, summary.profile),
+      className: parentClassroomName(context, summary),
+      teacherName: teacherName?.isNotEmpty == true
+          ? teacherName!
+          : context.getText(AppKeys.parentNoTeacher),
+      backgroundColor: index.isEven
+          ? AppColors.brandTeal
+          : AppColors.brandOrange,
+      onTap: widget.onTap,
     );
   }
 }
