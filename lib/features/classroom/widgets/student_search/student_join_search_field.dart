@@ -1,10 +1,11 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_class_search_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 class StudentJoinSearchField extends StatelessWidget {
   const StudentJoinSearchField({
@@ -22,27 +23,28 @@ class StudentJoinSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return TextField(
       controller: controller,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       textInputAction: TextInputAction.search,
       textAlignVertical: TextAlignVertical.center,
-      style: const TextStyle(
-        color: AppColors.textInkDark,
+      style: context.textStyles.bodyLarge?.copyWith(
+        color: colors.textPrimary,
         fontSize: FontSize.normal,
         fontWeight: FontWeight.w700,
         letterSpacing: 0,
       ),
       decoration: InputDecoration(
         hintText: context.getText(AppKeys.studentClassCodeHint),
-        hintStyle: TextStyle(
-          color: const Color(0xFF515F54).withValues(alpha: 0.7),
+        hintStyle: context.textStyles.bodyLarge?.copyWith(
+          color: colors.inputHint,
           fontSize: FontSize.normal,
           fontWeight: FontWeight.w700,
         ),
         filled: true,
-        fillColor: const Color(0xFFEBEEF1),
+        fillColor: colors.inputSurface,
         contentPadding: const EdgeInsets.fromLTRB(19, 14, 19, 10),
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 12),
@@ -86,7 +88,7 @@ class StudentJoinSearchField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(
-            color: AppColors.teal520.withValues(alpha: 0.3),
+            color: colors.brandStrong.withValues(alpha: 0.3),
           ),
         ),
       ),

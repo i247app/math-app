@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/helpers/score_number.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
@@ -19,6 +19,7 @@ class AssessmentScoreRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final slashIndex = scoreText.indexOf('/');
     final scoreValue = slashIndex == -1
         ? scoreText
@@ -40,11 +41,11 @@ class AssessmentScoreRing extends StatelessWidget {
                 width: 192,
                 height: 160,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE6F0F7).withValues(alpha: 0.42),
+                  color: colors.infoSurface.withValues(alpha: 0.42),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFE6F0F7).withValues(alpha: 0.70),
+                      color: colors.infoSurface.withValues(alpha: 0.70),
                       blurRadius: 32,
                       spreadRadius: 0,
                     ),
@@ -67,7 +68,7 @@ class AssessmentScoreRing extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: scoreValue,
-                          style: GoogleFonts.andika(
+                          style: context.textStyles.displayLarge?.copyWith(
                             color: accentColor,
                             fontSize: 48,
                             fontWeight: FontWeight.w800,
@@ -77,8 +78,8 @@ class AssessmentScoreRing extends StatelessWidget {
                         ),
                         TextSpan(
                           text: scoreTotal,
-                          style: GoogleFonts.andika(
-                            color: Colors.black,
+                          style: context.textStyles.displayLarge?.copyWith(
+                            color: colors.textPrimary,
                             fontSize: FontSize.displayLarge,
                             fontWeight: FontWeight.w800,
                             height: 40 / 36,
@@ -90,8 +91,8 @@ class AssessmentScoreRing extends StatelessWidget {
                   ),
                   Text(
                     context.getText(AppKeys.scoreUpper),
-                    style: GoogleFonts.andika(
-                      color: AppColors.textSubtle,
+                    style: context.textStyles.labelSmall?.copyWith(
+                      color: colors.textMuted,
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       height: 15 / 10,

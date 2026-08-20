@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key, this.message});
@@ -14,6 +14,7 @@ class LoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -27,7 +28,7 @@ class LoadingScreen extends StatelessWidget {
         final indicatorSize = shortSide * 0.14;
 
         return Material(
-          color: Colors.white,
+          color: colors.surface,
           child: SizedBox(
             width: width,
             height: height,
@@ -50,8 +51,8 @@ class LoadingScreen extends StatelessWidget {
                     child: Text(
                       'NUMINUMI',
                       maxLines: 1,
-                      style: GoogleFonts.andika(
-                        color: const Color(0xFF2C8B8D),
+                      style: context.textStyles.displaySmall?.copyWith(
+                        color: colors.brandStrong,
                         fontSize: logoFontSize,
                         fontWeight: FontWeight.w700,
                         height: 0.62,
@@ -90,17 +91,23 @@ class _SessionLoadingStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Column(
       children: [
-        _OrbitLoadingIndicator(size: indicatorSize),
+        _OrbitLoadingIndicator(
+          size: indicatorSize,
+          trackColor: colors.skeleton,
+          activeColor: colors.brandStrong,
+          dotColor: colors.accentStrong,
+        ),
         SizedBox(height: indicatorSize * 0.34),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36),
           child: Text(
             message,
             textAlign: TextAlign.center,
-            style: GoogleFonts.andika(
-              color: AppColors.muted,
+            style: context.textStyles.bodyMedium?.copyWith(
+              color: colors.textSecondary,
               fontSize: fontSize,
               fontWeight: FontWeight.w800,
               height: 1.25,
@@ -115,9 +122,17 @@ class _SessionLoadingStatus extends StatelessWidget {
 }
 
 class _OrbitLoadingIndicator extends StatefulWidget {
-  const _OrbitLoadingIndicator({required this.size});
+  const _OrbitLoadingIndicator({
+    required this.size,
+    required this.trackColor,
+    required this.activeColor,
+    required this.dotColor,
+  });
 
   final double size;
+  final Color trackColor;
+  final Color activeColor;
+  final Color dotColor;
 
   @override
   State<_OrbitLoadingIndicator> createState() => _OrbitLoadingIndicatorState();
@@ -149,7 +164,12 @@ class _OrbitLoadingIndicatorState extends State<_OrbitLoadingIndicator>
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) => CustomPaint(
-          painter: _OrbitLoadingPainter(progress: _controller.value),
+          painter: _OrbitLoadingPainter(
+            progress: _controller.value,
+            trackColor: widget.trackColor,
+            activeColor: widget.activeColor,
+            dotColor: widget.dotColor,
+          ),
         ),
       ),
     );
@@ -157,9 +177,17 @@ class _OrbitLoadingIndicatorState extends State<_OrbitLoadingIndicator>
 }
 
 class _OrbitLoadingPainter extends CustomPainter {
-  const _OrbitLoadingPainter({required this.progress});
+  const _OrbitLoadingPainter({
+    required this.progress,
+    required this.trackColor,
+    required this.activeColor,
+    required this.dotColor,
+  });
 
   final double progress;
+  final Color trackColor;
+  final Color activeColor;
+  final Color dotColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -170,13 +198,13 @@ class _OrbitLoadingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFFDAEFF0);
+      ..color = trackColor;
     final activePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round
-      ..color = AppColors.teal;
-    final dotPaint = Paint()..color = const Color(0xFFF97952);
+      ..color = activeColor;
+    final dotPaint = Paint()..color = dotColor;
 
     canvas.drawCircle(center, radius, basePaint);
     canvas.drawArc(
@@ -200,6 +228,9 @@ class _OrbitLoadingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _OrbitLoadingPainter oldDelegate) {
-    return oldDelegate.progress != progress;
+    return oldDelegate.progress != progress ||
+        oldDelegate.trackColor != trackColor ||
+        oldDelegate.activeColor != activeColor ||
+        oldDelegate.dotColor != dotColor;
   }
 }

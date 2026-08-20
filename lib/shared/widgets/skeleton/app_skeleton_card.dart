@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_shimmer.dart';
 
 /// A self-animating card that wraps content with a shimmer loading effect.
@@ -13,8 +14,8 @@ class AppSkeletonCard extends StatefulWidget {
     required this.child,
     this.padding = EdgeInsets.zero,
     this.borderRadius,
-    this.color = Colors.white,
-    this.borderColor = const Color(0x33C4C6D2),
+    this.color,
+    this.borderColor,
     this.animationDuration = const Duration(milliseconds: 1250),
   });
 
@@ -22,8 +23,8 @@ class AppSkeletonCard extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final double? borderRadius;
-  final Color color;
-  final Color borderColor;
+  final Color? color;
+  final Color? borderColor;
   final Duration animationDuration;
 
   @override
@@ -45,17 +46,18 @@ class _AppSkeletonCardState extends State<AppSkeletonCard>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final radius = widget.borderRadius ?? 24 * widget.scale;
     return AppSkeletonShimmer(
       controller: _controller,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: widget.color,
+          color: widget.color ?? colors.elevatedSurface,
           borderRadius: BorderRadius.circular(radius),
-          border: Border.all(color: widget.borderColor),
+          border: Border.all(color: widget.borderColor ?? colors.border),
           boxShadow: [
             BoxShadow(
-              color: const Color(0x1A002B6A),
+              color: colors.shadow,
               blurRadius: 20 * widget.scale,
               spreadRadius: -4 * widget.scale,
               offset: Offset(0, 4 * widget.scale),

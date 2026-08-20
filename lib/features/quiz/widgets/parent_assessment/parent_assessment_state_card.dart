@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentAssessmentStateCard extends StatelessWidget {
@@ -19,24 +21,25 @@ class ParentAssessmentStateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE1E8E7)),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Icon(icon, color: const Color(0xFF339395), size: 32),
+            child: Icon(icon, color: colors.brandStrong, size: 32),
           ),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF17252B),
+            style: context.textStyles.titleMedium?.copyWith(
+              color: colors.textPrimary,
               fontSize: FontSize.normal,
               fontWeight: FontWeight.w900,
             ),
@@ -46,8 +49,8 @@ class ParentAssessmentStateCard extends StatelessWidget {
             child: Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Color(0xFF77859A),
+              style: context.textStyles.bodySmall?.copyWith(
+                color: colors.textMuted,
                 fontSize: FontSize.caption,
                 fontWeight: FontWeight.w600,
               ),

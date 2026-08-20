@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 Future<bool> showUnsavedChangesExitDialog(BuildContext context) {
   return showExitConfirmationDialog(
@@ -31,7 +32,7 @@ Future<bool> showExitConfirmationDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         title: Text(
           context.getText(titleKey),
-          style: TextStyle(
+          style: context.textStyles.titleLarge?.copyWith(
             color: colors.textPrimary,
             fontWeight: FontWeight.w900,
             letterSpacing: 0,
@@ -39,7 +40,7 @@ Future<bool> showExitConfirmationDialog(
         ),
         content: Text(
           context.getText(messageKey),
-          style: TextStyle(
+          style: context.textStyles.bodyMedium?.copyWith(
             color: colors.textSecondary,
             fontWeight: FontWeight.w700,
             letterSpacing: 0,
@@ -51,7 +52,7 @@ Future<bool> showExitConfirmationDialog(
             onPressed: () => Navigator.of(dialogContext).pop(false),
             child: Text(
               context.getText(stayActionKey),
-              style: TextStyle(
+              style: context.textStyles.labelLarge?.copyWith(
                 color: colors.brandStrong,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.8,
@@ -66,7 +67,7 @@ Future<bool> showExitConfirmationDialog(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             child: Text(
               context.getText(exitActionKey),
-              style: const TextStyle(
+              style: context.textStyles.labelLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.8,
               ),

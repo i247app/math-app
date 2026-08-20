@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 import 'app_theme_colors.dart';
+import 'app_typography.dart';
 
 abstract final class AppTheme {
   const AppTheme._();
 
   static ThemeData light() {
-    final textTheme = GoogleFonts.andikaTextTheme();
+    final textTheme = AppTypography.light();
     final colorScheme =
         ColorScheme.fromSeed(
           seedColor: AppColors.teal,
@@ -102,11 +102,7 @@ abstract final class AppTheme {
   }
 
   static ThemeData dark() {
-    final textTheme = GoogleFonts.andikaTextTheme(ThemeData.dark().textTheme)
-        .apply(
-          bodyColor: AppColors.darkOnSurface,
-          displayColor: AppColors.darkOnSurface,
-        );
+    final textTheme = AppTypography.dark();
     const colorScheme = ColorScheme.dark(
       primary: AppColors.darkPrimaryTeal,
       onPrimary: AppColors.darkOnPrimary,

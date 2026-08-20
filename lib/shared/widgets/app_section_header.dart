@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 /// A shared section header with a title on the left and an optional action
@@ -38,10 +40,13 @@ class AppSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final titleToken = context.textStyles.titleMedium ?? const TextStyle();
+    final actionToken = context.textStyles.bodyMedium ?? const TextStyle();
     final effectiveTitleStyle =
         titleStyle ??
-        TextStyle(
-          color: const Color(0xFF001741),
+        titleToken.copyWith(
+          color: colors.textPrimary,
           fontSize: FontSize.normal * scale,
           fontWeight: FontWeight.w900,
           height: 1.25,
@@ -50,8 +55,8 @@ class AppSectionHeader extends StatelessWidget {
 
     final effectiveActionStyle =
         actionStyle ??
-        TextStyle(
-          color: const Color(0xFFBC3B14),
+        actionToken.copyWith(
+          color: colors.accentStrong,
           fontSize: FontSize.small * scale,
           fontWeight: FontWeight.w900,
           decoration: TextDecoration.underline,

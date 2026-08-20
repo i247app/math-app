@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 /// The standard top-of-page header used by the app's scrollable screens.
@@ -62,7 +62,7 @@ class PageHeader extends StatelessWidget {
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.andika(
+                    style: context.textStyles.titleLarge?.copyWith(
                       color: colors.brandStrong,
                       fontSize: titleFontSize,
                       fontWeight: FontWeight.w700,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 class StudentHomeworkSearchField extends StatelessWidget {
   const StudentHomeworkSearchField({
@@ -20,28 +20,29 @@ class StudentHomeworkSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return TextField(
       controller: controller,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       textInputAction: TextInputAction.search,
       textAlignVertical: TextAlignVertical.center,
-      style: GoogleFonts.andika(
-        color: AppColors.textNavy,
+      style: context.textStyles.bodyLarge?.copyWith(
+        color: colors.textPrimary,
         fontSize: FontSize.normal,
         fontWeight: FontWeight.w500,
         height: 24 / 16,
       ),
       decoration: InputDecoration(
         hintText: context.getText(AppKeys.studentHomeworkSearchHint),
-        hintStyle: GoogleFonts.andika(
-          color: const Color(0xFF515F54).withValues(alpha: 0.7),
+        hintStyle: context.textStyles.bodyLarge?.copyWith(
+          color: colors.inputHint,
           fontSize: FontSize.normal,
           fontWeight: FontWeight.w400,
           height: 24 / 16,
         ),
         filled: true,
-        fillColor: const Color(0xFFEBEEF1),
+        fillColor: colors.inputSurface,
         contentPadding: const EdgeInsets.fromLTRB(19, 14, 19, 10),
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 19, right: 9),
@@ -63,9 +64,9 @@ class StudentHomeworkSearchField extends StatelessWidget {
                   controller.clear();
                   onChanged('');
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.close_rounded,
-                  color: AppColors.textMuted,
+                  color: colors.textMuted,
                   size: 18,
                 ),
               ),
@@ -84,7 +85,7 @@ class StudentHomeworkSearchField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(
-            color: AppColors.teal500.withValues(alpha: 0.35),
+            color: colors.brandStrong.withValues(alpha: 0.35),
           ),
         ),
       ),

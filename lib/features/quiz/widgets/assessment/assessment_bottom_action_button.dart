@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class AssessmentBottomActionButton extends StatelessWidget {
@@ -23,6 +24,7 @@ class AssessmentBottomActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final enabled = onTap != null;
     final colorScheme = Theme.of(context).colorScheme;
     final effectiveForeground = enabled
@@ -49,7 +51,7 @@ class AssessmentBottomActionButton extends StatelessWidget {
                 ? null
                 : [
                     BoxShadow(
-                      color: AppColors.teal700.withValues(alpha: 0.20),
+                      color: colors.shadow,
                       blurRadius: 6,
                       offset: const Offset(0, 4),
                     ),
@@ -63,7 +65,7 @@ class AssessmentBottomActionButton extends StatelessWidget {
               Text(
                 label,
                 maxLines: 1,
-                style: TextStyle(
+                style: context.textStyles.labelSmall?.copyWith(
                   color: effectiveForeground,
                   fontSize: FontSize.xxs,
                   fontWeight: FontWeight.w900,

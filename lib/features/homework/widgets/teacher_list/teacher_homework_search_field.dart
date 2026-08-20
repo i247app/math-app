@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 class TeacherHomeworkSearchField extends StatelessWidget {
   const TeacherHomeworkSearchField({
@@ -42,14 +42,14 @@ class TeacherHomeworkSearchField extends StatelessWidget {
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
           textInputAction: TextInputAction.search,
           textAlignVertical: TextAlignVertical.center,
-          style: GoogleFonts.andika(
+          style: context.textStyles.bodyLarge?.copyWith(
             color: colors.textPrimary,
             fontSize: FontSize.normal,
             fontWeight: FontWeight.w600,
           ),
           decoration: InputDecoration(
             hintText: context.getText(AppKeys.teacherAssignmentSearchHint),
-            hintStyle: GoogleFonts.andika(
+            hintStyle: context.textStyles.bodyLarge?.copyWith(
               color: colors.inputHint,
               fontSize: FontSize.normal,
               fontWeight: FontWeight.w500,

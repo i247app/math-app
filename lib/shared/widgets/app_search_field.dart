@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class AppSearchField extends StatelessWidget {
@@ -19,15 +21,16 @@ class AppSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 42,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.inputSurface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE4DDDF)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: colors.shadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -41,21 +44,21 @@ class AppSearchField extends StatelessWidget {
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
           textInputAction: TextInputAction.search,
           textAlignVertical: TextAlignVertical.center,
-          style: const TextStyle(
-            color: Color(0xFF17252B),
+          style: context.textStyles.bodyLarge?.copyWith(
+            color: colors.textPrimary,
             fontSize: FontSize.normal,
             fontWeight: FontWeight.w700,
           ),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: const TextStyle(
-              color: Color(0xFFD8C5CC),
+            hintStyle: context.textStyles.bodyLarge?.copyWith(
+              color: colors.inputHint,
               fontSize: FontSize.normal,
               fontWeight: FontWeight.w700,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.search_rounded,
-              color: Color(0xFF063A7B),
+              color: colors.brandStrong,
               size: 23,
             ),
             suffixIcon: value.text.isNotEmpty
@@ -68,9 +71,9 @@ class AppSearchField extends StatelessWidget {
                     tooltip: MaterialLocalizations.of(
                       context,
                     ).closeButtonTooltip,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close_rounded,
-                      color: Color(0xFF063A7B),
+                      color: colors.brandStrong,
                       size: 20,
                     ),
                   )
@@ -78,9 +81,9 @@ class AppSearchField extends StatelessWidget {
                 ? null
                 : IconButton(
                     onPressed: onFilterPressed,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.tune_rounded,
-                      color: Color(0xFF063A7B),
+                      color: colors.brandStrong,
                       size: 21,
                     ),
                   ),

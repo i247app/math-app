@@ -14,7 +14,7 @@ class AppFormFieldLayout extends StatelessWidget {
     this.height = 56,
     this.horizontalPadding = 16,
     this.borderRadius = 14,
-    this.borderColor = const Color(0xFFD8E4E7),
+    this.borderColor,
     this.borderWidth = 1.6,
   });
 
@@ -27,7 +27,7 @@ class AppFormFieldLayout extends StatelessWidget {
   final double height;
   final double horizontalPadding;
   final double borderRadius;
-  final Color borderColor;
+  final Color? borderColor;
   final double borderWidth;
 
   @override
@@ -57,9 +57,7 @@ class AppFormFieldLayout extends StatelessWidget {
             color: colors.inputSurface,
             borderRadius: BorderRadius.circular(borderRadius * scale),
             border: Border.all(
-              color: borderColor == const Color(0xFFD8E4E7)
-                  ? colors.border
-                  : borderColor,
+              color: borderColor ?? colors.border,
               width: borderWidth * scale,
             ),
           ),

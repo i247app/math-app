@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class TeacherPrimaryButton extends StatelessWidget {
@@ -21,6 +22,7 @@ class TeacherPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: SizedBox(
@@ -33,7 +35,7 @@ class TeacherPrimaryButton extends StatelessWidget {
                 ? null
                 : [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.25),
+                      color: colors.shadow,
                       blurRadius: 2,
                       offset: const Offset(0, 4),
                     ),
@@ -41,8 +43,8 @@ class TeacherPrimaryButton extends StatelessWidget {
           ),
           child: Material(
             color: onPressed == null
-                ? AppColors.teal520.withValues(alpha: 0.45)
-                : AppColors.teal520,
+                ? colors.disabledBackground
+                : colors.brandStrong,
             borderRadius: BorderRadius.circular(20),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
@@ -53,14 +55,14 @@ class TeacherPrimaryButton extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: context.textStyles.titleLarge?.copyWith(
+                      color: colors.onBrand,
                       fontSize: FontSize.large,
                       fontWeight: FontWeight.w700,
                       height: 1,
                     ),
                   ),
-                  Icon(icon, color: Colors.white, size: 18),
+                  Icon(icon, color: colors.onBrand, size: 18),
                 ],
               ),
             ),

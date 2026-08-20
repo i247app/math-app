@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class AppContentSection extends StatelessWidget {
@@ -45,7 +46,7 @@ class AppContentSection extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: context.textStyles.titleMedium?.copyWith(
                     color: colors.textPrimary,
                     fontSize: FontSize.xl,
                     fontWeight: FontWeight.w600,
@@ -63,7 +64,7 @@ class AppContentSection extends StatelessWidget {
                   ),
                   label: Text(
                     context.getText(AppKeys.viewAll),
-                    style: const TextStyle(
+                    style: context.textStyles.labelMedium?.copyWith(
                       fontSize: FontSize.caption,
                       fontWeight: FontWeight.w800,
                     ),

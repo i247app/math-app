@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi/core/theme/app_theme_colors.dart';
+
 /// A simple rounded rectangle used as a skeleton placeholder block.
 ///
 /// Replaces both [TeacherSkeletonBlock] (simple colored rect) and
@@ -13,7 +15,7 @@ class AppSkeletonBlock extends StatelessWidget {
     this.width,
     this.height,
     required this.radius,
-    this.color = const Color(0xFFF3F7FA),
+    this.color,
     this.child,
     this.outlined = false,
   });
@@ -23,7 +25,7 @@ class AppSkeletonBlock extends StatelessWidget {
   final double radius;
 
   /// Fill color. In [outlined] mode this is the inner overlay color.
-  final Color color;
+  final Color? color;
 
   final Widget? child;
 
@@ -32,12 +34,14 @@ class AppSkeletonBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final resolvedColor = color ?? colors.skeleton;
     if (!outlined) {
       return Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: color,
+          color: resolvedColor,
           borderRadius: BorderRadius.circular(radius),
         ),
         child: child,
@@ -48,13 +52,13 @@ class AppSkeletonBlock extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: const Color(0xFFE8ECEB)),
+        border: Border.all(color: colors.border),
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.58),
+          color: resolvedColor.withValues(alpha: 0.58),
           borderRadius: BorderRadius.circular(radius),
         ),
         child: child,

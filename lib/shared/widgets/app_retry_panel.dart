@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class AppRetryPanel extends StatelessWidget {
@@ -45,7 +45,7 @@ class AppRetryPanel extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: GoogleFonts.andika(
+            style: context.textStyles.bodySmall?.copyWith(
               color: filledAction ? colors.textPrimary : colors.textSecondary,
               fontSize: messageFontSize * scale,
               fontWeight: messageFontWeight,

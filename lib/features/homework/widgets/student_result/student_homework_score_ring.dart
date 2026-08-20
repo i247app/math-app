@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 class StudentHomeworkScoreRing extends StatelessWidget {
   const StudentHomeworkScoreRing({super.key, required this.scoreText});
@@ -35,11 +34,11 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                 width: 192,
                 height: 160,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE6F0F7).withValues(alpha: 0.42),
+                  color: colors.infoSurface.withValues(alpha: 0.42),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFE6F0F7).withValues(alpha: 0.70),
+                      color: colors.infoSurface.withValues(alpha: 0.70),
                       blurRadius: 32,
                     ),
                   ],
@@ -65,8 +64,8 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: scoreValue,
-                          style: GoogleFonts.andika(
-                            color: AppColors.scoreGreen,
+                          style: context.textStyles.displayLarge?.copyWith(
+                            color: colors.success,
                             fontSize: 48,
                             fontWeight: FontWeight.w800,
                             height: 40 / 48,
@@ -75,7 +74,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                         ),
                         TextSpan(
                           text: scoreTotal,
-                          style: GoogleFonts.andika(
+                          style: context.textStyles.displayLarge?.copyWith(
                             color: colors.textPrimary,
                             fontSize: FontSize.displayLarge,
                             fontWeight: FontWeight.w800,
@@ -88,7 +87,7 @@ class StudentHomeworkScoreRing extends StatelessWidget {
                   ),
                   Text(
                     context.getText(AppKeys.scoreUpper),
-                    style: GoogleFonts.andika(
+                    style: context.textStyles.labelSmall?.copyWith(
                       color: colors.textSecondary,
                       fontSize: 10,
                       fontWeight: FontWeight.w800,

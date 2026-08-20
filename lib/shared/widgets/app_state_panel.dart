@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class AppStatePanel extends StatelessWidget {
@@ -82,7 +83,7 @@ class AppStatePanel extends StatelessWidget {
               textAlign: TextAlign.center,
               style:
                   titleStyle ??
-                  TextStyle(
+                  context.textStyles.bodyLarge?.copyWith(
                     color: colors.textPrimary,
                     fontSize: FontSize.normal,
                     fontWeight: FontWeight.w900,
@@ -97,7 +98,7 @@ class AppStatePanel extends StatelessWidget {
               textAlign: TextAlign.center,
               style:
                   messageStyle ??
-                  TextStyle(
+                  context.textStyles.bodySmall?.copyWith(
                     color: colors.textMuted,
                     fontSize: FontSize.caption,
                     fontWeight: FontWeight.w700,

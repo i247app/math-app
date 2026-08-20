@@ -32,6 +32,13 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Andika
+      fonts:
+        - asset: assets/fonts/Andika-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Andika-Bold.ttf
+          weight: 700
   assets:
     - assets/avatars/
     - assets/images/

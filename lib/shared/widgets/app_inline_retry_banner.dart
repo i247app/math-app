@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi/core/theme/app_typography.dart';
+
 class AppInlineRetryBanner extends StatelessWidget {
   const AppInlineRetryBanner({
     super.key,
@@ -61,7 +63,7 @@ class AppInlineRetryBanner extends StatelessWidget {
               message,
               maxLines: maxLines,
               overflow: maxLines == null ? null : TextOverflow.ellipsis,
-              style: TextStyle(
+              style: context.textStyles.bodySmall?.copyWith(
                 color: textColor,
                 fontSize: fontSize,
                 fontWeight: fontWeight,

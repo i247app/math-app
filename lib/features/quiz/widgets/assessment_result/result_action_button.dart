@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class AssessmentResultActionButton extends StatelessWidget {
@@ -19,6 +20,7 @@ class AssessmentResultActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -32,7 +34,7 @@ class AssessmentResultActionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
+                color: colors.shadow,
                 blurRadius: 2,
                 offset: const Offset(0, 4),
               ),
@@ -48,8 +50,8 @@ class AssessmentResultActionButton extends StatelessWidget {
                   child: Text(
                     label,
                     maxLines: 1,
-                    style: GoogleFonts.andika(
-                      color: Colors.white,
+                    style: context.textStyles.titleLarge?.copyWith(
+                      color: colors.onBrand,
                       fontSize: FontSize.large,
                       fontWeight: FontWeight.w800,
                       height: 28 / 18,
@@ -59,7 +61,7 @@ class AssessmentResultActionButton extends StatelessWidget {
                 ),
               ),
               if (icon != null)
-                Icon(icon, color: Colors.white, size: 18, weight: 700),
+                Icon(icon, color: colors.onBrand, size: 18, weight: 700),
             ],
           ),
         ),
