@@ -49,8 +49,11 @@ void main() {
     await tester.pump();
 
     final mainScrollable = find.descendant(
-      of: find.byType(SingleChildScrollView),
-      matching: find.byType(Scrollable),
+      of: find.byKey(const ValueKey('question-content')),
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is Scrollable && widget.physics is BouncingScrollPhysics,
+      ),
     );
     expect(mainScrollable, findsOneWidget);
     final scrollable = tester.state<ScrollableState>(mainScrollable);

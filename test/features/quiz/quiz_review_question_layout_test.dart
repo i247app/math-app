@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:numi/core/localization/lingo_provider.dart';
+import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_question_card.dart';
@@ -20,14 +22,19 @@ void main() {
     correctAnswer: 'A',
   );
 
-  Widget testApp(Widget child) {
+  Widget testApp(Widget child, LingoProvider lingo) {
     return MaterialApp(
       theme: ThemeData(
         useMaterial3: true,
         extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
       ),
-      home: Scaffold(
-        body: SingleChildScrollView(child: SizedBox(width: 360, child: child)),
+      home: LingoScope(
+        lingo: lingo,
+        child: Scaffold(
+          body: SingleChildScrollView(
+            child: SizedBox(width: 360, child: child),
+          ),
+        ),
       ),
     );
   }
@@ -35,8 +42,11 @@ void main() {
   testWidgets('retry question card expands and shows the complete question', (
     tester,
   ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
     await tester.pumpWidget(
-      testApp(const QuizReviewQuestionCard(question: question)),
+      testApp(const QuizReviewQuestionCard(question: question), lingo),
     );
 
     final questionText = tester.widget<Text>(find.text(longQuestion));
@@ -53,12 +63,16 @@ void main() {
   testWidgets('result question card shows the complete question', (
     tester,
   ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
     await tester.pumpWidget(
       testApp(
         const QuizReviewResultQuestionCard(
           question: question,
           selectedLabel: 'B',
         ),
+        lingo,
       ),
     );
 

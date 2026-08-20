@@ -35,7 +35,7 @@ class NetworkClient {
     String? baseUrl,
     Dio? dio,
     AuthTokenStore? authTokenStore,
-    AppApiMetadataProvider? metadataProvider,
+    ApiMetadataProvider? metadataProvider,
   }) : _baseUrl = _normalizeBaseUrl(baseUrl ?? ApiConfig.baseUrl),
        _dio = dio ?? Dio(),
        _authTokenStore = authTokenStore ?? CachedAuthTokenStore.instance,
@@ -65,7 +65,7 @@ class NetworkClient {
   final String _baseUrl;
   final Dio _dio;
   final AuthTokenStore _authTokenStore;
-  final AppApiMetadataProvider _metadataProvider;
+  final ApiMetadataProvider _metadataProvider;
 
   Future<Map<String, dynamic>> postJson(
     String path,

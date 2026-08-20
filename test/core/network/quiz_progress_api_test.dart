@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/network/api_metadata.dart';
+import 'package:numi/core/network/auth_token_store.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/network/quiz_models.dart';
 
@@ -64,7 +66,12 @@ void main() {
     String? requestPath;
     Map<String, dynamic>? requestBody;
     final dio = Dio();
-    final client = NetworkClient(baseUrl: 'https://example.test', dio: dio);
+    final client = NetworkClient(
+      baseUrl: 'https://example.test',
+      dio: dio,
+      metadataProvider: const _TestMetadataProvider(),
+      authTokenStore: _TestAuthTokenStore(),
+    );
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
@@ -136,4 +143,30 @@ void main() {
     expect(response.summary?.averageDelta, -1.8);
     expect(response.summary?.trend, 'NEED_TO_TRY');
   });
+}
+
+class _TestMetadataProvider implements ApiMetadataProvider {
+  const _TestMetadataProvider();
+
+  @override
+  Future<Map<String, Object>> buildMetadata() async {
+    return <String, Object>{'device_uuid': 'test-device'};
+  }
+}
+
+class _TestAuthTokenStore implements AuthTokenStore {
+  String? _token;
+
+  @override
+  Future<void> clearToken() async {
+    _token = null;
+  }
+
+  @override
+  Future<String?> readToken() async => _token;
+
+  @override
+  Future<void> writeToken(String token) async {
+    _token = token;
+  }
 }
