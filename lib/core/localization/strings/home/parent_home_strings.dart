@@ -74,6 +74,15 @@ const parentHomeStrings = <String, Map<String, String>>{
         'Chúc mừng cả lớp đã hoàn thành tốt hoạt động hôm nay!',
     AppKeys.parentMessagesTeacherThree: 'Cô Tuyết Mai',
     AppKeys.parentMessagesTeacherFour: 'Thầy Hoàng Nam',
+    AppKeys.parentMessagesTeacherFive: 'Thầy Tú',
+    AppKeys.parentMessagesTeacherSix: 'Cô Mai',
+    AppKeys.parentMessagesTeacherSeven: 'Thầy Hoan',
+    AppKeys.parentMessagesContactsTitle: 'Danh Sách',
+    AppKeys.parentMessagesOnlineLabel: 'ONLINE',
+    AppKeys.parentMessagesOfflineLabel: 'OFFLINE',
+    AppKeys.parentMessagesActiveNow: 'Đang hoạt động',
+    AppKeys.parentMessagesOfflineHours: 'Offline {count} giờ trước',
+    AppKeys.parentMessagesOfflineDays: 'Offline {count} ngày trước',
     AppKeys.parentMessagesBodyThree:
         'Bạn ơi, đừng quên lịch họp phụ huynh cuối tuần này nhé.',
     AppKeys.parentMessagesBodyFour:
@@ -171,6 +180,15 @@ const parentHomeStrings = <String, Map<String, String>>{
         'Congratulations to the class for completing today’s activity!',
     AppKeys.parentMessagesTeacherThree: 'Ms. Tuyet Mai',
     AppKeys.parentMessagesTeacherFour: 'Mr. Hoang Nam',
+    AppKeys.parentMessagesTeacherFive: 'Mr. Tu',
+    AppKeys.parentMessagesTeacherSix: 'Ms. Mai',
+    AppKeys.parentMessagesTeacherSeven: 'Mr. Hoan',
+    AppKeys.parentMessagesContactsTitle: 'Contacts',
+    AppKeys.parentMessagesOnlineLabel: 'ONLINE',
+    AppKeys.parentMessagesOfflineLabel: 'OFFLINE',
+    AppKeys.parentMessagesActiveNow: 'Active now',
+    AppKeys.parentMessagesOfflineHours: 'Offline {count} hours ago',
+    AppKeys.parentMessagesOfflineDays: 'Offline {count} days ago',
     AppKeys.parentMessagesBodyThree:
         'Please remember the parent meeting scheduled for this weekend.',
     AppKeys.parentMessagesBodyFour:

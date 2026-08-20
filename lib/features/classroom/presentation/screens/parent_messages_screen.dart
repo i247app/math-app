@@ -4,6 +4,8 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/classroom/presentation/screens/parent_message_contacts_screen.dart';
+import 'package:numi/features/classroom/widgets/parent_messages/parent_message_contact_data.dart';
 import 'package:numi/features/classroom/widgets/parent_messages/parent_message_contact_item.dart';
 import 'package:numi/features/classroom/widgets/parent_messages/parent_message_preview_tile.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
@@ -80,7 +82,7 @@ class _ParentMessagesScreenState extends State<ParentMessagesScreen> {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: TextButton.icon(
-                      onPressed: _showComingSoon,
+                      onPressed: _openContacts,
                       iconAlignment: IconAlignment.end,
                       icon: const Icon(Icons.chevron_right_rounded, size: 18),
                       label: Text(
@@ -137,21 +139,11 @@ class _ParentMessagesScreenState extends State<ParentMessagesScreen> {
     );
   }
 
-  List<({String name, String asset})> _contacts(BuildContext context) => [
-    (name: widget.teacherName, asset: homeTeacherAvatarOneAsset),
-    (
-      name: context.getText(AppKeys.homeMessageTeacherTwo),
-      asset: homeTeacherAvatarTwoAsset,
-    ),
-    (
-      name: context.getText(AppKeys.parentMessagesTeacherThree),
-      asset: homeTeacherAvatarOneAsset,
-    ),
-    (
-      name: context.getText(AppKeys.parentMessagesTeacherFour),
-      asset: homeTeacherAvatarTwoAsset,
-    ),
-  ];
+  List<ParentMessageContactData> _contacts(BuildContext context) =>
+      parentMessageContacts(
+        context,
+        primaryTeacherName: widget.teacherName,
+      ).where((contact) => contact.isOnline).toList(growable: false);
 
   List<_ParentMessageConversation> _conversations(BuildContext context) => [
     _ParentMessageConversation(
@@ -190,6 +182,16 @@ class _ParentMessagesScreenState extends State<ParentMessagesScreen> {
   void _showComingSoon() {
     HapticFeedback.selectionClick();
     context.showInfoDialog(context.getText(AppKeys.studentClassComingSoon));
+  }
+
+  void _openContacts() {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            ParentMessageContactsScreen(primaryTeacherName: widget.teacherName),
+      ),
+    );
   }
 }
 

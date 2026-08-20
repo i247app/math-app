@@ -206,6 +206,15 @@ class AppKeys {
   static const parentMessagesGroupPreview = 'parent_messages_group_preview';
   static const parentMessagesTeacherThree = 'parent_messages_teacher_three';
   static const parentMessagesTeacherFour = 'parent_messages_teacher_four';
+  static const parentMessagesTeacherFive = 'parent_messages_teacher_five';
+  static const parentMessagesTeacherSix = 'parent_messages_teacher_six';
+  static const parentMessagesTeacherSeven = 'parent_messages_teacher_seven';
+  static const parentMessagesContactsTitle = 'parent_messages_contacts_title';
+  static const parentMessagesOnlineLabel = 'parent_messages_online_label';
+  static const parentMessagesOfflineLabel = 'parent_messages_offline_label';
+  static const parentMessagesActiveNow = 'parent_messages_active_now';
+  static const parentMessagesOfflineHours = 'parent_messages_offline_hours';
+  static const parentMessagesOfflineDays = 'parent_messages_offline_days';
   static const parentMessagesBodyThree = 'parent_messages_body_three';
   static const parentMessagesBodyFour = 'parent_messages_body_four';
   static const parentMessagesTimeThree = 'parent_messages_time_three';

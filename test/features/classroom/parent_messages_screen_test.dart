@@ -36,6 +36,31 @@ void main() {
     await tester.pump();
 
     expect(find.byType(ParentMessagePreviewTile), findsOneWidget);
-    expect(find.text('Cô Tuyết Mai'), findsNWidgets(2));
+    expect(find.text('Cô Tuyết Mai'), findsOneWidget);
+  });
+
+  testWidgets('view all opens the contact list screen', (tester) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const ParentMessagesScreen(
+            className: 'Lớp 2A1',
+            teacherName: 'Cô Lan',
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Xem tất cả'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Danh Sách'), findsOneWidget);
+    expect(find.text('ONLINE'), findsOneWidget);
+    expect(find.text('OFFLINE'), findsOneWidget);
   });
 }
