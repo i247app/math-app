@@ -4,20 +4,16 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
-import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/home/models/parent_home_entrance_builder.dart';
+import 'package:numi/features/home/parent/home/widgets/parent_class_carousel.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_error_card.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_home_refresh_label.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_teacher_messages_list.dart';
-import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
 import 'package:numi/features/home/widgets/home_monster_rescue_preview_artwork.dart';
 import 'package:numi/features/home/widgets/sections/promo_actions/promo_actions.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
-import 'package:numi/features/classroom/widgets/room_class_summary_card.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
-import 'package:numi/shared/widgets/app_responsive_card_group.dart';
 
 class ParentChildOverviewContent extends StatelessWidget {
   const ParentChildOverviewContent({
@@ -52,12 +48,6 @@ class ParentChildOverviewContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final primarySummary = parentPrimarySummary(summaries);
-    final primaryClass = _classCard(
-      context,
-      primarySummary,
-      onTap: onViewTasks,
-    );
     final showGameSuggestions = pendingExercises.isEmpty || completions.isEmpty;
     final visiblePendingExercises = pendingExercises
         .take(2)
@@ -69,7 +59,7 @@ class ParentChildOverviewContent extends StatelessWidget {
       children: [
         entranceBuilder(
           order: 0,
-          child: AppResponsiveCardGroup(children: [primaryClass]),
+          child: ParentClassCarousel(summaries: summaries, onTap: onViewTasks),
         ),
         if (pendingExercises.isNotEmpty) ...[
           Padding(
@@ -183,25 +173,4 @@ class ParentChildOverviewContent extends StatelessWidget {
       ],
     );
   }
-}
-
-Widget _classCard(
-  BuildContext context,
-  ParentChildSummary? summary, {
-  required VoidCallback onTap,
-}) {
-  final teacherName = summary?.classroom?.teacherName?.trim();
-
-  return RoomClassSummaryCard(
-    studentName: summary == null
-        ? context.getText(AppKeys.parentNoStudentTitle)
-        : profileDisplayName(context, summary.profile),
-    className: summary == null
-        ? context.getText(AppKeys.parentNoClassroom)
-        : parentClassroomName(context, summary),
-    teacherName: teacherName?.isNotEmpty == true
-        ? teacherName!
-        : context.getText(AppKeys.parentNoTeacher),
-    onTap: onTap,
-  );
 }
