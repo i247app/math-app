@@ -8,6 +8,57 @@ import 'package:numi/features/home/parent/home/models/parent_child_summary.dart'
 import 'package:numi/features/home/parent/home/widgets/parent_class_carousel.dart';
 
 void main() {
+  testWidgets('hides children who have not joined a class', (tester) async {
+    const summaries = <ParentChildSummary>[
+      ParentChildSummary(profile: StudentProfile(name: 'Chưa có lớp')),
+      ParentChildSummary(
+        profile: StudentProfile(name: 'An'),
+        classroom: ClassroomModel(name: '2A5', teacherName: 'Thầy An'),
+      ),
+    ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: const Scaffold(
+          body: SizedBox(
+            width: 332,
+            child: ParentClassCarousel(summaries: summaries, onTap: _noOp),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('CHƯA CÓ LỚP'), findsNothing);
+    expect(find.text('AN'), findsOneWidget);
+    expect(find.text('2A5'), findsOneWidget);
+    expect(find.byType(ListView), findsNothing);
+    expect(
+      tester.getSize(find.byKey(const ValueKey('parent-class-card-0'))).width,
+      332,
+    );
+  });
+
+  testWidgets('hides the class list when no child has joined a class', (
+    tester,
+  ) async {
+    const summaries = <ParentChildSummary>[
+      ParentChildSummary(profile: StudentProfile(name: 'An')),
+    ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: const Scaffold(
+          body: ParentClassCarousel(summaries: summaries, onTap: _noOp),
+        ),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey('parent-class-card-0')), findsNothing);
+    expect(find.byType(ListView), findsNothing);
+  });
+
   testWidgets('uses the full available width when there is only one class', (
     tester,
   ) async {

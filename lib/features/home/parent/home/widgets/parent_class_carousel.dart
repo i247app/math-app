@@ -29,31 +29,29 @@ class _ParentClassCarouselState extends State<ParentClassCarousel> {
 
   int _activeIndex = 0;
 
+  List<ParentChildSummary> get _joinedClassSummaries => widget.summaries
+      .where((summary) => summary.classroom != null)
+      .toList(growable: false);
+
   @override
   void didUpdateWidget(covariant ParentClassCarousel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_activeIndex >= widget.summaries.length) {
-      _activeIndex = math.max(0, widget.summaries.length - 1);
+    final joinedClassCount = _joinedClassSummaries.length;
+    if (_activeIndex >= joinedClassCount) {
+      _activeIndex = math.max(0, joinedClassCount - 1);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.summaries.isEmpty) {
-      return SizedBox(
-        height: _cardHeight,
-        child: _ParentClassCard(
-          studentName: context.getText(AppKeys.parentNoStudentTitle),
-          className: context.getText(AppKeys.parentNoClassroom),
-          teacherName: context.getText(AppKeys.parentNoTeacher),
-          backgroundColor: AppColors.brandTeal,
-          onTap: widget.onTap,
-        ),
-      );
+    final joinedClassSummaries = _joinedClassSummaries;
+
+    if (joinedClassSummaries.isEmpty) {
+      return const SizedBox.shrink();
     }
 
-    if (widget.summaries.length == 1) {
-      final summary = widget.summaries.first;
+    if (joinedClassSummaries.length == 1) {
+      final summary = joinedClassSummaries.first;
       final teacherName = summary.classroom?.teacherName?.trim();
 
       return SizedBox(
@@ -85,7 +83,7 @@ class _ParentClassCarouselState extends State<ParentClassCarousel> {
                 onNotification: (notification) {
                   final nextIndex = (notification.metrics.pixels / itemExtent)
                       .round()
-                      .clamp(0, widget.summaries.length - 1);
+                      .clamp(0, joinedClassSummaries.length - 1);
                   if (nextIndex != _activeIndex) {
                     setState(() => _activeIndex = nextIndex);
                   }
@@ -96,10 +94,10 @@ class _ParentClassCarouselState extends State<ParentClassCarousel> {
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.only(right: trailingSpace),
-                  itemCount: widget.summaries.length,
+                  itemCount: joinedClassSummaries.length,
                   separatorBuilder: (_, _) => const SizedBox(width: _cardGap),
                   itemBuilder: (context, index) {
-                    final summary = widget.summaries[index];
+                    final summary = joinedClassSummaries[index];
                     final teacherName = summary.classroom?.teacherName?.trim();
 
                     return SizedBox(
@@ -129,7 +127,11 @@ class _ParentClassCarouselState extends State<ParentClassCarousel> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  for (var index = 0; index < widget.summaries.length; index++)
+                  for (
+                    var index = 0;
+                    index < joinedClassSummaries.length;
+                    index++
+                  )
                     AnimatedContainer(
                       key: ValueKey('parent-class-page-dot-$index'),
                       duration: const Duration(milliseconds: 180),
