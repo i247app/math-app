@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/network/grade_models.dart';
 import 'package:numi/features/quiz/widgets/grade_selection/grade_card.dart';
 import 'package:numi/features/quiz/widgets/grade_selection/grade_load_error.dart';
@@ -35,7 +36,7 @@ class GradeGrid extends StatelessWidget {
       return GradeLoadError(message: errorMessage!, onRetry: onRetry);
     }
 
-    final items =
+    final loadedItems =
         grades
             .where((grade) {
               final label = grade.label?.trim();
@@ -45,12 +46,27 @@ class GradeGrid extends StatelessWidget {
             .toList()
           ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
-    if (items.isEmpty) {
+    if (loadedItems.isEmpty) {
       return GradeLoadError(
         message: context.getText(AppKeys.noGrades),
         onRetry: onRetry,
       );
     }
+
+    final kindergarten = loadedItems
+        .where((option) => option.isKindergarten)
+        .firstOrNull;
+    final items = <GradeOption>[
+      kindergarten ??
+          GradeOption(
+            null,
+            AppLanguageState.current == AppLanguage.vi
+                ? 'Mẫu giáo'
+                : 'Kindergarten',
+            displayOrder: 0,
+          ),
+      ...loadedItems.where((option) => !option.isKindergarten),
+    ].where((option) => option.iconAsset != null).take(6).toList();
 
     return GridView.builder(
       shrinkWrap: true,
@@ -60,7 +76,7 @@ class GradeGrid extends StatelessWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 1.12,
+        childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
         final option = items[index];

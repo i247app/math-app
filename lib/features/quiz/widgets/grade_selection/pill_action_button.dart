@@ -11,6 +11,9 @@ class PillActionButton extends StatelessWidget {
     required this.foreground,
     required this.onPressed,
     this.gradient,
+    this.height = 44,
+    this.fontSize = FontSize.xxs,
+    this.borderRadius = 18,
   });
 
   final String label;
@@ -18,16 +21,20 @@ class PillActionButton extends StatelessWidget {
   final Color foreground;
   final VoidCallback onPressed;
   final Gradient? gradient;
+  final double height;
+  final double fontSize;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44,
+      height: height,
+      width: double.infinity,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: gradient == null ? background : null,
           gradient: gradient,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: gradient == null
               ? null
               : [
@@ -42,7 +49,9 @@ class PillActionButton extends StatelessWidget {
           onPressed: onPressed,
           style: TextButton.styleFrom(
             foregroundColor: foreground,
-            shape: const StadiumBorder(),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(borderRadius),
+            ),
             padding: EdgeInsets.zero,
           ),
           child: Padding(
@@ -53,11 +62,11 @@ class PillActionButton extends StatelessWidget {
                 child: Text(
                   label,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: FontSize.xxs,
+                  style: TextStyle(
+                    fontSize: fontSize,
                     fontWeight: FontWeight.w900,
                     height: 1,
-                    letterSpacing: 0.8,
+                    letterSpacing: 0,
                   ),
                 ),
               ),

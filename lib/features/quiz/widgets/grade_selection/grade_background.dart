@@ -8,19 +8,6 @@ class GradeBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            colors.pageBackgroundTop,
-            colors.pageBackground,
-            colors.pageBackgroundTop,
-          ],
-          stops: const [0, 0.80, 1],
-        ),
-      ),
-    );
+    return ColoredBox(color: colors.pageBackground);
   }
 }

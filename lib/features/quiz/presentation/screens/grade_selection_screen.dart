@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi/core/extension/localization_extension.dart';
-import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/network/grade_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
@@ -201,25 +200,12 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                   Positioned.fill(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(38, 132, 38, 128),
+                      padding: const EdgeInsets.fromLTRB(38, 88, 38, 184),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            context.getText(AppKeys.gradeQuestionTitle),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: colors.textPrimary,
-                              fontSize: 31,
-                              fontWeight: FontWeight.w900,
-                              height: 1.08,
-                              letterSpacing: 0,
-                            ),
-                          ),
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 26),
+                            padding: const EdgeInsets.only(bottom: 12),
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 220),
                               child: showGenerationFailed
@@ -254,7 +240,6 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                     right: 0,
                     bottom: 0,
                     child: GradeBottomBar(
-                      onSkip: openAssessment,
                       onContinue: continueWithSelectedGrade,
                     ),
                   ),

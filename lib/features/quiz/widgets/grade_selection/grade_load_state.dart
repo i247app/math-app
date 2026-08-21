@@ -10,12 +10,12 @@ class GradeLoadState extends StatelessWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: 4,
+      itemCount: 6,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 1.12,
+        childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
         return const GradeSkeletonCard();
