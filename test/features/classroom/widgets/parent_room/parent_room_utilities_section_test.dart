@@ -7,7 +7,7 @@ import 'package:numi/features/classroom/widgets/parent_room/parent_room_utilitie
 import 'package:numi/shared/widgets/app_content_section.dart';
 
 void main() {
-  testWidgets('shows the four parent room utilities in a three-column grid', (
+  testWidgets('shows the six parent room features in a three-column grid', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -33,11 +33,13 @@ void main() {
       ),
     );
 
-    expect(find.text('Tiện ích'), findsOneWidget);
+    expect(find.text('Tính năng'), findsOneWidget);
     expect(find.text('Tin nhắn'), findsOneWidget);
     expect(find.text('Bài Tập'), findsOneWidget);
     expect(find.text('Kiểm Tra'), findsOneWidget);
     expect(find.text('Tài Liệu'), findsOneWidget);
+    expect(find.text('Tiến độ'), findsOneWidget);
+    expect(find.text('Thành viên'), findsOneWidget);
     expect(find.byType(AppContentSection), findsNothing);
 
     final first = find.byKey(const ValueKey('parent-room-utility-message'));

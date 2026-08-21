@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -22,10 +24,13 @@ class ParentRoomDetailHero extends StatelessWidget {
             'grade': entry.classroom.gradeId,
           });
     final description = entry.classroom.description?.trim();
+    final programName = entry.classroom.programName?.trim();
+    final code = _roomCode(entry);
+    final joinLink = 'numinumi.vn/join/$code';
     final colors = context.themeColors;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+      padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(22),
@@ -37,16 +42,16 @@ class ParentRoomDetailHero extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 72,
+                width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFD6E8),
+                  color: const Color(0xFFFF6038),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.school_rounded,
-                  color: Color(0xFFFF5C9E),
-                  size: 34,
+                  color: Colors.white,
+                  size: 32,
                 ),
               ),
               Expanded(
@@ -65,8 +70,9 @@ class ParentRoomDetailHero extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () => parentRoomShowComingSoon(context),
-                icon: const Icon(Icons.share_rounded),
+                onPressed: () => _copy(joinLink),
+                icon: const Icon(Icons.share_outlined),
+                color: colors.textPrimary,
               ),
             ],
           ),
@@ -80,8 +86,10 @@ class ParentRoomDetailHero extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 7),
             child: ParentRoomDetailMeta(
-              icon: Icons.workspace_premium_outlined,
-              label: teacherName,
+              icon: Icons.menu_book_outlined,
+              label: programName?.isNotEmpty == true
+                  ? programName!
+                  : teacherName,
             ),
           ),
           if (description != null && description.isNotEmpty)
@@ -92,8 +100,115 @@ class ParentRoomDetailHero extends StatelessWidget {
                 label: description,
               ),
             ),
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Row(
+              children: [
+                Material(
+                  color: const Color(0xFFF4F8FA),
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
+                    onTap: () => _copy(code),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            code,
+                            style: TextStyle(
+                              color: colors.textPrimary,
+                              fontSize: FontSize.xs,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(width: 7),
+                          SvgPicture.asset(
+                            'assets/icons/teacher-class-copy.svg',
+                            width: 15,
+                            height: 15,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Image.asset(
+                  'assets/icons/teacher-class-qr.png',
+                  width: 20,
+                  height: 20,
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Container(
+              height: 38,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF4FAFA),
+                borderRadius: BorderRadius.circular(13),
+                border: Border.all(color: colors.border),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      joinLink,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.textSecondary,
+                        fontSize: FontSize.xs,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => _copy(joinLink),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.all(3),
+                      child: SvgPicture.asset(
+                        'assets/icons/teacher-class-copy.svg',
+                        width: 17,
+                        height: 17,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  String _roomCode(ParentRoomEntry entry) {
+    final classroomCode = entry.classroom.classroomCode?.trim();
+    if (classroomCode != null && classroomCode.isNotEmpty) {
+      return classroomCode;
+    }
+    final id = entry.classroomId;
+    if (id == null) {
+      return 'NM-9988';
+    }
+    final idText = id.toString();
+    final suffix = idText.length > 4
+        ? idText.substring(idText.length - 4)
+        : idText.padLeft(4, '0');
+    return 'NM-$suffix';
+  }
+
+  void _copy(String value) {
+    Clipboard.setData(ClipboardData(text: value));
+    HapticFeedback.selectionClick();
   }
 }

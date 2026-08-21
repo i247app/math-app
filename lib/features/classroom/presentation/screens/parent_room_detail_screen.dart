@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/features/home/data/home_api.dart';
-import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
-import 'package:numi/features/home/data/home_layout_mappers.dart';
 import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
+import 'package:numi/features/classroom/presentation/screens/parent_messages_screen.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_detail_hero.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_detail_shortcuts.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_detail_top_bar.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
+import 'package:numi/features/classroom/widgets/parent_room/parent_room_utilities_section.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
 
 class ParentRoomDetailScreen extends StatelessWidget {
@@ -40,139 +37,102 @@ class ParentRoomDetailScreen extends StatelessWidget {
     final title = roomClassName(context, entry.classroom);
     return Scaffold(
       backgroundColor: context.themeColors.pageBackground,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            ParentRoomDetailTopBar(
-              title: title,
-              onBack: () => Navigator.of(context).maybePop(),
+      body: Column(
+        children: [
+          PageHeader(
+            title: title,
+            backgroundColor: context.themeColors.elevatedSurface,
+            actionWidth: 52,
+            horizontalPadding: 12,
+            leading: IconButton(
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.arrow_back_rounded),
+              color: context.themeColors.brandStrong,
+              tooltip: context.getText(AppKeys.back),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.fromLTRB(
-                  14,
-                  18,
-                  14,
-                  MediaQuery.paddingOf(context).bottom + 28,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ParentRoomDetailHero(entry: entry),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 18),
-                      child: ParentRoomDetailShortcuts(
-                        pendingCount:
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(
+                14,
+                14,
+                14,
+                MediaQuery.paddingOf(context).bottom + 28,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ParentRoomDetailHero(entry: entry),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: ParentRoomUtilitiesSection(
+                      onMessageTap: () => _openMessages(context),
+                      onUtilityTap: () => parentRoomShowComingSoon(context),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 22),
+                    child: AppContentSection(
+                      title: context.formatText(AppKeys.parentTasksCountTitle, {
+                        'count':
                             pendingExercises.length + expiredExercises.length,
-                        completedCount: completions.length,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 26),
-                      child: AppContentSection(
-                        title: context
-                            .formatText(AppKeys.parentTasksCountTitle, {
-                              'count':
-                                  pendingExercises.length +
-                                  expiredExercises.length,
-                            }),
-                        onViewAll: () => parentRoomShowComingSoon(context),
-                        child:
-                            pendingExercises.isEmpty && expiredExercises.isEmpty
-                            ? ParentEmptyTaskLine(
-                                icon: Icons.assignment_turned_in_outlined,
-                                text: context.getText(
-                                  AppKeys.studentNoHomeworkTitle,
-                                ),
-                              )
-                            : Column(
-                                children: [
-                                  for (final pending in pendingExercises) ...[
-                                    ParentPendingTaskListItem(pending: pending),
-                                    if (pending != pendingExercises.last ||
-                                        expiredExercises.isNotEmpty)
-                                      const Divider(
-                                        height: 24,
-                                        indent: 62,
-                                        color: Color(0xFFE9EEF2),
-                                      ),
-                                  ],
-                                  for (final expired in expiredExercises) ...[
-                                    ParentPendingTaskListItem(
-                                      pending: expired,
-                                      isExpired: true,
-                                      onTap: () =>
-                                          showExpiredExerciseMessage(context),
-                                    ),
-                                    if (expired != expiredExercises.last)
-                                      const Divider(
-                                        height: 24,
-                                        indent: 62,
-                                        color: Color(0xFFE9EEF2),
-                                      ),
-                                  ],
-                                ],
+                      }),
+                      onViewAll: () => parentRoomShowComingSoon(context),
+                      child:
+                          pendingExercises.isEmpty && expiredExercises.isEmpty
+                          ? ParentEmptyTaskLine(
+                              icon: Icons.assignment_turned_in_outlined,
+                              text: context.getText(
+                                AppKeys.studentNoHomeworkTitle,
                               ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 14, bottom: 14),
-                      child: AppContentSection(
-                        title: context.getText(AppKeys.assessmentResultTitle),
-                        onViewAll: () => parentRoomShowComingSoon(context),
-                        child: completions.isEmpty
-                            ? ParentEmptyTaskLine(
-                                icon: Icons.fact_check_outlined,
-                                text: context.getText(
-                                  AppKeys.noCompletedHomeworkTitle,
-                                ),
-                              )
-                            : Column(
-                                children: [
-                                  for (final completion in completions) ...[
-                                    ParentCompletedTaskListItem(
-                                      completion: completion,
-                                      onTap: () => _openCompletionResult(
-                                        context,
-                                        completion,
-                                      ),
+                            )
+                          : Column(
+                              children: [
+                                for (final pending in pendingExercises) ...[
+                                  ParentPendingTaskListItem(pending: pending),
+                                  if (pending != pendingExercises.last ||
+                                      expiredExercises.isNotEmpty)
+                                    const Divider(
+                                      height: 24,
+                                      indent: 62,
+                                      color: Color(0xFFE9EEF2),
                                     ),
-                                    if (completion != completions.last)
-                                      const Divider(
-                                        height: 24,
-                                        indent: 62,
-                                        color: Color(0xFFE9EEF2),
-                                      ),
-                                  ],
                                 ],
-                              ),
-                      ),
+                                for (final expired in expiredExercises) ...[
+                                  ParentPendingTaskListItem(
+                                    pending: expired,
+                                    isExpired: true,
+                                    onTap: () =>
+                                        showExpiredExerciseMessage(context),
+                                  ),
+                                  if (expired != expiredExercises.last)
+                                    const Divider(
+                                      height: 24,
+                                      indent: 62,
+                                      color: Color(0xFFE9EEF2),
+                                    ),
+                                ],
+                              ],
+                            ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  void _openCompletionResult(
-    BuildContext context,
-    HomeLayoutRecentCompletion completion,
-  ) {
-    final quiz = quizFromRecentCompletion(completion);
-    final quizId = quiz.quizId ?? quiz.id;
-    if (quizId == null || quizId <= 0) {
-      return;
-    }
-    HapticFeedback.selectionClick();
+  void _openMessages(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
+        builder: (_) => ParentMessagesScreen(
+          className: roomClassName(context, entry.classroom),
+          teacherName: roomTeacherName(context, entry),
+        ),
       ),
     );
   }

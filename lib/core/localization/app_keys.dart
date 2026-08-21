@@ -786,6 +786,8 @@ class AppKeys {
   static const parentRoomUtilityHomework = 'parent_room_utility_homework';
   static const parentRoomUtilityTests = 'parent_room_utility_tests';
   static const parentRoomUtilityDocuments = 'parent_room_utility_documents';
+  static const parentRoomUtilityProgress = 'parent_room_utility_progress';
+  static const parentRoomUtilityMembers = 'parent_room_utility_members';
   static const excellentResultMessage = 'excellent_result_message';
   static const generatingNewQuiz = 'generating_new_quiz';
   static const assessmentResultTitle = 'assessment_result_title';

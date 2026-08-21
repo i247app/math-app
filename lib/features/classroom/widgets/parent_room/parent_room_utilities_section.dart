@@ -44,26 +44,50 @@ class ParentRoomUtilitiesSection extends StatelessWidget {
           children: [
             _ParentRoomUtilityTile(
               key: const ValueKey('parent-room-utility-message'),
-              asset: 'assets/icons/message-icon.svg',
+              icon: Icons.chat_bubble_outline_rounded,
+              iconColor: const Color(0xFF238C8C),
+              iconBackground: const Color(0xFFE5F7F5),
               label: context.getText(AppKeys.parentRoomUtilityMessages),
               onTap: onMessageTap,
             ),
             _ParentRoomUtilityTile(
               key: const ValueKey('parent-room-utility-homework'),
-              asset: 'assets/icons/homework-icon.svg',
+              icon: Icons.assignment_outlined,
+              iconColor: const Color(0xFF3785B5),
+              iconBackground: const Color(0xFFE7F4FB),
               label: context.getText(AppKeys.parentRoomUtilityHomework),
               onTap: onUtilityTap,
             ),
             _ParentRoomUtilityTile(
               key: const ValueKey('parent-room-utility-test'),
-              asset: 'assets/icons/test-icon.svg',
+              iconAsset: 'assets/icons/exam-icon.svg',
+              iconColor: const Color(0xFFF0A72B),
+              iconBackground: const Color(0xFFFFF5DE),
               label: context.getText(AppKeys.parentRoomUtilityTests),
               onTap: onUtilityTap,
             ),
             _ParentRoomUtilityTile(
               key: const ValueKey('parent-room-utility-document'),
-              asset: 'assets/icons/document-icon.svg',
+              iconAsset: 'assets/icons/folder-icon.svg',
+              iconColor: const Color(0xFFE9AF16),
+              iconBackground: const Color(0xFFFFFAE8),
               label: context.getText(AppKeys.parentRoomUtilityDocuments),
+              onTap: onUtilityTap,
+            ),
+            _ParentRoomUtilityTile(
+              key: const ValueKey('parent-room-utility-progress'),
+              icon: Icons.trending_up_rounded,
+              iconColor: const Color(0xFF9A4CAD),
+              iconBackground: const Color(0xFFF8ECFA),
+              label: context.getText(AppKeys.parentRoomUtilityProgress),
+              onTap: onUtilityTap,
+            ),
+            _ParentRoomUtilityTile(
+              key: const ValueKey('parent-room-utility-members'),
+              icon: Icons.groups_2_outlined,
+              iconColor: const Color(0xFF1E9D91),
+              iconBackground: const Color(0xFFE4F7F4),
+              label: context.getText(AppKeys.parentRoomUtilityMembers),
               onTap: onUtilityTap,
             ),
           ],
@@ -76,12 +100,18 @@ class ParentRoomUtilitiesSection extends StatelessWidget {
 class _ParentRoomUtilityTile extends StatelessWidget {
   const _ParentRoomUtilityTile({
     super.key,
-    required this.asset,
+    this.icon,
+    this.iconAsset,
+    required this.iconColor,
+    required this.iconBackground,
     required this.label,
     required this.onTap,
-  });
+  }) : assert(icon != null || iconAsset != null);
 
-  final String asset;
+  final IconData? icon;
+  final String? iconAsset;
+  final Color iconColor;
+  final Color iconBackground;
   final String label;
   final VoidCallback onTap;
 
@@ -123,7 +153,23 @@ class _ParentRoomUtilityTile extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SvgPicture.asset(asset, width: 34, height: 34),
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: iconBackground,
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    child: iconAsset == null
+                        ? Icon(icon, color: iconColor, size: 25)
+                        : Center(
+                            child: SvgPicture.asset(
+                              iconAsset!,
+                              width: 26,
+                              height: 24,
+                            ),
+                          ),
+                  ),
                   const SizedBox(height: 14),
                   Text(
                     label,
