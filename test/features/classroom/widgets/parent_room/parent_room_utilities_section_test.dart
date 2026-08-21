@@ -13,6 +13,7 @@ void main() {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
     var messageTapCount = 0;
+    var membersTapCount = 0;
     var utilityTapCount = 0;
 
     await tester.pumpWidget(
@@ -25,6 +26,7 @@ void main() {
               width: 360,
               child: ParentRoomUtilitiesSection(
                 onMessageTap: () => messageTapCount++,
+                onMembersTap: () => membersTapCount++,
                 onUtilityTap: () => utilityTapCount++,
               ),
             ),
@@ -62,6 +64,10 @@ void main() {
 
     await tester.tap(first);
     expect(messageTapCount, 1);
+    expect(utilityTapCount, 0);
+
+    await tester.tap(find.byKey(const ValueKey('parent-room-utility-members')));
+    expect(membersTapCount, 1);
     expect(utilityTapCount, 0);
   });
 }

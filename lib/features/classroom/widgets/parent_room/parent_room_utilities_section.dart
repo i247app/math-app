@@ -9,10 +9,12 @@ class ParentRoomUtilitiesSection extends StatelessWidget {
   const ParentRoomUtilitiesSection({
     super.key,
     required this.onMessageTap,
+    required this.onMembersTap,
     required this.onUtilityTap,
   });
 
   final VoidCallback onMessageTap;
+  final VoidCallback onMembersTap;
   final VoidCallback onUtilityTap;
 
   @override
@@ -88,7 +90,7 @@ class ParentRoomUtilitiesSection extends StatelessWidget {
               iconColor: const Color(0xFF1E9D91),
               iconBackground: const Color(0xFFE4F7F4),
               label: context.getText(AppKeys.parentRoomUtilityMembers),
-              onTap: onUtilityTap,
+              onTap: onMembersTap,
             ),
           ],
         ),
