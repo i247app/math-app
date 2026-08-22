@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/quiz/widgets/assessment/numi_assessment_mascot_animation.dart';
 import 'package:numi/features/quiz/widgets/shared/quiz_wave_loader.dart';
 
 class AssessmentGeneratingLoader extends StatelessWidget {
@@ -11,12 +12,8 @@ class AssessmentGeneratingLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return QuizWaveLoader(
-      leading: Image.asset(
-        'assets/images/numi-mascot.png',
-        width: 176,
-        height: 150,
-        fit: BoxFit.contain,
-      ),
+      leading: const NumiAssessmentMascotAnimation(),
+      leadingSpacing: 10,
       message: message,
       letterStyle: const TextStyle(
         color: AppColors.teal700,

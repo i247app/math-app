@@ -59,20 +59,26 @@ class _QuizWaveLoaderState extends State<QuizWaveLoader>
                   child: widget.leading!,
                 ),
               ],
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(letters.length, (index) {
-                  final delayedProgress =
-                      (controller.value - (index * 0.075)) % 1.0;
-                  final lift = delayedProgress <= 0.20
-                      ? -34 * math.sin(delayedProgress / 0.20 * math.pi)
-                      : 0.0;
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(letters.length, (index) {
+                      final delayedProgress =
+                          (controller.value - (index * 0.075)) % 1.0;
+                      final lift = delayedProgress <= 0.20
+                          ? -34 * math.sin(delayedProgress / 0.20 * math.pi)
+                          : 0.0;
 
-                  return Transform.translate(
-                    offset: Offset(0, lift),
-                    child: Text(letters[index], style: widget.letterStyle),
-                  );
-                }),
+                      return Transform.translate(
+                        offset: Offset(0, lift),
+                        child: Text(letters[index], style: widget.letterStyle),
+                      );
+                    }),
+                  ),
+                ),
               ),
               if (widget.message != null) ...[
                 Padding(
