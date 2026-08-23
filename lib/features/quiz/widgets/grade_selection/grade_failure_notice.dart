@@ -27,7 +27,7 @@ class GradeFailureNotice extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              context.getText(AppKeys.generateTestFailed),
+              context.getText(AppKeys.assessmentGenerationFailed),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(

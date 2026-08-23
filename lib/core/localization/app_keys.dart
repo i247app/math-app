@@ -688,7 +688,7 @@ class AppKeys {
   static const noAccountForGrades = 'no_account_for_grades';
   static const gradeLoadFailed = 'grade_load_failed';
   static const gradeQuestionTitle = 'grade_question_title';
-  static const generateTestFailed = 'generate_test_failed';
+  static const assessmentGenerationFailed = 'assessment_generation_failed';
   static const noGrades = 'no_grades';
   static const gamesGradeTitle = 'games_grade_title';
   static const gamesGradeSubtitle = 'games_grade_subtitle';

@@ -5,9 +5,11 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/core/network/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/errors/quiz_exception.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
@@ -16,6 +18,23 @@ class _UnusedGradeService implements GradeService {
   Future<List<GradeModel>> listGrades({required int userId}) {
     throw StateError('The initial grade list should be used by this test.');
   }
+}
+
+class _FailingQuizService implements QuizService {
+  @override
+  Future<GeneratedQuiz> generateAssessmentQuiz({
+    String purpose = quizPurposeAssessment,
+    String typeOfQuiz = quizTypeGeneral,
+    String? gradeLabel,
+    int? previousQuizId,
+    List<String>? chapters,
+    int? profileId,
+  }) {
+    throw const QuizException('Generation failed');
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
@@ -113,6 +132,52 @@ void main() {
         closeTo(96, 1),
       );
 
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'shows a localized notice after assessment generation automatically fails',
+    (tester) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final previousLanguage = AppLanguageState.current;
+      AppLanguageState.current = AppLanguage.vi;
+      addTearDown(() => AppLanguageState.current = previousLanguage);
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: GradeSelectionScreen(
+              initialGrades: grades,
+              gradeService: _UnusedGradeService(),
+              quizService: _FailingQuizService(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const ValueKey('grade-card-assets/icons/1.svg')),
+      );
+      await tester.tap(find.text('Tiếp tục'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tạo bài đánh giá thất bại.'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('generate-failed-notice')),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     },
   );

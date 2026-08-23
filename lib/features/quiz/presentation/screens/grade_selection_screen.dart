@@ -26,6 +26,7 @@ class GradeSelectionScreen extends StatefulWidget {
     this.user,
     this.initialGrades = const <GradeModel>[],
     this.gradeService,
+    this.quizService,
     this.quizPurpose = quizPurposeAssessment,
     this.profileId,
     this.initialGradeId,
@@ -36,6 +37,7 @@ class GradeSelectionScreen extends StatefulWidget {
   final LoginUser? user;
   final List<GradeModel> initialGrades;
   final GradeService? gradeService;
+  final QuizService? quizService;
   final String quizPurpose;
   final int? profileId;
   final int? initialGradeId;
@@ -129,6 +131,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     final result = await Navigator.of(context).push<AiAssessmentResult>(
       MaterialPageRoute<AiAssessmentResult>(
         builder: (_) => AiAssessmentScreen(
+          quizService: widget.quizService,
           purpose: widget.quizPurpose,
           typeOfQuiz: quizTypeGeneral,
           gradeLabel: gradeLabel,
