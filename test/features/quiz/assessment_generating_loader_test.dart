@@ -27,9 +27,9 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 500));
 
-    // A transition renders both neighboring poses simultaneously. The
-    // controller interpolates their opacity and transforms on every vsync.
-    expect(find.byType(Image), findsNWidgets(2));
+    // The original mascot is decoded once and masked body parts are painted
+    // and transformed independently on each vsync.
+    expect(find.byKey(const ValueKey('numi-rig-canvas')), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     for (final duration in <Duration>[
@@ -70,14 +70,16 @@ void main() {
     // 2600 ms lands in the hold portion of the idea stage.
     await tester.pump(const Duration(milliseconds: 2600));
 
-    final bulbRect = tester.getRect(find.byIcon(Icons.lightbulb_rounded));
+    final bulbRect = tester.getRect(
+      find.byKey(const ValueKey('numi-idea-bulb')),
+    );
     final mascotRect = tester.getRect(
-      find.byKey(const ValueKey('numi-sprite-pose-2')),
+      find.byKey(const ValueKey('numi-rig-canvas')),
     );
 
     expect(bulbRect.center.dx, closeTo(mascotRect.center.dx, 0.5));
     expect(bulbRect.bottom, lessThanOrEqualTo(mascotRect.top));
-    expect(mascotRect.width, closeTo(210, 0.5));
+    expect(mascotRect.width, closeTo(310, 0.5));
     expect(tester.takeException(), isNull);
   });
 }
