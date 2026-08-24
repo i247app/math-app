@@ -1,33 +1,38 @@
-import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 
-enum AppScreen {
+enum AuthScreen {
   welcome,
   welcomeDetails,
   login,
   deviceVerification,
   otp,
   signup,
-  passcode,
-  home,
 }
 
 enum OtpFlow { login, signup }
 
 enum AuthEntryMode { login, signup }
 
-enum PasscodeFlow { setup, unlock }
+class AuthenticationResult {
+  const AuthenticationResult({
+    required this.user,
+    required this.loginName,
+    this.isNewlyRegistered = false,
+  });
 
-/// Transient state for authentication forms and passcode setup/unlock only.
-/// Authenticated account/profile state belongs to [AppSessionCubit].
+  final LoginUser user;
+  final String? loginName;
+  final bool isNewlyRegistered;
+}
+
+/// Transient state for login, signup, OTP and device verification only.
 class AuthFlowState {
   const AuthFlowState({
-    this.screen = AppScreen.welcome,
-    this.loginBackScreen = AppScreen.welcomeDetails,
+    this.screen = AuthScreen.welcome,
+    this.loginBackScreen = AuthScreen.welcomeDetails,
     this.loginEntryMode = AuthEntryMode.login,
     this.phoneRegion = PhoneRegion.vn,
-    this.isRestoringSession = false,
     this.loginName,
     this.checkedLoginName,
     this.isCheckingLoginName = false,
@@ -53,26 +58,14 @@ class AuthFlowState {
     this.otpFlow = OtpFlow.login,
     this.authEntryMode = AuthEntryMode.login,
     this.authError,
-    this.passcodeFlow = PasscodeFlow.setup,
-    this.passcodeCanSkip = false,
-    this.isPasscodeBusy = false,
-    this.passcodeError,
-    this.passcodeErrorId = 0,
-    this.passcodeLoginRequiresOtp = false,
-    this.isCheckingPinLogin = false,
-    this.canLoginWithPin = false,
-    this.pinLoginUser,
-    this.pendingLoginUser,
-    this.pendingProfiles = const <StudentProfile>[],
-    this.pendingActiveProfile,
-    this.pendingProfileLoadError,
+    this.authenticationResult,
+    this.authenticationResultId = 0,
   });
 
-  final AppScreen screen;
-  final AppScreen loginBackScreen;
+  final AuthScreen screen;
+  final AuthScreen loginBackScreen;
   final AuthEntryMode loginEntryMode;
   final PhoneRegion phoneRegion;
-  final bool isRestoringSession;
   final String? loginName;
   final String? checkedLoginName;
   final bool isCheckingLoginName;
@@ -98,26 +91,14 @@ class AuthFlowState {
   final OtpFlow otpFlow;
   final AuthEntryMode authEntryMode;
   final String? authError;
-  final PasscodeFlow passcodeFlow;
-  final bool passcodeCanSkip;
-  final bool isPasscodeBusy;
-  final String? passcodeError;
-  final int passcodeErrorId;
-  final bool passcodeLoginRequiresOtp;
-  final bool isCheckingPinLogin;
-  final bool canLoginWithPin;
-  final LoginUser? pinLoginUser;
-  final LoginUser? pendingLoginUser;
-  final List<StudentProfile> pendingProfiles;
-  final StudentProfile? pendingActiveProfile;
-  final String? pendingProfileLoadError;
+  final AuthenticationResult? authenticationResult;
+  final int authenticationResultId;
 
   AuthFlowState copyWith({
-    AppScreen? screen,
-    AppScreen? loginBackScreen,
+    AuthScreen? screen,
+    AuthScreen? loginBackScreen,
     AuthEntryMode? loginEntryMode,
     PhoneRegion? phoneRegion,
-    bool? isRestoringSession,
     String? loginName,
     String? checkedLoginName,
     bool? isCheckingLoginName,
@@ -143,19 +124,8 @@ class AuthFlowState {
     OtpFlow? otpFlow,
     AuthEntryMode? authEntryMode,
     String? authError,
-    PasscodeFlow? passcodeFlow,
-    bool? passcodeCanSkip,
-    bool? isPasscodeBusy,
-    String? passcodeError,
-    int? passcodeErrorId,
-    bool? passcodeLoginRequiresOtp,
-    bool? isCheckingPinLogin,
-    bool? canLoginWithPin,
-    LoginUser? pinLoginUser,
-    LoginUser? pendingLoginUser,
-    List<StudentProfile>? pendingProfiles,
-    StudentProfile? pendingActiveProfile,
-    String? pendingProfileLoadError,
+    AuthenticationResult? authenticationResult,
+    int? authenticationResultId,
     bool clearAuthError = false,
     bool clearDevOtp = false,
     bool clearOtpError = false,
@@ -169,19 +139,13 @@ class AuthFlowState {
     bool clearTrustedDeviceState = false,
     bool clearSelectedTrustedDevice = false,
     bool clearTrustedDeviceError = false,
-    bool clearPasscodeError = false,
-    bool clearPinLogin = false,
-    bool clearPinLoginUser = false,
-    bool clearPendingSession = false,
-    bool clearPendingActiveProfile = false,
-    bool clearPendingProfileLoadError = false,
+    bool clearAuthenticationResult = false,
   }) {
     return AuthFlowState(
       screen: screen ?? this.screen,
       loginBackScreen: loginBackScreen ?? this.loginBackScreen,
       loginEntryMode: loginEntryMode ?? this.loginEntryMode,
       phoneRegion: phoneRegion ?? this.phoneRegion,
-      isRestoringSession: isRestoringSession ?? this.isRestoringSession,
       loginName: clearLoginName ? null : loginName ?? this.loginName,
       checkedLoginName: clearLoginLookup
           ? null
@@ -228,35 +192,11 @@ class AuthFlowState {
       otpFlow: otpFlow ?? this.otpFlow,
       authEntryMode: authEntryMode ?? this.authEntryMode,
       authError: clearAuthError ? null : authError ?? this.authError,
-      passcodeFlow: passcodeFlow ?? this.passcodeFlow,
-      passcodeCanSkip: passcodeCanSkip ?? this.passcodeCanSkip,
-      isPasscodeBusy: isPasscodeBusy ?? this.isPasscodeBusy,
-      passcodeError: clearPasscodeError
+      authenticationResult: clearAuthenticationResult
           ? null
-          : passcodeError ?? this.passcodeError,
-      passcodeErrorId: passcodeErrorId ?? this.passcodeErrorId,
-      passcodeLoginRequiresOtp:
-          passcodeLoginRequiresOtp ?? this.passcodeLoginRequiresOtp,
-      isCheckingPinLogin: isCheckingPinLogin ?? this.isCheckingPinLogin,
-      canLoginWithPin: clearPinLogin
-          ? false
-          : canLoginWithPin ?? this.canLoginWithPin,
-      pinLoginUser: clearPinLogin || clearPinLoginUser
-          ? null
-          : pinLoginUser ?? this.pinLoginUser,
-      pendingLoginUser: clearPendingSession
-          ? null
-          : pendingLoginUser ?? this.pendingLoginUser,
-      pendingProfiles: clearPendingSession
-          ? const <StudentProfile>[]
-          : pendingProfiles ?? this.pendingProfiles,
-      pendingActiveProfile: clearPendingSession || clearPendingActiveProfile
-          ? null
-          : pendingActiveProfile ?? this.pendingActiveProfile,
-      pendingProfileLoadError:
-          clearPendingSession || clearPendingProfileLoadError
-          ? null
-          : pendingProfileLoadError ?? this.pendingProfileLoadError,
+          : authenticationResult ?? this.authenticationResult,
+      authenticationResultId:
+          authenticationResultId ?? this.authenticationResultId,
     );
   }
 }

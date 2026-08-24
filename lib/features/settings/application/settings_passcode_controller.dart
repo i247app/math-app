@@ -3,9 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 
 class SettingsPasscodeController extends ChangeNotifier {
-  SettingsPasscodeController({
-    PasscodeService service = const SecurePasscodeService(),
-  }) : _service = service;
+  SettingsPasscodeController({required PasscodeService service})
+    : _service = service;
 
   final PasscodeService _service;
 

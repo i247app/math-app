@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
@@ -7,55 +6,6 @@ import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/auth/models/signup_form_data.dart';
 import 'package:numi/features/auth/models/signup_gender.dart';
 import 'package:numi/features/auth/models/signup_role.dart';
-import 'package:numi/features/session/services/passcode_service.dart';
-import 'package:numi/features/session/application/app_session_state.dart';
-import 'package:numi/features/session/models/profile_session_resolution.dart';
-import 'package:numi/features/session/services/profile_session_resolver.dart';
-
-class _FakePasscodeService implements PasscodeService {
-  @override
-  Future<void> clearPasscode(int userId) async {}
-
-  @override
-  Future<bool> hasPasscode(int userId) async => false;
-
-  @override
-  Future<PasscodeLoginAccount?> lastPasscodeAccount() async => null;
-
-  @override
-  Future<int?> lastPasscodeUserId() async => null;
-
-  @override
-  Future<void> rememberLoginAccount({
-    required int userId,
-    required String loginName,
-  }) async {}
-
-  @override
-  Future<void> setPasscode({
-    required int userId,
-    required String passcode,
-  }) async {}
-
-  @override
-  Future<bool> verifyPasscode({
-    required int userId,
-    required String passcode,
-  }) async => false;
-}
-
-class _FakeProfileSessionResolver implements ProfileSessionResolver {
-  @override
-  Future<ProfileSessionResolution> resolveForUserId(int userId) async {
-    return const ProfileSessionResolution.empty();
-  }
-
-  @override
-  Future<void> rememberActiveProfile({
-    required int userId,
-    required StudentProfile profile,
-  }) async {}
-}
 
 class _FakeAuthService implements AuthService {
   _FakeAuthService({
@@ -179,16 +129,10 @@ class _FakeAuthService implements AuthService {
 AuthFlowCubit _buildCubit({
   AuthService? authService,
   AuthFlowState? initialState,
-  void Function(AuthenticatedSession)? onAuthenticated,
 }) {
   return AuthFlowCubit(
     authService: authService ?? _FakeAuthService(),
     initialState: initialState,
-    passcodeService: _FakePasscodeService(),
-    profileResolver: _FakeProfileSessionResolver(),
-    onAuthenticated: onAuthenticated ?? (_) {},
-    onSessionCleared: () {},
-    onSessionRestoreStarted: () {},
   );
 }
 
@@ -196,20 +140,13 @@ void main() {
   test(
     'preserves the welcome-to-signup entry flow without a session',
     () async {
-      final cubit = AuthFlowCubit(
-        authService: _FakeAuthService(),
-        profileResolver: _FakeProfileSessionResolver(),
-        passcodeService: _FakePasscodeService(),
-        onAuthenticated: (_) {},
-        onSessionCleared: () {},
-        onSessionRestoreStarted: () {},
-      );
+      final cubit = AuthFlowCubit(authService: _FakeAuthService());
 
       cubit.openWelcomeDetails();
-      expect(cubit.state.screen, AppScreen.welcomeDetails);
+      expect(cubit.state.screen, AuthScreen.welcomeDetails);
 
       cubit.openSignupEntry();
-      expect(cubit.state.screen, AppScreen.login);
+      expect(cubit.state.screen, AuthScreen.login);
       expect(cubit.state.authEntryMode, AuthEntryMode.signup);
       await cubit.close();
     },
@@ -219,7 +156,7 @@ void main() {
     final authService = _FakeAuthService();
     final cubit = _buildCubit(
       authService: authService,
-      initialState: const AuthFlowState(screen: AppScreen.login),
+      initialState: const AuthFlowState(screen: AuthScreen.login),
     );
 
     await cubit.submitLoginName('learner@example.com');
@@ -228,7 +165,7 @@ void main() {
     expect(authService.sentOtpLoginName, 'learner@example.com');
     expect(authService.sentOtpKind, AuthOtpKind.login);
     expect(cubit.state.loginName, 'learner@example.com');
-    expect(cubit.state.screen, AppScreen.otp);
+    expect(cubit.state.screen, AuthScreen.otp);
     await cubit.close();
   });
 
@@ -246,14 +183,14 @@ void main() {
     );
     final cubit = _buildCubit(
       authService: authService,
-      initialState: const AuthFlowState(screen: AppScreen.login),
+      initialState: const AuthFlowState(screen: AuthScreen.login),
     );
 
     await cubit.submitLoginName('+84905666666');
 
     expect(authService.listedDeviceUserId, 7);
     expect(authService.sentOtpLoginName, isNull);
-    expect(cubit.state.screen, AppScreen.deviceVerification);
+    expect(cubit.state.screen, AuthScreen.deviceVerification);
     expect(cubit.state.trustedDevices.single.deviceId, 4);
 
     cubit.selectTrustedDevice(4);
@@ -263,7 +200,7 @@ void main() {
     expect(authService.sentOtpKind, AuthOtpKind.login);
     expect(authService.sentOtpUserId, 7);
     expect(authService.sentOtpTargetDeviceId, 4);
-    expect(cubit.state.screen, AppScreen.otp);
+    expect(cubit.state.screen, AuthScreen.otp);
     expect(cubit.state.devOtpCode, isNull);
     await cubit.close();
   });
@@ -278,7 +215,7 @@ void main() {
       );
       final cubit = _buildCubit(
         authService: authService,
-        initialState: const AuthFlowState(screen: AppScreen.login),
+        initialState: const AuthFlowState(screen: AuthScreen.login),
       );
 
       await cubit.submitLoginName('+84905666666');
@@ -288,13 +225,14 @@ void main() {
       expect(authService.sentOtpKind, AuthOtpKind.login);
       expect(authService.sentOtpUserId, isNull);
       expect(authService.sentOtpTargetDeviceId, isNull);
-      expect(cubit.state.screen, AppScreen.otp);
+      expect(cubit.state.screen, AuthScreen.otp);
       expect(cubit.state.devOtpCode, '1234');
       expect(cubit.state.showDevOtpPreview, isTrue);
 
       await cubit.verifyOtp('1234');
 
-      expect(cubit.state.screen, AppScreen.home);
+      expect(cubit.state.screen, AuthScreen.otp);
+      expect(cubit.state.authenticationResult?.user.id, 7);
       await cubit.close();
     },
   );
@@ -304,7 +242,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AppScreen.otp,
+        screen: AuthScreen.otp,
         loginName: 'learner@example.com',
       ),
     );
@@ -320,7 +258,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AppScreen.otp,
+        screen: AuthScreen.otp,
         loginName: 'learner@example.com',
         otpFlow: OtpFlow.login,
       ),
@@ -328,7 +266,8 @@ void main() {
 
     await cubit.verifyOtp('1234');
 
-    expect(cubit.state.screen, AppScreen.home);
+    expect(cubit.state.screen, AuthScreen.otp);
+    expect(cubit.state.authenticationResult?.user.id, 7);
     await cubit.close();
   });
 
@@ -337,7 +276,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AppScreen.login,
+        screen: AuthScreen.login,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -350,7 +289,7 @@ void main() {
     await cubit.submitLoginName('+84901234567');
 
     expect(authService.sentOtpLoginName, isNull);
-    expect(cubit.state.screen, AppScreen.signup);
+    expect(cubit.state.screen, AuthScreen.signup);
     await cubit.close();
   });
 
@@ -359,7 +298,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AppScreen.login,
+        screen: AuthScreen.login,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -368,18 +307,16 @@ void main() {
 
     expect(authService.lookedUpLoginName, isNull);
     expect(authService.sentOtpLoginName, isNull);
-    expect(cubit.state.screen, AppScreen.signup);
+    expect(cubit.state.screen, AuthScreen.signup);
     await cubit.close();
   });
 
   test('signup without email creates the account and opens home', () async {
     final authService = _FakeAuthService(accountExists: false);
-    AuthenticatedSession? authenticatedSession;
     final cubit = _buildCubit(
       authService: authService,
-      onAuthenticated: (session) => authenticatedSession = session,
       initialState: const AuthFlowState(
-        screen: AppScreen.login,
+        screen: AuthScreen.login,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -396,8 +333,8 @@ void main() {
     expect(authService.sentOtpLoginName, isNull);
     expect(authService.signupPhone, '+84901234567');
     expect(authService.signupEmail, isNull);
-    expect(cubit.state.screen, AppScreen.home);
-    expect(authenticatedSession?.isNewlyRegistered, isTrue);
+    expect(cubit.state.screen, AuthScreen.signup);
+    expect(cubit.state.authenticationResult?.isNewlyRegistered, isTrue);
     await cubit.close();
   });
 
@@ -411,7 +348,7 @@ void main() {
       final cubit = _buildCubit(
         authService: authService,
         initialState: const AuthFlowState(
-          screen: AppScreen.login,
+          screen: AuthScreen.login,
           authEntryMode: AuthEntryMode.signup,
         ),
       );
@@ -429,14 +366,15 @@ void main() {
       expect(authService.sentOtpLoginName, 'learner@example.com');
       expect(authService.sentOtpKind, AuthOtpKind.signup);
       expect(authService.signupPhone, isNull);
-      expect(cubit.state.screen, AppScreen.otp);
+      expect(cubit.state.screen, AuthScreen.otp);
 
       await cubit.verifyOtp('1234');
 
       expect(authService.verifiedOtpLoginName, 'learner@example.com');
       expect(authService.signupPhone, '+84901234567');
       expect(authService.signupEmail, 'learner@example.com');
-      expect(cubit.state.screen, AppScreen.home);
+      expect(cubit.state.screen, AuthScreen.otp);
+      expect(cubit.state.authenticationResult?.isNewlyRegistered, isTrue);
       await cubit.close();
     },
   );
@@ -446,7 +384,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AppScreen.login,
+        screen: AuthScreen.login,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -462,7 +400,7 @@ void main() {
     );
     cubit.backFromOtp();
 
-    expect(cubit.state.screen, AppScreen.signup);
+    expect(cubit.state.screen, AuthScreen.signup);
     expect(cubit.state.loginName, '+84901234567');
     expect(cubit.pendingSignupForm?.email, 'learner@example.com');
     await cubit.close();
@@ -473,7 +411,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AppScreen.login,
+        screen: AuthScreen.login,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -482,41 +420,29 @@ void main() {
 
     expect(authService.lookedUpLoginName, isNull);
     expect(authService.sentOtpLoginName, isNull);
-    expect(cubit.state.screen, AppScreen.login);
+    expect(cubit.state.screen, AuthScreen.login);
     await cubit.close();
   });
 
   test(
     'handles Back for state-driven auth screens before leaving the app',
     () async {
-      final cubit = AuthFlowCubit(
-        authService: _FakeAuthService(),
-        profileResolver: _FakeProfileSessionResolver(),
-        passcodeService: _FakePasscodeService(),
-        onAuthenticated: (_) {},
-        onSessionCleared: () {},
-        onSessionRestoreStarted: () {},
-      );
+      final cubit = AuthFlowCubit(authService: _FakeAuthService());
 
       cubit.openWelcomeDetails();
       expect(cubit.handleSystemBack(), isTrue);
-      expect(cubit.state.screen, AppScreen.welcome);
+      expect(cubit.state.screen, AuthScreen.welcome);
 
       await cubit.close();
       final otpCubit = AuthFlowCubit(
         authService: _FakeAuthService(),
-        profileResolver: _FakeProfileSessionResolver(),
-        initialState: const AuthFlowState(screen: AppScreen.otp),
-        passcodeService: _FakePasscodeService(),
-        onAuthenticated: (_) {},
-        onSessionCleared: () {},
-        onSessionRestoreStarted: () {},
+        initialState: const AuthFlowState(screen: AuthScreen.otp),
       );
       expect(otpCubit.handleSystemBack(), isTrue);
-      expect(otpCubit.state.screen, AppScreen.login);
+      expect(otpCubit.state.screen, AuthScreen.login);
 
       expect(otpCubit.handleSystemBack(), isTrue);
-      expect(otpCubit.state.screen, AppScreen.welcomeDetails);
+      expect(otpCubit.state.screen, AuthScreen.welcomeDetails);
 
       otpCubit.openWelcome();
       expect(otpCubit.handleSystemBack(), isFalse);
@@ -528,27 +454,27 @@ void main() {
     final cubit = _buildCubit();
 
     cubit.openLogin();
-    expect(cubit.state.screen, AppScreen.login);
+    expect(cubit.state.screen, AuthScreen.login);
 
     cubit.switchAuthEntryMode(AuthEntryMode.signup);
     expect(cubit.handleSystemBack(), isTrue);
-    expect(cubit.state.screen, AppScreen.login);
+    expect(cubit.state.screen, AuthScreen.login);
     expect(cubit.state.authEntryMode, AuthEntryMode.login);
 
     expect(cubit.handleSystemBack(), isTrue);
-    expect(cubit.state.screen, AppScreen.welcome);
+    expect(cubit.state.screen, AuthScreen.welcome);
 
     cubit.openWelcomeDetails();
     cubit.openSignupEntry();
-    expect(cubit.state.screen, AppScreen.login);
+    expect(cubit.state.screen, AuthScreen.login);
 
     cubit.switchAuthEntryMode(AuthEntryMode.login);
     expect(cubit.handleSystemBack(), isTrue);
-    expect(cubit.state.screen, AppScreen.login);
+    expect(cubit.state.screen, AuthScreen.login);
     expect(cubit.state.authEntryMode, AuthEntryMode.signup);
 
     expect(cubit.handleSystemBack(), isTrue);
-    expect(cubit.state.screen, AppScreen.welcomeDetails);
+    expect(cubit.state.screen, AuthScreen.welcomeDetails);
 
     await cubit.close();
   });

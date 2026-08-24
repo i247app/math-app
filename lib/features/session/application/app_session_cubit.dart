@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
@@ -10,9 +15,13 @@ import 'package:numi/features/session/services/profile_session_resolver.dart';
 class AppSessionCubit extends Cubit<AppSessionState> {
   AppSessionCubit({
     AuthenticatedSession? initialSession,
+    required AuthService authService,
     required ProfileSessionResolver profileResolver,
+    required NotificationPingService notificationPingService,
   }) : _sessionEpoch = initialSession == null ? 0 : 1,
+       _authService = authService,
        _profileResolver = profileResolver,
+       _notificationPingService = notificationPingService,
        super(
          initialSession == null
              ? const AppSessionState()
@@ -28,6 +37,8 @@ class AppSessionCubit extends Cubit<AppSessionState> {
        );
 
   final ProfileSessionResolver _profileResolver;
+  final AuthService _authService;
+  final NotificationPingService _notificationPingService;
   int _sessionEpoch;
 
   void beginRestore() {
@@ -35,6 +46,63 @@ class AppSessionCubit extends Cubit<AppSessionState> {
       return;
     }
     emit(state.copyWith(status: SessionStatus.restoring));
+  }
+
+  Future<void> restoreSession() async {
+    if (state.status == SessionStatus.restoring) {
+      return;
+    }
+    beginRestore();
+    try {
+      final user = await _authService.restoreSession();
+      if (isClosed) {
+        return;
+      }
+      if (user == null) {
+        clear();
+        return;
+      }
+      await establishSession(user: user);
+    } catch (_) {
+      if (!isClosed) {
+        clear();
+      }
+    }
+  }
+
+  Future<void> establishSession({
+    required LoginUser user,
+    bool isNewlyRegistered = false,
+  }) async {
+    if (user.id <= 0) {
+      clear();
+      return;
+    }
+    beginRestore();
+    final resolution = await _profileResolver.resolveForUserId(user.id);
+    if (isClosed) {
+      return;
+    }
+    authenticate(
+      AuthenticatedSession(
+        user: user,
+        profiles: resolution.profiles,
+        activeProfile: resolution.activeProfile,
+        profileLoadError: resolution.errorMessage,
+        isNewlyRegistered: isNewlyRegistered,
+      ),
+    );
+    unawaited(_notificationPingService.ping());
+  }
+
+  Future<void> logout() async {
+    try {
+      await _authService.logout();
+    } finally {
+      if (!isClosed) {
+        clear();
+      }
+    }
   }
 
   void authenticate(AuthenticatedSession session) {

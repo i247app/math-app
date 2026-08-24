@@ -1,12 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/session/application/app_session_cubit.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
 
 class _FakeProfileSessionResolver implements ProfileSessionResolver {
+  int? rememberedUserId;
+  StudentProfile? rememberedProfile;
+
   @override
   Future<ProfileSessionResolution> resolveForUserId(int userId) async {
     return const ProfileSessionResolution.empty();
@@ -16,11 +21,49 @@ class _FakeProfileSessionResolver implements ProfileSessionResolver {
   Future<void> rememberActiveProfile({
     required int userId,
     required StudentProfile profile,
-  }) async {}
+  }) async {
+    rememberedUserId = userId;
+    rememberedProfile = profile;
+  }
 }
 
-AppSessionCubit _buildCubit() =>
-    AppSessionCubit(profileResolver: _FakeProfileSessionResolver());
+class _FakeAuthService implements AuthService {
+  _FakeAuthService({this.restoredUser});
+
+  final LoginUser? restoredUser;
+  int logoutCalls = 0;
+
+  @override
+  Future<LoginUser?> restoreSession() async => restoredUser;
+
+  @override
+  Future<void> logout() async {
+    logoutCalls++;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeNotificationPingService implements NotificationPingService {
+  int calls = 0;
+
+  @override
+  Future<void> ping() async {
+    calls++;
+  }
+}
+
+AppSessionCubit _buildCubit({
+  _FakeAuthService? authService,
+  _FakeProfileSessionResolver? profileResolver,
+  _FakeNotificationPingService? notificationPingService,
+}) => AppSessionCubit(
+  authService: authService ?? _FakeAuthService(),
+  profileResolver: profileResolver ?? _FakeProfileSessionResolver(),
+  notificationPingService:
+      notificationPingService ?? _FakeNotificationPingService(),
+);
 
 void main() {
   group('AppSessionCubit', () {
@@ -104,6 +147,37 @@ void main() {
         );
         expect(cubit.state.shouldShowChildProfileDialog, isFalse);
 
+        await cubit.close();
+      },
+    );
+
+    test(
+      'owns restore, notification ping, active profile and logout',
+      () async {
+        final authService = _FakeAuthService(
+          restoredUser: const LoginUser(id: 9, role: 'STUDENT'),
+        );
+        final resolver = _FakeProfileSessionResolver();
+        final ping = _FakeNotificationPingService();
+        final cubit = _buildCubit(
+          authService: authService,
+          profileResolver: resolver,
+          notificationPingService: ping,
+        );
+
+        await cubit.restoreSession();
+        expect(cubit.state.user?.id, 9);
+        expect(cubit.state.status, SessionStatus.authenticated);
+        expect(ping.calls, 1);
+
+        const profile = StudentProfile(profileId: 91, role: 'STUDENT');
+        await cubit.activateProfile(profile);
+        expect(cubit.state.activeProfile?.profileId, 91);
+        expect(resolver.rememberedUserId, 9);
+
+        await cubit.logout();
+        expect(authService.logoutCalls, 1);
+        expect(cubit.state.status, SessionStatus.unauthenticated);
         await cubit.close();
       },
     );

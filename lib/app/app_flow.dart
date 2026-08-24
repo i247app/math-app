@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/app/application/app_coordinator_cubit.dart';
+import 'package:numi/app/application/app_coordinator_state.dart';
+import 'package:numi/app/navigation/app_screen.dart';
 import 'package:numi/core/data/session_scoped_repository_registry.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
@@ -14,6 +19,8 @@ import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
 import 'package:numi/app/app_screen_router.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
+import 'package:numi/features/session/application/passcode_cubit.dart';
+import 'package:numi/features/session/application/passcode_state.dart';
 
 class AppFlow extends StatefulWidget {
   const AppFlow({
@@ -163,17 +170,33 @@ class _AppFlowState extends State<AppFlow> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
+            create: (_) => AppCoordinatorCubit(
+              hasInitialSession: widget.initialSession != null,
+              restoreSessionOnStart:
+                  widget.restoreSessionOnStart && widget.initialSession == null,
+            ),
+          ),
+          BlocProvider(
             create: (context) {
               final cubit = AppSessionCubit(
                 initialSession: widget.initialSession,
+                authService: widget.authService ?? context.read<AuthService>(),
                 profileResolver: context.read(),
+                notificationPingService: context.read(),
               );
               context.read<SessionScopedRepositoryRegistry>().updateSession(
                 isAuthenticated: cubit.state.isAuthenticated,
                 sessionEpoch: cubit.state.sessionEpoch,
               );
+              if (widget.restoreSessionOnStart &&
+                  widget.initialSession == null) {
+                unawaited(cubit.restoreSession());
+              }
               return cubit;
             },
+          ),
+          BlocProvider(
+            create: (context) => PasscodeCubit(passcodeService: context.read()),
           ),
           BlocProvider(
             create: (context) => ClassroomCubit(
@@ -182,46 +205,124 @@ class _AppFlowState extends State<AppFlow> {
           ),
           BlocProvider(
             create: (context) {
-              final sessionCubit = context.read<AppSessionCubit>();
-              final cubit = AuthFlowCubit(
+              return AuthFlowCubit(
                 authService: widget.authService ?? context.read<AuthService>(),
-                profileResolver: context.read(),
-                passcodeService: context.read(),
-                notificationPingService: context.read(),
-                initialState: AuthFlowState(
-                  screen: widget.initialSession == null
-                      ? AppScreen.welcome
-                      : AppScreen.home,
-                ),
-                onAuthenticated: sessionCubit.authenticate,
-                onSessionCleared: sessionCubit.clear,
-                onSessionRestoreStarted: sessionCubit.beginRestore,
+                initialState: const AuthFlowState(screen: AuthScreen.welcome),
               );
-              if (widget.restoreSessionOnStart &&
-                  widget.initialSession == null) {
-                cubit.restoreSession();
-              }
-              return cubit;
             },
           ),
         ],
-        child: BlocListener<AppSessionCubit, AppSessionState>(
-          listenWhen: (previous, current) =>
-              previous.sessionEpoch != current.sessionEpoch,
-          listener: (context, state) {
-            context.read<SessionScopedRepositoryRegistry>().updateSession(
-              isAuthenticated: state.isAuthenticated,
-              sessionEpoch: state.sessionEpoch,
-            );
-            context.read<ClassroomCubit>().clear();
-          },
-          child: BlocBuilder<AuthFlowCubit, AuthFlowState>(
-            buildWhen: (previous, current) => previous.screen != current.screen,
-            builder: (context, scaffoldState) {
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<AuthFlowCubit, AuthFlowState>(
+              listenWhen: (previous, current) =>
+                  previous.screen != current.screen ||
+                  previous.authenticationResultId !=
+                      current.authenticationResultId,
+              listener: (context, state) async {
+                final coordinator = context.read<AppCoordinatorCubit>();
+                switch (state.screen) {
+                  case AuthScreen.welcome:
+                    coordinator.showWelcome();
+                  case AuthScreen.welcomeDetails:
+                    coordinator.showWelcomeDetails();
+                  case AuthScreen.login ||
+                      AuthScreen.deviceVerification ||
+                      AuthScreen.otp ||
+                      AuthScreen.signup:
+                    coordinator.showAuthScreen(state.screen);
+                }
+                final result = state.authenticationResult;
+                if (result == null) {
+                  return;
+                }
+                final needsSetup = await context
+                    .read<PasscodeCubit>()
+                    .prepareAfterAuthentication(
+                      user: result.user,
+                      loginName: result.loginName,
+                      isNewlyRegistered: result.isNewlyRegistered,
+                    );
+                if (context.mounted && needsSetup) {
+                  context.read<AppCoordinatorCubit>().showPasscode();
+                }
+                if (context.mounted) {
+                  context.read<AuthFlowCubit>().consumeAuthenticationResult();
+                }
+              },
+            ),
+            BlocListener<PasscodeCubit, PasscodeState>(
+              listenWhen: (previous, current) =>
+                  previous.outcomeId != current.outcomeId,
+              listener: (context, state) async {
+                final outcome = state.outcome;
+                if (outcome == null) {
+                  return;
+                }
+                switch (outcome.type) {
+                  case PasscodeOutcomeType.sessionReady:
+                    final user = outcome.user;
+                    if (user != null) {
+                      context
+                          .read<AppCoordinatorCubit>()
+                          .showRestoringSession();
+                      await context.read<AppSessionCubit>().establishSession(
+                        user: user,
+                        isNewlyRegistered: outcome.isNewlyRegistered,
+                      );
+                    }
+                  case PasscodeOutcomeType.resumeAuthentication:
+                    final user = outcome.user;
+                    final loginName = outcome.loginName;
+                    if (user != null && loginName != null) {
+                      final authCubit = context.read<AuthFlowCubit>();
+                      authCubit.openLogin(mode: AuthEntryMode.login);
+                      context.read<AppCoordinatorCubit>().showLogin();
+                      await authCubit.resumeRememberedLogin(
+                        loginName: loginName,
+                        fallbackUser: user,
+                      );
+                    }
+                  case PasscodeOutcomeType.cancelled:
+                    final authCubit = context.read<AuthFlowCubit>();
+                    authCubit.openLogin(mode: AuthEntryMode.login);
+                    context.read<AppCoordinatorCubit>().showLogin();
+                }
+                if (context.mounted) {
+                  context.read<PasscodeCubit>().consumeOutcome();
+                }
+              },
+            ),
+            BlocListener<AppSessionCubit, AppSessionState>(
+              listenWhen: (previous, current) =>
+                  previous.sessionEpoch != current.sessionEpoch ||
+                  previous.status != current.status,
+              listener: (context, state) {
+                context.read<SessionScopedRepositoryRegistry>().updateSession(
+                  isAuthenticated: state.isAuthenticated,
+                  sessionEpoch: state.sessionEpoch,
+                );
+                context.read<ClassroomCubit>().clear();
+                final coordinator = context.read<AppCoordinatorCubit>();
+                switch (state.status) {
+                  case SessionStatus.authenticated:
+                    coordinator.showHome();
+                  case SessionStatus.restoring:
+                    coordinator.showRestoringSession();
+                  case SessionStatus.unauthenticated:
+                    final authCubit = context.read<AuthFlowCubit>();
+                    authCubit.openLogin(mode: AuthEntryMode.login);
+                    coordinator.showLogin();
+                }
+              },
+            ),
+          ],
+          child: BlocBuilder<AppCoordinatorCubit, AppCoordinatorState>(
+            builder: (context, coordinatorState) {
               final colors = context.themeColors;
               final handlesSystemBack =
-                  !scaffoldState.isRestoringSession &&
-                  switch (scaffoldState.screen) {
+                  !coordinatorState.isRestoringSession &&
+                  switch (coordinatorState.screen) {
                     AppScreen.welcomeDetails ||
                     AppScreen.login ||
                     AppScreen.deviceVerification ||
@@ -229,6 +330,7 @@ class _AppFlowState extends State<AppFlow> {
                     AppScreen.signup => true,
                     AppScreen.welcome ||
                     AppScreen.passcode ||
+                    AppScreen.restoring ||
                     AppScreen.home => false,
                   };
               final overlayStyle =
@@ -239,6 +341,12 @@ class _AppFlowState extends State<AppFlow> {
                 canPop: !handlesSystemBack,
                 onPopInvokedWithResult: (didPop, result) {
                   if (!didPop) {
+                    final coordinator = context.read<AppCoordinatorCubit>();
+                    if (coordinator.state.screen == AppScreen.welcomeDetails) {
+                      context.read<AuthFlowCubit>().openWelcome();
+                      coordinator.showWelcome();
+                      return;
+                    }
                     final cubit = context.read<AuthFlowCubit>();
                     if (cubit.backFromLoginSwitchesEntryMode) {
                       clearLoginNameInput();
@@ -251,10 +359,10 @@ class _AppFlowState extends State<AppFlow> {
                   child: Scaffold(
                     backgroundColor: colors.pageBackground,
                     resizeToAvoidBottomInset:
-                        scaffoldState.screen != AppScreen.home &&
-                        scaffoldState.screen != AppScreen.login &&
-                        scaffoldState.screen != AppScreen.otp &&
-                        scaffoldState.screen != AppScreen.passcode,
+                        coordinatorState.screen != AppScreen.home &&
+                        coordinatorState.screen != AppScreen.login &&
+                        coordinatorState.screen != AppScreen.otp &&
+                        coordinatorState.screen != AppScreen.passcode,
                     body: AppScreenRouter(
                       loginNameController: loginNameController,
                       loginNameHasInput: _loginNameHasInput,

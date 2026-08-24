@@ -30,6 +30,7 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/profile/data/profile_options_cache.dart';
 import 'package:numi/features/settings/application/settings_passcode_controller.dart';
+import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi/features/settings/helpers/settings_profile_helpers.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
@@ -113,8 +114,7 @@ class SettingTab extends StatefulWidget {
 
 class _SettingTabState extends State<SettingTab>
     with _SettingProfileManagementMixin, _SettingProfileFormMixin {
-  final SettingsPasscodeController _passcodeController =
-      SettingsPasscodeController();
+  late final SettingsPasscodeController _passcodeController;
   final SettingsPasscodeFlow _passcodeFlow = const SettingsPasscodeFlow();
 
   @override
@@ -126,6 +126,9 @@ class _SettingTabState extends State<SettingTab>
   @override
   void initState() {
     super.initState();
+    _passcodeController = SettingsPasscodeController(
+      service: context.read<PasscodeService>(),
+    );
     _view = widget._initialView;
     _initializeProfileManagementState();
     _initializeProfileFormState();
