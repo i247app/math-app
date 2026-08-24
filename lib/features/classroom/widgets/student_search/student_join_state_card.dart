@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/shared/widgets/app_state_panel.dart';
 
 class StudentJoinStateCard extends StatelessWidget {
   const StudentJoinStateCard({
@@ -16,7 +19,11 @@ class StudentJoinStateCard extends StatelessWidget {
     required this.messageKey,
     this.actionLabelKey,
     this.onAction,
-  });
+  }) : assert(title != null || titleKey != null),
+       assert(
+         (actionLabelKey == null && onAction == null) ||
+             (actionLabelKey != null && onAction != null),
+       );
 
   final String assetPath;
   final bool isSvg;
@@ -29,62 +36,47 @@ class StudentJoinStateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    final colors = context.themeColors;
+    final actionLabel = actionLabelKey == null
+        ? null
+        : context.getText(actionLabelKey!);
+
+    return AppStatePanel(
+      title: title ?? context.getText(titleKey!),
+      message: context.getText(messageKey),
+      visual: isSvg
+          ? SvgPicture.asset(assetPath, width: 32, height: 32)
+          : Image.asset(assetPath, width: 32, height: 32),
       padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E8EB)),
+      borderRadius: 12,
+      visualTitleSpacing: 10,
+      titleMessageSpacing: 6,
+      messageActionSpacing: 14,
+      titleStyle: context.textStyles.bodyLarge?.copyWith(
+        color: titleColor,
+        fontSize: FontSize.normal,
+        fontWeight: FontWeight.w900,
       ),
-      child: Column(
-        children: [
-          isSvg
-              ? SvgPicture.asset(assetPath, width: 32, height: 32)
-              : Image.asset(assetPath, width: 32, height: 32),
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Text(
-              title ?? context.getText(titleKey!),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: titleColor,
-                fontSize: FontSize.normal,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(
-              context.getText(messageKey),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.grayText,
-                fontSize: FontSize.xs,
-                fontWeight: FontWeight.w700,
-                height: 1.25,
-              ),
-            ),
-          ),
-          if (onAction != null && actionLabelKey != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 14),
-              child: OutlinedButton.icon(
-                onPressed: onAction,
-                icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: Text(context.getText(actionLabelKey!)),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.tealActive,
-                  side: const BorderSide(color: AppColors.tealActive),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
-                  ),
+      messageStyle: context.textStyles.bodySmall?.copyWith(
+        color: colors.textMuted,
+        fontSize: FontSize.xs,
+        fontWeight: FontWeight.w700,
+        height: 1.25,
+      ),
+      action: actionLabel == null
+          ? null
+          : OutlinedButton.icon(
+              onPressed: onAction,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: Text(actionLabel),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: colors.brandStrong,
+                side: BorderSide(color: colors.brandStrong),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
                 ),
               ),
             ),
-        ],
-      ),
     );
   }
 }

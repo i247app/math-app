@@ -20,10 +20,19 @@ class AppStatePanel extends StatelessWidget {
     this.iconBackgroundColor,
     this.titleStyle,
     this.messageStyle,
+    this.action,
+    this.visualTitleSpacing = 14,
+    this.titleMessageSpacing = 8,
+    this.messageActionSpacing = 16,
   }) : assert(icon == null || visual == null),
        assert(
          (actionLabel == null && onAction == null) ||
              (actionLabel != null && onAction != null),
+       ),
+       assert(
+         action == null && actionLabel == null && onAction == null ||
+             action != null && actionLabel == null && onAction == null ||
+             action == null && actionLabel != null && onAction != null,
        );
 
   final String title;
@@ -40,6 +49,10 @@ class AppStatePanel extends StatelessWidget {
   final Color? iconBackgroundColor;
   final TextStyle? titleStyle;
   final TextStyle? messageStyle;
+  final Widget? action;
+  final double visualTitleSpacing;
+  final double titleMessageSpacing;
+  final double messageActionSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +76,11 @@ class AppStatePanel extends StatelessWidget {
                   size: 28,
                 ),
               ));
+    final resolvedAction =
+        action ??
+        (actionLabel == null
+            ? null
+            : TextButton(onPressed: onAction, child: Text(actionLabel!)));
 
     return Container(
       width: double.infinity,
@@ -77,7 +95,9 @@ class AppStatePanel extends StatelessWidget {
         children: [
           ?resolvedVisual,
           Padding(
-            padding: EdgeInsets.only(top: resolvedVisual == null ? 0 : 14),
+            padding: EdgeInsets.only(
+              top: resolvedVisual == null ? 0 : visualTitleSpacing,
+            ),
             child: Text(
               title,
               textAlign: TextAlign.center,
@@ -92,7 +112,7 @@ class AppStatePanel extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: EdgeInsets.only(top: titleMessageSpacing),
             child: Text(
               message,
               textAlign: TextAlign.center,
@@ -106,10 +126,10 @@ class AppStatePanel extends StatelessWidget {
                   ),
             ),
           ),
-          if (actionLabel != null)
+          if (resolvedAction != null)
             Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: TextButton(onPressed: onAction, child: Text(actionLabel!)),
+              padding: EdgeInsets.only(top: messageActionSpacing),
+              child: resolvedAction,
             ),
         ],
       ),

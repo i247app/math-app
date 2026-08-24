@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/shared/widgets/score_progress_ring.dart';
 
 class ParentTaskScoreRing extends StatelessWidget {
   const ParentTaskScoreRing({
@@ -13,31 +14,20 @@ class ParentTaskScoreRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 48,
-      height: 48,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          CircularProgressIndicator(
-            value: score <= 0 ? 0 : (score / 10).clamp(0.08, 1),
-            strokeWidth: 5,
-            backgroundColor: color.withValues(alpha: 0.12),
-            color: color,
-            strokeCap: StrokeCap.round,
-          ),
-          Center(
-            child: Text(
-              '$score',
-              style: TextStyle(
-                color: color,
-                fontSize: FontSize.xxxl,
-                fontWeight: FontWeight.w900,
-                height: 1,
-              ),
-            ),
-          ),
-        ],
+    return ScoreProgressRing(
+      progress: score <= 0 ? 0 : (score / 10).clamp(0.08, 1).toDouble(),
+      color: color,
+      trackColor: color.withValues(alpha: 0.12),
+      size: 48,
+      strokeWidth: 5,
+      child: Text(
+        '$score',
+        style: TextStyle(
+          color: color,
+          fontSize: FontSize.xxxl,
+          fontWeight: FontWeight.w900,
+          height: 1,
+        ),
       ),
     );
   }
