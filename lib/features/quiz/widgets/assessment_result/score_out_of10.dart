@@ -1,4 +1,4 @@
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 
 int scoreOutOf10(QuizGrading? grading) {
   final scorePercentage = grading?.scorePercentage;

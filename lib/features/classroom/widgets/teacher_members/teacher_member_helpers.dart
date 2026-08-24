@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
 
 bool isStudentProfile(StudentProfile profile) {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';

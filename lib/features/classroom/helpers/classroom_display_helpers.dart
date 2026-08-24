@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 
 String classroomDisplayName(BuildContext context, ClassroomModel classroom) {
   final name = classroom.name?.trim();

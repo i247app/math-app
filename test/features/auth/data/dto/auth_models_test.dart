@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/core/network/auth_models.dart';
+import 'package:numi/features/auth/data/dto/auth_models.dart';
 
 void main() {
   test('serializes the login identifier as login_name', () {

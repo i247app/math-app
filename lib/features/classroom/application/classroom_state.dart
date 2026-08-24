@@ -1,4 +1,4 @@
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 
 enum ClassroomCollectionType { owned, joined }
 

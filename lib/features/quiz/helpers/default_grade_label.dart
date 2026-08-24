@@ -1,4 +1,4 @@
-import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
 
 String? defaultGradeLabel(
   List<GradeModel> grades, {

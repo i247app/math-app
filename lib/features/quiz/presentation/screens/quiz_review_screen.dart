@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/application/quiz_review_controller.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';

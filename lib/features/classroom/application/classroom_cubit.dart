@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';

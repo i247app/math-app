@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,9 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_exercise_models.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';

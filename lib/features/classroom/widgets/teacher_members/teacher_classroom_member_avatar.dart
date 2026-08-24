@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 
 class TeacherClassroomMemberAvatar extends StatelessWidget {

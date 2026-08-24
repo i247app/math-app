@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 
 class LearningProgressChart extends StatelessWidget {
   const LearningProgressChart({super.key, required this.points});

@@ -1,4 +1,4 @@
-import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 
 String historyHomeworkDateText(ClassroomExercise exercise) {
   final values = <String?>[

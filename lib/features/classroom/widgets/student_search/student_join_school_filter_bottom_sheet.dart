@@ -4,7 +4,7 @@ import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/features/classroom/helpers/student_class_search_helpers.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_school_option_tile.dart';
 

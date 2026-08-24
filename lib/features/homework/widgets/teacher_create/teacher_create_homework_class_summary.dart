@@ -4,10 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/program_models.dart';
-import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/program_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_meta.dart';
 import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
 

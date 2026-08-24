@@ -18,12 +18,7 @@ void main() {
           ),
         );
       final api = QuizApi(
-        networkApi: NetworkApi(
-          networkClient: NetworkClient(
-            baseUrl: 'https://example.test',
-            dio: dio,
-          ),
-        ),
+        networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
       );
 
       await api.generateAssessmentQuiz(gradeLabel: '   ');
@@ -44,9 +39,7 @@ void main() {
         ),
       );
     final api = QuizApi(
-      networkApi: NetworkApi(
-        networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
-      ),
+      networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
     );
 
     await api.generateAssessmentQuiz(gradeLabel: '  Lớp 2  ');

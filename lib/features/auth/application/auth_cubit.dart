@@ -5,8 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
-import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/core/notifications/notification_ping_service.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
@@ -17,6 +16,7 @@ import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/auth/models/signup_form_data.dart';
+import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';

@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_exercise_models.dart';
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 
 String? studentClassNonEmpty(String? value) {
   final trimmed = value?.trim();

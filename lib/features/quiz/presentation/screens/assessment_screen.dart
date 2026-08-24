@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/application/assessment_controller.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/screens/assessment_result_screen.dart';

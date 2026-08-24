@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -123,9 +123,9 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
     });
     final range = _dateRange ?? _defaultRange();
     final fromDt = _startOfDay(range.start);
-    final toDt = _startOfDay(
-      range.end,
-    ).add(const Duration(days: 1)).subtract(const Duration(microseconds: 1));
+    final toDt = _startOfDay(range.end)
+        .add(const Duration(days: 1))
+        .subtract(const Duration(microseconds: 1));
 
     try {
       final progress = await widget.quizService.getQuizProgress(

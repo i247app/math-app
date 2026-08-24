@@ -4,10 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/program_models.dart';
-import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/program_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_code_chip.dart';
 import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_helpers.dart';
@@ -178,18 +178,15 @@ class TeacherClassDetailInfoCard extends StatelessWidget {
                                             CrossAxisAlignment.start,
                                         children: [
                                           TeacherClassDetailMetaRow(
-                                            iconAsset:
-                                                'assets/icons/teacher-class-grade.png',
+                                            iconAsset: 'assets/icons/teacher-class-grade.png',
                                             text: grade,
                                           ),
                                           TeacherClassDetailMetaRow(
-                                            iconAsset:
-                                                'assets/icons/teacher-class-program.png',
+                                            iconAsset: 'assets/icons/teacher-class-program.png',
                                             text: program,
                                           ),
                                           TeacherClassDetailMetaRow(
-                                            iconAsset:
-                                                'assets/icons/teacher-class-description.png',
+                                            iconAsset: 'assets/icons/teacher-class-description.png',
                                             text: schoolName,
                                           ),
                                         ],

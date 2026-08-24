@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
 import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_info_row.dart';
 import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_stat_due.dart';

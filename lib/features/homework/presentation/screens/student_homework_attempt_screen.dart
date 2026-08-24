@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
-import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 import 'package:numi/features/homework/data/cache/student_homework_cache.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
 import 'package:numi/features/homework/presentation/screens/student_homework_result_screen.dart';
@@ -286,9 +286,8 @@ class _StudentHomeworkAttemptScreenState
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    final hasActiveAttempt = studentHomeworkAttemptQuestions(
-      _exercise,
-    ).isNotEmpty;
+    final hasActiveAttempt = studentHomeworkAttemptQuestions(_exercise)
+        .isNotEmpty;
     final screen = Scaffold(
       backgroundColor: colors.pageBackground,
       body: SafeArea(

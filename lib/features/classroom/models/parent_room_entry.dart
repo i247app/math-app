@@ -1,5 +1,5 @@
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/home/data/home_api.dart';
 

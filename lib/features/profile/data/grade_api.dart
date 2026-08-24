@@ -1,7 +1,7 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/network_client.dart';
-import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
 
 class GradeException implements Exception {
   const GradeException(this.message, {this.status});
@@ -18,12 +18,14 @@ abstract class GradeService {
 }
 
 class GradeApi implements GradeService {
-  GradeApi({String? baseUrl, NetworkApi? networkApi})
-    : _networkApi =
-          networkApi ??
-          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
+  GradeApi({String? baseUrl, NetworkClient? networkClient})
+    : _networkClient =
+          networkClient ??
+          (baseUrl == null
+              ? NetworkClient.shared
+              : NetworkClient(baseUrl: baseUrl));
 
-  final NetworkApi _networkApi;
+  final NetworkClient _networkClient;
 
   @override
   Future<List<GradeModel>> listGrades({required int userId}) async {
@@ -33,7 +35,12 @@ class GradeApi implements GradeService {
 
     final GradeListResponse response;
     try {
-      response = await _networkApi.listGrades(GradeListRequest(userId: userId));
+      final json = await _networkClient.postJson(
+        '/grades/list',
+        GradeListRequest(userId: userId).toJson(),
+      );
+      NetworkClient.throwForApiStatus(json);
+      response = GradeListResponse.fromJson(json);
     } on NetworkException catch (error) {
       throw GradeException(error.message, status: error.status);
     }

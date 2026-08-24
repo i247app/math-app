@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/application/quiz_review_controller.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 

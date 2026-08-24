@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';

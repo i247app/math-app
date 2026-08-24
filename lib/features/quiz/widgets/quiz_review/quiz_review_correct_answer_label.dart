@@ -1,4 +1,4 @@
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 
 String? quizReviewCorrectAnswerLabel(QuizQuestion question) {
   final rightAnswer = question.rightAnswer?.trim();

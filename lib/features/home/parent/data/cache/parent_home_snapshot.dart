@@ -1,5 +1,5 @@
-import 'package:numi/core/network/home_layout_models.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/home/data/dto/home_layout_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 
 /// Snapshot of home-screen data for a single parent profile.
 class ParentHomeSnapshot {

@@ -3,7 +3,7 @@ import 'package:numi/features/classroom/widgets/student_search/student_class_sea
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 
 class StudentJoinClassActionState {
   const StudentJoinClassActionState({

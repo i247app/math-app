@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 import 'package:numi/features/classroom/helpers/classroom_display_helpers.dart';
 import 'package:numi/features/classroom/helpers/student_class_search_helpers.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_class_action_state.dart';

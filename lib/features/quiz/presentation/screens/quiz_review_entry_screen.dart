@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
 

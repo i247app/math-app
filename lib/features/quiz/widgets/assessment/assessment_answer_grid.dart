@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_answer_button.dart';
 
 class AssessmentAnswerGrid extends StatelessWidget {

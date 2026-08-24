@@ -1,7 +1,7 @@
-import 'package:numi/core/network/home_layout_models.dart';
+import 'package:numi/features/home/data/dto/home_layout_models.dart';
 import 'package:numi/core/network/network_client.dart';
 
-export 'package:numi/core/network/home_layout_models.dart';
+export 'package:numi/features/home/data/dto/home_layout_models.dart';
 
 class HomeLayoutException implements Exception {
   const HomeLayoutException(this.message, {this.status});
@@ -19,7 +19,11 @@ abstract class HomeLayoutService {
 
 class HomeLayoutApi implements HomeLayoutService {
   HomeLayoutApi({String? baseUrl, NetworkClient? networkClient})
-    : _networkClient = networkClient ?? NetworkClient(baseUrl: baseUrl);
+    : _networkClient =
+          networkClient ??
+          (baseUrl == null
+              ? NetworkClient.shared
+              : NetworkClient(baseUrl: baseUrl));
 
   final NetworkClient _networkClient;
 

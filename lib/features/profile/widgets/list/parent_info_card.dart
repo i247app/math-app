@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/models/profile_role.dart';

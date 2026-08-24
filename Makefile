@@ -1,9 +1,5 @@
 .PHONY: build project pods pub clean
 
-# ENV ?= dev
-# ENV_FILE = config/env.$(ENV).json
-# DART_DEFINE = --dart-define-from-file=$(ENV_FILE)
-
 run:
 	flutter run
 

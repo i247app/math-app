@@ -1,5 +1,5 @@
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/profile/data/school_api.dart';
 

@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/network/auth_token_store.dart';
 import 'package:numi/core/network/network_client.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/data/quiz_api.dart';
 
 void main() {
   test('quiz progress accepts a null average delta', () {
@@ -123,14 +124,12 @@ void main() {
         },
       ),
     );
-    final api = NetworkApi(networkClient: client);
+    final api = QuizApi(networkClient: client);
 
     final response = await api.getQuizProgress(
-      QuizProgressRequest(
-        profileId: 21,
-        fromDt: DateTime.parse('2026-01-03T04:48:58.607719Z'),
-        toDt: DateTime.parse('2026-08-03T04:48:58.607719Z'),
-      ),
+      profileId: 21,
+      fromDt: DateTime.parse('2026-01-03T04:48:58.607719Z'),
+      toDt: DateTime.parse('2026-08-03T04:48:58.607719Z'),
     );
 
     expect(requestPath, '/quizzes/analytics/progress');

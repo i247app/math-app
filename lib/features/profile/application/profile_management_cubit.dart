@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/program_models.dart';
-import 'package:numi/core/network/school_models.dart';
-import 'package:numi/core/network/semester_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/program_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
+import 'package:numi/features/profile/data/dto/semester_models.dart';
 import 'package:numi/features/profile/application/profile_management_state.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/grade_api.dart';

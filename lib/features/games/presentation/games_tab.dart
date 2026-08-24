@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/games/monster_rescue/monster_rescue_data.dart';
@@ -193,9 +193,8 @@ class _GamesTabState extends State<GamesTab> {
       final stageScreen = lesson.number <= 2
           ? NumiFarmHarvestStageScreen(stage: lesson.number)
           : NumiFarmChoiceStageScreen(stage: lesson.number);
-      final completed = await Navigator.of(
-        context,
-      ).push<bool>(MaterialPageRoute<bool>(builder: (_) => stageScreen));
+      final completed = await Navigator.of(context)
+          .push<bool>(MaterialPageRoute<bool>(builder: (_) => stageScreen));
       if (completed == true &&
           mounted &&
           _farmCompletedStages < lesson.number) {

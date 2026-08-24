@@ -1,6 +1,6 @@
-import 'package:numi/core/network/classroom_exercise_models.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 
 class HomeLayoutResponse {
   const HomeLayoutResponse({

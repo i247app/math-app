@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
@@ -120,12 +120,12 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
-    final oldChildIds = studentProfiles(
-      oldWidget.profiles,
-    ).map(ActiveProfileSession.profileStableId).join(',');
-    final childIds = studentProfiles(
-      widget.profiles,
-    ).map(ActiveProfileSession.profileStableId).join(',');
+    final oldChildIds = studentProfiles(oldWidget.profiles)
+        .map(ActiveProfileSession.profileStableId)
+        .join(',');
+    final childIds = studentProfiles(widget.profiles)
+        .map(ActiveProfileSession.profileStableId)
+        .join(',');
     final shouldForceRefresh =
         oldWidget.user?.id != widget.user?.id ||
         oldChildIds != childIds ||

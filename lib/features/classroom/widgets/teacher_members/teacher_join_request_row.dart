@@ -3,7 +3,7 @@ import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_classroom_member_avatar.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';

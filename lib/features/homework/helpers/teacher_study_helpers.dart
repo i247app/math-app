@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 import 'package:numi/features/homework/models/teacher_study_date_parts.dart';
 
 List<ClassroomExercise> deduplicateTeacherStudyExercises(

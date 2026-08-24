@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_card.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_computed_correct_count.dart';

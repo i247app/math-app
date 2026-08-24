@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/grade_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/quiz/data/ai_shake_service.dart';

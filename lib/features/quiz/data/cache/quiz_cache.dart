@@ -1,4 +1,4 @@
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 
 typedef QuizDetailLoader = Future<GeneratedQuiz> Function(int detailId);

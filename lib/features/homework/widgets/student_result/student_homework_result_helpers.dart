@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
-import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 import 'package:numi/features/homework/widgets/student_result/student_homework_result_summary.dart';
 
 StudentHomeworkResultSummary studentHomeworkResultSummary({

@@ -1,7 +1,7 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/network_client.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/errors/quiz_exception.dart';
 
 const quizPurposeAssessment = 'ASSESSMENT';
@@ -47,12 +47,14 @@ abstract class QuizService {
 }
 
 class QuizApi implements QuizService {
-  QuizApi({String? baseUrl, NetworkApi? networkApi})
-    : _networkApi =
-          networkApi ??
-          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
+  QuizApi({String? baseUrl, NetworkClient? networkClient})
+    : _networkClient =
+          networkClient ??
+          (baseUrl == null
+              ? NetworkClient.shared
+              : NetworkClient(baseUrl: baseUrl));
 
-  final NetworkApi _networkApi;
+  final NetworkClient _networkClient;
 
   @override
   Future<GeneratedQuiz> generateAssessmentQuiz({
@@ -66,7 +68,7 @@ class QuizApi implements QuizService {
     final GenerateQuizResponse response;
     final cleanGradeLabel = gradeLabel?.trim() ?? '';
     response = await _runQuizRequest(
-      () => _networkApi.generateQuiz(
+      () => _generateQuiz(
         GenerateQuizRequest(
           purpose: purpose,
           typeOfQuiz: typeOfQuiz,
@@ -94,7 +96,7 @@ class QuizApi implements QuizService {
   }) async {
     final SubmitQuizResponse response;
     response = await _runQuizRequest(
-      () => _networkApi.submitQuiz(
+      () => _submitQuiz(
         SubmitQuizRequest(
           quizId: quizId,
           answers: answers,
@@ -150,7 +152,7 @@ class QuizApi implements QuizService {
     }
 
     return _runQuizRequest(
-      () => _networkApi.getQuizProgress(
+      () => _getQuizProgressResponse(
         QuizProgressRequest(
           profileId: profileId,
           fromDt: fromDt.toUtc(),
@@ -175,7 +177,7 @@ class QuizApi implements QuizService {
 
     final QuizListResponse response;
     response = await _runQuizRequest(
-      () => _networkApi.listQuizzes(
+      () => _listQuizResponse(
         QuizListRequest(
           userId: userId,
           profileId: profileId,
@@ -196,7 +198,7 @@ class QuizApi implements QuizService {
     }
 
     final QuizDetailResponse response;
-    response = await _runQuizRequest(() => _networkApi.getQuizDetail(quizId));
+    response = await _runQuizRequest(() => _getQuizDetailResponse(quizId));
 
     final quiz = response.quiz;
     if (quiz == null) {
@@ -204,6 +206,63 @@ class QuizApi implements QuizService {
     }
 
     return quiz;
+  }
+
+  Future<GenerateQuizResponse> _generateQuiz(GenerateQuizRequest request) {
+    return _postResponse(
+      '/quizzes/generate',
+      request.toJson(),
+      GenerateQuizResponse.fromJson,
+      receiveTimeout: const Duration(seconds: 90),
+    );
+  }
+
+  Future<SubmitQuizResponse> _submitQuiz(SubmitQuizRequest request) {
+    return _postResponse(
+      '/quizzes/submit',
+      request.toJson(),
+      SubmitQuizResponse.fromJson,
+      receiveTimeout: const Duration(seconds: 90),
+    );
+  }
+
+  Future<QuizListResponse> _listQuizResponse(QuizListRequest request) {
+    return _postResponse(
+      '/quizzes/list',
+      request.toJson(),
+      QuizListResponse.fromJson,
+    );
+  }
+
+  Future<QuizProgressResponse> _getQuizProgressResponse(
+    QuizProgressRequest request,
+  ) {
+    return _postResponse(
+      '/quizzes/analytics/progress',
+      request.toJson(),
+      QuizProgressResponse.fromJson,
+    );
+  }
+
+  Future<QuizDetailResponse> _getQuizDetailResponse(int quizId) {
+    return _postResponse('/quizzes/detail', <String, dynamic>{
+      'quiz_id': quizId,
+    }, QuizDetailResponse.fromJson);
+  }
+
+  Future<T> _postResponse<T>(
+    String path,
+    Map<String, dynamic> body,
+    T Function(Map<String, dynamic>) fromJson, {
+    Duration? receiveTimeout,
+  }) async {
+    final json = await _networkClient.postJson(
+      path,
+      body,
+      receiveTimeout: receiveTimeout,
+    );
+    NetworkClient.throwForApiStatus(json);
+    return fromJson(json);
   }
 }
 

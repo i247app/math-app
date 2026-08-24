@@ -1,8 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/errors/http_status.dart';
-import 'package:numi/core/network/auth_models.dart';
-import 'package:numi/core/network/device_models.dart';
+import 'package:numi/features/auth/data/dto/auth_models.dart';
+import 'package:numi/features/auth/data/dto/device_models.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
@@ -65,25 +66,30 @@ abstract class AuthService {
 }
 
 class AuthApi implements AuthService {
-  AuthApi({String? baseUrl, NetworkApi? networkApi})
-    : _networkApi =
-          networkApi ??
-          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
+  AuthApi({String? baseUrl, NetworkClient? networkClient})
+    : _networkClient =
+          networkClient ??
+          (baseUrl == null
+              ? NetworkClient.shared
+              : NetworkClient(baseUrl: baseUrl));
 
-  final NetworkApi _networkApi;
+  final NetworkClient _networkClient;
   final Map<String, LoginUser> _loginUsers = {};
 
   @override
   Future<LoginUser?> restoreSession() async {
-    if (!await _networkApi.hasAuthToken()) {
+    if (!await _networkClient.hasAuthToken()) {
       return null;
     }
 
     try {
-      final response = await _networkApi.loginResume();
+      final response = await _postAuth(
+        '/auth/login-resume',
+        const <String, dynamic>{},
+      );
       final user = response.user?.toLoginUser();
       if (user == null || user.id <= 0) {
-        await _networkApi.clearAuthToken();
+        await _networkClient.clearAuthToken();
         return null;
       }
       return user;
@@ -97,7 +103,10 @@ class AuthApi implements AuthService {
   Future<AuthLoginLookupResult> lookupLoginName(String loginName) async {
     final AuthResponse response;
     try {
-      response = await _networkApi.login(LoginRequest(loginName: loginName));
+      response = await _postAuth(
+        '/auth/login',
+        LoginRequest(loginName: loginName).toJson(),
+      );
     } on NetworkException catch (error) {
       if (isAuthUserNotFoundStatus(error.status)) {
         _loginUsers.remove(loginName);
@@ -135,7 +144,7 @@ class AuthApi implements AuthService {
     int? targetDeviceId,
   }) async {
     final response = await _request(
-      () => _networkApi.sendOtp(
+      () => _sendOtp(
         SendOtpRequest(
           otpType: kind.apiType,
           identifier: loginName,
@@ -158,9 +167,7 @@ class AuthApi implements AuthService {
     required int userId,
   }) async {
     final response = await _request(
-      () => _networkApi.listDevices(
-        DeviceListRequest(userId: userId, isVerified: true),
-      ),
+      () => _listDevices(DeviceListRequest(userId: userId, isVerified: true)),
     );
 
     return response.devices
@@ -184,7 +191,7 @@ class AuthApi implements AuthService {
     String? email,
   }) async {
     final response = await _request(
-      () => _networkApi.signup(
+      () => _signup(
         SignupRequest(phone: phone, name: name, email: email, role: role),
       ),
     );
@@ -212,7 +219,7 @@ class AuthApi implements AuthService {
     String? avatarPath,
   }) async {
     final response = await _request(
-      () => _networkApi.updateUser(
+      () => _updateUser(
         UpdateUserRequest(
           userId: userId,
           name: name,
@@ -240,7 +247,7 @@ class AuthApi implements AuthService {
     required AuthOtpKind kind,
   }) async {
     final response = await _request(
-      () => _networkApi.verifyOtp(
+      () => _verifyOtp(
         VerifyOtpRequest(
           otpType: kind.apiType,
           identifier: loginName,
@@ -323,7 +330,7 @@ class AuthApi implements AuthService {
 
   Future<LoginUser?> _currentUserOrNull() async {
     try {
-      return (await _networkApi.getCurrentUser()).toLoginUser();
+      return (await _getCurrentUser()).toLoginUser();
     } on NetworkException catch (error) {
       await _clearAuthTokenIfUnauthorized(error);
 
@@ -341,13 +348,120 @@ class AuthApi implements AuthService {
 
   Future<void> _clearAuthTokenIfUnauthorized(NetworkException error) async {
     if (isUnauthorizedHttpStatus(error.status)) {
-      await _networkApi.clearAuthToken();
+      await _networkClient.clearAuthToken();
     }
   }
 
   @override
   Future<void> logout() async {
     _loginUsers.clear();
-    await _networkApi.clearAuthToken();
+    await _networkClient.clearAuthToken();
+  }
+
+  Future<AuthResponse> _signup(
+    SignupRequest request, {
+    String? avatarPath,
+  }) async {
+    final formData = FormData.fromMap({
+      'phone': request.phone,
+      if (request.email?.isNotEmpty == true) 'email': request.email,
+      if (request.name?.isNotEmpty == true) 'name': request.name,
+      if (request.role?.isNotEmpty == true) 'role': request.role,
+      if (avatarPath?.isNotEmpty == true)
+        'avatar': await MultipartFile.fromFile(avatarPath!),
+    });
+    final json = await _networkClient.postMultipart('/users/create', formData);
+    NetworkClient.throwForApiStatus(json);
+    final response = AuthResponse.fromJson(json);
+    await _storeAccessToken(response.accessToken);
+    return response;
+  }
+
+  Future<AuthResponse> _updateUser(
+    UpdateUserRequest request, {
+    String? avatarPath,
+  }) async {
+    final formData = FormData.fromMap({
+      'user_id': request.userId,
+      if (request.name?.isNotEmpty == true) 'name': request.name,
+      if (request.phone?.isNotEmpty == true) 'phone': request.phone,
+      if (request.email?.isNotEmpty == true) 'email': request.email,
+      if (avatarPath?.isNotEmpty == true)
+        'avatar': await MultipartFile.fromFile(avatarPath!),
+    });
+    final json = await _networkClient.postMultipart('/users/update', formData);
+    NetworkClient.throwForApiStatus(json);
+    return AuthResponse.fromJson(json);
+  }
+
+  Future<AuthResponse> _postAuth(String path, Map<String, dynamic> body) async {
+    final json = await _networkClient.postJson(path, body);
+    NetworkClient.throwForApiStatus(json);
+    final response = AuthResponse.fromJson(json);
+    await _storeAccessToken(response.accessToken);
+    return response;
+  }
+
+  Future<SendOtpResponse> _sendOtp(SendOtpRequest request) async {
+    final json = await _networkClient.postJson('/otps/send', request.toJson());
+    NetworkClient.throwForApiStatus(json);
+    return SendOtpResponse.fromJson(json);
+  }
+
+  Future<VerifyOtpResponse> _verifyOtp(VerifyOtpRequest request) async {
+    final json = await _networkClient.postJson(
+      '/otps/verify',
+      request.toJson(),
+    );
+    NetworkClient.throwForApiStatus(json);
+    final response = VerifyOtpResponse.fromJson(json);
+    await _storeAccessToken(response.accessToken);
+    return response;
+  }
+
+  Future<DeviceListResponse> _listDevices(DeviceListRequest request) async {
+    final json = await _networkClient.postJson(
+      '/devices/list',
+      request.toJson(),
+    );
+    NetworkClient.throwForApiStatus(json);
+    return DeviceListResponse.fromJson(json);
+  }
+
+  Future<AuthUser> _getCurrentUser() async {
+    final json = await _networkClient.postJson(
+      '/users/me',
+      const <String, dynamic>{},
+    );
+    NetworkClient.throwForApiStatus(json);
+    if (json.containsKey('user') && json['user'] == null) {
+      throw const NetworkException('Session expired.', status: 401);
+    }
+    final data = json['data'];
+    final user = json['user'] ?? _nestedUser(data) ?? data;
+    if (user case final Map<String, dynamic> userJson) {
+      return AuthUser.fromJson(userJson);
+    }
+    if (user case final Map<Object?, Object?> userJson) {
+      return AuthUser.fromJson(Map<String, dynamic>.from(userJson));
+    }
+    return AuthUser.fromJson(json);
+  }
+
+  Future<void> _storeAccessToken(String? accessToken) async {
+    final token = accessToken?.trim();
+    if (token != null && token.isNotEmpty) {
+      await _networkClient.writeAuthToken(token);
+    }
+  }
+
+  static Object? _nestedUser(Object? data) {
+    if (data case final Map<String, dynamic> dataJson) {
+      return dataJson['user'];
+    }
+    if (data case final Map<Object?, Object?> dataJson) {
+      return dataJson['user'];
+    }
+    return null;
   }
 }

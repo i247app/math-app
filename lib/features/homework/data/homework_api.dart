@@ -1,4 +1,4 @@
-import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 
@@ -47,12 +47,15 @@ abstract class ClassroomExerciseService {
 }
 
 class ClassroomExerciseApi implements ClassroomExerciseService {
-  ClassroomExerciseApi({String? baseUrl, NetworkApi? networkApi})
-    : _networkApi =
-          networkApi ??
-          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
+  ClassroomExerciseApi({String? baseUrl, NetworkClient? networkClient})
+    : _remote = _ClassroomExerciseRemoteDataSource(
+        networkClient ??
+            (baseUrl == null
+                ? NetworkClient.shared
+                : NetworkClient(baseUrl: baseUrl)),
+      );
 
-  final NetworkApi _networkApi;
+  final _ClassroomExerciseRemoteDataSource _remote;
 
   @override
   Future<List<ClassroomExercise>> listExercises({
@@ -64,7 +67,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     String? purpose,
   }) {
     return _runExerciseRequest(() async {
-      final response = await _networkApi.listClassroomExercises(
+      final response = await _remote.listClassroomExercises(
         ClassroomExerciseListRequest(
           classroomId: classroomId,
           profileId: profileId,
@@ -98,7 +101,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     String purpose = classroomExercisePurposeHomework,
   }) {
     return _runExerciseRequest(() async {
-      final response = await _networkApi.createClassroomExercise(
+      final response = await _remote.createClassroomExercise(
         CreateClassroomExerciseRequest(
           profileId: profileId,
           classroomId: classroomId,
@@ -124,7 +127,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required int profileId,
   }) {
     return _runExerciseRequest(() async {
-      final response = await _networkApi.getClassroomExerciseDetail(
+      final response = await _remote.getClassroomExerciseDetail(
         exerciseId: exerciseId,
         profileId: profileId,
       );
@@ -144,7 +147,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     String purpose = classroomExercisePurposeHomework,
   }) {
     return _runExerciseRequest(() async {
-      final response = await _networkApi.updateClassroomExercise(
+      final response = await _remote.updateClassroomExercise(
         UpdateClassroomExerciseRequest(
           profileId: profileId,
           classroomExerciseId: classroomExerciseId,
@@ -163,7 +166,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required List<SubmitClassroomExerciseAnswer> answers,
   }) {
     return _runExerciseRequest(() {
-      return _networkApi.submitClassroomExercise(
+      return _remote.submitClassroomExercise(
         SubmitClassroomExerciseRequest(
           profileId: profileId,
           classroomExerciseId: classroomExerciseId,
@@ -179,5 +182,61 @@ Future<T> _runExerciseRequest<T>(Future<T> Function() request) async {
     return await request();
   } on NetworkException catch (error) {
     throw ClassroomExerciseException(error.message, status: error.status);
+  }
+}
+
+class _ClassroomExerciseRemoteDataSource {
+  const _ClassroomExerciseRemoteDataSource(this._client);
+
+  final NetworkClient _client;
+
+  Future<ClassroomExerciseListResponse> listClassroomExercises(
+    ClassroomExerciseListRequest request,
+  ) => _postResponse(
+    '/classroom-exercises/list',
+    request.toJson(),
+    ClassroomExerciseListResponse.fromJson,
+  );
+
+  Future<ClassroomExerciseResponse> createClassroomExercise(
+    CreateClassroomExerciseRequest request,
+  ) => _postResponse(
+    '/classroom-exercises/create',
+    request.toJson(),
+    ClassroomExerciseResponse.fromJson,
+  );
+
+  Future<ClassroomExerciseResponse> updateClassroomExercise(
+    UpdateClassroomExerciseRequest request,
+  ) => _postResponse(
+    '/classroom-exercises/update',
+    request.toJson(),
+    ClassroomExerciseResponse.fromJson,
+  );
+
+  Future<ClassroomExerciseSubmissionResponse> submitClassroomExercise(
+    SubmitClassroomExerciseRequest request,
+  ) => _postResponse(
+    '/classroom-exercise/submissions/submit',
+    request.toJson(),
+    ClassroomExerciseSubmissionResponse.fromJson,
+  );
+
+  Future<ClassroomExerciseResponse> getClassroomExerciseDetail({
+    required int exerciseId,
+    int? profileId,
+  }) => _postResponse('/classroom-exercises/detail', <String, dynamic>{
+    'classroom_exercise_id': exerciseId,
+    'profile_id': ?profileId,
+  }, ClassroomExerciseResponse.fromJson);
+
+  Future<T> _postResponse<T>(
+    String path,
+    Map<String, dynamic> body,
+    T Function(Map<String, dynamic>) fromJson,
+  ) async {
+    final json = await _client.postJson(path, body);
+    NetworkClient.throwForApiStatus(json);
+    return fromJson(json);
   }
 }

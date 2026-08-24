@@ -1,5 +1,6 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_class_search_assets.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -9,9 +10,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/data/cache/student_class_search_filter_cache.dart';

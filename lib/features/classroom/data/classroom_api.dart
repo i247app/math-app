@@ -1,4 +1,5 @@
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:dio/dio.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';
 
@@ -81,17 +82,20 @@ abstract class ClassroomService {
 }
 
 class ClassroomApi implements ClassroomService {
-  ClassroomApi({String? baseUrl, NetworkApi? networkApi})
-    : _networkApi =
-          networkApi ??
-          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
+  ClassroomApi({String? baseUrl, NetworkClient? networkClient})
+    : _remote = _ClassroomRemoteDataSource(
+        networkClient ??
+            (baseUrl == null
+                ? NetworkClient.shared
+                : NetworkClient(baseUrl: baseUrl)),
+      );
 
-  final NetworkApi _networkApi;
+  final _ClassroomRemoteDataSource _remote;
 
   @override
   Future<List<ClassroomModel>> listClassrooms({required int profileId}) async {
     try {
-      final response = await _networkApi.listClassrooms(
+      final response = await _remote.listClassrooms(
         ClassroomListRequest(profileId: profileId, ownerProfileId: profileId),
       );
       return response.classrooms;
@@ -105,7 +109,7 @@ class ClassroomApi implements ClassroomService {
     required int profileId,
   }) async {
     try {
-      final response = await _networkApi.listMyJoinedClassrooms(
+      final response = await _remote.listMyJoinedClassrooms(
         ClassroomListRequest(profileId: profileId),
       );
       return response.classrooms;
@@ -122,7 +126,7 @@ class ClassroomApi implements ClassroomService {
     List<int>? schoolIds,
   }) async {
     try {
-      final response = await _networkApi.listClassrooms(
+      final response = await _remote.listClassrooms(
         ClassroomListRequest(
           profileId: profileId,
           search: search?.trim().isEmpty == true ? null : search?.trim(),
@@ -157,7 +161,7 @@ class ClassroomApi implements ClassroomService {
     required String classroomCode,
   }) async {
     try {
-      await _networkApi.joinClassroomByCode(
+      await _remote.joinClassroomByCode(
         ClassroomJoinByCodeRequest(
           profileId: profileId,
           classroomCode: classroomCode,
@@ -174,7 +178,7 @@ class ClassroomApi implements ClassroomService {
     required int classroomId,
   }) async {
     try {
-      final response = await _networkApi.listClassroomJoinRequests(
+      final response = await _remote.listClassroomJoinRequests(
         ClassroomMembersListRequest(
           profileId: profileId,
           classroomId: classroomId,
@@ -192,7 +196,7 @@ class ClassroomApi implements ClassroomService {
     required int classroomId,
   }) async {
     try {
-      final response = await _networkApi.listClassroomMembers(
+      final response = await _remote.listClassroomMembers(
         ClassroomMembersListRequest(
           profileId: profileId,
           classroomId: classroomId,
@@ -213,7 +217,7 @@ class ClassroomApi implements ClassroomService {
     required int targetProfileId,
   }) async {
     try {
-      await _networkApi.approveClassroomJoinRequest(
+      await _remote.approveClassroomJoinRequest(
         ClassroomJoinRequestActionRequest(
           profileId: profileId,
           classroomId: classroomId,
@@ -232,7 +236,7 @@ class ClassroomApi implements ClassroomService {
     required int targetProfileId,
   }) async {
     try {
-      await _networkApi.rejectClassroomJoinRequest(
+      await _remote.rejectClassroomJoinRequest(
         ClassroomJoinRequestActionRequest(
           profileId: profileId,
           classroomId: classroomId,
@@ -251,7 +255,7 @@ class ClassroomApi implements ClassroomService {
     required List<int> targetProfileIds,
   }) async {
     try {
-      await _networkApi.sendClassroomInvitations(
+      await _remote.sendClassroomInvitations(
         ClassroomInvitationSendRequest(
           inviterProfileId: inviterProfileId,
           classroomId: classroomId,
@@ -268,7 +272,7 @@ class ClassroomApi implements ClassroomService {
     required int profileId,
   }) async {
     try {
-      final response = await _networkApi.listMyPendingClassroomInvitations(
+      final response = await _remote.listMyPendingClassroomInvitations(
         ClassroomInvitationListRequest(profileId: profileId),
       );
       return response.invitations;
@@ -284,7 +288,7 @@ class ClassroomApi implements ClassroomService {
     required int classroomId,
   }) async {
     try {
-      await _networkApi.acceptClassroomInvitation(
+      await _remote.acceptClassroomInvitation(
         ClassroomInvitationActionRequest(
           inviteeProfileId: inviteeProfileId,
           inviterProfileId: inviterProfileId,
@@ -303,7 +307,7 @@ class ClassroomApi implements ClassroomService {
     required int classroomId,
   }) async {
     try {
-      await _networkApi.rejectClassroomInvitation(
+      await _remote.rejectClassroomInvitation(
         ClassroomInvitationActionRequest(
           inviteeProfileId: inviteeProfileId,
           inviterProfileId: inviterProfileId,
@@ -327,7 +331,7 @@ class ClassroomApi implements ClassroomService {
     String? filePath,
   }) async {
     try {
-      final response = await _networkApi.createClassroom(
+      final response = await _remote.createClassroom(
         CreateClassroomRequest(
           profileId: profileId,
           name: name,
@@ -351,7 +355,7 @@ class ClassroomApi implements ClassroomService {
     required int profileId,
   }) async {
     try {
-      final response = await _networkApi.getClassroomDetail(
+      final response = await _remote.getClassroomDetail(
         classroomId: classroomId,
         profileId: profileId,
       );
@@ -359,5 +363,118 @@ class ClassroomApi implements ClassroomService {
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }
+  }
+}
+
+class _ClassroomRemoteDataSource {
+  const _ClassroomRemoteDataSource(this._client);
+
+  final NetworkClient _client;
+
+  Future<ClassroomListResponse> listClassrooms(ClassroomListRequest request) =>
+      _postResponse(
+        '/classrooms/list',
+        request.toJson(),
+        ClassroomListResponse.fromJson,
+      );
+
+  Future<ClassroomListResponse> listMyJoinedClassrooms(
+    ClassroomListRequest request,
+  ) => _postResponse(
+    '/classrooms/my-joined',
+    request.toJson(),
+    ClassroomListResponse.fromJson,
+  );
+
+  Future<ClassroomActionResponse> joinClassroomByCode(
+    ClassroomJoinByCodeRequest request,
+  ) => _action('/classrooms/join-by-code', request.toJson());
+
+  Future<ClassroomMemberListResponse> listClassroomJoinRequests(
+    ClassroomMembersListRequest request,
+  ) => _postResponse(
+    '/classrooms/join-requests/list',
+    request.toJson(),
+    ClassroomMemberListResponse.fromJson,
+  );
+
+  Future<ClassroomMemberListResponse> listClassroomMembers(
+    ClassroomMembersListRequest request,
+  ) => _postResponse(
+    '/classrooms/members/list',
+    request.toJson(),
+    ClassroomMemberListResponse.fromJson,
+  );
+
+  Future<ClassroomActionResponse> approveClassroomJoinRequest(
+    ClassroomJoinRequestActionRequest request,
+  ) => _action('/classrooms/join-requests/approve', request.toJson());
+
+  Future<ClassroomActionResponse> rejectClassroomJoinRequest(
+    ClassroomJoinRequestActionRequest request,
+  ) => _action('/classrooms/join-requests/reject', request.toJson());
+
+  Future<ClassroomActionResponse> sendClassroomInvitations(
+    ClassroomInvitationSendRequest request,
+  ) => _action('/classrooms/invitations/send', request.toJson());
+
+  Future<ClassroomInvitationListResponse> listMyPendingClassroomInvitations(
+    ClassroomInvitationListRequest request,
+  ) => _postResponse(
+    '/classrooms/invitations/my-pending',
+    request.toJson(),
+    ClassroomInvitationListResponse.fromJson,
+  );
+
+  Future<ClassroomActionResponse> acceptClassroomInvitation(
+    ClassroomInvitationActionRequest request,
+  ) => _action('/classrooms/invitations/accept', request.toJson());
+
+  Future<ClassroomActionResponse> rejectClassroomInvitation(
+    ClassroomInvitationActionRequest request,
+  ) => _action('/classrooms/invitations/reject', request.toJson());
+
+  Future<ClassroomResponse> createClassroom(
+    CreateClassroomRequest request, {
+    String? filePath,
+  }) async {
+    final formData = FormData.fromMap({
+      'profile_id': request.profileId,
+      'name': request.name,
+      'program_ids': request.programIds,
+      'grade_id': request.gradeId,
+      'school_id': request.schoolId,
+      'max_members': request.maxMembers.toString(),
+      if (request.description?.isNotEmpty == true)
+        'description': request.description,
+      if (filePath?.isNotEmpty == true)
+        'file': await MultipartFile.fromFile(filePath!),
+    });
+    final json = await _client.postMultipart('/classrooms/create', formData);
+    NetworkClient.throwForApiStatus(json);
+    return ClassroomResponse.fromJson(json);
+  }
+
+  Future<ClassroomResponse> getClassroomDetail({
+    required int classroomId,
+    required int profileId,
+  }) => _postResponse('/classrooms/detail', <String, dynamic>{
+    'classroom_id': classroomId,
+    'profile_id': profileId,
+  }, ClassroomResponse.fromJson);
+
+  Future<ClassroomActionResponse> _action(
+    String path,
+    Map<String, dynamic> body,
+  ) => _postResponse(path, body, ClassroomActionResponse.fromJson);
+
+  Future<T> _postResponse<T>(
+    String path,
+    Map<String, dynamic> body,
+    T Function(Map<String, dynamic>) fromJson,
+  ) async {
+    final json = await _client.postJson(path, body);
+    NetworkClient.throwForApiStatus(json);
+    return fromJson(json);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_shadows.dart';

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/program_models.dart';
-import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/program_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
 

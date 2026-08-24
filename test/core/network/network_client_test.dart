@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_language.dart';
-import 'package:numi/core/network/auth_models.dart';
-import 'package:numi/core/network/device_models.dart';
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_exception.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 
 void main() {
   late AppLanguage originalLanguage;
@@ -104,19 +105,14 @@ void main() {
           },
         ),
       );
-    final api = NetworkApi(
+    final api = AuthApi(
       networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
     );
 
     await expectLater(
-      api.sendOtp(
-        const SendOtpRequest(
-          otpType: 'REGISTER',
-          identifier: 'learner@example.com',
-        ),
-      ),
+      api.sendOtp(loginName: 'learner@example.com', kind: AuthOtpKind.signup),
       throwsA(
-        isA<NetworkException>().having(
+        isA<AuthException>().having(
           (error) => error.message,
           'message',
           'OTP request limit reached.',
@@ -145,20 +141,18 @@ void main() {
           },
         ),
       );
-    final api = NetworkApi(
+    final api = AuthApi(
       networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
     );
 
     await expectLater(
-      api.signup(
-        const SignupRequest(
-          phone: '+84901234567',
-          name: 'Learner',
-          role: 'STUDENT',
-        ),
+      api.signupWithPhone(
+        phone: '+84901234567',
+        name: 'Learner',
+        role: 'STUDENT',
       ),
       throwsA(
-        isA<NetworkException>().having(
+        isA<AuthException>().having(
           (error) => error.message,
           'message',
           'Invalid server response.',
@@ -200,17 +194,15 @@ void main() {
           },
         ),
       );
-    final api = NetworkApi(
+    final api = AuthApi(
       networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
     );
 
-    final response = await api.listDevices(
-      const DeviceListRequest(userId: 21, isVerified: true),
-    );
+    final response = await api.listTrustedDevices(userId: 21);
 
     expect(requestPath, '/devices/list');
     expect(requestBody, <String, dynamic>{'user_id': 21, 'is_verified': true});
-    expect(response.devices.single.deviceId, 4);
+    expect(response.single.deviceId, 4);
   });
 
   test('sendOtp posts the selected trusted device for login 2FA', () async {
@@ -238,17 +230,15 @@ void main() {
           },
         ),
       );
-    final api = NetworkApi(
+    final api = AuthApi(
       networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
     );
 
     await api.sendOtp(
-      const SendOtpRequest(
-        otpType: 'LOGIN_2FA',
-        identifier: '+84905666666',
-        userId: 21,
-        targetDeviceId: 4,
-      ),
+      loginName: '+84905666666',
+      kind: AuthOtpKind.login,
+      userId: 21,
+      targetDeviceId: 4,
     );
 
     expect(requestPath, '/otps/send');

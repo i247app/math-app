@@ -1,13 +1,14 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/core/network/program_models.dart';
-import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/profile/data/dto/program_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
 import 'package:numi/features/auth/data/auth_models.dart';

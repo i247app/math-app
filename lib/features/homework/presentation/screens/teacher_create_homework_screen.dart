@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
@@ -7,11 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/network/classroom_exercise_models.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/program_models.dart';
-import 'package:numi/core/network/school_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/dto/program_models.dart';
+import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';
 import 'package:numi/features/homework/data/homework_api.dart';
@@ -573,9 +574,8 @@ class _TeacherCreateHomeworkScreenState
                               controller: _titleController,
                               focusNode: _titleFocusNode,
                               errorText: _titleErrorText,
-                              hintKey: teacherExerciseCopy(
-                                widget.purpose,
-                              ).titleHintKey,
+                              hintKey: teacherExerciseCopy(widget.purpose)
+                                  .titleHintKey,
                               height: 62,
                               radius: 10,
                             ),
@@ -695,9 +695,8 @@ class _TeacherCreateHomeworkScreenState
                             padding: const EdgeInsets.only(top: 17),
                             child: CreateHomeworkInput(
                               controller: _descriptionController,
-                              hintKey: teacherExerciseCopy(
-                                widget.purpose,
-                              ).descriptionHintKey,
+                              hintKey: teacherExerciseCopy(widget.purpose)
+                                  .descriptionHintKey,
                               height: 167,
                               maxLines: 6,
                               textAlignVertical: TextAlignVertical.top,

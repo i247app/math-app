@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
 

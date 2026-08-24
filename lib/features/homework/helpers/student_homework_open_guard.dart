@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 
 bool studentHomeworkIsNotOpen(ClassroomExercise exercise) {
   final startDate = DateTime.tryParse(exercise.startDate?.trim() ?? '');

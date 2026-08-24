@@ -10,12 +10,12 @@ abstract class NotificationPingService {
 
 class ApiNotificationPingService implements NotificationPingService {
   ApiNotificationPingService({
-    NetworkApi? networkApi,
+    NetworkClient? networkClient,
     AppApiMetadataProvider? metadataProvider,
-  }) : _networkApi = networkApi ?? NetworkApi.shared,
+  }) : _networkClient = networkClient ?? NetworkClient.shared,
        _metadataProvider = metadataProvider ?? AppApiMetadataProvider.instance;
 
-  final NetworkApi _networkApi;
+  final NetworkClient _networkClient;
   final AppApiMetadataProvider _metadataProvider;
 
   @override
@@ -26,7 +26,11 @@ class ApiNotificationPingService implements NotificationPingService {
         await _metadataProvider.updateDevicePushToken(pushToken);
       }
 
-      await _networkApi.pingNotifications();
+      final json = await _networkClient.postJson(
+        '/notifications/ping',
+        const <String, dynamic>{},
+      );
+      NetworkClient.throwForApiStatus(json);
       debugPrint('[Notification] backend ping succeeded.');
     } catch (error) {
       debugPrint('[Notification] backend ping failed: $error');

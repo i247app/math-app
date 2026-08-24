@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
 
 class SettingsAvatar extends StatelessWidget {

@@ -1,4 +1,4 @@
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 

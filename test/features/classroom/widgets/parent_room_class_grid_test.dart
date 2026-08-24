@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/home_layout_models.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/home/data/dto/home_layout_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';

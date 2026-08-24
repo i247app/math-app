@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/core/network/classroom_models.dart';
-import 'package:numi/core/network/home_layout_models.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/home/data/dto/home_layout_models.dart';
+import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 
 void main() {

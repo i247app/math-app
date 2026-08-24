@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:numi/core/network/quiz_models.dart';
+import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_card.dart';
 
-typedef AssessmentListItemWrapper =
-    Widget Function(Widget child, int index, int itemCount);
+typedef AssessmentListItemWrapper = Widget Function(
+  Widget child,
+  int index,
+  int itemCount,
+);
 
 class AssessmentListSection extends StatelessWidget {
   const AssessmentListSection({
