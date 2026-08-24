@@ -16,7 +16,7 @@ Without `make`, run the equivalent commands from the repository root:
 ```bash
 cp env.example .env
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter run
 ```
 

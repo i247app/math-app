@@ -148,7 +148,7 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
 
   Future<PackageInfo> _loadPackageInfo() async {
     try {
-      return PackageInfo.fromPlatform();
+      return await PackageInfo.fromPlatform();
     } catch (error) {
       debugPrint('AppApiMetadataProvider package info error: $error');
       return PackageInfo(
