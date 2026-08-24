@@ -17,8 +17,6 @@ import 'package:numi/features/practice/presentation/practice_chapter_screen.dart
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 
 const _gamesTeal = Color(0xFF006762);
-const _gamesOrange = Color(0xFFFF7B54);
-const _gamesCream = Color(0xFFFFF6DA);
 
 enum _GamesStep { grade, game, map }
 
@@ -524,7 +522,7 @@ class _GamesCatalog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final games = _gamePreviews(context, selectedGrade);
+    final games = _gamePreviews(context);
     return ColoredBox(
       color: colors.pageBackground,
       child: SafeArea(
@@ -1262,40 +1260,7 @@ class _GamePreview {
   final List<String>? levelTitleKeys;
 }
 
-List<_GamePreview> _gamePreviews(
-  BuildContext context,
-  GradeModel selectedGrade,
-) {
-  final gradeNumber = _selectedGradeNumber(selectedGrade);
-  if (gradeNumber == 3) {
-    return [
-      _GamePreview(
-        id: 'monster-rescue',
-        title: context.getText(AppKeys.gamesRescueTitle),
-        assetPath: 'assets/images/game-numi-electric-rescue.png',
-        background: const Color(0xFFDDF6E7),
-        accent: const Color(0xFF007D77),
-        levelCount: monsterRescueLevels.length,
-        levelTitleKeys: monsterRescueLevels
-            .map((level) => level.titleKey)
-            .toList(growable: false),
-      ),
-      _GamePreview(
-        id: 'journey-2',
-        title: context.getText(AppKeys.gamesJourneyTwo),
-        assetPath: 'assets/images/parent-home-race.png',
-        background: _gamesCream,
-        accent: const Color(0xFFA86700),
-      ),
-      _GamePreview(
-        id: 'journey-3',
-        title: context.getText(AppKeys.gamesJourneyThree),
-        assetPath: 'assets/images/parent-home-shop.png',
-        background: const Color(0xFFFFE5DD),
-        accent: _gamesOrange,
-      ),
-    ];
-  }
+List<_GamePreview> _gamePreviews(BuildContext context) {
   return [
     _GamePreview(
       id: 'journey-1',
@@ -1305,27 +1270,15 @@ List<_GamePreview> _gamePreviews(
       accent: _gamesTeal,
     ),
     _GamePreview(
-      id: 'journey-2',
-      title: context.getText(AppKeys.gamesJourneyTwo),
-      assetPath: 'assets/images/parent-home-race.png',
-      background: _gamesCream,
-      accent: const Color(0xFFA86700),
-    ),
-    _GamePreview(
-      id: 'journey-3',
-      title: context.getText(AppKeys.gamesJourneyThree),
-      assetPath: 'assets/images/parent-home-shop.png',
-      background: const Color(0xFFFFE5DD),
-      accent: _gamesOrange,
+      id: 'monster-rescue',
+      title: context.getText(AppKeys.gamesRescueTitle),
+      assetPath: 'assets/images/game-numi-electric-rescue.png',
+      background: const Color(0xFFDDF6E7),
+      accent: const Color(0xFF007D77),
+      levelCount: monsterRescueLevels.length,
+      levelTitleKeys: monsterRescueLevels
+          .map((level) => level.titleKey)
+          .toList(growable: false),
     ),
   ];
-}
-
-int? _selectedGradeNumber(GradeModel grade) {
-  final match = RegExp(r'\d+').firstMatch(grade.label ?? '');
-  if (match != null) {
-    return int.tryParse(match.group(0)!);
-  }
-  final order = grade.displayOrder;
-  return order != null && order >= 1 && order <= 12 ? order : null;
 }

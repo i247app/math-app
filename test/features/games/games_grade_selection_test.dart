@@ -98,5 +98,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('games-catalog')), findsOneWidget);
+    expect(find.text('Nông trại Numi'), findsOneWidget);
+    expect(find.text('Numi Monster Rescue'), findsOneWidget);
+    expect(find.text('Hành trình Numi 02'), findsNothing);
+    expect(find.text('Hành trình Numi 03'), findsNothing);
+
+    await tester.tap(find.text('Lớp 1'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Lớp 3'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('games-catalog')), findsOneWidget);
+    expect(find.text('Nông trại Numi'), findsOneWidget);
+    expect(find.text('Numi Monster Rescue'), findsOneWidget);
+    expect(find.text('Hành trình Numi 02'), findsNothing);
+    expect(find.text('Hành trình Numi 03'), findsNothing);
   });
 }
