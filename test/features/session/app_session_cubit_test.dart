@@ -3,13 +3,31 @@ import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/application/app_session_cubit.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
+import 'package:numi/features/session/models/profile_session_resolution.dart';
+import 'package:numi/features/session/services/profile_session_resolver.dart';
+
+class _FakeProfileSessionResolver implements ProfileSessionResolver {
+  @override
+  Future<ProfileSessionResolution> resolveForUserId(int userId) async {
+    return const ProfileSessionResolution.empty();
+  }
+
+  @override
+  Future<void> rememberActiveProfile({
+    required int userId,
+    required StudentProfile profile,
+  }) async {}
+}
+
+AppSessionCubit _buildCubit() =>
+    AppSessionCubit(profileResolver: _FakeProfileSessionResolver());
 
 void main() {
   group('AppSessionCubit', () {
     test(
       'owns an authenticated session independently from auth flow state',
       () async {
-        final cubit = AppSessionCubit();
+        final cubit = _buildCubit();
         const session = AuthenticatedSession(
           user: LoginUser(id: 7, phone: '0901234567'),
         );
@@ -26,7 +44,7 @@ void main() {
     test(
       'tracks restore then clears all session-owned data on logout',
       () async {
-        final cubit = AppSessionCubit();
+        final cubit = _buildCubit();
 
         cubit.beginRestore();
         expect(cubit.state.status, SessionStatus.restoring);
@@ -45,7 +63,7 @@ void main() {
     test(
       'advances the session epoch across logout and the next login',
       () async {
-        final cubit = AppSessionCubit();
+        final cubit = _buildCubit();
 
         cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 7)));
         final firstEpoch = cubit.state.sessionEpoch;
@@ -63,7 +81,7 @@ void main() {
     test(
       'offers the child-profile dialog only for a new parent account',
       () async {
-        final cubit = AppSessionCubit();
+        final cubit = _buildCubit();
 
         cubit.authenticate(
           const AuthenticatedSession(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:numi/core/theme/font_size.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -83,14 +84,15 @@ class _TeacherCreateHomeworkScreenState
   final GuardedExitController<bool> _exitController =
       GuardedExitController<bool>();
   late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? ClassroomExerciseApi();
+      widget._exerciseService ?? context.read<ClassroomExerciseService>();
   late final ClassroomService _classroomService =
-      widget._classroomService ?? ClassroomApi();
-  late final GradeService _gradeService = widget._gradeService ?? GradeApi();
+      widget._classroomService ?? context.read<ClassroomService>();
+  late final GradeService _gradeService =
+      widget._gradeService ?? context.read<GradeService>();
   late final ProfileService _profileService =
-      widget._profileService ?? ProfileApi();
+      widget._profileService ?? context.read<ProfileService>();
   late final SchoolService _schoolService =
-      widget._schoolService ?? SchoolApi();
+      widget._schoolService ?? context.read<SchoolService>();
   late ClassroomModel? _selectedClassroom = widget.initialClassroom;
   int? _selectedProgramId;
   DateTime? _startDate;
@@ -574,8 +576,9 @@ class _TeacherCreateHomeworkScreenState
                               controller: _titleController,
                               focusNode: _titleFocusNode,
                               errorText: _titleErrorText,
-                              hintKey: teacherExerciseCopy(widget.purpose)
-                                  .titleHintKey,
+                              hintKey: teacherExerciseCopy(
+                                widget.purpose,
+                              ).titleHintKey,
                               height: 62,
                               radius: 10,
                             ),
@@ -695,8 +698,9 @@ class _TeacherCreateHomeworkScreenState
                             padding: const EdgeInsets.only(top: 17),
                             child: CreateHomeworkInput(
                               controller: _descriptionController,
-                              hintKey: teacherExerciseCopy(widget.purpose)
-                                  .descriptionHintKey,
+                              hintKey: teacherExerciseCopy(
+                                widget.purpose,
+                              ).descriptionHintKey,
                               height: 167,
                               maxLines: 6,
                               textAlignVertical: TextAlignVertical.top,

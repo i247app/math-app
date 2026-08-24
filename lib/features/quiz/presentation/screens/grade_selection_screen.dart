@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -27,6 +28,7 @@ class GradeSelectionScreen extends StatefulWidget {
     this.initialGrades = const <GradeModel>[],
     this.gradeService,
     this.quizService,
+    this.quizShakeService,
     this.quizPurpose = quizPurposeAssessment,
     this.profileId,
     this.initialGradeId,
@@ -38,6 +40,7 @@ class GradeSelectionScreen extends StatefulWidget {
   final List<GradeModel> initialGrades;
   final GradeService? gradeService;
   final QuizService? quizService;
+  final QuizShakeService? quizShakeService;
   final String quizPurpose;
   final int? profileId;
   final int? initialGradeId;
@@ -59,11 +62,13 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    _gradeService = widget.gradeService ?? GradeApi();
+    _gradeService = widget.gradeService ?? context.read<GradeService>();
     grades = widget.initialGrades;
     selectedGradeLabel = _initialSelectedGradeLabel(grades);
     if (widget.quizPurpose == quizPurposeAssessment) {
-      unawaited(AIShakeService.shared.aiShake());
+      unawaited(
+        (widget.quizShakeService ?? context.read<QuizShakeService>()).aiShake(),
+      );
     }
     if (grades.isEmpty) {
       loadGrades();

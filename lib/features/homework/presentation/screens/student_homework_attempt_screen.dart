@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:flutter/services.dart';
 
@@ -46,7 +47,7 @@ class StudentHomeworkAttemptScreen extends StatefulWidget {
 class _StudentHomeworkAttemptScreenState
     extends State<StudentHomeworkAttemptScreen> {
   late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? ClassroomExerciseApi();
+      widget._exerciseService ?? context.read<ClassroomExerciseService>();
   final GuardedExitController<bool> _exitController =
       GuardedExitController<bool>();
 
@@ -286,8 +287,9 @@ class _StudentHomeworkAttemptScreenState
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    final hasActiveAttempt = studentHomeworkAttemptQuestions(_exercise)
-        .isNotEmpty;
+    final hasActiveAttempt = studentHomeworkAttemptQuestions(
+      _exercise,
+    ).isNotEmpty;
     final screen = Scaffold(
       backgroundColor: colors.pageBackground,
       body: SafeArea(

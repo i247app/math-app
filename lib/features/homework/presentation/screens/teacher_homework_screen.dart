@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -47,7 +48,7 @@ class TeacherHomeworkScreen extends StatefulWidget {
 
 class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
   late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? ClassroomExerciseApi();
+      widget._exerciseService ?? context.read<ClassroomExerciseService>();
   final TextEditingController _searchController = TextEditingController();
 
   bool _isLoading = false;
@@ -156,7 +157,7 @@ class _TeacherHomeworkScreenState extends State<TeacherHomeworkScreen> {
           initialClassroom: widget.initialClassroom,
           purpose: widget.purpose,
           exerciseService: _exerciseService,
-          classroomService: ClassroomApi(),
+          classroomService: context.read<ClassroomService>(),
         ),
       ),
     );

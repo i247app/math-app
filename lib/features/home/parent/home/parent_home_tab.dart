@@ -1,5 +1,6 @@
 import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -91,7 +92,8 @@ enum ParentHomeEntranceMode {
 }
 
 class ParentHomeContentState extends State<ParentHomeContent> {
-  late final HomeLayoutService _homeLayoutService = HomeLayoutApi();
+  late final HomeLayoutService _homeLayoutService = context
+      .read<HomeLayoutService>();
   bool isLoading = true;
   bool hasLoadedHome = false;
   String? errorMessage;
@@ -120,12 +122,12 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     final profileId = ActiveProfileSession.profileStableId(
       widget.activeProfile,
     );
-    final oldChildIds = studentProfiles(oldWidget.profiles)
-        .map(ActiveProfileSession.profileStableId)
-        .join(',');
-    final childIds = studentProfiles(widget.profiles)
-        .map(ActiveProfileSession.profileStableId)
-        .join(',');
+    final oldChildIds = studentProfiles(
+      oldWidget.profiles,
+    ).map(ActiveProfileSession.profileStableId).join(',');
+    final childIds = studentProfiles(
+      widget.profiles,
+    ).map(ActiveProfileSession.profileStableId).join(',');
     final shouldForceRefresh =
         oldWidget.user?.id != widget.user?.id ||
         oldChildIds != childIds ||

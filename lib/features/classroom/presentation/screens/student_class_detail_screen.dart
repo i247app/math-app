@@ -39,7 +39,7 @@ class StudentClassDetailScreen extends StatefulWidget {
 
 class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
   late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? ClassroomExerciseApi();
+      widget._exerciseService ?? context.read<ClassroomExerciseService>();
 
   List<ClassroomExercise> _homeworkExercises = const <ClassroomExercise>[];
   bool _isLoadingHomework = false;

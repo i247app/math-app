@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
@@ -11,14 +10,9 @@ import 'package:numi/features/session/services/profile_session_resolver.dart';
 class AppSessionCubit extends Cubit<AppSessionState> {
   AppSessionCubit({
     AuthenticatedSession? initialSession,
-    ProfileSessionResolver? profileResolver,
+    required ProfileSessionResolver profileResolver,
   }) : _sessionEpoch = initialSession == null ? 0 : 1,
-       _profileResolver =
-           profileResolver ??
-           ProfileSessionResolver(
-             profileService: ProfileApi(),
-             activeProfileSession: const ActiveProfileSession(),
-           ),
+       _profileResolver = profileResolver,
        super(
          initialSession == null
              ? const AppSessionState()

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -10,13 +11,13 @@ import 'package:numi/features/notifications/widgets/notification_content.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 class NotificationScreen extends StatefulWidget {
-  NotificationScreen({
+  const NotificationScreen({
     super.key,
     NotificationListService? notificationService,
     this.showMissingChildProfileNotice = false,
-  }) : notificationService = notificationService ?? NotificationApi();
+  }) : _notificationService = notificationService;
 
-  final NotificationListService notificationService;
+  final NotificationListService? _notificationService;
   final bool showMissingChildProfileNotice;
 
   @override
@@ -25,7 +26,8 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   late final NotificationController _controller = NotificationController(
-    service: widget.notificationService,
+    service:
+        widget._notificationService ?? context.read<NotificationListService>(),
   );
 
   @override

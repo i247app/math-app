@@ -1,12 +1,14 @@
 import 'package:numi/core/network/network_client.dart';
 
-class AIShakeService {
+abstract class QuizShakeService {
+  Future<void> aiShake();
+}
+
+class AIShakeService implements QuizShakeService {
   AIShakeService({
     NetworkClient? networkClient,
     this.cooldown = const Duration(minutes: 15),
   }) : _networkClient = networkClient ?? NetworkClient.shared;
-
-  static final shared = AIShakeService();
 
   final NetworkClient _networkClient;
   final Duration cooldown;
@@ -14,6 +16,7 @@ class AIShakeService {
   DateTime? _lastAttemptAt;
   Future<void>? _inFlight;
 
+  @override
   Future<void> aiShake() {
     final inFlight = _inFlight;
     if (inFlight != null) {

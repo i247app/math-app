@@ -99,12 +99,13 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   late final ClassroomService _classroomService =
-      widget._classroomService ?? ClassroomApi();
+      widget._classroomService ?? context.read<ClassroomService>();
   late final ClassroomExerciseService _assignmentService =
-      widget._assignmentService ?? ClassroomExerciseApi();
-  late final QuizService _quizService = widget._quizService ?? QuizApi();
+      widget._assignmentService ?? context.read<ClassroomExerciseService>();
+  late final QuizService _quizService =
+      widget._quizService ?? context.read<QuizService>();
   late final NotificationListService _notificationService =
-      widget._notificationService ?? NotificationApi();
+      widget._notificationService ?? context.read<NotificationListService>();
   late final NotificationBadgeController _notificationBadgeController =
       NotificationBadgeController(
         service: _notificationService,
@@ -115,7 +116,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final StudentRoleTabCubit _studentTabCubit = StudentRoleTabCubit();
   final TeacherRoleTabCubit _teacherTabCubit = TeacherRoleTabCubit();
   late final DashboardProfileController _profileController =
-      DashboardProfileController(gradeService: widget._gradeService);
+      DashboardProfileController(
+        gradeService: widget._gradeService ?? context.read<GradeService>(),
+      );
   final HomeTabPerformanceMonitor _tabPerformanceMonitor =
       HomeTabPerformanceMonitor();
   final ValueNotifier<double?> _tabSwipePosition = ValueNotifier(null);
@@ -303,7 +306,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     onRefreshProfiles: widget.onRefreshProfiles,
                     onActivateProfile: widget.onActivateProfile,
                     initialGrades: profileState.prefetchedGrades,
-                    gradeService: widget._gradeService ?? GradeApi(),
+                    gradeService:
+                        widget._gradeService ?? context.read<GradeService>(),
                     classroomService: _classroomService,
                     assignmentService: _assignmentService,
                     quizService: _quizService,

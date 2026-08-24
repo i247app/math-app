@@ -78,9 +78,9 @@ class TeacherHomeTab extends StatefulWidget {
 
 class _TeacherRoleTabState extends State<TeacherHomeTab> {
   late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? ClassroomExerciseApi();
+      widget._exerciseService ?? context.read<ClassroomExerciseService>();
   late final HomeLayoutService _homeLayoutService =
-      widget._homeLayoutService ?? HomeLayoutApi();
+      widget._homeLayoutService ?? context.read<HomeLayoutService>();
 
   bool _isLoadingHomeLayout = false;
   bool _hasLoadedHomeLayout = false;

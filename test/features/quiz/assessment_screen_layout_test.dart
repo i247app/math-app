@@ -3,8 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/quiz/presentation/screens/assessment_screen.dart';
+
+class _UnusedQuizService implements QuizService {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 void main() {
   testWidgets('standard questions fit without vertical scrolling', (
@@ -25,8 +31,9 @@ void main() {
         ),
         home: LingoScope(
           lingo: lingo,
-          child: const AiAssessmentScreen(
-            initialQuiz: GeneratedQuiz(
+          child: AiAssessmentScreen(
+            quizService: _UnusedQuizService(),
+            initialQuiz: const GeneratedQuiz(
               id: 1,
               questions: <QuizQuestion>[
                 QuizQuestion(

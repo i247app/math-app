@@ -9,6 +9,7 @@ import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/data/ai_shake_service.dart';
 import 'package:numi/features/quiz/errors/quiz_exception.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
@@ -18,6 +19,11 @@ class _UnusedGradeService implements GradeService {
   Future<List<GradeModel>> listGrades({required int userId}) {
     throw StateError('The initial grade list should be used by this test.');
   }
+}
+
+class _NoopQuizShakeService implements QuizShakeService {
+  @override
+  Future<void> aiShake() async {}
 }
 
 class _FailingQuizService implements QuizService {
@@ -165,6 +171,7 @@ void main() {
               initialGrades: grades,
               gradeService: _UnusedGradeService(),
               quizService: quizService,
+              quizShakeService: _NoopQuizShakeService(),
             ),
           ),
         ),
@@ -213,6 +220,7 @@ void main() {
               initialGrades: grades,
               gradeService: _UnusedGradeService(),
               quizService: quizService,
+              quizShakeService: _NoopQuizShakeService(),
             ),
           ),
         ),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -60,7 +61,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     super.initState();
     _answerFeedbackPlayer = AudioPlayer();
     _controller = AssessmentController(
-      quizService: widget.quizService ?? QuizApi(),
+      quizService: widget.quizService ?? context.read<QuizService>(),
       initialQuiz: widget.initialQuiz,
       purpose: widget.purpose,
       typeOfQuiz: widget.typeOfQuiz,

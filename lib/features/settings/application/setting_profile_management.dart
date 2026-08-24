@@ -1,7 +1,7 @@
 part of 'setting_tab.dart';
 
 mixin _SettingProfileManagementMixin on State<SettingTab> {
-  final ProfileService _profileService = ProfileApi();
+  ProfileService get _profileService => context.read<ProfileService>();
   final ActiveProfileSession _activeProfileSession =
       const ActiveProfileSession();
   late final ProfileManagementCubit _profileManagementCubit;
@@ -31,6 +31,8 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
   void _initializeProfileManagementState() {
     _profileManagementCubit = ProfileManagementCubit(
       profileService: _profileService,
+      gradeService: context.read<GradeService>(),
+      schoolService: context.read<SchoolService>(),
       activeProfileSession: _activeProfileSession,
     );
     _profiles = widget.profiles;

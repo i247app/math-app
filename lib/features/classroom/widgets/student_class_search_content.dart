@@ -59,10 +59,11 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
   static const _requestTimeout = Duration(seconds: 12);
 
   late final ClassroomService _classroomService =
-      widget._classroomService ?? ClassroomApi();
-  late final GradeService _gradeService = widget._gradeService ?? GradeApi();
+      widget._classroomService ?? context.read<ClassroomService>();
+  late final GradeService _gradeService =
+      widget._gradeService ?? context.read<GradeService>();
   late final SchoolService _schoolService =
-      widget._schoolService ?? SchoolApi();
+      widget._schoolService ?? context.read<SchoolService>();
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   List<ClassroomModel> _results = const <ClassroomModel>[];

@@ -10,6 +10,8 @@ import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/core/theme/app_theme_controller.dart';
 import 'package:numi/core/theme/app_theme_scope.dart';
 import 'package:numi/app/app_flow.dart';
+import 'package:numi/app/composition/app_service_scope.dart';
+import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 
@@ -17,6 +19,7 @@ class NumiApp extends StatefulWidget {
   const NumiApp({
     super.key,
     this.authService,
+    this.services,
     this.lingoProvider,
     this.themeController,
     this.initialSession,
@@ -24,6 +27,7 @@ class NumiApp extends StatefulWidget {
   });
 
   final AuthService? authService;
+  final AppServices? services;
   final LingoProvider? lingoProvider;
   final AppThemeController? themeController;
   final AuthenticatedSession? initialSession;
@@ -44,6 +48,7 @@ class NumiApp extends StatefulWidget {
 class _NumiAppState extends State<NumiApp> {
   late LingoProvider _lingoProvider;
   late AppThemeController _themeController;
+  late final AppServices _services;
   AuthenticatedSession? _startupSession;
   late bool _restoreSessionOnNextHome;
   int _restartSeed = 0;
@@ -52,6 +57,7 @@ class _NumiAppState extends State<NumiApp> {
   void initState() {
     super.initState();
     _startupSession = widget.initialSession;
+    _services = widget.services ?? AppServices(authService: widget.authService);
     _restoreSessionOnNextHome = widget.restoreSessionOnStart;
     _createLingoProvider(widget.lingoProvider);
     _createThemeController(widget.themeController);
@@ -115,22 +121,25 @@ class _NumiAppState extends State<NumiApp> {
       child: AnimatedBuilder(
         animation: _themeController,
         builder: (context, _) {
-          return LingoScope(
-            lingo: _lingoProvider,
-            child: AppThemeScope(
-              controller: _themeController,
-              child: MaterialApp(
-                key: ValueKey(_restartSeed),
-                debugShowCheckedModeBanner: false,
-                title: _lingoProvider.lookup(AppKeys.appName),
-                theme: AppTheme.light(),
-                darkTheme: AppTheme.dark(),
-                themeMode: _themeController.themeMode,
-                navigatorObservers: [_KeyboardDismissNavigatorObserver()],
-                home: AppFlow(
-                  authService: widget.authService,
-                  initialSession: _startupSession,
-                  restoreSessionOnStart: _restoreSessionOnNextHome,
+          return AppServiceScope(
+            services: _services,
+            child: LingoScope(
+              lingo: _lingoProvider,
+              child: AppThemeScope(
+                controller: _themeController,
+                child: MaterialApp(
+                  key: ValueKey(_restartSeed),
+                  debugShowCheckedModeBanner: false,
+                  title: _lingoProvider.lookup(AppKeys.appName),
+                  theme: AppTheme.light(),
+                  darkTheme: AppTheme.dark(),
+                  themeMode: _themeController.themeMode,
+                  navigatorObservers: [_KeyboardDismissNavigatorObserver()],
+                  home: AppFlow(
+                    authService: _services.authService,
+                    initialSession: _startupSession,
+                    restoreSessionOnStart: _restoreSessionOnNextHome,
+                  ),
                 ),
               ),
             ),

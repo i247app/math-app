@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
@@ -15,7 +16,7 @@ class QuizReviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReviewDetailScreen(
       detailId: quizId,
-      detailLoader: QuizApi().getQuizDetail,
+      detailLoader: context.read<QuizService>().getQuizDetail,
       initialDetail: initialQuiz,
     );
   }

@@ -4,6 +4,7 @@ import 'package:numi/core/theme/font_size.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -44,7 +45,7 @@ class TeacherHomeworkDetailScreen extends StatefulWidget {
 class _TeacherHomeworkDetailScreenState
     extends State<TeacherHomeworkDetailScreen> {
   late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? ClassroomExerciseApi();
+      widget._exerciseService ?? context.read<ClassroomExerciseService>();
 
   bool _isLoading = false;
   bool _isSaving = false;

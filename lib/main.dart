@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/app/numi_app.dart';
+import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/app/startup_bootstrap.dart';
 import 'package:numi/core/debug/app_debug_bloc_observer.dart';
 import 'package:numi/core/network/api_metadata.dart';
@@ -19,11 +20,13 @@ Future<void> main() async {
   }
   _forwardPushTokenToApiMetadata();
   unawaited(NotificationService().initialize());
-  final startup = await const StartupBootstrap().run();
+  final services = AppServices();
+  final startup = await StartupBootstrap(services: services).run();
   runApp(
     NumiApp(
       lingoProvider: startup.lingoProvider,
       themeController: startup.themeController,
+      services: startup.services,
       authService: startup.authService,
       initialSession: startup.initialSession,
       restoreSessionOnStart: false,

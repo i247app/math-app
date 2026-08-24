@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/theme/app_theme_controller.dart';
@@ -9,18 +10,19 @@ import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
-import 'package:numi/features/session/services/profile_session_resolver.dart';
 
 class StartupBootstrapResult {
   const StartupBootstrapResult({
     required this.lingoProvider,
     required this.themeController,
+    required this.services,
     required this.authService,
     required this.initialSession,
   });
 
   final LingoProvider lingoProvider;
   final AppThemeController themeController;
+  final AppServices services;
   final AuthService authService;
   final AuthenticatedSession? initialSession;
 }
@@ -28,16 +30,19 @@ class StartupBootstrapResult {
 class StartupBootstrap {
   const StartupBootstrap({
     this.sessionTimeout = const Duration(seconds: 8),
+    AppServices? services,
     AuthService? authService,
     ProfileService? profileService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
     PasscodeService passcodeService = const SecurePasscodeService(),
-  }) : _authService = authService,
+  }) : _services = services,
+       _authService = authService,
        _profileService = profileService,
        _activeProfileSession = activeProfileSession,
        _passcodeService = passcodeService;
 
   final Duration sessionTimeout;
+  final AppServices? _services;
   final AuthService? _authService;
   final ProfileService? _profileService;
   final ActiveProfileSession _activeProfileSession;
@@ -61,14 +66,24 @@ class StartupBootstrap {
       // Light theme is the startup fallback while dark theme is experimental.
     }
 
-    final authService = _authService ?? AuthApi();
+    final services =
+        _services ??
+        AppServices(
+          authService: _authService,
+          profileService: _profileService,
+          activeProfileSession: _activeProfileSession,
+          passcodeService: _passcodeService,
+        );
+    final authService = services.authService;
     final initialSession = await _restoreInitialSession(
       authService,
+      services,
     ).timeout(sessionTimeout, onTimeout: () => null);
 
     return StartupBootstrapResult(
       lingoProvider: lingoProvider,
       themeController: themeController,
+      services: services,
       authService: authService,
       initialSession: initialSession,
     );
@@ -76,6 +91,7 @@ class StartupBootstrap {
 
   Future<AuthenticatedSession?> _restoreInitialSession(
     AuthService authService,
+    AppServices services,
   ) async {
     try {
       final user = await authService.restoreSession();
@@ -84,11 +100,8 @@ class StartupBootstrap {
       }
 
       await _rememberAuthenticatedAccount(user);
-      final profileResolver = ProfileSessionResolver(
-        profileService: _profileService ?? ProfileApi(),
-        activeProfileSession: _activeProfileSession,
-      );
-      final profileResolution = await profileResolver.resolveForUserId(user.id);
+      final profileResolution = await services.profileSessionResolver
+          .resolveForUserId(user.id);
       return AuthenticatedSession(
         user: user,
         profiles: profileResolution.profiles,

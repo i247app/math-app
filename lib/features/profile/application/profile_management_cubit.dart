@@ -12,13 +12,13 @@ import 'package:numi/features/profile/data/school_api.dart';
 
 class ProfileManagementCubit extends Cubit<ProfileManagementState> {
   ProfileManagementCubit({
-    ProfileService? profileService,
-    GradeService? gradeService,
-    SchoolService? schoolService,
+    required ProfileService profileService,
+    required GradeService gradeService,
+    required SchoolService schoolService,
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
-  }) : _profileService = profileService ?? ProfileApi(),
-       _gradeService = gradeService ?? GradeApi(),
-       _schoolService = schoolService ?? SchoolApi(),
+  }) : _profileService = profileService,
+       _gradeService = gradeService,
+       _schoolService = schoolService,
        _activeProfileSession = activeProfileSession,
        super(const ProfileManagementState());
 

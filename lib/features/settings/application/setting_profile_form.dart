@@ -4,9 +4,9 @@ mixin _SettingProfileFormMixin
     on State<SettingTab>, _SettingProfileManagementMixin {
   final GuardedExitController<bool> _profileExitController =
       GuardedExitController<bool>();
-  final ProfileService _formProfileService = ProfileApi();
-  final GradeService _gradeService = GradeApi();
-  final SchoolService _schoolService = SchoolApi();
+  ProfileService get _formProfileService => context.read<ProfileService>();
+  GradeService get _gradeService => context.read<GradeService>();
+  SchoolService get _schoolService => context.read<SchoolService>();
 
   final TextEditingController _profileNameController = TextEditingController();
   final TextEditingController _profilePhoneController = TextEditingController();

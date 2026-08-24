@@ -39,7 +39,7 @@ class TeacherClassMembersScreen extends StatefulWidget {
 
 class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
   late final ClassroomService _classroomService =
-      widget._classroomService ?? ClassroomApi();
+      widget._classroomService ?? context.read<ClassroomService>();
 
   final Set<int> _processingProfileIds = <int>{};
   bool _isSendingInvites = false;
@@ -149,7 +149,8 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
       useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => TeacherStudentInviteSearchSheet(
-        profileService: widget._profileService ?? ProfileApi(),
+        profileService:
+            widget._profileService ?? context.read<ProfileService>(),
       ),
     );
     if (selected == null || selected.isEmpty || !context.mounted) {

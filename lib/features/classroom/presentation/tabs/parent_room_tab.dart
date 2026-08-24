@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -64,7 +65,8 @@ class ParentRoomTab extends StatefulWidget {
 }
 
 class _ParentRoomTabState extends State<ParentRoomTab> {
-  late final HomeLayoutService _homeLayoutService = HomeLayoutApi();
+  late final HomeLayoutService _homeLayoutService = context
+      .read<HomeLayoutService>();
 
   HomeLayout? _layout;
   bool _isLoading = true;

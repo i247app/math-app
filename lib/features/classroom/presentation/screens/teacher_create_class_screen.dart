@@ -59,12 +59,13 @@ class TeacherCreateClassScreen extends StatefulWidget {
 
 class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
   late final ClassroomService _classroomService =
-      widget._classroomService ?? ClassroomApi();
-  late final GradeService _gradeService = widget._gradeService ?? GradeApi();
+      widget._classroomService ?? context.read<ClassroomService>();
+  late final GradeService _gradeService =
+      widget._gradeService ?? context.read<GradeService>();
   late final ProfileService _profileService =
-      widget._profileService ?? ProfileApi();
+      widget._profileService ?? context.read<ProfileService>();
   late final SchoolService _schoolService =
-      widget._schoolService ?? SchoolApi();
+      widget._schoolService ?? context.read<SchoolService>();
   late final AvatarPickerService _avatarPicker =
       widget._avatarPicker ?? const AvatarPickerService();
 

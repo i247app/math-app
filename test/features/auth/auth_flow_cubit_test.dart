@@ -182,7 +182,7 @@ AuthFlowCubit _buildCubit({
   void Function(AuthenticatedSession)? onAuthenticated,
 }) {
   return AuthFlowCubit(
-    authService: authService,
+    authService: authService ?? _FakeAuthService(),
     initialState: initialState,
     passcodeService: _FakePasscodeService(),
     profileResolver: _FakeProfileSessionResolver(),
@@ -197,6 +197,8 @@ void main() {
     'preserves the welcome-to-signup entry flow without a session',
     () async {
       final cubit = AuthFlowCubit(
+        authService: _FakeAuthService(),
+        profileResolver: _FakeProfileSessionResolver(),
         passcodeService: _FakePasscodeService(),
         onAuthenticated: (_) {},
         onSessionCleared: () {},
@@ -488,6 +490,8 @@ void main() {
     'handles Back for state-driven auth screens before leaving the app',
     () async {
       final cubit = AuthFlowCubit(
+        authService: _FakeAuthService(),
+        profileResolver: _FakeProfileSessionResolver(),
         passcodeService: _FakePasscodeService(),
         onAuthenticated: (_) {},
         onSessionCleared: () {},
@@ -500,6 +504,8 @@ void main() {
 
       await cubit.close();
       final otpCubit = AuthFlowCubit(
+        authService: _FakeAuthService(),
+        profileResolver: _FakeProfileSessionResolver(),
         initialState: const AuthFlowState(screen: AppScreen.otp),
         passcodeService: _FakePasscodeService(),
         onAuthenticated: (_) {},

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -29,7 +30,7 @@ class SettingAccountScreen extends StatefulWidget {
 class _SettingAccountScreenState extends State<SettingAccountScreen>
     with SingleTickerProviderStateMixin {
   final AvatarPickerService _avatarPicker = const AvatarPickerService();
-  final AuthService _authService = AuthApi();
+  late final AuthService _authService;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -57,6 +58,7 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
   @override
   void initState() {
     super.initState();
+    _authService = context.read<AuthService>();
     _usernameController.addListener(_onDraftChanged);
     _phoneController.addListener(_onDraftChanged);
     _emailController.addListener(_onDraftChanged);

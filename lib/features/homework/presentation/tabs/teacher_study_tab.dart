@@ -66,9 +66,9 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   static const int _exercisePageSize = 10;
 
   late final ClassroomService _classroomService =
-      widget._classroomService ?? ClassroomApi();
+      widget._classroomService ?? context.read<ClassroomService>();
   late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? ClassroomExerciseApi();
+      widget._exerciseService ?? context.read<ClassroomExerciseService>();
   final TextEditingController _searchController = TextEditingController();
 
   Timer? _searchDebounce;

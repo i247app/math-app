@@ -9,12 +9,10 @@ import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
-import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/auth/models/signup_form_data.dart';
 import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
@@ -25,27 +23,19 @@ import 'package:numi/features/auth/application/auth_state.dart';
 
 class AuthFlowCubit extends Cubit<AuthFlowState> {
   AuthFlowCubit({
-    AuthService? authService,
-    ProfileService? profileService,
-    ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
-    ProfileSessionResolver? profileResolver,
+    required AuthService authService,
+    required ProfileSessionResolver profileResolver,
     PasscodeService passcodeService = const SecurePasscodeService(),
     NotificationPingService? notificationPingService,
     AuthFlowState? initialState,
     required void Function(AuthenticatedSession session) onAuthenticated,
     required VoidCallback onSessionCleared,
     required VoidCallback onSessionRestoreStarted,
-  }) : _authService = authService ?? AuthApi(),
-       _profileResolver =
-           profileResolver ??
-           ProfileSessionResolver(
-             profileService: profileService ?? ProfileApi(),
-             activeProfileSession: activeProfileSession,
-           ),
+  }) : _authService = authService,
+       _profileResolver = profileResolver,
        _passcodeService = passcodeService,
        _notificationPingService =
-           notificationPingService ??
-           _defaultNotificationPingService(authService ?? AuthApi()),
+           notificationPingService ?? const NoopNotificationPingService(),
        _onAuthenticated = onAuthenticated,
        _onSessionCleared = onSessionCleared,
        _onSessionRestoreStarted = onSessionRestoreStarted,
@@ -1703,14 +1693,6 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     }
 
     unawaited(_notificationPingService.ping());
-  }
-
-  static NotificationPingService _defaultNotificationPingService(
-    AuthService authService,
-  ) {
-    return authService is AuthApi
-        ? ApiNotificationPingService()
-        : const NoopNotificationPingService();
   }
 
   void _emitAuthError(

@@ -7,10 +7,8 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/features/session/application/app_session_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
-import 'package:numi/features/classroom/data/classroom_api.dart';
-import 'package:numi/features/homework/data/homework_api.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
@@ -159,24 +157,16 @@ class _AppFlowState extends State<AppFlow> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<GradeService>(create: (_) => GradeApi()),
-        RepositoryProvider<ClassroomService>(create: (_) => ClassroomApi()),
-        RepositoryProvider<ClassroomExerciseService>(
-          create: (_) => ClassroomExerciseApi(),
-        ),
-        RepositoryProvider<SessionScopedRepositoryRegistry>(
-          create: (_) => SessionScopedRepositoryRegistry(),
-          dispose: (registry) => registry.dispose(),
-        ),
-      ],
+    return RepositoryProvider<SessionScopedRepositoryRegistry>(
+      create: (_) => SessionScopedRepositoryRegistry(),
+      dispose: (registry) => registry.dispose(),
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (context) {
               final cubit = AppSessionCubit(
                 initialSession: widget.initialSession,
+                profileResolver: context.read(),
               );
               context.read<SessionScopedRepositoryRegistry>().updateSession(
                 isAuthenticated: cubit.state.isAuthenticated,
@@ -194,7 +184,10 @@ class _AppFlowState extends State<AppFlow> {
             create: (context) {
               final sessionCubit = context.read<AppSessionCubit>();
               final cubit = AuthFlowCubit(
-                authService: widget.authService,
+                authService: widget.authService ?? context.read<AuthService>(),
+                profileResolver: context.read(),
+                passcodeService: context.read(),
+                notificationPingService: context.read(),
                 initialState: AuthFlowState(
                   screen: widget.initialSession == null
                       ? AppScreen.welcome
