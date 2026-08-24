@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -22,8 +24,8 @@ class AppStatePanel extends StatelessWidget {
     this.messageStyle,
     this.action,
     this.visualTitleSpacing = 14,
-    this.titleMessageSpacing = 8,
-    this.messageActionSpacing = 16,
+    this.titleMessageSpacing = AppSpacing.s8,
+    this.messageActionSpacing = AppSpacing.s16,
   }) : assert(icon == null || visual == null),
        assert(
          (actionLabel == null && onAction == null) ||
@@ -68,7 +70,7 @@ class AppStatePanel extends StatelessWidget {
                   color:
                       iconBackgroundColor ??
                       colors.brandStrong.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(AppRadius.r24),
                 ),
                 child: Icon(
                   icon,

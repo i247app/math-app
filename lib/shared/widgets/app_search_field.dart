@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi/core/theme/app_radius.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -26,7 +27,7 @@ class AppSearchField extends StatelessWidget {
       height: 42,
       decoration: BoxDecoration(
         color: colors.inputSurface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.r24),
         border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(

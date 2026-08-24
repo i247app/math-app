@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_shimmer.dart';
 
@@ -50,14 +52,14 @@ class _AccountScreenSkeletonState extends State<AccountScreenSkeleton>
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 24),
+            padding: const EdgeInsets.only(top: AppSpacing.s24),
             child: Column(
-              spacing: 20,
+              spacing: AppSpacing.s20,
               children: List.generate(
                 3,
                 (_) => const AppSkeletonBlock(
                   height: 68,
-                  radius: 16,
+                  radius: AppRadius.r16,
                   color: Color(0xFFE8EEF0),
                 ),
               ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -100,7 +102,7 @@ class AppSectionHeader extends StatelessWidget {
           ),
         ),
         if (action != null) ...[
-          SizedBox(width: 12 * scale),
+          SizedBox(width: AppSpacing.s12 * scale),
           if (onAction == null)
             action
           else
@@ -109,9 +111,9 @@ class AppSectionHeader extends StatelessWidget {
                 if (useHaptic) HapticFeedback.selectionClick();
                 onAction!();
               },
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.r8),
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 4 * scale),
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.s4 * scale),
                 child: action,
               ),
             ),
@@ -128,7 +130,7 @@ class AppSectionHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         header,
-        SizedBox(height: bottomSpacing ?? 8 * scale),
+        SizedBox(height: bottomSpacing ?? AppSpacing.s8 * scale),
         bottomContent,
       ],
     );

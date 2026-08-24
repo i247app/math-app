@@ -7,6 +7,8 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/settings/widgets/menu/language_sheet_option.dart';
 
@@ -38,7 +40,7 @@ class LanguageBottomSheet extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(AppRadius.r28),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.14),
@@ -48,7 +50,12 @@ class LanguageBottomSheet extends StatelessWidget {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.s18,
+                  AppSpacing.s12,
+                  AppSpacing.s18,
+                  AppSpacing.s18,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -57,11 +64,11 @@ class LanguageBottomSheet extends StatelessWidget {
                       height: 5,
                       decoration: BoxDecoration(
                         color: const Color(0xFFD8E2E0),
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: BorderRadius.circular(AppRadius.full),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 18),
+                      padding: const EdgeInsets.only(top: AppSpacing.s18),
                       child: Text(
                         context.getText(AppKeys.languageTitle),
                         style: GoogleFonts.andika(
@@ -74,9 +81,9 @@ class LanguageBottomSheet extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 18),
+                      padding: const EdgeInsets.only(top: AppSpacing.s18),
                       child: Column(
-                        spacing: 10,
+                        spacing: AppSpacing.s10,
                         children: [
                           for (final language in AppLanguage.values)
                             LanguageSheetOption(

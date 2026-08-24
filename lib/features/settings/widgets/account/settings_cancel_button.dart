@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class SettingsCancelButton extends StatelessWidget {
@@ -15,16 +17,16 @@ class SettingsCancelButton extends StatelessWidget {
     return Material(
       color: const Color(0xFFFFD995),
       elevation: 0,
-      borderRadius: BorderRadius.circular(999),
+      borderRadius: BorderRadius.circular(AppRadius.full),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppRadius.full),
         child: SizedBox(
           width: 138,
           height: 60,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 4,
+            spacing: AppSpacing.s4,
             children: [
               const Icon(
                 Icons.arrow_back_rounded,

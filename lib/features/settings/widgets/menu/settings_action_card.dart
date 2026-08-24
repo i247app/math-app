@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
@@ -31,7 +33,7 @@ class SettingsActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final radius = BorderRadius.circular(16);
+    final radius = BorderRadius.circular(AppRadius.r16);
 
     return Material(
       color: colors.elevatedSurface,
@@ -42,7 +44,10 @@ class SettingsActionCard extends StatelessWidget {
         borderRadius: radius,
         child: Container(
           constraints: const BoxConstraints(minHeight: 72),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.s16,
+            vertical: AppSpacing.s12,
+          ),
           decoration: BoxDecoration(
             color: colors.elevatedSurface,
             borderRadius: radius,

@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/settings/widgets/menu/language_bottom_sheet.dart';
@@ -40,7 +42,7 @@ class SettingsLanguageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final radius = BorderRadius.circular(16);
+    final radius = BorderRadius.circular(AppRadius.r16);
 
     return Material(
       color: colors.elevatedSurface,
@@ -51,7 +53,10 @@ class SettingsLanguageCard extends StatelessWidget {
         borderRadius: radius,
         child: Container(
           constraints: const BoxConstraints(minHeight: 72),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.s16,
+            vertical: AppSpacing.s12,
+          ),
           decoration: BoxDecoration(
             color: colors.elevatedSurface,
             borderRadius: radius,

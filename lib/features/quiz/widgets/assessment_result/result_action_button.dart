@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -21,17 +23,18 @@ class AssessmentResultActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final radius = BorderRadius.circular(AppRadius.r20);
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: radius,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: radius,
         child: Ink(
           height: 57,
           decoration: BoxDecoration(
             color: background,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: radius,
             boxShadow: [
               BoxShadow(
                 color: colors.shadow,
@@ -42,7 +45,7 @@ class AssessmentResultActionButton extends StatelessWidget {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 8,
+            spacing: AppSpacing.s8,
             children: [
               Flexible(
                 child: FittedBox(

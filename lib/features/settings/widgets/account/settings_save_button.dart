@@ -1,9 +1,11 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class SettingsSaveButton extends StatelessWidget {
@@ -18,25 +20,28 @@ class SettingsSaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final backgroundColor = enabled
-        ? AppColors.tealIcon
-        : const Color(0xFFBFC9CA);
-    final foregroundColor = enabled ? Colors.white : const Color(0xFFF4F6F6);
+        ? colors.brandStrong
+        : colors.disabledBackground;
+    final foregroundColor = enabled
+        ? colors.onBrand
+        : colors.disabledForeground;
 
     return Material(
       color: backgroundColor,
       elevation: enabled ? 9 : 0,
-      shadowColor: Colors.black.withValues(alpha: enabled ? 0.30 : 0),
-      borderRadius: BorderRadius.circular(999),
+      shadowColor: colors.shadow.withValues(alpha: enabled ? 0.30 : 0),
+      borderRadius: BorderRadius.circular(AppRadius.full),
       child: InkWell(
         onTap: enabled ? onTap : null,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppRadius.full),
         child: SizedBox(
           width: 142,
           height: 60,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 10,
+            spacing: AppSpacing.s10,
             children: [
               Text(
                 context.getText(AppKeys.save),

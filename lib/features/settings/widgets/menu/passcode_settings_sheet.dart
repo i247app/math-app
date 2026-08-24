@@ -1,8 +1,10 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
 
 enum PasscodeSettingsAction { change, remove }
@@ -22,11 +24,11 @@ class PasscodeSettingsSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.all(18),
+        margin: const EdgeInsets.all(AppSpacing.s16),
+        padding: const EdgeInsets.all(AppSpacing.s18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppRadius.r24),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.12),
@@ -37,7 +39,7 @@ class PasscodeSettingsSheet extends StatelessWidget {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          spacing: 12,
+          spacing: AppSpacing.s12,
           children: [
             SettingsActionCard(
               icon: Icons.edit_outlined,

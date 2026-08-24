@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'app_radius.dart';
 import 'app_theme_colors.dart';
 import 'app_typography.dart';
 
@@ -86,15 +87,15 @@ abstract final class AppTheme {
           letterSpacing: 0,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.borderNeutral),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.borderNeutral),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.tealIcon, width: 1.5),
         ),
       ),
@@ -179,15 +180,15 @@ abstract final class AppTheme {
           letterSpacing: 0,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.darkOutline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.darkOutline),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(
             color: AppColors.darkPrimaryTeal,
             width: 1.5,

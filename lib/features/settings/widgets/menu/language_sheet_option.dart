@@ -1,7 +1,9 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class LanguageSheetOption extends StatelessWidget {
@@ -20,7 +22,7 @@ class LanguageSheetOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(18);
+    final radius = BorderRadius.circular(AppRadius.r18);
 
     return Material(
       color: selected ? const Color(0xFFFFF2F8) : const Color(0xFFF7FBFB),
@@ -29,7 +31,10 @@ class LanguageSheetOption extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.s16,
+            vertical: 14,
+          ),
           decoration: BoxDecoration(
             borderRadius: radius,
             border: Border.all(
@@ -42,7 +47,7 @@ class LanguageSheetOption extends StatelessWidget {
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.only(right: 12),
+                padding: const EdgeInsets.only(right: AppSpacing.s12),
                 child: Text(
                   flag,
                   style: const TextStyle(fontSize: FontSize.xxxl),
