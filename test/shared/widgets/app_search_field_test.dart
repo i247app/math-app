@@ -34,11 +34,19 @@ void main() {
     expect(find.byIcon(Icons.tune_rounded), findsOneWidget);
     expect(tester.getSize(find.byType(AppSearchField)).height, 42);
 
-    await tester.enterText(find.byType(TextField), 'fractions');
-    expect(changedValue, 'fractions');
-
     await tester.tap(find.byIcon(Icons.tune_rounded));
     expect(filterTapCount, 1);
+
+    await tester.enterText(find.byType(TextField), 'fractions');
+    await tester.pump();
+    expect(changedValue, 'fractions');
+    expect(find.byIcon(Icons.tune_rounded), findsNothing);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pump();
+    expect(controller.text, isEmpty);
+    expect(changedValue, isEmpty);
   });
 
   testWidgets('uses semantic color and typography tokens in dark mode', (
@@ -77,5 +85,75 @@ void main() {
       field.style?.fontFamily,
       AppTheme.dark().textTheme.bodyLarge?.fontFamily,
     );
+  });
+
+  testWidgets('supports pill, filled, and outlined appearances', (
+    tester,
+  ) async {
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+
+    Future<void> pumpAppearance(AppSearchFieldAppearance appearance) {
+      return tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: AppSearchField(
+              controller: controller,
+              hintText: 'Search items',
+              appearance: appearance,
+            ),
+          ),
+        ),
+      );
+    }
+
+    await pumpAppearance(AppSearchFieldAppearance.pill);
+    expect(tester.getSize(find.byType(AppSearchField)).height, 49);
+    var field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.decoration?.isCollapsed, isTrue);
+
+    await pumpAppearance(AppSearchFieldAppearance.filled);
+    field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.decoration?.filled, isTrue);
+    expect(field.decoration?.isCollapsed, isFalse);
+    expect(field.decoration?.focusedBorder, isA<OutlineInputBorder>());
+
+    await pumpAppearance(AppSearchFieldAppearance.outlined);
+    field = tester.widget<TextField>(find.byType(TextField));
+    final enabledBorder = field.decoration?.enabledBorder as OutlineInputBorder;
+    expect(enabledBorder.borderSide.color, AppThemeColors.light.border);
+  });
+
+  testWidgets('keeps a custom suffix and forwards search submission', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: '7A');
+    addTearDown(controller.dispose);
+    String? submittedValue;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: Scaffold(
+          body: AppSearchField(
+            controller: controller,
+            hintText: 'Class code',
+            appearance: AppSearchFieldAppearance.filled,
+            showDefaultPrefixIcon: false,
+            showClearButton: false,
+            suffixIcon: const Icon(Icons.qr_code_scanner_rounded),
+            onSubmitted: (value) => submittedValue = value,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.close_rounded), findsNothing);
+    expect(find.byIcon(Icons.qr_code_scanner_rounded), findsOneWidget);
+
+    await tester.tap(find.byType(TextField));
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    expect(submittedValue, '7A');
   });
 }

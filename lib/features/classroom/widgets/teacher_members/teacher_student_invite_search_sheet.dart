@@ -13,6 +13,7 @@ import 'package:numi/features/profile/data/profile_exception.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_send_invite_button.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_student_search_result_list.dart';
+import 'package:numi/shared/widgets/app_search_field.dart';
 
 class TeacherStudentInviteSearchSheet extends StatefulWidget {
   const TeacherStudentInviteSearchSheet({
@@ -164,41 +165,26 @@ class _TeacherStudentInviteSearchSheetState
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 14),
-                child: TextField(
+                child: AppSearchField(
                   controller: _searchController,
+                  hintText: context.getText(AppKeys.teacherSearchStudentHint),
+                  appearance: AppSearchFieldAppearance.outlined,
                   autofocus: true,
-                  textInputAction: TextInputAction.search,
-                  textAlignVertical: TextAlignVertical.center,
                   onChanged: _onSearchChanged,
                   onSubmitted: _searchProfiles,
-                  decoration: InputDecoration(
-                    hintText: context.getText(AppKeys.teacherSearchStudentHint),
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: _searchController.text.isEmpty
-                        ? null
-                        : IconButton(
-                            onPressed: () {
-                              _searchController.clear();
-                              _onSearchChanged('');
-                            },
-                            icon: const Icon(Icons.close_rounded),
-                          ),
-                    filled: true,
-                    fillColor: colors.inputSurface,
-                    contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: colors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: colors.border),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: colors.brandStrong),
-                    ),
+                  hapticFeedbackOnClear: false,
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: colors.textSecondary,
                   ),
+                  clearIconColor: colors.textSecondary,
+                  clearIconSize: 24,
+                  textStyle: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
+                  hintStyle: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: colors.inputHint),
                 ),
               ),
               Padding(
