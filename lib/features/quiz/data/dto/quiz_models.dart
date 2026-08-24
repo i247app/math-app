@@ -73,6 +73,7 @@ class QuizListRequest {
     this.page,
     this.size,
     this.takeAll,
+    required this.purpose,
   });
 
   final int? userId;
@@ -80,6 +81,7 @@ class QuizListRequest {
   final int? page;
   final int? size;
   final bool? takeAll;
+  final String purpose;
 
   factory QuizListRequest.fromJson(Map<String, dynamic> json) =>
       _$QuizListRequestFromJson(json);
@@ -93,11 +95,13 @@ class QuizProgressRequest {
     required this.profileId,
     required this.fromDt,
     required this.toDt,
+    required this.purpose,
   });
 
   final int profileId;
   final DateTime fromDt;
   final DateTime toDt;
+  final String purpose;
 
   factory QuizProgressRequest.fromJson(Map<String, dynamic> json) =>
       _$QuizProgressRequestFromJson(json);

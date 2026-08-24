@@ -135,6 +135,7 @@ void main() {
     expect(requestPath, '/quizzes/analytics/progress');
     expect(requestBody, contains('metadata'));
     expect(requestBody, containsPair('profile_id', 21));
+    expect(requestBody, containsPair('purpose', 'ASSESSMENT'));
     expect(requestBody, containsPair('from_dt', '2026-01-03T04:48:58.607719Z'));
     expect(requestBody, containsPair('to_dt', '2026-08-03T04:48:58.607719Z'));
     expect(response.series.single.quizId, 62);

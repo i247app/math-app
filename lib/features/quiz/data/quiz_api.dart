@@ -157,6 +157,7 @@ class QuizApi implements QuizService {
           profileId: profileId,
           fromDt: fromDt.toUtc(),
           toDt: toDt.toUtc(),
+          purpose: quizPurposeAssessment,
         ),
       ),
     );
@@ -184,6 +185,7 @@ class QuizApi implements QuizService {
           page: page,
           size: size,
           takeAll: takeAll,
+          purpose: quizPurposeAssessment,
         ),
       ),
     );
