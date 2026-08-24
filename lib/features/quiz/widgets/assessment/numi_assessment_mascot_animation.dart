@@ -140,50 +140,53 @@ class _NumiAssessmentMascotAnimationState
         child: SizedBox(
           width: 310,
           height: 290,
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              final sequence = _MascotSequence.at(_controller.value);
-              return Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Positioned.fill(
-                    key: const ValueKey('numi-rig-canvas'),
-                    top: 42,
-                    child:
-                        _atlas == null ||
-                            _thinkingHand == null ||
-                            _thinkingHandShader == null ||
-                            _wingShader == null ||
-                            _leftTorsoShader == null ||
-                            _rightTorsoShader == null ||
-                            _leftGlassesShader == null ||
-                            _rightGlassesShader == null
-                        ? Image.asset(
-                            'assets/images/numi-mascot.png',
-                            key: const ValueKey('numi-rig-loading-fallback'),
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.high,
-                          )
-                        : CustomPaint(
-                            painter: _NumiRigPainter(
-                              atlas: _atlas!,
-                              thinkingHand: _thinkingHand!,
-                              thinkingHandShader: _thinkingHandShader!,
-                              wingShader: _wingShader!,
-                              leftTorsoShader: _leftTorsoShader!,
-                              rightTorsoShader: _rightTorsoShader!,
-                              leftGlassesShader: _leftGlassesShader!,
-                              rightGlassesShader: _rightGlassesShader!,
-                              progress: _controller.value,
+          child: Transform.translate(
+            offset: const Offset(0, -30),
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                final sequence = _MascotSequence.at(_controller.value);
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Positioned.fill(
+                      key: const ValueKey('numi-rig-canvas'),
+                      top: 42,
+                      child:
+                          _atlas == null ||
+                              _thinkingHand == null ||
+                              _thinkingHandShader == null ||
+                              _wingShader == null ||
+                              _leftTorsoShader == null ||
+                              _rightTorsoShader == null ||
+                              _leftGlassesShader == null ||
+                              _rightGlassesShader == null
+                          ? Image.asset(
+                              'assets/images/numi-mascot.png',
+                              key: const ValueKey('numi-rig-loading-fallback'),
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.high,
+                            )
+                          : CustomPaint(
+                              painter: _NumiRigPainter(
+                                atlas: _atlas!,
+                                thinkingHand: _thinkingHand!,
+                                thinkingHandShader: _thinkingHandShader!,
+                                wingShader: _wingShader!,
+                                leftTorsoShader: _leftTorsoShader!,
+                                rightTorsoShader: _rightTorsoShader!,
+                                leftGlassesShader: _leftGlassesShader!,
+                                rightGlassesShader: _rightGlassesShader!,
+                                progress: _controller.value,
+                              ),
                             ),
-                          ),
-                  ),
-                  _StageDecoration(sequence: sequence),
-                ],
-              );
-            },
+                    ),
+                    _StageDecoration(sequence: sequence),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
