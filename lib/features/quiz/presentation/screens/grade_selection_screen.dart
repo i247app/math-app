@@ -173,8 +173,8 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   }
 
   void continueWithSelectedGrade() {
-    final gradeLabel = selectedGradeLabel;
-    if (gradeLabel == null || gradeLabel.isEmpty) {
+    final gradeLabel = selectedGradeLabel?.trim() ?? '';
+    if (gradeLabel.isEmpty && widget.quizPurpose != quizPurposeAssessment) {
       HapticFeedback.selectionClick();
       return;
     }

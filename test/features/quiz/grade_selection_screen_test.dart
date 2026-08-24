@@ -21,6 +21,8 @@ class _UnusedGradeService implements GradeService {
 }
 
 class _FailingQuizService implements QuizService {
+  final List<String?> requestedGradeLabels = <String?>[];
+
   @override
   Future<GeneratedQuiz> generateAssessmentQuiz({
     String purpose = quizPurposeAssessment,
@@ -30,6 +32,7 @@ class _FailingQuizService implements QuizService {
     List<String>? chapters,
     int? profileId,
   }) {
+    requestedGradeLabels.add(gradeLabel);
     throw const QuizException('Generation failed');
   }
 
@@ -150,6 +153,7 @@ void main() {
       final lingo = LingoProvider();
       addTearDown(lingo.dispose);
 
+      final quizService = _FailingQuizService();
       await tester.pumpWidget(
         LingoScope(
           lingo: lingo,
@@ -160,7 +164,7 @@ void main() {
             home: GradeSelectionScreen(
               initialGrades: grades,
               gradeService: _UnusedGradeService(),
-              quizService: _FailingQuizService(),
+              quizService: quizService,
             ),
           ),
         ),
@@ -178,6 +182,47 @@ void main() {
         find.byKey(const ValueKey('generate-failed-notice')),
         findsOneWidget,
       );
+      expect(quizService.requestedGradeLabels, <String?>['Lớp 1']);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'generates an assessment with an empty grade when no grade is selected',
+    (tester) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final previousLanguage = AppLanguageState.current;
+      AppLanguageState.current = AppLanguage.vi;
+      addTearDown(() => AppLanguageState.current = previousLanguage);
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      final quizService = _FailingQuizService();
+
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: GradeSelectionScreen(
+              initialGrades: grades,
+              gradeService: _UnusedGradeService(),
+              quizService: quizService,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Tiếp tục'));
+      await tester.pumpAndSettle();
+
+      expect(quizService.requestedGradeLabels, <String?>['']);
       expect(tester.takeException(), isNull);
     },
   );

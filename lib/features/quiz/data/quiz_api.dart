@@ -64,17 +64,13 @@ class QuizApi implements QuizService {
     int? profileId,
   }) async {
     final GenerateQuizResponse response;
-    final cleanGradeLabel = gradeLabel?.trim();
+    final cleanGradeLabel = gradeLabel?.trim() ?? '';
     response = await _runQuizRequest(
       () => _networkApi.generateQuiz(
         GenerateQuizRequest(
           purpose: purpose,
           typeOfQuiz: typeOfQuiz,
-          gradeLabel: previousQuizId == null
-              ? cleanGradeLabel?.isNotEmpty == true
-                    ? cleanGradeLabel
-                    : assessmentQuizGradeLabel
-              : null,
+          gradeLabel: previousQuizId == null ? cleanGradeLabel : null,
           previousQuizId: previousQuizId,
           chapters: _cleanChapters(chapters),
           profileId: profileId,
