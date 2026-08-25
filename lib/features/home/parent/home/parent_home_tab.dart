@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +18,9 @@ import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/features/home/data/home_layout_mappers.dart';
 import 'package:numi/features/home/parent/data/cache/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
+import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
 import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
 import 'package:numi/features/settings/application/setting_tab.dart';
@@ -101,6 +105,8 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   List<GeneratedQuiz> completedAssessments = const <GeneratedQuiz>[];
   List<ParentChildSummary> childSummaries = const <ParentChildSummary>[];
   int _childLoadRequestId = 0;
+  int _assessmentLoadRequestId = 0;
+  int _lastAppliedAssessmentLoadRequestId = 0;
   final Set<ParentHomeEntranceMode> _playedEntrances = {};
   bool _hasOfferedMissingStudentProfile = false;
   bool _isMissingStudentDialogVisible = false;
@@ -176,6 +182,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       widget.activeProfile,
     );
     if (profileId == null || profileId <= 0) {
+      _assessmentLoadRequestId++;
       if (!mounted) {
         return;
       }
@@ -190,6 +197,10 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       widget.onParentAssessmentStateChanged(false);
       return;
     }
+
+    final assessmentRequestId = _startAssessmentBackgroundRefresh(
+      profileId: profileId,
+    );
 
     final cache = HomeProfileCache.instance;
     final cachedSnapshot = cache.getParent(profileId);
@@ -225,7 +236,11 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         return;
       }
       final parent = layout.parent;
-      final completedAssessments = quizzesFromLayoutQuizzes(layout.quizzes);
+      final layoutAssessments = quizzesFromLayoutQuizzes(layout.quizzes);
+      final completedAssessments =
+          _lastAppliedAssessmentLoadRequestId >= assessmentRequestId
+          ? this.completedAssessments
+          : layoutAssessments;
       final summaries = widget.useActiveStudentProfileData
           ? _studentSummariesFromLayout(layout, completedAssessments)
           : summariesFromLayout(parent);
@@ -288,6 +303,68 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         completedAssessments = const <GeneratedQuiz>[];
       });
       widget.onParentAssessmentStateChanged(false);
+    }
+  }
+
+  int _startAssessmentBackgroundRefresh({required int profileId}) {
+    final requestId = ++_assessmentLoadRequestId;
+    unawaited(
+      _refreshAssessmentsInBackground(
+        requestId: requestId,
+        profileId: profileId,
+      ),
+    );
+    return requestId;
+  }
+
+  Future<void> _refreshAssessmentsInBackground({
+    required int requestId,
+    required int profileId,
+  }) async {
+    try {
+      final userId = widget.useActiveStudentProfileData
+          ? null
+          : widget.user?.id;
+      final result = await loadCompletedParentAssessments(
+        quizService: widget.quizService,
+        profileId: profileId,
+        userId: userId,
+        page: 1,
+        size: 5,
+        allowUserFallback: !widget.useActiveStudentProfileData,
+      );
+      if (!mounted || requestId != _assessmentLoadRequestId) {
+        return;
+      }
+
+      final assessments = result.allQuizzes;
+      final layout = homeLayout;
+      setState(() {
+        _lastAppliedAssessmentLoadRequestId = requestId;
+        completedAssessments = assessments;
+        if (widget.useActiveStudentProfileData && layout != null) {
+          childSummaries = _studentSummariesFromLayout(layout, assessments);
+        }
+      });
+      QuizCache.seedList(
+        quizzes: assessments,
+        userId: userId,
+        profileId: profileId,
+      );
+
+      if (layout != null) {
+        HomeProfileCache.instance.putParent(
+          ParentHomeSnapshot(
+            profileId: profileId,
+            homeLayout: layout,
+            completedAssessments: assessments,
+            cachedAt: DateTime.now(),
+          ),
+        );
+      }
+      widget.onParentAssessmentStateChanged(assessments.isNotEmpty);
+    } catch (_) {
+      // Home layout remains the fallback when the background refresh fails.
     }
   }
 
