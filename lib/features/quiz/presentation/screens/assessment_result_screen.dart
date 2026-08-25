@@ -72,7 +72,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
     }
 
     await generateAgain(
-      purpose: quizPurposeAssessment,
+      purpose: quizPurposePractice,
       typeOfQuiz: quizTypeReinforcement,
       previousQuizId: previousQuizId,
     );
