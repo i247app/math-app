@@ -3,6 +3,7 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/theme/app_theme_controller.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
@@ -26,6 +27,7 @@ class StartupBootstrapResult {
 
 class StartupBootstrap {
   const StartupBootstrap({
+    this.sessionTimeout = const Duration(seconds: 8),
     AppServices? services,
     AuthService? authService,
     ProfileService? profileService,
@@ -37,6 +39,7 @@ class StartupBootstrap {
        _activeProfileSession = activeProfileSession,
        _passcodeService = passcodeService;
 
+  final Duration sessionTimeout;
   final AppServices? _services;
   final AuthService? _authService;
   final ProfileService? _profileService;
@@ -70,13 +73,59 @@ class StartupBootstrap {
           passcodeService: _passcodeService,
         );
     final authService = services.authService;
+    final initialSession = await _restoreInitialSession(
+      authService,
+      services,
+    ).timeout(sessionTimeout, onTimeout: () => null);
 
     return StartupBootstrapResult(
       lingoProvider: lingoProvider,
       themeController: themeController,
       services: services,
       authService: authService,
-      initialSession: null,
+      initialSession: initialSession,
     );
+  }
+
+  Future<AuthenticatedSession?> _restoreInitialSession(
+    AuthService authService,
+    AppServices services,
+  ) async {
+    try {
+      final user = await authService.restoreSession();
+      if (user == null) {
+        return null;
+      }
+
+      await _rememberAuthenticatedAccount(user);
+      final profileResolution = await services.profileSessionResolver
+          .resolveForUserId(user.id);
+      return AuthenticatedSession(
+        user: user,
+        profiles: profileResolution.profiles,
+        activeProfile: profileResolution.activeProfile,
+        profileLoadError: profileResolution.errorMessage,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _rememberAuthenticatedAccount(LoginUser user) async {
+    final phone = user.phone?.trim();
+    final email = user.email?.trim();
+    final loginName = phone != null && phone.isNotEmpty ? phone : email;
+    if (user.id <= 0 || loginName == null || loginName.isEmpty) {
+      return;
+    }
+
+    try {
+      await _passcodeService.rememberLoginAccount(
+        userId: user.id,
+        loginName: loginName,
+      );
+    } catch (_) {
+      // Remembered PIN login is optional and must not block app startup.
+    }
   }
 }

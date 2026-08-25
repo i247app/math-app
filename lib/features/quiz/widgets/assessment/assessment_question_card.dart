@@ -17,8 +17,8 @@ class AssessmentQuestionCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: colors.border.withValues(alpha: 0.35)),
       ),
       child: mathQuestion != null
           ? _AssessmentMathQuestion(
@@ -76,7 +76,7 @@ class AssessmentQuestionCard extends StatelessWidget {
       style: TextStyle(
         color: colors.textPrimary,
         fontSize: _fontSizeFor(question),
-        fontWeight: FontWeight.w900,
+        fontWeight: FontWeight.w600,
         height: 1.2,
         letterSpacing: 0,
       ),

@@ -340,6 +340,10 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                         currentQuestion:
                                             _controller.questionIndex + 1,
                                         totalQuestions: questions.length,
+                                        answeredQuestionIndexes: _controller
+                                            .selectedAnswerLabels
+                                            .keys
+                                            .toSet(),
                                       ),
                                       AssessmentQuestionCard(
                                         question: currentQuestion!.questionName,

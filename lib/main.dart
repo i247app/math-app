@@ -29,7 +29,7 @@ Future<void> main() async {
       services: startup.services,
       authService: startup.authService,
       initialSession: startup.initialSession,
-      restoreSessionOnStart: true,
+      restoreSessionOnStart: false,
     ),
   );
 }

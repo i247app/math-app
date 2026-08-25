@@ -16,13 +16,17 @@ class AssessmentAnswerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isNumericGrid =
+        answers.isNotEmpty &&
+        answers.every((answer) => isNumericAssessmentContent(answer.content));
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: answers.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 16,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: isNumericGrid ? 2 : 1,
+        mainAxisSpacing: isNumericGrid ? 16 : 8,
         crossAxisSpacing: 16,
         mainAxisExtent: 96,
       ),
