@@ -133,7 +133,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       unawaited(_playAnswerFeedback(isCorrect));
     }
 
-    if (_controller.isLastQuestion && _controller.allQuestionsAnswered) {
+    if (_controller.allQuestionsAnswered) {
       submitCurrentQuiz();
       return;
     }
@@ -408,7 +408,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                           child: AssessmentBottomBar(
                             bottomInset: bottomInset,
                             canGoBack: _controller.questionIndex > 0,
-                            isLastQuestion: _controller.isLastQuestion,
                             allQuestionsAnswered:
                                 _controller.allQuestionsAnswered,
                             isSubmitting: isSubmittingQuiz,

@@ -8,6 +8,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/quiz/presentation/screens/assessment_screen.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_bar.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_progress_section.dart';
 
 class _UnusedQuizService implements QuizService {
   @override
@@ -58,11 +59,69 @@ void main() {
     }
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'shows submit immediately after answering the last unanswered question',
+    (tester) async {
+      await _pumpAssessment(
+        tester,
+        questions: const <QuizQuestion>[
+          QuizQuestion(
+            questionName: '12 + 8 = ?',
+            questionNumber: 1,
+            answers: <QuizAnswer>[
+              QuizAnswer(label: 'A', content: '18'),
+              QuizAnswer(label: 'B', content: '19'),
+              QuizAnswer(label: 'C', content: '20'),
+              QuizAnswer(label: 'D', content: '21'),
+            ],
+          ),
+          QuizQuestion(
+            questionName: '20 + 10 = ?',
+            questionNumber: 2,
+            answers: <QuizAnswer>[
+              QuizAnswer(label: 'A', content: '28'),
+              QuizAnswer(label: 'B', content: '29'),
+              QuizAnswer(label: 'C', content: '30'),
+              QuizAnswer(label: 'D', content: '31'),
+            ],
+          ),
+        ],
+      );
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AssessmentProgressSection),
+          matching: find.text('2'),
+        ),
+      );
+      await tester.pump();
+      await tester.tap(find.text('30'));
+      await tester.pump();
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AssessmentProgressSection),
+          matching: find.text('1'),
+        ),
+      );
+      await tester.pump();
+      expect(find.byIcon(Icons.check_rounded), findsNothing);
+
+      await tester.tap(find.text('20'));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_forward_rounded), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
 
 Future<void> _pumpAssessment(
   WidgetTester tester, {
   double bottomInset = 0,
+  List<QuizQuestion>? questions,
 }) async {
   tester.view.physicalSize = const Size(430, 844);
   tester.view.devicePixelRatio = 1;
@@ -87,20 +146,22 @@ Future<void> _pumpAssessment(
           lingo: lingo,
           child: AiAssessmentScreen(
             quizService: _UnusedQuizService(),
-            initialQuiz: const GeneratedQuiz(
+            initialQuiz: GeneratedQuiz(
               id: 1,
-              questions: <QuizQuestion>[
-                QuizQuestion(
-                  questionName: '12 + 8 = ?',
-                  questionNumber: 1,
-                  answers: <QuizAnswer>[
-                    QuizAnswer(label: 'A', content: '18'),
-                    QuizAnswer(label: 'B', content: '19'),
-                    QuizAnswer(label: 'C', content: '20'),
-                    QuizAnswer(label: 'D', content: '21'),
+              questions:
+                  questions ??
+                  const <QuizQuestion>[
+                    QuizQuestion(
+                      questionName: '12 + 8 = ?',
+                      questionNumber: 1,
+                      answers: <QuizAnswer>[
+                        QuizAnswer(label: 'A', content: '18'),
+                        QuizAnswer(label: 'B', content: '19'),
+                        QuizAnswer(label: 'C', content: '20'),
+                        QuizAnswer(label: 'D', content: '21'),
+                      ],
+                    ),
                   ],
-                ),
-              ],
             ),
           ),
         ),
