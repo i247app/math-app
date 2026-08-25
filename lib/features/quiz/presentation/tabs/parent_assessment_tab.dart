@@ -85,7 +85,11 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   void didUpdateWidget(covariant ParentAssessmentTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _scheduleActivationLoad();
+      // A tab activation is an explicit refresh boundary. Load immediately so
+      // every navigation into Assess issues a fresh /quizzes/list request,
+      // even when this tab's widget and its previously rendered data are kept
+      // alive by the dashboard tab host.
+      _loadAssessments(forceRefresh: true, page: 1);
       return;
     }
     if (!widget.isActive) {

@@ -60,6 +60,49 @@ void main() {
     expect(find.byType(ParentAssessmentTabBanner), findsNothing);
     expect(find.byType(ParentAssessmentSearchField), findsNothing);
   });
+
+  testWidgets('reloads assessments whenever the tab becomes active', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final quizService = _CountingQuizService();
+    addTearDown(lingo.dispose);
+
+    Future<void> pumpAssessmentTab({required bool isActive}) {
+      return tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: LingoScope(
+            lingo: lingo,
+            child: ParentAssessmentTab(
+              user: const LoginUser(id: 981243),
+              activeProfile: null,
+              isActive: isActive,
+              activeRefreshTick: 0,
+              initialGrades: const <GradeModel>[],
+              gradeService: _FakeGradeService(),
+              quizService: quizService,
+              bottomPadding: 0,
+            ),
+          ),
+        ),
+      );
+    }
+
+    await pumpAssessmentTab(isActive: false);
+    expect(quizService.listPageCalls, 0);
+
+    await pumpAssessmentTab(isActive: true);
+    await tester.pump();
+    expect(quizService.listPageCalls, 1);
+
+    await pumpAssessmentTab(isActive: false);
+    await pumpAssessmentTab(isActive: true);
+    await tester.pump();
+    expect(quizService.listPageCalls, 2);
+  });
 }
 
 class _PendingQuizService implements QuizService {
@@ -77,6 +120,25 @@ class _PendingQuizService implements QuizService {
     required int size,
     bool takeAll = false,
   }) => _pageCompleter.future;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _CountingQuizService implements QuizService {
+  int listPageCalls = 0;
+
+  @override
+  Future<QuizListResponse> listQuizPage({
+    int? userId,
+    int? profileId,
+    required int page,
+    required int size,
+    bool takeAll = false,
+  }) async {
+    listPageCalls++;
+    return const QuizListResponse(mstatus: 1);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
