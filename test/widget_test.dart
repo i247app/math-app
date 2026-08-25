@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/session/application/app_session_cubit.dart';
+import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/main.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
+
+class _FakeAuthService implements AuthService {
+  @override
+  Future<void> logout() async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 void main() {
   group('authentication entry characterization', () {
@@ -70,5 +83,38 @@ void main() {
         expect(find.byKey(const ValueKey('login-name-error')), findsNothing);
       },
     );
+
+    testWidgets('clears the login input after logout', (tester) async {
+      FlutterSecureStorage.setMockInitialValues(<String, String>{});
+      await tester.pumpWidget(NumiApp(authService: _FakeAuthService()));
+
+      final welcomeLogin = find.text('ĐĂNG NHẬP');
+      await tester.ensureVisible(welcomeLogin);
+      await tester.tap(welcomeLogin);
+      await tester.pumpAndSettle();
+
+      final input = find.byType(EditableText);
+      await tester.enterText(input, 'learner@example.com');
+      await tester.pump();
+
+      final sessionCubit = tester
+          .element(find.byKey(const ValueKey('login')))
+          .read<AppSessionCubit>();
+      sessionCubit.authenticate(
+        const AuthenticatedSession(user: LoginUser(id: 7, role: 'STUDENT')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(sessionCubit.state.status, SessionStatus.authenticated);
+
+      await sessionCubit.logout();
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('login')), findsOneWidget);
+      expect(
+        tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+        isEmpty,
+      );
+    });
   });
 }

@@ -310,6 +310,7 @@ class _AppFlowState extends State<AppFlow> {
                   case SessionStatus.restoring:
                     coordinator.showRestoringSession();
                   case SessionStatus.unauthenticated:
+                    clearLoginNameInput();
                     final authCubit = context.read<AuthFlowCubit>();
                     authCubit.openLogin(mode: AuthEntryMode.login);
                     coordinator.showLogin();
