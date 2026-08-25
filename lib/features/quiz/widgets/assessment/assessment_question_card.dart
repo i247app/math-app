@@ -12,16 +12,21 @@ class AssessmentQuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final mathQuestion = _mathQuestionParts(question);
+    final isPictorialQuestion = _containsPictorialSymbols(question);
 
     return Container(
       constraints: BoxConstraints(
         minHeight: _minimumHeightFor(
           question,
           isMathQuestion: mathQuestion != null,
+          isPictorialQuestion: isPictorialQuestion,
         ),
       ),
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+      padding: EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: isPictorialQuestion ? 40 : 28,
+      ),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(26),
@@ -38,10 +43,14 @@ class AssessmentQuestionCard extends StatelessWidget {
     );
   }
 
-  double _minimumHeightFor(String value, {required bool isMathQuestion}) {
+  double _minimumHeightFor(
+    String value, {
+    required bool isMathQuestion,
+    required bool isPictorialQuestion,
+  }) {
     final length = value.trim().length;
-    if (_containsPictorialSymbols(value)) {
-      return length <= 90 ? 236 : 276;
+    if (isPictorialQuestion) {
+      return length <= 90 ? 260 : 300;
     }
 
     if (isMathQuestion) {
