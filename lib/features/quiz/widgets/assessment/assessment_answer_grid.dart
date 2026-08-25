@@ -16,17 +16,37 @@ class AssessmentAnswerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isNumericGrid =
+    final hasOnlyNumericAnswers =
         answers.isNotEmpty &&
         answers.every((answer) => isNumericAssessmentContent(answer.content));
+    final hasLongNumericAnswer = answers.any(
+      (answer) => RegExp(r'\d').allMatches(answer.content).length >= 4,
+    );
+    final useNumericGrid = hasOnlyNumericAnswers && !hasLongNumericAnswer;
+
+    if (!useNumericGrid) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var index = 0; index < answers.length; index++) ...[
+            AssessmentAnswerButton(
+              answer: answers[index],
+              selected: answers[index].label == selectedAnswerLabel,
+              onTap: () => onSelected(answers[index]),
+            ),
+            if (index < answers.length - 1) const SizedBox(height: 8),
+          ],
+        ],
+      );
+    }
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: answers.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isNumericGrid ? 2 : 1,
-        mainAxisSpacing: isNumericGrid ? 16 : 8,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
         crossAxisSpacing: 16,
         mainAxisExtent: 96,
       ),

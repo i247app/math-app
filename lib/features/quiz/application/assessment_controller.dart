@@ -194,7 +194,7 @@ class AssessmentController extends ChangeNotifier {
 
   bool goToNextQuestion() {
     final questions = _quiz?.questions ?? const <QuizQuestion>[];
-    if (!canContinue || _questionIndex >= questions.length - 1) {
+    if (_questionIndex >= questions.length - 1) {
       return false;
     }
 

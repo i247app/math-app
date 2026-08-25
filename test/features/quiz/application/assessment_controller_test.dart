@@ -26,7 +26,7 @@ void main() {
     ],
   );
 
-  test('cannot continue before answering the current question', () {
+  test('can continue before answering the current question', () {
     final controller = AssessmentController(
       quizService: _UnusedQuizService(),
       initialQuiz: quiz,
@@ -34,15 +34,10 @@ void main() {
     addTearDown(controller.dispose);
 
     expect(controller.canContinue, isFalse);
-    expect(controller.goToNextQuestion(), isFalse);
-    expect(controller.questionIndex, 0);
-
-    controller.selectAnswer(answers.first);
-
-    expect(controller.canContinue, isTrue);
     expect(controller.goToNextQuestion(), isTrue);
     expect(controller.questionIndex, 1);
     expect(controller.canContinue, isFalse);
+    expect(controller.goToNextQuestion(), isFalse);
   });
 
   test('checks answers by either their label or displayed content', () {

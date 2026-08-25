@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class AssessmentProgressSection extends StatelessWidget {
   const AssessmentProgressSection({
@@ -29,7 +30,7 @@ class AssessmentProgressSection extends StatelessWidget {
           }),
           style: TextStyle(
             color: colors.brandStrong,
-            fontSize: 16,
+            fontSize: FontSize.normal,
             fontWeight: FontWeight.w800,
             height: 1.2,
             letterSpacing: 0,
@@ -37,7 +38,7 @@ class AssessmentProgressSection extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         SizedBox(
-          height: 52,
+          height: 44,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -48,8 +49,8 @@ class AssessmentProgressSection extends StatelessWidget {
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOutCubic,
-                width: 50,
-                height: 50,
+                width: 42,
+                height: 42,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: answered ? colors.brandStrong : colors.elevatedSurface,
@@ -60,7 +61,7 @@ class AssessmentProgressSection extends StatelessWidget {
                   '${index + 1}',
                   style: TextStyle(
                     color: answered ? colors.onBrand : colors.brandStrong,
-                    fontSize: 21,
+                    fontSize: FontSize.large,
                     fontWeight: FontWeight.w700,
                     height: 1,
                   ),

@@ -1,4 +1,5 @@
 abstract final class FontSize {
+  static const double displayMath = 64.0;
   static const double displayHero = 50.0;
   static const double displayExtraLarge = 42.0;
   static const double displayLarge = 36.0;

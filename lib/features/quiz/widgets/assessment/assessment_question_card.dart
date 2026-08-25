@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class AssessmentQuestionCard extends StatelessWidget {
   const AssessmentQuestionCard({super.key, required this.question});
@@ -12,7 +13,12 @@ class AssessmentQuestionCard extends StatelessWidget {
     final mathQuestion = _mathQuestionParts(question);
 
     return Container(
-      constraints: const BoxConstraints(minHeight: 260),
+      constraints: BoxConstraints(
+        minHeight: _minimumHeightFor(
+          question,
+          isMathQuestion: mathQuestion != null,
+        ),
+      ),
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
@@ -30,13 +36,27 @@ class AssessmentQuestionCard extends StatelessWidget {
     );
   }
 
+  double _minimumHeightFor(String value, {required bool isMathQuestion}) {
+    final length = value.trim().length;
+    if (isMathQuestion) {
+      if (length <= 24) return 220;
+      if (length <= 48) return 240;
+      return 260;
+    }
+
+    if (length <= 45) return 160;
+    if (length <= 90) return 190;
+    if (length <= 160) return 230;
+    return 260;
+  }
+
   double _fontSizeFor(String value) {
     final length = value.trim().length;
-    if (length <= 18) return 52;
-    if (length <= 45) return 40;
-    if (length <= 90) return 30;
-    if (length <= 160) return 24;
-    return 20;
+    if (length <= 18) return FontSize.displayHero;
+    if (length <= 45) return FontSize.displayExtraLarge;
+    if (length <= 90) return FontSize.displaySmall;
+    if (length <= 160) return FontSize.xxxl;
+    return FontSize.xl;
   }
 
   bool _isMathExpression(String value) {
@@ -117,7 +137,7 @@ class _AssessmentMathQuestion extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: color,
-              fontSize: 32,
+              fontSize: FontSize.displaySmall,
               fontWeight: FontWeight.w900,
               height: 1.2,
             ),
@@ -153,7 +173,7 @@ class _AssessmentMathExpression extends StatelessWidget {
                   expression,
                   softWrap: false,
                   textAlign: TextAlign.center,
-                  style: _textStyle(64),
+                  style: _textStyle(FontSize.displayMath),
                 ),
               ),
             ),
@@ -167,7 +187,11 @@ class _AssessmentMathExpression extends StatelessWidget {
             spacing: 12,
             runSpacing: 10,
             children: _semanticSegments().map((segment) {
-              return Text(segment, softWrap: false, style: _textStyle(32));
+              return Text(
+                segment,
+                softWrap: false,
+                style: _textStyle(FontSize.displaySmall),
+              );
             }).toList(),
           ),
         );

@@ -13,6 +13,10 @@ class AssessmentBottomActionButton extends StatelessWidget {
     required this.onTap,
     this.background,
     this.gradient,
+    this.disabledBackground,
+    this.disabledForeground,
+    this.labelFontSize = FontSize.xxs,
+    this.borderRadius = 18,
   });
 
   final String label;
@@ -21,6 +25,10 @@ class AssessmentBottomActionButton extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? background;
   final Gradient? gradient;
+  final Color? disabledBackground;
+  final Color? disabledForeground;
+  final double labelFontSize;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -29,24 +37,24 @@ class AssessmentBottomActionButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final effectiveForeground = enabled
         ? foreground
-        : colorScheme.onSurface.withValues(alpha: 0.38);
+        : disabledForeground ?? colorScheme.onSurface.withValues(alpha: 0.38);
     final effectiveBackground = enabled
         ? background
-        : colorScheme.onSurface.withValues(alpha: 0.12);
+        : disabledBackground ?? colorScheme.onSurface.withValues(alpha: 0.12);
     final effectiveGradient = enabled ? gradient : null;
 
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(999),
+      borderRadius: BorderRadius.circular(borderRadius),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(borderRadius),
         child: Ink(
           height: 48,
           decoration: BoxDecoration(
             color: effectiveBackground,
             gradient: effectiveGradient,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(borderRadius),
             boxShadow: !enabled || gradient == null
                 ? null
                 : [
@@ -67,10 +75,10 @@ class AssessmentBottomActionButton extends StatelessWidget {
                 maxLines: 1,
                 style: context.textStyles.labelSmall?.copyWith(
                   color: effectiveForeground,
-                  fontSize: FontSize.xxs,
-                  fontWeight: FontWeight.w900,
+                  fontSize: labelFontSize,
+                  fontWeight: FontWeight.w800,
                   height: 1,
-                  letterSpacing: 1.2,
+                  letterSpacing: 0,
                 ),
               ),
             ],

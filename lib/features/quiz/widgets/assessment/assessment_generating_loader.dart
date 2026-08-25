@@ -17,7 +17,7 @@ class AssessmentGeneratingLoader extends StatelessWidget {
       message: message,
       letterStyle: const TextStyle(
         color: AppColors.teal700,
-        fontSize: 40,
+        fontSize: FontSize.displayExtraLarge,
         fontWeight: FontWeight.w900,
         height: 1,
         letterSpacing: 3,

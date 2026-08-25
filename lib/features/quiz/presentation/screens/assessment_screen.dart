@@ -119,11 +119,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   }
 
   void goToNextQuestion() {
-    if (!_controller.canContinue) {
-      HapticFeedback.selectionClick();
-      return;
-    }
-
     final isCorrect = _controller.isSelectedAnswerCorrect;
     if (isCorrect != null) {
       unawaited(_playAnswerFeedback(isCorrect));
@@ -326,9 +321,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                   key: const ValueKey('question-content'),
                                   physics: const BouncingScrollPhysics(),
                                   padding: const EdgeInsets.fromLTRB(
-                                    24,
+                                    14,
                                     0,
-                                    24,
+                                    14,
                                     24,
                                   ),
                                   child: Column(

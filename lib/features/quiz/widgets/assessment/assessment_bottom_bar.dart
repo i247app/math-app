@@ -6,6 +6,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
 
 class AssessmentBottomBar extends StatelessWidget {
@@ -33,7 +34,7 @@ class AssessmentBottomBar extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           height: 97,
-          padding: const EdgeInsets.fromLTRB(24, 25, 24, 24),
+          padding: const EdgeInsets.fromLTRB(14, 25, 14, 24),
           decoration: BoxDecoration(
             color: colors.elevatedSurface.withValues(alpha: 0.90),
             border: Border(
@@ -47,8 +48,11 @@ class AssessmentBottomBar extends StatelessWidget {
                 child: AssessmentBottomActionButton(
                   label: context.getText(AppKeys.previousQuestionUpper),
                   icon: Icons.arrow_back_rounded,
-                  background: AppColors.peachStrong.withValues(alpha: 0.50),
-                  foreground: AppColors.rust,
+                  background: AppColors.brandOrange,
+                  foreground: colors.onAccent,
+                  disabledBackground: AppColors.brandOrange,
+                  disabledForeground: colors.onAccent,
+                  labelFontSize: FontSize.normal,
                   onTap: canGoBack && !isSubmitting ? onBack : null,
                 ),
               ),
@@ -62,13 +66,12 @@ class AssessmentBottomBar extends StatelessWidget {
                   icon: isLastQuestion
                       ? Icons.check_rounded
                       : Icons.arrow_forward_rounded,
-                  foreground: const Color(0xFFBEFFF9),
-                  onTap: isSubmitting || !canContinue ? null : onContinue,
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppColors.teal700, Color(0xFF73F1E7)],
-                  ),
+                  background: AppColors.brandTealSolid,
+                  foreground: colors.onBrand,
+                  labelFontSize: FontSize.normal,
+                  onTap: isSubmitting || (isLastQuestion && !canContinue)
+                      ? null
+                      : onContinue,
                 ),
               ),
             ],

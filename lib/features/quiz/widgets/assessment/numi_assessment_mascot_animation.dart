@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 /// Native Flutter cutout rig for Numi's assessment-generation sequence.
 ///
@@ -971,7 +972,7 @@ class _StageDecoration extends StatelessWidget {
               '?',
               style: TextStyle(
                 color: AppColors.teal700,
-                fontSize: 46,
+                fontSize: FontSize.displayExtraLarge,
                 height: 1,
                 fontWeight: FontWeight.w900,
               ),
