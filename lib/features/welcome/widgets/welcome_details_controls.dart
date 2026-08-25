@@ -13,7 +13,7 @@ class WelcomeDetailsControls extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(
         top: 28,
-        bottom: MediaQuery.paddingOf(context).bottom + 20,
+        bottom: MediaQuery.viewPaddingOf(context).bottom + 20,
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),

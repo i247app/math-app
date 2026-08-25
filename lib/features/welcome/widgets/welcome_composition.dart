@@ -155,7 +155,8 @@ class WelcomeComposition extends StatelessWidget {
                             ),
                           ),
                           SizedBox(
-                            height: MediaQuery.paddingOf(context).bottom + 20,
+                            height:
+                                MediaQuery.viewPaddingOf(context).bottom + 20,
                           ),
                         ],
                       ),

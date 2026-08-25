@@ -6,6 +6,8 @@ import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/quiz/presentation/screens/assessment_screen.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
+import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_bar.dart';
 
 class _UnusedQuizService implements QuizService {
   @override
@@ -16,20 +18,72 @@ void main() {
   testWidgets('standard questions fit without vertical scrolling', (
     tester,
   ) async {
-    tester.view.physicalSize = const Size(430, 844);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+    await _pumpAssessment(tester);
 
-    final lingo = LingoProvider();
-    addTearDown(lingo.dispose);
+    final mainScrollable = find.descendant(
+      of: find.byKey(const ValueKey('question-content')),
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is Scrollable &&
+            widget.axisDirection == AxisDirection.down &&
+            widget.physics is BouncingScrollPhysics,
+      ),
+    );
+    expect(mainScrollable, findsOneWidget);
+    final scrollable = tester.state<ScrollableState>(mainScrollable);
+    expect(scrollable.position.maxScrollExtent, 0);
+    expect(tester.takeException(), isNull);
+  });
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+  testWidgets('bottom actions stay above Android navigation bar', (
+    tester,
+  ) async {
+    const systemBottomInset = 48.0;
+    await _pumpAssessment(tester, bottomInset: systemBottomInset);
+
+    final bottomBar = find.byType(AssessmentBottomBar);
+    expect(
+      tester.getSize(bottomBar).height,
+      AssessmentBottomBar.contentHeight + systemBottomInset,
+    );
+
+    final actionButtons = find.descendant(
+      of: bottomBar,
+      matching: find.byType(AssessmentBottomActionButton),
+    );
+    expect(actionButtons, findsNWidgets(2));
+    for (final element in actionButtons.evaluate()) {
+      final button = find.byWidget(element.widget);
+      expect(tester.getBottomLeft(button).dy, lessThanOrEqualTo(844 - 48));
+    }
+    expect(tester.takeException(), isNull);
+  });
+}
+
+Future<void> _pumpAssessment(
+  WidgetTester tester, {
+  double bottomInset = 0,
+}) async {
+  tester.view.physicalSize = const Size(430, 844);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  final lingo = LingoProvider();
+  addTearDown(lingo.dispose);
+
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: ThemeData(
+        extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+      ),
+      home: MediaQuery(
+        data: MediaQueryData(
+          size: const Size(430, 844),
+          padding: EdgeInsets.only(bottom: bottomInset),
+          viewPadding: EdgeInsets.only(bottom: bottomInset),
         ),
-        home: LingoScope(
+        child: LingoScope(
           lingo: lingo,
           child: AiAssessmentScreen(
             quizService: _UnusedQuizService(),
@@ -51,20 +105,8 @@ void main() {
           ),
         ),
       ),
-    );
+    ),
+  );
 
-    await tester.pump();
-
-    final mainScrollable = find.descendant(
-      of: find.byKey(const ValueKey('question-content')),
-      matching: find.byWidgetPredicate(
-        (widget) =>
-            widget is Scrollable && widget.physics is BouncingScrollPhysics,
-      ),
-    );
-    expect(mainScrollable, findsOneWidget);
-    final scrollable = tester.state<ScrollableState>(mainScrollable);
-    expect(scrollable.position.maxScrollExtent, 0);
-    expect(tester.takeException(), isNull);
-  });
+  await tester.pump();
 }

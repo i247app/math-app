@@ -269,6 +269,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final isSubmittingQuiz = _controller.isSubmittingQuiz;
           final hasActiveAttempt = questions.isNotEmpty;
           final isBusy = isGeneratingQuestion || isSubmittingQuiz;
+          final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+          final bottomBarHeight =
+              AssessmentBottomBar.contentHeight + bottomInset;
           final backgroundColor = isGeneratingQuestion
               ? colors.surface
               : colors.pageBackground;
@@ -292,7 +295,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                 isSubmittingQuiz ||
                                 errorMessage != null
                             ? 0
-                            : 97,
+                            : bottomBarHeight,
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 320),
                           switchInCurve: Curves.easeOutCubic,
@@ -371,6 +374,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                           right: 0,
                           bottom: 0,
                           child: AssessmentBottomBar(
+                            bottomInset: bottomInset,
                             canGoBack: _controller.questionIndex > 0,
                             canContinue: _controller.canContinue,
                             isLastQuestion: _controller.isLastQuestion,

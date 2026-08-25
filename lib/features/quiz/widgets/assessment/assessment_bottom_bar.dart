@@ -12,6 +12,7 @@ import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_action_b
 class AssessmentBottomBar extends StatelessWidget {
   const AssessmentBottomBar({
     super.key,
+    required this.bottomInset,
     required this.canGoBack,
     required this.canContinue,
     required this.isLastQuestion,
@@ -19,6 +20,9 @@ class AssessmentBottomBar extends StatelessWidget {
     required this.onBack,
     required this.onContinue,
   });
+  static const double contentHeight = 97;
+
+  final double bottomInset;
   final bool canGoBack;
   final bool canContinue;
   final bool isLastQuestion;
@@ -33,8 +37,8 @@ class AssessmentBottomBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
-          height: 97,
-          padding: const EdgeInsets.fromLTRB(14, 25, 14, 24),
+          height: contentHeight + bottomInset,
+          padding: EdgeInsets.fromLTRB(14, 25, 14, 24 + bottomInset),
           decoration: BoxDecoration(
             color: colors.elevatedSurface.withValues(alpha: 0.90),
             border: Border(

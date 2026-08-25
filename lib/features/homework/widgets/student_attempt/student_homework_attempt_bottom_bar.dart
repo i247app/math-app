@@ -11,12 +11,16 @@ import 'package:numi/features/homework/widgets/student_attempt/student_homework_
 class StudentHomeworkAttemptBottomBar extends StatelessWidget {
   const StudentHomeworkAttemptBottomBar({
     super.key,
+    required this.bottomInset,
     required this.canGoBack,
     required this.isLastQuestion,
     required this.isSubmitting,
     required this.onBack,
     required this.onContinue,
   });
+  static const double contentHeight = 97;
+
+  final double bottomInset;
   final bool canGoBack;
   final bool isLastQuestion;
   final bool isSubmitting;
@@ -30,8 +34,8 @@ class StudentHomeworkAttemptBottomBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
-          height: 97,
-          padding: const EdgeInsets.fromLTRB(24, 25, 24, 24),
+          height: contentHeight + bottomInset,
+          padding: EdgeInsets.fromLTRB(24, 25, 24, 24 + bottomInset),
           decoration: BoxDecoration(
             color: colors.elevatedSurface.withValues(alpha: 0.90),
             border: Border(

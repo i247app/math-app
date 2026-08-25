@@ -286,6 +286,9 @@ class _StudentHomeworkAttemptScreenState
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    final bottomBarHeight =
+        StudentHomeworkAttemptBottomBar.contentHeight + bottomInset;
 
     final hasActiveAttempt = studentHomeworkAttemptQuestions(
       _exercise,
@@ -332,7 +335,7 @@ class _StudentHomeworkAttemptScreenState
                       bottom:
                           _isLoading || _isSubmitting || effectiveError != null
                           ? 0
-                          : 97,
+                          : bottomBarHeight,
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         switchInCurve: Curves.easeOutCubic,
@@ -414,6 +417,7 @@ class _StudentHomeworkAttemptScreenState
                         right: 0,
                         bottom: 0,
                         child: StudentHomeworkAttemptBottomBar(
+                          bottomInset: bottomInset,
                           canGoBack: _questionIndex > 0,
                           isLastQuestion:
                               _questionIndex >= questions.length - 1,
