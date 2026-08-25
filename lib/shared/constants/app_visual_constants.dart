@@ -22,8 +22,9 @@ const studentHomeInviteAsset = 'assets/icons/student-home-invite.svg';
 const parentHomeAfterReviewBannerAsset =
     'assets/images/parent-banner-after-review.jpg';
 const parentHomeClassroomAsset = 'assets/images/join-classroom.jpg';
-const parentHomeRaceAsset = 'assets/images/parent-home-race.png';
-const parentHomeShopAsset = 'assets/images/parent-home-shop.png';
+const parentHomeNumiFarmAsset = 'assets/images/game-numi-farm-banner.png';
+const parentHomeMonsterRescueAsset =
+    'assets/images/game-numi-electric-rescue.png';
 const studentParentHomeClassThumbAsset =
     'assets/images/student-parent-home-class-thumb.png';
 const studentParentHomeAcceptIconAsset =

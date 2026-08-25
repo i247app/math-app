@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/features/home/widgets/sections/assessment_list/assessment_list.dart';
 import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/home/widgets/sections/promo_actions/promo_actions.dart';
+import 'package:numi/features/home/widgets/home_game_preview_artwork.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 
@@ -32,13 +33,23 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
                 children: [
                   PromoActionCard(
                     data: PromoActionData(
-                      image: const AssetImage(parentHomeRaceAsset),
+                      child: const HomeGamePreviewArtwork(
+                        assetPath: parentHomeNumiFarmAsset,
+                        title: 'NUMI FARM',
+                        alignment: Alignment(0, 0.12),
+                      ),
+                      semanticLabel: 'Numi Farm',
                       onTap: widget.onOpenPracticeTab,
                     ),
                   ),
                   PromoActionCard(
                     data: PromoActionData(
-                      image: const AssetImage(parentHomeShopAsset),
+                      child: const HomeGamePreviewArtwork(
+                        assetPath: parentHomeMonsterRescueAsset,
+                        title: 'ELECTRIC RESCUE',
+                        alignment: Alignment(0, 0.08),
+                      ),
+                      semanticLabel: 'Electric Rescue',
                       onTap: widget.onOpenPracticeTab,
                     ),
                   ),
