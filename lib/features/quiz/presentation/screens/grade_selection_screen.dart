@@ -162,13 +162,11 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   }
 
   String? _initialSelectedGradeLabel(List<GradeModel> grades) {
-    if (widget.quizPurpose == quizPurposeAssessment) {
-      return null;
-    }
     return defaultGradeLabel(
       grades,
       preferredGradeId: widget.initialGradeId,
       preferredGradeLabel: widget.initialGradeLabel,
+      fallbackToFirst: widget.quizPurpose != quizPurposeAssessment,
     );
   }
 

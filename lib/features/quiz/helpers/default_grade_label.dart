@@ -4,6 +4,7 @@ String? defaultGradeLabel(
   List<GradeModel> grades, {
   int? preferredGradeId,
   String? preferredGradeLabel,
+  bool fallbackToFirst = true,
 }) {
   final sortedGrades =
       grades.where((grade) => grade.label?.trim().isNotEmpty == true).toList()
@@ -30,5 +31,5 @@ String? defaultGradeLabel(
     }
   }
 
-  return sortedGrades.first.label?.trim();
+  return fallbackToFirst ? sortedGrades.first.label?.trim() : null;
 }

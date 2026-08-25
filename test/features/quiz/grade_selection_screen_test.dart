@@ -11,6 +11,7 @@ import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 import 'package:numi/features/quiz/data/ai_shake_service.dart';
 import 'package:numi/features/quiz/errors/quiz_exception.dart';
+import 'package:numi/features/quiz/helpers/default_grade_label.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
@@ -54,6 +55,14 @@ void main() {
     GradeModel(id: 4, label: 'Lớp 4', displayOrder: 4),
     GradeModel(id: 5, label: 'Lớp 5', displayOrder: 5),
   ];
+
+  test('matches the active profile grade without falling back', () {
+    expect(
+      defaultGradeLabel(grades, preferredGradeId: 3, fallbackToFirst: false),
+      'Lớp 3',
+    );
+    expect(defaultGradeLabel(grades, fallbackToFirst: false), isNull);
+  });
 
   testWidgets(
     'uses the six grade icons, PageHeader, and plain continue label',
@@ -193,6 +202,47 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('preselects the active child profile grade for an assessment', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(375, 812);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final previousLanguage = AppLanguageState.current;
+    AppLanguageState.current = AppLanguage.vi;
+    addTearDown(() => AppLanguageState.current = previousLanguage);
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final quizService = _FailingQuizService();
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeSelectionScreen(
+            initialGrades: grades,
+            initialGradeId: 3,
+            gradeService: _UnusedGradeService(),
+            quizService: quizService,
+            quizShakeService: _NoopQuizShakeService(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Tiếp tục'));
+    await tester.pumpAndSettle();
+
+    expect(quizService.requestedGradeLabels, <String?>['Lớp 3']);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'generates an assessment with an empty grade when no grade is selected',
