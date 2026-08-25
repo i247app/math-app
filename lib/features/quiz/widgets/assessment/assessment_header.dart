@@ -23,7 +23,7 @@ class AssessmentHeader extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
           height: 80,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             color: colors.elevatedSurface.withValues(alpha: 0.84),
             borderRadius: const BorderRadius.vertical(
@@ -37,36 +37,42 @@ class AssessmentHeader extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              QuizHeaderIconButton(
-                icon: Icons.close_rounded,
-                color: colors.brandStrong,
-                circle: true,
-                onTap: onClose,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: QuizHeaderIconButton(
+                  icon: Icons.close_rounded,
+                  color: colors.brandStrong,
+                  circle: true,
+                  onTap: onClose,
+                ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Text(
-                    context.getText(AppKeys.aiChallenge),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: colors.brandStrong,
-                      fontSize: FontSize.xl,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      letterSpacing: 0,
-                    ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 56),
+                child: Text(
+                  context.getText(AppKeys.assessmentHeaderTitle),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.brandStrong,
+                    fontSize: FontSize.xl,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: 0,
                   ),
                 ),
               ),
-              QuizHeaderIconButton(
-                icon: Icons.help_outline_rounded,
-                color: colors.brandStrong,
-                circle: true,
-                onTap: HapticFeedback.selectionClick,
+              Align(
+                alignment: Alignment.centerRight,
+                child: QuizHeaderIconButton(
+                  icon: Icons.help_outline_rounded,
+                  color: colors.brandStrong,
+                  circle: true,
+                  onTap: HapticFeedback.selectionClick,
+                ),
               ),
             ],
           ),
