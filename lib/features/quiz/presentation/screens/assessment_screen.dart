@@ -272,9 +272,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
           final bottomBarHeight =
               AssessmentBottomBar.contentHeight + bottomInset;
-          final backgroundColor = isGeneratingQuestion
-              ? colors.surface
-              : colors.pageBackground;
+          final backgroundColor = colors.surface;
 
           final screen = Scaffold(
             backgroundColor: backgroundColor,
@@ -289,7 +287,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                         child: ColoredBox(color: backgroundColor),
                       ),
                       Positioned.fill(
-                        top: isGeneratingQuestion || isSubmittingQuiz ? 0 : 80,
+                        top: isGeneratingQuestion || isSubmittingQuiz
+                            ? 0
+                            : AssessmentHeader.height,
                         bottom:
                             isGeneratingQuestion ||
                                 isSubmittingQuiz ||
@@ -320,19 +320,16 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                     AppKeys.generatingAssessment,
                                   ),
                                 )
-                              : SingleChildScrollView(
-                                  key: const ValueKey('question-content'),
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: const EdgeInsets.fromLTRB(
-                                    14,
-                                    0,
-                                    14,
-                                    24,
+                              : Padding(
+                                  key: const ValueKey(
+                                    'question-content-layout',
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
                                   ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
-                                    spacing: 32,
                                     children: [
                                       AssessmentProgressSection(
                                         currentQuestion:
@@ -343,14 +340,42 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                             .keys
                                             .toSet(),
                                       ),
-                                      AssessmentQuestionCard(
-                                        question: currentQuestion!.questionName,
-                                      ),
-                                      AssessmentAnswerGrid(
-                                        answers: currentQuestion.answers,
-                                        selectedAnswerLabel:
-                                            _controller.selectedAnswerLabel,
-                                        onSelected: selectAnswer,
+                                      const SizedBox(height: 24),
+                                      Expanded(
+                                        child: KeyedSubtree(
+                                          key: ValueKey(
+                                            'assessment-question-${_controller.questionIndex}',
+                                          ),
+                                          child: SingleChildScrollView(
+                                            key: const ValueKey(
+                                              'question-content',
+                                            ),
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            padding: const EdgeInsets.only(
+                                              bottom: 24,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                AssessmentQuestionCard(
+                                                  question: currentQuestion!
+                                                      .questionName,
+                                                ),
+                                                const SizedBox(height: 32),
+                                                AssessmentAnswerGrid(
+                                                  answers:
+                                                      currentQuestion.answers,
+                                                  selectedAnswerLabel:
+                                                      _controller
+                                                          .selectedAnswerLabel,
+                                                  onSelected: selectAnswer,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),

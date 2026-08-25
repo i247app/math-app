@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
@@ -24,7 +25,8 @@ class AssessmentQuestionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: colors.border.withValues(alpha: 0.35)),
+        border: Border.all(color: colors.border),
+        boxShadow: AppShadows.card(colors),
       ),
       child: mathQuestion != null
           ? _AssessmentMathQuestion(
@@ -39,15 +41,15 @@ class AssessmentQuestionCard extends StatelessWidget {
   double _minimumHeightFor(String value, {required bool isMathQuestion}) {
     final length = value.trim().length;
     if (isMathQuestion) {
-      if (length <= 24) return 220;
-      if (length <= 48) return 240;
-      return 260;
+      if (length <= 24) return 236;
+      if (length <= 48) return 256;
+      return 276;
     }
 
-    if (length <= 45) return 160;
-    if (length <= 90) return 190;
-    if (length <= 160) return 230;
-    return 260;
+    if (length <= 45) return 176;
+    if (length <= 90) return 206;
+    if (length <= 160) return 246;
+    return 276;
   }
 
   double _fontSizeFor(String value) {
