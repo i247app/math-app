@@ -40,6 +40,28 @@ void main() {
     expect(controller.goToNextQuestion(), isFalse);
   });
 
+  test('jumps to any question and tracks the first unanswered question', () {
+    final controller = AssessmentController(
+      quizService: _UnusedQuizService(),
+      initialQuiz: quiz,
+    );
+    addTearDown(controller.dispose);
+
+    expect(controller.firstUnansweredQuestionIndex, 0);
+    expect(controller.allQuestionsAnswered, isFalse);
+    expect(controller.goToQuestion(1), isTrue);
+
+    controller.selectAnswer(answers.first);
+    expect(controller.firstUnansweredQuestionIndex, 0);
+    expect(controller.goToQuestion(0), isTrue);
+
+    controller.selectAnswer(answers.last);
+    expect(controller.firstUnansweredQuestionIndex, isNull);
+    expect(controller.allQuestionsAnswered, isTrue);
+    expect(controller.goToQuestion(-1), isFalse);
+    expect(controller.goToQuestion(2), isFalse);
+  });
+
   test('checks answers by either their label or displayed content', () {
     final controller = AssessmentController(
       quizService: _UnusedQuizService(),

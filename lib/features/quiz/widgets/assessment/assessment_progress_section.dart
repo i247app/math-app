@@ -11,10 +11,12 @@ class AssessmentProgressSection extends StatelessWidget {
     required this.currentQuestion,
     required this.totalQuestions,
     required this.answeredQuestionIndexes,
+    required this.onQuestionSelected,
   });
   final int currentQuestion;
   final int totalQuestions;
   final Set<int> answeredQuestionIndexes;
+  final ValueChanged<int> onQuestionSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,7 @@ class AssessmentProgressSection extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         SizedBox(
-          height: 44,
+          height: 66,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -46,24 +48,60 @@ class AssessmentProgressSection extends StatelessWidget {
             separatorBuilder: (_, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final answered = answeredQuestionIndexes.contains(index);
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOutCubic,
-                width: 42,
-                height: 42,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: answered ? colors.brandStrong : colors.elevatedSurface,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: colors.brandStrong, width: 2),
-                ),
-                child: Text(
-                  '${index + 1}',
-                  style: TextStyle(
-                    color: answered ? colors.onBrand : colors.brandStrong,
-                    fontSize: FontSize.large,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
+              final isCurrent = index == currentQuestion - 1;
+              return Semantics(
+                button: true,
+                selected: isCurrent,
+                label: '${index + 1}',
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onQuestionSelected(index),
+                  child: SizedBox(
+                    width: 42,
+                    child: Column(
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOutCubic,
+                          width: 42,
+                          height: 42,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: answered
+                                ? colors.brandStrong
+                                : colors.elevatedSurface,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: colors.brandStrong,
+                              width: 2,
+                            ),
+                          ),
+                          child: Text(
+                            '${index + 1}',
+                            style: TextStyle(
+                              color: answered
+                                  ? colors.onBrand
+                                  : colors.brandStrong,
+                              fontSize: FontSize.large,
+                              fontWeight: FontWeight.w700,
+                              height: 1,
+                            ),
+                          ),
+                        ),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 160),
+                          child: isCurrent
+                              ? Icon(
+                                  Icons.arrow_downward_rounded,
+                                  key: ValueKey('current-question-$index'),
+                                  color: colors.brandStrong,
+                                  size: 22,
+                                  weight: 700,
+                                )
+                              : const SizedBox(height: 22),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

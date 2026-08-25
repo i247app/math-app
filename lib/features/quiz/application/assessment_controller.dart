@@ -85,6 +85,16 @@ class AssessmentController extends ChangeNotifier {
 
   bool get canContinue => selectedAnswerLabel != null;
 
+  int? get firstUnansweredQuestionIndex {
+    final questions = _quiz?.questions ?? const <QuizQuestion>[];
+    return _firstUnansweredIndex(questions);
+  }
+
+  bool get allQuestionsAnswered {
+    final questions = _quiz?.questions ?? const <QuizQuestion>[];
+    return questions.isNotEmpty && firstUnansweredQuestionIndex == null;
+  }
+
   bool? get isSelectedAnswerCorrect {
     final question = currentQuestion;
     final selectedLabel = selectedAnswerLabel;
@@ -188,6 +198,17 @@ class AssessmentController extends ChangeNotifier {
       return false;
     }
     _questionIndex--;
+    notifyListeners();
+    return true;
+  }
+
+  bool goToQuestion(int index) {
+    final questions = _quiz?.questions ?? const <QuizQuestion>[];
+    if (index < 0 || index >= questions.length || index == _questionIndex) {
+      return false;
+    }
+
+    _questionIndex = index;
     notifyListeners();
     return true;
   }

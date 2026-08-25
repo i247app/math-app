@@ -40,6 +40,10 @@ class AssessmentQuestionCard extends StatelessWidget {
 
   double _minimumHeightFor(String value, {required bool isMathQuestion}) {
     final length = value.trim().length;
+    if (_containsPictorialSymbols(value)) {
+      return length <= 90 ? 236 : 276;
+    }
+
     if (isMathQuestion) {
       if (length <= 24) return 236;
       if (length <= 48) return 256;
@@ -50,6 +54,10 @@ class AssessmentQuestionCard extends StatelessWidget {
     if (length <= 90) return 206;
     if (length <= 160) return 246;
     return 276;
+  }
+
+  bool _containsPictorialSymbols(String value) {
+    return RegExp(r'[\u{1F300}-\u{1FAFF}]', unicode: true).hasMatch(value);
   }
 
   double _fontSizeFor(String value) {

@@ -12,8 +12,8 @@ class AssessmentBottomBar extends StatelessWidget {
     super.key,
     required this.bottomInset,
     required this.canGoBack,
-    required this.canContinue,
     required this.isLastQuestion,
+    required this.allQuestionsAnswered,
     required this.isSubmitting,
     required this.onBack,
     required this.onContinue,
@@ -22,8 +22,8 @@ class AssessmentBottomBar extends StatelessWidget {
 
   final double bottomInset;
   final bool canGoBack;
-  final bool canContinue;
   final bool isLastQuestion;
+  final bool allQuestionsAnswered;
   final bool isSubmitting;
   final VoidCallback onBack;
   final VoidCallback onContinue;
@@ -31,6 +31,7 @@ class AssessmentBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final showSubmit = isLastQuestion && allQuestionsAnswered;
     return Container(
       height: contentHeight + bottomInset,
       padding: EdgeInsets.fromLTRB(14, 25, 14, 24 + bottomInset),
@@ -54,18 +55,16 @@ class AssessmentBottomBar extends StatelessWidget {
             child: AssessmentBottomActionButton(
               label: isSubmitting
                   ? context.getText(AppKeys.submittingUpper)
-                  : isLastQuestion
+                  : showSubmit
                   ? context.getText(AppKeys.submitUpper)
                   : context.getText(AppKeys.continueUpper),
-              icon: isLastQuestion
+              icon: showSubmit
                   ? Icons.check_rounded
                   : Icons.arrow_forward_rounded,
               background: AppColors.brandTealSolid,
               foreground: colors.onBrand,
               labelFontSize: FontSize.normal,
-              onTap: isSubmitting || (isLastQuestion && !canContinue)
-                  ? null
-                  : onContinue,
+              onTap: isSubmitting ? null : onContinue,
             ),
           ),
         ],

@@ -118,19 +118,38 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     _controller.goToPreviousQuestion();
   }
 
+  void goToQuestion(int index) {
+    final moved = _controller.goToQuestion(index);
+    if (moved) {
+      HapticFeedback.mediumImpact();
+    } else {
+      HapticFeedback.selectionClick();
+    }
+  }
+
   void goToNextQuestion() {
     final isCorrect = _controller.isSelectedAnswerCorrect;
     if (isCorrect != null) {
       unawaited(_playAnswerFeedback(isCorrect));
     }
 
-    if (_controller.isLastQuestion) {
+    if (_controller.isLastQuestion && _controller.allQuestionsAnswered) {
       submitCurrentQuiz();
       return;
     }
 
     HapticFeedback.mediumImpact();
-    _controller.goToNextQuestion();
+    _moveToNextQuestion();
+  }
+
+  bool _moveToNextQuestion() {
+    if (!_controller.isLastQuestion) {
+      return _controller.goToNextQuestion();
+    }
+
+    final firstUnansweredIndex = _controller.firstUnansweredQuestionIndex;
+    return firstUnansweredIndex != null &&
+        _controller.goToQuestion(firstUnansweredIndex);
   }
 
   Future<void> submitCurrentQuiz() async {
@@ -320,64 +339,52 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                     AppKeys.generatingAssessment,
                                   ),
                                 )
-                              : Padding(
+                              : SizedBox.expand(
                                   key: const ValueKey(
                                     'question-content-layout',
                                   ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      AssessmentProgressSection(
-                                        currentQuestion:
-                                            _controller.questionIndex + 1,
-                                        totalQuestions: questions.length,
-                                        answeredQuestionIndexes: _controller
-                                            .selectedAnswerLabels
-                                            .keys
-                                            .toSet(),
+                                  child: KeyedSubtree(
+                                    key: ValueKey(
+                                      'assessment-question-${_controller.questionIndex}',
+                                    ),
+                                    child: SingleChildScrollView(
+                                      key: const ValueKey('question-content'),
+                                      physics: const BouncingScrollPhysics(),
+                                      padding: const EdgeInsets.fromLTRB(
+                                        14,
+                                        0,
+                                        14,
+                                        24,
                                       ),
-                                      const SizedBox(height: 24),
-                                      Expanded(
-                                        child: KeyedSubtree(
-                                          key: ValueKey(
-                                            'assessment-question-${_controller.questionIndex}',
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          AssessmentProgressSection(
+                                            currentQuestion:
+                                                _controller.questionIndex + 1,
+                                            totalQuestions: questions.length,
+                                            answeredQuestionIndexes: _controller
+                                                .selectedAnswerLabels
+                                                .keys
+                                                .toSet(),
+                                            onQuestionSelected: goToQuestion,
                                           ),
-                                          child: SingleChildScrollView(
-                                            key: const ValueKey(
-                                              'question-content',
-                                            ),
-                                            physics:
-                                                const BouncingScrollPhysics(),
-                                            padding: const EdgeInsets.only(
-                                              bottom: 24,
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                AssessmentQuestionCard(
-                                                  question: currentQuestion!
-                                                      .questionName,
-                                                ),
-                                                const SizedBox(height: 32),
-                                                AssessmentAnswerGrid(
-                                                  answers:
-                                                      currentQuestion.answers,
-                                                  selectedAnswerLabel:
-                                                      _controller
-                                                          .selectedAnswerLabel,
-                                                  onSelected: selectAnswer,
-                                                ),
-                                              ],
-                                            ),
+                                          const SizedBox(height: 16),
+                                          AssessmentQuestionCard(
+                                            question:
+                                                currentQuestion!.questionName,
                                           ),
-                                        ),
+                                          const SizedBox(height: 32),
+                                          AssessmentAnswerGrid(
+                                            answers: currentQuestion.answers,
+                                            selectedAnswerLabel:
+                                                _controller.selectedAnswerLabel,
+                                            onSelected: selectAnswer,
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                         ),
@@ -401,8 +408,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                           child: AssessmentBottomBar(
                             bottomInset: bottomInset,
                             canGoBack: _controller.questionIndex > 0,
-                            canContinue: _controller.canContinue,
                             isLastQuestion: _controller.isLastQuestion,
+                            allQuestionsAnswered:
+                                _controller.allQuestionsAnswered,
                             isSubmitting: isSubmittingQuiz,
                             onBack: goToPreviousQuestion,
                             onContinue: goToNextQuestion,
