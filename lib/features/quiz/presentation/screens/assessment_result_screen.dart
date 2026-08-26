@@ -28,6 +28,7 @@ class AssessmentResultScreen extends StatefulWidget {
     super.key,
     this.quiz,
     this.quizService,
+    this.gradeLabel,
     this.profileId,
     this.onTestAgainGenerated,
     this.onBack,
@@ -35,6 +36,7 @@ class AssessmentResultScreen extends StatefulWidget {
 
   final GeneratedQuiz? quiz;
   final QuizService? quizService;
+  final String? gradeLabel;
   final int? profileId;
   final ValueChanged<GeneratedQuiz>? onTestAgainGenerated;
   final VoidCallback? onBack;
@@ -57,7 +59,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
     await generateAgain(
       purpose: quizPurposeAssessment,
       typeOfQuiz: quizTypeGeneral,
-      gradeLabel: assessmentQuizGradeLabel,
+      gradeLabel: widget.gradeLabel,
     );
   }
 
@@ -74,6 +76,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
     await generateAgain(
       purpose: quizPurposePractice,
       typeOfQuiz: quizTypeReinforcement,
+      gradeLabel: widget.gradeLabel,
       previousQuizId: previousQuizId,
     );
   }

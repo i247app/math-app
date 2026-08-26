@@ -149,6 +149,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           return AssessmentResultScreen(
             quiz: result.quiz,
             quizService: quizService,
+            gradeLabel: gradeLabel,
             profileId: profileId,
             onTestAgainGenerated: (generatedQuiz) {
               Navigator.of(resultContext).pushReplacement(

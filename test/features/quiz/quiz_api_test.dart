@@ -46,6 +46,30 @@ void main() {
 
     expect(requestBody, containsPair('grade_label', 'Lớp 2'));
   });
+
+  test('sends both grade label and previous quiz id when provided', () async {
+    Object? requestBody;
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requestBody = options.data;
+            handler.resolve(_generatedQuizResponse(options));
+          },
+        ),
+      );
+    final api = QuizApi(
+      networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
+    );
+
+    await api.generateAssessmentQuiz(
+      gradeLabel: '  Lớp 3  ',
+      previousQuizId: 42,
+    );
+
+    expect(requestBody, containsPair('grade_label', 'Lớp 3'));
+    expect(requestBody, containsPair('previous_quiz_id', 42));
+  });
 }
 
 Response<Object?> _generatedQuizResponse(RequestOptions options) {

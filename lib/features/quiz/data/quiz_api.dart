@@ -9,7 +9,6 @@ const quizPurposePractice = 'PRACTICE';
 const quizTypeGeneral = 'GENERAL';
 const quizTypeReinforcement = 'REINFORCEMENT';
 const assessmentQuizType = quizPurposeAssessment;
-const assessmentQuizGradeLabel = 'Grade 1';
 
 abstract class QuizService {
   Future<GeneratedQuiz> generateAssessmentQuiz({
@@ -72,7 +71,7 @@ class QuizApi implements QuizService {
         GenerateQuizRequest(
           purpose: purpose,
           typeOfQuiz: typeOfQuiz,
-          gradeLabel: previousQuizId == null ? cleanGradeLabel : null,
+          gradeLabel: cleanGradeLabel,
           previousQuizId: previousQuizId,
           chapters: _cleanChapters(chapters),
           profileId: profileId,
