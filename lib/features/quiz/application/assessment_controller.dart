@@ -189,7 +189,11 @@ class AssessmentController extends ChangeNotifier {
   }
 
   void selectAnswer(QuizAnswer answer) {
-    _selectedAnswerLabels[_questionIndex] = answer.label;
+    if (_selectedAnswerLabels[_questionIndex] == answer.label) {
+      _selectedAnswerLabels.remove(_questionIndex);
+    } else {
+      _selectedAnswerLabels[_questionIndex] = answer.label;
+    }
     notifyListeners();
   }
 

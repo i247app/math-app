@@ -82,6 +82,27 @@ void main() {
     expect(controller.isSelectedAnswerCorrect, isNull);
   });
 
+  test('tapping the selected answer again unselects it', () {
+    final controller = AssessmentController(
+      quizService: _UnusedQuizService(),
+      initialQuiz: quiz,
+    );
+    addTearDown(controller.dispose);
+
+    controller.selectAnswer(answers.first);
+    expect(controller.selectedAnswerLabel, answers.first.label);
+    expect(controller.canContinue, isTrue);
+
+    controller.selectAnswer(answers.first);
+    expect(controller.selectedAnswerLabel, isNull);
+    expect(controller.canContinue, isFalse);
+    expect(controller.firstUnansweredQuestionIndex, 0);
+
+    controller.selectAnswer(answers.first);
+    controller.selectAnswer(answers.last);
+    expect(controller.selectedAnswerLabel, answers.last.label);
+  });
+
   test(
     'does not report incorrect when the server omits the correct answer',
     () {
