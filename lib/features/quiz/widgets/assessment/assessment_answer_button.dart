@@ -38,7 +38,7 @@ class AssessmentAnswerButton extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
-          constraints: BoxConstraints(minHeight: isNumeric ? 96 : 82),
+          constraints: BoxConstraints(minHeight: isNumeric ? 90 : 76),
           decoration: BoxDecoration(
             color: selected ? const Color(0xFFE8F8F8) : colors.elevatedSurface,
             borderRadius: BorderRadius.circular(_borderRadius),
@@ -54,7 +54,7 @@ class AssessmentAnswerButton extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 20,
-              vertical: isNumeric ? 8 : 4,
+              vertical: isNumeric ? 6 : 2,
             ),
             child: Row(
               children: [

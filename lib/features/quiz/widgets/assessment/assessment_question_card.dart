@@ -8,6 +8,15 @@ class AssessmentQuestionCard extends StatelessWidget {
   const AssessmentQuestionCard({super.key, required this.question});
   final String question;
 
+  static final RegExp _pictorialSymbolPattern = RegExp(
+    <String>[
+      r'\p{Extended_Pictographic}',
+      r'\p{Regional_Indicator}{2}',
+      r'[#*0-9]\uFE0F?\u20E3',
+    ].join('|'),
+    unicode: true,
+  );
+
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
@@ -66,7 +75,7 @@ class AssessmentQuestionCard extends StatelessWidget {
   }
 
   bool _containsPictorialSymbols(String value) {
-    return RegExp(r'[\u{1F300}-\u{1FAFF}]', unicode: true).hasMatch(value);
+    return _pictorialSymbolPattern.hasMatch(value);
   }
 
   double _fontSizeFor(String value) {

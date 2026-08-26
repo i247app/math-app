@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,14 +49,12 @@ class AiAssessmentScreen extends StatefulWidget {
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   late final AssessmentController _controller;
-  late final AudioPlayer _answerFeedbackPlayer;
   final GuardedExitController<AiAssessmentResult> _exitController =
       GuardedExitController<AiAssessmentResult>();
 
   @override
   void initState() {
     super.initState();
-    _answerFeedbackPlayer = AudioPlayer();
     _controller = AssessmentController(
       quizService: widget.quizService ?? context.read<QuizService>(),
       initialQuiz: widget.initialQuiz,
@@ -76,7 +71,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
   @override
   void dispose() {
-    unawaited(_answerFeedbackPlayer.dispose());
     _controller.dispose();
     super.dispose();
   }
@@ -97,22 +91,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     _controller.selectAnswer(answer);
   }
 
-  Future<void> _playAnswerFeedback(bool isCorrect) async {
-    try {
-      await _answerFeedbackPlayer.stop();
-      await _answerFeedbackPlayer.play(
-        AssetSource(
-          isCorrect
-              ? 'sounds/effects/correct.wav'
-              : 'sounds/effects/incorrect.wav',
-        ),
-        mode: PlayerMode.lowLatency,
-      );
-    } catch (_) {
-      // Audio feedback must never interrupt answering the assessment.
-    }
-  }
-
   void goToPreviousQuestion() {
     HapticFeedback.selectionClick();
     _controller.goToPreviousQuestion();
@@ -128,11 +106,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   }
 
   void goToNextQuestion() {
-    final isCorrect = _controller.isSelectedAnswerCorrect;
-    if (isCorrect != null) {
-      unawaited(_playAnswerFeedback(isCorrect));
-    }
-
     if (_controller.allQuestionsAnswered) {
       submitCurrentQuiz();
       return;
@@ -289,8 +262,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final hasActiveAttempt = questions.isNotEmpty;
           final isBusy = isGeneratingQuestion || isSubmittingQuiz;
           final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
-          final bottomBarHeight =
-              AssessmentBottomBar.contentHeight + bottomInset;
           final backgroundColor = colors.surface;
 
           final screen = Scaffold(
@@ -300,122 +271,103 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 430),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: ColoredBox(color: backgroundColor),
-                      ),
-                      Positioned.fill(
-                        top: isGeneratingQuestion || isSubmittingQuiz
-                            ? 0
-                            : AssessmentHeader.height,
-                        bottom:
-                            isGeneratingQuestion ||
-                                isSubmittingQuiz ||
-                                errorMessage != null
-                            ? 0
-                            : bottomBarHeight,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 320),
-                          switchInCurve: Curves.easeOutCubic,
-                          switchOutCurve: Curves.easeInCubic,
-                          child: errorMessage != null
-                              ? AssessmentErrorState(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 320),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    child: errorMessage != null
+                        ? Column(
+                            key: const ValueKey('question-error-layout'),
+                            children: [
+                              AssessmentHeader(
+                                onClose: _exitController.requestExit,
+                              ),
+                              Expanded(
+                                child: AssessmentErrorState(
                                   key: const ValueKey('question-error'),
                                   message: errorMessage,
                                   onRetry: retryErrorAction,
-                                )
-                              : isSubmittingQuiz
-                              ? AssessmentGeneratingLoader(
-                                  key: const ValueKey('submit-loader'),
-                                  message: context.getText(
-                                    AppKeys.submittingForYou,
-                                  ),
-                                )
-                              : isGeneratingQuestion
-                              ? AssessmentGeneratingLoader(
-                                  key: const ValueKey('question-loader'),
-                                  message: context.getText(
-                                    AppKeys.generatingAssessment,
-                                  ),
-                                )
-                              : SizedBox.expand(
-                                  key: const ValueKey(
-                                    'question-content-layout',
-                                  ),
-                                  child: KeyedSubtree(
-                                    key: ValueKey(
-                                      'assessment-question-${_controller.questionIndex}',
-                                    ),
-                                    child: SingleChildScrollView(
-                                      key: const ValueKey('question-content'),
-                                      physics: const BouncingScrollPhysics(),
-                                      padding: const EdgeInsets.fromLTRB(
-                                        14,
-                                        0,
-                                        14,
-                                        24,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          AssessmentProgressSection(
-                                            currentQuestion:
-                                                _controller.questionIndex + 1,
-                                            totalQuestions: questions.length,
-                                            answeredQuestionIndexes: _controller
-                                                .selectedAnswerLabels
-                                                .keys
-                                                .toSet(),
-                                            onQuestionSelected: goToQuestion,
-                                          ),
-                                          const SizedBox(height: 16),
-                                          AssessmentQuestionCard(
-                                            question:
-                                                currentQuestion!.questionName,
-                                          ),
-                                          const SizedBox(height: 32),
-                                          AssessmentAnswerGrid(
-                                            answers: currentQuestion.answers,
-                                            selectedAnswerLabel:
-                                                _controller.selectedAnswerLabel,
-                                            onSelected: selectAnswer,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
                                 ),
-                        ),
-                      ),
-                      if (!isGeneratingQuestion && !isSubmittingQuiz)
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          top: 0,
-                          child: AssessmentHeader(
-                            onClose: _exitController.requestExit,
+                              ),
+                            ],
+                          )
+                        : isSubmittingQuiz
+                        ? AssessmentGeneratingLoader(
+                            key: const ValueKey('submit-loader'),
+                            message: context.getText(AppKeys.submittingForYou),
+                          )
+                        : isGeneratingQuestion
+                        ? AssessmentGeneratingLoader(
+                            key: const ValueKey('question-loader'),
+                            message: context.getText(
+                              AppKeys.generatingAssessment,
+                            ),
+                          )
+                        : SizedBox.expand(
+                            key: const ValueKey('question-content-layout'),
+                            child: KeyedSubtree(
+                              key: ValueKey(
+                                'assessment-question-${_controller.questionIndex}',
+                              ),
+                              child: CustomScrollView(
+                                key: const ValueKey('question-content'),
+                                physics: const BouncingScrollPhysics(),
+                                slivers: [
+                                  SliverToBoxAdapter(
+                                    child: AssessmentHeader(
+                                      onClose: _exitController.requestExit,
+                                    ),
+                                  ),
+                                  SliverPadding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                    ),
+                                    sliver: SliverList.list(
+                                      children: [
+                                        AssessmentProgressSection(
+                                          currentQuestion:
+                                              _controller.questionIndex + 1,
+                                          totalQuestions: questions.length,
+                                          answeredQuestionIndexes: _controller
+                                              .selectedAnswerLabels
+                                              .keys
+                                              .toSet(),
+                                          onQuestionSelected: goToQuestion,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        AssessmentQuestionCard(
+                                          question:
+                                              currentQuestion!.questionName,
+                                        ),
+                                        const SizedBox(height: 32),
+                                        AssessmentAnswerGrid(
+                                          answers: currentQuestion.answers,
+                                          selectedAnswerLabel:
+                                              _controller.selectedAnswerLabel,
+                                          onSelected: selectAnswer,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SliverToBoxAdapter(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: AssessmentBottomBar(
+                                        bottomInset: bottomInset,
+                                        canGoBack:
+                                            _controller.questionIndex > 0,
+                                        allQuestionsAnswered:
+                                            _controller.allQuestionsAnswered,
+                                        isSubmitting: isSubmittingQuiz,
+                                        onBack: goToPreviousQuestion,
+                                        onContinue: goToNextQuestion,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      if (!isGeneratingQuestion &&
-                          !isSubmittingQuiz &&
-                          errorMessage == null)
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: AssessmentBottomBar(
-                            bottomInset: bottomInset,
-                            canGoBack: _controller.questionIndex > 0,
-                            allQuestionsAnswered:
-                                _controller.allQuestionsAnswered,
-                            isSubmitting: isSubmittingQuiz,
-                            onBack: goToPreviousQuestion,
-                            onContinue: goToNextQuestion,
-                          ),
-                        ),
-                    ],
                   ),
                 ),
               ),

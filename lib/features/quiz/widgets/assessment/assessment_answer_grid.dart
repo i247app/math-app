@@ -48,7 +48,7 @@ class AssessmentAnswerGrid extends StatelessWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
-        mainAxisExtent: 96,
+        mainAxisExtent: 90,
       ),
       itemBuilder: (context, index) {
         final answer = answers[index];

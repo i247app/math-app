@@ -17,7 +17,7 @@ class AssessmentBottomBar extends StatelessWidget {
     required this.onBack,
     required this.onContinue,
   });
-  static const double contentHeight = 97;
+  static const double contentHeight = 84;
 
   final double bottomInset;
   final bool canGoBack;
@@ -32,7 +32,7 @@ class AssessmentBottomBar extends StatelessWidget {
     final showSubmit = allQuestionsAnswered;
     return Container(
       height: contentHeight + bottomInset,
-      padding: EdgeInsets.fromLTRB(14, 25, 14, 24 + bottomInset),
+      padding: EdgeInsets.fromLTRB(14, 12, 14, 24 + bottomInset),
       color: colors.surface,
       child: Row(
         spacing: 48,
