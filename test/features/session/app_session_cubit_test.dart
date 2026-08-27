@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
@@ -25,6 +27,21 @@ class _FakeProfileSessionResolver implements ProfileSessionResolver {
     rememberedUserId = userId;
     rememberedProfile = profile;
   }
+}
+
+class _ControlledProfileSessionResolver implements ProfileSessionResolver {
+  final Completer<ProfileSessionResolution> resolution =
+      Completer<ProfileSessionResolution>();
+
+  @override
+  Future<ProfileSessionResolution> resolveForUserId(int userId) =>
+      resolution.future;
+
+  @override
+  Future<void> rememberActiveProfile({
+    required int userId,
+    required StudentProfile profile,
+  }) async {}
 }
 
 class _FakeAuthService implements AuthService {
@@ -56,7 +73,7 @@ class _FakeNotificationPingService implements NotificationPingService {
 
 AppSessionCubit _buildCubit({
   _FakeAuthService? authService,
-  _FakeProfileSessionResolver? profileResolver,
+  ProfileSessionResolver? profileResolver,
   _FakeNotificationPingService? notificationPingService,
 }) => AppSessionCubit(
   authService: authService ?? _FakeAuthService(),
@@ -178,6 +195,58 @@ void main() {
         await cubit.logout();
         expect(authService.logoutCalls, 1);
         expect(cubit.state.status, SessionStatus.unauthenticated);
+        await cubit.close();
+      },
+    );
+
+    test('shows Home while a new login resolves profiles', () async {
+      final resolver = _ControlledProfileSessionResolver();
+      final cubit = _buildCubit(profileResolver: resolver);
+
+      final establish = cubit.establishSession(
+        user: const LoginUser(id: 10, role: 'STUDENT'),
+      );
+
+      expect(cubit.state.status, SessionStatus.authenticated);
+      expect(cubit.state.user?.id, 10);
+      expect(cubit.state.isResolvingProfile, isTrue);
+
+      resolver.resolution.complete(
+        const ProfileSessionResolution(
+          profiles: [StudentProfile(profileId: 101, role: 'STUDENT')],
+          activeProfile: StudentProfile(profileId: 101, role: 'STUDENT'),
+        ),
+      );
+      await establish;
+
+      expect(cubit.state.isResolvingProfile, isFalse);
+      expect(cubit.state.activeProfile?.profileId, 101);
+      await cubit.close();
+    });
+
+    test(
+      'keeps an explicit session restore behind the restoring state',
+      () async {
+        final resolver = _ControlledProfileSessionResolver();
+        final cubit = _buildCubit(
+          authService: _FakeAuthService(
+            restoredUser: const LoginUser(id: 11, role: 'STUDENT'),
+          ),
+          profileResolver: resolver,
+        );
+
+        final restore = cubit.restoreSession();
+        await Future<void>.delayed(Duration.zero);
+
+        expect(cubit.state.status, SessionStatus.restoring);
+        expect(cubit.state.user, isNull);
+
+        resolver.resolution.complete(const ProfileSessionResolution.empty());
+        await restore;
+
+        expect(cubit.state.status, SessionStatus.authenticated);
+        expect(cubit.state.user?.id, 11);
+        expect(cubit.state.isResolvingProfile, isFalse);
         await cubit.close();
       },
     );

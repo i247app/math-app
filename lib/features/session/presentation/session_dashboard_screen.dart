@@ -26,6 +26,7 @@ class SessionDashboardScreen extends StatelessWidget {
         previous.profiles != current.profiles ||
         previous.activeProfile != current.activeProfile ||
         previous.profileLoadError != current.profileLoadError ||
+        previous.isResolvingProfile != current.isResolvingProfile ||
         previous.shouldShowChildProfileDialog !=
             current.shouldShowChildProfileDialog;
   }
@@ -42,6 +43,7 @@ class SessionDashboardScreen extends StatelessWidget {
           activeProfile: session.activeProfile,
           activeRole: session.activeRole,
           profileLoadError: session.profileLoadError,
+          isResolvingProfile: session.isResolvingProfile,
           showChildProfileDialogOnStart: session.shouldShowChildProfileDialog,
           onChildProfileDialogShown: sessionCubit.consumeChildProfileDialog,
           onRefreshProfiles: sessionCubit.refreshProfiles,

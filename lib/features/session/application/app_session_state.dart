@@ -28,6 +28,7 @@ class AppSessionState {
     this.profiles = const <StudentProfile>[],
     this.activeProfile,
     this.profileLoadError,
+    this.isResolvingProfile = false,
     this.shouldShowChildProfileDialog = false,
   });
 
@@ -37,6 +38,7 @@ class AppSessionState {
   final List<StudentProfile> profiles;
   final StudentProfile? activeProfile;
   final String? profileLoadError;
+  final bool isResolvingProfile;
   final bool shouldShowChildProfileDialog;
 
   ProfileRole get activeRole {
@@ -55,6 +57,7 @@ class AppSessionState {
     List<StudentProfile>? profiles,
     StudentProfile? activeProfile,
     String? profileLoadError,
+    bool? isResolvingProfile,
     bool? shouldShowChildProfileDialog,
     bool clearUser = false,
     bool clearActiveProfile = false,
@@ -76,6 +79,9 @@ class AppSessionState {
       profileLoadError: clearsSession || clearProfileLoadError
           ? null
           : profileLoadError ?? this.profileLoadError,
+      isResolvingProfile: clearsSession
+          ? false
+          : isResolvingProfile ?? this.isResolvingProfile,
       shouldShowChildProfileDialog: clearsSession
           ? false
           : shouldShowChildProfileDialog ?? this.shouldShowChildProfileDialog,

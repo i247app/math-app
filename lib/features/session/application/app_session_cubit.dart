@@ -62,7 +62,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
         clear();
         return;
       }
-      await establishSession(user: user);
+      await establishSession(user: user, showHomeWhileResolving: false);
     } catch (_) {
       if (!isClosed) {
         clear();
@@ -73,12 +73,17 @@ class AppSessionCubit extends Cubit<AppSessionState> {
   Future<void> establishSession({
     required LoginUser user,
     bool isNewlyRegistered = false,
+    bool showHomeWhileResolving = true,
   }) async {
     if (user.id <= 0) {
       clear();
       return;
     }
-    beginRestore();
+    if (showHomeWhileResolving) {
+      _showAuthenticatedShell(user);
+    } else {
+      beginRestore();
+    }
     final resolution = await _profileResolver.resolveForUserId(user.id);
     if (isClosed) {
       return;
@@ -93,6 +98,22 @@ class AppSessionCubit extends Cubit<AppSessionState> {
       ),
     );
     unawaited(_notificationPingService.ping());
+  }
+
+  void _showAuthenticatedShell(LoginUser user) {
+    final startsNewSession =
+        !state.isAuthenticated || state.user?.id != user.id;
+    if (startsNewSession) {
+      _sessionEpoch++;
+    }
+    emit(
+      AppSessionState(
+        status: SessionStatus.authenticated,
+        sessionEpoch: _sessionEpoch,
+        user: user,
+        isResolvingProfile: true,
+      ),
+    );
   }
 
   Future<void> logout() async {

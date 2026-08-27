@@ -263,9 +263,6 @@ class _AppFlowState extends State<AppFlow> {
                   case PasscodeOutcomeType.sessionReady:
                     final user = outcome.user;
                     if (user != null) {
-                      context
-                          .read<AppCoordinatorCubit>()
-                          .showRestoringSession();
                       await context.read<AppSessionCubit>().establishSession(
                         user: user,
                         isNewlyRegistered: outcome.isNewlyRegistered,

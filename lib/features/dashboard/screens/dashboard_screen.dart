@@ -29,6 +29,7 @@ import 'package:numi/features/dashboard/widgets/dashboard_background.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_bottom_navigation.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_header_bar.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_profile_menu.dart';
+import 'package:numi/features/dashboard/widgets/dashboard_session_skeleton.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
@@ -56,6 +57,7 @@ class DashboardScreen extends StatefulWidget {
     required this.activeProfile,
     required this.activeRole,
     required this.profileLoadError,
+    this.isResolvingProfile = false,
     required this.onRefreshProfiles,
     required this.onActivateProfile,
     required this.onBack,
@@ -80,6 +82,7 @@ class DashboardScreen extends StatefulWidget {
   final StudentProfile? activeProfile;
   final ProfileRole activeRole;
   final String? profileLoadError;
+  final bool isResolvingProfile;
   final Future<void> Function() onRefreshProfiles;
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onBack;
@@ -292,88 +295,97 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: RepaintBoundary(child: DashboardBackground()),
                 ),
                 Positioned.fill(
-                  child: RoleTabHost(
-                    // No ValueKey — profileResetSignal drives selective
-                    // data reload without recreating the widget subtree.
-                    profileResetSignal: profileState.profileResetSignal,
-                    activeTab: navigation.activeTab,
-                    selectionRevision: navigation.selectionRevision,
-                    user: widget.user,
-                    profiles: widget.profiles,
-                    activeProfile: widget.activeProfile,
-                    activeRole: widget.activeRole,
-                    profileLoadError: widget.profileLoadError,
-                    onRefreshProfiles: widget.onRefreshProfiles,
-                    onActivateProfile: widget.onActivateProfile,
-                    initialGrades: profileState.prefetchedGrades,
-                    gradeService:
-                        widget._gradeService ?? context.read<GradeService>(),
-                    classroomService: _classroomService,
-                    assignmentService: _assignmentService,
-                    quizService: _quizService,
-                    onLogout: _handleLogout,
-                    onAddProfileFromPractice: () {
-                      HapticFeedback.selectionClick();
-                      _profileController.requestAddProfile();
-                      setState(() {
-                        _returnToPracticeAfterProfileSave = true;
-                      });
-                      _selectTab(roleTabCubit, 4);
-                    },
-                    onProfileSaved: () {
-                      if (!_returnToPracticeAfterProfileSave) {
-                        return;
-                      }
-                      setState(() {
-                        _returnToPracticeAfterProfileSave = false;
-                      });
-                      _selectTab(roleTabCubit, 3);
-                    },
-                    openAddProfileRequestId:
-                        profileState.openAddProfileRequestId,
-                    onCompleteTeacherProfile: _openTeacherProfileForm,
-                    onOpenClassroomTab: () => _selectTab(
-                      roleTabCubit,
-                      widget.activeRole == ProfileRole.teacher ? 1 : 2,
-                    ),
-                    onOpenPracticeTab: () {
-                      HapticFeedback.lightImpact();
-                      _selectTab(
-                        roleTabCubit,
-                        widget.activeRole == ProfileRole.teacher ? 2 : 3,
-                      );
-                    },
-                    onOpenProfileMenu: () {
-                      if (switchableProfiles.isEmpty || isMenuOpen) {
-                        return;
-                      }
-                      HapticFeedback.selectionClick();
-                      _profileController.openMenu();
-                    },
-                    onParentAssessmentStateChanged: (hasAssessment) {
-                      _updateParentStreak(hasAssessment ? 4 : 1);
-                    },
-                    bottomPadding: navHeight + 14,
-                    hasUnreadNotifications:
-                        _notificationBadgeController.hasUnread ||
-                        hasMissingChildProfileNotice,
-                    onNotificationTap: _openNotifications,
-                    homeHeader: homeHeader,
-                    showChildProfileDialogOnStart:
-                        widget.showChildProfileDialogOnStart,
-                    onSwipeToTab: (index) {
-                      HapticFeedback.selectionClick();
-                      _selectTab(roleTabCubit, index);
-                    },
-                    onSwipePositionChanged: (position) {
-                      _tabSwipePosition.value = position;
-                    },
-                    onSwipeInteractionEnded: () {
-                      _tabSwipePosition.value = null;
-                    },
-                    onChildProfileDialogShown: widget.onChildProfileDialogShown,
-                  ),
+                  child: widget.isResolvingProfile
+                      ? DashboardSessionSkeleton(
+                          topPadding: showHeader ? headerHeight : topInset,
+                          bottomPadding: navHeight + 14,
+                        )
+                      : RoleTabHost(
+                          // No ValueKey — profileResetSignal drives selective
+                          // data reload without recreating the widget subtree.
+                          profileResetSignal: profileState.profileResetSignal,
+                          activeTab: navigation.activeTab,
+                          selectionRevision: navigation.selectionRevision,
+                          user: widget.user,
+                          profiles: widget.profiles,
+                          activeProfile: widget.activeProfile,
+                          activeRole: widget.activeRole,
+                          profileLoadError: widget.profileLoadError,
+                          onRefreshProfiles: widget.onRefreshProfiles,
+                          onActivateProfile: widget.onActivateProfile,
+                          initialGrades: profileState.prefetchedGrades,
+                          gradeService:
+                              widget._gradeService ??
+                              context.read<GradeService>(),
+                          classroomService: _classroomService,
+                          assignmentService: _assignmentService,
+                          quizService: _quizService,
+                          onLogout: _handleLogout,
+                          onAddProfileFromPractice: () {
+                            HapticFeedback.selectionClick();
+                            _profileController.requestAddProfile();
+                            setState(() {
+                              _returnToPracticeAfterProfileSave = true;
+                            });
+                            _selectTab(roleTabCubit, 4);
+                          },
+                          onProfileSaved: () {
+                            if (!_returnToPracticeAfterProfileSave) {
+                              return;
+                            }
+                            setState(() {
+                              _returnToPracticeAfterProfileSave = false;
+                            });
+                            _selectTab(roleTabCubit, 3);
+                          },
+                          openAddProfileRequestId:
+                              profileState.openAddProfileRequestId,
+                          onCompleteTeacherProfile: _openTeacherProfileForm,
+                          onOpenClassroomTab: () => _selectTab(
+                            roleTabCubit,
+                            widget.activeRole == ProfileRole.teacher ? 1 : 2,
+                          ),
+                          onOpenPracticeTab: () {
+                            HapticFeedback.lightImpact();
+                            _selectTab(
+                              roleTabCubit,
+                              widget.activeRole == ProfileRole.teacher ? 2 : 3,
+                            );
+                          },
+                          onOpenProfileMenu: () {
+                            if (switchableProfiles.isEmpty || isMenuOpen) {
+                              return;
+                            }
+                            HapticFeedback.selectionClick();
+                            _profileController.openMenu();
+                          },
+                          onParentAssessmentStateChanged: (hasAssessment) {
+                            _updateParentStreak(hasAssessment ? 4 : 1);
+                          },
+                          bottomPadding: navHeight + 14,
+                          hasUnreadNotifications:
+                              _notificationBadgeController.hasUnread ||
+                              hasMissingChildProfileNotice,
+                          onNotificationTap: _openNotifications,
+                          homeHeader: homeHeader,
+                          showChildProfileDialogOnStart:
+                              widget.showChildProfileDialogOnStart,
+                          onSwipeToTab: (index) {
+                            HapticFeedback.selectionClick();
+                            _selectTab(roleTabCubit, index);
+                          },
+                          onSwipePositionChanged: (position) {
+                            _tabSwipePosition.value = position;
+                          },
+                          onSwipeInteractionEnded: () {
+                            _tabSwipePosition.value = null;
+                          },
+                          onChildProfileDialogShown:
+                              widget.onChildProfileDialogShown,
+                        ),
                 ),
+                if (widget.isResolvingProfile && homeHeader != null)
+                  Positioned(left: 0, right: 0, top: 0, child: homeHeader),
                 if (isMenuOpen)
                   Positioned.fill(
                     child: GestureDetector(
@@ -412,15 +424,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   right: 0,
                   bottom: 0,
                   child: RepaintBoundary(
-                    child: DashboardBottomNavigation(
-                      bottomInset: bottomInset,
-                      activeIndex: navigation.activeTab,
-                      activeRole: widget.activeRole,
-                      user: widget.user,
-                      swipePosition: _tabSwipePosition,
-                      onTabSelected: (index) {
-                        _selectTab(roleTabCubit, index);
-                      },
+                    child: IgnorePointer(
+                      ignoring: widget.isResolvingProfile,
+                      child: DashboardBottomNavigation(
+                        bottomInset: bottomInset,
+                        activeIndex: navigation.activeTab,
+                        activeRole: widget.activeRole,
+                        user: widget.user,
+                        swipePosition: _tabSwipePosition,
+                        onTabSelected: (index) {
+                          _selectTab(roleTabCubit, index);
+                        },
+                      ),
                     ),
                   ),
                 ),
