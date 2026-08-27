@@ -20,6 +20,7 @@ class ProfileCard extends StatelessWidget {
     super.key,
     required this.profile,
     required this.isActive,
+    this.isSwitching = false,
     required this.onSelect,
     required this.onEdit,
     required this.onDelete,
@@ -27,6 +28,7 @@ class ProfileCard extends StatelessWidget {
 
   final StudentProfile profile;
   final bool isActive;
+  final bool isSwitching;
   final VoidCallback onSelect;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -43,7 +45,7 @@ class ProfileCard extends StatelessWidget {
       color: colors.elevatedSurface,
       borderRadius: radius,
       child: InkWell(
-        onTap: onSelect,
+        onTap: isSwitching ? null : onSelect,
         borderRadius: radius,
         child: Container(
           padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
@@ -106,7 +108,10 @@ class ProfileCard extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child: ProfileRadio(isActive: isActive),
+                    child: ProfileRadio(
+                      isActive: isActive,
+                      isLoading: isSwitching,
+                    ),
                   ),
                 ],
               ),

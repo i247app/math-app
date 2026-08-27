@@ -19,6 +19,7 @@ class ParentProfileManagePanel extends StatelessWidget {
     required this.parentProfile,
     required this.children,
     required this.activeProfileId,
+    required this.switchingProfileId,
     required this.user,
     required this.onAdd,
     required this.onSelect,
@@ -30,6 +31,7 @@ class ParentProfileManagePanel extends StatelessWidget {
   final StudentProfile parentProfile;
   final List<StudentProfile> children;
   final int? activeProfileId;
+  final int? switchingProfileId;
   final LoginUser? user;
   final VoidCallback onAdd;
   final ValueChanged<StudentProfile> onSelect;
@@ -62,6 +64,9 @@ class ParentProfileManagePanel extends StatelessWidget {
             isActive:
                 ActiveProfileSession.profileStableId(parentProfile) ==
                 activeProfileId,
+            isSwitching:
+                ActiveProfileSession.profileStableId(parentProfile) ==
+                switchingProfileId,
             onSelect: () => onSelect(parentProfile),
             onEdit: () => onEdit(parentProfile),
           ),
@@ -105,6 +110,9 @@ class ParentProfileManagePanel extends StatelessWidget {
                     isActive:
                         ActiveProfileSession.profileStableId(profile) ==
                         activeProfileId,
+                    isSwitching:
+                        ActiveProfileSession.profileStableId(profile) ==
+                        switchingProfileId,
                     onSelect: () => onSelect(profile),
                     onEdit: () => onEdit(profile),
                     onDelete: () => onDelete(profile),

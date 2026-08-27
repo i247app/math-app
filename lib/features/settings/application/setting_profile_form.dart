@@ -15,7 +15,6 @@ mixin _SettingProfileFormMixin
 
   bool _isLoadingProfileOptions = false;
   bool _isSavingProfile = false;
-  bool _isUpdatingProfile = false;
   bool _suppressProfileDraftTracking = false;
   String? _profileDraftBaseline;
   String? _profileOptionsError;
@@ -411,7 +410,6 @@ mixin _SettingProfileFormMixin
     HapticFeedback.mediumImpact();
     setState(() {
       _isSavingProfile = true;
-      _isUpdatingProfile = isUpdatingProfile;
       _profileCreateError = null;
     });
 
@@ -481,11 +479,7 @@ mixin _SettingProfileFormMixin
       }
 
       if (createdActiveProfile != null) {
-        await _runWithDeferredLoading(
-          action: () => widget.onActivateProfile(createdActiveProfile!),
-          show: () => setState(() => _isSwitchingProfile = true),
-          hide: () => setState(() => _isSwitchingProfile = false),
-        );
+        await widget.onActivateProfile(createdActiveProfile);
         if (!mounted) {
           return;
         }
@@ -498,7 +492,6 @@ mixin _SettingProfileFormMixin
 
       setState(() {
         _isSavingProfile = false;
-        _isUpdatingProfile = false;
         _captureProfileDraftBaseline();
       });
       widget.onProfileSaved?.call();
@@ -511,8 +504,6 @@ mixin _SettingProfileFormMixin
       setState(() {
         _profileCreateError = error.message;
         _isSavingProfile = false;
-        _isUpdatingProfile = false;
-        _isSwitchingProfile = false;
       });
     } catch (_) {
       if (!mounted) {
@@ -524,8 +515,6 @@ mixin _SettingProfileFormMixin
             ? context.readText(AppKeys.profileCreateFailed)
             : context.readText(AppKeys.profileUpdateFailed);
         _isSavingProfile = false;
-        _isUpdatingProfile = false;
-        _isSwitchingProfile = false;
       });
     }
   }

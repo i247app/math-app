@@ -330,7 +330,6 @@ class _SettingTabState extends State<SettingTab>
     }
   }
 
-  @override
   Future<T> _runWithDeferredLoading<T>({
     required Future<T> Function() action,
     required VoidCallback show,
@@ -396,8 +395,7 @@ class _SettingTabState extends State<SettingTab>
       controller: _profileExitController,
       shouldConfirm:
           _view == SettingPageView.addProfile && _isProfileDraftDirty,
-      isExitBlocked:
-          _isSavingProfile || _isSwitchingProfile || _isUpdatingProfile,
+      isExitBlocked: _isSavingProfile,
       confirmExit: showUnsavedChangesExitDialog,
       child: Stack(
         children: [
@@ -465,10 +463,8 @@ class _SettingTabState extends State<SettingTab>
                           activeProfile: widget.activeProfile,
                           user: widget.user,
                           activeProfileId: _activeProfileId,
-                          isLoading:
-                              _isLoadingProfiles ||
-                              _isDeletingProfile ||
-                              _isSettingDefaultProfile,
+                          switchingProfileId: _switchingProfileId,
+                          isLoading: _isLoadingProfiles || _isDeletingProfile,
                           errorMessage: _profileLoadError,
                           onRetry: _loadProfiles,
                           onAdd: _openAddProfile,
@@ -529,16 +525,6 @@ class _SettingTabState extends State<SettingTab>
               ),
             ),
           ),
-          if (_isSwitchingProfile || _isUpdatingProfile)
-            Positioned.fill(
-              child: LoadingScreen(
-                message: context.getText(
-                  _isUpdatingProfile
-                      ? AppKeys.updatingProfile
-                      : AppKeys.switchingProfile,
-                ),
-              ),
-            ),
         ],
       ),
     );

@@ -105,12 +105,7 @@ class AccountDetailsPanel extends StatelessWidget {
                     spacing: 14,
                     children: [
                       SettingsCancelButton(onTap: isSaving ? () {} : onCancel),
-                      Opacity(
-                        opacity: isSaving ? 0.72 : 1,
-                        child: SettingsSaveButton(
-                          onTap: isSaving ? () {} : onSave,
-                        ),
-                      ),
+                      SettingsSaveButton(isLoading: isSaving, onTap: onSave),
                     ],
                   ),
                 ),

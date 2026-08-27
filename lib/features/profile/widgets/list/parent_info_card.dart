@@ -20,6 +20,7 @@ class ParentInfoCard extends StatelessWidget {
     required this.profile,
     required this.user,
     required this.isActive,
+    this.isSwitching = false,
     required this.onSelect,
     required this.onEdit,
   });
@@ -27,6 +28,7 @@ class ParentInfoCard extends StatelessWidget {
   final StudentProfile profile;
   final LoginUser? user;
   final bool isActive;
+  final bool isSwitching;
   final VoidCallback onSelect;
   final VoidCallback onEdit;
 
@@ -36,7 +38,7 @@ class ParentInfoCard extends StatelessWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: onSelect,
+      onTap: isSwitching ? null : onSelect,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -90,7 +92,7 @@ class ParentInfoCard extends StatelessWidget {
                           height: 19,
                         ),
                       ),
-                      ProfileRadio(isActive: isActive),
+                      ProfileRadio(isActive: isActive, isLoading: isSwitching),
                     ],
                   ),
                   Padding(

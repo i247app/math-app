@@ -19,6 +19,7 @@ class ProfilePlaceholderPanel extends StatelessWidget {
     required this.activeProfile,
     required this.user,
     required this.activeProfileId,
+    required this.switchingProfileId,
     required this.isLoading,
     required this.errorMessage,
     required this.onRetry,
@@ -33,6 +34,7 @@ class ProfilePlaceholderPanel extends StatelessWidget {
   final StudentProfile? activeProfile;
   final LoginUser? user;
   final int? activeProfileId;
+  final int? switchingProfileId;
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback onRetry;
@@ -85,6 +87,7 @@ class ProfilePlaceholderPanel extends StatelessWidget {
         parentProfile: parentProfile,
         children: _studentProfiles,
         activeProfileId: activeProfileId,
+        switchingProfileId: switchingProfileId,
         user: user,
         canAddProfile: canAddProfile,
         onAdd: onAdd,
@@ -114,6 +117,9 @@ class ProfilePlaceholderPanel extends StatelessWidget {
                   isActive:
                       ActiveProfileSession.profileStableId(profile) ==
                       activeProfileId,
+                  isSwitching:
+                      ActiveProfileSession.profileStableId(profile) ==
+                      switchingProfileId,
                   onSelect: () => onSelect(profile),
                   onEdit: () => onEdit(profile),
                   onDelete: () => onDelete(profile),

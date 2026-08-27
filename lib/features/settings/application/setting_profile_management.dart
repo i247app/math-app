@@ -9,7 +9,7 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
   bool _isLoadingProfiles = false;
   bool _isDeletingProfile = false;
   bool _isSettingDefaultProfile = false;
-  bool _isSwitchingProfile = false;
+  int? _switchingProfileId;
   String? _profileLoadError;
   List<StudentProfile> _profiles = const <StudentProfile>[];
   int? _localActiveProfileId;
@@ -20,12 +20,6 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
     SettingPageView view, {
     StudentProfile? editingProfile,
     bool openAddProfileOnStart = false,
-  });
-
-  Future<T> _runWithDeferredLoading<T>({
-    required Future<T> Function() action,
-    required VoidCallback show,
-    required VoidCallback hide,
   });
 
   void _initializeProfileManagementState() {
@@ -186,14 +180,11 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
     HapticFeedback.selectionClick();
     setState(() {
       _isSettingDefaultProfile = true;
+      _switchingProfileId = profileId;
     });
 
     try {
-      await _runWithDeferredLoading(
-        action: () => widget.onActivateProfile(selectedProfile),
-        show: () => setState(() => _isSwitchingProfile = true),
-        hide: () => setState(() => _isSwitchingProfile = false),
-      );
+      await widget.onActivateProfile(selectedProfile);
       if (!mounted) {
         return;
       }
@@ -207,7 +198,7 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
       if (mounted) {
         setState(() {
           _isSettingDefaultProfile = false;
-          _isSwitchingProfile = false;
+          _switchingProfileId = null;
         });
       }
     }

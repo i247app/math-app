@@ -13,53 +13,66 @@ class SettingsSaveButton extends StatelessWidget {
     super.key,
     required this.onTap,
     this.enabled = true,
+    this.isLoading = false,
   });
 
   final VoidCallback onTap;
   final bool enabled;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final backgroundColor = enabled
+    final usesActiveStyle = enabled || isLoading;
+    final backgroundColor = usesActiveStyle
         ? colors.brandStrong
         : colors.disabledBackground;
-    final foregroundColor = enabled
+    final foregroundColor = usesActiveStyle
         ? colors.onBrand
         : colors.disabledForeground;
 
     return Material(
       color: backgroundColor,
-      elevation: enabled ? 9 : 0,
-      shadowColor: colors.shadow.withValues(alpha: enabled ? 0.30 : 0),
+      elevation: usesActiveStyle ? 9 : 0,
+      shadowColor: colors.shadow.withValues(alpha: usesActiveStyle ? 0.30 : 0),
       borderRadius: BorderRadius.circular(AppRadius.full),
       child: InkWell(
-        onTap: enabled ? onTap : null,
+        onTap: enabled && !isLoading ? onTap : null,
         borderRadius: BorderRadius.circular(AppRadius.full),
         child: SizedBox(
           width: 142,
           height: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: AppSpacing.s10,
-            children: [
-              Text(
-                context.getText(AppKeys.save),
-                style: GoogleFonts.andika(
-                  color: foregroundColor,
-                  fontSize: FontSize.large,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  letterSpacing: 0,
+          child: isLoading
+              ? Center(
+                  child: SizedBox.square(
+                    dimension: 24,
+                    child: CircularProgressIndicator(
+                      color: foregroundColor,
+                      strokeWidth: 2.8,
+                    ),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: AppSpacing.s10,
+                  children: [
+                    Text(
+                      context.getText(AppKeys.save),
+                      style: GoogleFonts.andika(
+                        color: foregroundColor,
+                        fontSize: FontSize.large,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      color: foregroundColor,
+                      size: 24,
+                    ),
+                  ],
                 ),
-              ),
-              Icon(
-                Icons.arrow_forward_rounded,
-                color: foregroundColor,
-                size: 24,
-              ),
-            ],
-          ),
         ),
       ),
     );

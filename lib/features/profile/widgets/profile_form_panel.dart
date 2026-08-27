@@ -228,9 +228,10 @@ class AddProfilePanel extends StatelessWidget {
             spacing: 14,
             children: [
               SettingsCancelButton(onTap: isSaving ? () {} : onCancel),
-              Opacity(
-                opacity: isSaving ? 0.72 : 1,
-                child: SettingsSaveButton(enabled: canSave, onTap: onSave),
+              SettingsSaveButton(
+                enabled: canSave,
+                isLoading: isSaving,
+                onTap: onSave,
               ),
             ],
           ),
