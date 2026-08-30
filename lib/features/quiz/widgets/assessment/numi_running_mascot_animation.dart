@@ -2,11 +2,13 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-/// A pure native Flutter vector-rigged animation of Numi running sideways (run cycle).
+/// Native Flutter cutout-rig animation of Numi running sideways.
 ///
-/// Models the 12-frame running sprite sequence mathematically using 60/120 FPS
-/// procedural canvas rendering with:
+/// The branded body, glasses, eye, and wing pixels are sampled from the
+/// original mascot asset, while the 12-frame reference is modeled as a smooth
+/// procedural run cycle with:
 /// - 2-step harmonic leg kinematics with stride, push-off, and recovery phases.
 /// - Dynamic vertical body bounce, squash & stretch, and forward lean.
 /// - Wing/arm pumping and trailing feather deformation.
@@ -48,7 +50,10 @@ class NumiRunningMascotAnimation extends StatefulWidget {
 
 class _NumiRunningMascotAnimationState extends State<NumiRunningMascotAnimation>
     with SingleTickerProviderStateMixin {
+  static const _sourceAsset = 'assets/images/numi-mascot.png';
+
   late final AnimationController _controller;
+  ui.Image? _atlas;
 
   @override
   void initState() {
@@ -60,6 +65,19 @@ class _NumiRunningMascotAnimationState extends State<NumiRunningMascotAnimation>
     if (widget.isRunning) {
       _controller.repeat();
     }
+    _loadAtlas();
+  }
+
+  Future<void> _loadAtlas() async {
+    final data = await rootBundle.load(_sourceAsset);
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    final frame = await codec.getNextFrame();
+    codec.dispose();
+    if (!mounted) {
+      frame.image.dispose();
+      return;
+    }
+    setState(() => _atlas = frame.image);
   }
 
   @override
@@ -94,6 +112,7 @@ class _NumiRunningMascotAnimationState extends State<NumiRunningMascotAnimation>
   @override
   void dispose() {
     _controller.dispose();
+    _atlas?.dispose();
     super.dispose();
   }
 
@@ -109,8 +128,18 @@ class _NumiRunningMascotAnimationState extends State<NumiRunningMascotAnimation>
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, _) {
+              final atlas = _atlas;
+              if (atlas == null) {
+                return Image.asset(
+                  _sourceAsset,
+                  key: const ValueKey('numi-running-loading-fallback'),
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                );
+              }
               return CustomPaint(
                 painter: _NumiRunningPainter(
+                  atlas: atlas,
                   progress: _controller.value,
                   showSpeedLines: widget.showSpeedLines,
                   showShadow: widget.showShadow,
@@ -127,11 +156,13 @@ class _NumiRunningMascotAnimationState extends State<NumiRunningMascotAnimation>
 /// Canvas painter responsible for drawing all vector layers of Numi running.
 class _NumiRunningPainter extends CustomPainter {
   const _NumiRunningPainter({
+    required this.atlas,
     required this.progress,
     required this.showSpeedLines,
     required this.showShadow,
   });
 
+  final ui.Image atlas;
   final double progress;
   final bool showSpeedLines;
   final bool showShadow;
@@ -193,7 +224,6 @@ class _NumiRunningPainter extends CustomPainter {
 
     _drawBody(canvas);
     _drawOrangeVisor(canvas);
-    _drawEye(canvas, pose);
     _drawBeak(canvas);
 
     canvas.restore();
@@ -235,106 +265,112 @@ class _NumiRunningPainter extends CustomPainter {
   }
 
   void _drawBody(Canvas canvas) {
-    const bodyCenter = Offset(215, 175);
-    const bodyRadius = 74.0;
-
-    // Body base spherical gradient
-    final bodyPaint = Paint()
-      ..shader = ui.Gradient.radial(
-        const Offset(185, 140),
-        bodyRadius * 1.35,
-        const [
-          Color(0xFF14C8CA), // Bright teal highlight
-          Color(0xFF0AAEB0), // Mid vibrant teal
-          Color(0xFF007A80), // Deep teal
-          Color(0xFF00565B), // Shadow rim
-        ],
-        const [0.0, 0.4, 0.8, 1.0],
+    final body = Path()
+      ..addOval(
+        Rect.fromCenter(
+          center: const Offset(213, 176),
+          width: 158,
+          height: 151,
+        ),
       );
 
-    canvas.drawCircle(bodyCenter, bodyRadius, bodyPaint);
+    // Keep the official mascot's shaded material instead of approximating it
+    // with a hand-authored radial gradient.
+    _drawAtlasCutout(
+      canvas,
+      mask: body,
+      source: const Rect.fromLTWH(190, 600, 620, 210),
+      destination: const Rect.fromLTWH(133, 100, 160, 154),
+    );
   }
 
   void _drawOrangeVisor(Canvas canvas) {
-    // Distinct orange mask on front-right profile
+    // Mirror the original right glasses half into Numi's running side profile.
     final visorPath = Path()
-      ..moveTo(242, 70) // Top crest / horn point
-      ..cubicTo(260, 110, 282, 132, 290, 148) // Upper curve towards beak
-      ..cubicTo(282, 185, 252, 218, 218, 222) // Bottom curve
-      ..cubicTo(210, 205, 212, 160, 224, 120) // Inner body edge
-      ..cubicTo(230, 95, 236, 80, 242, 70)
+      ..moveTo(224, 82)
+      ..lineTo(251, 70)
+      ..lineTo(301, 157)
+      ..lineTo(221, 207)
       ..close();
 
-    final visorPaint = Paint()
-      ..shader = ui.Gradient.linear(
-        const Offset(220, 70),
-        const Offset(290, 220),
-        const [
-          Color(0xFFFF7A3D),
-          Color(0xFFFF521D),
-          Color(0xFFDE3E0E),
-        ],
-        const [0.0, 0.6, 1.0],
-      );
-
-    canvas.drawPath(visorPath, visorPaint);
-  }
-
-  void _drawEye(Canvas canvas, _RunningPose pose) {
-    const eyeCenter = Offset(262, 150);
-    const eyeRadius = 24.0;
-
-    // White sclera
-    canvas.drawCircle(
-      eyeCenter,
-      eyeRadius,
-      Paint()..color = Colors.white,
-    );
-
-    // Dark pupil looking forward (slightly right)
-    final pupilOffset = eyeCenter + const Offset(5, 0);
-    const pupilRadius = 12.0;
-
-    canvas.drawCircle(
-      pupilOffset,
-      pupilRadius,
-      Paint()..color = const Color(0xFF1E2B2B),
-    );
-
-    // Specular highlight sparkle
-    canvas.drawCircle(
-      pupilOffset + const Offset(3.5, -3.5),
-      4.0,
-      Paint()..color = Colors.white,
-    );
-    canvas.drawCircle(
-      pupilOffset + const Offset(-4, 3.5),
-      1.8,
-      Paint()..color = Colors.white.withValues(alpha: 0.85),
+    _drawAtlasCutout(
+      canvas,
+      mask: visorPath,
+      source: const Rect.fromLTWH(500, 130, 410, 500),
+      destination: const Rect.fromLTWH(216, 69, 91, 151),
+      mirrorX: true,
     );
   }
 
   void _drawBeak(Canvas canvas) {
-    // Sharp amber diamond / triangle beak pointing right
-    final beakPath = Path()
-      ..moveTo(284, 145)
-      ..lineTo(312, 160) // Beak tip
-      ..lineTo(280, 175)
+    final upper = Path()
+      ..moveTo(292, 145)
+      ..lineTo(316, 160)
+      ..lineTo(289, 163)
+      ..close();
+    final lower = Path()
+      ..moveTo(289, 163)
+      ..lineTo(316, 160)
+      ..lineTo(296, 177)
       ..close();
 
-    final beakPaint = Paint()
-      ..shader = ui.Gradient.linear(
-        const Offset(280, 145),
-        const Offset(312, 175),
-        const [
-          Color(0xFFFFB300),
-          Color(0xFFFF8F00),
-          Color(0xFFE65100),
-        ],
-        const [0.0, 0.65, 1.0],
+    canvas
+      ..drawPath(
+        upper,
+        Paint()
+          ..shader = ui.Gradient.linear(
+            const Offset(291, 145),
+            const Offset(315, 164),
+            const [Color(0xFFFFC542), Color(0xFFFF9F05)],
+          ),
+      )
+      ..drawPath(
+        lower,
+        Paint()
+          ..shader = ui.Gradient.linear(
+            const Offset(289, 161),
+            const Offset(307, 177),
+            const [Color(0xFFFFA514), Color(0xFFE77B00)],
+          ),
       );
+  }
 
-    canvas.drawPath(beakPath, beakPaint);
+  Rect _atlasSource(Rect normalized) {
+    final scaleX = atlas.width / 1000;
+    final scaleY = atlas.height / 1000;
+    return Rect.fromLTRB(
+      normalized.left * scaleX,
+      normalized.top * scaleY,
+      normalized.right * scaleX,
+      normalized.bottom * scaleY,
+    );
+  }
+
+  void _drawAtlasCutout(
+    Canvas canvas, {
+    required Path mask,
+    required Rect source,
+    required Rect destination,
+    bool mirrorX = false,
+    double opacity = 1,
+  }) {
+    canvas
+      ..save()
+      ..clipPath(mask);
+    if (mirrorX) {
+      canvas
+        ..translate(destination.left + destination.right, 0)
+        ..scale(-1, 1);
+    }
+    canvas.drawImageRect(
+      atlas,
+      _atlasSource(source),
+      destination,
+      Paint()
+        ..color = Colors.white.withValues(alpha: opacity.clamp(0, 1))
+        ..filterQuality = FilterQuality.high,
+    );
+    canvas.restore();
   }
 
   void _drawNearWing(Canvas canvas, _RunningPose pose) {
@@ -369,19 +405,15 @@ class _NumiRunningPainter extends CustomPainter {
         ..close();
     }
 
-    final wingPaint = Paint()
-      ..shader = ui.Gradient.linear(
-        const Offset(180, 160),
-        const Offset(100, 225),
-        const [
-          Color(0xFF14C8CA),
-          Color(0xFF0AAEB0),
-          Color(0xFF007075),
-        ],
-        const [0.0, 0.5, 1.0],
-      );
-
-    canvas.drawPath(wingPath, wingPaint);
+    _drawAtlasCutout(
+      canvas,
+      mask: wingPath,
+      source: const Rect.fromLTWH(135, 565, 180, 225),
+      destination: wing.isPumpingForward
+          ? const Rect.fromLTWH(158, 150, 98, 78)
+          : const Rect.fromLTWH(82, 151, 112, 88),
+      mirrorX: wing.isPumpingForward,
+    );
     canvas.restore();
   }
 
@@ -402,12 +434,13 @@ class _NumiRunningPainter extends CustomPainter {
       ..cubicTo(230, 172, 222, 162, 225, 155)
       ..close();
 
-    final farWingPaint = Paint()
-      ..color = const Color(0xFF006B70).withValues(
-        alpha: pose.farWingVisibility.clamp(0.0, 1.0),
-      );
-
-    canvas.drawPath(farWingPath, farWingPaint);
+    _drawAtlasCutout(
+      canvas,
+      mask: farWingPath,
+      source: const Rect.fromLTWH(685, 565, 180, 225),
+      destination: const Rect.fromLTWH(218, 143, 74, 48),
+      opacity: pose.farWingVisibility,
+    );
     canvas.restore();
   }
 
@@ -417,26 +450,31 @@ class _NumiRunningPainter extends CustomPainter {
     required bool isFarLeg,
     required Offset bodyOffset,
   }) {
-    final hip = (isFarLeg ? const Offset(195, 230) : const Offset(228, 238)) +
+    final hip =
+        (isFarLeg ? const Offset(195, 230) : const Offset(228, 238)) +
         bodyOffset;
 
     const thighLength = 28.0;
     const shinLength = 26.0;
 
     // Forward kinematics: Hip -> Knee -> Ankle -> Toe
-    final knee = hip +
+    final knee =
+        hip +
         Offset(
           math.sin(leg.thighAngle) * thighLength,
           math.cos(leg.thighAngle) * thighLength,
         );
 
-    final ankle = knee +
+    final ankle =
+        knee +
         Offset(
           math.sin(leg.thighAngle + leg.kneeBend) * shinLength,
           math.cos(leg.thighAngle + leg.kneeBend) * shinLength,
         );
 
-    final legColor = isFarLeg ? const Color(0xFF00565A) : const Color(0xFF007B80);
+    final legColor = isFarLeg
+        ? const Color(0xFF00565A)
+        : const Color(0xFF007B80);
 
     final legStrokePaint = Paint()
       ..color = legColor
@@ -502,6 +540,7 @@ class _NumiRunningPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _NumiRunningPainter oldDelegate) =>
+      oldDelegate.atlas != atlas ||
       oldDelegate.progress != progress ||
       oldDelegate.showSpeedLines != showSpeedLines ||
       oldDelegate.showShadow != showShadow;
@@ -522,10 +561,7 @@ class _LegPose {
 }
 
 class _WingPose {
-  const _WingPose({
-    required this.angle,
-    required this.isPumpingForward,
-  });
+  const _WingPose({required this.angle, required this.isPumpingForward});
 
   final double angle;
   final bool isPumpingForward;
@@ -564,7 +600,8 @@ class _RunningPose {
     // Body vertical bounce (Double bounce per full run cycle)
     // Lowest point at foot-strike, highest point at flight peak
     final double bounceSin = math.sin(bouncePhase);
-    final double bodyBounceY = -14.0 * (bounceSin > 0 ? bounceSin : 0.0) +
+    final double bodyBounceY =
+        -14.0 * (bounceSin > 0 ? bounceSin : 0.0) +
         3.0 * (bounceSin < 0 ? -bounceSin : 0.0);
 
     final double altitude = (bodyBounceY.abs() / 14.0).clamp(0.0, 1.0);
@@ -647,10 +684,7 @@ class _RunningPose {
         ? math.sin(p * math.pi * 4.0) * 0.18
         : -0.15 + (math.sin(p * math.pi * 2.0) * 0.32);
 
-    return _WingPose(
-      angle: angle,
-      isPumpingForward: isPumping,
-    );
+    return _WingPose(angle: angle, isPumpingForward: isPumping);
   }
 
   static double _lerp(double a, double b, double t) => a + (b - a) * t;
