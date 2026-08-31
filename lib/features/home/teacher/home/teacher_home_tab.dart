@@ -16,9 +16,10 @@ import 'package:numi/features/classroom/presentation/screens/teacher_class_detai
 import 'package:numi/features/classroom/presentation/screens/teacher_create_class_screen.dart';
 import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
-import 'package:numi/features/home/data/home_api.dart';
+import 'package:numi/features/home/application/contracts/home_layout_service.dart';
+import 'package:numi/features/home/errors/home_layout_exception.dart';
 import 'package:numi/features/home/teacher/data/cache/teacher_home_snapshot.dart';
-import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/notifications/navigation/notification_route.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';

@@ -1,5 +1,5 @@
 import 'package:numi/features/notifications/data/dto/notification_models.dart';
-import 'package:numi/features/notifications/data/notification_api.dart';
+import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
 
 class NotificationCache {
   NotificationCache._();

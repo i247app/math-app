@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 
 bool isCompletedAssessment(GeneratedQuiz quiz) {
   final purpose = (quiz.purpose ?? quiz.type ?? '').trim().toUpperCase();

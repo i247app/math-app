@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/quiz/presentation/screens/assessment_screen.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';

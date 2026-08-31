@@ -5,7 +5,7 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/profile/data/dto/grade_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/games/presentation/games_tab.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/application/contracts/grade_service.dart';
 
 class _UnusedGradeService implements GradeService {
   @override

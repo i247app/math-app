@@ -6,13 +6,14 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
-import 'package:numi/features/home/data/home_api.dart';
+import 'package:numi/features/home/application/contracts/home_layout_service.dart';
+import 'package:numi/features/home/data/dto/home_layout_models.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 import 'package:numi/features/profile/data/dto/grade_models.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 
 void main() {
   testWidgets('parent home refreshes assessments in the background on entry', (

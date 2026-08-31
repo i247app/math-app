@@ -3,10 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/notifications/notification_service.dart';
-
-abstract class NotificationPingService {
-  Future<void> ping();
-}
+import 'package:numi/features/notifications/application/contracts/notification_ping_service.dart';
 
 class ApiNotificationPingService implements NotificationPingService {
   ApiNotificationPingService({

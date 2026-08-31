@@ -6,7 +6,7 @@ import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 import 'package:numi/features/classroom/data/dto/classroom_models.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/home/data/home_api.dart';
+import 'package:numi/features/home/data/dto/home_layout_models.dart';
 import 'package:numi/features/home/data/home_layout_mappers.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
 

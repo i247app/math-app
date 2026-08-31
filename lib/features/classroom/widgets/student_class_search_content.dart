@@ -16,7 +16,7 @@ import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/data/cache/student_class_search_filter_cache.dart';
-import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';
 import 'package:numi/features/classroom/helpers/student_class_search_helpers.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_class_card.dart';
@@ -25,8 +25,8 @@ import 'package:numi/features/classroom/widgets/student_search/student_join_retr
 import 'package:numi/features/classroom/widgets/student_search/student_join_search_field.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_school_filter_bottom_sheet.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_join_state_card.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
-import 'package:numi/features/profile/data/school_api.dart';
+import 'package:numi/features/profile/application/contracts/grade_service.dart';
+import 'package:numi/features/profile/application/contracts/school_service.dart';
 
 class StudentClassSearchContent extends StatefulWidget {
   const StudentClassSearchContent({

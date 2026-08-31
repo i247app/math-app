@@ -1,6 +1,6 @@
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
-import 'package:numi/features/home/data/home_api.dart';
+import 'package:numi/features/home/data/dto/home_layout_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
 

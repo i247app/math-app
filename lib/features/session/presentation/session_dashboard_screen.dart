@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/dashboard/screens/dashboard_screen.dart';
-import 'package:numi/features/homework/data/homework_api.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
+import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/session/application/app_session_cubit.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 

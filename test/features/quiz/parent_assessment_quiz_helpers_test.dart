@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
 
 void main() {

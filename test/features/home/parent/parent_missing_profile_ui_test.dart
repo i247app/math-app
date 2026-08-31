@@ -7,9 +7,9 @@ import 'package:numi/features/classroom/widgets/parent_room/parent_room_select_s
 import 'package:numi/features/classroom/presentation/tabs/parent_room_tab.dart';
 import 'package:numi/features/home/parent/home/parent_home_tab.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
-import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/profile/application/contracts/grade_service.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
+import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 

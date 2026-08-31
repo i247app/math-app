@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/notifications/data/notification_ping_service.dart';
+import 'package:numi/features/notifications/application/contracts/notification_ping_service.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';

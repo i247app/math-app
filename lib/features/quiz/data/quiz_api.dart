@@ -1,49 +1,9 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/errors/quiz_exception.dart';
-
-const quizPurposeAssessment = 'ASSESSMENT';
-const quizPurposePractice = 'PRACTICE';
-const quizTypeGeneral = 'GENERAL';
-const quizTypeReinforcement = 'REINFORCEMENT';
-const assessmentQuizType = quizPurposeAssessment;
-
-abstract class QuizService {
-  Future<GeneratedQuiz> generateAssessmentQuiz({
-    String purpose = quizPurposeAssessment,
-    String typeOfQuiz = quizTypeGeneral,
-    String? gradeLabel,
-    int? previousQuizId,
-    List<String>? chapters,
-    int? profileId,
-  });
-
-  Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId});
-
-  Future<QuizListResponse> listQuizPage({
-    int? userId,
-    int? profileId,
-    required int page,
-    required int size,
-    bool takeAll = false,
-  });
-
-  Future<QuizProgressResponse> getQuizProgress({
-    required int profileId,
-    required DateTime fromDt,
-    required DateTime toDt,
-  });
-
-  Future<GeneratedQuiz> submitQuiz({
-    required int quizId,
-    required List<SubmitQuizAnswer> answers,
-    int? profileId,
-  });
-
-  Future<GeneratedQuiz> getQuizDetail(int quizId);
-}
 
 class QuizApi implements QuizService {
   QuizApi({String? baseUrl, NetworkClient? networkClient})

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/home/data/home_api.dart';
+import 'package:numi/features/home/data/dto/home_layout_models.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_status_icon.dart';

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:numi/features/notifications/data/dto/notification_models.dart';
 import 'package:numi/features/notifications/application/notification_state.dart';
 import 'package:numi/features/notifications/data/cache/notification_cache.dart';
-import 'package:numi/features/notifications/data/notification_api.dart';
+import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
 import 'package:numi/features/notifications/errors/notification_list_exception.dart';
 
 class NotificationController extends ChangeNotifier {

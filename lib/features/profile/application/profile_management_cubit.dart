@@ -6,9 +6,9 @@ import 'package:numi/features/profile/data/dto/school_models.dart';
 import 'package:numi/features/profile/data/dto/semester_models.dart';
 import 'package:numi/features/profile/application/profile_management_state.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
-import 'package:numi/features/profile/data/profile_api.dart';
-import 'package:numi/features/profile/data/school_api.dart';
+import 'package:numi/features/profile/application/contracts/grade_service.dart';
+import 'package:numi/features/profile/application/contracts/profile_service.dart';
+import 'package:numi/features/profile/application/contracts/school_service.dart';
 
 class ProfileManagementCubit extends Cubit<ProfileManagementState> {
   ProfileManagementCubit({

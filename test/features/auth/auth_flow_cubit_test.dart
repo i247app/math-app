@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/auth/application/auth_cubit.dart';
 import 'package:numi/features/auth/application/auth_state.dart';
-import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/auth/models/signup_form_data.dart';
 import 'package:numi/features/auth/models/signup_gender.dart';

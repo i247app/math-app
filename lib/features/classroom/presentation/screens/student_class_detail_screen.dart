@@ -15,7 +15,7 @@ import 'package:numi/features/classroom/widgets/student_detail/student_class_lea
 import 'package:numi/features/classroom/widgets/student_detail/student_class_teacher_profile_card.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_top_bar.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_upcoming_deadline_section.dart';
-import 'package:numi/features/homework/data/homework_api.dart';
+import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 
 class StudentClassDetailScreen extends StatefulWidget {

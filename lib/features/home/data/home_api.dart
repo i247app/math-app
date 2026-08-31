@@ -1,21 +1,9 @@
+import 'package:numi/features/home/application/contracts/home_layout_service.dart';
 import 'package:numi/features/home/data/dto/home_layout_models.dart';
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/home/errors/home_layout_exception.dart';
 
 export 'package:numi/features/home/data/dto/home_layout_models.dart';
-
-class HomeLayoutException implements Exception {
-  const HomeLayoutException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
-
-abstract class HomeLayoutService {
-  Future<HomeLayout> getLayout({required int profileId});
-}
 
 class HomeLayoutApi implements HomeLayoutService {
   HomeLayoutApi({String? baseUrl, NetworkClient? networkClient})

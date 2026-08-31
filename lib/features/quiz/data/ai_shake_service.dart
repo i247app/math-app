@@ -1,8 +1,5 @@
 import 'package:numi/core/network/network_client.dart';
-
-abstract class QuizShakeService {
-  Future<void> aiShake();
-}
+import 'package:numi/features/quiz/application/contracts/quiz_shake_service.dart';
 
 class AIShakeService implements QuizShakeService {
   AIShakeService({

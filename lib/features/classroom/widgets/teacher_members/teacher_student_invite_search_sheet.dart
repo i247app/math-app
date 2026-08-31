@@ -8,7 +8,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/application/contracts/profile_service.dart';
 import 'package:numi/features/profile/data/profile_exception.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_send_invite_button.dart';
@@ -179,10 +179,12 @@ class _TeacherStudentInviteSearchSheetState
                   ),
                   clearIconColor: colors.textSecondary,
                   clearIconSize: 24,
-                  textStyle: Theme.of(context).textTheme.bodyLarge
-                      ?.copyWith(color: colors.textPrimary),
-                  hintStyle: Theme.of(context).textTheme.bodyLarge
-                      ?.copyWith(color: colors.inputHint),
+                  textStyle: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
+                  hintStyle: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: colors.inputHint),
                 ),
               ),
               Padding(

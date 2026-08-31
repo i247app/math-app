@@ -4,7 +4,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/errors/quiz_exception.dart';
 
 enum AssessmentRetryAction { generate, submit }

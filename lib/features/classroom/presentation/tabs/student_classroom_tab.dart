@@ -10,7 +10,7 @@ import 'package:numi/features/auth/data/auth_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
-import 'package:numi/features/classroom/data/classroom_api.dart';
+import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/classroom/presentation/screens/student_class_detail_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';

@@ -1,19 +1,7 @@
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/profile/application/contracts/school_service.dart';
 import 'package:numi/features/profile/data/dto/school_models.dart';
-
-class SchoolException implements Exception {
-  const SchoolException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
-
-abstract class SchoolService {
-  Future<List<SchoolModel>> listSchools();
-}
+import 'package:numi/features/profile/errors/school_exception.dart';
 
 class SchoolApi implements SchoolService {
   SchoolApi({String? baseUrl, NetworkClient? networkClient})

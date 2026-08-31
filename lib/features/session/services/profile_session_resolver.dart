@@ -2,7 +2,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/profile/data/profile_api.dart';
+import 'package:numi/features/profile/application/contracts/profile_service.dart';
 import 'package:numi/features/profile/data/profile_exception.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
 

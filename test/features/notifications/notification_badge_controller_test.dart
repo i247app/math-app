@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/notifications/data/dto/notification_models.dart';
 import 'package:numi/features/notifications/application/notification_badge_controller.dart';
 import 'package:numi/features/notifications/data/cache/notification_cache.dart';
-import 'package:numi/features/notifications/data/notification_api.dart';
+import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
 
 void main() {
   setUp(NotificationCache.invalidate);

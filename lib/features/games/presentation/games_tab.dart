@@ -11,7 +11,8 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/games/monster_rescue/monster_rescue_data.dart';
 import 'package:numi/features/games/presentation/monster_rescue_stage_screen.dart';
 import 'package:numi/features/games/presentation/numi_farm_stage_screen.dart';
-import 'package:numi/features/profile/data/grade_api.dart';
+import 'package:numi/features/profile/application/contracts/grade_service.dart';
+import 'package:numi/features/profile/errors/grade_exception.dart';
 import 'package:numi/features/practice/practice_catalog.dart';
 import 'package:numi/features/practice/presentation/practice_chapter_screen.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
@@ -193,8 +194,9 @@ class _GamesTabState extends State<GamesTab> {
       final stageScreen = lesson.number <= 2
           ? NumiFarmHarvestStageScreen(stage: lesson.number)
           : NumiFarmChoiceStageScreen(stage: lesson.number);
-      final completed = await Navigator.of(context)
-          .push<bool>(MaterialPageRoute<bool>(builder: (_) => stageScreen));
+      final completed = await Navigator.of(
+        context,
+      ).push<bool>(MaterialPageRoute<bool>(builder: (_) => stageScreen));
       if (completed == true &&
           mounted &&
           _farmCompletedStages < lesson.number) {

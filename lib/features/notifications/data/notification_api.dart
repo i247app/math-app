@@ -1,10 +1,7 @@
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
 import 'package:numi/features/notifications/data/dto/notification_models.dart';
 import 'package:numi/features/notifications/errors/notification_list_exception.dart';
-
-abstract class NotificationListService {
-  Future<List<NotificationModel>> listNotifications();
-}
 
 class NotificationApi implements NotificationListService {
   NotificationApi({String? baseUrl, NetworkClient? networkClient})

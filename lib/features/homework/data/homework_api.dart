@@ -1,50 +1,7 @@
+import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
-
-abstract class ClassroomExerciseService {
-  Future<List<ClassroomExercise>> listExercises({
-    required int classroomId,
-    required int profileId,
-    String? search,
-    String? visibility,
-    String? submissionStatus,
-    String? purpose,
-  });
-
-  Future<ClassroomExercise?> createExercise({
-    required int profileId,
-    required int classroomId,
-    required int programId,
-    required String title,
-    required String description,
-    required int numQuestions,
-    required String chapterName,
-    required String lessonName,
-    required String visibility,
-    required String startDate,
-    required String endDate,
-    String purpose = classroomExercisePurposeHomework,
-  });
-
-  Future<ClassroomExercise?> getExerciseDetail({
-    required int exerciseId,
-    required int profileId,
-  });
-
-  Future<ClassroomExercise?> updateExerciseVisibility({
-    required int profileId,
-    required int classroomExerciseId,
-    required String visibility,
-    String purpose = classroomExercisePurposeHomework,
-  });
-
-  Future<ClassroomExerciseSubmissionResponse> submitExercise({
-    required int profileId,
-    required int classroomExerciseId,
-    required List<SubmitClassroomExerciseAnswer> answers,
-  });
-}
 
 class ClassroomExerciseApi implements ClassroomExerciseService {
   ClassroomExerciseApi({String? baseUrl, NetworkClient? networkClient})

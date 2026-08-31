@@ -1,21 +1,9 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/profile/data/dto/grade_models.dart';
-
-class GradeException implements Exception {
-  const GradeException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
-
-abstract class GradeService {
-  Future<List<GradeModel>> listGrades({required int userId});
-}
+import 'package:numi/features/profile/errors/grade_exception.dart';
 
 class GradeApi implements GradeService {
   GradeApi({String? baseUrl, NetworkClient? networkClient})

@@ -6,7 +6,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/application/assessment_controller.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/presentation/screens/assessment_result_screen.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_answer_grid.dart';
 import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_bar.dart';

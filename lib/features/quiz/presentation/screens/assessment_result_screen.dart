@@ -10,7 +10,7 @@ import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/errors/quiz_exception.dart';
 import 'package:numi/features/quiz/widgets/assessment_result/ai_review_card.dart';
 import 'package:numi/features/quiz/widgets/assessment_result/assessment_result_review_text.dart';
