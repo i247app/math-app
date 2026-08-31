@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class AppStaggeredEntrance extends StatefulWidget {
@@ -27,6 +29,7 @@ class AppStaggeredEntrance extends StatefulWidget {
 class _AppStaggeredEntranceState extends State<AppStaggeredEntrance> {
   late bool _isVisible;
   bool _hasNotifiedFinished = false;
+  Timer? _entranceTimer;
 
   @override
   void initState() {
@@ -35,11 +38,27 @@ class _AppStaggeredEntranceState extends State<AppStaggeredEntrance> {
     if (_isVisible) {
       return;
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final multiplier = widget.order.clamp(0, widget.maxOrder);
-      await Future<void>.delayed(widget.delayStep * multiplier);
-      if (mounted) setState(() => _isVisible = true);
+      final delay = widget.delayStep * multiplier;
+      if (delay == Duration.zero) {
+        _show();
+        return;
+      }
+      _entranceTimer = Timer(delay, _show);
     });
+  }
+
+  void _show() {
+    if (!mounted) return;
+    setState(() => _isVisible = true);
+  }
+
+  @override
+  void dispose() {
+    _entranceTimer?.cancel();
+    super.dispose();
   }
 
   void _notifyFinished() {

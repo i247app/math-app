@@ -18,7 +18,7 @@ ifeq ($(HOST_OS),macos)
 PROJECT_DEPENDENCIES += pods
 endif
 
-.PHONY: run apk-debug apk-release release-android release-ios build project \
+.PHONY: run test apk-debug apk-release release-android release-ios build project \
 	pods models pub clean build-release-android host-os
 
 host-os:
@@ -27,6 +27,11 @@ host-os:
 run:
 	@echo "Running Flutter on $(HOST_OS)..."
 	flutter run
+
+# Keep output visible and execution deterministic so a slow or stuck test can
+# be identified from the last printed file and test name.
+test:
+	flutter test --reporter expanded --concurrency=1
 
 apk-debug: project
 	flutter build apk --debug
