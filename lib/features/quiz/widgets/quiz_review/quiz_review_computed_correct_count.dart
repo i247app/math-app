@@ -1,4 +1,4 @@
-import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_correct_answer_label.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_selected_answer_label.dart';
 

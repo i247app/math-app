@@ -4,9 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/widgets/list/parent_child_profile_card.dart';
 import 'package:numi/features/profile/widgets/list/parent_info_card.dart';

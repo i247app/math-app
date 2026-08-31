@@ -4,7 +4,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/auth/widgets/auth_action_button.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 

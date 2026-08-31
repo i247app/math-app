@@ -6,8 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/profile/data/dto/grade_models.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/profile/errors/grade_exception.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_shake_service.dart';

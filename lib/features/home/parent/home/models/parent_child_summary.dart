@@ -1,6 +1,6 @@
-import 'package:numi/features/profile/data/dto/profile_models.dart';
-import 'package:numi/features/classroom/data/dto/classroom_models.dart';
-import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
+import 'package:numi/features/quiz/domain/models/quiz.dart';
 
 class ParentChildSummary {
   const ParentChildSummary({

@@ -3,7 +3,7 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/theme/app_theme_controller.dart';
 import 'package:numi/features/auth/application/contracts/auth_service.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';

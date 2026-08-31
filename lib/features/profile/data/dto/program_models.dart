@@ -18,7 +18,7 @@ class ProgramListRequest {
 class ProgramListResponse {
   const ProgramListResponse({
     required this.mstatus,
-    this.programs = const <ProgramModel>[],
+    this.programs = const <ProgramDto>[],
     this.status,
     this.mmessage,
     this.debug,
@@ -27,7 +27,7 @@ class ProgramListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _programListFromJson)
-  final List<ProgramModel> programs;
+  final List<ProgramDto> programs;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -39,8 +39,8 @@ class ProgramListResponse {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ProgramModel {
-  const ProgramModel({
+class ProgramDto {
+  const ProgramDto({
     this.id,
     this.programId,
     this.label,
@@ -63,14 +63,14 @@ class ProgramModel {
   final String? createDt;
   final String? modifyDt;
 
-  factory ProgramModel.fromJson(Map<String, dynamic> json) =>
-      _$ProgramModelFromJson(json);
+  factory ProgramDto.fromJson(Map<String, dynamic> json) =>
+      _$ProgramDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ProgramModelToJson(this);
+  Map<String, dynamic> toJson() => _$ProgramDtoToJson(this);
 }
 
-List<ProgramModel> _programListFromJson(Object? value) {
-  return _listFromJson(value, ProgramModel.fromJson);
+List<ProgramDto> _programListFromJson(Object? value) {
+  return _listFromJson(value, ProgramDto.fromJson);
 }
 
 List<T> _listFromJson<T>(

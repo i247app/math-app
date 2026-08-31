@@ -5,13 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/profile/data/dto/grade_models.dart';
-import 'package:numi/features/profile/data/dto/profile_models.dart';
-import 'package:numi/features/profile/data/dto/program_models.dart';
-import 'package:numi/features/profile/data/dto/school_models.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/profile/domain/models/program.dart';
+import 'package:numi/features/profile/domain/models/school.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';

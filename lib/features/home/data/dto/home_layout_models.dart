@@ -1,9 +1,15 @@
 import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/mappers/classroom_exercise_mapper.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/classroom/data/mappers/classroom_mapper.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/profile/data/mappers/profile_mapper.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
 
-class HomeLayoutResponse {
-  const HomeLayoutResponse({
+class HomeLayoutResponseDto {
+  const HomeLayoutResponseDto({
     required this.mstatus,
     this.home,
     this.status,
@@ -12,17 +18,17 @@ class HomeLayoutResponse {
   });
 
   final int mstatus;
-  final HomeLayout? home;
+  final HomeLayoutDto? home;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory HomeLayoutResponse.fromJson(Map<String, dynamic> json) {
+  factory HomeLayoutResponseDto.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
     final homeValue = json['home'] ?? _nestedValue(data, 'home') ?? data;
-    return HomeLayoutResponse(
+    return HomeLayoutResponseDto(
       mstatus: _requiredIntFromJson(json['mstatus']),
-      home: _objectFromJson(homeValue, HomeLayout.fromJson),
+      home: _objectFromJson(homeValue, HomeLayoutDto.fromJson),
       status: _stringFromJson(json['status']),
       mmessage: _stringFromJson(json['mmessage']),
       debug: _stringFromJson(json['debug']),
@@ -30,50 +36,53 @@ class HomeLayoutResponse {
   }
 }
 
-class HomeLayout {
-  const HomeLayout({
+class HomeLayoutDto {
+  const HomeLayoutDto({
     this.role,
     this.profile,
     this.parent,
     this.student,
     this.teacher,
-    this.rooms = const <HomeLayoutClassroom>[],
+    this.rooms = const <HomeLayoutClassroomDto>[],
     this.subProfiles = const <StudentProfile>[],
-    this.tasks = const <HomeLayoutTask>[],
-    this.messages = const <HomeLayoutMessage>[],
-    this.quizzes = const <HomeLayoutQuiz>[],
+    this.tasks = const <HomeLayoutTaskDto>[],
+    this.messages = const <HomeLayoutMessageDto>[],
+    this.quizzes = const <HomeLayoutQuizDto>[],
   });
 
   final String? role;
   final StudentProfile? profile;
-  final ParentHomeLayout? parent;
-  final StudentHomeLayout? student;
-  final TeacherHomeLayout? teacher;
-  final List<HomeLayoutClassroom> rooms;
+  final ParentHomeLayoutDto? parent;
+  final StudentHomeLayoutDto? student;
+  final TeacherHomeLayoutDto? teacher;
+  final List<HomeLayoutClassroomDto> rooms;
   final List<StudentProfile> subProfiles;
-  final List<HomeLayoutTask> tasks;
-  final List<HomeLayoutMessage> messages;
-  final List<HomeLayoutQuiz> quizzes;
+  final List<HomeLayoutTaskDto> tasks;
+  final List<HomeLayoutMessageDto> messages;
+  final List<HomeLayoutQuizDto> quizzes;
 
-  factory HomeLayout.fromJson(Map<String, dynamic> json) {
-    final rooms = _listFromJson(json['rooms'], HomeLayoutClassroom.fromJson);
+  factory HomeLayoutDto.fromJson(Map<String, dynamic> json) {
+    final rooms = _listFromJson(json['rooms'], HomeLayoutClassroomDto.fromJson);
     final subProfiles = _listFromJson(
       json['sub_profiles'],
-      StudentProfile.fromJson,
+      _studentProfileFromJson,
     );
-    final tasks = _listFromJson(json['tasks'], HomeLayoutTask.fromJson);
-    final parent = _objectFromJson(json['parent'], ParentHomeLayout.fromJson);
+    final tasks = _listFromJson(json['tasks'], HomeLayoutTaskDto.fromJson);
+    final parent = _objectFromJson(
+      json['parent'],
+      ParentHomeLayoutDto.fromJson,
+    );
     final student = _objectFromJson(
       json['student'],
-      StudentHomeLayout.fromJson,
+      StudentHomeLayoutDto.fromJson,
     );
     final teacher = _objectFromJson(
       json['teacher'],
-      TeacherHomeLayout.fromJson,
+      TeacherHomeLayoutDto.fromJson,
     );
-    return HomeLayout(
+    return HomeLayoutDto(
       role: _stringFromJson(json['role']),
-      profile: _objectFromJson(json['profile'], StudentProfile.fromJson),
+      profile: _objectFromJson(json['profile'], _studentProfileFromJson),
       parent:
           parent ??
           _parentLayoutFromModernFields(
@@ -88,14 +97,14 @@ class HomeLayout {
       rooms: rooms,
       subProfiles: subProfiles,
       tasks: tasks,
-      messages: _listFromJson(json['messages'], HomeLayoutMessage.fromJson),
-      quizzes: _listFromJson(json['quizzes'], HomeLayoutQuiz.fromJson),
+      messages: _listFromJson(json['messages'], HomeLayoutMessageDto.fromJson),
+      quizzes: _listFromJson(json['quizzes'], HomeLayoutQuizDto.fromJson),
     );
   }
 }
 
-class HomeLayoutMessage {
-  const HomeLayoutMessage({
+class HomeLayoutMessageDto {
+  const HomeLayoutMessageDto({
     this.id,
     this.title,
     this.message,
@@ -111,8 +120,8 @@ class HomeLayoutMessage {
   final StudentProfile? sender;
   final ClassroomModel? classroom;
 
-  factory HomeLayoutMessage.fromJson(Map<String, dynamic> json) {
-    return HomeLayoutMessage(
+  factory HomeLayoutMessageDto.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutMessageDto(
       id: _intFromJson(json['id'] ?? json['message_id']),
       title: _stringFromJson(json['title']),
       message: _stringFromJson(
@@ -123,15 +132,15 @@ class HomeLayoutMessage {
       ),
       sender: _objectFromJson(
         json['sender'] ?? json['profile'],
-        StudentProfile.fromJson,
+        _studentProfileFromJson,
       ),
-      classroom: _objectFromJson(json['classroom'], ClassroomModel.fromJson),
+      classroom: _objectFromJson(json['classroom'], _classroomFromJson),
     );
   }
 }
 
-class HomeLayoutQuiz {
-  const HomeLayoutQuiz({
+class HomeLayoutQuizDto {
+  const HomeLayoutQuizDto({
     this.quizId,
     this.createDt,
     this.purpose,
@@ -155,8 +164,8 @@ class HomeLayoutQuiz {
   final String? typeOfQuiz;
   final int? correctNumber;
 
-  factory HomeLayoutQuiz.fromJson(Map<String, dynamic> json) {
-    return HomeLayoutQuiz(
+  factory HomeLayoutQuizDto.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutQuizDto(
       quizId: _intFromJson(json['quiz_id']),
       createDt: _stringFromJson(json['create_dt']),
       purpose: _stringFromJson(json['purpose']),
@@ -171,110 +180,110 @@ class HomeLayoutQuiz {
   }
 }
 
-class ParentHomeLayout {
-  const ParentHomeLayout({
+class ParentHomeLayoutDto {
+  const ParentHomeLayoutDto({
     this.children = const <StudentProfile>[],
-    this.classrooms = const <HomeLayoutClassroom>[],
-    this.pendingExercises = const <HomeLayoutPendingExercise>[],
-    this.expiredExercises = const <HomeLayoutPendingExercise>[],
-    this.recentCompletions = const <HomeLayoutRecentCompletion>[],
+    this.classrooms = const <HomeLayoutClassroomDto>[],
+    this.pendingExercises = const <HomeLayoutPendingExerciseDto>[],
+    this.expiredExercises = const <HomeLayoutPendingExerciseDto>[],
+    this.recentCompletions = const <HomeLayoutRecentCompletionDto>[],
   });
 
   final List<StudentProfile> children;
-  final List<HomeLayoutClassroom> classrooms;
-  final List<HomeLayoutPendingExercise> pendingExercises;
-  final List<HomeLayoutPendingExercise> expiredExercises;
-  final List<HomeLayoutRecentCompletion> recentCompletions;
+  final List<HomeLayoutClassroomDto> classrooms;
+  final List<HomeLayoutPendingExerciseDto> pendingExercises;
+  final List<HomeLayoutPendingExerciseDto> expiredExercises;
+  final List<HomeLayoutRecentCompletionDto> recentCompletions;
 
-  factory ParentHomeLayout.fromJson(Map<String, dynamic> json) {
-    return ParentHomeLayout(
-      children: _listFromJson(json['children'], StudentProfile.fromJson),
+  factory ParentHomeLayoutDto.fromJson(Map<String, dynamic> json) {
+    return ParentHomeLayoutDto(
+      children: _listFromJson(json['children'], _studentProfileFromJson),
       classrooms: _listFromJson(
         json['classrooms'],
-        HomeLayoutClassroom.fromJson,
+        HomeLayoutClassroomDto.fromJson,
       ),
       pendingExercises: _listFromJson(
         json['pending_exercises'],
-        HomeLayoutPendingExercise.fromJson,
+        HomeLayoutPendingExerciseDto.fromJson,
       ),
       expiredExercises: _listFromJson(
         json['expired_exercises'],
-        HomeLayoutPendingExercise.fromJson,
+        HomeLayoutPendingExerciseDto.fromJson,
       ),
       recentCompletions: _listFromJson(
         json['recent_completions'],
-        HomeLayoutRecentCompletion.fromJson,
+        HomeLayoutRecentCompletionDto.fromJson,
       ),
     );
   }
 }
 
-class StudentHomeLayout {
-  const StudentHomeLayout({
-    this.classrooms = const <HomeLayoutClassroom>[],
-    this.pendingExercises = const <HomeLayoutPendingExercise>[],
-    this.expiredExercises = const <HomeLayoutPendingExercise>[],
-    this.recentCompletions = const <HomeLayoutRecentCompletion>[],
+class StudentHomeLayoutDto {
+  const StudentHomeLayoutDto({
+    this.classrooms = const <HomeLayoutClassroomDto>[],
+    this.pendingExercises = const <HomeLayoutPendingExerciseDto>[],
+    this.expiredExercises = const <HomeLayoutPendingExerciseDto>[],
+    this.recentCompletions = const <HomeLayoutRecentCompletionDto>[],
   });
 
-  final List<HomeLayoutClassroom> classrooms;
-  final List<HomeLayoutPendingExercise> pendingExercises;
-  final List<HomeLayoutPendingExercise> expiredExercises;
-  final List<HomeLayoutRecentCompletion> recentCompletions;
+  final List<HomeLayoutClassroomDto> classrooms;
+  final List<HomeLayoutPendingExerciseDto> pendingExercises;
+  final List<HomeLayoutPendingExerciseDto> expiredExercises;
+  final List<HomeLayoutRecentCompletionDto> recentCompletions;
 
-  factory StudentHomeLayout.fromJson(Map<String, dynamic> json) {
-    return StudentHomeLayout(
+  factory StudentHomeLayoutDto.fromJson(Map<String, dynamic> json) {
+    return StudentHomeLayoutDto(
       classrooms: _listFromJson(
         json['classrooms'],
-        HomeLayoutClassroom.fromJson,
+        HomeLayoutClassroomDto.fromJson,
       ),
       pendingExercises: _listFromJson(
         json['pending_exercises'],
-        HomeLayoutPendingExercise.fromJson,
+        HomeLayoutPendingExerciseDto.fromJson,
       ),
       expiredExercises: _listFromJson(
         json['expired_exercises'],
-        HomeLayoutPendingExercise.fromJson,
+        HomeLayoutPendingExerciseDto.fromJson,
       ),
       recentCompletions: _listFromJson(
         json['recent_completions'],
-        HomeLayoutRecentCompletion.fromJson,
+        HomeLayoutRecentCompletionDto.fromJson,
       ),
     );
   }
 }
 
-class TeacherHomeLayout {
-  const TeacherHomeLayout({
-    this.classrooms = const <HomeLayoutClassroom>[],
+class TeacherHomeLayoutDto {
+  const TeacherHomeLayoutDto({
+    this.classrooms = const <HomeLayoutClassroomDto>[],
     this.assignedExercises = const <ClassroomExercise>[],
     this.expiredExercises = const <ClassroomExercise>[],
   });
 
-  final List<HomeLayoutClassroom> classrooms;
+  final List<HomeLayoutClassroomDto> classrooms;
   final List<ClassroomExercise> assignedExercises;
   final List<ClassroomExercise> expiredExercises;
 
-  factory TeacherHomeLayout.fromJson(Map<String, dynamic> json) {
-    return TeacherHomeLayout(
+  factory TeacherHomeLayoutDto.fromJson(Map<String, dynamic> json) {
+    return TeacherHomeLayoutDto(
       classrooms: _listFromJson(
         json['classrooms'],
-        HomeLayoutClassroom.fromJson,
+        HomeLayoutClassroomDto.fromJson,
       ),
       assignedExercises: _listFromJson(
         json['assigned_exercises'],
-        ClassroomExercise.fromJson,
+        _classroomExerciseFromJson,
       ),
       expiredExercises: _listFromJson(
         json['expired_exercises'],
-        ClassroomExercise.fromJson,
+        _classroomExerciseFromJson,
       ),
     );
   }
 }
 
-class HomeLayoutTask {
-  const HomeLayoutTask({
+class HomeLayoutTaskDto {
+  const HomeLayoutTaskDto({
     this.taskType,
     this.child,
     this.classroom,
@@ -286,17 +295,17 @@ class HomeLayoutTask {
   final StudentProfile? child;
   final ClassroomModel? classroom;
   final ClassroomExercise? exercise;
-  final HomeLayoutTaskSubmission? submission;
+  final HomeLayoutTaskSubmissionDto? submission;
 
-  factory HomeLayoutTask.fromJson(Map<String, dynamic> json) {
-    return HomeLayoutTask(
+  factory HomeLayoutTaskDto.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutTaskDto(
       taskType: _stringFromJson(json['task_type']),
-      child: _objectFromJson(json['child'], StudentProfile.fromJson),
-      classroom: _objectFromJson(json['classroom'], ClassroomModel.fromJson),
+      child: _objectFromJson(json['child'], _studentProfileFromJson),
+      classroom: _objectFromJson(json['classroom'], _classroomFromJson),
       exercise: _exerciseFromJson(json['exercise']),
       submission: _objectFromJson(
         json['submission'],
-        HomeLayoutTaskSubmission.fromJson,
+        HomeLayoutTaskSubmissionDto.fromJson,
       ),
     );
   }
@@ -312,8 +321,8 @@ class HomeLayoutTask {
   bool get isExpired => normalizedType == 'EXPIRED';
 }
 
-class HomeLayoutTaskSubmission {
-  const HomeLayoutTaskSubmission({
+class HomeLayoutTaskSubmissionDto {
+  const HomeLayoutTaskSubmissionDto({
     this.classroomExerciseSubmissionId,
     this.correctNumber,
     this.gradedDt,
@@ -331,8 +340,8 @@ class HomeLayoutTaskSubmission {
   final String? submittedDt;
   final int? totalQuestions;
 
-  factory HomeLayoutTaskSubmission.fromJson(Map<String, dynamic> json) {
-    return HomeLayoutTaskSubmission(
+  factory HomeLayoutTaskSubmissionDto.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutTaskSubmissionDto(
       classroomExerciseSubmissionId: _intFromJson(
         json['classroom_exercise_submission_id'],
       ),
@@ -346,8 +355,8 @@ class HomeLayoutTaskSubmission {
   }
 }
 
-class HomeLayoutClassroom {
-  const HomeLayoutClassroom({
+class HomeLayoutClassroomDto {
+  const HomeLayoutClassroomDto({
     required this.classroom,
     this.memberProfileId,
     this.myRole,
@@ -357,17 +366,17 @@ class HomeLayoutClassroom {
   final int? memberProfileId;
   final String? myRole;
 
-  factory HomeLayoutClassroom.fromJson(Map<String, dynamic> json) {
-    return HomeLayoutClassroom(
-      classroom: ClassroomModel.fromJson(json),
+  factory HomeLayoutClassroomDto.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutClassroomDto(
+      classroom: _classroomFromJson(json),
       memberProfileId: _intFromJson(json['member_profile_id']),
       myRole: _stringFromJson(json['my_role']),
     );
   }
 }
 
-class HomeLayoutPendingExercise {
-  const HomeLayoutPendingExercise({
+class HomeLayoutPendingExerciseDto {
+  const HomeLayoutPendingExerciseDto({
     this.child,
     this.classroom,
     this.classroomExerciseId,
@@ -381,10 +390,10 @@ class HomeLayoutPendingExercise {
   final int? classroomId;
   final ClassroomExercise? exercise;
 
-  factory HomeLayoutPendingExercise.fromJson(Map<String, dynamic> json) {
-    return HomeLayoutPendingExercise(
-      child: _objectFromJson(json['child'], StudentProfile.fromJson),
-      classroom: _objectFromJson(json['classroom'], ClassroomModel.fromJson),
+  factory HomeLayoutPendingExerciseDto.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutPendingExerciseDto(
+      child: _objectFromJson(json['child'], _studentProfileFromJson),
+      classroom: _objectFromJson(json['classroom'], _classroomFromJson),
       classroomExerciseId: _intFromJson(json['classroom_exercise_id']),
       classroomId: _intFromJson(json['classroom_id']),
       exercise: _exerciseFromJson(json['exercise']),
@@ -392,8 +401,8 @@ class HomeLayoutPendingExercise {
   }
 }
 
-class HomeLayoutRecentCompletion {
-  const HomeLayoutRecentCompletion({
+class HomeLayoutRecentCompletionDto {
+  const HomeLayoutRecentCompletionDto({
     this.child,
     this.classroom,
     this.classroomExerciseId,
@@ -421,10 +430,10 @@ class HomeLayoutRecentCompletion {
   final String? submittedDt;
   final int? totalQuestions;
 
-  factory HomeLayoutRecentCompletion.fromJson(Map<String, dynamic> json) {
-    return HomeLayoutRecentCompletion(
-      child: _objectFromJson(json['child'], StudentProfile.fromJson),
-      classroom: _objectFromJson(json['classroom'], ClassroomModel.fromJson),
+  factory HomeLayoutRecentCompletionDto.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutRecentCompletionDto(
+      child: _objectFromJson(json['child'], _studentProfileFromJson),
+      classroom: _objectFromJson(json['classroom'], _classroomFromJson),
       classroomExerciseId: _intFromJson(json['classroom_exercise_id']),
       classroomExerciseSubmissionId: _intFromJson(
         json['classroom_exercise_submission_id'],
@@ -441,15 +450,15 @@ class HomeLayoutRecentCompletion {
   }
 }
 
-ParentHomeLayout? _parentLayoutFromModernFields({
+ParentHomeLayoutDto? _parentLayoutFromModernFields({
   required List<StudentProfile> subProfiles,
-  required List<HomeLayoutClassroom> rooms,
-  required List<HomeLayoutTask> tasks,
+  required List<HomeLayoutClassroomDto> rooms,
+  required List<HomeLayoutTaskDto> tasks,
 }) {
   if (subProfiles.isEmpty && rooms.isEmpty && tasks.isEmpty) {
     return null;
   }
-  return ParentHomeLayout(
+  return ParentHomeLayoutDto(
     children: subProfiles,
     classrooms: rooms,
     pendingExercises: _pendingExercisesFromTasks(tasks, 'PENDING'),
@@ -458,14 +467,14 @@ ParentHomeLayout? _parentLayoutFromModernFields({
   );
 }
 
-TeacherHomeLayout? _teacherLayoutFromModernFields({
-  required List<HomeLayoutClassroom> rooms,
-  required List<HomeLayoutTask> tasks,
+TeacherHomeLayoutDto? _teacherLayoutFromModernFields({
+  required List<HomeLayoutClassroomDto> rooms,
+  required List<HomeLayoutTaskDto> tasks,
 }) {
   if (rooms.isEmpty && tasks.isEmpty) {
     return null;
   }
-  return TeacherHomeLayout(
+  return TeacherHomeLayoutDto(
     classrooms: rooms,
     assignedExercises: tasks
         .where((task) => task.isAssigned)
@@ -480,14 +489,14 @@ TeacherHomeLayout? _teacherLayoutFromModernFields({
   );
 }
 
-StudentHomeLayout? _studentLayoutFromModernFields({
-  required List<HomeLayoutClassroom> rooms,
-  required List<HomeLayoutTask> tasks,
+StudentHomeLayoutDto? _studentLayoutFromModernFields({
+  required List<HomeLayoutClassroomDto> rooms,
+  required List<HomeLayoutTaskDto> tasks,
 }) {
   if (rooms.isEmpty && tasks.isEmpty) {
     return null;
   }
-  return StudentHomeLayout(
+  return StudentHomeLayoutDto(
     classrooms: rooms,
     pendingExercises: _pendingExercisesFromTasks(tasks, 'PENDING'),
     expiredExercises: _pendingExercisesFromTasks(tasks, 'EXPIRED'),
@@ -495,14 +504,14 @@ StudentHomeLayout? _studentLayoutFromModernFields({
   );
 }
 
-List<HomeLayoutPendingExercise> _pendingExercisesFromTasks(
-  List<HomeLayoutTask> tasks,
+List<HomeLayoutPendingExerciseDto> _pendingExercisesFromTasks(
+  List<HomeLayoutTaskDto> tasks,
   String taskType,
 ) {
   return tasks
       .where((task) => task.normalizedType == taskType)
       .map(
-        (task) => HomeLayoutPendingExercise(
+        (task) => HomeLayoutPendingExerciseDto(
           child: task.child,
           classroom: task.classroom,
           classroomExerciseId: task.exercise?.stableId,
@@ -513,14 +522,14 @@ List<HomeLayoutPendingExercise> _pendingExercisesFromTasks(
       .toList(growable: false);
 }
 
-List<HomeLayoutRecentCompletion> _recentCompletionsFromTasks(
-  List<HomeLayoutTask> tasks,
+List<HomeLayoutRecentCompletionDto> _recentCompletionsFromTasks(
+  List<HomeLayoutTaskDto> tasks,
 ) {
   return tasks
       .where((task) => task.isCompleted)
       .map((task) {
         final submission = task.submission;
-        return HomeLayoutRecentCompletion(
+        return HomeLayoutRecentCompletionDto(
           child: task.child,
           classroom: task.classroom,
           classroomExerciseId: task.exercise?.stableId,
@@ -551,14 +560,20 @@ Object? _nestedValue(Object? value, String key) {
 
 ClassroomExercise? _exerciseFromJson(Object? value) {
   if (value case final Map<String, dynamic> json) {
-    return ClassroomExercise.fromJson(_normalizedExerciseJson(json));
+    return ClassroomExerciseDto.fromJson(
+      _normalizedExerciseJson(json),
+    ).toDomain();
   }
   if (value case final Map<Object?, Object?> json) {
-    return ClassroomExercise.fromJson(
+    return ClassroomExerciseDto.fromJson(
       _normalizedExerciseJson(Map<String, dynamic>.from(json)),
-    );
+    ).toDomain();
   }
   return null;
+}
+
+ClassroomExercise _classroomExerciseFromJson(Map<String, dynamic> json) {
+  return ClassroomExerciseDto.fromJson(json).toDomain();
 }
 
 Map<String, dynamic> _normalizedExerciseJson(Map<String, dynamic> json) {
@@ -566,6 +581,14 @@ Map<String, dynamic> _normalizedExerciseJson(Map<String, dynamic> json) {
     ...json,
     'num_questions': json['num_questions'] ?? json['total_questions'],
   };
+}
+
+StudentProfile _studentProfileFromJson(Map<String, dynamic> json) {
+  return StudentProfileDto.fromJson(json).toDomain();
+}
+
+ClassroomModel _classroomFromJson(Map<String, dynamic> json) {
+  return ClassroomDto.fromJson(json).toDomain();
 }
 
 T? _objectFromJson<T>(

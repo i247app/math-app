@@ -1,7 +1,7 @@
-import 'package:numi/features/classroom/data/dto/classroom_models.dart';
-import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/home/data/dto/home_layout_models.dart';
+import 'package:numi/features/home/domain/models/home_layout.dart';
 
 class ParentRoomEntry {
   const ParentRoomEntry({required this.layoutClassroom, required this.child});

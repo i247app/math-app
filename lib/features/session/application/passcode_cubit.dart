@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/session/application/passcode_state.dart';
 import 'package:numi/features/session/services/passcode_service.dart';
 

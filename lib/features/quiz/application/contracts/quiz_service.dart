@@ -1,4 +1,4 @@
-import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/domain/models/quiz.dart';
 
 const quizPurposeAssessment = 'ASSESSMENT';
 const quizPurposePractice = 'PRACTICE';

@@ -4,7 +4,11 @@ import 'package:numi/features/profile/application/contracts/profile_service.dart
 import 'package:numi/features/profile/data/dto/profile_models.dart';
 import 'package:numi/features/profile/data/dto/program_models.dart';
 import 'package:numi/features/profile/data/dto/semester_models.dart';
+import 'package:numi/features/profile/data/mappers/profile_mapper.dart';
 import 'package:numi/features/profile/data/profile_exception.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/profile/domain/models/program.dart';
+import 'package:numi/features/profile/domain/models/semester.dart';
 
 class ProfileApi implements ProfileService {
   ProfileApi({String? baseUrl, NetworkClient? networkClient})
@@ -20,7 +24,7 @@ class ProfileApi implements ProfileService {
   Future<List<StudentProfile>> listProfiles({required int userId}) async {
     try {
       final response = await _listProfiles(ProfileListRequest(userId: userId));
-      return response.profiles;
+      return response.profiles.map((profile) => profile.toDomain()).toList();
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
     }
@@ -30,7 +34,7 @@ class ProfileApi implements ProfileService {
   Future<List<StudentProfile>> searchProfiles({required String search}) async {
     try {
       final response = await _listProfiles(ProfileListRequest(search: search));
-      return response.profiles;
+      return response.profiles.map((profile) => profile.toDomain()).toList();
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
     }
@@ -40,7 +44,7 @@ class ProfileApi implements ProfileService {
   Future<List<ProgramModel>> listPrograms({required int userId}) async {
     try {
       final response = await _listPrograms(ProgramListRequest(userId: userId));
-      return response.programs;
+      return response.programs.map((program) => program.toDomain()).toList();
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
     }
@@ -52,7 +56,7 @@ class ProfileApi implements ProfileService {
       final response = await _listSemesters(
         SemesterListRequest(userId: userId),
       );
-      return response.semesters;
+      return response.semesters.map((semester) => semester.toDomain()).toList();
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
     }
@@ -94,7 +98,7 @@ class ProfileApi implements ProfileService {
         ),
         avatarPath: avatarPath,
       );
-      return response.profile;
+      return response.profile?.toDomain();
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
     }
@@ -136,7 +140,7 @@ class ProfileApi implements ProfileService {
         ),
         avatarPath: avatarPath,
       );
-      return response.profile;
+      return response.profile?.toDomain();
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
     }

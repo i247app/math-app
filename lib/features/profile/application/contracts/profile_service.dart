@@ -1,6 +1,6 @@
-import 'package:numi/features/profile/data/dto/profile_models.dart';
-import 'package:numi/features/profile/data/dto/program_models.dart';
-import 'package:numi/features/profile/data/dto/semester_models.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/profile/domain/models/program.dart';
+import 'package:numi/features/profile/domain/models/semester.dart';
 
 abstract interface class ProfileService {
   Future<List<StudentProfile>> listProfiles({required int userId});

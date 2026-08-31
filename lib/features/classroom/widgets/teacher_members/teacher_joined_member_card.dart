@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
 
-import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_joined_member_avatar.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_text_block.dart';

@@ -2,29 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'classroom_models.g.dart';
 
-enum ClassroomRelationship {
-  member,
-  pendingInvitation,
-  pendingRequest,
-  none,
-  unknown;
-
-  static ClassroomRelationship fromWire(String? value) {
-    switch (value?.trim().toUpperCase()) {
-      case 'MEMBER':
-        return ClassroomRelationship.member;
-      case 'PENDING_INVITATION':
-        return ClassroomRelationship.pendingInvitation;
-      case 'PENDING_REQUEST':
-        return ClassroomRelationship.pendingRequest;
-      case 'NONE':
-        return ClassroomRelationship.none;
-      default:
-        return ClassroomRelationship.unknown;
-    }
-  }
-}
-
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class ClassroomListRequest {
   const ClassroomListRequest({
@@ -186,7 +163,7 @@ class CreateClassroomRequest {
 class ClassroomListResponse {
   const ClassroomListResponse({
     required this.mstatus,
-    this.classrooms = const <ClassroomModel>[],
+    this.classrooms = const <ClassroomDto>[],
     this.pagination,
     this.status,
     this.mmessage,
@@ -196,7 +173,7 @@ class ClassroomListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _classroomListFromJson)
-  final List<ClassroomModel> classrooms;
+  final List<ClassroomDto> classrooms;
   final ClassroomPagination? pagination;
   final String? status;
   final String? mmessage;
@@ -259,7 +236,7 @@ class ClassroomPagination {
 class ClassroomMemberListResponse {
   const ClassroomMemberListResponse({
     required this.mstatus,
-    this.members = const <ClassroomStudent>[],
+    this.members = const <ClassroomStudentDto>[],
     this.pagination,
     this.status,
     this.mmessage,
@@ -269,7 +246,7 @@ class ClassroomMemberListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _studentListFromJson)
-  final List<ClassroomStudent> members;
+  final List<ClassroomStudentDto> members;
   final ClassroomPagination? pagination;
   final String? status;
   final String? mmessage;
@@ -305,7 +282,7 @@ class ClassroomMemberListResponse {
 class ClassroomInvitationListResponse {
   const ClassroomInvitationListResponse({
     required this.mstatus,
-    this.invitations = const <ClassroomInvitation>[],
+    this.invitations = const <ClassroomInvitationDto>[],
     this.pagination,
     this.status,
     this.mmessage,
@@ -315,7 +292,7 @@ class ClassroomInvitationListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _invitationListFromJson)
-  final List<ClassroomInvitation> invitations;
+  final List<ClassroomInvitationDto> invitations;
   final ClassroomPagination? pagination;
   final String? status;
   final String? mmessage;
@@ -359,7 +336,7 @@ class ClassroomResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _classroomFromJson)
-  final ClassroomModel? classroom;
+  final ClassroomDto? classroom;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -404,8 +381,8 @@ class ClassroomActionResponse {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class ClassroomModel {
-  const ClassroomModel({
+class ClassroomDto {
+  const ClassroomDto({
     this.id,
     this.classroomId,
     this.profileId,
@@ -427,7 +404,7 @@ class ClassroomModel {
     this.studentCount,
     this.teacherCount,
     this.pendingRequestCount,
-    this.students = const <ClassroomStudent>[],
+    this.students = const <ClassroomStudentDto>[],
     this.imageUrl,
     this.avatarUrl,
     this.fileUrl,
@@ -454,7 +431,7 @@ class ClassroomModel {
   @JsonKey(fromJson: _stringFromJson)
   final String? classroomCode;
   @JsonKey(fromJson: _ownerFromJson)
-  final ClassroomOwner? owner;
+  final ClassroomOwnerDto? owner;
   @JsonKey(fromJson: _intFromJson)
   final int? ownerProfileId;
   @JsonKey(fromJson: _stringFromJson)
@@ -476,14 +453,14 @@ class ClassroomModel {
   @JsonKey(fromJson: _intFromJson)
   final int? pendingRequestCount;
   @JsonKey(fromJson: _studentListFromJson)
-  final List<ClassroomStudent> students;
+  final List<ClassroomStudentDto> students;
   final String? imageUrl;
   final String? avatarUrl;
   final String? fileUrl;
   final String? createDt;
   final String? modifyDt;
 
-  factory ClassroomModel.fromJson(Map<String, dynamic> json) {
+  factory ClassroomDto.fromJson(Map<String, dynamic> json) {
     final studentsValue =
         json['students'] ??
         json['members'] ??
@@ -500,7 +477,7 @@ class ClassroomModel {
         json['join_request_count'] ??
         json['join_requests_count'];
 
-    return _$ClassroomModelFromJson(<String, dynamic>{
+    return _$ClassroomDtoFromJson(<String, dynamic>{
       ...json,
       'classroom_code': json['classroom_code'] ?? json['invite_code'],
       'program_ids':
@@ -532,7 +509,7 @@ class ClassroomModel {
     });
   }
 
-  Map<String, dynamic> toJson() => _$ClassroomModelToJson(this);
+  Map<String, dynamic> toJson() => _$ClassroomDtoToJson(this);
 
   int? get stableId => classroomId ?? id;
 
@@ -542,14 +519,11 @@ class ClassroomModel {
   int get displayMemberCount => memberCount ?? displayStudentCount;
 
   int get displayPendingRequestCount => pendingRequestCount ?? 0;
-
-  ClassroomRelationship get relationshipStatus =>
-      ClassroomRelationship.fromWire(relationship);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ClassroomOwner {
-  const ClassroomOwner({
+class ClassroomOwnerDto {
+  const ClassroomOwnerDto({
     this.profileId,
     this.name,
     this.role,
@@ -569,8 +543,8 @@ class ClassroomOwner {
   @JsonKey(fromJson: _stringFromJson)
   final String? fileUrl;
 
-  factory ClassroomOwner.fromJson(Map<String, dynamic> json) {
-    return _$ClassroomOwnerFromJson(<String, dynamic>{
+  factory ClassroomOwnerDto.fromJson(Map<String, dynamic> json) {
+    return _$ClassroomOwnerDtoFromJson(<String, dynamic>{
       ...json,
       'avatar_url':
           json['avatar_url'] ??
@@ -590,12 +564,12 @@ class ClassroomOwner {
     });
   }
 
-  Map<String, dynamic> toJson() => _$ClassroomOwnerToJson(this);
+  Map<String, dynamic> toJson() => _$ClassroomOwnerDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ClassroomStudent {
-  const ClassroomStudent({
+class ClassroomStudentDto {
+  const ClassroomStudentDto({
     this.id,
     this.profileId,
     this.name,
@@ -617,7 +591,7 @@ class ClassroomStudent {
   final String? status;
   final String? role;
 
-  factory ClassroomStudent.fromJson(Map<String, dynamic> json) {
+  factory ClassroomStudentDto.fromJson(Map<String, dynamic> json) {
     final requester = json['requester'];
     final memberProfile = json['member_profile'];
     final profile = json['profile'];
@@ -662,7 +636,7 @@ class ClassroomStudent {
     final status = json['status'] ?? json['member_status'];
     final joinedAt = json['joined_at'] ?? json['joined_dt'];
 
-    return _$ClassroomStudentFromJson(<String, dynamic>{
+    return _$ClassroomStudentDtoFromJson(<String, dynamic>{
       ...json,
       'id': id,
       'profile_id': profileId,
@@ -675,12 +649,12 @@ class ClassroomStudent {
     });
   }
 
-  Map<String, dynamic> toJson() => _$ClassroomStudentToJson(this);
+  Map<String, dynamic> toJson() => _$ClassroomStudentDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class ClassroomInvitation {
-  const ClassroomInvitation({
+class ClassroomInvitationDto {
+  const ClassroomInvitationDto({
     this.id,
     this.invitationId,
     this.classroomId,
@@ -706,9 +680,9 @@ class ClassroomInvitation {
   @JsonKey(fromJson: _stringFromJson)
   final String? createdAt;
   @JsonKey(fromJson: _classroomFromJson)
-  final ClassroomModel? classroom;
+  final ClassroomDto? classroom;
 
-  factory ClassroomInvitation.fromJson(Map<String, dynamic> json) {
+  factory ClassroomInvitationDto.fromJson(Map<String, dynamic> json) {
     final classroom = json['classroom'] ?? json['class'];
     final inviter = json['inviter'] ?? json['teacher'] ?? json['owner'];
     final classroomId =
@@ -724,7 +698,7 @@ class ClassroomInvitation {
     final classroomValue =
         classroom ?? <String, dynamic>{...json, 'classroom_id': classroomId};
 
-    return _$ClassroomInvitationFromJson(<String, dynamic>{
+    return _$ClassroomInvitationDtoFromJson(<String, dynamic>{
       ...json,
       'invitation_id': json['invitation_id'] ?? json['request_id'],
       'classroom_id': classroomId,
@@ -743,29 +717,29 @@ class ClassroomInvitation {
     });
   }
 
-  Map<String, dynamic> toJson() => _$ClassroomInvitationToJson(this);
+  Map<String, dynamic> toJson() => _$ClassroomInvitationDtoToJson(this);
 
   int? get stableClassroomId => classroomId ?? classroom?.stableId;
 }
 
-List<ClassroomModel> _classroomListFromJson(Object? value) {
-  return _listFromJson(value, ClassroomModel.fromJson);
+List<ClassroomDto> _classroomListFromJson(Object? value) {
+  return _listFromJson(value, ClassroomDto.fromJson);
 }
 
-List<ClassroomInvitation> _invitationListFromJson(Object? value) {
-  return _listFromJson(value, ClassroomInvitation.fromJson);
+List<ClassroomInvitationDto> _invitationListFromJson(Object? value) {
+  return _listFromJson(value, ClassroomInvitationDto.fromJson);
 }
 
-ClassroomModel? _classroomFromJson(Object? value) {
-  return _objectFromJson(value, ClassroomModel.fromJson);
+ClassroomDto? _classroomFromJson(Object? value) {
+  return _objectFromJson(value, ClassroomDto.fromJson);
 }
 
-ClassroomOwner? _ownerFromJson(Object? value) {
-  return _objectFromJson(value, ClassroomOwner.fromJson);
+ClassroomOwnerDto? _ownerFromJson(Object? value) {
+  return _objectFromJson(value, ClassroomOwnerDto.fromJson);
 }
 
-List<ClassroomStudent> _studentListFromJson(Object? value) {
-  return _listFromJson(value, ClassroomStudent.fromJson);
+List<ClassroomStudentDto> _studentListFromJson(Object? value) {
+  return _listFromJson(value, ClassroomStudentDto.fromJson);
 }
 
 Object? _nestedValue(Object? value, String key) {

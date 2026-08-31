@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';
 

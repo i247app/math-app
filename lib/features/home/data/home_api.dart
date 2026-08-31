@@ -1,9 +1,11 @@
 import 'package:numi/features/home/application/contracts/home_layout_service.dart';
 import 'package:numi/features/home/data/dto/home_layout_models.dart';
+import 'package:numi/features/home/data/mappers/home_layout_mapper.dart';
+import 'package:numi/features/home/domain/models/home_layout.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/home/errors/home_layout_exception.dart';
 
-export 'package:numi/features/home/data/dto/home_layout_models.dart';
+export 'package:numi/features/home/domain/models/home_layout.dart';
 
 class HomeLayoutApi implements HomeLayoutService {
   HomeLayoutApi({String? baseUrl, NetworkClient? networkClient})
@@ -22,7 +24,7 @@ class HomeLayoutApi implements HomeLayoutService {
         '/home/layout',
         <String, dynamic>{'profile_id': profileId},
       );
-      final response = HomeLayoutResponse.fromJson(json);
+      final response = HomeLayoutResponseDto.fromJson(json);
       if (response.mstatus != 200) {
         throw HomeLayoutException(
           response.mmessage ??
@@ -36,7 +38,7 @@ class HomeLayoutApi implements HomeLayoutService {
       if (home == null) {
         throw const HomeLayoutException('Home layout is empty.');
       }
-      return home;
+      return home.toDomain();
     } on NetworkException catch (error) {
       throw HomeLayoutException(error.message, status: error.status);
     }

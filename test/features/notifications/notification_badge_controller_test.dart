@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:numi/features/notifications/data/dto/notification_models.dart';
+import 'package:numi/features/notifications/domain/models/notification.dart';
 import 'package:numi/features/notifications/application/notification_badge_controller.dart';
 import 'package:numi/features/notifications/data/cache/notification_cache.dart';
 import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
@@ -14,8 +14,8 @@ void main() {
     'shows the badge when the API contains an unread notification',
     () async {
       final controller = NotificationBadgeController(
-        service: _FakeNotificationService([
-          NotificationModel(rawJson: const {}, id: 1, isRead: false),
+        service: const _FakeNotificationService([
+          NotificationModel(id: 1, isRead: false),
         ]),
       );
       addTearDown(controller.dispose);
@@ -28,13 +28,9 @@ void main() {
 
   test('does not show the badge when every notification is read', () async {
     final controller = NotificationBadgeController(
-      service: _FakeNotificationService([
-        NotificationModel(rawJson: const {}, id: 1, isRead: true),
-        NotificationModel(
-          rawJson: const {},
-          id: 2,
-          readAt: '2026-07-30T08:00:00Z',
-        ),
+      service: const _FakeNotificationService([
+        NotificationModel(id: 1, isRead: true),
+        NotificationModel(id: 2, readAt: '2026-07-30T08:00:00Z'),
       ]),
     );
     addTearDown(controller.dispose);

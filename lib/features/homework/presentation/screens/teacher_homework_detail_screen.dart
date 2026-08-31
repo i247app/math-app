@@ -10,7 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/shared/layouts/app_screen_app_bar.dart';

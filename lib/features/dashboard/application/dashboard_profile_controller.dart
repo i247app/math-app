@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/profile/data/dto/grade_models.dart';
-import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 

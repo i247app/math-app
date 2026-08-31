@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/homework/data/cache/student_homework_cache.dart';
 import 'package:numi/features/homework/data/cache/teacher_homework_cache.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';

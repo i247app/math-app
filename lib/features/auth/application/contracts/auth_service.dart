@@ -1,4 +1,4 @@
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 
 abstract interface class AuthService {
   Future<AuthLoginLookupResult> lookupLoginName(String loginName);

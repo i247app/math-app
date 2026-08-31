@@ -5,26 +5,11 @@ import 'package:numi/core/errors/http_status.dart';
 import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/data/dto/auth_models.dart';
 import 'package:numi/features/auth/data/dto/device_models.dart';
+import 'package:numi/features/auth/data/mappers/auth_mapper.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
-
-extension on AuthUser {
-  LoginUser toLoginUser({String? fallbackLoginName}) {
-    final fallbackIsEmail = fallbackLoginName?.contains('@') == true;
-    return LoginUser(
-      id: userId ?? id ?? 0,
-      email: email ?? (fallbackIsEmail ? fallbackLoginName : null),
-      name: name,
-      phone: phone ?? (fallbackIsEmail ? null : fallbackLoginName),
-      avatarUrl: avatarUrl,
-      role: role,
-      createDt: createDt,
-      modifyDt: modifyDt,
-    );
-  }
-}
 
 class AuthApi implements AuthService {
   AuthApi({String? baseUrl, NetworkClient? networkClient})
@@ -48,7 +33,7 @@ class AuthApi implements AuthService {
         '/auth/login-resume',
         const <String, dynamic>{},
       );
-      final user = response.user?.toLoginUser();
+      final user = response.user?.toDomain();
       if (user == null || user.id <= 0) {
         await _networkClient.clearAuthToken();
         return null;
@@ -82,7 +67,7 @@ class AuthApi implements AuthService {
       throw AuthException(error.message, status: error.status);
     }
 
-    final user = response.user?.toLoginUser(fallbackLoginName: loginName);
+    final user = response.user?.toDomain(fallbackLoginName: loginName);
     if (user == null) {
       throw AuthException(AppStrings.current(AppKeys.missingOtpUser));
     }
@@ -115,12 +100,7 @@ class AuthApi implements AuthService {
       ),
     );
 
-    return SendOtpResult(
-      otpCode: response.otpCode,
-      purpose: kind.previewPurpose,
-      expiresAt: response.expiresAt,
-      expiresIn: _expiresInFrom(response.expiresAt) ?? 0,
-    );
+    return response.toDomain(kind: kind);
   }
 
   @override
@@ -132,15 +112,8 @@ class AuthApi implements AuthService {
     );
 
     return response.devices
-        .where((device) => device.deviceId != null)
-        .map(
-          (device) => AuthTrustedDevice(
-            deviceId: device.deviceId!,
-            deviceName: _deviceName(device),
-            deviceUuid: device.deviceUuid,
-            platform: device.platform,
-          ),
-        )
+        .map((device) => device.toDomain())
+        .whereType<AuthTrustedDevice>()
         .toList(growable: false);
   }
 
@@ -157,8 +130,7 @@ class AuthApi implements AuthService {
       ),
     );
 
-    final user = _signupUserFromResponse(
-      response,
+    final user = response.toSignupDomain(
       fallbackPhone: phone,
       fallbackName: name,
       fallbackEmail: email,
@@ -192,7 +164,7 @@ class AuthApi implements AuthService {
     );
 
     final user =
-        response.user?.toLoginUser(fallbackLoginName: phone) ??
+        response.user?.toDomain(fallbackLoginName: phone) ??
         LoginUser(id: userId, name: name, phone: phone, email: email);
     final userPhone = user.phone?.trim();
     if (userPhone != null && userPhone.isNotEmpty) {
@@ -218,7 +190,7 @@ class AuthApi implements AuthService {
     );
 
     final user =
-        response.user?.toLoginUser(fallbackLoginName: loginName) ??
+        response.user?.toDomain(fallbackLoginName: loginName) ??
         _loginUsers[loginName];
     if (response.verified && user != null) {
       _loginUsers[loginName] = user;
@@ -238,60 +210,9 @@ class AuthApi implements AuthService {
     _loginUsers.remove(loginName);
   }
 
-  static int? _expiresInFrom(String? expiresAt) {
-    if (expiresAt == null) {
-      return null;
-    }
-
-    final parsed = DateTime.tryParse(expiresAt);
-    if (parsed == null) {
-      return null;
-    }
-
-    final seconds = parsed.toUtc().difference(DateTime.now().toUtc()).inSeconds;
-    return seconds < 0 ? 0 : seconds;
-  }
-
-  static LoginUser _signupUserFromResponse(
-    AuthResponse response, {
-    required String fallbackPhone,
-    required String fallbackName,
-    String? fallbackEmail,
-  }) {
-    final user = response.user;
-    final profile = response.profile;
-
-    return LoginUser(
-      id: user?.userId ?? user?.id ?? profile?.userId ?? 0,
-      email: user?.email ?? fallbackEmail,
-      name: profile?.name ?? user?.name ?? fallbackName,
-      phone: user?.phone ?? fallbackPhone,
-      avatarUrl: profile?.avatarUrl ?? user?.avatarUrl,
-      role: user?.role,
-      createDt: user?.createDt ?? profile?.createDt,
-      modifyDt: user?.modifyDt ?? profile?.modifyDt,
-    );
-  }
-
-  static String _deviceName(DeviceModel device) {
-    final name = device.deviceName?.trim();
-    if (name != null && name.isNotEmpty) {
-      return name;
-    }
-
-    final platform = device.platform?.trim();
-    if (platform != null &&
-        platform.isNotEmpty &&
-        platform.toUpperCase() != 'UNKNOWN') {
-      return platform;
-    }
-
-    return 'Device ${device.deviceId}';
-  }
-
   Future<LoginUser?> _currentUserOrNull() async {
     try {
-      return (await _getCurrentUser()).toLoginUser();
+      return (await _getCurrentUser()).toDomain();
     } on NetworkException catch (error) {
       await _clearAuthTokenIfUnauthorized(error);
 

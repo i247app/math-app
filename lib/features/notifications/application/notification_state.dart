@@ -1,4 +1,4 @@
-import 'package:numi/features/notifications/data/dto/notification_models.dart';
+import 'package:numi/features/notifications/domain/models/notification.dart';
 
 class NotificationState {
   const NotificationState({

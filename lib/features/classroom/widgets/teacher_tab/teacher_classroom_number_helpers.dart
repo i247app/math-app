@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
 
 class TeacherClassroomNumberPalette {
   const TeacherClassroomNumberPalette({

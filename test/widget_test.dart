@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/auth/application/contracts/auth_service.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/session/application/app_session_cubit.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/main.dart';

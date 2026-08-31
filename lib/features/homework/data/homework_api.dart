@@ -1,5 +1,7 @@
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/data/mappers/classroom_exercise_mapper.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 
@@ -38,7 +40,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
           purpose: purpose?.trim().isEmpty == true ? null : purpose?.trim(),
         ),
       );
-      return response.exercises;
+      return response.exercises.map((exercise) => exercise.toDomain()).toList();
     });
   }
 
@@ -74,7 +76,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
           purpose: purpose,
         ),
       );
-      return response.exercise;
+      return response.exercise?.toDomain();
     });
   }
 
@@ -92,7 +94,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
       if (exercise == null) {
         throw const ClassroomExerciseException('');
       }
-      return exercise;
+      return exercise.toDomain();
     });
   }
 
@@ -112,7 +114,7 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
           purpose: purpose,
         ),
       );
-      return response.exercise;
+      return response.exercise?.toDomain();
     });
   }
 
@@ -123,13 +125,15 @@ class ClassroomExerciseApi implements ClassroomExerciseService {
     required List<SubmitClassroomExerciseAnswer> answers,
   }) {
     return _runExerciseRequest(() {
-      return _remote.submitClassroomExercise(
-        SubmitClassroomExerciseRequest(
-          profileId: profileId,
-          classroomExerciseId: classroomExerciseId,
-          answers: answers,
-        ),
-      );
+      return _remote
+          .submitClassroomExercise(
+            SubmitClassroomExerciseRequest(
+              profileId: profileId,
+              classroomExerciseId: classroomExerciseId,
+              answers: answers.map((answer) => answer.toDto()).toList(),
+            ),
+          )
+          .then((response) => response.toDomain());
     });
   }
 }
@@ -171,12 +175,12 @@ class _ClassroomExerciseRemoteDataSource {
     ClassroomExerciseResponse.fromJson,
   );
 
-  Future<ClassroomExerciseSubmissionResponse> submitClassroomExercise(
+  Future<ClassroomExerciseSubmissionResponseDto> submitClassroomExercise(
     SubmitClassroomExerciseRequest request,
   ) => _postResponse(
     '/classroom-exercise/submissions/submit',
     request.toJson(),
-    ClassroomExerciseSubmissionResponse.fromJson,
+    ClassroomExerciseSubmissionResponseDto.fromJson,
   );
 
   Future<ClassroomExerciseResponse> getClassroomExerciseDetail({

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/homework/data/homework_quiz_review_service.dart';
 import 'package:numi/features/quiz/presentation/screens/quiz_review_screen.dart';

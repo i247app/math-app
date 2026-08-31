@@ -3,7 +3,9 @@ import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/data/mappers/profile_mapper.dart';
 import 'package:numi/features/profile/errors/grade_exception.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
 
 class GradeApi implements GradeService {
   GradeApi({String? baseUrl, NetworkClient? networkClient})
@@ -33,6 +35,6 @@ class GradeApi implements GradeService {
       throw GradeException(error.message, status: error.status);
     }
 
-    return response.grades;
+    return response.grades.map((grade) => grade.toDomain()).toList();
   }
 }

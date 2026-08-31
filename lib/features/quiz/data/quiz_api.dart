@@ -3,6 +3,8 @@ import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/data/mappers/quiz_mapper.dart';
+import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/features/quiz/errors/quiz_exception.dart';
 
 class QuizApi implements QuizService {
@@ -24,7 +26,7 @@ class QuizApi implements QuizService {
     List<String>? chapters,
     int? profileId,
   }) async {
-    final GenerateQuizResponse response;
+    final GenerateQuizResponseDto response;
     final cleanGradeLabel = gradeLabel?.trim() ?? '';
     response = await _runQuizRequest(
       () => _generateQuiz(
@@ -44,7 +46,7 @@ class QuizApi implements QuizService {
       throw QuizException(AppStrings.current(AppKeys.quizHasNoQuestions));
     }
 
-    return quiz;
+    return quiz.toDomain();
   }
 
   @override
@@ -53,12 +55,12 @@ class QuizApi implements QuizService {
     required List<SubmitQuizAnswer> answers,
     int? profileId,
   }) async {
-    final SubmitQuizResponse response;
+    final SubmitQuizResponseDto response;
     response = await _runQuizRequest(
       () => _submitQuiz(
         SubmitQuizRequest(
           quizId: quizId,
-          answers: answers,
+          answers: answers.map((answer) => answer.toDto()).toList(),
           profileId: profileId,
         ),
       ),
@@ -69,13 +71,13 @@ class QuizApi implements QuizService {
       throw QuizException(AppStrings.current(AppKeys.submitQuizFailed));
     }
 
-    return quiz;
+    return quiz.toDomain();
   }
 
   @override
   Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId}) async {
     final response = await _listQuizzes(userId: userId, profileId: profileId);
-    return response.quizzes;
+    return response.quizzes.map((quiz) => quiz.toDomain()).toList();
   }
 
   @override
@@ -92,7 +94,7 @@ class QuizApi implements QuizService {
       page: page,
       size: size,
       takeAll: takeAll,
-    );
+    ).then((response) => response.toDomain());
   }
 
   @override
@@ -119,10 +121,10 @@ class QuizApi implements QuizService {
           purpose: quizPurposeAssessment,
         ),
       ),
-    );
+    ).then((response) => response.toDomain());
   }
 
-  Future<QuizListResponse> _listQuizzes({
+  Future<QuizListResponseDto> _listQuizzes({
     int? userId,
     int? profileId,
     int? page,
@@ -135,7 +137,7 @@ class QuizApi implements QuizService {
       );
     }
 
-    final QuizListResponse response;
+    final QuizListResponseDto response;
     response = await _runQuizRequest(
       () => _listQuizResponse(
         QuizListRequest(
@@ -158,7 +160,7 @@ class QuizApi implements QuizService {
       throw QuizException(AppStrings.current(AppKeys.missingQuizIdShort));
     }
 
-    final QuizDetailResponse response;
+    final QuizDetailResponseDto response;
     response = await _runQuizRequest(() => _getQuizDetailResponse(quizId));
 
     final quiz = response.quiz;
@@ -166,49 +168,49 @@ class QuizApi implements QuizService {
       throw QuizException(AppStrings.current(AppKeys.quizDetailLoadFailed));
     }
 
-    return quiz;
+    return quiz.toDomain();
   }
 
-  Future<GenerateQuizResponse> _generateQuiz(GenerateQuizRequest request) {
+  Future<GenerateQuizResponseDto> _generateQuiz(GenerateQuizRequest request) {
     return _postResponse(
       '/quizzes/generate',
       request.toJson(),
-      GenerateQuizResponse.fromJson,
+      GenerateQuizResponseDto.fromJson,
       receiveTimeout: const Duration(seconds: 90),
     );
   }
 
-  Future<SubmitQuizResponse> _submitQuiz(SubmitQuizRequest request) {
+  Future<SubmitQuizResponseDto> _submitQuiz(SubmitQuizRequest request) {
     return _postResponse(
       '/quizzes/submit',
       request.toJson(),
-      SubmitQuizResponse.fromJson,
+      SubmitQuizResponseDto.fromJson,
       receiveTimeout: const Duration(seconds: 90),
     );
   }
 
-  Future<QuizListResponse> _listQuizResponse(QuizListRequest request) {
+  Future<QuizListResponseDto> _listQuizResponse(QuizListRequest request) {
     return _postResponse(
       '/quizzes/list',
       request.toJson(),
-      QuizListResponse.fromJson,
+      QuizListResponseDto.fromJson,
     );
   }
 
-  Future<QuizProgressResponse> _getQuizProgressResponse(
+  Future<QuizProgressResponseDto> _getQuizProgressResponse(
     QuizProgressRequest request,
   ) {
     return _postResponse(
       '/quizzes/analytics/progress',
       request.toJson(),
-      QuizProgressResponse.fromJson,
+      QuizProgressResponseDto.fromJson,
     );
   }
 
-  Future<QuizDetailResponse> _getQuizDetailResponse(int quizId) {
+  Future<QuizDetailResponseDto> _getQuizDetailResponse(int quizId) {
     return _postResponse('/quizzes/detail', <String, dynamic>{
       'quiz_id': quizId,
-    }, QuizDetailResponse.fromJson);
+    }, QuizDetailResponseDto.fromJson);
   }
 
   Future<T> _postResponse<T>(

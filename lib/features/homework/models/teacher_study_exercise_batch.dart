@@ -1,4 +1,4 @@
-import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 
 class TeacherStudyExerciseBatch {
   const TeacherStudyExerciseBatch({

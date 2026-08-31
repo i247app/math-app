@@ -4,11 +4,12 @@ import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/network/auth_token_store.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/data/mappers/quiz_mapper.dart';
 import 'package:numi/features/quiz/data/quiz_api.dart';
 
 void main() {
   test('quiz progress accepts a null average delta', () {
-    final response = QuizProgressResponse.fromJson(<String, dynamic>{
+    final response = QuizProgressResponseDto.fromJson(<String, dynamic>{
       'from_dt': '2026-08-13T17:00:00.000Z',
       'limit': 10,
       'mstatus': 200,
@@ -56,7 +57,7 @@ void main() {
       },
       'to_dt': '2026-08-14T16:59:59.999999Z',
       'tz': '+07:00',
-    });
+    }).toDomain();
 
     expect(response.series, hasLength(2));
     expect(response.summary?.averageDelta, isNull);

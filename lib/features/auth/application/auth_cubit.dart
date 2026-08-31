@@ -9,7 +9,7 @@ import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/errors/auth_status.dart';
 import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/auth/models/signup_form_data.dart';
 
 import 'package:numi/features/auth/application/auth_state.dart';

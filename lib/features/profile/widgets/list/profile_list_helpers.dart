@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 

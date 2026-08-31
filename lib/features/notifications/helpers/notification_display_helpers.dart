@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/notifications/data/dto/notification_models.dart';
+import 'package:numi/features/notifications/domain/models/notification.dart';
 
 typedef NotificationGroups = ({
   List<NotificationModel> today,

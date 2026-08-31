@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_add_button.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_empty_state.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_list_card.dart';

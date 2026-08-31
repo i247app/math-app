@@ -1,5 +1,5 @@
-import 'package:numi/features/profile/data/dto/profile_models.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 
 enum SessionStatus { unauthenticated, restoring, authenticated }

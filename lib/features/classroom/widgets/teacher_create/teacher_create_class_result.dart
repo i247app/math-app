@@ -1,4 +1,4 @@
-import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
 
 class TeacherCreateClassResult {
   const TeacherCreateClassResult({this.classroom});

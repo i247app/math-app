@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/classroom/data/mappers/classroom_mapper.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';
 
@@ -21,7 +23,9 @@ class ClassroomApi implements ClassroomService {
       final response = await _remote.listClassrooms(
         ClassroomListRequest(profileId: profileId, ownerProfileId: profileId),
       );
-      return response.classrooms;
+      return response.classrooms
+          .map((classroom) => classroom.toDomain())
+          .toList();
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }
@@ -35,7 +39,9 @@ class ClassroomApi implements ClassroomService {
       final response = await _remote.listMyJoinedClassrooms(
         ClassroomListRequest(profileId: profileId),
       );
-      return response.classrooms;
+      return response.classrooms
+          .map((classroom) => classroom.toDomain())
+          .toList();
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }
@@ -72,6 +78,7 @@ class ClassroomApi implements ClassroomService {
                     selectedSchoolIds.contains(classroom.schoolId));
             return matchesGrade && matchesSchool;
           })
+          .map((classroom) => classroom.toDomain())
           .toList(growable: false);
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
@@ -107,7 +114,7 @@ class ClassroomApi implements ClassroomService {
           classroomId: classroomId,
         ),
       );
-      return response.members;
+      return response.members.map((member) => member.toDomain()).toList();
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }
@@ -127,7 +134,7 @@ class ClassroomApi implements ClassroomService {
           status: 'ACTIVE',
         ),
       );
-      return response.members;
+      return response.members.map((member) => member.toDomain()).toList();
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }
@@ -198,7 +205,9 @@ class ClassroomApi implements ClassroomService {
       final response = await _remote.listMyPendingClassroomInvitations(
         ClassroomInvitationListRequest(profileId: profileId),
       );
-      return response.invitations;
+      return response.invitations
+          .map((invitation) => invitation.toDomain())
+          .toList();
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }
@@ -266,7 +275,7 @@ class ClassroomApi implements ClassroomService {
         ),
         filePath: filePath,
       );
-      return response.classroom;
+      return response.classroom?.toDomain();
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }
@@ -282,7 +291,7 @@ class ClassroomApi implements ClassroomService {
         classroomId: classroomId,
         profileId: profileId,
       );
-      return response.classroom;
+      return response.classroom?.toDomain();
     } on NetworkException catch (error) {
       throw ClassroomException(error.message, status: error.status);
     }

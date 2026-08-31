@@ -18,7 +18,7 @@ class GradeListRequest {
 class GradeListResponse {
   const GradeListResponse({
     required this.mstatus,
-    this.grades = const <GradeModel>[],
+    this.grades = const <GradeDto>[],
     this.pagination,
     this.status,
     this.mmessage,
@@ -28,7 +28,7 @@ class GradeListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _gradeListFromJson)
-  final List<GradeModel> grades;
+  final List<GradeDto> grades;
   @JsonKey(fromJson: _gradePaginationFromJson)
   final GradePagination? pagination;
   final String? status;
@@ -75,8 +75,8 @@ class GradePagination {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class GradeModel {
-  const GradeModel({
+class GradeDto {
+  const GradeDto({
     this.id,
     this.gradeId,
     this.label,
@@ -99,18 +99,18 @@ class GradeModel {
   final String? createDt;
   final String? modifyDt;
 
-  factory GradeModel.fromJson(Map<String, dynamic> json) =>
-      _$GradeModelFromJson(json);
+  factory GradeDto.fromJson(Map<String, dynamic> json) =>
+      _$GradeDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$GradeModelToJson(this);
+  Map<String, dynamic> toJson() => _$GradeDtoToJson(this);
 }
 
 GradePagination? _gradePaginationFromJson(Object? value) {
   return _objectFromJson(value, GradePagination.fromJson);
 }
 
-List<GradeModel> _gradeListFromJson(Object? value) {
-  return _listFromJson(value, GradeModel.fromJson);
+List<GradeDto> _gradeListFromJson(Object? value) {
+  return _listFromJson(value, GradeDto.fromJson);
 }
 
 T? _objectFromJson<T>(

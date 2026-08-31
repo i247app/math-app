@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numi/features/home/data/dto/home_layout_models.dart';
+import 'package:numi/features/home/domain/models/home_layout.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';

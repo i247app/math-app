@@ -1,6 +1,8 @@
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
 import 'package:numi/features/notifications/data/dto/notification_models.dart';
+import 'package:numi/features/notifications/data/mappers/notification_mapper.dart';
+import 'package:numi/features/notifications/domain/models/notification.dart';
 import 'package:numi/features/notifications/errors/notification_list_exception.dart';
 
 class NotificationApi implements NotificationListService {
@@ -22,7 +24,9 @@ class NotificationApi implements NotificationListService {
       );
       NetworkClient.throwForApiStatus(json);
       final response = NotificationListResponse.fromJson(json);
-      return response.notifications;
+      return response.notifications
+          .map((notification) => notification.toDomain())
+          .toList();
     } on NetworkException catch (error) {
       throw NotificationListException(error.message, status: error.status);
     }

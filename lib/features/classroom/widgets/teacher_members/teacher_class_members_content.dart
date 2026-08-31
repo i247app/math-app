@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/shared/layouts/app_screen_app_bar.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';

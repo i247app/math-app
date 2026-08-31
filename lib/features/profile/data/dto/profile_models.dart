@@ -111,7 +111,7 @@ class DeleteProfileRequest {
 class ProfileListResponse {
   const ProfileListResponse({
     required this.mstatus,
-    this.profiles = const <StudentProfile>[],
+    this.profiles = const <StudentProfileDto>[],
     this.status,
     this.mmessage,
     this.debug,
@@ -120,7 +120,7 @@ class ProfileListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _profilesFromJson)
-  final List<StudentProfile> profiles;
+  final List<StudentProfileDto> profiles;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -152,7 +152,7 @@ class CreateProfileResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _studentProfileFromJson)
-  final StudentProfile? profile;
+  final StudentProfileDto? profile;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -176,7 +176,7 @@ class UpdateProfileResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _studentProfileFromJson)
-  final StudentProfile? profile;
+  final StudentProfileDto? profile;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -209,8 +209,8 @@ class DeleteProfileResponse {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class StudentProfile {
-  const StudentProfile({
+class StudentProfileDto {
+  const StudentProfileDto({
     this.id,
     this.profileId,
     this.profileCode,
@@ -247,7 +247,7 @@ class StudentProfile {
   @JsonKey(fromJson: _intFromJson)
   final int? schoolId;
   @JsonKey(fromJson: _schoolFromJson)
-  final SchoolModel? school;
+  final SchoolDto? school;
   final String? name;
   final String? avatarKey;
   final String? avatarUrl;
@@ -255,15 +255,15 @@ class StudentProfile {
   @JsonKey(fromJson: _intFromJson)
   final int? gradeId;
   @JsonKey(fromJson: _profileGradeFromJson)
-  final ProfileGrade? grade;
+  final ProfileGradeDto? grade;
   @JsonKey(fromJson: _intFromJson)
   final int? programId;
   @JsonKey(fromJson: _programFromJson)
-  final ProgramModel? program;
+  final ProgramDto? program;
   @JsonKey(fromJson: _intFromJson)
   final int? semesterId;
   @JsonKey(fromJson: _semesterFromJson)
-  final SemesterModel? semester;
+  final SemesterDto? semester;
   @JsonKey(fromJson: _boolFromJson)
   final bool isDefault;
   final String? role;
@@ -274,15 +274,15 @@ class StudentProfile {
   final String? createDt;
   final String? modifyDt;
 
-  factory StudentProfile.fromJson(Map<String, dynamic> json) =>
-      _$StudentProfileFromJson(json);
+  factory StudentProfileDto.fromJson(Map<String, dynamic> json) =>
+      _$StudentProfileDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$StudentProfileToJson(this);
+  Map<String, dynamic> toJson() => _$StudentProfileDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ProfileGrade {
-  const ProfileGrade({
+class ProfileGradeDto {
+  const ProfileGradeDto({
     this.id,
     this.gradeId,
     this.label,
@@ -301,42 +301,44 @@ class ProfileGrade {
   final int? displayOrder;
   final String? imageUrl;
 
-  factory ProfileGrade.fromJson(Map<String, dynamic> json) =>
-      _$ProfileGradeFromJson(json);
+  factory ProfileGradeDto.fromJson(Map<String, dynamic> json) =>
+      _$ProfileGradeDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ProfileGradeToJson(this);
+  Map<String, dynamic> toJson() => _$ProfileGradeDtoToJson(this);
 }
 
-List<StudentProfile> _profilesFromJson(Object? value) {
+List<StudentProfileDto> _profilesFromJson(Object? value) {
   if (value is List) {
     return value
-        .map((item) => _objectFromJson(item, StudentProfile.fromJson))
-        .whereType<StudentProfile>()
+        .map((item) => _objectFromJson(item, StudentProfileDto.fromJson))
+        .whereType<StudentProfileDto>()
         .toList();
   }
 
-  final profile = _objectFromJson(value, StudentProfile.fromJson);
-  return profile == null ? const <StudentProfile>[] : <StudentProfile>[profile];
+  final profile = _objectFromJson(value, StudentProfileDto.fromJson);
+  return profile == null
+      ? const <StudentProfileDto>[]
+      : <StudentProfileDto>[profile];
 }
 
-StudentProfile? _studentProfileFromJson(Object? value) {
-  return _objectFromJson(value, StudentProfile.fromJson);
+StudentProfileDto? _studentProfileFromJson(Object? value) {
+  return _objectFromJson(value, StudentProfileDto.fromJson);
 }
 
-SchoolModel? _schoolFromJson(Object? value) {
-  return _objectFromJson(value, SchoolModel.fromJson);
+SchoolDto? _schoolFromJson(Object? value) {
+  return _objectFromJson(value, SchoolDto.fromJson);
 }
 
-ProfileGrade? _profileGradeFromJson(Object? value) {
-  return _objectFromJson(value, ProfileGrade.fromJson);
+ProfileGradeDto? _profileGradeFromJson(Object? value) {
+  return _objectFromJson(value, ProfileGradeDto.fromJson);
 }
 
-ProgramModel? _programFromJson(Object? value) {
-  return _objectFromJson(value, ProgramModel.fromJson);
+ProgramDto? _programFromJson(Object? value) {
+  return _objectFromJson(value, ProgramDto.fromJson);
 }
 
-SemesterModel? _semesterFromJson(Object? value) {
-  return _objectFromJson(value, SemesterModel.fromJson);
+SemesterDto? _semesterFromJson(Object? value) {
+  return _objectFromJson(value, SemesterDto.fromJson);
 }
 
 T? _objectFromJson<T>(

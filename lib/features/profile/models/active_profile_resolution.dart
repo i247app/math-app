@@ -1,4 +1,4 @@
-import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 

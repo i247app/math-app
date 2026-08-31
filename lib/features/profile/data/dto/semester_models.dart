@@ -18,7 +18,7 @@ class SemesterListRequest {
 class SemesterListResponse {
   const SemesterListResponse({
     required this.mstatus,
-    this.semesters = const <SemesterModel>[],
+    this.semesters = const <SemesterDto>[],
     this.status,
     this.mmessage,
     this.debug,
@@ -27,7 +27,7 @@ class SemesterListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _semesterListFromJson)
-  final List<SemesterModel> semesters;
+  final List<SemesterDto> semesters;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -39,8 +39,8 @@ class SemesterListResponse {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class SemesterModel {
-  const SemesterModel({
+class SemesterDto {
+  const SemesterDto({
     this.id,
     this.semesterId,
     this.name,
@@ -63,14 +63,14 @@ class SemesterModel {
   final String? createDt;
   final String? modifyDt;
 
-  factory SemesterModel.fromJson(Map<String, dynamic> json) =>
-      _$SemesterModelFromJson(json);
+  factory SemesterDto.fromJson(Map<String, dynamic> json) =>
+      _$SemesterDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SemesterModelToJson(this);
+  Map<String, dynamic> toJson() => _$SemesterDtoToJson(this);
 }
 
-List<SemesterModel> _semesterListFromJson(Object? value) {
-  return _listFromJson(value, SemesterModel.fromJson);
+List<SemesterDto> _semesterListFromJson(Object? value) {
+  return _listFromJson(value, SemesterDto.fromJson);
 }
 
 List<T> _listFromJson<T>(

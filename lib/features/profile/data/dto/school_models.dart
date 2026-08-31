@@ -22,7 +22,7 @@ class SchoolListResponse {
   const SchoolListResponse({
     required this.mstatus,
     this.pagination,
-    this.schools = const <SchoolModel>[],
+    this.schools = const <SchoolDto>[],
     this.status,
     this.mmessage,
     this.debug,
@@ -33,7 +33,7 @@ class SchoolListResponse {
   @JsonKey(fromJson: _schoolPaginationFromJson)
   final SchoolPagination? pagination;
   @JsonKey(fromJson: _schoolListFromJson)
-  final List<SchoolModel> schools;
+  final List<SchoolDto> schools;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -78,8 +78,8 @@ class SchoolPagination {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class SchoolModel {
-  const SchoolModel({
+class SchoolDto {
+  const SchoolDto({
     this.id,
     this.schoolId,
     this.name,
@@ -97,18 +97,18 @@ class SchoolModel {
   final String? createDt;
   final String? modifyDt;
 
-  factory SchoolModel.fromJson(Map<String, dynamic> json) =>
-      _$SchoolModelFromJson(json);
+  factory SchoolDto.fromJson(Map<String, dynamic> json) =>
+      _$SchoolDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SchoolModelToJson(this);
+  Map<String, dynamic> toJson() => _$SchoolDtoToJson(this);
 }
 
 SchoolPagination? _schoolPaginationFromJson(Object? value) {
   return _objectFromJson(value, SchoolPagination.fromJson);
 }
 
-List<SchoolModel> _schoolListFromJson(Object? value) {
-  return _listFromJson(value, SchoolModel.fromJson);
+List<SchoolDto> _schoolListFromJson(Object? value) {
+  return _listFromJson(value, SchoolDto.fromJson);
 }
 
 T? _objectFromJson<T>(

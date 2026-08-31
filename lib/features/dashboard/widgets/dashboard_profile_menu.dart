@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/profile/data/dto/profile_models.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';

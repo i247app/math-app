@@ -20,7 +20,7 @@ class NotificationListRequest {
 class NotificationListResponse {
   const NotificationListResponse({
     required this.mstatus,
-    this.notifications = const <NotificationModel>[],
+    this.notifications = const <NotificationDto>[],
     this.pagination,
     this.status,
     this.mmessage,
@@ -30,7 +30,7 @@ class NotificationListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _notificationListFromJson)
-  final List<NotificationModel> notifications;
+  final List<NotificationDto> notifications;
   @JsonKey(fromJson: _notificationPaginationFromJson)
   final NotificationPagination? pagination;
   final String? status;
@@ -81,8 +81,8 @@ class NotificationPagination {
 /// The list response provided by the API currently contains no sample item.
 /// Common fields are exposed as typed values while [rawJson] preserves every
 /// backend field so callers do not lose data when the item schema is extended.
-class NotificationModel {
-  NotificationModel({
+class NotificationDto {
+  NotificationDto({
     required Map<String, dynamic> rawJson,
     this.id,
     this.notificationId,
@@ -110,9 +110,9 @@ class NotificationModel {
   final String? createDt;
   final String? modifyDt;
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+  factory NotificationDto.fromJson(Map<String, dynamic> json) {
     final payload = json['data'] ?? json['payload'];
-    return NotificationModel(
+    return NotificationDto(
       rawJson: json,
       id: _intFromJson(json['id']),
       notificationId: _intFromJson(json['notification_id']),
@@ -183,8 +183,8 @@ NotificationPagination? _notificationPaginationFromJson(Object? value) {
   return _objectFromJson(value, NotificationPagination.fromJson);
 }
 
-List<NotificationModel> _notificationListFromJson(Object? value) {
-  return _listFromJson(value, NotificationModel.fromJson);
+List<NotificationDto> _notificationListFromJson(Object? value) {
+  return _listFromJson(value, NotificationDto.fromJson);
 }
 
 T? _objectFromJson<T>(

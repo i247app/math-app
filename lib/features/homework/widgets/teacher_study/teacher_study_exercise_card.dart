@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
 import 'package:numi/features/homework/helpers/teacher_study_helpers.dart';

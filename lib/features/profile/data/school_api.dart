@@ -1,7 +1,9 @@
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/profile/application/contracts/school_service.dart';
 import 'package:numi/features/profile/data/dto/school_models.dart';
+import 'package:numi/features/profile/data/mappers/profile_mapper.dart';
 import 'package:numi/features/profile/errors/school_exception.dart';
+import 'package:numi/features/profile/domain/models/school.dart';
 
 class SchoolApi implements SchoolService {
   SchoolApi({String? baseUrl, NetworkClient? networkClient})
@@ -32,6 +34,6 @@ class SchoolApi implements SchoolService {
       );
     }
 
-    return response.schools;
+    return response.schools.map((school) => school.toDomain()).toList();
   }
 }

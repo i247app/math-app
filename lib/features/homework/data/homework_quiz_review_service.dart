@@ -1,5 +1,5 @@
-import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
-import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
+import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 

@@ -7,7 +7,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
 import 'package:numi/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';

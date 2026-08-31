@@ -43,7 +43,7 @@ class SubmitQuizRequest {
   });
 
   final int quizId;
-  final List<SubmitQuizAnswer> answers;
+  final List<SubmitQuizAnswerDto> answers;
   final int? profileId;
 
   factory SubmitQuizRequest.fromJson(Map<String, dynamic> json) =>
@@ -53,16 +53,19 @@ class SubmitQuizRequest {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class SubmitQuizAnswer {
-  const SubmitQuizAnswer({required this.questionNumber, required this.label});
+class SubmitQuizAnswerDto {
+  const SubmitQuizAnswerDto({
+    required this.questionNumber,
+    required this.label,
+  });
 
   final int questionNumber;
   final String label;
 
-  factory SubmitQuizAnswer.fromJson(Map<String, dynamic> json) =>
-      _$SubmitQuizAnswerFromJson(json);
+  factory SubmitQuizAnswerDto.fromJson(Map<String, dynamic> json) =>
+      _$SubmitQuizAnswerDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SubmitQuizAnswerToJson(this);
+  Map<String, dynamic> toJson() => _$SubmitQuizAnswerDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
@@ -110,8 +113,8 @@ class QuizProgressRequest {
 }
 
 @JsonSerializable(explicitToJson: true)
-class GenerateQuizResponse {
-  const GenerateQuizResponse({
+class GenerateQuizResponseDto {
+  const GenerateQuizResponseDto({
     required this.mstatus,
     this.quiz,
     this.status,
@@ -120,20 +123,20 @@ class GenerateQuizResponse {
   });
 
   final int mstatus;
-  final GeneratedQuiz? quiz;
+  final GeneratedQuizDto? quiz;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory GenerateQuizResponse.fromJson(Map<String, dynamic> json) =>
-      _$GenerateQuizResponseFromJson(json);
+  factory GenerateQuizResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$GenerateQuizResponseDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$GenerateQuizResponseToJson(this);
+  Map<String, dynamic> toJson() => _$GenerateQuizResponseDtoToJson(this);
 }
 
 @JsonSerializable(explicitToJson: true)
-class SubmitQuizResponse {
-  const SubmitQuizResponse({
+class SubmitQuizResponseDto {
+  const SubmitQuizResponseDto({
     required this.mstatus,
     this.quiz,
     this.status,
@@ -142,44 +145,44 @@ class SubmitQuizResponse {
   });
 
   final int mstatus;
-  final GeneratedQuiz? quiz;
+  final GeneratedQuizDto? quiz;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory SubmitQuizResponse.fromJson(Map<String, dynamic> json) =>
-      _$SubmitQuizResponseFromJson(json);
+  factory SubmitQuizResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$SubmitQuizResponseDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SubmitQuizResponseToJson(this);
+  Map<String, dynamic> toJson() => _$SubmitQuizResponseDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class QuizListResponse {
-  const QuizListResponse({
+class QuizListResponseDto {
+  const QuizListResponseDto({
     required this.mstatus,
     this.pagination,
-    this.quizzes = const <GeneratedQuiz>[],
+    this.quizzes = const <GeneratedQuizDto>[],
     this.status,
     this.mmessage,
     this.debug,
   });
 
   final int mstatus;
-  final QuizPagination? pagination;
-  final List<GeneratedQuiz> quizzes;
+  final QuizPaginationDto? pagination;
+  final List<GeneratedQuizDto> quizzes;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory QuizListResponse.fromJson(Map<String, dynamic> json) =>
-      _$QuizListResponseFromJson(json);
+  factory QuizListResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizListResponseDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizListResponseToJson(this);
+  Map<String, dynamic> toJson() => _$QuizListResponseDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class QuizDetailResponse {
-  const QuizDetailResponse({
+class QuizDetailResponseDto {
+  const QuizDetailResponseDto({
     required this.mstatus,
     this.quiz,
     this.status,
@@ -188,27 +191,27 @@ class QuizDetailResponse {
   });
 
   final int mstatus;
-  final GeneratedQuiz? quiz;
+  final GeneratedQuizDto? quiz;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory QuizDetailResponse.fromJson(Map<String, dynamic> json) =>
-      _$QuizDetailResponseFromJson(json);
+  factory QuizDetailResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizDetailResponseDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizDetailResponseToJson(this);
+  Map<String, dynamic> toJson() => _$QuizDetailResponseDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class QuizProgressResponse {
-  const QuizProgressResponse({
+class QuizProgressResponseDto {
+  const QuizProgressResponseDto({
     required this.mstatus,
     this.profileId,
     this.fromDt,
     this.toDt,
     this.limit,
     this.purpose,
-    this.series = const <QuizProgressPoint>[],
+    this.series = const <QuizProgressPointDto>[],
     this.summary,
     this.status,
     this.tz,
@@ -222,22 +225,22 @@ class QuizProgressResponse {
   final DateTime? toDt;
   final int? limit;
   final String? purpose;
-  final List<QuizProgressPoint> series;
-  final QuizProgressSummary? summary;
+  final List<QuizProgressPointDto> series;
+  final QuizProgressSummaryDto? summary;
   final String? status;
   final String? tz;
   final String? mmessage;
   final String? debug;
 
-  factory QuizProgressResponse.fromJson(Map<String, dynamic> json) =>
-      _$QuizProgressResponseFromJson(json);
+  factory QuizProgressResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizProgressResponseDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizProgressResponseToJson(this);
+  Map<String, dynamic> toJson() => _$QuizProgressResponseDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class QuizProgressPoint {
-  const QuizProgressPoint({
+class QuizProgressPointDto {
+  const QuizProgressPointDto({
     required this.completedDt,
     required this.correctNumber,
     required this.quizId,
@@ -263,15 +266,15 @@ class QuizProgressPoint {
   final String? title;
   final String? typeOfQuiz;
 
-  factory QuizProgressPoint.fromJson(Map<String, dynamic> json) =>
-      _$QuizProgressPointFromJson(json);
+  factory QuizProgressPointDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizProgressPointDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizProgressPointToJson(this);
+  Map<String, dynamic> toJson() => _$QuizProgressPointDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class QuizProgressSummary {
-  const QuizProgressSummary({
+class QuizProgressSummaryDto {
+  const QuizProgressSummaryDto({
     required this.averageDelta,
     required this.averageScore,
     required this.averageScorePct,
@@ -293,15 +296,15 @@ class QuizProgressSummary {
   final double lowestScore;
   final String trend;
 
-  factory QuizProgressSummary.fromJson(Map<String, dynamic> json) =>
-      _$QuizProgressSummaryFromJson(json);
+  factory QuizProgressSummaryDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizProgressSummaryDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizProgressSummaryToJson(this);
+  Map<String, dynamic> toJson() => _$QuizProgressSummaryDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class QuizPagination {
-  const QuizPagination({
+class QuizPaginationDto {
+  const QuizPaginationDto({
     this.hasNext,
     this.hasPrevious,
     this.page,
@@ -321,15 +324,15 @@ class QuizPagination {
   final int? totalCount;
   final int? totalPages;
 
-  factory QuizPagination.fromJson(Map<String, dynamic> json) =>
-      _$QuizPaginationFromJson(json);
+  factory QuizPaginationDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizPaginationDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizPaginationToJson(this);
+  Map<String, dynamic> toJson() => _$QuizPaginationDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class GeneratedQuiz {
-  const GeneratedQuiz({
+class GeneratedQuizDto {
+  const GeneratedQuizDto({
     this.id,
     this.quizId,
     this.previousQuizId,
@@ -344,7 +347,7 @@ class GeneratedQuiz {
     this.createDt,
     this.modifyDt,
     this.grading,
-    this.answers = const <SubmitQuizAnswer>[],
+    this.answers = const <SubmitQuizAnswerDto>[],
     required this.questions,
   });
 
@@ -367,20 +370,20 @@ class GeneratedQuiz {
   final int? userId;
   final String? createDt;
   final String? modifyDt;
-  final QuizGrading? grading;
-  final List<SubmitQuizAnswer> answers;
-  @JsonKey(defaultValue: <QuizQuestion>[])
-  final List<QuizQuestion> questions;
+  final QuizGradingDto? grading;
+  final List<SubmitQuizAnswerDto> answers;
+  @JsonKey(defaultValue: <QuizQuestionDto>[])
+  final List<QuizQuestionDto> questions;
 
-  factory GeneratedQuiz.fromJson(Map<String, dynamic> json) =>
-      _$GeneratedQuizFromJson(json);
+  factory GeneratedQuizDto.fromJson(Map<String, dynamic> json) =>
+      _$GeneratedQuizDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$GeneratedQuizToJson(this);
+  Map<String, dynamic> toJson() => _$GeneratedQuizDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class QuizGrading {
-  const QuizGrading({
+class QuizGradingDto {
+  const QuizGradingDto({
     this.aiDetectGrade,
     this.aiReview,
     this.correctNumber,
@@ -394,15 +397,15 @@ class QuizGrading {
   final int? scorePercentage;
   final int? totalQuestions;
 
-  factory QuizGrading.fromJson(Map<String, dynamic> json) =>
-      _$QuizGradingFromJson(json);
+  factory QuizGradingDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizGradingDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizGradingToJson(this);
+  Map<String, dynamic> toJson() => _$QuizGradingDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class QuizQuestion {
-  const QuizQuestion({
+class QuizQuestionDto {
+  const QuizQuestionDto({
     required this.questionName,
     required this.questionNumber,
     required this.answers,
@@ -414,31 +417,31 @@ class QuizQuestion {
 
   final String questionName;
   final int questionNumber;
-  @JsonKey(defaultValue: <QuizAnswer>[])
-  final List<QuizAnswer> answers;
+  @JsonKey(defaultValue: <QuizAnswerDto>[])
+  final List<QuizAnswerDto> answers;
   final String? rightAnswer;
   final String? correctAnswer;
   @JsonKey(fromJson: _intFromJson)
   final int? difficulty;
   final String? topic;
 
-  factory QuizQuestion.fromJson(Map<String, dynamic> json) =>
-      _$QuizQuestionFromJson(json);
+  factory QuizQuestionDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizQuestionDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizQuestionToJson(this);
+  Map<String, dynamic> toJson() => _$QuizQuestionDtoToJson(this);
 }
 
 @JsonSerializable()
-class QuizAnswer {
-  const QuizAnswer({required this.content, required this.label});
+class QuizAnswerDto {
+  const QuizAnswerDto({required this.content, required this.label});
 
   final String content;
   final String label;
 
-  factory QuizAnswer.fromJson(Map<String, dynamic> json) =>
-      _$QuizAnswerFromJson(json);
+  factory QuizAnswerDto.fromJson(Map<String, dynamic> json) =>
+      _$QuizAnswerDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$QuizAnswerToJson(this);
+  Map<String, dynamic> toJson() => _$QuizAnswerDtoToJson(this);
 }
 
 int? _intFromJson(Object? value) {

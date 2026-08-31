@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/session/application/passcode_cubit.dart';
 import 'package:numi/features/session/application/passcode_state.dart';
 import 'package:numi/features/session/services/passcode_service.dart';

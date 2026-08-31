@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/profile/data/dto/grade_models.dart';
-import 'package:numi/features/profile/data/dto/program_models.dart';
-import 'package:numi/features/profile/data/dto/school_models.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
+import 'package:numi/features/profile/domain/models/program.dart';
+import 'package:numi/features/profile/domain/models/school.dart';
 import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_class_avatar_picker.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_dropdown_field.dart';

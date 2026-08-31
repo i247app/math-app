@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/profile/data/dto/grade_models.dart';
-import 'package:numi/features/profile/data/dto/profile_models.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';

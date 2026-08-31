@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/classroom/data/dto/classroom_models.dart';
+import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/home/teacher/shared/widgets/class_default_image.dart';
 
 class ClassThumb extends StatelessWidget {

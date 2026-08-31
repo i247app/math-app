@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/homework/widgets/student_list/student_homework_filter.dart';
 
 String studentHomeworkTitle(ClassroomExercise exercise) {

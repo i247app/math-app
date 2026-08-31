@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_centered_text.dart';

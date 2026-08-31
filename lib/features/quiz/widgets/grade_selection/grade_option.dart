@@ -1,4 +1,4 @@
-import 'package:numi/features/profile/data/dto/grade_models.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/features/quiz/helpers/grade_number_from_label.dart';
 
 class GradeOption {

@@ -1,8 +1,8 @@
-import 'package:numi/features/profile/data/dto/grade_models.dart';
-import 'package:numi/features/profile/data/dto/profile_models.dart';
-import 'package:numi/features/profile/data/dto/program_models.dart';
-import 'package:numi/features/profile/data/dto/school_models.dart';
-import 'package:numi/features/profile/data/dto/semester_models.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
+import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/profile/domain/models/program.dart';
+import 'package:numi/features/profile/domain/models/school.dart';
+import 'package:numi/features/profile/domain/models/semester.dart';
 
 class ProfileManagementState {
   const ProfileManagementState({

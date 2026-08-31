@@ -1,4 +1,4 @@
-import 'package:numi/features/homework/data/dto/classroom_exercise_models.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/quiz/helpers/history_date_value.dart';
 import 'package:numi/features/quiz/helpers/history_homework_date_text.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/quiz/data/dto/quiz_models.dart';
+import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 
 bool isCompletedAssessment(GeneratedQuiz quiz) {

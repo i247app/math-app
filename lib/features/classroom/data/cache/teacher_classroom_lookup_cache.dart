@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:numi/features/profile/data/dto/grade_models.dart';
-import 'package:numi/features/profile/data/dto/program_models.dart';
-import 'package:numi/features/profile/data/dto/school_models.dart';
+import 'package:numi/features/profile/domain/models/grade.dart';
+import 'package:numi/features/profile/domain/models/program.dart';
+import 'package:numi/features/profile/domain/models/school.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
 import 'package:numi/features/profile/application/contracts/school_service.dart';

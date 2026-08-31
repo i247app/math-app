@@ -1,10 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 
 part 'classroom_exercise_models.g.dart';
-
-const classroomExercisePurposeHomework = 'HOMEWORK';
-const classroomExercisePurposeQuiz = 'QUIZ';
-const classroomExercisePurposeExam = 'EXAM';
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class ClassroomExerciseListRequest {
@@ -60,7 +57,7 @@ class SubmitClassroomExerciseRequest {
 
   final int profileId;
   final int classroomExerciseId;
-  final List<SubmitClassroomExerciseAnswer> answers;
+  final List<SubmitClassroomExerciseAnswerDto> answers;
 
   factory SubmitClassroomExerciseRequest.fromJson(Map<String, dynamic> json) =>
       _$SubmitClassroomExerciseRequestFromJson(json);
@@ -69,8 +66,8 @@ class SubmitClassroomExerciseRequest {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
-class SubmitClassroomExerciseAnswer {
-  const SubmitClassroomExerciseAnswer({
+class SubmitClassroomExerciseAnswerDto {
+  const SubmitClassroomExerciseAnswerDto({
     required this.questionNumber,
     required this.label,
     this.answer,
@@ -82,10 +79,12 @@ class SubmitClassroomExerciseAnswer {
   final String? answer;
   final String? answerContent;
 
-  factory SubmitClassroomExerciseAnswer.fromJson(Map<String, dynamic> json) =>
-      _$SubmitClassroomExerciseAnswerFromJson(json);
+  factory SubmitClassroomExerciseAnswerDto.fromJson(
+    Map<String, dynamic> json,
+  ) => _$SubmitClassroomExerciseAnswerDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SubmitClassroomExerciseAnswerToJson(this);
+  Map<String, dynamic> toJson() =>
+      _$SubmitClassroomExerciseAnswerDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
@@ -127,8 +126,8 @@ class CreateClassroomExerciseRequest {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ClassroomExerciseSubmissionResponse {
-  const ClassroomExerciseSubmissionResponse({
+class ClassroomExerciseSubmissionResponseDto {
+  const ClassroomExerciseSubmissionResponseDto({
     required this.mstatus,
     this.grading,
     this.status,
@@ -139,12 +138,12 @@ class ClassroomExerciseSubmissionResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _submissionGradingFromJson)
-  final ClassroomExerciseSubmissionGrading? grading;
+  final ClassroomExerciseSubmissionGradingDto? grading;
   final String? status;
   final String? mmessage;
   final String? debug;
 
-  factory ClassroomExerciseSubmissionResponse.fromJson(
+  factory ClassroomExerciseSubmissionResponseDto.fromJson(
     Map<String, dynamic> json,
   ) {
     final data = json['data'];
@@ -163,19 +162,19 @@ class ClassroomExerciseSubmissionResponse {
         _nestedValue(submission, 'result') ??
         submission;
 
-    return _$ClassroomExerciseSubmissionResponseFromJson(<String, dynamic>{
+    return _$ClassroomExerciseSubmissionResponseDtoFromJson(<String, dynamic>{
       ...json,
       'grading': grading,
     });
   }
 
   Map<String, dynamic> toJson() =>
-      _$ClassroomExerciseSubmissionResponseToJson(this);
+      _$ClassroomExerciseSubmissionResponseDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ClassroomExerciseSubmissionGrading {
-  const ClassroomExerciseSubmissionGrading({
+class ClassroomExerciseSubmissionGradingDto {
+  const ClassroomExerciseSubmissionGradingDto({
     this.aiReview,
     this.correctNumber,
     this.scorePercentage,
@@ -191,10 +190,10 @@ class ClassroomExerciseSubmissionGrading {
   @JsonKey(fromJson: _intFromJson)
   final int? totalQuestions;
 
-  factory ClassroomExerciseSubmissionGrading.fromJson(
+  factory ClassroomExerciseSubmissionGradingDto.fromJson(
     Map<String, dynamic> json,
   ) {
-    return _$ClassroomExerciseSubmissionGradingFromJson(<String, dynamic>{
+    return _$ClassroomExerciseSubmissionGradingDtoFromJson(<String, dynamic>{
       ...json,
       'ai_review':
           json['ai_review'] ??
@@ -213,14 +212,14 @@ class ClassroomExerciseSubmissionGrading {
   }
 
   Map<String, dynamic> toJson() =>
-      _$ClassroomExerciseSubmissionGradingToJson(this);
+      _$ClassroomExerciseSubmissionGradingDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ClassroomExerciseListResponse {
   const ClassroomExerciseListResponse({
     required this.mstatus,
-    this.exercises = const <ClassroomExercise>[],
+    this.exercises = const <ClassroomExerciseDto>[],
     this.pagination,
     this.status,
     this.mmessage,
@@ -230,7 +229,7 @@ class ClassroomExerciseListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _exerciseListFromJson)
-  final List<ClassroomExercise> exercises;
+  final List<ClassroomExerciseDto> exercises;
   final ClassroomExercisePagination? pagination;
   final String? status;
   final String? mmessage;
@@ -269,7 +268,7 @@ class ClassroomExerciseResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _exerciseFromJson)
-  final ClassroomExercise? exercise;
+  final ClassroomExerciseDto? exercise;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -322,8 +321,8 @@ class ClassroomExercisePagination {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class ClassroomExercise {
-  const ClassroomExercise({
+class ClassroomExerciseDto {
+  const ClassroomExerciseDto({
     this.id,
     this.exerciseId,
     this.classroomExerciseId,
@@ -345,7 +344,7 @@ class ClassroomExercise {
     this.createDt,
     this.modifyDt,
     this.metadata,
-    this.questions = const <ClassroomExerciseQuestion>[],
+    this.questions = const <ClassroomExerciseQuestionDto>[],
   });
 
   @JsonKey(fromJson: _intFromJson)
@@ -390,9 +389,9 @@ class ClassroomExercise {
   final String? modifyDt;
   final Map<String, dynamic>? metadata;
   @JsonKey(fromJson: _questionListFromJson)
-  final List<ClassroomExerciseQuestion> questions;
+  final List<ClassroomExerciseQuestionDto> questions;
 
-  factory ClassroomExercise.fromJson(Map<String, dynamic> json) {
+  factory ClassroomExerciseDto.fromJson(Map<String, dynamic> json) {
     final questionsValue =
         json['questions'] ??
         json['exercise_questions'] ??
@@ -400,7 +399,7 @@ class ClassroomExercise {
         _nestedValue(json['data'], 'questions') ??
         _nestedValue(json['data'], 'exercise_questions');
 
-    return _$ClassroomExerciseFromJson(<String, dynamic>{
+    return _$ClassroomExerciseDtoFromJson(<String, dynamic>{
       ...json,
       'exercise_id': json['exercise_id'] ?? json['assignment_id'],
       'classroom_exercise_id':
@@ -425,14 +424,14 @@ class ClassroomExercise {
     });
   }
 
-  Map<String, dynamic> toJson() => _$ClassroomExerciseToJson(this);
+  Map<String, dynamic> toJson() => _$ClassroomExerciseDtoToJson(this);
 
   int? get stableId => classroomExerciseId ?? exerciseId ?? id;
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ClassroomExerciseQuestion {
-  const ClassroomExerciseQuestion({
+class ClassroomExerciseQuestionDto {
+  const ClassroomExerciseQuestionDto({
     this.id,
     this.questionId,
     this.questionNumber,
@@ -460,8 +459,8 @@ class ClassroomExerciseQuestion {
   @JsonKey(fromJson: _stringListFromJson)
   final List<String> answers;
 
-  factory ClassroomExerciseQuestion.fromJson(Map<String, dynamic> json) {
-    return _$ClassroomExerciseQuestionFromJson(<String, dynamic>{
+  factory ClassroomExerciseQuestionDto.fromJson(Map<String, dynamic> json) {
+    return _$ClassroomExerciseQuestionDtoFromJson(<String, dynamic>{
       ...json,
       'question_id': json['question_id'] ?? json['id'],
       'question_number': json['question_number'] ?? json['number'],
@@ -477,7 +476,7 @@ class ClassroomExerciseQuestion {
     });
   }
 
-  Map<String, dynamic> toJson() => _$ClassroomExerciseQuestionToJson(this);
+  Map<String, dynamic> toJson() => _$ClassroomExerciseQuestionDtoToJson(this);
 
   String? get displayPrompt {
     final values = <String?>[content, prompt, question];
@@ -491,20 +490,22 @@ class ClassroomExerciseQuestion {
   }
 }
 
-List<ClassroomExercise> _exerciseListFromJson(Object? value) {
-  return _listFromJson(value, ClassroomExercise.fromJson);
+List<ClassroomExerciseDto> _exerciseListFromJson(Object? value) {
+  return _listFromJson(value, ClassroomExerciseDto.fromJson);
 }
 
-ClassroomExercise? _exerciseFromJson(Object? value) {
-  return _objectFromJson(value, ClassroomExercise.fromJson);
+ClassroomExerciseDto? _exerciseFromJson(Object? value) {
+  return _objectFromJson(value, ClassroomExerciseDto.fromJson);
 }
 
-ClassroomExerciseSubmissionGrading? _submissionGradingFromJson(Object? value) {
-  return _objectFromJson(value, ClassroomExerciseSubmissionGrading.fromJson);
+ClassroomExerciseSubmissionGradingDto? _submissionGradingFromJson(
+  Object? value,
+) {
+  return _objectFromJson(value, ClassroomExerciseSubmissionGradingDto.fromJson);
 }
 
-List<ClassroomExerciseQuestion> _questionListFromJson(Object? value) {
-  return _listFromJson(value, ClassroomExerciseQuestion.fromJson);
+List<ClassroomExerciseQuestionDto> _questionListFromJson(Object? value) {
+  return _listFromJson(value, ClassroomExerciseQuestionDto.fromJson);
 }
 
 Object? _nestedValue(Object? value, String key) {
