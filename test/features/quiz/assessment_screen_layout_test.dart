@@ -6,9 +6,9 @@ import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/quiz/presentation/screens/assessment_screen.dart';
-import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_action_button.dart';
-import 'package:numi/features/quiz/widgets/assessment/assessment_bottom_bar.dart';
-import 'package:numi/features/quiz/widgets/assessment/assessment_progress_section.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment/assessment_bottom_action_button.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment/assessment_bottom_bar.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment/assessment_progress_section.dart';
 
 class _UnusedQuizService implements QuizService {
   @override

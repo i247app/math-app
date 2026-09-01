@@ -7,16 +7,16 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
-import 'package:numi/features/classroom/application/classroom_cubit.dart';
-import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/classroom/presentation/helpers/student_class_detail_helpers.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_state.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
-import 'package:numi/features/classroom/widgets/student_detail/student_class_learning_category_section.dart';
-import 'package:numi/features/classroom/widgets/student_detail/student_class_teacher_profile_card.dart';
-import 'package:numi/features/classroom/widgets/student_detail/student_class_top_bar.dart';
-import 'package:numi/features/classroom/widgets/student_detail/student_class_upcoming_deadline_section.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_detail/student_class_learning_category_section.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_detail/student_class_teacher_profile_card.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_detail/student_class_top_bar.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_detail/student_class_upcoming_deadline_section.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
-import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/application/errors/classroom_exercise_exception.dart';
 
 class StudentClassDetailScreen extends StatefulWidget {
   const StudentClassDetailScreen({

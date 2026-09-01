@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/dashboard/widgets/dashboard_header_bar.dart';
-import 'package:numi/features/home/teacher/home/widgets/teacher_top_bar.dart';
+import 'package:numi/features/dashboard/presentation/widgets/dashboard_header_bar.dart';
+import 'package:numi/features/home/presentation/teacher/widgets/teacher_top_bar.dart';
 import 'package:numi/shared/widgets/notification_unread_dot.dart';
 
 void main() {

@@ -4,7 +4,7 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/games/presentation/games_tab.dart';
+import 'package:numi/features/games/presentation/tabs/games_tab.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 
 class _UnusedGradeService implements GradeService {

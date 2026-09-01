@@ -3,7 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
-import 'package:numi/features/home/teacher/home/widgets/teacher_hero_card.dart';
+import 'package:numi/features/home/presentation/teacher/widgets/teacher_hero_card.dart';
 
 void main() {
   testWidgets('keeps the Vietnamese hero title visible on a narrow phone', (

@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/network/network_client.dart';
-import 'package:numi/features/auth/data/auth_api.dart';
-import 'package:numi/features/auth/data/auth_exception.dart';
+import 'package:numi/features/auth/data/api/auth_api.dart';
+import 'package:numi/features/auth/data/errors/auth_exception.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 
 void main() {

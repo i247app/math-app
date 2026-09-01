@@ -11,15 +11,15 @@ import 'package:numi/features/home/application/contracts/home_layout_service.dar
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
 import 'package:numi/features/notifications/application/contracts/notification_ping_service.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/data/adapters/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
 import 'package:numi/features/profile/application/contracts/school_service.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_shake_service.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_snapshot_store.dart';
-import 'package:numi/features/session/services/passcode_service.dart';
-import 'package:numi/features/session/services/profile_session_resolver.dart';
+import 'package:numi/features/session/application/services/passcode_service.dart';
+import 'package:numi/features/session/application/services/profile_session_resolver.dart';
 
 /// Exposes application-scoped service interfaces above the Navigator.
 class AppServiceScope extends StatelessWidget {

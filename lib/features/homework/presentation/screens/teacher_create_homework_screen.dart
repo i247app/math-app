@@ -15,27 +15,30 @@ import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/features/profile/domain/models/program.dart';
 import 'package:numi/features/profile/domain/models/school.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
-import 'package:numi/features/classroom/errors/classroom_exception.dart';
+import 'package:numi/features/classroom/application/errors/classroom_exception.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
 import 'package:numi/features/profile/application/contracts/school_service.dart';
 import 'package:numi/shared/layouts/app_screen_app_bar.dart';
-import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_choice_chip.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_class_summary.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_date_field.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_helpers.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_input.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_label.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_labeled_input.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_option_bottom_sheet.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_publish_switch.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_select_field.dart';
-import 'package:numi/features/homework/widgets/teacher_create/teacher_create_homework_submit_button.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
+import 'package:numi/features/homework/application/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_choice_chip.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_class_summary.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_date_field.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_helpers.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_input.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_label.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_labeled_input.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_option_bottom_sheet.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_publish_switch.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_select_field.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_create/teacher_create_homework_submit_button.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_list/teacher_exercise_copy.dart';
 import 'package:numi/shared/widgets/exit_confirmation_dialog.dart';
 import 'package:numi/shared/widgets/guarded_exit_scope.dart';
+
+part 'teacher_create_homework/form_actions.dart';
+part 'teacher_create_homework/data_actions.dart';
 
 class TeacherCreateHomeworkScreen extends StatefulWidget {
   const TeacherCreateHomeworkScreen({
@@ -133,375 +136,6 @@ class _TeacherCreateHomeworkScreenState
     _descriptionController.dispose();
     _titleFocusNode.dispose();
     super.dispose();
-  }
-
-  Future<void> _submit() async {
-    if (_isSubmitting) {
-      return;
-    }
-
-    if (!_validateCreateHomeworkForm()) {
-      return;
-    }
-
-    HapticFeedback.selectionClick();
-    setState(() => _isSubmitting = true);
-    try {
-      await _exerciseService.createExercise(
-        profileId: widget.profileId,
-        classroomId: _selectedClassroomId,
-        programId: _selectedProgramId!,
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        numQuestions: _selectedQuestionCount,
-        chapterName: trimOrDefault(
-          _chapterController.text,
-          context.readText(AppKeys.teacherAssignmentDefaultChapter),
-        ),
-        lessonName: trimOrDefault(
-          _lessonController.text,
-          context.readText(AppKeys.teacherAssignmentDefaultLesson),
-        ),
-        visibility: _visibility,
-        startDate: exerciseApiDate(_startDate!),
-        endDate: exerciseApiDate(_endDate!),
-        purpose: widget.purpose,
-      );
-      if (!mounted) {
-        return;
-      }
-      await _exitController.exitWithResult(true);
-    } on ClassroomExerciseException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      _showError(
-        error.message.trim().isEmpty
-            ? context.readText(
-                teacherExerciseCopy(widget.purpose).createFailedKey,
-              )
-            : error.message,
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
-    }
-  }
-
-  int get _selectedClassroomId =>
-      _selectedClassroom?.stableId ?? widget.classroomId;
-
-  void _dismissKeyboard() {
-    FocusManager.instance.primaryFocus?.unfocus();
-  }
-
-  void _markDraftDirty() {
-    if (!_isDraftDirty && mounted) {
-      setState(() => _isDraftDirty = true);
-    }
-  }
-
-  void _handleTitleChanged() {
-    _markDraftDirty();
-    if (_titleErrorText != null && _titleController.text.trim().isNotEmpty) {
-      setState(() => _titleErrorText = null);
-    }
-  }
-
-  bool _validateCreateHomeworkForm() {
-    if (_titleController.text.trim().isEmpty) {
-      setState(() {
-        _titleErrorText = context.readText(
-          teacherExerciseCopy(widget.purpose).titleRequiredKey,
-        );
-      });
-      _titleFocusNode.requestFocus();
-      return false;
-    }
-
-    final now = DateTime.now();
-    if (_selectedProgramId == null) {
-      _showError(context.readText(AppKeys.teacherAssignmentProgramRequired));
-      return false;
-    }
-    if (_startDate == null) {
-      _showError(context.readText(AppKeys.teacherAssignmentStartDateRequired));
-      return false;
-    }
-    if (_endDate == null) {
-      _showError(context.readText(AppKeys.teacherAssignmentEndDateRequired));
-      return false;
-    }
-    if (!_startDate!.isAfter(now) || !_endDate!.isAfter(now)) {
-      _showError(context.readText(AppKeys.teacherAssignmentFutureDateRequired));
-      return false;
-    }
-    if (!_endDate!.isAfter(_startDate!)) {
-      _showError(context.readText(AppKeys.teacherAssignmentEndAfterStart));
-      return false;
-    }
-    return true;
-  }
-
-  Future<void> _loadClassrooms() async {
-    if (_isLoadingClassrooms) {
-      return;
-    }
-
-    setState(() => _isLoadingClassrooms = true);
-    try {
-      final classrooms = await _classroomService.listClassrooms(
-        profileId: widget.profileId,
-      );
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _classrooms = mergeSelectedClassroom(classrooms, _selectedClassroom);
-        _selectedClassroom =
-            matchingClassroom(_classrooms, _selectedClassroomId) ??
-            _selectedClassroom;
-        _selectedProgramId = validProgramIdForClassroom(
-          _selectedClassroom,
-          _selectedProgramId,
-          _programs,
-        );
-      });
-      await _loadSelectedClassroomDetail();
-    } on ClassroomException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      _showError(error.message);
-    } finally {
-      if (mounted) {
-        setState(() => _isLoadingClassrooms = false);
-      }
-    }
-  }
-
-  Future<void> _loadSelectedClassroomDetail() async {
-    if (_isLoadingSelectedClassroom) {
-      return;
-    }
-
-    final classroomId = _selectedClassroomId;
-    setState(() => _isLoadingSelectedClassroom = true);
-    try {
-      final classroom = await _classroomService.getClassroomDetail(
-        classroomId: classroomId,
-        profileId: widget.profileId,
-      );
-      if (!mounted || classroom == null) {
-        return;
-      }
-      setState(() {
-        _selectedClassroom = classroom;
-        _selectedProgramId = validProgramIdForClassroom(
-          classroom,
-          _selectedProgramId,
-          _programs,
-        );
-      });
-    } on ClassroomException catch (error) {
-      if (mounted) {
-        _showError(error.message);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoadingSelectedClassroom = false);
-      }
-    }
-  }
-
-  Future<void> _loadLookupOptions() async {
-    final userId = widget.userId;
-    if (userId == null || userId <= 0) {
-      return;
-    }
-
-    setState(() => _isLoadingLookups = true);
-    try {
-      final results = await Future.wait<Object>([
-        _gradeService.listGrades(userId: userId),
-        _profileService.listPrograms(userId: userId),
-        _schoolService.listSchools(),
-      ]);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _grades = results[0] as List<GradeModel>;
-        _programs = results[1] as List<ProgramModel>;
-        _schools = results[2] as List<SchoolModel>;
-        _selectedProgramId = validProgramIdForClassroom(
-          _selectedClassroom,
-          _selectedProgramId,
-          _programs,
-        );
-      });
-    } catch (_) {
-      // Keep the form usable with classroom ids if lookup endpoints fail.
-    } finally {
-      if (mounted) {
-        setState(() => _isLoadingLookups = false);
-      }
-    }
-  }
-
-  Future<void> _openClassSelector() async {
-    _dismissKeyboard();
-    if (_classrooms.isEmpty) {
-      await _loadClassrooms();
-    }
-    if (!mounted || _classrooms.isEmpty) {
-      if (mounted) {
-        _showError(context.readText(AppKeys.teacherNoOptions));
-      }
-      return;
-    }
-
-    final selected = await showModalBottomSheet<ClassroomModel>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return CreateHomeworkOptionBottomSheet<ClassroomModel>(
-          options: _classrooms,
-          titleKey: AppKeys.teacherAssignmentSelectClass,
-          isSelected: (classroom) => classroom.stableId == _selectedClassroomId,
-          titleBuilder: createHomeworkClassName,
-          subtitleBuilder: createHomeworkStudentCount,
-          bottomInset: bottomInset,
-        );
-      },
-    );
-    if (selected == null || !mounted) {
-      return;
-    }
-    setState(() {
-      _selectedClassroom = selected;
-      _selectedProgramId = null;
-      _isDraftDirty = true;
-    });
-    await _loadSelectedClassroomDetail();
-  }
-
-  Future<void> _openProgramSelector() async {
-    _dismissKeyboard();
-    final options = programOptionsForClassroom(
-      context,
-      _selectedClassroom,
-      _programs,
-    );
-    if (options.isEmpty) {
-      _showError(context.readText(AppKeys.teacherNoOptions));
-      return;
-    }
-
-    final selected = await showModalBottomSheet<ClassroomProgramOption>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return CreateHomeworkOptionBottomSheet<ClassroomProgramOption>(
-          options: options,
-          titleKey: AppKeys.teacherAssignmentProgramLabel,
-          isSelected: (option) => option.id == _selectedProgramId,
-          titleBuilder: (_, option) => option.label,
-          bottomInset: bottomInset,
-        );
-      },
-    );
-    if (selected == null || !mounted) {
-      return;
-    }
-    setState(() {
-      _selectedProgramId = selected.id;
-      _isDraftDirty = true;
-    });
-  }
-
-  void _selectQuestionCount(int count) {
-    if (_selectedQuestionCount == count) {
-      return;
-    }
-    HapticFeedback.selectionClick();
-    setState(() {
-      _selectedQuestionCount = count;
-      _isDraftDirty = true;
-    });
-  }
-
-  Future<void> _openDatePicker({required bool isStart}) async {
-    _dismissKeyboard();
-    final now = DateTime.now();
-    final minimum = now.add(const Duration(minutes: 1));
-    final currentValue = isStart ? _startDate : _endDate;
-    final endMinimum = _startDate?.add(const Duration(minutes: 1));
-    final baseInitial =
-        currentValue ??
-        (isStart
-            ? minimum.add(const Duration(hours: 1))
-            : endMinimum ?? minimum.add(const Duration(days: 1)));
-    final initialDateTime = baseInitial.isAfter(minimum)
-        ? baseInitial
-        : minimum;
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime(
-        initialDateTime.year,
-        initialDateTime.month,
-        initialDateTime.day,
-      ),
-      firstDate: DateTime(now.year, now.month, now.day),
-      lastDate: DateTime(now.year + 5, now.month, now.day),
-    );
-    if (pickedDate == null || !mounted) {
-      return;
-    }
-
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initialDateTime),
-    );
-    if (pickedTime == null || !mounted) {
-      return;
-    }
-
-    final selected = DateTime(
-      pickedDate.year,
-      pickedDate.month,
-      pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
-    );
-    if (!selected.isAfter(now)) {
-      _showError(context.readText(AppKeys.teacherAssignmentFutureDateRequired));
-      return;
-    }
-    if (isStart && _endDate != null && !selected.isBefore(_endDate!)) {
-      _showError(context.readText(AppKeys.teacherAssignmentEndAfterStart));
-      return;
-    }
-    if (!isStart && _startDate != null && !selected.isAfter(_startDate!)) {
-      _showError(context.readText(AppKeys.teacherAssignmentEndAfterStart));
-      return;
-    }
-
-    setState(() {
-      if (isStart) {
-        _startDate = selected;
-      } else {
-        _endDate = selected;
-      }
-      _isDraftDirty = true;
-    });
-  }
-
-  void _showError(String message) {
-    context.showErrorDialog(message);
   }
 
   @override
@@ -749,4 +383,6 @@ class _TeacherCreateHomeworkScreenState
       child: screen,
     );
   }
+
+  void _updateState(VoidCallback update) => setState(update);
 }

@@ -4,8 +4,8 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/classroom/widgets/parent_messages/parent_message_contact_data.dart';
-import 'package:numi/features/classroom/widgets/parent_messages/parent_message_contact_list_tile.dart';
+import 'package:numi/features/classroom/presentation/widgets/parent_messages/parent_message_contact_data.dart';
+import 'package:numi/features/classroom/presentation/widgets/parent_messages/parent_message_contact_list_tile.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_search_field.dart';
 

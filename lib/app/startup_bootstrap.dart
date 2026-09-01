@@ -4,10 +4,10 @@ import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/theme/app_theme_controller.dart';
 import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/session/services/passcode_service.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/session/application/services/passcode_service.dart';
+import 'package:numi/features/profile/data/adapters/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
-import 'package:numi/features/session/application/app_session_state.dart';
+import 'package:numi/features/session/application/controllers/app_session_state.dart';
 
 class StartupBootstrapResult {
   const StartupBootstrapResult({

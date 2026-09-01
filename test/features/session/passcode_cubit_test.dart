@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/session/application/passcode_cubit.dart';
-import 'package:numi/features/session/application/passcode_state.dart';
-import 'package:numi/features/session/services/passcode_service.dart';
+import 'package:numi/features/session/application/controllers/passcode_cubit.dart';
+import 'package:numi/features/session/application/controllers/passcode_state.dart';
+import 'package:numi/features/session/application/services/passcode_service.dart';
 
 class _FakePasscodeService implements PasscodeService {
   bool hasStoredPasscode = false;

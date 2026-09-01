@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
-import 'package:numi/features/auth/errors/auth_error_messages.dart';
+import 'package:numi/features/auth/application/errors/auth_error_messages.dart';
 
 void main() {
   testWidgets('blank auth errors use a visible localized fallback', (

@@ -12,17 +12,17 @@ import 'package:numi/features/classroom/application/contracts/classroom_service.
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/shared/layouts/app_screen_app_bar.dart';
-import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/application/errors/classroom_exercise_exception.dart';
 import 'package:numi/features/homework/data/cache/teacher_homework_cache.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_create_homework_screen.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_assignment_card.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_list/teacher_assignment_card.dart';
 import 'package:numi/shared/widgets/teacher_empty_assignments_panel.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_list/teacher_exercise_copy.dart';
 import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_add_button.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_search_field.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_homework_section_header.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_list/teacher_homework_add_button.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_list/teacher_homework_search_field.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_list/teacher_homework_section_header.dart';
 
 class TeacherHomeworkScreen extends StatefulWidget {
   const TeacherHomeworkScreen({

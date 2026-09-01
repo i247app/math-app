@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
+import 'package:numi/features/home/presentation/parent/helpers/parent_child_dashboard_helpers.dart';
 
 void main() {
   test('keeps every classroom joined by the same child', () {

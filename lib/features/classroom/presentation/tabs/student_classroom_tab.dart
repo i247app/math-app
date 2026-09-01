@@ -7,17 +7,17 @@ import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/classroom/application/classroom_cubit.dart';
-import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_state.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/classroom/presentation/screens/student_class_detail_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
-import 'package:numi/features/classroom/widgets/student_class_search_content.dart';
-import 'package:numi/features/classroom/widgets/student_tab/student_inline_error_panel.dart';
-import 'package:numi/features/classroom/widgets/student_tab/student_classroom_tab_card.dart';
-import 'package:numi/features/classroom/widgets/student_tab/student_join_another_classroom_title.dart';
-import 'package:numi/features/classroom/widgets/student_tab/student_classroom_loading_region.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_class_search_content.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_tab/student_inline_error_panel.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_tab/student_classroom_tab_card.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_tab/student_join_another_classroom_title.dart';
+import 'package:numi/features/classroom/presentation/widgets/student_tab/student_classroom_loading_region.dart';
 
 class StudentClassroomTab extends StatefulWidget {
   const StudentClassroomTab({

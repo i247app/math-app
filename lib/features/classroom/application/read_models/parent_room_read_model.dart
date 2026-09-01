@@ -7,7 +7,7 @@ import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
 import 'package:numi/features/home/application/read_models/home_layout_read_model.dart';
-import 'package:numi/features/classroom/models/parent_room_entry.dart';
+import 'package:numi/features/classroom/application/read_models/parent_room_entry.dart';
 
 List<ParentRoomEntry> roomEntries(ParentHomeLayout? parent) {
   if (parent == null) {

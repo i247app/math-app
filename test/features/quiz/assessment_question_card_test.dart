@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/quiz/widgets/assessment/assessment_question_card.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment/assessment_question_card.dart';
 
 void main() {
   testWidgets('uses pictorial spacing for emoji outside the fruit range', (

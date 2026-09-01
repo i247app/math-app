@@ -8,7 +8,7 @@ import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/application/contracts/home_layout_service.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
-import 'package:numi/features/home/parent/home/parent_home_tab.dart';
+import 'package:numi/features/home/presentation/parent/parent_home_tab.dart';
 import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';

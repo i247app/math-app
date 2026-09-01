@@ -10,8 +10,8 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_shake_service.dart';
-import 'package:numi/features/quiz/errors/quiz_exception.dart';
-import 'package:numi/features/quiz/helpers/default_grade_label.dart';
+import 'package:numi/features/quiz/application/errors/quiz_exception.dart';
+import 'package:numi/features/quiz/application/read_models/default_grade_label.dart';
 import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 

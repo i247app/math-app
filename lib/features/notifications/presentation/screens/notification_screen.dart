@@ -5,9 +5,9 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/notifications/application/notification_controller.dart';
+import 'package:numi/features/notifications/application/controllers/notification_controller.dart';
 import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
-import 'package:numi/features/notifications/widgets/notification_content.dart';
+import 'package:numi/features/notifications/presentation/widgets/notification_content.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 class NotificationScreen extends StatefulWidget {

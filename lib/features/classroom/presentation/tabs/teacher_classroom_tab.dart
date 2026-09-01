@@ -9,16 +9,16 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/classroom/application/classroom_cubit.dart';
-import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_state.dart';
 import 'package:numi/features/classroom/presentation/screens/teacher_class_detail_screen.dart';
 import 'package:numi/features/classroom/presentation/screens/teacher_create_class_screen.dart';
-import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
-import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_body.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_create/teacher_create_class_result.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_tab/teacher_classroom_body.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
-import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_header.dart';
-import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_loading_content.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_tab/teacher_classroom_header.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_tab/teacher_classroom_loading_content.dart';
 
 class TeacherClassroomTab extends StatefulWidget {
   const TeacherClassroomTab({

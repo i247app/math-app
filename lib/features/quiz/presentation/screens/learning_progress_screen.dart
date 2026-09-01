@@ -9,11 +9,11 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/application/read_models/parent_assessment_read_model.dart';
-import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
-import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_chart_card.dart';
-import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_date_filter_dialog.dart';
-import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_filter_control.dart';
-import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_insight_card.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_entry.dart';
+import 'package:numi/features/quiz/presentation/widgets/learning_progress/learning_progress_chart_card.dart';
+import 'package:numi/features/quiz/presentation/widgets/learning_progress/learning_progress_date_filter_dialog.dart';
+import 'package:numi/features/quiz/presentation/widgets/learning_progress/learning_progress_filter_control.dart';
+import 'package:numi/features/quiz/presentation/widgets/learning_progress/learning_progress_insight_card.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 

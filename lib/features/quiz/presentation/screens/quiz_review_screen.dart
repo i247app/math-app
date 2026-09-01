@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:numi/features/quiz/domain/models/quiz.dart';
-import 'package:numi/features/quiz/application/quiz_review_controller.dart';
+import 'package:numi/features/quiz/application/controllers/quiz_review_controller.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_content.dart';
-import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_header.dart';
-import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_loading_content.dart';
-import 'package:numi/features/quiz/widgets/quiz_review/quiz_review_state_panel.dart';
+import 'package:numi/features/quiz/presentation/widgets/quiz_review/quiz_review_content.dart';
+import 'package:numi/features/quiz/presentation/widgets/quiz_review/quiz_review_header.dart';
+import 'package:numi/features/quiz/presentation/widgets/quiz_review/quiz_review_loading_content.dart';
+import 'package:numi/features/quiz/presentation/widgets/quiz_review/quiz_review_state_panel.dart';
 
 /// Shared review-detail layout used by quiz and classroom-exercise entry
 /// screens. Source-specific screens provide the detail loader and data model.

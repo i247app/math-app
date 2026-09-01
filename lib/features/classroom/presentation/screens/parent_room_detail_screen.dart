@@ -5,12 +5,12 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
 import 'package:numi/features/classroom/application/read_models/parent_room_read_model.dart';
-import 'package:numi/features/classroom/models/parent_room_entry.dart';
+import 'package:numi/features/classroom/application/read_models/parent_room_entry.dart';
 import 'package:numi/features/classroom/presentation/screens/parent_message_contacts_screen.dart';
 import 'package:numi/features/classroom/presentation/screens/parent_messages_screen.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_detail_hero.dart';
-import 'package:numi/features/classroom/widgets/parent_room/parent_room_utilities_section.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
+import 'package:numi/features/classroom/presentation/widgets/parent_room/parent_room_detail_hero.dart';
+import 'package:numi/features/classroom/presentation/widgets/parent_room/parent_room_utilities_section.dart';
+import 'package:numi/features/classroom/presentation/widgets/parent_tasks/parent_pending_task_list_item.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
 

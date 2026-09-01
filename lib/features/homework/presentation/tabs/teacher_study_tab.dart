@@ -13,28 +13,31 @@ import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/classroom/application/classroom_cubit.dart';
-import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_state.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
-import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_add_button.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_tab/teacher_classroom_add_button.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_create_homework_screen.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
 import 'package:numi/shared/widgets/teacher_empty_assignments_panel.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_list/teacher_exercise_copy.dart';
 import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
-import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
-import 'package:numi/features/homework/helpers/teacher_study_helpers.dart';
-import 'package:numi/features/homework/models/teacher_study_exercise_batch.dart';
-import 'package:numi/features/homework/widgets/teacher_study/teacher_study_class_filters.dart';
-import 'package:numi/features/homework/widgets/teacher_study/teacher_study_exercise_card.dart';
-import 'package:numi/features/homework/widgets/teacher_study/teacher_study_loading_indicator.dart';
-import 'package:numi/features/homework/widgets/teacher_study/teacher_study_load_more_button.dart';
-import 'package:numi/features/homework/widgets/teacher_study/teacher_study_purpose_filters.dart';
-import 'package:numi/features/homework/widgets/teacher_study/teacher_study_search_field.dart';
+import 'package:numi/features/homework/application/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/presentation/helpers/teacher_study_helpers.dart';
+import 'package:numi/features/homework/application/read_models/teacher_study_exercise_batch.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_study/teacher_study_class_filters.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_study/teacher_study_exercise_card.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_study/teacher_study_loading_indicator.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_study/teacher_study_load_more_button.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_study/teacher_study_purpose_filters.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_study/teacher_study_search_field.dart';
+
+part 'teacher_study/data_actions.dart';
+part 'teacher_study/navigation_actions.dart';
 
 class TeacherStudyTab extends StatefulWidget {
   const TeacherStudyTab({
@@ -127,278 +130,6 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadClassrooms({bool forceRefresh = false}) async {
-    final profileId = profileStableId(widget.activeProfile);
-    _exerciseRequestId++;
-    final isInitialProfileLoad =
-        !_hasCompletedInitialLoad || profileId != _loadedProfileId;
-    if (profileId == null) {
-      setState(() {
-        _loadedProfileId = null;
-        _exercises = const <ClassroomExercise>[];
-        _visibleExerciseCount = _exercisePageSize;
-        _error = context.readText(AppKeys.teacherMissingProfileId);
-        _isLoadingExercises = false;
-        _hasCompletedInitialLoad = true;
-      });
-      return;
-    }
-
-    setState(() {
-      _loadedProfileId = profileId;
-      _isLoadingExercises = true;
-      if (isInitialProfileLoad) {
-        _hasCompletedInitialLoad = false;
-        _exercises = const <ClassroomExercise>[];
-      }
-      _visibleExerciseCount = _exercisePageSize;
-      _error = null;
-    });
-
-    final collection = await context.read<ClassroomCubit>().loadOwned(
-      profileId,
-      forceRefresh: forceRefresh,
-    );
-    if (!mounted || profileId != _loadedProfileId) {
-      return;
-    }
-
-    final selectedStillExists =
-        _selectedClassroomId == null ||
-        collection.classrooms.any(
-          (classroom) => classroom.stableId == _selectedClassroomId,
-        );
-    if (!selectedStillExists) {
-      _selectedClassroomId = null;
-    }
-    if (collection.errorMessage != null && collection.classrooms.isEmpty) {
-      setState(() {
-        _exercises = const <ClassroomExercise>[];
-        _visibleExerciseCount = _exercisePageSize;
-        _error = collection.errorMessage!.trim().isEmpty
-            ? context.readText(AppKeys.teacherStudyLoadFailed)
-            : collection.errorMessage;
-        _isLoadingExercises = false;
-        _hasCompletedInitialLoad = true;
-      });
-      return;
-    }
-    await _loadExercises();
-  }
-
-  Future<void> _refreshClassrooms() {
-    return _loadClassrooms(forceRefresh: true);
-  }
-
-  Future<void> _loadExercises() async {
-    final profileId = profileStableId(widget.activeProfile);
-    if (profileId == null || _isLoadingClassrooms) {
-      return;
-    }
-
-    final requestId = ++_exerciseRequestId;
-    final classrooms = _selectedClassroomId == null
-        ? _classrooms
-        : _classrooms
-              .where((classroom) => classroom.stableId == _selectedClassroomId)
-              .toList(growable: false);
-    final targets = classrooms
-        .where((classroom) => classroom.stableId != null)
-        .toList(growable: false);
-
-    if (targets.isEmpty) {
-      setState(() {
-        _exercises = const <ClassroomExercise>[];
-        _error = null;
-        _isLoadingExercises = false;
-        _hasCompletedInitialLoad = true;
-      });
-      return;
-    }
-
-    setState(() {
-      _isLoadingExercises = true;
-      _error = null;
-      _visibleExerciseCount = _exercisePageSize;
-    });
-
-    final search = _searchController.text.trim();
-    final batches = await Future.wait(
-      targets.map(
-        (classroom) => _loadExerciseBatch(
-          classroomId: classroom.stableId!,
-          profileId: profileId,
-          search: search,
-          purpose: _selectedPurpose,
-        ),
-      ),
-    );
-    if (!mounted ||
-        requestId != _exerciseRequestId ||
-        profileId != _loadedProfileId) {
-      return;
-    }
-
-    final exercises = <ClassroomExercise>[];
-    String? firstError;
-    for (final batch in batches) {
-      exercises.addAll(batch.exercises);
-      firstError ??= batch.error;
-    }
-    exercises.sort(compareTeacherStudyExercises);
-
-    setState(() {
-      _exercises = deduplicateTeacherStudyExercises(exercises);
-      _visibleExerciseCount = _exercisePageSize;
-      _error = exercises.isEmpty ? firstError : null;
-      _isLoadingExercises = false;
-      _hasCompletedInitialLoad = true;
-    });
-  }
-
-  Future<TeacherStudyExerciseBatch> _loadExerciseBatch({
-    required int classroomId,
-    required int profileId,
-    required String search,
-    required String purpose,
-  }) async {
-    final fallbackError = context.readText(AppKeys.teacherStudyLoadFailed);
-    try {
-      final exercises = await _exerciseService.listExercises(
-        classroomId: classroomId,
-        profileId: profileId,
-        search: search,
-        purpose: purpose,
-      );
-      return TeacherStudyExerciseBatch(exercises: exercises);
-    } on ClassroomExerciseException catch (error) {
-      return TeacherStudyExerciseBatch(
-        error: error.message.trim().isEmpty ? fallbackError : error.message,
-      );
-    } catch (_) {
-      return TeacherStudyExerciseBatch(error: fallbackError);
-    }
-  }
-
-  void _onSearchChanged(String _) {
-    _searchDebounce?.cancel();
-    if (_visibleExerciseCount != _exercisePageSize) {
-      setState(() => _visibleExerciseCount = _exercisePageSize);
-    }
-    _searchDebounce = Timer(const Duration(milliseconds: 350), _loadExercises);
-  }
-
-  void _selectClassroom(int? classroomId) {
-    if (_selectedClassroomId == classroomId) {
-      return;
-    }
-    HapticFeedback.selectionClick();
-    setState(() {
-      _selectedClassroomId = classroomId;
-      _visibleExerciseCount = _exercisePageSize;
-    });
-    _loadExercises();
-  }
-
-  void _selectPurpose(String purpose) {
-    if (_selectedPurpose == purpose) {
-      return;
-    }
-    HapticFeedback.selectionClick();
-    setState(() {
-      _selectedPurpose = purpose;
-      _visibleExerciseCount = _exercisePageSize;
-    });
-    _loadExercises();
-  }
-
-  void _showMoreExercises() {
-    if (_visibleExerciseCount >= _exercises.length) {
-      return;
-    }
-    HapticFeedback.selectionClick();
-    setState(() {
-      _visibleExerciseCount = (_visibleExerciseCount + _exercisePageSize).clamp(
-        0,
-        _exercises.length,
-      );
-    });
-  }
-
-  Future<void> _openCreateExercise() async {
-    final profileId = profileStableId(widget.activeProfile);
-    final classroom = _createClassroomSelection;
-    final classroomId = classroom?.stableId;
-    if (profileId == null || classroom == null || classroomId == null) {
-      _showError(context.readText(AppKeys.teacherNoOptions));
-      return;
-    }
-
-    HapticFeedback.lightImpact();
-    final created = await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (_) => TeacherCreateHomeworkScreen(
-          classroomId: classroomId,
-          profileId: profileId,
-          userId: widget.user?.id,
-          initialClassroom: classroom,
-          purpose: _selectedPurpose,
-          exerciseService: _exerciseService,
-          classroomService: _classroomService,
-        ),
-      ),
-    );
-    if (created == true) {
-      await _loadExercises();
-    }
-  }
-
-  ClassroomModel? get _createClassroomSelection {
-    if (_selectedClassroomId != null) {
-      for (final classroom in _classrooms) {
-        if (classroom.stableId == _selectedClassroomId) {
-          return classroom;
-        }
-      }
-    }
-    for (final classroom in _classrooms) {
-      if (classroom.stableId != null) {
-        return classroom;
-      }
-    }
-    return null;
-  }
-
-  void _openExerciseDetail(ClassroomExercise exercise) {
-    final exerciseId = exercise.stableId;
-    final profileId = profileStableId(widget.activeProfile);
-    if (exerciseId == null || profileId == null) {
-      showTeacherHomeworkSoon(context);
-      return;
-    }
-
-    final purpose = exercise.purpose?.trim().toUpperCase();
-    Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => TeacherHomeworkDetailScreen(
-          exerciseId: exerciseId,
-          profileId: profileId,
-          initialExercise: exercise,
-          purpose: purpose == classroomExercisePurposeExam
-              ? classroomExercisePurposeExam
-              : purpose == classroomExercisePurposeHomework
-              ? classroomExercisePurposeHomework
-              : _selectedPurpose,
-          exerciseService: _exerciseService,
-        ),
-      ),
-    );
-  }
-
-  void _showError(String message) {
-    context.showErrorDialog(message);
   }
 
   @override
@@ -534,4 +265,6 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
       ),
     );
   }
+
+  void _updateState(VoidCallback update) => setState(update);
 }

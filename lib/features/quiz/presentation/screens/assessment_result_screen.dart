@@ -11,16 +11,16 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
-import 'package:numi/features/quiz/errors/quiz_exception.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/ai_review_card.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/assessment_result_review_text.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/exit_to_grade_selection.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/result_bottom_bar.dart';
-import 'package:numi/features/quiz/helpers/result_level_for_score.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/score_out_of10.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/score_ring.dart';
-import 'package:numi/features/quiz/widgets/assessment_result/test_again_loader.dart';
-import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+import 'package:numi/features/quiz/application/errors/quiz_exception.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment_result/ai_review_card.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment_result/assessment_result_review_text.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment_result/exit_to_grade_selection.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment_result/result_bottom_bar.dart';
+import 'package:numi/features/quiz/application/read_models/result_level_for_score.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment_result/score_out_of10.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment_result/score_ring.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment_result/test_again_loader.dart';
+import 'package:numi/features/quiz/presentation/widgets/shared/quiz_header_icon_button.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 class AssessmentResultScreen extends StatefulWidget {

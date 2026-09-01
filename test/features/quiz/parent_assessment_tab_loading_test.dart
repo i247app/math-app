@@ -11,10 +11,10 @@ import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/presentation/tabs/parent_assessment_tab.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_empty_poster.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_search_field.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_banner.dart';
+import 'package:numi/features/quiz/presentation/widgets/parent_assessment/parent_assessment_empty_poster.dart';
+import 'package:numi/features/quiz/presentation/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
+import 'package:numi/features/quiz/presentation/widgets/parent_assessment/parent_assessment_search_field.dart';
+import 'package:numi/features/quiz/presentation/widgets/parent_assessment/parent_assessment_tab_banner.dart';
 
 void main() {
   testWidgets('shows only the full skeleton until the initial load settles', (

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/homework/widgets/student_attempt/student_homework_attempt_loading_skeleton.dart';
+import 'package:numi/features/homework/presentation/widgets/student_attempt/student_homework_attempt_loading_skeleton.dart';
 
 void main() {
   testWidgets('does not overflow on a short screen', (tester) async {

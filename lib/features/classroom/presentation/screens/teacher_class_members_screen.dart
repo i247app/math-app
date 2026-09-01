@@ -7,14 +7,14 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/classroom/application/classroom_cubit.dart';
-import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_state.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
-import 'package:numi/features/classroom/errors/classroom_exception.dart';
+import 'package:numi/features/classroom/application/errors/classroom_exception.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
-import 'package:numi/features/classroom/widgets/teacher_members/teacher_class_members_content.dart';
-import 'package:numi/features/classroom/widgets/teacher_members/teacher_sending_invite_overlay.dart';
-import 'package:numi/features/classroom/widgets/teacher_members/teacher_student_invite_search_sheet.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_members/teacher_class_members_content.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_members/teacher_sending_invite_overlay.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_members/teacher_student_invite_search_sheet.dart';
 
 class TeacherClassMembersScreen extends StatefulWidget {
   const TeacherClassMembersScreen({

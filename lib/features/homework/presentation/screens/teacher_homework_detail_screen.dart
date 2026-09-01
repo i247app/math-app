@@ -14,12 +14,12 @@ import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/shared/layouts/app_screen_app_bar.dart';
-import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
+import 'package:numi/features/homework/application/errors/classroom_exercise_exception.dart';
 import 'package:numi/features/homework/data/cache/teacher_homework_cache.dart';
-import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
-import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_info_card.dart';
-import 'package:numi/features/homework/widgets/teacher_detail/teacher_question_card.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_detail/teacher_assignment_detail_helpers.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_detail/teacher_assignment_info_card.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_detail/teacher_question_card.dart';
+import 'package:numi/features/homework/presentation/widgets/teacher_list/teacher_exercise_copy.dart';
 
 class TeacherHomeworkDetailScreen extends StatefulWidget {
   const TeacherHomeworkDetailScreen({

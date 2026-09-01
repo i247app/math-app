@@ -9,17 +9,17 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
-import 'package:numi/features/profile/errors/grade_exception.dart';
+import 'package:numi/features/profile/application/errors/grade_exception.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_shake_service.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
 import 'package:numi/features/quiz/presentation/screens/assessment_screen.dart';
-import 'package:numi/features/quiz/helpers/default_grade_label.dart';
-import 'package:numi/features/quiz/widgets/grade_selection/grade_background.dart';
-import 'package:numi/features/quiz/widgets/grade_selection/grade_bottom_bar.dart';
-import 'package:numi/features/quiz/widgets/grade_selection/grade_failure_notice.dart';
-import 'package:numi/features/quiz/widgets/grade_selection/grade_grid.dart';
-import 'package:numi/features/quiz/widgets/grade_selection/grade_header.dart';
-import 'package:numi/features/quiz/widgets/grade_selection/grade_option.dart';
+import 'package:numi/features/quiz/application/read_models/default_grade_label.dart';
+import 'package:numi/features/quiz/presentation/widgets/grade_selection/grade_background.dart';
+import 'package:numi/features/quiz/presentation/widgets/grade_selection/grade_bottom_bar.dart';
+import 'package:numi/features/quiz/presentation/widgets/grade_selection/grade_failure_notice.dart';
+import 'package:numi/features/quiz/presentation/widgets/grade_selection/grade_grid.dart';
+import 'package:numi/features/quiz/presentation/widgets/grade_selection/grade_header.dart';
+import 'package:numi/features/quiz/presentation/widgets/grade_selection/grade_option.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
 class GradeSelectionScreen extends StatefulWidget {

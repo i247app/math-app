@@ -5,7 +5,7 @@ import 'package:numi/core/network/auth_token_store.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/quiz/data/dto/quiz_models.dart';
 import 'package:numi/features/quiz/data/mappers/quiz_mapper.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
+import 'package:numi/features/quiz/data/api/quiz_api.dart';
 
 void main() {
   test('quiz progress accepts a null average delta', () {

@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/session/services/passcode_service.dart';
+import 'package:numi/features/session/application/services/passcode_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

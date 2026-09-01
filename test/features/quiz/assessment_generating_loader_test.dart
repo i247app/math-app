@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/quiz/widgets/assessment/assessment_generating_loader.dart';
-import 'package:numi/features/quiz/widgets/assessment/numi_assessment_mascot_animation.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment/assessment_generating_loader.dart';
+import 'package:numi/features/quiz/presentation/widgets/assessment/numi_assessment_mascot_animation.dart';
 
 void main() {
   testWidgets('mascot loading sequence renders every stage without overflow', (

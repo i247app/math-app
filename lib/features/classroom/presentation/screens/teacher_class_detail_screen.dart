@@ -12,8 +12,8 @@ import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/features/profile/domain/models/program.dart';
 import 'package:numi/features/profile/domain/models/school.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/classroom/application/classroom_cubit.dart';
-import 'package:numi/features/classroom/application/classroom_state.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_cubit.dart';
+import 'package:numi/features/classroom/application/controllers/classroom_state.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_homework_screen.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
@@ -23,8 +23,8 @@ import 'package:numi/shared/layouts/app_screen_app_bar.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/features/classroom/data/cache/teacher_classroom_lookup_cache.dart';
 import 'package:numi/features/classroom/presentation/screens/teacher_class_members_screen.dart';
-import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart';
-import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_lower_content.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_detail/teacher_class_detail_info_card.dart';
+import 'package:numi/features/classroom/presentation/widgets/teacher_detail/teacher_class_detail_lower_content.dart';
 
 class TeacherClassDetailScreen extends StatefulWidget {
   const TeacherClassDetailScreen({

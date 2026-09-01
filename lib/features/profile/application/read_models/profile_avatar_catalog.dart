@@ -1,4 +1,4 @@
-import 'package:numi/features/profile/models/profile_avatar_option.dart';
+import 'package:numi/features/profile/presentation/models/profile_avatar_option.dart';
 
 class ProfileAvatarCatalog {
   const ProfileAvatarCatalog._();

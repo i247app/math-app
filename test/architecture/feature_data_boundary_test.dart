@@ -109,4 +109,76 @@ void main() {
           '${violations.join('\n')}',
     );
   });
+
+  test('features use the standard top-level layers', () {
+    const allowedLayers = <String>{
+      'application',
+      'data',
+      'domain',
+      'presentation',
+    };
+    final violations = <String>[];
+
+    for (final feature in Directory('lib/features').listSync()) {
+      if (feature is! Directory) {
+        violations.add('Feature root contains a file: ${feature.path}');
+        continue;
+      }
+
+      for (final entry in feature.listSync()) {
+        if (entry is File) {
+          violations.add('Feature root contains a file: ${entry.path}');
+          continue;
+        }
+        if (entry is Directory) {
+          final layer = entry.uri.pathSegments
+              .where((segment) => segment.isNotEmpty)
+              .last;
+          if (!allowedLayers.contains(layer)) {
+            violations.add('Non-standard feature layer: ${entry.path}');
+          }
+        }
+      }
+    }
+
+    expect(
+      violations,
+      isEmpty,
+      reason:
+          'Feature roots may only contain application, data, domain, and '
+          'presentation layers:\n${violations.join('\n')}',
+    );
+  });
+
+  test('application and presentation files stay responsibility-sized', () {
+    const maximumLines = 650;
+    final violations = <String>[];
+
+    for (final entity in Directory('lib/features').listSync(recursive: true)) {
+      if (entity is! File ||
+          !entity.path.endsWith('.dart') ||
+          entity.path.endsWith('.g.dart')) {
+        continue;
+      }
+
+      final normalizedPath = entity.path.replaceAll('\\', '/');
+      if (!normalizedPath.contains('/application/') &&
+          !normalizedPath.contains('/presentation/')) {
+        continue;
+      }
+
+      final lineCount = entity.readAsLinesSync().length;
+      if (lineCount > maximumLines) {
+        violations.add('$normalizedPath: $lineCount lines');
+      }
+    }
+
+    expect(
+      violations,
+      isEmpty,
+      reason:
+          'Large hand-written files should be split by responsibility before '
+          'they exceed $maximumLines lines:\n${violations.join('\n')}',
+    );
+  });
 }

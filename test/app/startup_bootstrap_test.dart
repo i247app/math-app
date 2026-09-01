@@ -6,7 +6,7 @@ import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
-import 'package:numi/features/session/services/passcode_service.dart';
+import 'package:numi/features/session/application/services/passcode_service.dart';
 
 class _FakeAuthService implements AuthService {
   _FakeAuthService(this.user);

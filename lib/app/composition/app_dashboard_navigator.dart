@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/dashboard/application/contracts/dashboard_navigator.dart';
 import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
-import 'package:numi/features/notifications/navigation/notification_route.dart';
-import 'package:numi/features/settings/application/setting_tab.dart';
-import 'package:numi/features/settings/helpers/setting_page_builders.dart';
-import 'package:numi/features/settings/models/setting_screen_args.dart';
-import 'package:numi/features/settings/navigation/settings_depth_route.dart';
+import 'package:numi/features/notifications/presentation/navigation/notification_route.dart';
+import 'package:numi/features/settings/presentation/tabs/setting_tab.dart';
+import 'package:numi/features/settings/presentation/helpers/setting_page_builders.dart';
+import 'package:numi/features/settings/presentation/models/setting_screen_args.dart';
+import 'package:numi/features/settings/presentation/navigation/settings_depth_route.dart';
 
 class AppDashboardNavigator implements DashboardNavigator {
   const AppDashboardNavigator();

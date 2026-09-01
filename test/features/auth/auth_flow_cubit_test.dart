@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/auth/application/auth_cubit.dart';
-import 'package:numi/features/auth/application/auth_state.dart';
+import 'package:numi/features/auth/application/controllers/auth_cubit.dart';
+import 'package:numi/features/auth/application/controllers/auth_state.dart';
 import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/auth/models/signup_form_data.dart';
-import 'package:numi/features/auth/models/signup_gender.dart';
-import 'package:numi/features/auth/models/signup_role.dart';
+import 'package:numi/features/auth/presentation/models/signup_form_data.dart';
+import 'package:numi/features/auth/presentation/models/signup_gender.dart';
+import 'package:numi/features/auth/presentation/models/signup_role.dart';
 
 class _FakeAuthService implements AuthService {
   _FakeAuthService({

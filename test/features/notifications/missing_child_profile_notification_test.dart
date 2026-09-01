@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/notifications/application/notification_state.dart';
-import 'package:numi/features/notifications/widgets/notification_card.dart';
-import 'package:numi/features/notifications/widgets/notification_content.dart';
+import 'package:numi/features/notifications/application/controllers/notification_state.dart';
+import 'package:numi/features/notifications/presentation/widgets/notification_card.dart';
+import 'package:numi/features/notifications/presentation/widgets/notification_content.dart';
 
 void main() {
   testWidgets('shows the child-profile reminder in Notification screen', (

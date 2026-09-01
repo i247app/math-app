@@ -1,5 +1,5 @@
-import 'package:numi/features/home/parent/data/cache/parent_home_snapshot.dart';
-import 'package:numi/features/home/teacher/data/cache/teacher_home_snapshot.dart';
+import 'package:numi/features/home/data/cache/parent_home_snapshot.dart';
+import 'package:numi/features/home/data/cache/teacher_home_snapshot.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
 
 /// In-memory, per-session cache for home-screen data indexed by profile ID.

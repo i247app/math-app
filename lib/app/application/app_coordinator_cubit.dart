@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/app/application/app_coordinator_state.dart';
 import 'package:numi/app/navigation/app_screen.dart';
-import 'package:numi/features/auth/application/auth_state.dart';
+import 'package:numi/features/auth/application/controllers/auth_state.dart';
 
 /// Owns global flow navigation. Feature cubits publish results; this cubit
 /// decides which flow is visible.

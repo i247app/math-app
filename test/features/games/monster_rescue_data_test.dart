@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/games/monster_rescue/monster_rescue_data.dart';
+import 'package:numi/features/games/domain/models/monster_rescue/monster_rescue_data.dart';
 
 void main() {
   test('rescue gates transform the visible team size', () {
