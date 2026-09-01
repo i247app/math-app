@@ -11,7 +11,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_theme_scope.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/settings/application/settings_constants.dart';
-import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/shared/widgets/settings_action_card.dart';
 import 'package:numi/features/settings/widgets/menu/settings_avatar.dart';
 import 'package:numi/features/settings/widgets/menu/settings_language_card.dart';
 import 'package:numi/features/settings/widgets/menu/settings_theme_switch_card.dart';

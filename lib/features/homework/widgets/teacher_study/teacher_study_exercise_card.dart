@@ -8,7 +8,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
 import 'package:numi/features/homework/helpers/teacher_study_helpers.dart';
 
 class TeacherStudyExerciseCard extends StatelessWidget {

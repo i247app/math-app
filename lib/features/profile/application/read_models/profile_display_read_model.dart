@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
 
 String profileDisplayName(BuildContext context, StudentProfile profile) {
   final name = profile.name?.trim();

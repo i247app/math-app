@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_task_score_ring.dart';
+import 'package:numi/shared/widgets/parent_tasks/parent_task_score_ring.dart';
 import 'package:numi/shared/widgets/app_state_panel.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
 

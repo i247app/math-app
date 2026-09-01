@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:numi/features/notifications/domain/models/notification.dart';
-import 'package:numi/features/notifications/application/notification_badge_controller.dart';
+import 'package:numi/features/notifications/application/read_models/notification_badge_controller.dart';
 import 'package:numi/features/notifications/data/cache/notification_cache.dart';
 import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
 

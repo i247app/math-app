@@ -1,10 +1,9 @@
-import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_read_model.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/quiz/domain/models/quiz.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
-import 'package:numi/features/home/data/home_layout_mappers.dart';
+import 'package:numi/features/home/application/read_models/home_layout_read_model.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 
 ParentChildSummary? parentPrimarySummary(List<ParentChildSummary> summaries) {
@@ -24,7 +23,7 @@ List<ParentChildSummary> summariesFromLayout(ParentHomeLayout? parent) {
 
   return children
       .map((child) {
-        final childId = ActiveProfileSession.profileStableId(child);
+        final childId = profileStableId(child);
         final classrooms = _classroomsForLayoutChild(parent, child);
         final assessments = <GeneratedQuiz>[
           for (final completion
@@ -52,7 +51,7 @@ List<ClassroomModel> _classroomsForLayoutChild(
     return const <ClassroomModel>[];
   }
 
-  final childId = ActiveProfileSession.profileStableId(child);
+  final childId = profileStableId(child);
   final classrooms = <ClassroomModel>[];
 
   for (final layoutClassroom in parent.classrooms) {

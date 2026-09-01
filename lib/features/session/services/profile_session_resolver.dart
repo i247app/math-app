@@ -27,9 +27,7 @@ class ProfileSessionResolver {
         userId: userId,
         profiles: profiles,
       );
-      final activeProfileId = ActiveProfileSession.profileStableId(
-        activeProfile,
-      );
+      final activeProfileId = profileStableId(activeProfile);
       if (activeProfileId != null) {
         await _activeProfileSession.writeActiveProfileId(
           userId: userId,
@@ -61,7 +59,7 @@ class ProfileSessionResolver {
     required int userId,
     required StudentProfile profile,
   }) async {
-    final profileId = ActiveProfileSession.profileStableId(profile);
+    final profileId = profileStableId(profile);
     if (userId <= 0 || profileId == null) {
       return;
     }

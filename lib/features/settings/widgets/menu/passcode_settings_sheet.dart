@@ -5,7 +5,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_radius.dart';
 import 'package:numi/core/theme/app_spacing.dart';
-import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/shared/widgets/settings_action_card.dart';
 
 enum PasscodeSettingsAction { change, remove }
 

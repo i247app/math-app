@@ -7,7 +7,7 @@ import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/features/profile/domain/models/program.dart';
 import 'package:numi/features/profile/domain/models/school.dart';
 import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
 
 String trimOrDefault(String value, String fallback) {
   final trimmed = value.trim();

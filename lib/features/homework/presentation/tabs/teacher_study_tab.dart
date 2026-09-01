@@ -22,10 +22,9 @@ import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_create_homework_screen.dart';
 import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
+import 'package:numi/shared/widgets/teacher_empty_assignments_panel.dart';
 import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_copy.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/features/homework/errors/classroom_exercise_exception.dart';
 import 'package:numi/features/homework/helpers/teacher_study_helpers.dart';
@@ -83,9 +82,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   int _visibleExerciseCount = _exercisePageSize;
 
   ClassroomCollectionState get _classroomCollection {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (profileId == null || profileId <= 0) {
       return const ClassroomCollectionState(profileId: 0);
     }
@@ -116,9 +113,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
     if (!widget.isActive) {
       return;
     }
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (profileId != _loadedProfileId) {
       _selectedClassroomId = null;
       _loadClassrooms();
@@ -135,9 +130,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   }
 
   Future<void> _loadClassrooms({bool forceRefresh = false}) async {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     _exerciseRequestId++;
     final isInitialProfileLoad =
         !_hasCompletedInitialLoad || profileId != _loadedProfileId;
@@ -200,9 +193,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   }
 
   Future<void> _loadExercises() async {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (profileId == null || _isLoadingClassrooms) {
       return;
     }
@@ -337,9 +328,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
   }
 
   Future<void> _openCreateExercise() async {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     final classroom = _createClassroomSelection;
     final classroomId = classroom?.stableId;
     if (profileId == null || classroom == null || classroomId == null) {
@@ -384,9 +373,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
 
   void _openExerciseDetail(ClassroomExercise exercise) {
     final exerciseId = exercise.stableId;
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (exerciseId == null || profileId == null) {
       showTeacherHomeworkSoon(context);
       return;
@@ -416,9 +403,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
 
   @override
   Widget build(BuildContext context) {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (profileId != null && profileId > 0) {
       context.select<ClassroomCubit, ClassroomCollectionState>(
         (cubit) => cubit.owned(profileId),

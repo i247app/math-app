@@ -5,7 +5,6 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_student_search_result_tile.dart';
 
 class TeacherStudentSearchResultList extends StatelessWidget {
@@ -68,7 +67,7 @@ class TeacherStudentSearchResultList extends StatelessWidget {
       itemCount: profiles.length,
       itemBuilder: (context, index) {
         final profile = profiles[index];
-        final id = ActiveProfileSession.profileStableId(profile);
+        final id = profileStableId(profile);
         final selected = id != null && selectedProfileIds.contains(id);
         return Padding(
           padding: EdgeInsets.only(

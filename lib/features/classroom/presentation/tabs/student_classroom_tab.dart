@@ -7,7 +7,6 @@ import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
@@ -45,8 +44,7 @@ class StudentClassroomTab extends StatefulWidget {
 class _StudentClassroomTabState extends State<StudentClassroomTab> {
   late final ClassroomService _classroomService = widget.classroomService;
 
-  int? get _profileId =>
-      ActiveProfileSession.profileStableId(widget.activeProfile);
+  int? get _profileId => profileStableId(widget.activeProfile);
 
   ClassroomCollectionState get _classroomCollection {
     final profileId = _profileId;
@@ -90,12 +88,8 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
     if (!widget.isActive) {
       return;
     }
-    final oldProfileId = ActiveProfileSession.profileStableId(
-      oldWidget.activeProfile,
-    );
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final oldProfileId = profileStableId(oldWidget.activeProfile);
+    final profileId = profileStableId(widget.activeProfile);
     if (oldProfileId != profileId) {
       _loadClassrooms();
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
@@ -119,9 +113,7 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
   }
 
   Future<void> _openClassDetail(ClassroomModel classroom) async {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     final classroomId = classroom.stableId;
     if (profileId == null || profileId <= 0 || classroomId == null) {
       context.showErrorDialog(context.readText(AppKeys.teacherClassOpenFailed));

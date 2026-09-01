@@ -20,15 +20,6 @@ int compareRecentAssignments(
   return (second.stableId ?? -1).compareTo(first.stableId ?? -1);
 }
 
-String teacherExercisePurpose(ClassroomExercise exercise) {
-  final purpose = exercise.purpose?.trim().toUpperCase();
-  if (purpose == classroomExercisePurposeExam ||
-      purpose == classroomExercisePurposeQuiz) {
-    return classroomExercisePurposeExam;
-  }
-  return classroomExercisePurposeHomework;
-}
-
 DateTime? _recentAssignmentSortDate(ClassroomExercise exercise) {
   final values = <String?>[
     exercise.createDt,

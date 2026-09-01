@@ -5,9 +5,9 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
-import 'package:numi/features/classroom/helpers/classroom_display_helpers.dart';
+import 'package:numi/features/classroom/application/read_models/classroom_display_read_model.dart';
 import 'package:numi/features/home/teacher/shared/widgets/class_thumb.dart';
-import 'package:numi/features/classroom/widgets/teacher_shared/teacher_member_summary_text.dart';
+import 'package:numi/features/classroom/application/read_models/teacher_member_summary_read_model.dart';
 
 class TeacherClassCard extends StatelessWidget {
   const TeacherClassCard({

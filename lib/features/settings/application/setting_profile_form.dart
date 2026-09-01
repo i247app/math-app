@@ -430,9 +430,7 @@ mixin _SettingProfileFormMixin
           teacherId: shouldSubmitTeacherId ? profileIdValue : null,
         );
         if (formRole == 'STUDENT' || isCreatingFirstProfile) {
-          final profileId = ActiveProfileSession.profileStableId(
-            createdProfile,
-          );
+          final profileId = profileStableId(createdProfile);
           if (profileId != null) {
             createdActiveProfile = createdProfile;
           }
@@ -484,9 +482,7 @@ mixin _SettingProfileFormMixin
           return;
         }
         setState(() {
-          _localActiveProfileId = ActiveProfileSession.profileStableId(
-            createdActiveProfile,
-          );
+          _localActiveProfileId = profileStableId(createdActiveProfile);
         });
       }
 

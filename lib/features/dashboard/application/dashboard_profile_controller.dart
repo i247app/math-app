@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 
 /// State snapshot for [DashboardProfileController].
@@ -94,8 +93,7 @@ class DashboardProfileController extends ChangeNotifier {
     void Function(String message)? onError,
   }) async {
     if (_state.isSwitchingProfile) return;
-    if (ActiveProfileSession.profileStableId(profile) ==
-        ActiveProfileSession.profileStableId(activeProfile)) {
+    if (profileStableId(profile) == profileStableId(activeProfile)) {
       return;
     }
 

@@ -3,12 +3,12 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
-import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
+import 'package:numi/features/profile/application/read_models/profile_display_read_model.dart';
+import 'package:numi/features/classroom/application/read_models/parent_room_read_model.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_status_icon.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_task_header.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_task_shell.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_task_meta_chip.dart';
+import 'package:numi/shared/widgets/parent_tasks/parent_task_meta_chip.dart';
 
 // ignore: unused_element
 class _ParentRoomPendingCard extends StatelessWidget {

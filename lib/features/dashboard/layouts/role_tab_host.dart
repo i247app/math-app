@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/features/profile/domain/models/grade.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
-import 'package:numi/features/dashboard/navigation/parent_tab_host.dart';
-import 'package:numi/features/dashboard/navigation/student_tab_host.dart';
-import 'package:numi/features/dashboard/navigation/teacher_tab_host.dart';
+import 'package:numi/features/dashboard/application/contracts/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
@@ -17,6 +15,7 @@ class RoleTabHost extends StatefulWidget {
   const RoleTabHost({
     super.key,
     required this.activeTab,
+    required this.tabFactory,
     required this.selectionRevision,
     required this.user,
     required this.profiles,
@@ -52,6 +51,7 @@ class RoleTabHost extends StatefulWidget {
   });
 
   final int activeTab;
+  final DashboardTabFactory tabFactory;
   final int selectionRevision;
   final LoginUser? user;
   final List<StudentProfile> profiles;
@@ -466,11 +466,11 @@ class RoleTabHostState extends State<RoleTabHost>
       homeHeader: tab == 0 ? widget.homeHeader : null,
     );
 
-    return switch (widget.activeRole) {
-      ProfileRole.parent => ParentTabHost(args: args),
-      ProfileRole.student => StudentTabHost(args: args),
-      ProfileRole.teacher => TeacherTabHost(args: args),
-    };
+    return widget.tabFactory.buildTab(
+      context: context,
+      role: widget.activeRole,
+      args: args,
+    );
   }
 
   static bool _requiresAllTabsRebuild(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/list/profile_list_helpers.dart';
 
 class ManagedProfileRolePill extends StatelessWidget {

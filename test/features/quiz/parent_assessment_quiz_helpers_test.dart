@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_read_model.dart';
 
 void main() {
   test('student profile scope does not fall back to user quizzes', () async {

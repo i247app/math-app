@@ -11,21 +11,13 @@ import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/classroom/application/classroom_cubit.dart';
-import 'package:numi/features/classroom/presentation/screens/teacher_class_detail_screen.dart';
-import 'package:numi/features/classroom/presentation/screens/teacher_create_class_screen.dart';
-import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/application/contracts/home_layout_service.dart';
 import 'package:numi/features/home/errors/home_layout_exception.dart';
 import 'package:numi/features/home/teacher/data/cache/teacher_home_snapshot.dart';
-import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
-import 'package:numi/features/notifications/navigation/notification_route.dart';
-import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/shared/widgets/teacher_empty_assignments_panel.dart';
+import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
+import 'package:numi/shared/widgets/settings_action_card.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 
@@ -51,14 +43,15 @@ class TeacherHomeTab extends StatefulWidget {
     required this.onCompleteProfile,
     this.onOpenClassroomTab,
     this.onOpenStudyTab,
-    ClassroomExerciseService? exerciseService,
     HomeLayoutService? homeLayoutService,
     this.activeRefreshTick = 0,
     this.isActive = true,
     this.hasUnreadNotifications = false,
     this.onNotificationTap,
-  }) : _exerciseService = exerciseService,
-       _homeLayoutService = homeLayoutService;
+    this.onCreateClass,
+    this.onOpenClassDetail,
+    this.onOpenAssignmentDetail,
+  }) : _homeLayoutService = homeLayoutService;
 
   final LoginUser? user;
   final StudentProfile? activeProfile;
@@ -70,7 +63,15 @@ class TeacherHomeTab extends StatefulWidget {
   final bool isActive;
   final bool hasUnreadNotifications;
   final VoidCallback? onNotificationTap;
-  final ClassroomExerciseService? _exerciseService;
+  final Future<ClassroomModel?> Function(BuildContext context)? onCreateClass;
+  final Future<void> Function(
+    BuildContext context,
+    ClassroomModel classroom,
+    bool initiallyExpanded,
+  )?
+  onOpenClassDetail;
+  final void Function(BuildContext context, ClassroomExercise exercise)?
+  onOpenAssignmentDetail;
   final HomeLayoutService? _homeLayoutService;
 
   @override
@@ -78,8 +79,6 @@ class TeacherHomeTab extends StatefulWidget {
 }
 
 class _TeacherRoleTabState extends State<TeacherHomeTab> {
-  late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? context.read<ClassroomExerciseService>();
   late final HomeLayoutService _homeLayoutService =
       widget._homeLayoutService ?? context.read<HomeLayoutService>();
 
@@ -105,9 +104,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
       _recentAssignments.isEmpty;
 
   String? get _error {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (profileId == null || profileId <= 0) {
       return context.readText(AppKeys.teacherMissingProfileId);
     }
@@ -115,9 +112,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
   }
 
   String get _teacherHomeProfileKey {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     return 'profile-${profileId ?? 'none'}';
   }
 
@@ -151,9 +146,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
     if (!widget.isActive) {
       return;
     }
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (profileId != _loadedProfileId) {
       _resetHomeEntrance();
       _loadClassrooms();
@@ -167,9 +160,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
   }
 
   Future<void> _loadClassrooms({bool forceRefresh = false}) async {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     final requestId = ++_homeLayoutRequestId;
     if (profileId == null || profileId <= 0) {
       setState(() {
@@ -328,24 +319,16 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
         .map((classroom) => classroom.stableId)
         .whereType<int>()
         .toSet();
-    final classroomCubit = context.read<ClassroomCubit>();
-    final result = await Navigator.of(context).push<TeacherCreateClassResult>(
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: classroomCubit,
-          child: TeacherCreateClassScreen(
-            user: widget.user,
-            activeProfile: widget.activeProfile,
-          ),
-        ),
-      ),
-    );
-    if (result != null) {
+    final createdClassroom = await widget.onCreateClass?.call(context);
+    if (createdClassroom != null) {
       await _refreshClassrooms();
       if (!mounted) {
         return;
       }
-      final classroom = _findCreatedClassroom(result, previousClassroomIds);
+      final classroom = _findCreatedClassroom(
+        createdClassroom,
+        previousClassroomIds,
+      );
       if (classroom != null) {
         await _openClassDetail(classroom, initiallyExpanded: true);
       }
@@ -367,17 +350,17 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
   }
 
   ClassroomModel? _findCreatedClassroom(
-    TeacherCreateClassResult result,
+    ClassroomModel createdClassroom,
     Set<int> previousClassroomIds,
   ) {
-    final createdId = result.classroom?.stableId;
+    final createdId = createdClassroom.stableId;
     if (createdId != null) {
       for (final classroom in _classrooms) {
         if (classroom.stableId == createdId) {
           return classroom;
         }
       }
-      return result.classroom;
+      return createdClassroom;
     }
 
     for (final classroom in _classrooms) {
@@ -394,63 +377,30 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
     bool initiallyExpanded = false,
   }) async {
     final classroomId = classroom.stableId;
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (classroomId == null || profileId == null) {
       _showError(context.readText(AppKeys.teacherClassOpenFailed));
       return;
     }
 
     HapticFeedback.selectionClick();
-    final classroomCubit = context.read<ClassroomCubit>();
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: classroomCubit,
-          child: TeacherClassDetailScreen(
-            classroomId: classroomId,
-            profileId: profileId,
-            userId: widget.user?.id,
-            initialClassroom: classroom,
-            initiallyExpanded: initiallyExpanded,
-          ),
-        ),
-      ),
-    );
+    await widget.onOpenClassDetail?.call(context, classroom, initiallyExpanded);
   }
 
   void _openAssignmentDetail(ClassroomExercise exercise) {
     final exerciseId = exercise.stableId;
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (exerciseId == null || profileId == null) {
       showTeacherHomeworkSoon(context);
       return;
     }
 
     HapticFeedback.selectionClick();
-    Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => TeacherHomeworkDetailScreen(
-          exerciseId: exerciseId,
-          profileId: profileId,
-          initialExercise: exercise,
-          purpose: teacherExercisePurpose(exercise),
-          exerciseService: _exerciseService,
-        ),
-      ),
-    );
+    widget.onOpenAssignmentDetail?.call(context, exercise);
   }
 
   void _showError(String message) {
     context.showErrorDialog(message);
-  }
-
-  void _openNotifications() {
-    HapticFeedback.selectionClick();
-    Navigator.of(context).push<bool>(NotificationRoute());
   }
 
   Widget _buildClassroomSection({required bool isProfileComplete}) {
@@ -545,7 +495,7 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
             TeacherTopBar(
               profile: widget.activeProfile,
               topPadding: MediaQuery.paddingOf(context).top,
-              onNotificationTap: widget.onNotificationTap ?? _openNotifications,
+              onNotificationTap: widget.onNotificationTap ?? () {},
               hasUnreadNotifications: widget.hasUnreadNotifications,
             ),
             Padding(

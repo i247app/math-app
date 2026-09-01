@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
-import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/features/profile/application/read_models/profile_display_read_model.dart';
+import 'package:numi/shared/widgets/profile_avatar_image.dart';
 
 class DashboardProfileMenu extends StatelessWidget {
   const DashboardProfileMenu({

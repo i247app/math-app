@@ -30,9 +30,7 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
       activeProfileSession: _activeProfileSession,
     );
     _profiles = widget.profiles;
-    _localActiveProfileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    _localActiveProfileId = profileStableId(widget.activeProfile);
     _profileLoadError = widget.profileLoadError;
 
     if (_view == SettingPageView.profile) {
@@ -60,9 +58,7 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
       _profiles = widget.profiles;
     }
     if (oldWidget.activeProfile != widget.activeProfile) {
-      _localActiveProfileId = ActiveProfileSession.profileStableId(
-        widget.activeProfile,
-      );
+      _localActiveProfileId = profileStableId(widget.activeProfile);
     }
     if (oldWidget.profileLoadError != widget.profileLoadError) {
       _profileLoadError = widget.profileLoadError;
@@ -168,7 +164,7 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
 
   Future<void> _selectActiveProfile(StudentProfile selectedProfile) async {
     final userId = widget.user?.id;
-    final profileId = ActiveProfileSession.profileStableId(selectedProfile);
+    final profileId = profileStableId(selectedProfile);
     if (_isSettingDefaultProfile ||
         userId == null ||
         userId <= 0 ||

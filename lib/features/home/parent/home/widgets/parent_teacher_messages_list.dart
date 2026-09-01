@@ -4,7 +4,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
 import 'package:numi/features/home/parent/home/widgets/parent_teacher_message_item.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_empty_task_line.dart';
+import 'package:numi/shared/widgets/parent_tasks/parent_empty_task_line.dart';
 
 class ParentTeacherMessagesList extends StatelessWidget {
   const ParentTeacherMessagesList({super.key, required this.summaries});

@@ -3,23 +3,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/debug/home_tab_performance_monitor.dart';
+import 'package:numi/core/data/session_data_cleaner.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/notifications/notification_service.dart';
-import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
+import 'package:numi/features/profile/application/read_models/profile_display_read_model.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
-import 'package:numi/features/notifications/navigation/notification_route.dart';
-import 'package:numi/features/notifications/application/notification_badge_controller.dart';
-import 'package:numi/features/notifications/data/cache/notification_cache.dart';
+import 'package:numi/features/notifications/application/read_models/notification_badge_controller.dart';
 import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
-import 'package:numi/features/home/data/cache/home_profile_cache.dart';
-import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi/features/home/application/read_models/parent_home_read_model.dart';
 import 'package:numi/features/dashboard/application/dashboard_profile_controller.dart';
+import 'package:numi/features/dashboard/application/contracts/dashboard_tab_factory.dart';
+import 'package:numi/features/dashboard/application/contracts/dashboard_navigator.dart';
 import 'package:numi/features/dashboard/application/role_tab_cubit.dart';
 import 'package:numi/features/dashboard/layouts/role_tab_host.dart';
 import 'package:numi/features/dashboard/application/parent_role_tab_cubit.dart';
@@ -33,10 +31,6 @@ import 'package:numi/features/dashboard/widgets/dashboard_session_skeleton.dart'
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
-import 'package:numi/features/settings/helpers/setting_page_builders.dart';
-import 'package:numi/features/settings/application/setting_tab.dart';
-import 'package:numi/features/settings/models/setting_screen_args.dart';
-import 'package:numi/features/settings/navigation/settings_depth_route.dart';
 
 enum _RoleTabDestination {
   home,
@@ -109,6 +103,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       widget._quizService ?? context.read<QuizService>();
   late final NotificationListService _notificationService =
       widget._notificationService ?? context.read<NotificationListService>();
+  late final DashboardTabFactory _tabFactory = context
+      .read<DashboardTabFactory>();
+  late final DashboardNavigator _dashboardNavigator = context
+      .read<DashboardNavigator>();
   late final NotificationBadgeController _notificationBadgeController =
       NotificationBadgeController(
         service: _notificationService,
@@ -257,10 +255,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             final switchableProfiles = widget.profiles
                 .where(
                   (profile) =>
-                      ActiveProfileSession.profileStableId(profile) !=
-                      ActiveProfileSession.profileStableId(
-                        widget.activeProfile,
-                      ),
+                      profileStableId(profile) !=
+                      profileStableId(widget.activeProfile),
                 )
                 .toList(growable: false);
             final isMenuOpen = profileState.isMenuOpen;
@@ -301,6 +297,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           bottomPadding: navHeight + 14,
                         )
                       : RoleTabHost(
+                          tabFactory: _tabFactory,
                           // No ValueKey — profileResetSignal drives selective
                           // data reload without recreating the widget subtree.
                           profileResetSignal: profileState.profileResetSignal,
@@ -481,13 +478,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _openNotifications() async {
     _notificationBadgeController.markViewed();
-    final shouldCreateProfile = await Navigator.of(context).push<bool>(
-      NotificationRoute(
-        notificationService: _notificationService,
-        showMissingChildProfileNotice:
-            widget.activeRole == ProfileRole.parent &&
-            studentProfiles(widget.profiles).isEmpty,
-      ),
+    final shouldCreateProfile = await _dashboardNavigator.openNotifications(
+      context: context,
+      notificationService: _notificationService,
+      showMissingChildProfileNotice:
+          widget.activeRole == ProfileRole.parent &&
+          studentProfiles(widget.profiles).isEmpty,
     );
     if (!mounted || shouldCreateProfile != true) {
       return;
@@ -498,8 +494,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _handleLogout() {
-    HomeProfileCache.instance.invalidateAll();
-    NotificationCache.invalidate();
+    context.read<SessionDataCleaner>().clear();
     widget.onLogout();
   }
 
@@ -516,37 +511,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _openTeacherProfileForm() async {
-    final profile = widget.activeProfile;
-    if (profile == null) {
-      return;
-    }
-    final didSave = await Navigator.of(context).push<bool>(
-      SettingsDepthRoute<bool>(
-        builder: (routeContext) => Material(
-          color: routeContext.themeColors.pageBackground,
-          child: SafeArea(
-            child: buildPushedSettingPage(
-              context: routeContext,
-              args: SettingScreenArgs(
-                user: widget.user,
-                profiles: widget.profiles,
-                activeProfile: widget.activeProfile,
-                profileLoadError: widget.profileLoadError,
-                onLogout: _handleLogout,
-                onActivateProfile: widget.onActivateProfile,
-                onRefreshProfiles: widget.onRefreshProfiles,
-                onProfileSaved: () => Navigator.of(routeContext).pop(true),
-              ),
-              initialView: SettingPageView.addProfile,
-              initialEditingProfile: profile,
-              onProfileSaved: () => Navigator.of(routeContext).pop(true),
-            ),
-          ),
-        ),
+    final didSave = await _dashboardNavigator.openTeacherProfile(
+      context: context,
+      request: TeacherProfileNavigationRequest(
+        user: widget.user,
+        profiles: widget.profiles,
+        activeProfile: widget.activeProfile,
+        profileLoadError: widget.profileLoadError,
+        onLogout: _handleLogout,
+        onActivateProfile: widget.onActivateProfile,
+        onRefreshProfiles: widget.onRefreshProfiles,
       ),
     );
 
-    if (didSave == true) {
+    if (didSave) {
       await widget.onRefreshProfiles();
     }
   }

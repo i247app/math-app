@@ -7,7 +7,6 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/widgets/list/parent_child_profile_card.dart';
 import 'package:numi/features/profile/widgets/list/parent_info_card.dart';
 import 'package:numi/features/profile/widgets/list/profile_add_button.dart';
@@ -61,12 +60,8 @@ class ParentProfileManagePanel extends StatelessWidget {
           child: ParentInfoCard(
             profile: parentProfile,
             user: user,
-            isActive:
-                ActiveProfileSession.profileStableId(parentProfile) ==
-                activeProfileId,
-            isSwitching:
-                ActiveProfileSession.profileStableId(parentProfile) ==
-                switchingProfileId,
+            isActive: profileStableId(parentProfile) == activeProfileId,
+            isSwitching: profileStableId(parentProfile) == switchingProfileId,
             onSelect: () => onSelect(parentProfile),
             onEdit: () => onEdit(parentProfile),
           ),
@@ -107,12 +102,8 @@ class ParentProfileManagePanel extends StatelessWidget {
                 .map(
                   (profile) => ParentChildProfileCard(
                     profile: profile,
-                    isActive:
-                        ActiveProfileSession.profileStableId(profile) ==
-                        activeProfileId,
-                    isSwitching:
-                        ActiveProfileSession.profileStableId(profile) ==
-                        switchingProfileId,
+                    isActive: profileStableId(profile) == activeProfileId,
+                    isSwitching: profileStableId(profile) == switchingProfileId,
                     onSelect: () => onSelect(profile),
                     onEdit: () => onEdit(profile),
                     onDelete: () => onDelete(profile),
@@ -130,8 +121,7 @@ class ParentProfileManagePanel extends StatelessWidget {
     }
 
     final activeIndex = children.indexWhere(
-      (profile) =>
-          ActiveProfileSession.profileStableId(profile) == activeProfileId,
+      (profile) => profileStableId(profile) == activeProfileId,
     );
     if (activeIndex <= 0) {
       return children;

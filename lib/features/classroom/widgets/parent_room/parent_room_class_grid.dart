@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
+import 'package:numi/features/classroom/application/read_models/parent_room_read_model.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
 import 'package:numi/features/classroom/widgets/room_class_summary_card.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
+import 'package:numi/features/profile/application/read_models/profile_display_read_model.dart';
 import 'package:numi/shared/widgets/app_responsive_card_group.dart';
 
 class ParentRoomClassGrid extends StatelessWidget {

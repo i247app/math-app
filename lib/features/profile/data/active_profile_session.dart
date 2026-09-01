@@ -73,7 +73,7 @@ class ActiveProfileSession {
   }
 
   static int? profileStableId(StudentProfile? profile) {
-    return profile?.profileId ?? profile?.id;
+    return profile?.stableId;
   }
 
   static String? _storageKey(int userId) {

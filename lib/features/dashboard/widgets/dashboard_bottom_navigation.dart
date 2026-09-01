@@ -9,8 +9,8 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
+import 'package:numi/shared/widgets/profile_avatar_image.dart';
 
 class DashboardBottomNavigation extends StatefulWidget {
   const DashboardBottomNavigation({

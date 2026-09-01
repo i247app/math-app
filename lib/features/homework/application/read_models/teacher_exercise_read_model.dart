@@ -5,6 +5,15 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 
+String teacherExercisePurpose(ClassroomExercise exercise) {
+  final purpose = exercise.purpose?.trim().toUpperCase();
+  if (purpose == classroomExercisePurposeExam ||
+      purpose == classroomExercisePurposeQuiz) {
+    return classroomExercisePurposeExam;
+  }
+  return classroomExercisePurposeHomework;
+}
+
 void showTeacherHomeworkSoon(BuildContext context) {
   HapticFeedback.selectionClick();
   context.showInfoDialog(context.getText(AppKeys.teacherCreateAssignmentSoon));

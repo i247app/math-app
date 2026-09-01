@@ -1,10 +1,10 @@
-import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_read_model.dart';
 import 'package:flutter/material.dart';
 import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_shadows.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_helpers.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_display_read_model.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_score_badge.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_meta_item.dart';
 

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
@@ -11,23 +10,19 @@ import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/application/contracts/home_layout_service.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
 import 'package:numi/features/home/errors/home_layout_exception.dart';
-import 'package:numi/features/home/data/home_layout_mappers.dart';
+import 'package:numi/features/home/application/read_models/home_layout_read_model.dart';
 import 'package:numi/features/home/parent/data/cache/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
-import 'package:numi/features/quiz/data/cache/quiz_cache.dart';
+import 'package:numi/features/quiz/application/contracts/quiz_snapshot_store.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
-import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
-import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
-import 'package:numi/features/settings/application/setting_tab.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_read_model.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
-import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi/features/home/application/read_models/parent_home_read_model.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/parent/home/helpers/parent_child_dashboard_helpers.dart';
 import 'package:numi/features/home/parent/home/parent_learning_streak_content.dart';
@@ -64,6 +59,10 @@ class ParentHomeContent extends StatefulWidget {
     this.onChildProfileDialogShown,
     this.homeHeader,
     this.useActiveStudentProfileData = false,
+    this.quizSnapshotStore = const NoopQuizSnapshotStore(),
+    this.onOpenAssessment,
+    this.onOpenQuizReview,
+    this.onCreateStudentProfile,
   });
 
   final LoginUser? user;
@@ -86,6 +85,11 @@ class ParentHomeContent extends StatefulWidget {
   final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
   final bool useActiveStudentProfileData;
+  final QuizSnapshotStore quizSnapshotStore;
+  final Future<void> Function(BuildContext context)? onOpenAssessment;
+  final Future<void> Function(BuildContext context, GeneratedQuiz quiz)?
+  onOpenQuizReview;
+  final Future<void> Function(BuildContext context)? onCreateStudentProfile;
 
   @override
   State<ParentHomeContent> createState() => ParentHomeContentState();
@@ -124,18 +128,14 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   @override
   void didUpdateWidget(covariant ParentHomeContent oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final oldProfileId = ActiveProfileSession.profileStableId(
-      oldWidget.activeProfile,
-    );
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final oldProfileId = profileStableId(oldWidget.activeProfile);
+    final profileId = profileStableId(widget.activeProfile);
     final oldChildIds = studentProfiles(
       oldWidget.profiles,
-    ).map(ActiveProfileSession.profileStableId).join(',');
+    ).map(profileStableId).join(',');
     final childIds = studentProfiles(
       widget.profiles,
-    ).map(ActiveProfileSession.profileStableId).join(',');
+    ).map(profileStableId).join(',');
     final shouldForceRefresh =
         oldWidget.user?.id != widget.user?.id ||
         oldChildIds != childIds ||
@@ -180,9 +180,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
   Future<void> loadHome({bool forceRefresh = false}) async {
     final requestId = ++_childLoadRequestId;
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (profileId == null || profileId <= 0) {
       _assessmentLoadRequestId++;
       if (!mounted) {
@@ -348,7 +346,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
           childSummaries = _studentSummariesFromLayout(layout, assessments);
         }
       });
-      QuizCache.seedList(
+      widget.quizSnapshotStore.seedList(
         quizzes: assessments,
         userId: userId,
         profileId: profileId,
@@ -519,19 +517,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
   Future<void> openAssessment() async {
     HapticFeedback.lightImpact();
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => GradeSelectionScreen(
-          user: widget.user,
-          initialGrades: widget.initialGrades,
-          gradeService: widget.gradeService,
-          quizPurpose: quizPurposeAssessment,
-          profileId: ActiveProfileSession.profileStableId(widget.activeProfile),
-          initialGradeId: profileGradeStableId(widget.activeProfile),
-          initialGradeLabel: widget.activeProfile?.grade?.label,
-        ),
-      ),
-    );
+    await widget.onOpenAssessment?.call(context);
     if (mounted) {
       await loadHome();
     }
@@ -551,11 +537,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return;
     }
     HapticFeedback.selectionClick();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
-      ),
-    );
+    widget.onOpenQuizReview?.call(context, quiz);
   }
 
   Future<void> showClassroomMessage() async {
@@ -632,29 +614,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
   Future<void> _openCreateStudentProfile() async {
     HapticFeedback.selectionClick();
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => Material(
-          color: context.themeColors.pageBackground,
-          child: SafeArea(
-            child: SettingTab.page(
-              user: widget.user,
-              profiles: widget.profiles,
-              activeProfile: widget.activeProfile,
-              profileLoadError: null,
-              onLogout: () {},
-              onActivateProfile: widget.onActivateProfile,
-              onRefreshProfiles: widget.onRefreshProfiles,
-              onProfileSaved: widget.onProfileSaved,
-              bottomPadding: 0,
-              initialView: SettingPageView.profile,
-              isPushedPage: true,
-              openAddProfileOnStart: true,
-            ),
-          ),
-        ),
-      ),
-    );
+    await widget.onCreateStudentProfile?.call(context);
     await widget.onRefreshProfiles();
   }
 }

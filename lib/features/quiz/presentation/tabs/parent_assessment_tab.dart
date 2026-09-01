@@ -1,4 +1,4 @@
-import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_read_model.dart';
 import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +9,6 @@ import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/shared/layouts/page_header.dart';
@@ -147,16 +146,14 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     bool useActiveStudentProfileData,
   ) {
     return '${user?.id}|'
-        '${ActiveProfileSession.profileStableId(activeProfile)}|'
+        '${profileStableId(activeProfile)}|'
         '$useActiveStudentProfileData';
   }
 
   Future<void> _loadAssessments({bool forceRefresh = false, int? page}) async {
     final requestId = ++_loadRequestId;
     final targetPage = page ?? _pagination?.page ?? 1;
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     final userId = widget.useActiveStudentProfileData ? null : widget.user?.id;
     final cachedAssessments = QuizCache.peekList(
       userId: userId,
@@ -338,7 +335,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => LearningProgressScreen(
-          profileId: ActiveProfileSession.profileStableId(widget.activeProfile),
+          profileId: profileStableId(widget.activeProfile),
           quizService: widget.quizService,
           initialEntries: List<ParentAssessmentEntry>.unmodifiable(_allEntries),
         ),
@@ -356,7 +353,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           initialGrades: widget.initialGrades,
           gradeService: widget.gradeService,
           quizPurpose: quizPurposeAssessment,
-          profileId: ActiveProfileSession.profileStableId(widget.activeProfile),
+          profileId: profileStableId(widget.activeProfile),
           initialGradeId: profileGradeStableId(widget.activeProfile),
           initialGradeLabel: widget.activeProfile?.grade?.label,
           onResultBack: () {

@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
 
 class TeacherRecentAssignmentCard extends StatelessWidget {
   const TeacherRecentAssignmentCard({

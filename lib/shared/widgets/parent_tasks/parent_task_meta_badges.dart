@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_task_meta_chip.dart';
+import 'package:numi/shared/widgets/parent_tasks/parent_task_meta_chip.dart';
 
 class ParentTaskMetaBadges extends StatelessWidget {
   const ParentTaskMetaBadges({

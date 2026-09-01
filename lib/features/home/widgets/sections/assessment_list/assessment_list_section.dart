@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/features/home/widgets/sections/assessment_list/home_assessment_result_card.dart';
 import 'package:numi/features/quiz/domain/models/quiz.dart';
-import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_card.dart';
 
 typedef AssessmentListItemWrapper =
     Widget Function(Widget child, int index, int itemCount);
@@ -34,7 +34,7 @@ class AssessmentListSection extends StatelessWidget {
       children: [
         for (final entry in visibleAssessments.indexed)
           _wrapItem(
-            AssessmentResultListItemCard(
+            HomeAssessmentResultCard(
               quiz: entry.$2,
               onTap: () => onAssessmentTap(entry.$2),
               useCardShadow: useCardShadow,

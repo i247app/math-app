@@ -5,8 +5,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/list/parent_profile_manage_panel.dart';
 import 'package:numi/features/profile/widgets/list/profile_add_button.dart';
 import 'package:numi/features/profile/widgets/list/profile_card.dart';
@@ -114,12 +113,8 @@ class ProfilePlaceholderPanel extends StatelessWidget {
               .map(
                 (profile) => ProfileCard(
                   profile: profile,
-                  isActive:
-                      ActiveProfileSession.profileStableId(profile) ==
-                      activeProfileId,
-                  isSwitching:
-                      ActiveProfileSession.profileStableId(profile) ==
-                      switchingProfileId,
+                  isActive: profileStableId(profile) == activeProfileId,
+                  isSwitching: profileStableId(profile) == switchingProfileId,
                   onSelect: () => onSelect(profile),
                   onEdit: () => onEdit(profile),
                   onDelete: () => onDelete(profile),
@@ -137,8 +132,7 @@ class ProfilePlaceholderPanel extends StatelessWidget {
     }
 
     final activeIndex = profiles.indexWhere(
-      (profile) =>
-          ActiveProfileSession.profileStableId(profile) == activeProfileId,
+      (profile) => profileStableId(profile) == activeProfileId,
     );
     if (activeIndex <= 0) {
       return profiles;
@@ -152,10 +146,10 @@ class ProfilePlaceholderPanel extends StatelessWidget {
   }
 
   StudentProfile? get _parentProfile {
-    final activeProfileId = ActiveProfileSession.profileStableId(activeProfile);
+    final activeProfileId = profileStableId(activeProfile);
     if (activeProfileId != null) {
       for (final profile in profiles) {
-        if (ActiveProfileSession.profileStableId(profile) == activeProfileId &&
+        if (profileStableId(profile) == activeProfileId &&
             ProfileRole.fromProfile(profile) == ProfileRole.parent) {
           return profile;
         }

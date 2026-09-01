@@ -54,7 +54,11 @@ class StudentProfile {
   final String? teacherId;
   final String? createDt;
   final String? modifyDt;
+
+  int? get stableId => profileId ?? id;
 }
+
+int? profileStableId(StudentProfile? profile) => profile?.stableId;
 
 class ProfileGrade {
   const ProfileGrade({

@@ -6,8 +6,8 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/home/parent/home/models/parent_child_summary.dart';
-import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
+import 'package:numi/features/home/application/read_models/parent_home_read_model.dart';
+import 'package:numi/features/profile/application/read_models/profile_display_read_model.dart';
 
 class ParentClassCarousel extends StatefulWidget {
   const ParentClassCarousel({

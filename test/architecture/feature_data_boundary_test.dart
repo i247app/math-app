@@ -61,4 +61,52 @@ void main() {
 
     expect(violations, isEmpty, reason: violations.join('\n'));
   });
+
+  test('home and dashboard only use public APIs from other features', () {
+    const aggregatorFeatures = <String>{'home', 'dashboard'};
+    const publicPrefixes = <String>[
+      'application/contracts/',
+      'application/read_models/',
+      'domain/',
+    ];
+    final featureImport = RegExp(r"package:numi/features/([^/]+)/([^']+)");
+    final violations = <String>[];
+
+    for (final sourceFeature in aggregatorFeatures) {
+      final directory = Directory('lib/features/$sourceFeature');
+      for (final entity in directory.listSync(recursive: true)) {
+        if (entity is! File || !entity.path.endsWith('.dart')) {
+          continue;
+        }
+
+        final normalizedPath = entity.path.replaceAll('\\', '/');
+        final lines = entity.readAsLinesSync();
+        for (var index = 0; index < lines.length; index++) {
+          final match = featureImport.firstMatch(lines[index]);
+          if (match == null) {
+            continue;
+          }
+
+          final targetFeature = match.group(1)!;
+          final targetPath = match.group(2)!;
+          if (targetFeature == sourceFeature ||
+              publicPrefixes.any(targetPath.startsWith)) {
+            continue;
+          }
+
+          violations.add('$normalizedPath:${index + 1}: ${lines[index]}');
+        }
+      }
+    }
+
+    expect(
+      violations,
+      isEmpty,
+      reason:
+          'Aggregator features must not reach into another feature\'s data, '
+          'presentation, widget, helper, or private model folders. Use its '
+          'domain model, application contract, or public read-model:\n'
+          '${violations.join('\n')}',
+    );
+  });
 }

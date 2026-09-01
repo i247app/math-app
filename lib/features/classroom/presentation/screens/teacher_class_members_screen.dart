@@ -11,7 +11,6 @@ import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_class_members_content.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_sending_invite_overlay.dart';
@@ -157,7 +156,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
       return;
     }
     final targetProfileIds = selected
-        .map(ActiveProfileSession.profileStableId)
+        .map(profileStableId)
         .whereType<int>()
         .toList(growable: false);
     if (targetProfileIds.isEmpty) {

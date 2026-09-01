@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
-import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_task_icon_box.dart';
-import 'package:numi/features/classroom/widgets/parent_tasks/parent_task_list_item.dart';
+import 'package:numi/features/profile/application/read_models/profile_display_read_model.dart';
+import 'package:numi/features/classroom/application/read_models/parent_room_read_model.dart';
+import 'package:numi/shared/widgets/parent_tasks/parent_task_icon_box.dart';
+import 'package:numi/shared/widgets/parent_tasks/parent_task_list_item.dart';
 
 class ParentPendingTaskListItem extends StatelessWidget {
   const ParentPendingTaskListItem({

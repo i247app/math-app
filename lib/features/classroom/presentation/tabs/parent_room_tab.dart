@@ -8,7 +8,6 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/home/data/cache/home_profile_cache.dart';
 import 'package:numi/features/home/application/contracts/home_layout_service.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
@@ -19,8 +18,8 @@ import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
 import 'package:numi/features/settings/application/setting_tab.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
-import 'package:numi/features/home/data/home_layout_mappers.dart';
-import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
+import 'package:numi/features/home/application/read_models/home_layout_read_model.dart';
+import 'package:numi/features/classroom/application/read_models/parent_room_read_model.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
 import 'package:numi/features/classroom/presentation/screens/parent_room_detail_screen.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_loading.dart';
@@ -29,7 +28,7 @@ import 'package:numi/features/classroom/widgets/parent_room/parent_room_select_s
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_state_card.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_task_list_item.dart';
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
-import 'package:numi/features/home/parent/shared/parent_home_helpers.dart';
+import 'package:numi/features/home/application/read_models/parent_home_read_model.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
 
 class ParentRoomTab extends StatefulWidget {
@@ -95,12 +94,8 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     if (!widget.isActive) {
       return;
     }
-    final oldProfileId = ActiveProfileSession.profileStableId(
-      oldWidget.activeProfile,
-    );
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final oldProfileId = profileStableId(oldWidget.activeProfile);
+    final profileId = profileStableId(widget.activeProfile);
     if (oldProfileId != profileId ||
         oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       _resetRoomEntrance();
@@ -137,9 +132,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
 
   Future<void> _loadLayout({bool forceRefresh = false}) async {
     final requestId = ++_requestId;
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (profileId == null || profileId <= 0) {
       if (!mounted) {
         return;

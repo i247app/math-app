@@ -3,7 +3,7 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/classroom/widgets/teacher_shared/teacher_small_coral_add_button.dart';
+import 'package:numi/shared/widgets/teacher_small_coral_add_button.dart';
 import 'package:numi/shared/widgets/app_section_header.dart';
 
 class TeacherClassSectionHeader extends StatelessWidget {

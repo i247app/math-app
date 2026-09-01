@@ -15,7 +15,6 @@ import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
 import 'package:numi/features/classroom/errors/classroom_exception.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/grade_service.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
 import 'package:numi/features/profile/application/contracts/school_service.dart';
@@ -186,9 +185,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
   }
 
   Future<void> _submit() async {
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     final gradeId = gradeStableId(_selectedGrade);
     final programIds = _selectedPrograms
         .map(programStableId)

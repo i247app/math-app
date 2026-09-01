@@ -1,7 +1,7 @@
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/profile/models/profile_id_type_option.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
 
 T? settingsFirstWhereOrNull<T>(Iterable<T> items, bool Function(T item) test) {
   for (final item in items) {

@@ -5,9 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/features/auth/application/contracts/auth_service.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/notifications/application/contracts/notification_ping_service.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
 import 'package:numi/features/session/application/app_session_state.dart';
 import 'package:numi/features/session/services/profile_session_resolver.dart';
 
@@ -193,7 +192,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
 
   Future<void> activateProfile(StudentProfile profile) async {
     final user = state.user;
-    final profileId = ActiveProfileSession.profileStableId(profile);
+    final profileId = profileStableId(profile);
     if (user == null || user.id <= 0 || profileId == null) {
       return;
     }
@@ -208,8 +207,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
 
     final profiles = <StudentProfile>[
       for (final existing in state.profiles)
-        if (ActiveProfileSession.profileStableId(existing) != profileId)
-          existing,
+        if (profileStableId(existing) != profileId) existing,
       profile,
     ];
     authenticate(

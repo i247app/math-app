@@ -13,7 +13,7 @@ import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment
 import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_stat_due.dart';
 import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_stat_questions.dart';
 import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_switch.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
 
 class TeacherAssignmentInfoCard extends StatelessWidget {
   const TeacherAssignmentInfoCard({

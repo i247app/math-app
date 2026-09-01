@@ -5,7 +5,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
+import 'package:numi/features/classroom/application/read_models/parent_room_read_model.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_detail_meta.dart';
 

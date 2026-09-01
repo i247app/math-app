@@ -5,9 +5,8 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/classroom/domain/models/classroom.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
-import 'package:numi/features/home/data/home_layout_mappers.dart';
+import 'package:numi/features/home/application/read_models/home_layout_read_model.dart';
 import 'package:numi/features/classroom/models/parent_room_entry.dart';
 
 List<ParentRoomEntry> roomEntries(ParentHomeLayout? parent) {
@@ -17,8 +16,7 @@ List<ParentRoomEntry> roomEntries(ParentHomeLayout? parent) {
 
   final childById = <int, StudentProfile>{
     for (final child in parent.children)
-      if (ActiveProfileSession.profileStableId(child) != null)
-        ActiveProfileSession.profileStableId(child)!: child,
+      if (profileStableId(child) != null) profileStableId(child)!: child,
   };
 
   final layoutClassroomById = <int, HomeLayoutClassroom>{
@@ -35,8 +33,7 @@ List<ParentRoomEntry> roomEntries(ParentHomeLayout? parent) {
     int? memberProfileId,
   }) {
     final classroomId = layoutClassroom.classroom.stableId;
-    final childId =
-        memberProfileId ?? ActiveProfileSession.profileStableId(child);
+    final childId = memberProfileId ?? profileStableId(child);
     if (classroomId == null || childId == null) {
       return;
     }

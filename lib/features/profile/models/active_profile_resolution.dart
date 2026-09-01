@@ -1,6 +1,5 @@
 import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
 
 class ActiveProfileResolution {
   const ActiveProfileResolution({
@@ -13,6 +12,5 @@ class ActiveProfileResolution {
 
   ProfileRole get role => ProfileRole.fromProfile(activeProfile);
 
-  int? get activeProfileId =>
-      ActiveProfileSession.profileStableId(activeProfile);
+  int? get activeProfileId => profileStableId(activeProfile);
 }

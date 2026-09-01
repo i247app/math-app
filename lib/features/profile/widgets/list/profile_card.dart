@@ -6,7 +6,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/profile/domain/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/list/managed_profile_role_pill.dart';
 import 'package:numi/features/profile/widgets/list/profile_avatar.dart';
 import 'package:numi/features/profile/widgets/list/profile_action_button.dart';

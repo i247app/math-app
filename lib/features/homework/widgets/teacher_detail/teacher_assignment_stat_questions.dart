@@ -5,7 +5,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
 import 'package:numi/features/homework/widgets/teacher_detail/teacher_assignment_stat.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_exercise_helpers.dart';
+import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
 
 class TeacherAssignmentStatQuestions extends StatelessWidget {
   const TeacherAssignmentStatQuestions(this.exercise, {super.key});

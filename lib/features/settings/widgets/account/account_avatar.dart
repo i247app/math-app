@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/profile/widgets/profile_avatar_image.dart';
+import 'package:numi/shared/widgets/profile_avatar_image.dart';
 import 'package:numi/features/settings/widgets/account/settings_round_icon_button.dart';
 
 class AccountAvatar extends StatelessWidget {

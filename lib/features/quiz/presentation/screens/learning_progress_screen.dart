@@ -8,7 +8,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_read_model.dart';
 import 'package:numi/features/quiz/models/parent_assessment_entry.dart';
 import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_chart_card.dart';
 import 'package:numi/features/quiz/widgets/learning_progress/learning_progress_date_filter_dialog.dart';

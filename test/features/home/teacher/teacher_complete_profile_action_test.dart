@@ -13,8 +13,8 @@ import 'package:numi/features/home/domain/models/home_layout.dart';
 import 'package:numi/features/home/teacher/home/teacher_home_tab.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_hero_card.dart';
 import 'package:numi/features/home/teacher/home/widgets/teacher_home_hero_skeleton.dart';
-import 'package:numi/features/homework/widgets/teacher_list/teacher_empty_assignments_panel.dart';
-import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/shared/widgets/teacher_empty_assignments_panel.dart';
+import 'package:numi/shared/widgets/settings_action_card.dart';
 import 'package:numi/shared/widgets/app_section_header.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 

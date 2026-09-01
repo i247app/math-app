@@ -1,8 +1,7 @@
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/quiz/domain/models/quiz.dart';
 import 'package:numi/features/home/domain/models/home_layout.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_quiz_helpers.dart';
+import 'package:numi/features/quiz/application/read_models/parent_assessment_read_model.dart';
 
 List<GeneratedQuiz> quizzesFromLayoutQuizzes(List<HomeLayoutQuiz> quizzes) {
   return <GeneratedQuiz>[
@@ -58,5 +57,5 @@ GeneratedQuiz quizFromRecentCompletion(HomeLayoutRecentCompletion completion) {
 }
 
 int? layoutChildId(StudentProfile? child) {
-  return child == null ? null : ActiveProfileSession.profileStableId(child);
+  return child == null ? null : profileStableId(child);
 }

@@ -11,7 +11,6 @@ import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/features/auth/domain/models/auth_models.dart';
 import 'package:numi/features/classroom/application/classroom_cubit.dart';
 import 'package:numi/features/classroom/application/classroom_state.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/classroom/presentation/screens/teacher_class_detail_screen.dart';
 import 'package:numi/features/classroom/presentation/screens/teacher_create_class_screen.dart';
 import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
@@ -45,8 +44,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
   final TextEditingController _searchController = TextEditingController();
   bool _hasPlayedClassroomEntrance = false;
 
-  int? get _profileId =>
-      ActiveProfileSession.profileStableId(widget.activeProfile);
+  int? get _profileId => profileStableId(widget.activeProfile);
 
   ClassroomCollectionState get _classroomCollection {
     final profileId = _profileId;
@@ -89,9 +87,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
     if (!widget.isActive) {
       return;
     }
-    final oldProfileId = ActiveProfileSession.profileStableId(
-      oldWidget.activeProfile,
-    );
+    final oldProfileId = profileStableId(oldWidget.activeProfile);
     if (_profileId != oldProfileId) {
       _hasPlayedClassroomEntrance = false;
       _loadClassrooms();
@@ -237,9 +233,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
     bool initiallyExpanded = false,
   }) async {
     final classroomId = classroom.stableId;
-    final profileId = ActiveProfileSession.profileStableId(
-      widget.activeProfile,
-    );
+    final profileId = profileStableId(widget.activeProfile);
     if (classroomId == null || profileId == null) {
       context.showErrorDialog(context.readText(AppKeys.teacherClassOpenFailed));
       return;

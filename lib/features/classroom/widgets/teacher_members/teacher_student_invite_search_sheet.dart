@@ -7,7 +7,6 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/domain/models/profile.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/application/contracts/profile_service.dart';
 import 'package:numi/features/profile/data/profile_exception.dart';
 import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
@@ -105,7 +104,7 @@ class _TeacherStudentInviteSearchSheetState
   }
 
   void _toggleProfile(StudentProfile profile) {
-    final id = ActiveProfileSession.profileStableId(profile);
+    final id = profileStableId(profile);
     if (id == null) {
       return;
     }
