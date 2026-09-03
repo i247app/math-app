@@ -53,6 +53,18 @@ void main() {
       matching: find.byType(AssessmentBottomActionButton),
     );
     expect(actionButtons, findsNWidgets(2));
+    final previousButton = tester.widget<AssessmentBottomActionButton>(
+      actionButtons.first,
+    );
+    expect(previousButton.onTap, isNull);
+    expect(
+      previousButton.disabledBackground,
+      AppThemeColors.light.disabledBackground,
+    );
+    expect(
+      previousButton.disabledForeground,
+      AppThemeColors.light.disabledForeground,
+    );
     for (final element in actionButtons.evaluate()) {
       final button = find.byWidget(element.widget);
       expect(tester.getBottomLeft(button).dy, lessThanOrEqualTo(844 - 48));
