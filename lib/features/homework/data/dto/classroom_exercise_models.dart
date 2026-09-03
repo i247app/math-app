@@ -195,19 +195,10 @@ class ClassroomExerciseSubmissionGradingDto {
   ) {
     return _$ClassroomExerciseSubmissionGradingDtoFromJson(<String, dynamic>{
       ...json,
-      'ai_review':
-          json['ai_review'] ??
-          json['review'] ??
-          json['feedback'] ??
-          json['message'],
-      'correct_number':
-          json['correct_number'] ??
-          json['correct_count'] ??
-          json['correct_answers'],
-      'score_percentage':
-          json['score_percentage'] ?? json['score'] ?? json['percentage'],
-      'total_questions':
-          json['total_questions'] ?? json['question_count'] ?? json['total'],
+      'review': json['review'],
+      'correct_number': json['correct_number'],
+      'score_percentage': json['score_percentage'],
+      'total_questions': json['total_questions'],
     });
   }
 
