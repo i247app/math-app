@@ -42,6 +42,7 @@ class AssessmentProgressSection extends StatelessWidget {
         SizedBox(
           height: 66,
           child: ListView.separated(
+            key: const PageStorageKey<String>('assessment-question-navigation'),
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             itemCount: totalQuestions,

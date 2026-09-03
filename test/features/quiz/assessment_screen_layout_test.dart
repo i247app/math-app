@@ -128,6 +128,56 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('keeps question navigation scroll offset after switching', (
+    tester,
+  ) async {
+    final questions = List<QuizQuestion>.generate(
+      10,
+      (index) => QuizQuestion(
+        questionName: '${index + 1} + 1 = ?',
+        questionNumber: index + 1,
+        answers: const <QuizAnswer>[
+          QuizAnswer(label: 'A', content: '1'),
+          QuizAnswer(label: 'B', content: '2'),
+          QuizAnswer(label: 'C', content: '3'),
+          QuizAnswer(label: 'D', content: '4'),
+        ],
+      ),
+    );
+    await _pumpAssessment(tester, questions: questions);
+
+    final navigation = find.byKey(
+      const PageStorageKey<String>('assessment-question-navigation'),
+    );
+    await tester.drag(navigation, const Offset(-220, 0));
+    await tester.pumpAndSettle();
+
+    ScrollableState navigationState() => tester.state<ScrollableState>(
+      find.descendant(
+        of: navigation,
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is Scrollable &&
+              widget.axisDirection == AxisDirection.right,
+        ),
+      ),
+    );
+
+    final offsetBeforeSwitch = navigationState().position.pixels;
+    expect(offsetBeforeSwitch, greaterThan(0));
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AssessmentProgressSection),
+        matching: find.text('7'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(navigationState().position.pixels, closeTo(offsetBeforeSwitch, 0.5));
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Future<void> _pumpAssessment(
