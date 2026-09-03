@@ -4,6 +4,41 @@ import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/quiz/data/api/quiz_api.dart';
 
 void main() {
+  test('unpaginated quiz list omits page, size, and take_all', () async {
+    Map<String, dynamic>? requestBody;
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requestBody = Map<String, dynamic>.from(
+              options.data as Map<String, dynamic>,
+            );
+            handler.resolve(
+              Response<Object?>(
+                requestOptions: options,
+                statusCode: 200,
+                data: const <String, dynamic>{
+                  'mstatus': 200,
+                  'quizzes': <Map<String, dynamic>>[],
+                },
+              ),
+            );
+          },
+        ),
+      );
+    final api = QuizApi(
+      networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
+    );
+
+    await api.listQuizzes(profileId: 21);
+
+    expect(requestBody, containsPair('profile_id', 21));
+    expect(requestBody, containsPair('purpose', 'ASSESSMENT'));
+    expect(requestBody, isNot(contains('page')));
+    expect(requestBody, isNot(contains('size')));
+    expect(requestBody, isNot(contains('take_all')));
+  });
+
   test(
     'sends an empty grade label when assessment grade is not selected',
     () async {

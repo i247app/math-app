@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart';
-
+import 'package:numi/core/debug/app_logger.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/notifications/notification_service.dart';
@@ -28,9 +27,9 @@ class ApiNotificationPingService implements NotificationPingService {
         const <String, dynamic>{},
       );
       NetworkClient.throwForApiStatus(json);
-      debugPrint('[Notification] backend ping succeeded.');
+      AppLogger.info('NOTIFY', 'backend ping succeeded');
     } catch (error) {
-      debugPrint('[Notification] backend ping failed: $error');
+      AppLogger.error('NOTIFY', 'backend ping failed', error: error);
     }
   }
 }

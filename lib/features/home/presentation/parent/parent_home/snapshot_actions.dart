@@ -16,6 +16,7 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
         page: 1,
         size: 5,
         allowUserFallback: !widget.useActiveStudentProfileData,
+        useUnpaginatedList: true,
       );
       if (!mounted || requestId != _assessmentLoadRequestId) {
         return;

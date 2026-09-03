@@ -31,6 +31,7 @@ Future<CompletedParentAssessmentPage> loadCompletedParentAssessments({
   required int page,
   required int size,
   bool allowUserFallback = true,
+  bool useUnpaginatedList = false,
 }) async {
   List<GeneratedQuiz> completed(List<GeneratedQuiz> quizzes) {
     return quizzes.where(isCompletedAssessment).toList(growable: false)
@@ -63,6 +64,10 @@ Future<CompletedParentAssessmentPage> loadCompletedParentAssessments({
   }
 
   Future<List<GeneratedQuiz>> loadAll({int? profileId, int? userId}) async {
+    if (useUnpaginatedList) {
+      return quizService.listQuizzes(profileId: profileId, userId: userId);
+    }
+
     final firstResponse = await quizService.listQuizPage(
       profileId: profileId,
       userId: userId,

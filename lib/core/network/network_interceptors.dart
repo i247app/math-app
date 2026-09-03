@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../debug/app_logger.dart';
 import '../debug/debug_request_metrics.dart';
 import 'api_metadata.dart';
 import 'auth_token_store.dart';
@@ -80,21 +81,36 @@ class DebugRequestMetricsInterceptor extends Interceptor {
 class NetworkLogInterceptor extends Interceptor {
   const NetworkLogInterceptor();
 
-  // Android and terminal tooling can impose different per-entry limits. Keep
-  // chunks deliberately small and count UTF-8 bytes rather than Dart UTF-16
-  // code units so non-ASCII response data is not truncated.
-  static const _maxLogChunkBytes = 800;
+  static const _requestIdKey = 'networkLogRequestId';
+  static const _startedAtKey = 'networkLogStartedAt';
+  static int _lastRequestId = 0;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    _log('*** Request ***');
-    _log('uri: ${options.uri}');
-    _log('method: ${options.method}');
-    if (options.headers.isNotEmpty) {
-      _log('headers: ${_formatHeaders(options.headers)}');
+    if (!AppLogger.isDiagnosticBuild) {
+      handler.next(options);
+      return;
     }
-    _log('data:');
-    _logPayload(_formatData(options.data));
+
+    final requestId = ++_lastRequestId;
+    options.extra[_requestIdKey] = requestId;
+    options.extra[_startedAtKey] = DateTime.now();
+    AppLogger.info(
+      'API',
+      '[REQUEST] #$requestId ${options.method} ${options.uri}',
+    );
+    if (options.headers.isNotEmpty) {
+      AppLogger.payload(
+        'API',
+        '#$requestId request headers',
+        _formatHeaders(options.headers),
+      );
+    }
+    AppLogger.payload(
+      'API',
+      '#$requestId request body',
+      _formatData(options.data),
+    );
     handler.next(options);
   }
 
@@ -103,48 +119,62 @@ class NetworkLogInterceptor extends Interceptor {
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) {
-    _log('*** Response ***');
-    _log('uri: ${response.requestOptions.uri}');
-    _log('statusCode: ${response.statusCode}');
-    _log('Response Text:');
-    _logPayload(_formatData(response.data));
+    final options = response.requestOptions;
+    final requestId = _requestId(options);
+    AppLogger.info(
+      'API',
+      '[RESPONSE] #$requestId ${options.method} ${options.uri} '
+          'status=${response.statusCode}${_elapsed(options)}',
+    );
+    AppLogger.payload(
+      'API',
+      '#$requestId response body',
+      _formatData(response.data),
+    );
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    _log('*** DioException ***');
-    _log('uri: ${err.requestOptions.uri}');
-    _log('type: ${err.type}');
-    _log('message: ${err.message}');
+    final options = err.requestOptions;
+    final requestId = _requestId(options);
+    AppLogger.error(
+      'API',
+      '[RESPONSE] #$requestId ${options.method} ${options.uri} '
+          'type=${err.type}${_elapsed(options)}',
+      error: err.message,
+      stackTrace: err.stackTrace,
+    );
     final response = err.response;
     if (response != null) {
-      _log('statusCode: ${response.statusCode}');
-      _log('Response Text:');
-      _logPayload(_formatData(response.data));
+      AppLogger.payload(
+        'API',
+        '#$requestId error response status=${response.statusCode}',
+        _formatData(response.data),
+      );
     }
     handler.next(err);
   }
 
-  static String _formatHeaders(Map<String, dynamic> headers) {
+  static Object _formatHeaders(Map<String, dynamic> headers) {
     final redacted = <String, dynamic>{};
     for (final entry in headers.entries) {
       final key = entry.key;
       redacted[key] = _shouldRedactValue(key) ? '<redacted>' : entry.value;
     }
-    return _jsonOrString(redacted);
+    return redacted;
   }
 
-  static String _formatData(Object? data) {
+  static Object? _formatData(Object? data) {
     if (data == null) {
-      return 'null';
+      return null;
     }
 
     if (data is FormData) {
       return _formatFormData(data);
     }
 
-    return _jsonOrString(_redactSensitiveData(data));
+    return _redactSensitiveData(data);
   }
 
   static Object? _redactSensitiveData(Object? value) {
@@ -185,7 +215,7 @@ class NetworkLogInterceptor extends Interceptor {
     return !kDebugMode && _isSensitiveKey(key);
   }
 
-  static String _formatFormData(FormData formData) {
+  static Object _formatFormData(FormData formData) {
     final fields = <String, Object?>{};
     for (final field in formData.fields) {
       final existing = fields[field.key];
@@ -208,57 +238,20 @@ class NetworkLogInterceptor extends Interceptor {
       };
     }).toList();
 
-    return _jsonOrString(<String, Object?>{'fields': fields, 'files': files});
+    return <String, Object?>{'fields': fields, 'files': files};
   }
 
-  static String _jsonOrString(Object? value) {
-    try {
-      return jsonEncode(value);
-    } catch (_) {
-      return value.toString();
-    }
+  static int _requestId(RequestOptions options) {
+    final requestId = options.extra[_requestIdKey];
+    return requestId is int ? requestId : 0;
   }
 
-  static void _log(String message) => debugPrint(message);
-
-  static void _logPayload(String message) {
-    final chunks = _utf8Chunks(message);
-    for (var index = 0; index < chunks.length; index++) {
-      debugPrint('[chunk ${index + 1}/${chunks.length}] ${chunks[index]}');
+  static String _elapsed(RequestOptions options) {
+    final startedAt = options.extra[_startedAtKey];
+    if (startedAt is! DateTime) {
+      return '';
     }
-  }
-
-  static List<String> _utf8Chunks(String message) {
-    if (message.isEmpty) {
-      return const <String>[''];
-    }
-
-    final chunks = <String>[];
-    var chunk = StringBuffer();
-    var chunkBytes = 0;
-
-    for (final rune in message.runes) {
-      final runeBytes = switch (rune) {
-        <= 0x7F => 1,
-        <= 0x7FF => 2,
-        <= 0xFFFF => 3,
-        _ => 4,
-      };
-
-      if (chunkBytes + runeBytes > _maxLogChunkBytes && chunkBytes > 0) {
-        chunks.add(chunk.toString());
-        chunk = StringBuffer();
-        chunkBytes = 0;
-      }
-
-      chunk.writeCharCode(rune);
-      chunkBytes += runeBytes;
-    }
-
-    if (chunkBytes > 0) {
-      chunks.add(chunk.toString());
-    }
-    return chunks;
+    return ' ${DateTime.now().difference(startedAt).inMilliseconds}ms';
   }
 }
 

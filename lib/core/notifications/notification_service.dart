@@ -6,6 +6,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../debug/app_logger.dart';
+
 @pragma('vm:entry-point')
 Future<void> numiFirebaseMessagingBackgroundHandler(
   RemoteMessage message,
@@ -24,10 +26,8 @@ Future<void> numiFirebaseMessagingBackgroundHandler(
 
 @pragma('vm:entry-point')
 void numiLocalNotificationTapBackground(NotificationResponse response) {
-  debugPrint(
-    '[Notification] local background tap id=${response.id} '
-    'payload=${response.payload}',
-  );
+  AppLogger.info('NOTIFY', 'local background tap id=${response.id}');
+  AppLogger.payload('NOTIFY', 'local background tap payload', response.payload);
 }
 
 class NotificationService {
@@ -86,12 +86,12 @@ class NotificationService {
         getFcmToken: messaging.getToken,
       );
       if (token == null || token.isEmpty) {
-        debugPrint('[Notification] FCM token is not available yet.');
+        AppLogger.warning('NOTIFY', 'FCM token is not available yet');
         return null;
       }
 
       _emitToken(token);
-      debugPrint('[Notification] FCM token: $token');
+      AppLogger.info('NOTIFY', 'FCM token loaded');
       return token;
     } catch (error, stackTrace) {
       _logNotificationError('token load', error, stackTrace);
@@ -133,9 +133,9 @@ class NotificationService {
       }
 
       if (!apnsTokenAvailable) {
-        debugPrint(
-          '[Notification] APNs token is not available yet; '
-          'deferring FCM token load.',
+        AppLogger.warning(
+          'NOTIFY',
+          'APNs token is not available yet; deferring FCM token load',
         );
         return null;
       }
@@ -277,8 +277,9 @@ class NotificationService {
         provisional: false,
         sound: true,
       );
-      debugPrint(
-        '[Notification] permission: ${settings.authorizationStatus.name}',
+      AppLogger.info(
+        'NOTIFY',
+        'permission=${settings.authorizationStatus.name}',
       );
     } catch (error, stackTrace) {
       _logNotificationError('permission request', error, stackTrace);
@@ -307,7 +308,7 @@ class NotificationService {
     _firebaseMessaging.onTokenRefresh.listen(
       (token) {
         _emitToken(token);
-        debugPrint('[Notification] FCM token refreshed: $token');
+        AppLogger.info('NOTIFY', 'FCM token refreshed');
       },
       onError: (Object error, StackTrace stackTrace) {
         _logNotificationError('token refresh', error, stackTrace);
@@ -383,9 +384,8 @@ class NotificationService {
 
   static void _handleLocalNotificationResponse(NotificationResponse response) {
     _localResponseController.add(response);
-    debugPrint(
-      '[Notification] local tap id=${response.id} payload=${response.payload}',
-    );
+    AppLogger.info('NOTIFY', 'local tap id=${response.id}');
+    AppLogger.payload('NOTIFY', 'local tap payload', response.payload);
   }
 
   void _listenForOpenedMessages() {
@@ -418,18 +418,20 @@ class NotificationService {
     RemoteMessage message, {
     required String source,
   }) {
-    final notification = message.notification;
-    debugPrint(
-      '[Notification] $source message id=${message.messageId} '
-      'title=${notification?.title} body=${notification?.body} '
-      'data=${message.data}',
-    );
+    AppLogger.info('NOTIFY', '$source message id=${message.messageId}');
+    AppLogger.payload('NOTIFY', '$source message payload', <String, Object?>{
+      'title': message.notification?.title,
+      'body': message.notification?.body,
+      'data': message.data,
+    });
   }
 }
 
 void _logNotificationError(String action, Object error, StackTrace stackTrace) {
-  debugPrint('[Notification] $action failed: $error');
-  if (kDebugMode) {
-    debugPrintStack(stackTrace: stackTrace);
-  }
+  AppLogger.error(
+    'NOTIFY',
+    '$action failed',
+    error: error,
+    stackTrace: stackTrace,
+  );
 }

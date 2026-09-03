@@ -67,11 +67,13 @@ void main() {
     await pumpParentHome(isActive: true);
     await tester.pump();
     expect(quizService.profileRequests, const <int?>[profileId]);
+    expect(quizService.listPageCalls, 0);
 
     await pumpParentHome(isActive: false);
     await pumpParentHome(isActive: true);
     await tester.pump();
     expect(quizService.profileRequests, const <int?>[profileId, profileId]);
+    expect(quizService.listPageCalls, 0);
   });
 }
 
@@ -92,6 +94,20 @@ class _EmptyParentHomeService implements HomeLayoutService {
 
 class _RecordingQuizService implements QuizService {
   final List<int?> profileRequests = <int?>[];
+  int listPageCalls = 0;
+
+  @override
+  Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId}) async {
+    profileRequests.add(profileId);
+    return const <GeneratedQuiz>[
+      GeneratedQuiz(
+        quizId: 991,
+        purpose: quizPurposeAssessment,
+        quizStatus: 'SUBMITTED',
+        questions: <QuizQuestion>[],
+      ),
+    ];
+  }
 
   @override
   Future<QuizListResponse> listQuizPage({
@@ -101,7 +117,7 @@ class _RecordingQuizService implements QuizService {
     required int size,
     bool takeAll = false,
   }) async {
-    profileRequests.add(profileId);
+    listPageCalls++;
     return const QuizListResponse(
       mstatus: 200,
       quizzes: <GeneratedQuiz>[

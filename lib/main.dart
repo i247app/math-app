@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/app/numi_app.dart';
 import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/app/startup_bootstrap.dart';
+import 'package:numi/core/debug/app_logger.dart';
 import 'package:numi/core/debug/app_debug_bloc_observer.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/notifications/notification_service.dart';
@@ -44,7 +45,7 @@ void _forwardPushTokenToApiMetadata() {
   NotificationService.tokens.listen(
     (token) => unawaited(_applyPushToken(metadataProvider, token)),
     onError: (Object error) =>
-        debugPrint('[Notification] forward push token failed: $error'),
+        AppLogger.error('NOTIFY', 'forward push token failed', error: error),
   );
   final latestToken = NotificationService.latestToken;
   if (latestToken != null) {
@@ -59,6 +60,6 @@ Future<void> _applyPushToken(
   try {
     await metadataProvider.updateDevicePushToken(token);
   } catch (error) {
-    debugPrint('[Notification] forward push token failed: $error');
+    AppLogger.error('NOTIFY', 'forward push token failed', error: error);
   }
 }

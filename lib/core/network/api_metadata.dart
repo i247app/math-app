@@ -2,10 +2,10 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../debug/app_logger.dart';
 import '../localization/app_language.dart';
 
 abstract class ApiMetadataProvider {
@@ -135,7 +135,7 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
         );
       }
     } catch (error) {
-      debugPrint('AppApiMetadataProvider device info error: $error');
+      AppLogger.warning('API', 'device info unavailable: $error');
     }
 
     return _DeviceMetadata(
@@ -150,7 +150,7 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
     try {
       return await PackageInfo.fromPlatform();
     } catch (error) {
-      debugPrint('AppApiMetadataProvider package info error: $error');
+      AppLogger.warning('API', 'package info unavailable: $error');
       return PackageInfo(
         appName: 'NUMI',
         packageName: 'numi',
@@ -197,7 +197,7 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
         }
       }
     } catch (error) {
-      debugPrint('AppApiMetadataProvider ip address error: $error');
+      AppLogger.warning('API', 'IP address unavailable: $error');
     }
 
     return '';
