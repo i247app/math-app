@@ -5,9 +5,8 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/features/homework/domain/models/classroom_exercise.dart';
-import 'package:numi/features/homework/data/cache/student_homework_cache.dart';
+import 'package:numi/features/homework/application/controllers/student_homework_attempt_controller.dart';
 import 'package:numi/features/homework/application/contracts/classroom_exercise_service.dart';
 import 'package:numi/features/homework/presentation/screens/student_homework_result_screen.dart';
 import 'package:numi/features/homework/presentation/widgets/student_attempt/student_homework_attempt_answer_grid.dart';
@@ -22,7 +21,6 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/homework/presentation/widgets/student_result/student_homework_result_helpers.dart';
 import 'package:numi/features/quiz/presentation/widgets/shared/quiz_wave_loader.dart';
 import 'package:numi/features/quiz/presentation/widgets/shared/attempt_exit_dialog.dart';
-import 'package:numi/features/homework/application/errors/classroom_exercise_exception.dart';
 import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 class StudentHomeworkAttemptScreen extends StatefulWidget {
@@ -46,232 +44,102 @@ class StudentHomeworkAttemptScreen extends StatefulWidget {
 
 class _StudentHomeworkAttemptScreenState
     extends State<StudentHomeworkAttemptScreen> {
-  late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? context.read<ClassroomExerciseService>();
+  late final StudentHomeworkAttemptController _controller;
   final GuardedExitController<bool> _exitController =
       GuardedExitController<bool>();
-
-  ClassroomExercise? _exercise;
-  int _questionIndex = 0;
-  final Map<int, String> _selectedAnswerLabels = <int, String>{};
-  bool _isLoading = false;
-  bool _isSubmitting = false;
-  String? _errorMessage;
-  VoidCallback? _errorRetryAction;
 
   @override
   void initState() {
     super.initState();
-    _exercise = widget.initialExercise;
-    final initialExercise = widget.initialExercise;
-    if (initialExercise != null) {
-      StudentHomeworkCache.seedDetail(
-        profileId: widget.profileId,
-        exercise: initialExercise,
-      );
-    }
-    _loadDetail();
+    _controller = StudentHomeworkAttemptController(
+      exerciseId: widget.exerciseId,
+      profileId: widget.profileId,
+      exerciseService:
+          widget._exerciseService ?? context.read<ClassroomExerciseService>(),
+      initialExercise: widget.initialExercise,
+    );
+    _controller.loadDetail();
   }
 
-  Future<void> _loadDetail({bool forceRefresh = false}) async {
-    if (!forceRefresh) {
-      final cachedExercise = StudentHomeworkCache.peekFullDetail(
-        exerciseId: widget.exerciseId,
-        profileId: widget.profileId,
-      );
-      if (cachedExercise != null) {
-        setState(() {
-          _exercise = cachedExercise;
-          _isLoading = true;
-          _errorMessage = null;
-          _errorRetryAction = null;
-        });
-        await _loadDetail(forceRefresh: true);
-        return;
-      }
-    }
-
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-      _errorRetryAction = null;
-    });
-
-    try {
-      final exercise = await StudentHomeworkCache.loadDetail(
-        service: _exerciseService,
-        exerciseId: widget.exerciseId,
-        profileId: widget.profileId,
-        forceRefresh: forceRefresh,
-      );
-      if (!mounted) {
-        return;
-      }
-      final shouldResetProgress =
-          !forceRefresh || _exercise == null || _selectedAnswerLabels.isEmpty;
-      setState(() {
-        _exercise = exercise ?? _exercise;
-        if (shouldResetProgress) {
-          _questionIndex = 0;
-          _selectedAnswerLabels.clear();
-        }
-      });
-    } on ClassroomExerciseException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = error.message.trim().isEmpty
-            ? context.readText(AppKeys.studentHomeworkLoadFailed)
-            : error.message;
-        _errorRetryAction = _loadDetail;
-      });
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = context.readText(AppKeys.studentHomeworkLoadFailed);
-        _errorRetryAction = _loadDetail;
-      });
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _selectAnswer(StudentHomeworkAttemptAnswer answer) {
     HapticFeedback.selectionClick();
-    setState(() => _selectedAnswerLabels[_questionIndex] = answer.label);
+    _controller.selectAnswer(answer);
   }
 
   void _goToPreviousQuestion() {
-    if (_questionIndex == 0) {
-      HapticFeedback.selectionClick();
-      return;
-    }
-
     HapticFeedback.selectionClick();
-    setState(() => _questionIndex--);
+    _controller.goToPreviousQuestion();
   }
 
-  void _goToNextQuestion(List<StudentHomeworkAttemptQuestion> questions) {
-    if (_questionIndex >= questions.length - 1) {
-      _submitHomework(questions);
+  void _goToNextQuestion() {
+    if (_controller.isLastQuestion) {
+      _submitHomework();
       return;
     }
-
     HapticFeedback.mediumImpact();
-    setState(() => _questionIndex++);
+    _controller.goToNextQuestion();
   }
 
-  Future<void> _submitHomework(
-    List<StudentHomeworkAttemptQuestion> questions,
-  ) async {
-    if (_isSubmitting) {
-      return;
+  Future<void> _submitHomework() async {
+    if (_controller.isSubmitting) return;
+    final pendingSubmission = _controller.submit();
+    if (_controller.isSubmitting) {
+      HapticFeedback.mediumImpact();
     }
+    final result = await pendingSubmission;
+    if (!mounted) return;
 
-    final exerciseId = (_exercise?.stableId ?? widget.exerciseId);
-    if (exerciseId <= 0) {
-      setState(() {
-        _errorMessage = context.readText(
-          AppKeys.studentHomeworkMissingExercise,
+    switch (result.status) {
+      case StudentHomeworkSubmitStatus.submitted:
+        Navigator.of(context).pushReplacement<bool, void>(
+          MaterialPageRoute<bool>(
+            builder: (_) => StudentHomeworkResultScreen(
+              summary: studentHomeworkResultSummary(
+                submission: result.submission!,
+              ),
+            ),
+          ),
         );
-        _errorRetryAction = null;
-      });
-      return;
-    }
-
-    for (var index = 0; index < questions.length; index++) {
-      if (_selectedAnswerLabels[index] == null) {
+      case StudentHomeworkSubmitStatus.unanswered:
         HapticFeedback.selectionClick();
-        setState(() => _questionIndex = index);
-        return;
-      }
-    }
-
-    final answers = <SubmitClassroomExerciseAnswer>[
-      for (var index = 0; index < questions.length; index++)
-        SubmitClassroomExerciseAnswer(
-          questionNumber: questions[index].questionNumber,
-          label: _selectedAnswerLabels[index]!,
-          answer: questions[index].selectedAnswerContent(
-            _selectedAnswerLabels[index]!,
-          ),
-          answerContent: questions[index].selectedAnswerContent(
-            _selectedAnswerLabels[index]!,
-          ),
-        ),
-    ];
-
-    HapticFeedback.mediumImpact();
-    setState(() {
-      _isSubmitting = true;
-      _errorMessage = null;
-      _errorRetryAction = null;
-    });
-
-    var shouldResetSubmitting = true;
-    try {
-      final submission = await _exerciseService.submitExercise(
-        profileId: widget.profileId,
-        classroomExerciseId: exerciseId,
-        answers: answers,
-      );
-      if (!mounted) {
-        return;
-      }
-      final exercise = _exercise;
-      if (exercise == null) {
-        setState(() {
-          _errorMessage = context.readText(
-            AppKeys.studentHomeworkMissingExercise,
-          );
-          _errorRetryAction = null;
-        });
-        return;
-      }
-      StudentHomeworkCache.markSubmitted(
-        profileId: widget.profileId,
-        exercise: exercise,
-      );
-      Navigator.of(context).pushReplacement<bool, void>(
-        MaterialPageRoute<bool>(
-          builder: (_) => StudentHomeworkResultScreen(
-            summary: studentHomeworkResultSummary(submission: submission),
-          ),
-        ),
-      );
-    } on ClassroomExerciseException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      if (error.status == 12706) {
-        shouldResetSubmitting = false;
+      case StudentHomeworkSubmitStatus.notOpen:
         await _returnFromNotOpenHomework();
-      } else {
-        setState(() {
-          _errorMessage = error.message.trim().isEmpty
-              ? context.readText(AppKeys.studentHomeworkSubmitFailed)
-              : error.message;
-          _errorRetryAction = () => _submitHomework(questions);
-        });
-      }
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = AppStrings.current(AppKeys.studentHomeworkSubmitFailed);
-        _errorRetryAction = () => _submitHomework(questions);
-      });
-    } finally {
-      if (mounted && shouldResetSubmitting) {
-        setState(() => _isSubmitting = false);
-      }
+      case StudentHomeworkSubmitStatus.missingExercise:
+      case StudentHomeworkSubmitStatus.failed:
+      case StudentHomeworkSubmitStatus.ignored:
+        break;
     }
+  }
+
+  void _retry() {
+    if (_controller.retryAction == StudentHomeworkRetryAction.submit) {
+      _submitHomework();
+    } else {
+      _controller.loadDetail();
+    }
+  }
+
+  String? _errorText(BuildContext context) {
+    final message = _controller.errorMessage;
+    if (message != null) return message;
+    return switch (_controller.error) {
+      StudentHomeworkAttemptError.loadFailed => context.getText(
+        AppKeys.studentHomeworkLoadFailed,
+      ),
+      StudentHomeworkAttemptError.submitFailed => context.getText(
+        AppKeys.studentHomeworkSubmitFailed,
+      ),
+      StudentHomeworkAttemptError.missingExercise => context.getText(
+        AppKeys.studentHomeworkMissingExercise,
+      ),
+      null => null,
+    };
   }
 
   Future<void> _returnFromNotOpenHomework() async {
@@ -285,14 +153,23 @@ class _StudentHomeworkAttemptScreenState
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, _) => _buildScreen(context),
+    );
+  }
+
+  Widget _buildScreen(BuildContext context) {
+    final isLoading = _controller.isLoading;
+    final isSubmitting = _controller.isSubmitting;
+    final questionIndex = _controller.questionIndex;
+    final questions = _controller.questions;
     final colors = context.themeColors;
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     final bottomBarHeight =
         StudentHomeworkAttemptBottomBar.contentHeight + bottomInset;
 
-    final hasActiveAttempt = studentHomeworkAttemptQuestions(
-      _exercise,
-    ).isNotEmpty;
+    final hasActiveAttempt = questions.isNotEmpty;
     final screen = Scaffold(
       backgroundColor: colors.pageBackground,
       body: SafeArea(
@@ -302,22 +179,20 @@ class _StudentHomeworkAttemptScreenState
             constraints: const BoxConstraints(maxWidth: 430),
             child: Builder(
               builder: (context) {
-                final questions = studentHomeworkAttemptQuestions(_exercise);
-                final questionError = _isLoading
+                final questionError = isLoading
                     ? null
                     : studentHomeworkAttemptQuestionDataError(
                         context,
                         questions,
                       );
-                final effectiveError = _errorMessage ?? questionError;
+                final effectiveError = _errorText(context) ?? questionError;
                 final currentQuestion = questions.isEmpty
                     ? null
-                    : questions[_questionIndex.clamp(0, questions.length - 1)];
-                final selectedAnswerLabel =
-                    _selectedAnswerLabels[_questionIndex];
+                    : questions[questionIndex.clamp(0, questions.length - 1)];
+                final selectedAnswerLabel = _controller.selectedAnswerLabel;
                 final isQuestionContentVisible =
-                    !_isLoading &&
-                    !_isSubmitting &&
+                    !isLoading &&
+                    !isSubmitting &&
                     effectiveError == null &&
                     currentQuestion != null;
 
@@ -325,15 +200,15 @@ class _StudentHomeworkAttemptScreenState
                   children: [
                     Positioned.fill(
                       child: ColoredBox(
-                        color: _isLoading || _isSubmitting
+                        color: isLoading || isSubmitting
                             ? colors.surface
                             : colors.pageBackground,
                       ),
                     ),
                     Positioned.fill(
-                      top: _isLoading || _isSubmitting ? 0 : 80,
+                      top: isLoading || isSubmitting ? 0 : 80,
                       bottom:
-                          _isLoading || _isSubmitting || effectiveError != null
+                          isLoading || isSubmitting || effectiveError != null
                           ? 0
                           : bottomBarHeight,
                       child: AnimatedSwitcher(
@@ -344,9 +219,9 @@ class _StudentHomeworkAttemptScreenState
                             ? StudentHomeworkAttemptErrorState(
                                 key: const ValueKey('homework-error'),
                                 message: effectiveError,
-                                onRetry: _errorRetryAction ?? _loadDetail,
+                                onRetry: _retry,
                               )
-                            : _isSubmitting
+                            : isSubmitting
                             ? QuizWaveLoader(
                                 key: const ValueKey('homework-submit-loader'),
                                 message: context.getText(
@@ -367,7 +242,7 @@ class _StudentHomeworkAttemptScreenState
                                   letterSpacing: 0,
                                 ),
                               )
-                            : _isLoading
+                            : isLoading
                             ? const StudentHomeworkAttemptLoadingSkeleton(
                                 key: ValueKey('homework-loader'),
                               )
@@ -386,7 +261,7 @@ class _StudentHomeworkAttemptScreenState
                                   spacing: 32,
                                   children: [
                                     StudentHomeworkAttemptProgressSection(
-                                      currentQuestion: _questionIndex + 1,
+                                      currentQuestion: questionIndex + 1,
                                       totalQuestions: questions.length,
                                     ),
                                     StudentHomeworkAttemptQuestionCard(
@@ -402,7 +277,7 @@ class _StudentHomeworkAttemptScreenState
                               ),
                       ),
                     ),
-                    if (!_isSubmitting)
+                    if (!isSubmitting)
                       Positioned(
                         left: 0,
                         right: 0,
@@ -418,12 +293,11 @@ class _StudentHomeworkAttemptScreenState
                         bottom: 0,
                         child: StudentHomeworkAttemptBottomBar(
                           bottomInset: bottomInset,
-                          canGoBack: _questionIndex > 0,
-                          isLastQuestion:
-                              _questionIndex >= questions.length - 1,
-                          isSubmitting: _isSubmitting,
+                          canGoBack: questionIndex > 0,
+                          isLastQuestion: questionIndex >= questions.length - 1,
+                          isSubmitting: isSubmitting,
                           onBack: _goToPreviousQuestion,
-                          onContinue: () => _goToNextQuestion(questions),
+                          onContinue: _goToNextQuestion,
                         ),
                       ),
                   ],
@@ -438,7 +312,7 @@ class _StudentHomeworkAttemptScreenState
     return GuardedExitScope<bool>(
       controller: _exitController,
       shouldConfirm: hasActiveAttempt,
-      isExitBlocked: _isSubmitting,
+      isExitBlocked: isSubmitting,
       confirmExit: showAttemptExitDialog,
       exitResult: false,
       child: screen,
