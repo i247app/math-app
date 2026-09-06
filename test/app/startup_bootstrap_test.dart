@@ -2,11 +2,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/app/startup_bootstrap.dart';
-import 'package:numi/features/auth/application/contracts/auth_service.dart';
-import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/application/contracts/profile_service.dart';
-import 'package:numi/features/session/application/services/passcode_service.dart';
+import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/features/profile/data/profile_service.dart';
+import 'package:numi/features/session/data/passcode_service.dart';
 
 class _FakeAuthService implements AuthService {
   _FakeAuthService(this.user);

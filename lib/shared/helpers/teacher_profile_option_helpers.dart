@@ -1,8 +1,8 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
-import 'package:numi/features/profile/domain/models/grade.dart';
-import 'package:numi/features/profile/domain/models/program.dart';
-import 'package:numi/features/profile/domain/models/school.dart';
+import 'package:numi/features/profile/models/grade.dart';
+import 'package:numi/features/profile/models/program.dart';
+import 'package:numi/features/profile/models/school.dart';
 
 int? gradeStableId(GradeModel? grade) => grade?.gradeId ?? grade?.id;
 

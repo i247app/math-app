@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/dashboard/application/controllers/role_tab_cubit.dart';
+import 'package:numi/features/dashboard/controllers/role_tab_cubit.dart';
 
 void main() {
   group('RoleTabCubit characterization', () {

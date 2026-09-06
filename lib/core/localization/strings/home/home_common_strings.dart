@@ -4,7 +4,7 @@ const homeCommonStrings = <String, Map<String, String>>{
   'vi': {
     AppKeys.navHome: 'HOME',
     AppKeys.navClassroom: 'LỚP HỌC',
-    AppKeys.navHomework: 'BÀI TẬP',
+    AppKeys.navClassroomExercise: 'BÀI TẬP',
     AppKeys.navStudy: 'HỌC',
     AppKeys.navMembers: 'THÀNH VIÊN',
     AppKeys.navReview: 'ÔN TẬP',
@@ -34,7 +34,7 @@ const homeCommonStrings = <String, Map<String, String>>{
   'en': {
     AppKeys.navHome: 'HOME',
     AppKeys.navClassroom: 'CLASS',
-    AppKeys.navHomework: 'HOMEWORK',
+    AppKeys.navClassroomExercise: 'HOMEWORK',
     AppKeys.navStudy: 'STUDY',
     AppKeys.navMembers: 'MEMBERS',
     AppKeys.navReview: 'PRACTICE',

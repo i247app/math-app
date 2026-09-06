@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/network/network_client.dart';
-import 'package:numi/features/quiz/data/api/quiz_api.dart';
+import 'package:numi/features/quiz/data/quiz_api.dart';
 
 void main() {
   test('unpaginated quiz list omits page, size, and take_all', () async {

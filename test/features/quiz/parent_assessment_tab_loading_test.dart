@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
-import 'package:numi/features/profile/domain/models/grade.dart';
-import 'package:numi/features/quiz/domain/models/quiz.dart';
+import 'package:numi/features/profile/models/grade.dart';
+import 'package:numi/features/quiz/models/quiz.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/profile/application/contracts/grade_service.dart';
-import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
-import 'package:numi/features/quiz/presentation/tabs/parent_assessment_tab.dart';
-import 'package:numi/features/quiz/presentation/widgets/parent_assessment/parent_assessment_empty_poster.dart';
-import 'package:numi/features/quiz/presentation/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
-import 'package:numi/features/quiz/presentation/widgets/parent_assessment/parent_assessment_search_field.dart';
-import 'package:numi/features/quiz/presentation/widgets/parent_assessment/parent_assessment_tab_banner.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/profile/data/grade_service.dart';
+import 'package:numi/features/quiz/data/quiz_service.dart';
+import 'package:numi/features/quiz/screens/parent_assessment_tab.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_empty_poster.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_search_field.dart';
+import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_banner.dart';
 
 void main() {
   testWidgets('shows only the full skeleton until the initial load settles', (

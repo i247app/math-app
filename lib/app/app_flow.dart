@@ -4,23 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:numi/app/application/app_coordinator_cubit.dart';
-import 'package:numi/app/application/app_coordinator_state.dart';
+import 'package:numi/app/controllers/app_coordinator_cubit.dart';
+import 'package:numi/app/controllers/app_coordinator_state.dart';
 import 'package:numi/app/navigation/app_screen.dart';
 import 'package:numi/core/data/session_scoped_repository_registry.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
-import 'package:numi/features/session/application/controllers/app_session_cubit.dart';
-import 'package:numi/features/classroom/application/controllers/classroom_cubit.dart';
-import 'package:numi/features/auth/application/contracts/auth_service.dart';
-import 'package:numi/features/classroom/application/contracts/classroom_service.dart';
+import 'package:numi/features/session/controllers/app_session_cubit.dart';
+import 'package:numi/features/classroom/controllers/classroom_cubit.dart';
+import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
-import 'package:numi/features/auth/application/controllers/auth_cubit.dart';
-import 'package:numi/features/auth/application/controllers/auth_state.dart';
+import 'package:numi/features/auth/controllers/auth_cubit.dart';
+import 'package:numi/features/auth/controllers/auth_state.dart';
 import 'package:numi/app/app_screen_router.dart';
-import 'package:numi/features/session/application/controllers/app_session_state.dart';
-import 'package:numi/features/session/application/controllers/passcode_cubit.dart';
-import 'package:numi/features/session/application/controllers/passcode_state.dart';
+import 'package:numi/features/session/controllers/app_session_state.dart';
+import 'package:numi/features/session/controllers/passcode_cubit.dart';
+import 'package:numi/features/session/controllers/passcode_state.dart';
 
 class AppFlow extends StatefulWidget {
   const AppFlow({

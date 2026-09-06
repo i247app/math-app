@@ -2,30 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/classroom/application/controllers/classroom_cubit.dart';
-import 'package:numi/features/classroom/presentation/screens/teacher_class_detail_screen.dart';
-import 'package:numi/features/classroom/presentation/screens/teacher_create_class_screen.dart';
-import 'package:numi/features/classroom/presentation/widgets/teacher_create/teacher_create_class_result.dart';
-import 'package:numi/features/classroom/presentation/tabs/parent_room_tab.dart';
-import 'package:numi/features/classroom/presentation/tabs/student_classroom_tab.dart';
-import 'package:numi/features/classroom/presentation/tabs/teacher_classroom_tab.dart';
-import 'package:numi/features/dashboard/application/contracts/dashboard_tab_factory.dart';
-import 'package:numi/features/dashboard/application/models/dashboard_tab_args.dart';
-import 'package:numi/features/games/presentation/tabs/games_tab.dart';
-import 'package:numi/features/home/presentation/parent/parent_home_tab.dart';
-import 'package:numi/features/home/presentation/teacher/teacher_home_tab.dart';
-import 'package:numi/features/homework/presentation/tabs/teacher_study_tab.dart';
-import 'package:numi/features/homework/presentation/screens/teacher_homework_detail_screen.dart';
-import 'package:numi/features/homework/application/read_models/teacher_exercise_read_model.dart';
-import 'package:numi/features/profile/application/read_models/profile_identity_helpers.dart';
-import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/domain/models/profile_role.dart';
-import 'package:numi/features/quiz/application/contracts/quiz_snapshot_store.dart';
-import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
-import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
-import 'package:numi/features/quiz/presentation/screens/quiz_review_entry_screen.dart';
-import 'package:numi/features/quiz/presentation/tabs/parent_assessment_tab.dart';
-import 'package:numi/features/settings/presentation/tabs/setting_tab.dart';
+import 'package:numi/features/classroom/controllers/classroom_cubit.dart';
+import 'package:numi/features/classroom/screens/teacher_class_detail_screen.dart';
+import 'package:numi/features/classroom/screens/teacher_create_class_screen.dart';
+import 'package:numi/features/classroom/widgets/teacher_create/teacher_create_class_result.dart';
+import 'package:numi/features/classroom/screens/parent_room_tab.dart';
+import 'package:numi/features/classroom/screens/student_classroom_tab.dart';
+import 'package:numi/features/classroom/screens/teacher_classroom_tab.dart';
+import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
+import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
+import 'package:numi/features/games/screens/games_tab.dart';
+import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
+import 'package:numi/features/home/screens/teacher/teacher_home_tab.dart';
+import 'package:numi/features/classroom_exercise/screens/teacher_study_tab.dart';
+import 'package:numi/features/classroom_exercise/screens/teacher_classroom_exercise_detail_screen.dart';
+import 'package:numi/features/classroom_exercise/helpers/teacher_exercise_helpers.dart';
+import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
+import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/features/profile/models/profile_role.dart';
+import 'package:numi/features/quiz/data/quiz_snapshot_store.dart';
+import 'package:numi/features/quiz/data/quiz_service.dart';
+import 'package:numi/features/quiz/screens/grade_selection_screen.dart';
+import 'package:numi/features/quiz/screens/quiz_review_entry_screen.dart';
+import 'package:numi/features/quiz/screens/parent_assessment_tab.dart';
+import 'package:numi/features/settings/screens/setting_tab.dart';
 
 class AppDashboardTabFactory implements DashboardTabFactory {
   const AppDashboardTabFactory({required this.quizSnapshotStore});
@@ -228,7 +228,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
           }
           Navigator.of(context).push<void>(
             MaterialPageRoute<void>(
-              builder: (_) => TeacherHomeworkDetailScreen(
+              builder: (_) => TeacherClassroomExerciseDetailScreen(
                 exerciseId: exerciseId,
                 profileId: profileId,
                 initialExercise: exercise,

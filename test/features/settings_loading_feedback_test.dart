@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/profile/presentation/widgets/list/profile_radio.dart';
-import 'package:numi/features/settings/presentation/widgets/account/settings_save_button.dart';
+import 'package:numi/features/profile/widgets/list/profile_radio.dart';
+import 'package:numi/features/settings/widgets/account/settings_save_button.dart';
 
 void main() {
   testWidgets('save button keeps loading feedback inside the action', (

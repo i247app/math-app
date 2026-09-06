@@ -4,15 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
-import 'package:numi/features/profile/domain/models/grade.dart';
-import 'package:numi/features/quiz/domain/models/quiz.dart';
+import 'package:numi/features/profile/models/grade.dart';
+import 'package:numi/features/quiz/models/quiz.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/profile/application/contracts/grade_service.dart';
-import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
-import 'package:numi/features/quiz/application/contracts/quiz_shake_service.dart';
-import 'package:numi/features/quiz/application/errors/quiz_exception.dart';
-import 'package:numi/features/quiz/application/read_models/default_grade_label.dart';
-import 'package:numi/features/quiz/presentation/screens/grade_selection_screen.dart';
+import 'package:numi/features/profile/data/grade_service.dart';
+import 'package:numi/features/quiz/data/quiz_service.dart';
+import 'package:numi/features/quiz/data/quiz_shake_service.dart';
+import 'package:numi/features/quiz/data/quiz_exception.dart';
+import 'package:numi/features/quiz/helpers/default_grade_label.dart';
+import 'package:numi/features/quiz/screens/grade_selection_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 class _UnusedGradeService implements GradeService {

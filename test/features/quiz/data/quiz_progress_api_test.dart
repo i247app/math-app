@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/network/auth_token_store.dart';
 import 'package:numi/core/network/network_client.dart';
-import 'package:numi/features/quiz/data/dto/quiz_models.dart';
-import 'package:numi/features/quiz/data/mappers/quiz_mapper.dart';
-import 'package:numi/features/quiz/data/api/quiz_api.dart';
+import 'package:numi/features/quiz/data/quiz_api_models.dart';
+import 'package:numi/features/quiz/data/quiz_conversion.dart';
+import 'package:numi/features/quiz/data/quiz_api.dart';
 
 void main() {
   test('quiz progress accepts a null average delta', () {
@@ -57,7 +57,7 @@ void main() {
       },
       'to_dt': '2026-08-14T16:59:59.999999Z',
       'tz': '+07:00',
-    }).toDomain();
+    }).toModel();
 
     expect(response.series, hasLength(2));
     expect(response.summary?.averageDelta, isNull);

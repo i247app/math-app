@@ -98,7 +98,7 @@ class AppKeys {
 
   static const navHome = 'nav_home';
   static const navClassroom = 'nav_classroom';
-  static const navHomework = 'nav_homework';
+  static const navClassroomExercise = 'nav_homework';
   static const navStudy = 'nav_study';
   static const navMembers = 'nav_members';
   static const navReview = 'nav_review';
@@ -191,7 +191,7 @@ class AppKeys {
   static const parentWeekdayFri = 'parent_weekday_fri';
   static const parentWeekdaySat = 'parent_weekday_sat';
   static const yourAchievement = 'your_achievement';
-  static const studentHomework = 'student_homework';
+  static const studentClassroomExercise = 'student_homework';
   static const studentClassroom = 'student_classroom';
   static const homeMessageTeacherOne = 'home_message_teacher_one';
   static const homeMessageTeacherTwo = 'home_message_teacher_two';
@@ -219,8 +219,9 @@ class AppKeys {
   static const parentMessagesBodyFour = 'parent_messages_body_four';
   static const parentMessagesTimeThree = 'parent_messages_time_three';
   static const parentMessagesTimeFour = 'parent_messages_time_four';
-  static const studentNoHomeworkTitle = 'student_no_homework_title';
-  static const studentNoHomeworkMessage = 'student_no_homework_message';
+  static const studentNoClassroomExerciseTitle = 'student_no_homework_title';
+  static const studentNoClassroomExerciseMessage =
+      'student_no_homework_message';
   static const studentNoClassroomsTitle = 'student_no_classrooms_title';
   static const studentNoClassroomsMessage = 'student_no_classrooms_message';
   static const studentJoinNewClassroom = 'student_join_new_classroom';
@@ -305,26 +306,36 @@ class AppKeys {
   static const studentClassReview15Minutes = 'student_class_review_15_minutes';
   static const studentClassDeadlineSample = 'student_class_deadline_sample';
   static const studentClassComingSoon = 'student_class_coming_soon';
-  static const studentHomeworkSearchHint = 'student_homework_search_hint';
-  static const studentHomeworkNotSubmitted = 'student_homework_not_submitted';
-  static const studentHomeworkSubmitted = 'student_homework_submitted';
-  static const studentHomeworkOverdue = 'student_homework_overdue';
-  static const studentHomeworkAssignedAt = 'student_homework_assigned_at';
-  static const studentHomeworkReviewTitle = 'student_homework_review_title';
-  static const studentHomeworkQuestionCount = 'student_homework_question_count';
-  static const studentHomeworkDueDate = 'student_homework_due_date';
-  static const studentHomeworkDueFormat = 'student_homework_due_format';
-  static const studentHomeworkLoadFailed = 'student_homework_load_failed';
-  static const studentHomeworkNoQuestions = 'student_homework_no_questions';
-  static const studentHomeworkQuestionMissingAnswers =
+  static const studentClassroomExerciseSearchHint =
+      'student_homework_search_hint';
+  static const studentClassroomExerciseNotSubmitted =
+      'student_homework_not_submitted';
+  static const studentClassroomExerciseSubmitted = 'student_homework_submitted';
+  static const studentClassroomExerciseOverdue = 'student_homework_overdue';
+  static const studentClassroomExerciseAssignedAt =
+      'student_homework_assigned_at';
+  static const studentClassroomExerciseReviewTitle =
+      'student_homework_review_title';
+  static const studentClassroomExerciseQuestionCount =
+      'student_homework_question_count';
+  static const studentClassroomExerciseDueDate = 'student_homework_due_date';
+  static const studentClassroomExerciseDueFormat =
+      'student_homework_due_format';
+  static const studentClassroomExerciseLoadFailed =
+      'student_homework_load_failed';
+  static const studentClassroomExerciseNoQuestions =
+      'student_homework_no_questions';
+  static const studentClassroomExerciseQuestionMissingAnswers =
       'student_homework_question_missing_answers';
-  static const studentHomeworkSubmitSuccess = 'student_homework_submit_success';
-  static const studentHomeworkSubmitFailed = 'student_homework_submit_failed';
-  static const studentHomeworkMissingExercise =
+  static const studentClassroomExerciseSubmitSuccess =
+      'student_homework_submit_success';
+  static const studentClassroomExerciseSubmitFailed =
+      'student_homework_submit_failed';
+  static const studentClassroomExerciseMissingExercise =
       'student_homework_missing_exercise';
-  static const studentHomeworkAlreadySubmitted =
+  static const studentClassroomExerciseAlreadySubmitted =
       'student_homework_already_submitted';
-  static const studentHomeworkNotOpen = 'student_homework_not_open';
+  static const studentClassroomExerciseNotOpen = 'student_homework_not_open';
   static const assessmentAction = 'assessment_action';
   static const viewAll = 'view_all';
   static const viewAllUpper = 'view_all_upper';
@@ -776,15 +787,19 @@ class AppKeys {
   static const goodResultTitle = 'good_result_title';
   static const completedResultTitle = 'completed_result_title';
   static const incompleteResultTitle = 'incomplete_result_title';
-  static const noCompletedHomeworkTitle = 'no_completed_homework_title';
-  static const noCompletedHomeworkMessage = 'no_completed_homework_message';
-  static const homeworkExpiredCannotSubmit = 'homework_expired_cannot_submit';
-  static const homeworkDueSoon = 'homework_due_soon';
-  static const homeworkFailed = 'homework_failed';
+  static const noCompletedClassroomExerciseTitle =
+      'no_completed_homework_title';
+  static const noCompletedClassroomExerciseMessage =
+      'no_completed_homework_message';
+  static const classroomExerciseExpiredCannotSubmit =
+      'homework_expired_cannot_submit';
+  static const classroomExerciseDueSoon = 'homework_due_soon';
+  static const classroomExerciseFailed = 'homework_failed';
   static const parentRoomAssignmentsTitle = 'parent_room_assignments_title';
   static const parentRoomUtilitiesTitle = 'parent_room_utilities_title';
   static const parentRoomUtilityMessages = 'parent_room_utility_messages';
-  static const parentRoomUtilityHomework = 'parent_room_utility_homework';
+  static const parentRoomUtilityClassroomExercise =
+      'parent_room_utility_homework';
   static const parentRoomUtilityTests = 'parent_room_utility_tests';
   static const parentRoomUtilityDocuments = 'parent_room_utility_documents';
   static const parentRoomUtilityProgress = 'parent_room_utility_progress';
@@ -835,9 +850,11 @@ class AppKeys {
   static const welcomeParentTeacherSubtitle = 'welcome_parent_teacher_subtitle';
   static const welcomeGamesTitle = 'welcome_games_title';
   static const welcomeGamesSubtitle = 'welcome_games_subtitle';
-  static const studentHomeworkReviewLabel = 'student_homework_review_label';
-  static const studentHomeworkPurposeQuiz = 'student_homework_purpose_quiz';
-  static const studentHomeworkPurposeHomework =
+  static const studentClassroomExerciseReviewLabel =
+      'student_homework_review_label';
+  static const studentClassroomExercisePurposeQuiz =
+      'student_homework_purpose_quiz';
+  static const studentClassroomExercisePurposeHomework =
       'student_homework_purpose_homework';
   static const teacherAssignmentDefaultChapter =
       'teacher_assignment_default_chapter';

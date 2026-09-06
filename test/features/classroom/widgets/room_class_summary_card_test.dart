@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/classroom/presentation/widgets/room_class_summary_card.dart';
+import 'package:numi/features/classroom/widgets/room_class_summary_card.dart';
 
 void main() {
   testWidgets('renders the shared room class hierarchy and handles taps', (

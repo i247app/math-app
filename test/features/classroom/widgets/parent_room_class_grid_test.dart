@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/classroom/domain/models/classroom.dart';
-import 'package:numi/features/home/domain/models/home_layout.dart';
-import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/classroom/models/classroom.dart';
+import 'package:numi/features/home/models/home_layout.dart';
+import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/classroom/application/read_models/parent_room_entry.dart';
-import 'package:numi/features/classroom/presentation/widgets/parent_room/parent_room_class_grid.dart';
+import 'package:numi/features/classroom/models/parent_room_entry.dart';
+import 'package:numi/features/classroom/widgets/parent_room/parent_room_class_grid.dart';
 
 void main() {
   testWidgets('renders room classes in a two-column four-color grid', (

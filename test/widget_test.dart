@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/auth/application/contracts/auth_service.dart';
-import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/session/application/controllers/app_session_cubit.dart';
-import 'package:numi/features/session/application/controllers/app_session_state.dart';
+import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/session/controllers/app_session_cubit.dart';
+import 'package:numi/features/session/controllers/app_session_state.dart';
 import 'package:numi/main.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 

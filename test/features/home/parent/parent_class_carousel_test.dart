@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/classroom/domain/models/classroom.dart';
-import 'package:numi/features/profile/domain/models/profile.dart';
+import 'package:numi/features/classroom/models/classroom.dart';
+import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/home/presentation/parent/models/parent_child_summary.dart';
-import 'package:numi/features/home/presentation/parent/widgets/parent_class_carousel.dart';
+import 'package:numi/features/home/models/parent/parent_child_summary.dart';
+import 'package:numi/features/home/widgets/parent/parent_class_carousel.dart';
 
 void main() {
   testWidgets('hides children who have not joined a class', (tester) async {

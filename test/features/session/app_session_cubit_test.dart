@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/auth/application/contracts/auth_service.dart';
-import 'package:numi/features/notifications/application/contracts/notification_ping_service.dart';
-import 'package:numi/features/session/application/controllers/app_session_cubit.dart';
-import 'package:numi/features/session/application/controllers/app_session_state.dart';
-import 'package:numi/features/session/application/read_models/profile_session_resolution.dart';
-import 'package:numi/features/session/application/services/profile_session_resolver.dart';
+import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/notifications/data/notification_ping_service.dart';
+import 'package:numi/features/session/controllers/app_session_cubit.dart';
+import 'package:numi/features/session/controllers/app_session_state.dart';
+import 'package:numi/features/session/models/profile_session_resolution.dart';
+import 'package:numi/features/session/data/profile_session_resolver.dart';
 
 class _FakeProfileSessionResolver implements ProfileSessionResolver {
   int? rememberedUserId;

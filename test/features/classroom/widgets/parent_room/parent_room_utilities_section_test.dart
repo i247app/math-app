@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/classroom/presentation/widgets/parent_room/parent_room_utilities_section.dart';
+import 'package:numi/features/classroom/widgets/parent_room/parent_room_utilities_section.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
 
 void main() {

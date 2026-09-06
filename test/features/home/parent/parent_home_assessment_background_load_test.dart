@@ -4,16 +4,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/auth/domain/models/auth_models.dart';
-import 'package:numi/features/home/data/cache/home_profile_cache.dart';
-import 'package:numi/features/home/application/contracts/home_layout_service.dart';
-import 'package:numi/features/home/domain/models/home_layout.dart';
-import 'package:numi/features/home/presentation/parent/parent_home_tab.dart';
-import 'package:numi/features/profile/domain/models/grade.dart';
-import 'package:numi/features/profile/domain/models/profile.dart';
-import 'package:numi/features/profile/application/contracts/grade_service.dart';
-import 'package:numi/features/quiz/domain/models/quiz.dart';
-import 'package:numi/features/quiz/application/contracts/quiz_service.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/home/data/home_profile_cache.dart';
+import 'package:numi/features/home/data/home_layout_service.dart';
+import 'package:numi/features/home/models/home_layout.dart';
+import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
+import 'package:numi/features/profile/models/grade.dart';
+import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/features/profile/data/grade_service.dart';
+import 'package:numi/features/quiz/models/quiz.dart';
+import 'package:numi/features/quiz/data/quiz_service.dart';
 
 void main() {
   testWidgets('parent home refreshes assessments in the background on entry', (

@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numi/features/notifications/domain/models/notification.dart';
-import 'package:numi/features/notifications/application/controllers/notification_controller.dart';
-import 'package:numi/features/notifications/data/cache/notification_cache.dart';
-import 'package:numi/features/notifications/application/contracts/notification_list_service.dart';
+import 'package:numi/features/notifications/models/notification.dart';
+import 'package:numi/features/notifications/controllers/notification_controller.dart';
+import 'package:numi/features/notifications/data/notification_cache.dart';
+import 'package:numi/features/notifications/data/notification_list_service.dart';
 
 void main() {
   setUp(NotificationCache.invalidate);

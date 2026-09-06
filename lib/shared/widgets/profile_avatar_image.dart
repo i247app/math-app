@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/profile/application/read_models/profile_avatar_catalog.dart';
+import 'package:numi/features/profile/models/profile_avatar_catalog.dart';
 
 class ProfileAvatarImage extends StatelessWidget {
   const ProfileAvatarImage({

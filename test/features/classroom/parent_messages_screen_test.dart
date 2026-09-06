@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/classroom/presentation/screens/parent_messages_screen.dart';
-import 'package:numi/features/classroom/presentation/widgets/parent_messages/parent_message_preview_tile.dart';
+import 'package:numi/features/classroom/screens/parent_messages_screen.dart';
+import 'package:numi/features/classroom/widgets/parent_messages/parent_message_preview_tile.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
