@@ -15,7 +15,10 @@ class _FakeProfileSessionResolver implements ProfileSessionResolver {
   StudentProfile? rememberedProfile;
 
   @override
-  Future<ProfileSessionResolution> resolveForUserId(int userId) async {
+  Future<ProfileSessionResolution> resolveForUserId(
+    int userId, {
+    bool Function()? isCurrent,
+  }) async {
     return const ProfileSessionResolution.empty();
   }
 
@@ -23,6 +26,7 @@ class _FakeProfileSessionResolver implements ProfileSessionResolver {
   Future<void> rememberActiveProfile({
     required int userId,
     required StudentProfile profile,
+    bool Function()? isCurrent,
   }) async {
     rememberedUserId = userId;
     rememberedProfile = profile;
@@ -34,13 +38,16 @@ class _ControlledProfileSessionResolver implements ProfileSessionResolver {
       Completer<ProfileSessionResolution>();
 
   @override
-  Future<ProfileSessionResolution> resolveForUserId(int userId) =>
-      resolution.future;
+  Future<ProfileSessionResolution> resolveForUserId(
+    int userId, {
+    bool Function()? isCurrent,
+  }) => resolution.future;
 
   @override
   Future<void> rememberActiveProfile({
     required int userId,
     required StudentProfile profile,
+    bool Function()? isCurrent,
   }) async {}
 }
 
