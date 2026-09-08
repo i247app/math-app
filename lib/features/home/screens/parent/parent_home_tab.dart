@@ -31,6 +31,7 @@ import 'package:numi/features/home/screens/parent/parent_home_completed_assessme
 import 'package:numi/features/home/screens/parent/parent_home_first_assessment.dart';
 import 'package:numi/features/home/widgets/parent/parent_home_error_card.dart';
 import 'package:numi/features/home/widgets/parent/parent_home_loading_card.dart';
+import 'package:numi/features/home/widgets/parent/parent_home_skeleton.dart';
 import 'package:numi/features/home/widgets/parent/parent_home_refresh_label.dart';
 import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
 import 'package:numi/features/home/widgets/parent/parent_profile_dialog_action.dart';
@@ -346,6 +347,16 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.useActiveStudentProfileData && isLoading && !hasLoadedHome) {
+      return RefreshIndicator(
+        color: context.themeColors.brandStrong,
+        onRefresh: loadHome,
+        child: ParentHomeSkeleton(
+          bottomPadding: widget.bottomPadding,
+          homeHeader: widget.homeHeader,
+        ),
+      );
+    }
     final hasJoinedClassroom = childSummaries.any(
       (summary) => summary.classroom != null,
     );
