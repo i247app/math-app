@@ -11,8 +11,6 @@ extension _TeacherHomeDataActions on _TeacherRoleTabState {
         _recentAssignments = const <ClassroomExercise>[];
         _isLoadingHomeLayout = false;
         _hasLoadedHomeLayout = true;
-        _isLoadingAssignments = false;
-        _hasLoadedAssignments = true;
         _homeLayoutError = null;
       });
       return;
@@ -31,12 +29,10 @@ extension _TeacherHomeDataActions on _TeacherRoleTabState {
         _hasLoadedHomeLayout && _loadedProfileId == profileId;
     _updateState(() {
       _isLoadingHomeLayout = true;
-      _isLoadingAssignments = true;
       if (!hadRenderableContent) {
         _layoutClassrooms = const <ClassroomModel>[];
         _recentAssignments = const <ClassroomExercise>[];
         _hasLoadedHomeLayout = false;
-        _hasLoadedAssignments = false;
       }
       _homeLayoutError = null;
       _loadedProfileId = profileId;
@@ -78,8 +74,6 @@ extension _TeacherHomeDataActions on _TeacherRoleTabState {
         _recentAssignments = assignments;
         _isLoadingHomeLayout = false;
         _hasLoadedHomeLayout = true;
-        _isLoadingAssignments = false;
-        _hasLoadedAssignments = true;
         _homeLayoutError = null;
       });
       cache.putTeacher(
@@ -102,7 +96,6 @@ extension _TeacherHomeDataActions on _TeacherRoleTabState {
       if (hadRenderableContent) {
         _updateState(() {
           _isLoadingHomeLayout = false;
-          _isLoadingAssignments = false;
           _homeLayoutError = message;
         });
         return;
@@ -112,8 +105,6 @@ extension _TeacherHomeDataActions on _TeacherRoleTabState {
         _recentAssignments = const <ClassroomExercise>[];
         _isLoadingHomeLayout = false;
         _hasLoadedHomeLayout = true;
-        _isLoadingAssignments = false;
-        _hasLoadedAssignments = true;
         _homeLayoutError = message;
       });
     }
@@ -125,8 +116,6 @@ extension _TeacherHomeDataActions on _TeacherRoleTabState {
     _recentAssignments = snapshot.recentAssignments;
     _isLoadingHomeLayout = false;
     _hasLoadedHomeLayout = true;
-    _isLoadingAssignments = false;
-    _hasLoadedAssignments = true;
     _homeLayoutError = null;
   }
 

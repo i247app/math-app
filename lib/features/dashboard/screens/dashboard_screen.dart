@@ -15,6 +15,7 @@ import 'package:numi/features/classroom_exercise/data/classroom_exercise_service
 import 'package:numi/features/notifications/controllers/notification_badge_controller.dart';
 import 'package:numi/features/notifications/data/notification_list_service.dart';
 import 'package:numi/features/home/helpers/parent_home_helpers.dart';
+import 'package:numi/features/home/widgets/teacher/teacher_home_skeleton.dart';
 import 'package:numi/features/dashboard/controllers/dashboard_profile_controller.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_navigator.dart';
@@ -294,10 +295,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 Positioned.fill(
                   child: widget.isResolvingProfile
-                      ? DashboardSessionSkeleton(
-                          topPadding: showHeader ? headerHeight : topInset,
-                          bottomPadding: navHeight + 14,
-                        )
+                      ? widget.activeRole == ProfileRole.teacher &&
+                                navigation.activeTab == 0
+                            ? TeacherHomeSkeleton(
+                                profile: widget.activeProfile,
+                                bottomPadding: navHeight + 14,
+                                onNotificationTap: _openNotifications,
+                                hasUnreadNotifications:
+                                    _notificationBadgeController.hasUnread,
+                              )
+                            : DashboardSessionSkeleton(
+                                topPadding: showHeader
+                                    ? headerHeight
+                                    : topInset,
+                                bottomPadding: navHeight + 14,
+                              )
                       : RoleTabHost(
                           tabFactory: _tabFactory,
                           // No ValueKey — profileResetSignal drives selective

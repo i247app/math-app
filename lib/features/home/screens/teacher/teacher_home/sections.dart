@@ -6,17 +6,12 @@ extension _TeacherHomeSections on _TeacherRoleTabState {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 12,
       children: [
-        if (_isInitialHomeLoading)
-          const TeacherAppSectionHeaderSkeleton()
-        else
-          TeacherClassSectionHeader(
-            showAddButton: isProfileComplete,
-            onAdd: _handleClassCreateAction,
-            onViewAll: widget.onOpenClassroomTab,
-          ),
-        if (_isInitialHomeLoading)
-          const TeacherLoadingPanel()
-        else if (_error != null && _classrooms.isEmpty)
+        TeacherClassSectionHeader(
+          showAddButton: isProfileComplete,
+          onAdd: _handleClassCreateAction,
+          onViewAll: widget.onOpenClassroomTab,
+        ),
+        if (_error != null && _classrooms.isEmpty)
           AppRetryPanel(message: _error!, onRetry: _refreshClassrooms)
         else if (_classrooms.isEmpty)
           TeacherEmptyAssignmentsPanel(
@@ -40,28 +35,23 @@ extension _TeacherHomeSections on _TeacherRoleTabState {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 12,
       children: [
-        if (_isInitialAssignmentsLoading)
-          const TeacherAppSectionHeaderSkeleton()
-        else
-          AppSectionHeader(
-            title: context.getText(AppKeys.teacherRecentlyAssigned),
-            actionLabel: context.getText(AppKeys.viewAll),
-            actionIcon: Icons.chevron_right_rounded,
-            onAction: widget.onOpenStudyTab,
-            titleStyle: TextStyle(
-              color: context.themeColors.textPrimary,
-              fontSize: FontSize.xl,
-              fontWeight: FontWeight.w600,
-            ),
-            actionStyle: TextStyle(
-              color: context.themeColors.info,
-              fontSize: FontSize.caption,
-              fontWeight: FontWeight.w800,
-            ),
+        AppSectionHeader(
+          title: context.getText(AppKeys.teacherRecentlyAssigned),
+          actionLabel: context.getText(AppKeys.viewAll),
+          actionIcon: Icons.chevron_right_rounded,
+          onAction: widget.onOpenStudyTab,
+          titleStyle: TextStyle(
+            color: context.themeColors.textPrimary,
+            fontSize: FontSize.xl,
+            fontWeight: FontWeight.w600,
           ),
-        if (_isInitialAssignmentsLoading)
-          const TeacherAssignmentsLoadingPanel()
-        else if (_recentAssignments.isEmpty)
+          actionStyle: TextStyle(
+            color: context.themeColors.info,
+            fontSize: FontSize.caption,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        if (_recentAssignments.isEmpty)
           TeacherEmptyAssignmentsPanel(
             message: context.getText(AppKeys.teacherNoAssignments),
           )

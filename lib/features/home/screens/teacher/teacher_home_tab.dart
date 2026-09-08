@@ -22,15 +22,12 @@ import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 
 import 'package:numi/features/home/helpers/teacher/teacher_home_helpers.dart';
-import 'package:numi/features/home/widgets/teacher/teacher_assignments_loading_panel.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_class_carousel.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_class_section_header.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_hero_card.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
-import 'package:numi/features/home/widgets/teacher/teacher_home_hero_skeleton.dart';
-import 'package:numi/features/home/widgets/teacher/teacher_home_section_header_skeleton.dart';
+import 'package:numi/features/home/widgets/teacher/teacher_home_skeleton.dart';
 import 'package:numi/shared/widgets/app_section_header.dart';
-import 'package:numi/features/home/widgets/teacher/teacher_loading_panel.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_recent_assignment_carousel.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_top_bar.dart';
 
@@ -88,8 +85,6 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
 
   bool _isLoadingHomeLayout = false;
   bool _hasLoadedHomeLayout = false;
-  bool _isLoadingAssignments = false;
-  bool _hasLoadedAssignments = false;
   int? _loadedProfileId;
   int _homeLayoutRequestId = 0;
   String? _homeLayoutError;
@@ -101,11 +96,6 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
 
   bool get _isInitialHomeLoading =>
       _isLoadingHomeLayout && !_hasLoadedHomeLayout && _classrooms.isEmpty;
-
-  bool get _isInitialAssignmentsLoading =>
-      _isLoadingAssignments &&
-      !_hasLoadedAssignments &&
-      _recentAssignments.isEmpty;
 
   String? get _error {
     final profileId = profileStableId(widget.activeProfile);
@@ -186,6 +176,18 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isInitialHomeLoading) {
+      return RefreshIndicator(
+        color: AppColors.teal520,
+        onRefresh: _refreshClassrooms,
+        child: TeacherHomeSkeleton(
+          profile: widget.activeProfile,
+          bottomPadding: widget.bottomPadding,
+          onNotificationTap: widget.onNotificationTap ?? () {},
+          hasUnreadNotifications: widget.hasUnreadNotifications,
+        ),
+      );
+    }
     final isProfileComplete = isTeacherProfileComplete(widget.activeProfile);
 
     return RefreshIndicator(
@@ -214,15 +216,13 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 22),
-                    child: _isInitialHomeLoading
-                        ? const TeacherHomeHeroSkeleton()
-                        : _homeEntrance(
-                            id: _heroEntranceId,
-                            order: 0,
-                            child: const TeacherHeroCard(),
-                          ),
+                    child: _homeEntrance(
+                      id: _heroEntranceId,
+                      order: 0,
+                      child: const TeacherHeroCard(),
+                    ),
                   ),
-                  if (!isProfileComplete && !_isInitialHomeLoading)
+                  if (!isProfileComplete)
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
                       child: _homeEntrance(
@@ -246,27 +246,21 @@ class _TeacherRoleTabState extends State<TeacherHomeTab> {
                     ),
                   Padding(
                     padding: const EdgeInsets.only(top: 28),
-                    child: _isInitialHomeLoading
-                        ? _buildClassroomSection(
-                            isProfileComplete: isProfileComplete,
-                          )
-                        : _homeEntrance(
-                            id: _classroomEntranceId,
-                            order: isProfileComplete ? 1 : 2,
-                            child: _buildClassroomSection(
-                              isProfileComplete: isProfileComplete,
-                            ),
-                          ),
+                    child: _homeEntrance(
+                      id: _classroomEntranceId,
+                      order: isProfileComplete ? 1 : 2,
+                      child: _buildClassroomSection(
+                        isProfileComplete: isProfileComplete,
+                      ),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 30),
-                    child: _isInitialAssignmentsLoading
-                        ? _buildRecentAssignmentsSection()
-                        : _homeEntrance(
-                            id: _assignmentsEntranceId,
-                            order: isProfileComplete ? 2 : 3,
-                            child: _buildRecentAssignmentsSection(),
-                          ),
+                    child: _homeEntrance(
+                      id: _assignmentsEntranceId,
+                      order: isProfileComplete ? 2 : 3,
+                      child: _buildRecentAssignmentsSection(),
+                    ),
                   ),
                 ],
               ),
