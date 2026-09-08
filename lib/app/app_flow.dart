@@ -217,23 +217,24 @@ class _AppFlowState extends State<AppFlow> {
             BlocListener<AuthFlowCubit, AuthFlowState>(
               listenWhen: (previous, current) =>
                   previous.screen != current.screen ||
+                  previous.authError != current.authError ||
                   previous.authenticationResultId !=
                       current.authenticationResultId,
               listener: (context, state) async {
                 final coordinator = context.read<AppCoordinatorCubit>();
-                switch (state.screen) {
-                  case AuthScreen.welcome:
-                    coordinator.showWelcome();
-                  case AuthScreen.welcomeDetails:
-                    coordinator.showWelcomeDetails();
-                  case AuthScreen.login ||
-                      AuthScreen.deviceVerification ||
-                      AuthScreen.otp ||
-                      AuthScreen.signup:
-                    coordinator.showAuthScreen(state.screen);
-                }
                 final result = state.authenticationResult;
                 if (result == null) {
+                  final isResumingPin =
+                      context.read<PasscodeCubit>().state.outcome?.type ==
+                      PasscodeOutcomeType.resumeAuthentication;
+                  // The login state also carries the background account check
+                  // after PIN verification. Keep PIN visible during that check.
+                  if (isResumingPin &&
+                      state.screen == AuthScreen.login &&
+                      state.isCheckingLoginName) {
+                    return;
+                  }
+                  coordinator.showAuthScreen(state.screen);
                   return;
                 }
                 final needsSetup = await context
@@ -273,12 +274,15 @@ class _AppFlowState extends State<AppFlow> {
                     final loginName = outcome.loginName;
                     if (user != null && loginName != null) {
                       final authCubit = context.read<AuthFlowCubit>();
-                      authCubit.openLogin(mode: AuthEntryMode.login);
-                      context.read<AppCoordinatorCubit>().showLogin();
                       await authCubit.resumeRememberedLogin(
                         loginName: loginName,
                         fallbackUser: user,
                       );
+                      // The authentication listener now owns the transition,
+                      // including asynchronous PIN preparation.
+                      if (authCubit.state.authenticationResult != null) {
+                        return;
+                      }
                     }
                   case PasscodeOutcomeType.cancelled:
                     final authCubit = context.read<AuthFlowCubit>();
@@ -286,7 +290,9 @@ class _AppFlowState extends State<AppFlow> {
                     context.read<AppCoordinatorCubit>().showLogin();
                 }
                 if (context.mounted) {
-                  context.read<PasscodeCubit>().consumeOutcome();
+                  context.read<PasscodeCubit>().consumeOutcome(
+                    outcomeId: state.outcomeId,
+                  );
                 }
               },
             ),

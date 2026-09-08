@@ -196,7 +196,10 @@ class PasscodeCubit extends Cubit<PasscodeState> {
 
   void skipSetup() {
     final user = state.user;
-    if (state.mode != PasscodeMode.setup || !state.canSkip || user == null) {
+    if (state.isBusy ||
+        state.mode != PasscodeMode.setup ||
+        !state.canSkip ||
+        user == null) {
       return;
     }
     _emitOutcome(
@@ -217,13 +220,20 @@ class PasscodeCubit extends Cubit<PasscodeState> {
     );
   }
 
-  void consumeOutcome() =>
-      emit(state.copyWith(clearPending: true, clearOutcome: true));
+  void consumeOutcome({int? outcomeId}) {
+    if (isClosed ||
+        state.outcome == null ||
+        (outcomeId != null && outcomeId != state.outcomeId)) {
+      return;
+    }
+    emit(state.copyWith(clearPending: true, clearOutcome: true));
+  }
 
   void _emitOutcome(PasscodeOutcome outcome) {
     emit(
       state.copyWith(
-        isBusy: false,
+        // Stay busy until the app finishes handling this successful outcome.
+        isBusy: true,
         clearError: true,
         outcome: outcome,
         outcomeId: state.outcomeId + 1,
