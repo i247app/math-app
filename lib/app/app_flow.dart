@@ -214,6 +214,16 @@ class _AppFlowState extends State<AppFlow> {
         ],
         child: MultiBlocListener(
           listeners: [
+            BlocListener<AppCoordinatorCubit, AppCoordinatorState>(
+              listenWhen: (previous, current) =>
+                  previous.screen != current.screen &&
+                  current.screen == AppScreen.login,
+              listener: (context, state) {
+                unawaited(
+                  context.read<PasscodeCubit>().checkLoginAvailability(),
+                );
+              },
+            ),
             BlocListener<AuthFlowCubit, AuthFlowState>(
               listenWhen: (previous, current) =>
                   previous.screen != current.screen ||

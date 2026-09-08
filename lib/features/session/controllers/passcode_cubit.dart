@@ -12,18 +12,20 @@ class PasscodeCubit extends Cubit<PasscodeState> {
       super(const PasscodeState());
 
   final PasscodeService _passcodeService;
+  Future<void>? _availabilityCheck;
 
-  Future<void> checkLoginAvailability() async {
-    if (state.isCheckingAvailability) {
-      return;
+  Future<void> checkLoginAvailability() {
+    if (isClosed) {
+      return Future<void>.value();
     }
-    emit(
-      state.copyWith(
-        isCheckingAvailability: true,
-        clearRememberedAccount: true,
-        clearError: true,
-      ),
-    );
+    // Callers opening PIN must wait for an existing storage read as well.
+    return _availabilityCheck ??= _readLoginAvailability().whenComplete(() {
+      _availabilityCheck = null;
+    });
+  }
+
+  Future<void> _readLoginAvailability() async {
+    emit(state.copyWith(isCheckingAvailability: true, clearError: true));
     try {
       final account = await _passcodeService.lastPasscodeAccount();
       if (isClosed) {
