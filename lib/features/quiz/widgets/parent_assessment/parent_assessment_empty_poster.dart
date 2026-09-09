@@ -26,13 +26,7 @@ class ParentAssessmentEmptyPoster extends StatelessWidget {
       onTap: onPracticeTap,
     );
 
-    return Column(
-      children: [
-        Expanded(flex: 46, child: assessmentBanner),
-        const SizedBox(height: 12),
-        Expanded(flex: 54, child: practiceBanner),
-      ],
-    );
+    return Column(spacing: 12, children: [assessmentBanner, practiceBanner]);
   }
 }
 
@@ -72,7 +66,7 @@ class _AssessmentEmptyBanner extends StatelessWidget {
             aspectRatio: aspectRatio,
             child: Image.asset(
               assetPath,
-              fit: BoxFit.fill,
+              fit: BoxFit.cover,
               frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                 if (wasSynchronouslyLoaded) {
                   return child;

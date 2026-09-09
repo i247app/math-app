@@ -3,6 +3,7 @@ part of '../parent_assessment_tab.dart';
 extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
   List<Widget> _buildAssessmentChildren({
     required List<ParentAssessmentEntry> entries,
+    required bool hasNoAssessments,
     required bool shouldShowFullSkeleton,
   }) {
     final colors = context.themeColors;
@@ -10,6 +11,17 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
 
     if (shouldShowFullSkeleton) {
       return const [ParentAssessmentFullSkeleton()];
+    }
+
+    if (hasNoAssessments) {
+      return [
+        _initialFadeIn(
+          child: ParentAssessmentEmptyPoster(
+            onTap: _openAssessment,
+            onPracticeTap: widget.onOpenPracticeTab,
+          ),
+        ),
+      ];
     }
 
     return [
