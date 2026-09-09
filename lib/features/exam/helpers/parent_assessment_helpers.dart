@@ -100,11 +100,9 @@ Future<CompletedParentAssessmentPage> loadCompletedParentAssessments({
   Object? profileError;
   if (profileId != null && profileId > 0) {
     try {
-      final exams = await loadAll(profileId: profileId);
-      final assessments = completed(exams);
-      if (assessments.isNotEmpty) {
-        return paginate(assessments);
-      }
+      // An empty response is a successful profile-scoped result, not a signal
+      // to retry the Exam API with the unrelated user id.
+      return paginate(await loadAll(profileId: profileId));
     } catch (error) {
       profileError = error;
     }

@@ -4,21 +4,25 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 
 void main() {
-  test('student profile scope does not fall back to user exams', () async {
-    final service = _RecordingExamService();
+  test(
+    'successful empty profile response does not fall back to user id',
+    () async {
+      final service = _RecordingExamService();
 
-    final result = await loadCompletedParentAssessments(
-      examService: service,
-      profileId: 42,
-      userId: 7,
-      page: 1,
-      size: 5,
-      allowUserFallback: false,
-    );
+      final result = await loadCompletedParentAssessments(
+        examService: service,
+        profileId: 42,
+        userId: 7,
+        page: 1,
+        size: 5,
+      );
 
-    expect(result.exams, isEmpty);
-    expect(service.requests, const <_ExamRequest>[_ExamRequest(profileId: 42)]);
-  });
+      expect(result.exams, isEmpty);
+      expect(service.requests, const <_ExamRequest>[
+        _ExamRequest(profileId: 42),
+      ]);
+    },
+  );
 }
 
 class _RecordingExamService implements ExamService {
