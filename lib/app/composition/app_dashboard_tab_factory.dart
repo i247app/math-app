@@ -133,6 +133,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
         gradeService: args.gradeService,
         quizService: args.quizService,
         bottomPadding: args.bottomPadding,
+        onOpenPracticeTab: args.onOpenPracticeTab,
         useActiveStudentProfileData: useActiveStudentProfileData,
       ),
       2 => ParentRoomTab(

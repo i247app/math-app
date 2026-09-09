@@ -43,6 +43,7 @@ class ParentAssessmentTab extends StatefulWidget {
     required this.gradeService,
     required this.quizService,
     required this.bottomPadding,
+    this.onOpenPracticeTab,
     this.useActiveStudentProfileData = false,
   });
 
@@ -54,6 +55,7 @@ class ParentAssessmentTab extends StatefulWidget {
   final GradeService gradeService;
   final QuizService quizService;
   final double bottomPadding;
+  final VoidCallback? onOpenPracticeTab;
   final bool useActiveStudentProfileData;
 
   @override
@@ -154,23 +156,53 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
                 topInset: topInset,
               ),
             ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                14,
-                16,
-                widget.bottomPadding + 20,
-              ),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate(
-                  _buildAssessmentChildren(
-                    entries: entries,
-                    hasNoAssessments: hasNoAssessments,
-                    shouldShowFullSkeleton: shouldShowFullSkeleton,
+            if (hasNoAssessments)
+              SliverLayoutBuilder(
+                builder: (context, constraints) {
+                  final remainingHeight =
+                      constraints.viewportMainAxisExtent >
+                          constraints.precedingScrollExtent
+                      ? constraints.viewportMainAxisExtent -
+                            constraints.precedingScrollExtent
+                      : 0.0;
+                  return SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: remainingHeight,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          14,
+                          16,
+                          widget.bottomPadding + 20,
+                        ),
+                        child: _initialFadeIn(
+                          child: ParentAssessmentEmptyPoster(
+                            onTap: _openAssessment,
+                            onPracticeTap: widget.onOpenPracticeTab,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+            else
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  14,
+                  16,
+                  widget.bottomPadding + 20,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
+                    _buildAssessmentChildren(
+                      entries: entries,
+                      shouldShowFullSkeleton: shouldShowFullSkeleton,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),

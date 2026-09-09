@@ -15,6 +15,7 @@ import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_e
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_search_field.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_tab_banner.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 
 void main() {
   testWidgets('shows only the full skeleton until the initial load settles', (
@@ -59,6 +60,14 @@ void main() {
     expect(find.byType(ParentAssessmentEmptyPoster), findsOneWidget);
     expect(find.byType(ParentAssessmentTabBanner), findsNothing);
     expect(find.byType(ParentAssessmentSearchField), findsNothing);
+    expect(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+      findsOneWidget,
+    );
+    expect(
+      find.image(const AssetImage(parentHomeAfterReviewBannerAsset)),
+      findsOneWidget,
+    );
   });
 
   testWidgets('reloads assessments whenever the tab becomes active', (

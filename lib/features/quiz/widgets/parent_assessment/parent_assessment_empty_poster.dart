@@ -4,9 +4,48 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/features/quiz/widgets/parent_assessment/parent_assessment_skeleton_pulse.dart';
 
 class ParentAssessmentEmptyPoster extends StatelessWidget {
-  const ParentAssessmentEmptyPoster({super.key, required this.onTap});
+  const ParentAssessmentEmptyPoster({
+    super.key,
+    required this.onTap,
+    this.onPracticeTap,
+  });
 
   final VoidCallback onTap;
+  final VoidCallback? onPracticeTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final assessmentBanner = _AssessmentEmptyBanner(
+      assetPath: homeInitialAssessmentBannerAsset,
+      aspectRatio: 1280 / 852,
+      onTap: onTap,
+    );
+    final practiceBanner = _AssessmentEmptyBanner(
+      assetPath: parentHomeAfterReviewBannerAsset,
+      aspectRatio: 1280 / 854,
+      onTap: onPracticeTap,
+    );
+
+    return Column(
+      children: [
+        Expanded(flex: 46, child: assessmentBanner),
+        const SizedBox(height: 12),
+        Expanded(flex: 54, child: practiceBanner),
+      ],
+    );
+  }
+}
+
+class _AssessmentEmptyBanner extends StatelessWidget {
+  const _AssessmentEmptyBanner({
+    required this.assetPath,
+    required this.aspectRatio,
+    this.onTap,
+  });
+
+  final String assetPath;
+  final double aspectRatio;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +69,10 @@ class ParentAssessmentEmptyPoster extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: AspectRatio(
-            aspectRatio: 9 / 16,
+            aspectRatio: aspectRatio,
             child: Image.asset(
-              parentReviewEmptyAssessmentAsset,
-              fit: BoxFit.cover,
+              assetPath,
+              fit: BoxFit.fill,
               frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                 if (wasSynchronouslyLoaded) {
                   return child;
