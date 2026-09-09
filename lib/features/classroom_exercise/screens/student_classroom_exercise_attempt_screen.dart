@@ -19,8 +19,8 @@ import 'package:numi/features/classroom_exercise/widgets/student_attempt/student
 import 'package:numi/features/classroom_exercise/widgets/student_attempt/student_classroom_exercise_attempt_question_card.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom_exercise/widgets/student_result/student_classroom_exercise_result_helpers.dart';
-import 'package:numi/features/quiz/widgets/shared/quiz_wave_loader.dart';
-import 'package:numi/features/quiz/widgets/shared/attempt_exit_dialog.dart';
+import 'package:numi/features/exam/widgets/shared/exam_wave_loader.dart';
+import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
 class StudentClassroomExerciseAttemptScreen extends StatefulWidget {
@@ -222,7 +222,7 @@ class _StudentClassroomExerciseAttemptScreenState
                                 onRetry: _retry,
                               )
                             : isSubmitting
-                            ? QuizWaveLoader(
+                            ? ExamWaveLoader(
                                 key: const ValueKey('homework-submit-loader'),
                                 message: context.getText(
                                   AppKeys.submittingForYou,

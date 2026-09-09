@@ -1,5 +1,4 @@
 const classroomExercisePurposeHomework = 'HOMEWORK';
-const classroomExercisePurposeQuiz = 'QUIZ';
 const classroomExercisePurposeExam = 'EXAM';
 
 class SubmitClassroomExerciseAnswer {

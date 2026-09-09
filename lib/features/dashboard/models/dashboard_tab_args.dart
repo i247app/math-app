@@ -6,7 +6,7 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 
 class DashboardTabArgs {
   const DashboardTabArgs({
@@ -22,7 +22,7 @@ class DashboardTabArgs {
     required this.gradeService,
     required this.classroomService,
     required this.assignmentService,
-    required this.quizService,
+    required this.examService,
     required this.onLogout,
     required this.onAddProfileFromPractice,
     required this.onProfileSaved,
@@ -53,7 +53,7 @@ class DashboardTabArgs {
   final GradeService gradeService;
   final ClassroomService classroomService;
   final ClassroomExerciseService assignmentService;
-  final QuizService quizService;
+  final ExamService examService;
   final VoidCallback onLogout;
   final VoidCallback onAddProfileFromPractice;
   final VoidCallback onProfileSaved;

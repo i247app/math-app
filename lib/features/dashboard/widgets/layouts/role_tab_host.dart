@@ -9,7 +9,7 @@ import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 
 part 'role_tab_host/gestures.dart';
 part 'role_tab_host/tab_builder.dart';
@@ -31,7 +31,7 @@ class RoleTabHost extends StatefulWidget {
     required this.gradeService,
     required this.classroomService,
     required this.assignmentService,
-    required this.quizService,
+    required this.examService,
     required this.onLogout,
     required this.onAddProfileFromPractice,
     required this.onProfileSaved,
@@ -67,7 +67,7 @@ class RoleTabHost extends StatefulWidget {
   final GradeService gradeService;
   final ClassroomService classroomService;
   final ClassroomExerciseService assignmentService;
-  final QuizService quizService;
+  final ExamService examService;
   final VoidCallback onLogout;
   final VoidCallback onAddProfileFromPractice;
   final VoidCallback onProfileSaved;

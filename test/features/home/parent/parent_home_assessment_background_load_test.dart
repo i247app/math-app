@@ -12,8 +12,8 @@ import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
 import 'package:numi/features/profile/models/grade.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
-import 'package:numi/features/quiz/models/quiz.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
+import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 
 void main() {
   testWidgets('parent home refreshes assessments in the background on entry', (
@@ -25,7 +25,7 @@ void main() {
     addTearDown(() => cache.invalidateProfile(profileId));
 
     final lingo = LingoProvider();
-    final quizService = _RecordingQuizService();
+    final examService = _RecordingExamService();
     const homeService = _EmptyParentHomeService();
     addTearDown(lingo.dispose);
 
@@ -48,7 +48,7 @@ void main() {
                 activeRefreshTick: 0,
                 initialGrades: const <GradeModel>[],
                 gradeService: _EmptyGradeService(),
-                quizService: quizService,
+                examService: examService,
                 onRefreshProfiles: _doNothing,
                 onActivateProfile: _activateNothing,
                 onProfileSaved: _doNothingSync,
@@ -66,14 +66,14 @@ void main() {
 
     await pumpParentHome(isActive: true);
     await tester.pump();
-    expect(quizService.profileRequests, const <int?>[profileId]);
-    expect(quizService.listPageCalls, 0);
+    expect(examService.profileRequests, const <int?>[profileId]);
+    expect(examService.listPageCalls, 0);
 
     await pumpParentHome(isActive: false);
     await pumpParentHome(isActive: true);
     await tester.pump();
-    expect(quizService.profileRequests, const <int?>[profileId, profileId]);
-    expect(quizService.listPageCalls, 0);
+    expect(examService.profileRequests, const <int?>[profileId, profileId]);
+    expect(examService.listPageCalls, 0);
   });
 }
 
@@ -92,25 +92,25 @@ class _EmptyParentHomeService implements HomeLayoutService {
   }
 }
 
-class _RecordingQuizService implements QuizService {
+class _RecordingExamService implements ExamService {
   final List<int?> profileRequests = <int?>[];
   int listPageCalls = 0;
 
   @override
-  Future<List<GeneratedQuiz>> listQuizzes({int? userId, int? profileId}) async {
+  Future<List<GeneratedExam>> listExams({int? userId, int? profileId}) async {
     profileRequests.add(profileId);
-    return const <GeneratedQuiz>[
-      GeneratedQuiz(
-        quizId: 991,
-        purpose: quizPurposeAssessment,
-        quizStatus: 'SUBMITTED',
-        questions: <QuizQuestion>[],
+    return const <GeneratedExam>[
+      GeneratedExam(
+        examId: 991,
+        purpose: examPurposeAssessment,
+        examStatus: 'SUBMITTED',
+        questions: <ExamQuestion>[],
       ),
     ];
   }
 
   @override
-  Future<QuizListResponse> listQuizPage({
+  Future<ExamListResponse> listExamPage({
     int? userId,
     int? profileId,
     required int page,
@@ -118,14 +118,14 @@ class _RecordingQuizService implements QuizService {
     bool takeAll = false,
   }) async {
     listPageCalls++;
-    return const QuizListResponse(
+    return const ExamListResponse(
       mstatus: 200,
-      quizzes: <GeneratedQuiz>[
-        GeneratedQuiz(
-          quizId: 991,
-          purpose: quizPurposeAssessment,
-          quizStatus: 'SUBMITTED',
-          questions: <QuizQuestion>[],
+      exams: <GeneratedExam>[
+        GeneratedExam(
+          examId: 991,
+          purpose: examPurposeAssessment,
+          examStatus: 'SUBMITTED',
+          questions: <ExamQuestion>[],
         ),
       ],
     );

@@ -38,7 +38,7 @@ stay together in a subfolder. Navigation contracts belong in `navigation/`.
   the app models. `*_conversion.dart` converts them using `toModel()` or
   `toDto()`. There are no separate `dto/`, `mappers/` or `contracts/` folders.
 - API values such as `HOMEWORK`, JSON keys, translation keys and asset paths
-  retain their existing values. `HOMEWORK` is still a purpose alongside `QUIZ`
+  retain their existing values. `HOMEWORK` is still a purpose alongside `EXAM`
   and `EXAM`; renaming the feature does not change the backend contract.
 
 Tests live under `test/`, grouped by feature or shared component. Architecture
@@ -93,4 +93,3 @@ open ios/Runner.xcworkspace
 ```
 
 Then choose an iPhone Simulator and press Run.
-

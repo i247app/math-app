@@ -32,7 +32,7 @@ import 'package:numi/features/dashboard/widgets/dashboard_profile_menu.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_session_skeleton.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 
 part 'dashboard/actions.dart';
 
@@ -65,13 +65,13 @@ class DashboardScreen extends StatefulWidget {
     GradeService? gradeService,
     ClassroomService? classroomService,
     ClassroomExerciseService? assignmentService,
-    QuizService? quizService,
+    ExamService? examService,
     NotificationListService? notificationService,
     Stream<Object?>? notificationMessages,
   }) : _gradeService = gradeService,
        _classroomService = classroomService,
        _assignmentService = assignmentService,
-       _quizService = quizService,
+       _examService = examService,
        _notificationService = notificationService,
        _notificationMessages = notificationMessages;
 
@@ -90,7 +90,7 @@ class DashboardScreen extends StatefulWidget {
   final GradeService? _gradeService;
   final ClassroomService? _classroomService;
   final ClassroomExerciseService? _assignmentService;
-  final QuizService? _quizService;
+  final ExamService? _examService;
   final NotificationListService? _notificationService;
   final Stream<Object?>? _notificationMessages;
 
@@ -103,8 +103,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       widget._classroomService ?? context.read<ClassroomService>();
   late final ClassroomExerciseService _assignmentService =
       widget._assignmentService ?? context.read<ClassroomExerciseService>();
-  late final QuizService _quizService =
-      widget._quizService ?? context.read<QuizService>();
+  late final ExamService _examService =
+      widget._examService ?? context.read<ExamService>();
   late final NotificationListService _notificationService =
       widget._notificationService ?? context.read<NotificationListService>();
   late final DashboardTabFactory _tabFactory = context
@@ -336,7 +336,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               context.read<GradeService>(),
                           classroomService: _classroomService,
                           assignmentService: _assignmentService,
-                          quizService: _quizService,
+                          examService: _examService,
                           onLogout: _handleLogout,
                           onAddProfileFromPractice: () {
                             HapticFeedback.selectionClick();

@@ -9,21 +9,21 @@ extension ParentHomeNavigationActions on ParentHomeContentState {
     }
   }
 
-  void openParentAssessmentResult(GeneratedQuiz quiz) {
-    _openQuizReview(quiz);
+  void openParentAssessmentResult(GeneratedExam exam) {
+    _openExamReview(exam);
   }
 
   void openCompletionResult(HomeLayoutRecentCompletion completion) {
-    _openQuizReview(quizFromRecentCompletion(completion));
+    _openExamReview(examFromRecentCompletion(completion));
   }
 
-  void _openQuizReview(GeneratedQuiz quiz) {
-    final quizId = quiz.quizId ?? quiz.id;
-    if (quizId == null || quizId <= 0) {
+  void _openExamReview(GeneratedExam exam) {
+    final examId = exam.examId ?? exam.id;
+    if (examId == null || examId <= 0) {
       return;
     }
     HapticFeedback.selectionClick();
-    widget.onOpenQuizReview?.call(context, quiz);
+    widget.onOpenExamReview?.call(context, exam);
   }
 
   Future<void> showClassroomMessage() async {

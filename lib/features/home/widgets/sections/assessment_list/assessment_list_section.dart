@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/features/home/widgets/sections/assessment_list/home_assessment_result_card.dart';
-import 'package:numi/features/quiz/models/quiz.dart';
+import 'package:numi/features/exam/models/exam.dart';
 
 typedef AssessmentListItemWrapper =
     Widget Function(Widget child, int index, int itemCount);
@@ -16,8 +16,8 @@ class AssessmentListSection extends StatelessWidget {
     this.useCardShadow = false,
   });
 
-  final List<GeneratedQuiz> assessments;
-  final ValueChanged<GeneratedQuiz> onAssessmentTap;
+  final List<GeneratedExam> assessments;
+  final ValueChanged<GeneratedExam> onAssessmentTap;
   final int maxVisibleItems;
   final double spacing;
   final AssessmentListItemWrapper? itemWrapper;
@@ -35,7 +35,7 @@ class AssessmentListSection extends StatelessWidget {
         for (final entry in visibleAssessments.indexed)
           _wrapItem(
             HomeAssessmentResultCard(
-              quiz: entry.$2,
+              exam: entry.$2,
               onTap: () => onAssessmentTap(entry.$2),
               useCardShadow: useCardShadow,
             ),

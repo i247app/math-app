@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+import 'package:numi/features/exam/widgets/shared/exam_header_icon_button.dart';
 
 class StudentClassroomExerciseAttemptHeader extends StatelessWidget {
   const StudentClassroomExerciseAttemptHeader({
@@ -42,7 +42,7 @@ class StudentClassroomExerciseAttemptHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              QuizHeaderIconButton(
+              ExamHeaderIconButton(
                 icon: Icons.close_rounded,
                 color: colors.brandStrong,
                 circle: true,
@@ -65,7 +65,7 @@ class StudentClassroomExerciseAttemptHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              QuizHeaderIconButton(
+              ExamHeaderIconButton(
                 icon: Icons.help_outline_rounded,
                 color: colors.brandStrong,
                 circle: true,

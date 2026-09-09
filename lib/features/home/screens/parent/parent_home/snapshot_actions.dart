@@ -10,7 +10,7 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
           ? null
           : widget.user?.id;
       final result = await loadCompletedParentAssessments(
-        quizService: widget.quizService,
+        examService: widget.examService,
         profileId: profileId,
         userId: userId,
         page: 1,
@@ -22,7 +22,7 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
         return;
       }
 
-      final assessments = result.allQuizzes;
+      final assessments = result.allExams;
       final layout = homeLayout;
       _updateState(() {
         _lastAppliedAssessmentLoadRequestId = requestId;
@@ -31,8 +31,8 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
           childSummaries = _studentSummariesFromLayout(layout, assessments);
         }
       });
-      widget.quizSnapshotStore.seedList(
-        quizzes: assessments,
+      widget.examSnapshotStore.seedList(
+        exams: assessments,
         userId: userId,
         profileId: profileId,
       );
@@ -70,7 +70,7 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
 
   List<ParentChildSummary> _studentSummariesFromLayout(
     HomeLayout layout,
-    List<GeneratedQuiz> assessments,
+    List<GeneratedExam> assessments,
   ) {
     final profile = layout.profile ?? widget.activeProfile;
     if (profile == null) {

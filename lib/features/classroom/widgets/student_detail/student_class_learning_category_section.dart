@@ -61,9 +61,9 @@ class StudentClassLearningCategorySection extends StatelessWidget {
               ),
               StudentClassCategoryTile(
                 backgroundColor: const Color(0xFFFDF4EE),
-                iconAsset: 'assets/icons/student-class-quiz.svg',
-                title: context.getText(AppKeys.studentClassQuizzes),
-                subtitle: context.getText(AppKeys.studentClassQuizzesSubtitle),
+                iconAsset: 'assets/icons/student-class-exam.svg',
+                title: context.getText(AppKeys.studentClassExams),
+                subtitle: context.getText(AppKeys.studentClassExamsSubtitle),
               ),
               StudentClassCategoryTile(
                 backgroundColor: const Color(0xFFF0F4FF),

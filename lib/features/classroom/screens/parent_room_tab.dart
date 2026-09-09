@@ -15,7 +15,7 @@ import 'package:numi/features/home/data/home_layout_exception.dart';
 import 'package:numi/features/home/data/parent_home_snapshot.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/shared/layouts/page_header.dart';
-import 'package:numi/features/quiz/screens/quiz_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/settings/screens/setting_tab.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/helpers/home_layout_helpers.dart';
@@ -179,7 +179,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         ParentHomeSnapshot(
           profileId: profileId,
           homeLayout: layout,
-          completedAssessments: quizzesFromLayoutQuizzes(layout.quizzes),
+          completedAssessments: examsFromLayoutExams(layout.exams),
           cachedAt: DateTime.now(),
         ),
       );
@@ -418,15 +418,15 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
   }
 
   void _openCompletionResult(HomeLayoutRecentCompletion completion) {
-    final quiz = quizFromRecentCompletion(completion);
-    final quizId = quiz.quizId ?? quiz.id;
-    if (quizId == null || quizId <= 0) {
+    final exam = examFromRecentCompletion(completion);
+    final examId = exam.examId ?? exam.id;
+    if (examId == null || examId <= 0) {
       return;
     }
     HapticFeedback.selectionClick();
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
+        builder: (_) => ExamReviewScreen(examId: examId, initialExam: exam),
       ),
     );
   }

@@ -13,7 +13,7 @@ class HomeLayout {
     this.subProfiles = const <StudentProfile>[],
     this.tasks = const <HomeLayoutTask>[],
     this.messages = const <HomeLayoutMessage>[],
-    this.quizzes = const <HomeLayoutQuiz>[],
+    this.exams = const <HomeLayoutExam>[],
   });
 
   final String? role;
@@ -25,7 +25,7 @@ class HomeLayout {
   final List<StudentProfile> subProfiles;
   final List<HomeLayoutTask> tasks;
   final List<HomeLayoutMessage> messages;
-  final List<HomeLayoutQuiz> quizzes;
+  final List<HomeLayoutExam> exams;
 }
 
 class HomeLayoutMessage {
@@ -46,29 +46,29 @@ class HomeLayoutMessage {
   final ClassroomModel? classroom;
 }
 
-class HomeLayoutQuiz {
-  const HomeLayoutQuiz({
-    this.quizId,
+class HomeLayoutExam {
+  const HomeLayoutExam({
+    this.examId,
     this.createDt,
     this.purpose,
-    this.quizStatus,
+    this.examStatus,
     this.scorePercentage,
     this.shortText,
     this.title,
     this.totalQuestions,
-    this.typeOfQuiz,
+    this.typeOfExam,
     this.correctNumber,
   });
 
-  final int? quizId;
+  final int? examId;
   final String? createDt;
   final String? purpose;
-  final String? quizStatus;
+  final String? examStatus;
   final int? scorePercentage;
   final String? shortText;
   final String? title;
   final int? totalQuestions;
-  final String? typeOfQuiz;
+  final String? typeOfExam;
   final int? correctNumber;
 }
 

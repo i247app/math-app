@@ -20,17 +20,17 @@ import 'package:numi/features/classroom_exercise/helpers/teacher_exercise_helper
 import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/quiz/data/quiz_snapshot_store.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
-import 'package:numi/features/quiz/screens/grade_selection_screen.dart';
-import 'package:numi/features/quiz/screens/quiz_review_entry_screen.dart';
-import 'package:numi/features/quiz/screens/parent_assessment_tab.dart';
+import 'package:numi/features/exam/data/exam_snapshot_store.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/screens/grade_selection_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/settings/screens/setting_tab.dart';
 
 class AppDashboardTabFactory implements DashboardTabFactory {
-  const AppDashboardTabFactory({required this.quizSnapshotStore});
+  const AppDashboardTabFactory({required this.examSnapshotStore});
 
-  final QuizSnapshotStore quizSnapshotStore;
+  final ExamSnapshotStore examSnapshotStore;
 
   @override
   Widget buildTab({
@@ -61,30 +61,30 @@ class AppDashboardTabFactory implements DashboardTabFactory {
         activeRefreshTick: args.activeRefreshTick,
         initialGrades: args.initialGrades,
         gradeService: args.gradeService,
-        quizService: args.quizService,
-        quizSnapshotStore: quizSnapshotStore,
+        examService: args.examService,
+        examSnapshotStore: examSnapshotStore,
         onOpenAssessment: (context) => Navigator.of(context).push<void>(
           MaterialPageRoute<void>(
             builder: (_) => GradeSelectionScreen(
               user: args.user,
               initialGrades: args.initialGrades,
               gradeService: args.gradeService,
-              quizPurpose: quizPurposeAssessment,
+              examPurpose: examPurposeAssessment,
               profileId: profileStableId(args.activeProfile),
               initialGradeId: profileGradeStableId(args.activeProfile),
               initialGradeLabel: args.activeProfile?.grade?.label,
             ),
           ),
         ),
-        onOpenQuizReview: (context, quiz) {
-          final quizId = quiz.quizId ?? quiz.id;
-          if (quizId == null || quizId <= 0) {
+        onOpenExamReview: (context, exam) {
+          final examId = exam.examId ?? exam.id;
+          if (examId == null || examId <= 0) {
             return Future<void>.value();
           }
           return Navigator.of(context).push<void>(
             MaterialPageRoute<void>(
               builder: (_) =>
-                  QuizReviewScreen(quizId: quizId, initialQuiz: quiz),
+                  ExamReviewScreen(examId: examId, initialExam: exam),
             ),
           );
         },
@@ -131,7 +131,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
         activeRefreshTick: args.activeRefreshTick,
         initialGrades: args.initialGrades,
         gradeService: args.gradeService,
-        quizService: args.quizService,
+        examService: args.examService,
         bottomPadding: args.bottomPadding,
         onOpenPracticeTab: args.onOpenPracticeTab,
         useActiveStudentProfileData: useActiveStudentProfileData,

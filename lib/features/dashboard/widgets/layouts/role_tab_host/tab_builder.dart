@@ -15,7 +15,7 @@ extension _RoleTabBuilder on RoleTabHostState {
       gradeService: widget.gradeService,
       classroomService: widget.classroomService,
       assignmentService: widget.assignmentService,
-      quizService: widget.quizService,
+      examService: widget.examService,
       onLogout: widget.onLogout,
       onAddProfileFromPractice: widget.onAddProfileFromPractice,
       onProfileSaved: widget.onProfileSaved,

@@ -16,7 +16,7 @@ import 'strings/notification_strings.dart';
 import 'strings/profile/profile_strings.dart';
 import 'strings/settings/settings_strings.dart';
 import 'strings/study/study_strings.dart';
-import 'strings/quiz/quiz_strings.dart';
+import 'strings/exam/exam_strings.dart';
 
 class AppStrings {
   static final Map<String, Map<String, String>> _localizedValues = {
@@ -38,7 +38,7 @@ class AppStrings {
       ...profileStrings['vi']!,
       ...settingsStrings['vi']!,
       ...studyStrings['vi']!,
-      ...quizStrings['vi']!,
+      ...examStrings['vi']!,
     },
     'en': {
       ...authStrings['en']!,
@@ -58,7 +58,7 @@ class AppStrings {
       ...profileStrings['en']!,
       ...settingsStrings['en']!,
       ...studyStrings['en']!,
-      ...quizStrings['en']!,
+      ...examStrings['en']!,
     },
   };
 

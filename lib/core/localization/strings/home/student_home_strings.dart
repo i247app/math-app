@@ -6,7 +6,7 @@ const studentHomeStrings = <String, Map<String, String>>{
     AppKeys.studentNoInvitationsMessage:
         'Lời mời lớp học mới sẽ xuất hiện tại đây.',
     AppKeys.studentClassroomExerciseReviewLabel: 'Bài Tập Ôn Luyện',
-    AppKeys.studentClassroomExercisePurposeQuiz: 'Kiểm Tra',
+    AppKeys.studentClassroomExercisePurposeExam: 'Kiểm Tra',
     AppKeys.studentClassroomExercisePurposeHomework: 'Bài Tập',
     AppKeys.student: 'HỌC SINH',
     AppKeys.yourAchievement: 'Thành tích của bạn',
@@ -22,7 +22,7 @@ const studentHomeStrings = <String, Map<String, String>>{
     AppKeys.studentNoInvitationsMessage:
         'New class invitations will appear here.',
     AppKeys.studentClassroomExerciseReviewLabel: 'Practice Homework',
-    AppKeys.studentClassroomExercisePurposeQuiz: 'Assessment',
+    AppKeys.studentClassroomExercisePurposeExam: 'Assessment',
     AppKeys.studentClassroomExercisePurposeHomework: 'Homework',
     AppKeys.student: 'STUDENT',
     AppKeys.yourAchievement: 'Your achievements',

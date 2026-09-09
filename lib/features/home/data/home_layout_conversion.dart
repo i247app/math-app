@@ -12,7 +12,7 @@ extension HomeLayoutDtoConversion on HomeLayoutDto {
     subProfiles: subProfiles,
     tasks: tasks.map((task) => task.toModel()).toList(),
     messages: messages.map((message) => message.toModel()).toList(),
-    quizzes: quizzes.map((quiz) => quiz.toModel()).toList(),
+    exams: exams.map((exam) => exam.toModel()).toList(),
   );
 }
 
@@ -27,17 +27,17 @@ extension HomeLayoutMessageDtoConversion on HomeLayoutMessageDto {
   );
 }
 
-extension HomeLayoutQuizDtoConversion on HomeLayoutQuizDto {
-  HomeLayoutQuiz toModel() => HomeLayoutQuiz(
-    quizId: quizId,
+extension HomeLayoutExamDtoConversion on HomeLayoutExamDto {
+  HomeLayoutExam toModel() => HomeLayoutExam(
+    examId: examId,
     createDt: createDt,
     purpose: purpose,
-    quizStatus: quizStatus,
+    examStatus: examStatus,
     scorePercentage: scorePercentage,
     shortText: shortText,
     title: title,
     totalQuestions: totalQuestions,
-    typeOfQuiz: typeOfQuiz,
+    typeOfExam: typeOfExam,
     correctNumber: correctNumber,
   );
 }

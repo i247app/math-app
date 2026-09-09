@@ -8,7 +8,7 @@ import 'package:numi/features/classroom/screens/parent_room_tab.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/layouts/page_header.dart';
@@ -103,7 +103,7 @@ void main() {
               activeRefreshTick: 0,
               initialGrades: const [],
               gradeService: _UnusedGradeService(),
-              quizService: _UnusedQuizService(),
+              examService: _UnusedExamService(),
               onRefreshProfiles: () async {},
               onActivateProfile: (_) async {},
               onProfileSaved: () {},
@@ -156,7 +156,7 @@ void main() {
               activeRefreshTick: 0,
               initialGrades: const [],
               gradeService: _UnusedGradeService(),
-              quizService: _UnusedQuizService(),
+              examService: _UnusedExamService(),
               onRefreshProfiles: () async {},
               onActivateProfile: (_) async {},
               onProfileSaved: () {},
@@ -182,7 +182,7 @@ class _UnusedGradeService implements GradeService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _UnusedQuizService implements QuizService {
+class _UnusedExamService implements ExamService {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

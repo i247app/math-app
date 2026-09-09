@@ -42,7 +42,7 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.historyLoadErrorTitle: 'Chưa tải được lịch sử',
     AppKeys.noHistoryTitle: 'Chưa có bài phù hợp',
     AppKeys.noHistoryMessage: 'Đổi từ khóa để xem các bài khác.',
-    AppKeys.missingQuizId: 'Bài kiểm tra này thiếu quiz_id.',
+    AppKeys.missingExamId: 'Bài kiểm tra này thiếu exam_id.',
     AppKeys.testAgain: 'Làm Lại',
     AppKeys.teacherStudyTitle: 'Học',
     AppKeys.teacherStudyAllClasses: 'Tất cả',
@@ -52,12 +52,12 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.teacherStudyShowMore: 'Xem thêm {count} bài',
     AppKeys.teacherStudyDueDate: 'Hạn nộp: {date}',
     AppKeys.teacherStudyMonth: 'TH{month}',
-    AppKeys.testAgainCreateMissingQuiz: 'Không tìm thấy bài test trước đó.',
+    AppKeys.testAgainCreateMissingExam: 'Không tìm thấy bài test trước đó.',
     AppKeys.testAgainCreateFailed: 'Không thể tạo bài mới. Vui lòng thử lại.',
     AppKeys.testAgainDialogTitle: 'Tạo bài mới thất bại',
     AppKeys.missingUserOrProfileForHistory:
         'Thiếu user hoặc profile để tải lịch sử.',
-    AppKeys.missingQuizIdShort: 'Thiếu quiz ID.',
+    AppKeys.missingExamIdShort: 'Thiếu exam ID.',
   },
   'en': {
     AppKeys.noChapterTitle: 'No chapters',
@@ -101,7 +101,7 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.historyLoadErrorTitle: 'Could not load history',
     AppKeys.noHistoryTitle: 'No matching items',
     AppKeys.noHistoryMessage: 'Change the keyword to view other items.',
-    AppKeys.missingQuizId: 'This test is missing quiz_id.',
+    AppKeys.missingExamId: 'This test is missing exam_id.',
     AppKeys.testAgain: 'Try Again',
     AppKeys.teacherStudyTitle: 'Study',
     AppKeys.teacherStudyAllClasses: 'All',
@@ -111,12 +111,12 @@ const studyStrings = <String, Map<String, String>>{
     AppKeys.teacherStudyShowMore: 'Show {count} more',
     AppKeys.teacherStudyDueDate: 'Due: {date}',
     AppKeys.teacherStudyMonth: 'M{month}',
-    AppKeys.testAgainCreateMissingQuiz: 'Could not find the previous test.',
+    AppKeys.testAgainCreateMissingExam: 'Could not find the previous test.',
     AppKeys.testAgainCreateFailed:
         'Could not create a new test. Please try again.',
     AppKeys.testAgainDialogTitle: 'New test failed',
     AppKeys.missingUserOrProfileForHistory:
         'Missing user or profile to load history.',
-    AppKeys.missingQuizIdShort: 'Missing quiz ID.',
+    AppKeys.missingExamIdShort: 'Missing exam ID.',
   },
 };

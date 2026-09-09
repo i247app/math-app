@@ -15,9 +15,9 @@ import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/data/profile_service.dart';
 import 'package:numi/features/profile/data/school_service.dart';
-import 'package:numi/features/quiz/data/quiz_shake_service.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
-import 'package:numi/features/quiz/data/quiz_snapshot_store.dart';
+import 'package:numi/features/exam/data/exam_shake_service.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_snapshot_store.dart';
 import 'package:numi/features/session/data/passcode_service.dart';
 import 'package:numi/features/session/data/profile_session_resolver.dart';
 
@@ -48,7 +48,7 @@ class AppServiceScope extends StatelessWidget {
         RepositoryProvider<ClassroomExerciseService>.value(
           value: services.classroomExerciseService,
         ),
-        RepositoryProvider<QuizService>.value(value: services.quizService),
+        RepositoryProvider<ExamService>.value(value: services.examService),
         RepositoryProvider<NotificationListService>.value(
           value: services.notificationService,
         ),
@@ -58,11 +58,11 @@ class AppServiceScope extends StatelessWidget {
         RepositoryProvider<HomeLayoutService>.value(
           value: services.homeLayoutService,
         ),
-        RepositoryProvider<QuizShakeService>.value(
-          value: services.quizShakeService,
+        RepositoryProvider<ExamShakeService>.value(
+          value: services.examShakeService,
         ),
-        RepositoryProvider<QuizSnapshotStore>.value(
-          value: services.quizSnapshotStore,
+        RepositoryProvider<ExamSnapshotStore>.value(
+          value: services.examSnapshotStore,
         ),
         RepositoryProvider<SessionDataCleaner>.value(
           value: services.sessionDataCleaner,

@@ -3,30 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_display_helpers.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_helpers.dart';
-import 'package:numi/features/quiz/models/quiz.dart';
+import 'package:numi/features/exam/helpers/parent_assessment_display_helpers.dart';
+import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
+import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
 
 class HomeAssessmentResultCard extends StatelessWidget {
   const HomeAssessmentResultCard({
     super.key,
-    required this.quiz,
+    required this.exam,
     required this.onTap,
     this.useCardShadow = false,
   });
 
-  final GeneratedQuiz quiz;
+  final GeneratedExam exam;
   final VoidCallback onTap;
   final bool useCardShadow;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final percent = quiz.grading?.scorePercentage;
+    final percent = exam.grading?.scorePercentage;
     final scoreStyle = parentAssessmentScoreStyle(context, percent);
-    final dateParts = parentAssessmentDateParts(quiz.createDt);
-    final shortText = homeQuizShortText(quiz);
+    final dateParts = parentAssessmentDateParts(exam.createDt);
+    final shortText = homeExamShortText(exam);
     final radius = BorderRadius.circular(24);
 
     return Material(
@@ -80,7 +80,7 @@ class HomeAssessmentResultCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 7),
                         child: Text(
-                          homeQuizTitle(context, quiz),
+                          homeExamTitle(context, exam),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

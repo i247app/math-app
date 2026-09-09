@@ -270,8 +270,7 @@ String roomExerciseTitle(BuildContext context, ClassroomExercise? exercise) {
 
 String roomPurposeLabel(BuildContext context, String? purpose) {
   final normalized = purpose?.trim().toUpperCase();
-  if (normalized == classroomExercisePurposeQuiz ||
-      normalized == classroomExercisePurposeExam) {
+  if (normalized == classroomExercisePurposeExam) {
     return context.getText(AppKeys.test);
   }
   return context.getText(AppKeys.studentClassroomExercise);
@@ -279,8 +278,7 @@ String roomPurposeLabel(BuildContext context, String? purpose) {
 
 ({Color color, Color badge}) roomPurposeAccent(String? purpose) {
   final normalized = purpose?.trim().toUpperCase();
-  if (normalized == classroomExercisePurposeQuiz ||
-      normalized == classroomExercisePurposeExam) {
+  if (normalized == classroomExercisePurposeExam) {
     return (color: const Color(0xFFBD1C21), badge: const Color(0xFFFFDDE6));
   }
   return (color: const Color(0xFF147A8F), badge: const Color(0xFFDDF4F8));
@@ -289,8 +287,7 @@ String roomPurposeLabel(BuildContext context, String? purpose) {
 ({Color color, Color background, IconData icon, String? asset})
 roomPurposeListAccent(String? purpose) {
   final normalized = purpose?.trim().toUpperCase();
-  if (normalized == classroomExercisePurposeQuiz ||
-      normalized == classroomExercisePurposeExam) {
+  if (normalized == classroomExercisePurposeExam) {
     return (
       color: const Color(0xFFBD1C21),
       background: const Color(0xFFFFEFF1),

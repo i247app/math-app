@@ -1,7 +1,7 @@
-import 'package:numi/features/quiz/helpers/parent_assessment_helpers.dart';
+import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/classroom/models/classroom.dart';
 import 'package:numi/features/profile/models/profile.dart';
-import 'package:numi/features/quiz/models/quiz.dart';
+import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/home/models/home_layout.dart';
 import 'package:numi/features/home/helpers/home_layout_helpers.dart';
 import 'package:numi/features/home/models/parent/parent_child_summary.dart';
@@ -25,13 +25,13 @@ List<ParentChildSummary> summariesFromLayout(ParentHomeLayout? parent) {
       .map((child) {
         final childId = profileStableId(child);
         final classrooms = _classroomsForLayoutChild(parent, child);
-        final assessments = <GeneratedQuiz>[
+        final assessments = <GeneratedExam>[
           for (final completion
               in parent?.recentCompletions ??
                   const <HomeLayoutRecentCompletion>[])
             if (layoutChildId(completion.child) == childId)
-              quizFromRecentCompletion(completion),
-        ]..sort((a, b) => quizDate(b).compareTo(quizDate(a)));
+              examFromRecentCompletion(completion),
+        ]..sort((a, b) => examDate(b).compareTo(examDate(a)));
 
         return ParentChildSummary(
           profile: child,

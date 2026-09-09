@@ -7,8 +7,7 @@ import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart'
 
 String teacherExercisePurpose(ClassroomExercise exercise) {
   final purpose = exercise.purpose?.trim().toUpperCase();
-  if (purpose == classroomExercisePurposeExam ||
-      purpose == classroomExercisePurposeQuiz) {
+  if (purpose == classroomExercisePurposeExam) {
     return classroomExercisePurposeExam;
   }
   return classroomExercisePurposeHomework;

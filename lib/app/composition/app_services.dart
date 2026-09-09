@@ -24,12 +24,12 @@ import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/grade_api.dart';
 import 'package:numi/features/profile/data/profile_api.dart';
 import 'package:numi/features/profile/data/school_api.dart';
-import 'package:numi/features/quiz/data/quiz_shake_service.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
-import 'package:numi/features/quiz/data/ai_shake_service.dart';
-import 'package:numi/features/quiz/data/quiz_api.dart';
-import 'package:numi/features/quiz/data/quiz_snapshot_store.dart';
-import 'package:numi/features/quiz/data/cached_quiz_snapshot_store.dart';
+import 'package:numi/features/exam/data/exam_shake_service.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/ai_shake_service.dart';
+import 'package:numi/features/exam/data/exam_api.dart';
+import 'package:numi/features/exam/data/exam_snapshot_store.dart';
+import 'package:numi/features/exam/data/cached_exam_snapshot_store.dart';
 import 'package:numi/features/session/data/passcode_service.dart';
 import 'package:numi/features/session/data/profile_session_resolver.dart';
 
@@ -46,12 +46,12 @@ class AppServices {
     SchoolService? schoolService,
     ClassroomService? classroomService,
     ClassroomExerciseService? classroomExerciseService,
-    QuizService? quizService,
+    ExamService? examService,
     NotificationListService? notificationService,
     NotificationPingService? notificationPingService,
     HomeLayoutService? homeLayoutService,
-    QuizShakeService? quizShakeService,
-    QuizSnapshotStore quizSnapshotStore = const CachedQuizSnapshotStore(),
+    ExamShakeService? examShakeService,
+    ExamSnapshotStore examSnapshotStore = const CachedExamSnapshotStore(),
     SessionDataCleaner sessionDataCleaner = const AppSessionDataCleaner(),
     DashboardTabFactory? dashboardTabFactory,
     DashboardNavigator dashboardNavigator = const AppDashboardNavigator(),
@@ -61,7 +61,7 @@ class AppServices {
     final client = networkClient ?? NetworkClient.shared;
     final profiles = profileService ?? ProfileApi(networkClient: client);
 
-    final quizSnapshots = quizSnapshotStore;
+    final examSnapshots = examSnapshotStore;
     return AppServices._(
       networkClient: client,
       authService: authService ?? AuthApi(networkClient: client),
@@ -72,7 +72,7 @@ class AppServices {
       classroomExerciseService:
           classroomExerciseService ??
           ClassroomExerciseApi(networkClient: client),
-      quizService: quizService ?? QuizApi(networkClient: client),
+      examService: examService ?? ExamApi(networkClient: client),
       notificationService:
           notificationService ?? NotificationApi(networkClient: client),
       notificationPingService:
@@ -80,12 +80,12 @@ class AppServices {
           ApiNotificationPingService(networkClient: client),
       homeLayoutService:
           homeLayoutService ?? HomeLayoutApi(networkClient: client),
-      quizShakeService:
-          quizShakeService ?? AIShakeService(networkClient: client),
-      quizSnapshotStore: quizSnapshotStore,
+      examShakeService:
+          examShakeService ?? AIShakeService(networkClient: client),
+      examSnapshotStore: examSnapshotStore,
       dashboardTabFactory:
           dashboardTabFactory ??
-          AppDashboardTabFactory(quizSnapshotStore: quizSnapshots),
+          AppDashboardTabFactory(examSnapshotStore: examSnapshots),
       dashboardNavigator: dashboardNavigator,
       sessionDataCleaner: sessionDataCleaner,
       activeProfileSession: activeProfileSession,
@@ -105,12 +105,12 @@ class AppServices {
     required this.schoolService,
     required this.classroomService,
     required this.classroomExerciseService,
-    required this.quizService,
+    required this.examService,
     required this.notificationService,
     required this.notificationPingService,
     required this.homeLayoutService,
-    required this.quizShakeService,
-    required this.quizSnapshotStore,
+    required this.examShakeService,
+    required this.examSnapshotStore,
     required this.sessionDataCleaner,
     required this.dashboardTabFactory,
     required this.dashboardNavigator,
@@ -126,12 +126,12 @@ class AppServices {
   final SchoolService schoolService;
   final ClassroomService classroomService;
   final ClassroomExerciseService classroomExerciseService;
-  final QuizService quizService;
+  final ExamService examService;
   final NotificationListService notificationService;
   final NotificationPingService notificationPingService;
   final HomeLayoutService homeLayoutService;
-  final QuizShakeService quizShakeService;
-  final QuizSnapshotStore quizSnapshotStore;
+  final ExamShakeService examShakeService;
+  final ExamSnapshotStore examSnapshotStore;
   final SessionDataCleaner sessionDataCleaner;
   final DashboardTabFactory dashboardTabFactory;
   final DashboardNavigator dashboardNavigator;

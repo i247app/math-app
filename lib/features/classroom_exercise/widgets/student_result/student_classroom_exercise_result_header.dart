@@ -5,7 +5,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom_exercise/widgets/student_result/student_classroom_exercise_result_helpers.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/quiz/widgets/shared/quiz_header_icon_button.dart';
+import 'package:numi/features/exam/widgets/shared/exam_header_icon_button.dart';
 
 class StudentClassroomExerciseResultHeader extends StatelessWidget {
   const StudentClassroomExerciseResultHeader({super.key});
@@ -31,7 +31,7 @@ class StudentClassroomExerciseResultHeader extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: QuizHeaderIconButton(
+            child: ExamHeaderIconButton(
               icon: Icons.arrow_back_rounded,
               color: colors.brandStrong,
               size: 40,

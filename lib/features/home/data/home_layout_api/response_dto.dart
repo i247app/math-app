@@ -39,7 +39,7 @@ class HomeLayoutDto {
     this.subProfiles = const <StudentProfile>[],
     this.tasks = const <HomeLayoutTaskDto>[],
     this.messages = const <HomeLayoutMessageDto>[],
-    this.quizzes = const <HomeLayoutQuizDto>[],
+    this.exams = const <HomeLayoutExamDto>[],
   });
 
   final String? role;
@@ -51,7 +51,7 @@ class HomeLayoutDto {
   final List<StudentProfile> subProfiles;
   final List<HomeLayoutTaskDto> tasks;
   final List<HomeLayoutMessageDto> messages;
-  final List<HomeLayoutQuizDto> quizzes;
+  final List<HomeLayoutExamDto> exams;
 
   factory HomeLayoutDto.fromJson(Map<String, dynamic> json) {
     final rooms = _listFromJson(json['rooms'], HomeLayoutClassroomDto.fromJson);
@@ -90,7 +90,7 @@ class HomeLayoutDto {
       subProfiles: subProfiles,
       tasks: tasks,
       messages: _listFromJson(json['messages'], HomeLayoutMessageDto.fromJson),
-      quizzes: _listFromJson(json['quizzes'], HomeLayoutQuizDto.fromJson),
+      exams: _listFromJson(json['exams'], HomeLayoutExamDto.fromJson),
     );
   }
 }
@@ -131,42 +131,42 @@ class HomeLayoutMessageDto {
   }
 }
 
-class HomeLayoutQuizDto {
-  const HomeLayoutQuizDto({
-    this.quizId,
+class HomeLayoutExamDto {
+  const HomeLayoutExamDto({
+    this.examId,
     this.createDt,
     this.purpose,
-    this.quizStatus,
+    this.examStatus,
     this.scorePercentage,
     this.shortText,
     this.title,
     this.totalQuestions,
-    this.typeOfQuiz,
+    this.typeOfExam,
     this.correctNumber,
   });
 
-  final int? quizId;
+  final int? examId;
   final String? createDt;
   final String? purpose;
-  final String? quizStatus;
+  final String? examStatus;
   final int? scorePercentage;
   final String? shortText;
   final String? title;
   final int? totalQuestions;
-  final String? typeOfQuiz;
+  final String? typeOfExam;
   final int? correctNumber;
 
-  factory HomeLayoutQuizDto.fromJson(Map<String, dynamic> json) {
-    return HomeLayoutQuizDto(
-      quizId: _intFromJson(json['quiz_id']),
+  factory HomeLayoutExamDto.fromJson(Map<String, dynamic> json) {
+    return HomeLayoutExamDto(
+      examId: _intFromJson(json['exam_id']),
       createDt: _stringFromJson(json['create_dt']),
       purpose: _stringFromJson(json['purpose']),
-      quizStatus: _stringFromJson(json['quiz_status']),
+      examStatus: _stringFromJson(json['exam_status']),
       scorePercentage: _intFromJson(json['score_percentage']),
       shortText: _stringFromJson(json['short_text']),
       title: _stringFromJson(json['title']),
       totalQuestions: _intFromJson(json['total_questions']),
-      typeOfQuiz: _stringFromJson(json['type_of_quiz']),
+      typeOfExam: _stringFromJson(json['type_of_exam']),
       correctNumber: _intFromJson(json['correct_number']),
     );
   }

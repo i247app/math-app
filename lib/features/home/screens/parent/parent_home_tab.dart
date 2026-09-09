@@ -7,7 +7,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/models/grade.dart';
 import 'package:numi/features/profile/models/profile.dart';
-import 'package:numi/features/quiz/models/quiz.dart';
+import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -18,9 +18,9 @@ import 'package:numi/features/home/data/home_layout_exception.dart';
 import 'package:numi/features/home/helpers/home_layout_helpers.dart';
 import 'package:numi/features/home/data/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
-import 'package:numi/features/quiz/data/quiz_snapshot_store.dart';
-import 'package:numi/features/quiz/data/quiz_service.dart';
-import 'package:numi/features/quiz/helpers/parent_assessment_helpers.dart';
+import 'package:numi/features/exam/data/exam_snapshot_store.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/home/models/parent/parent_child_summary.dart';
 import 'package:numi/features/home/helpers/parent_home_helpers.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
@@ -50,7 +50,7 @@ class ParentHomeContent extends StatefulWidget {
     required this.activeRefreshTick,
     required this.initialGrades,
     required this.gradeService,
-    required this.quizService,
+    required this.examService,
     required this.onRefreshProfiles,
     required this.onActivateProfile,
     required this.onProfileSaved,
@@ -63,9 +63,9 @@ class ParentHomeContent extends StatefulWidget {
     this.onChildProfileDialogShown,
     this.homeHeader,
     this.useActiveStudentProfileData = false,
-    this.quizSnapshotStore = const NoopQuizSnapshotStore(),
+    this.examSnapshotStore = const NoopExamSnapshotStore(),
     this.onOpenAssessment,
-    this.onOpenQuizReview,
+    this.onOpenExamReview,
     this.onCreateStudentProfile,
   });
 
@@ -76,7 +76,7 @@ class ParentHomeContent extends StatefulWidget {
   final int activeRefreshTick;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
-  final QuizService quizService;
+  final ExamService examService;
   final Future<void> Function() onRefreshProfiles;
   final Future<void> Function(StudentProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
@@ -89,10 +89,10 @@ class ParentHomeContent extends StatefulWidget {
   final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
   final bool useActiveStudentProfileData;
-  final QuizSnapshotStore quizSnapshotStore;
+  final ExamSnapshotStore examSnapshotStore;
   final Future<void> Function(BuildContext context)? onOpenAssessment;
-  final Future<void> Function(BuildContext context, GeneratedQuiz quiz)?
-  onOpenQuizReview;
+  final Future<void> Function(BuildContext context, GeneratedExam exam)?
+  onOpenExamReview;
   final Future<void> Function(BuildContext context)? onCreateStudentProfile;
 
   @override
@@ -112,7 +112,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   bool hasLoadedHome = false;
   String? errorMessage;
   HomeLayout? homeLayout;
-  List<GeneratedQuiz> completedAssessments = const <GeneratedQuiz>[];
+  List<GeneratedExam> completedAssessments = const <GeneratedExam>[];
   List<ParentChildSummary> childSummaries = const <ParentChildSummary>[];
   int _childLoadRequestId = 0;
   int _assessmentLoadRequestId = 0;
@@ -196,7 +196,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         errorMessage = null;
         homeLayout = null;
         childSummaries = const <ParentChildSummary>[];
-        completedAssessments = const <GeneratedQuiz>[];
+        completedAssessments = const <GeneratedExam>[];
       });
       widget.onParentAssessmentStateChanged(false);
       return;
@@ -224,7 +224,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       errorMessage = null;
       if (!hadRenderableContent) {
         childSummaries = const <ParentChildSummary>[];
-        completedAssessments = const <GeneratedQuiz>[];
+        completedAssessments = const <GeneratedExam>[];
       }
     });
     if (!hadRenderableContent) {
@@ -240,7 +240,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         return;
       }
       final parent = layout.parent;
-      final layoutAssessments = quizzesFromLayoutQuizzes(layout.quizzes);
+      final layoutAssessments = examsFromLayoutExams(layout.exams);
       final completedAssessments =
           _lastAppliedAssessmentLoadRequestId >= assessmentRequestId
           ? this.completedAssessments
@@ -282,7 +282,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         errorMessage = error.message;
         homeLayout = null;
         childSummaries = const <ParentChildSummary>[];
-        completedAssessments = const <GeneratedQuiz>[];
+        completedAssessments = const <GeneratedExam>[];
       });
       widget.onParentAssessmentStateChanged(false);
     } catch (_) {
@@ -304,7 +304,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         errorMessage = context.readText(AppKeys.parentChildDashboardLoadFailed);
         homeLayout = null;
         childSummaries = const <ParentChildSummary>[];
-        completedAssessments = const <GeneratedQuiz>[];
+        completedAssessments = const <GeneratedExam>[];
       });
       widget.onParentAssessmentStateChanged(false);
     }
