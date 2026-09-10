@@ -43,6 +43,76 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     );
   }
 
+  Future<void> _openFakeAssessment() async {
+    HapticFeedback.lightImpact();
+    final assessmentTabRoute = ModalRoute.of(context);
+    final fakeExamService = FakeAssessmentExamService(
+      delegate: widget.examService,
+    );
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => AiAssessmentScreen(
+          examService: fakeExamService,
+          purpose: examPurposeAssessment,
+          typeOfExam: examTypeGeneral,
+          gradeLabel: widget.activeProfile?.grade?.label,
+          profileId: profileStableId(widget.activeProfile),
+          onResultBack: () {
+            if (!mounted) {
+              return;
+            }
+            final navigator = Navigator.of(context);
+            if (assessmentTabRoute == null) {
+              navigator.popUntil((route) => route.isFirst);
+              return;
+            }
+            navigator.popUntil((route) => identical(route, assessmentTabRoute));
+          },
+        ),
+      ),
+    );
+    if (mounted) {
+      await _loadAssessments(forceRefresh: true, page: 1);
+    }
+  }
+
+  Future<void> _openFakeAssessmentWithGradeSelection() async {
+    HapticFeedback.lightImpact();
+    final assessmentTabRoute = ModalRoute.of(context);
+    final fakeExamService = FakeAssessmentExamService(
+      delegate: widget.examService,
+    );
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => GradeSelectionScreen(
+          user: widget.user,
+          initialGrades: widget.initialGrades,
+          gradeService: widget.gradeService,
+          examService: fakeExamService,
+          examShakeService: const NoopExamShakeService(),
+          examPurpose: examPurposeAssessment,
+          profileId: profileStableId(widget.activeProfile),
+          initialGradeId: profileGradeStableId(widget.activeProfile),
+          initialGradeLabel: widget.activeProfile?.grade?.label,
+          onResultBack: () {
+            if (!mounted) {
+              return;
+            }
+            final navigator = Navigator.of(context);
+            if (assessmentTabRoute == null) {
+              navigator.popUntil((route) => route.isFirst);
+              return;
+            }
+            navigator.popUntil((route) => identical(route, assessmentTabRoute));
+          },
+        ),
+      ),
+    );
+    if (mounted) {
+      await _loadAssessments(forceRefresh: true, page: 1);
+    }
+  }
+
   Future<void> _openAssessment() async {
     HapticFeedback.lightImpact();
     final assessmentTabRoute = ModalRoute.of(context);

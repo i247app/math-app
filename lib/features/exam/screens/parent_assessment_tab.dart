@@ -14,7 +14,10 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
+import 'package:numi/features/exam/data/fake_assessment_exam_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_shake_service.dart';
+import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/learning_progress_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
@@ -43,7 +46,6 @@ class ParentAssessmentTab extends StatefulWidget {
     required this.gradeService,
     required this.examService,
     required this.bottomPadding,
-    this.onOpenPracticeTab,
     this.useActiveStudentProfileData = false,
   });
 
@@ -55,7 +57,6 @@ class ParentAssessmentTab extends StatefulWidget {
   final GradeService gradeService;
   final ExamService examService;
   final double bottomPadding;
-  final VoidCallback? onOpenPracticeTab;
   final bool useActiveStudentProfileData;
 
   @override

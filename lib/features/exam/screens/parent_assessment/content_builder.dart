@@ -17,8 +17,8 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
       return [
         _initialFadeIn(
           child: ParentAssessmentEmptyPoster(
-            onTap: _openAssessment,
-            onPracticeTap: widget.onOpenPracticeTab,
+            onTap: _openFakeAssessment,
+            onSecondaryTap: _openFakeAssessmentWithGradeSelection,
           ),
         ),
       ];

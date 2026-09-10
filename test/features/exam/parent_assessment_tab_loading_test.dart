@@ -9,7 +9,11 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
+import 'package:numi/features/exam/data/fake_assessment_exam_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_shake_service.dart';
+import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_empty_poster.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
@@ -68,6 +72,17 @@ void main() {
       find.image(const AssetImage(parentHomeAfterReviewBannerAsset)),
       findsOneWidget,
     );
+
+    await tester.tap(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+    );
+    await tester.pump();
+
+    expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    expect(find.byType(GradeSelectionScreen), findsNothing);
+
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(find.text('12 + 8 = ?'), findsOneWidget);
   });
 
   testWidgets('reloads assessments whenever the tab becomes active', (
@@ -111,6 +126,64 @@ void main() {
     await pumpAssessmentTab(isActive: true);
     await tester.pump();
     expect(examService.listPageCalls, 2);
+  });
+
+  testWidgets('second empty banner selects a grade before using fake data', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final examService = _CountingExamService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: ParentAssessmentTab(
+            user: const LoginUser(id: 981243),
+            activeProfile: null,
+            isActive: true,
+            activeRefreshTick: 0,
+            initialGrades: const <GradeModel>[
+              GradeModel(id: 3, label: 'Lớp 3', displayOrder: 3),
+            ],
+            gradeService: _FakeGradeService(),
+            examService: examService,
+            bottomPadding: 0,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final secondBanner = find.image(
+      const AssetImage(parentHomeAfterReviewBannerAsset),
+    );
+    await tester.ensureVisible(secondBanner);
+    await tester.pump();
+    await tester.tap(secondBanner);
+    await tester.pump();
+
+    expect(find.byType(GradeSelectionScreen), findsOneWidget);
+    final gradeSelection = tester.widget<GradeSelectionScreen>(
+      find.byType(GradeSelectionScreen),
+    );
+    expect(gradeSelection.examService, isA<FakeAssessmentExamService>());
+    expect(gradeSelection.examShakeService, isA<NoopExamShakeService>());
+
+    await tester.tap(
+      find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
+    );
+    await tester.tap(find.text('Tiếp tục'));
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('12 + 8 = ?'), findsOneWidget);
   });
 }
 

@@ -7,11 +7,11 @@ class ParentAssessmentEmptyPoster extends StatelessWidget {
   const ParentAssessmentEmptyPoster({
     super.key,
     required this.onTap,
-    this.onPracticeTap,
+    this.onSecondaryTap,
   });
 
   final VoidCallback onTap;
-  final VoidCallback? onPracticeTap;
+  final VoidCallback? onSecondaryTap;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class ParentAssessmentEmptyPoster extends StatelessWidget {
     final practiceBanner = _AssessmentEmptyBanner(
       assetPath: parentHomeAfterReviewBannerAsset,
       aspectRatio: 1280 / 854,
-      onTap: onPracticeTap,
+      onTap: onSecondaryTap,
     );
 
     return Column(spacing: 12, children: [assessmentBanner, practiceBanner]);
