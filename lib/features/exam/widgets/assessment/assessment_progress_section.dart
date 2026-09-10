@@ -16,7 +16,7 @@ class AssessmentProgressSection extends StatelessWidget {
   final int currentQuestion;
   final int totalQuestions;
   final Set<int> answeredQuestionIndexes;
-  final ValueChanged<int> onQuestionSelected;
+  final ValueChanged<int>? onQuestionSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +50,16 @@ class AssessmentProgressSection extends StatelessWidget {
             itemBuilder: (context, index) {
               final answered = answeredQuestionIndexes.contains(index);
               final isCurrent = index == currentQuestion - 1;
+              final canSelectQuestion = onQuestionSelected != null;
               return Semantics(
-                button: true,
+                button: canSelectQuestion,
                 selected: isCurrent,
                 label: '${index + 1}',
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => onQuestionSelected(index),
+                  onTap: canSelectQuestion
+                      ? () => onQuestionSelected!(index)
+                      : null,
                   child: SizedBox(
                     width: 42,
                     child: Column(

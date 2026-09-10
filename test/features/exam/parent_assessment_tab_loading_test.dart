@@ -79,6 +79,12 @@ void main() {
     await tester.pump();
 
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    expect(
+      tester
+          .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
+          .allowQuestionNavigation,
+      isFalse,
+    );
     expect(find.byType(GradeSelectionScreen), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 700));
@@ -182,6 +188,12 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
 
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    expect(
+      tester
+          .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
+          .allowQuestionNavigation,
+      isTrue,
+    );
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('12 + 8 = ?'), findsOneWidget);
   });

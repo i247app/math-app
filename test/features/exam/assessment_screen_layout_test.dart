@@ -178,12 +178,53 @@ void main() {
     expect(navigationState().position.pixels, closeTo(offsetBeforeSwitch, 0.5));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('can disable switching questions from the progress circles', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      allowQuestionNavigation: false,
+      questions: const <ExamQuestion>[
+        ExamQuestion(
+          questionName: 'First question',
+          questionNumber: 1,
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '1'),
+            ExamAnswer(label: 'B', content: '2'),
+          ],
+        ),
+        ExamQuestion(
+          questionName: 'Second question',
+          questionNumber: 2,
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '3'),
+            ExamAnswer(label: 'B', content: '4'),
+          ],
+        ),
+      ],
+    );
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AssessmentProgressSection),
+        matching: find.text('2'),
+      ),
+      warnIfMissed: false,
+    );
+    await tester.pump();
+
+    expect(find.text('First question'), findsOneWidget);
+    expect(find.text('Second question'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Future<void> _pumpAssessment(
   WidgetTester tester, {
   double bottomInset = 0,
   List<ExamQuestion>? questions,
+  bool allowQuestionNavigation = true,
 }) async {
   tester.view.physicalSize = const Size(430, 844);
   tester.view.devicePixelRatio = 1;
@@ -208,6 +249,7 @@ Future<void> _pumpAssessment(
           lingo: lingo,
           child: AiAssessmentScreen(
             examService: _UnusedExamService(),
+            allowQuestionNavigation: allowQuestionNavigation,
             initialExam: GeneratedExam(
               id: 1,
               questions:
