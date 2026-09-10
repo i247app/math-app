@@ -85,10 +85,26 @@ void main() {
           .allowQuestionNavigation,
       isFalse,
     );
+    expect(
+      tester
+          .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
+          .showQuestionNavigation,
+      isFalse,
+    );
     expect(find.byType(GradeSelectionScreen), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 700));
     expect(find.text('12 + 8 = ?'), findsOneWidget);
+    expect(
+      find.byKey(
+        const PageStorageKey<String>('assessment-question-navigation'),
+      ),
+      findsNothing,
+    );
+    final questionLabel = tester.widget<Text>(
+      find.byKey(const ValueKey('assessment-question-label')),
+    );
+    expect(questionLabel.data, isNot(contains('/')));
   });
 
   testWidgets('reloads assessments whenever the tab becomes active', (
@@ -195,6 +211,12 @@ void main() {
       tester
           .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
           .allowQuestionNavigation,
+      isTrue,
+    );
+    expect(
+      tester
+          .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
+          .showQuestionNavigation,
       isTrue,
     );
     await tester.pump(const Duration(milliseconds: 400));

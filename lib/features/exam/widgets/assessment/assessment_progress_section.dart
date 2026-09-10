@@ -12,11 +12,13 @@ class AssessmentProgressSection extends StatelessWidget {
     required this.totalQuestions,
     required this.answeredQuestionIndexes,
     required this.onQuestionSelected,
+    this.showQuestionNavigation = true,
   });
   final int currentQuestion;
   final int totalQuestions;
   final Set<int> answeredQuestionIndexes;
   final ValueChanged<int>? onQuestionSelected;
+  final bool showQuestionNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +28,15 @@ class AssessmentProgressSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          context.formatText(AppKeys.questionProgress, {
-            'current': currentQuestion,
-            'total': totalQuestions,
-          }),
+          showQuestionNavigation
+              ? context.formatText(AppKeys.questionProgress, {
+                  'current': currentQuestion,
+                  'total': totalQuestions,
+                })
+              : context.formatText(AppKeys.questionNumber, {
+                  'number': currentQuestion,
+                }),
+          key: const ValueKey('assessment-question-label'),
           style: TextStyle(
             color: colors.brandStrong,
             fontSize: FontSize.normal,
@@ -38,80 +45,84 @@ class AssessmentProgressSection extends StatelessWidget {
             letterSpacing: 0,
           ),
         ),
-        const SizedBox(height: 14),
-        SizedBox(
-          height: 66,
-          child: ListView.separated(
-            key: const PageStorageKey<String>('assessment-question-navigation'),
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: totalQuestions,
-            separatorBuilder: (_, index) => const SizedBox(width: 8),
-            itemBuilder: (context, index) {
-              final answered = answeredQuestionIndexes.contains(index);
-              final isCurrent = index == currentQuestion - 1;
-              final canSelectQuestion = onQuestionSelected != null;
-              return Semantics(
-                button: canSelectQuestion,
-                selected: isCurrent,
-                label: '${index + 1}',
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: canSelectQuestion
-                      ? () => onQuestionSelected!(index)
-                      : null,
-                  child: SizedBox(
-                    width: 42,
-                    child: Column(
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          curve: Curves.easeOutCubic,
-                          width: 42,
-                          height: 42,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: answered
-                                ? colors.brandStrong
-                                : colors.elevatedSurface,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colors.brandStrong,
-                              width: 2,
-                            ),
-                          ),
-                          child: Text(
-                            '${index + 1}',
-                            style: TextStyle(
+        if (showQuestionNavigation) ...[
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 66,
+            child: ListView.separated(
+              key: const PageStorageKey<String>(
+                'assessment-question-navigation',
+              ),
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: totalQuestions,
+              separatorBuilder: (_, index) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final answered = answeredQuestionIndexes.contains(index);
+                final isCurrent = index == currentQuestion - 1;
+                final canSelectQuestion = onQuestionSelected != null;
+                return Semantics(
+                  button: canSelectQuestion,
+                  selected: isCurrent,
+                  label: '${index + 1}',
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: canSelectQuestion
+                        ? () => onQuestionSelected!(index)
+                        : null,
+                    child: SizedBox(
+                      width: 42,
+                      child: Column(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            curve: Curves.easeOutCubic,
+                            width: 42,
+                            height: 42,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
                               color: answered
-                                  ? colors.onBrand
-                                  : colors.brandStrong,
-                              fontSize: FontSize.large,
-                              fontWeight: FontWeight.w700,
-                              height: 1,
+                                  ? colors.brandStrong
+                                  : colors.elevatedSurface,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: colors.brandStrong,
+                                width: 2,
+                              ),
+                            ),
+                            child: Text(
+                              '${index + 1}',
+                              style: TextStyle(
+                                color: answered
+                                    ? colors.onBrand
+                                    : colors.brandStrong,
+                                fontSize: FontSize.large,
+                                fontWeight: FontWeight.w700,
+                                height: 1,
+                              ),
                             ),
                           ),
-                        ),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 160),
-                          child: isCurrent
-                              ? Icon(
-                                  Icons.arrow_downward_rounded,
-                                  key: ValueKey('current-question-$index'),
-                                  color: colors.brandStrong,
-                                  size: 22,
-                                  weight: 700,
-                                )
-                              : const SizedBox(height: 22),
-                        ),
-                      ],
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 160),
+                            child: isCurrent
+                                ? Icon(
+                                    Icons.arrow_downward_rounded,
+                                    key: ValueKey('current-question-$index'),
+                                    color: colors.brandStrong,
+                                    size: 22,
+                                    weight: 700,
+                                  )
+                                : const SizedBox(height: 22),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
+        ],
       ],
     );
   }

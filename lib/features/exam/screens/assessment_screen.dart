@@ -33,6 +33,7 @@ class AiAssessmentScreen extends StatefulWidget {
     this.profileId,
     this.onResultBack,
     this.allowQuestionNavigation = true,
+    this.showQuestionNavigation = true,
   });
 
   final ExamService? examService;
@@ -44,6 +45,7 @@ class AiAssessmentScreen extends StatefulWidget {
   final int? profileId;
   final VoidCallback? onResultBack;
   final bool allowQuestionNavigation;
+  final bool showQuestionNavigation;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -145,6 +147,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     final profileId = widget.profileId;
     final onResultBack = widget.onResultBack;
     final allowQuestionNavigation = widget.allowQuestionNavigation;
+    final showQuestionNavigation = widget.showQuestionNavigation;
 
     navigator.pushReplacement(
       MaterialPageRoute<void>(
@@ -166,6 +169,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                     profileId: profileId,
                     onResultBack: onResultBack,
                     allowQuestionNavigation: allowQuestionNavigation,
+                    showQuestionNavigation: showQuestionNavigation,
                   ),
                 ),
               );
@@ -341,6 +345,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                               widget.allowQuestionNavigation
                                               ? goToQuestion
                                               : null,
+                                          showQuestionNavigation:
+                                              widget.showQuestionNavigation,
                                         ),
                                         const SizedBox(height: 16),
                                         AssessmentQuestionCard(

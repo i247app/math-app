@@ -55,6 +55,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
           gradeLabel: widget.activeProfile?.grade?.label,
           profileId: profileStableId(widget.activeProfile),
           allowQuestionNavigation: false,
+          showQuestionNavigation: false,
           onResultBack: () {
             if (!mounted) {
               return;
