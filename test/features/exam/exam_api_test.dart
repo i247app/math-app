@@ -47,7 +47,10 @@ void main() {
     expect(body, containsPair('grade', 2));
     expect(body, containsPair('level', 1));
     expect(body, isNot(contains('grade_label')));
+    expect(body, isNot(contains('purpose')));
+    expect(body, isNot(contains('type_of_exam')));
     expect(body, isNot(contains('previous_exam_id')));
+    expect(body, isNot(contains('chapters')));
     expect(exam.examId, 2);
     expect(exam.aiExamId, 7);
     expect(exam.questions.single.rightAnswer, 'A');

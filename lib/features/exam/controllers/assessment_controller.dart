@@ -42,19 +42,15 @@ class AssessmentController extends ChangeNotifier {
   AssessmentController({
     required ExamService examService,
     GeneratedExam? initialExam,
-    this.purpose = examPurposeAssessment,
-    this.typeOfExam = examTypeGeneral,
+    this.examType = examTypeAssessment,
     this.gradeLabel,
-    this.chapters,
     this.profileId,
   }) : _examService = examService,
        _exam = initialExam;
 
   final ExamService _examService;
-  final String purpose;
-  final String typeOfExam;
+  final String examType;
   final String? gradeLabel;
-  final List<String>? chapters;
   final int? profileId;
 
   GeneratedExam? _exam;
@@ -156,10 +152,8 @@ class AssessmentController extends ChangeNotifier {
 
     try {
       final generatedExam = await _examService.generateAssessmentExam(
-        purpose: purpose,
-        typeOfExam: typeOfExam,
+        examType: examType,
         gradeLabel: gradeLabel,
-        chapters: chapters,
         profileId: profileId,
       );
       if (requestId != _generateRequestId) {

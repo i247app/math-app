@@ -50,25 +50,23 @@ class HomeLayoutExam {
   const HomeLayoutExam({
     this.examId,
     this.createDt,
-    this.purpose,
+    this.examType,
     this.examStatus,
     this.scorePercentage,
     this.shortText,
     this.title,
     this.totalQuestions,
-    this.typeOfExam,
     this.correctNumber,
   });
 
   final int? examId;
   final String? createDt;
-  final String? purpose;
+  final String? examType;
   final String? examStatus;
   final int? scorePercentage;
   final String? shortText;
   final String? title;
   final int? totalQuestions;
-  final String? typeOfExam;
   final int? correctNumber;
 }
 

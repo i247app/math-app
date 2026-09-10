@@ -6,9 +6,9 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 
 bool isCompletedAssessment(GeneratedExam exam) {
-  final purpose = (exam.purpose ?? exam.type ?? '').trim().toUpperCase();
+  final examType = (exam.examType ?? '').trim().toUpperCase();
   final status = exam.examStatus?.trim().toUpperCase();
-  return purpose == examPurposeAssessment &&
+  return examType == examTypeAssessment &&
       (status == 'SUBMITTED' || exam.grading?.scorePercentage != null);
 }
 

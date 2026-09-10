@@ -57,45 +57,29 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
 
   Future<void> generateTestAgain() async {
     await generateAgain(
-      purpose: examPurposeAssessment,
-      typeOfExam: examTypeGeneral,
+      examType: examTypeAssessment,
       gradeLabel: widget.gradeLabel,
     );
   }
 
   Future<void> generatePracticeAgain() async {
-    final previousExamId = widget.exam?.examId;
-    if (previousExamId == null) {
-      HapticFeedback.selectionClick();
-      showTestAgainError(
-        AppStrings.current(AppKeys.testAgainCreateMissingExam),
-      );
-      return;
-    }
-
     await generateAgain(
-      purpose: examPurposePractice,
-      typeOfExam: examTypeReinforcement,
+      examType: examTypePractice,
       gradeLabel: widget.gradeLabel,
-      previousExamId: previousExamId,
     );
   }
 
   Future<void> generateAgain({
-    required String purpose,
-    required String typeOfExam,
+    required String examType,
     String? gradeLabel,
-    int? previousExamId,
   }) async {
     HapticFeedback.mediumImpact();
     setState(() => isGeneratingAgain = true);
 
     try {
       final generatedExam = await _examService.generateAssessmentExam(
-        purpose: purpose,
-        typeOfExam: typeOfExam,
+        examType: examType,
         gradeLabel: gradeLabel,
-        previousExamId: previousExamId,
         profileId: widget.profileId,
       );
       if (!mounted) {

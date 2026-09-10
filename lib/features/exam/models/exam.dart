@@ -30,7 +30,7 @@ class ExamProgressResponse {
     this.fromDt,
     this.toDt,
     this.limit,
-    this.purpose,
+    this.examType,
     this.series = const <ExamProgressPoint>[],
     this.summary,
     this.status,
@@ -44,7 +44,7 @@ class ExamProgressResponse {
   final DateTime? fromDt;
   final DateTime? toDt;
   final int? limit;
-  final String? purpose;
+  final String? examType;
   final List<ExamProgressPoint> series;
   final ExamProgressSummary? summary;
   final String? status;
@@ -62,10 +62,9 @@ class ExamProgressPoint {
     required this.scorePct,
     required this.sequence,
     required this.totalQuestions,
-    this.purpose,
+    this.examType,
     this.shortText,
     this.title,
-    this.typeOfExam,
     this.grade,
     this.level,
   });
@@ -77,10 +76,9 @@ class ExamProgressPoint {
   final double scorePct;
   final int sequence;
   final int totalQuestions;
-  final String? purpose;
+  final String? examType;
   final String? shortText;
   final String? title;
-  final String? typeOfExam;
   final int? grade;
   final int? level;
 }
@@ -135,12 +133,9 @@ class GeneratedExam {
   const GeneratedExam({
     this.id,
     this.examId,
-    this.previousExamId,
     this.profileId,
     this.examStatus,
-    this.purpose,
-    this.typeOfExam,
-    this.type,
+    this.examType,
     this.title,
     this.shortText,
     this.userId,
@@ -160,12 +155,9 @@ class GeneratedExam {
 
   final int? id;
   final int? examId;
-  final int? previousExamId;
   final int? profileId;
   final String? examStatus;
-  final String? purpose;
-  final String? typeOfExam;
-  final String? type;
+  final String? examType;
   final String? title;
   final String? shortText;
   final int? userId;

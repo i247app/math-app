@@ -26,10 +26,8 @@ class AiAssessmentScreen extends StatefulWidget {
     super.key,
     this.examService,
     this.initialExam,
-    this.purpose = examPurposeAssessment,
-    this.typeOfExam = examTypeGeneral,
+    this.examType = examTypeAssessment,
     this.gradeLabel,
-    this.chapters,
     this.profileId,
     this.onResultBack,
     this.allowQuestionNavigation = true,
@@ -38,10 +36,8 @@ class AiAssessmentScreen extends StatefulWidget {
 
   final ExamService? examService;
   final GeneratedExam? initialExam;
-  final String purpose;
-  final String typeOfExam;
+  final String examType;
   final String? gradeLabel;
-  final List<String>? chapters;
   final int? profileId;
   final VoidCallback? onResultBack;
   final bool allowQuestionNavigation;
@@ -62,10 +58,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     _controller = AssessmentController(
       examService: widget.examService ?? context.read<ExamService>(),
       initialExam: widget.initialExam,
-      purpose: widget.purpose,
-      typeOfExam: widget.typeOfExam,
+      examType: widget.examType,
       gradeLabel: widget.gradeLabel,
-      chapters: widget.chapters,
       profileId: widget.profileId,
     );
     if (widget.initialExam == null) {
@@ -141,8 +135,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
     final navigator = Navigator.of(context);
     final examService = _controller.examService;
-    final fallbackPurpose = widget.purpose;
-    final fallbackTypeOfExam = widget.typeOfExam;
+    final fallbackExamType = widget.examType;
     final gradeLabel = widget.gradeLabel;
     final profileId = widget.profileId;
     final onResultBack = widget.onResultBack;
@@ -163,8 +156,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                   builder: (_) => AiAssessmentScreen(
                     examService: examService,
                     initialExam: generatedExam,
-                    purpose: generatedExam.purpose ?? fallbackPurpose,
-                    typeOfExam: generatedExam.typeOfExam ?? fallbackTypeOfExam,
+                    examType: generatedExam.examType ?? fallbackExamType,
                     gradeLabel: gradeLabel,
                     profileId: profileId,
                     onResultBack: onResultBack,

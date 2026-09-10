@@ -30,13 +30,13 @@ void main() {
     addTearDown(lingo.dispose);
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-        ),
-        home: LingoScope(
-          lingo: lingo,
-          child: ParentAssessmentTab(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: ParentAssessmentTab(
             user: const LoginUser(id: 981243),
             activeProfile: null,
             isActive: true,
@@ -76,7 +76,7 @@ void main() {
     await tester.tap(
       find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
     expect(
@@ -116,13 +116,13 @@ void main() {
 
     Future<void> pumpAssessmentTab({required bool isActive}) {
       return tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData(
-            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-          ),
-          home: LingoScope(
-            lingo: lingo,
-            child: ParentAssessmentTab(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: ParentAssessmentTab(
               user: const LoginUser(id: 981243),
               activeProfile: null,
               isActive: isActive,
@@ -158,15 +158,15 @@ void main() {
     addTearDown(lingo.dispose);
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-        ),
-        home: RepositoryProvider<ExamShakeService>.value(
-          value: const _TestExamShakeService(),
-          child: LingoScope(
-            lingo: lingo,
-            child: ParentAssessmentTab(
+      RepositoryProvider<ExamShakeService>.value(
+        value: const _TestExamShakeService(),
+        child: LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: ParentAssessmentTab(
               user: const LoginUser(id: 981243),
               activeProfile: null,
               isActive: true,
@@ -191,7 +191,7 @@ void main() {
     await tester.ensureVisible(secondBanner);
     await tester.pump();
     await tester.tap(secondBanner);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.byType(GradeSelectionScreen), findsOneWidget);
     final gradeSelection = tester.widget<GradeSelectionScreen>(
@@ -204,7 +204,7 @@ void main() {
       find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
     );
     await tester.tap(find.text('Tiếp tục'));
-    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
 
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
     expect(
@@ -233,11 +233,8 @@ class _PendingExamService implements ExamService {
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
-    String purpose = examPurposeAssessment,
-    String typeOfExam = examTypeGeneral,
+    String examType = examTypeAssessment,
     String? gradeLabel,
-    int? previousExamId,
-    List<String>? chapters,
     int? profileId,
   }) async => _testExam;
 
@@ -259,11 +256,8 @@ class _CountingExamService implements ExamService {
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
-    String purpose = examPurposeAssessment,
-    String typeOfExam = examTypeGeneral,
+    String examType = examTypeAssessment,
     String? gradeLabel,
-    int? previousExamId,
-    List<String>? chapters,
     int? profileId,
   }) async => _testExam;
 

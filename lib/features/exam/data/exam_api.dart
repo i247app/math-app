@@ -19,11 +19,8 @@ class ExamApi implements ExamService, ExamStatsService {
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
-    String purpose = examPurposeAssessment,
-    String typeOfExam = examTypeGeneral,
+    String examType = examTypeAssessment,
     String? gradeLabel,
-    int? previousExamId,
-    List<String>? chapters,
     int? profileId,
   }) async {
     final validProfileId = _requireProfileId(profileId);
@@ -33,7 +30,7 @@ class ExamApi implements ExamService, ExamStatsService {
         GenerateExamRequest(
           profileId: validProfileId,
           numQuestions: 10,
-          examType: purpose,
+          examType: examType,
           grade: _gradeFromLabel(gradeLabel),
           level: 1,
         ),
@@ -122,7 +119,7 @@ class ExamApi implements ExamService, ExamStatsService {
           profileId: profileId,
           fromDt: fromDt.toUtc(),
           toDt: toDt.toUtc(),
-          examType: examPurposeAssessment,
+          examType: examTypeAssessment,
         ),
       ),
     ).then((response) => response.toModel());
@@ -145,7 +142,7 @@ class ExamApi implements ExamService, ExamStatsService {
           page: page,
           size: size,
           takeAll: takeAll,
-          examType: examPurposeAssessment,
+          examType: examTypeAssessment,
         ),
       ),
     );
@@ -188,7 +185,7 @@ class ExamApi implements ExamService, ExamStatsService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examPurposeAssessment,
+    String examType = examTypeAssessment,
   }) async {
     final response = await _runExamRequest(
       () => _getExamStatsResponse(

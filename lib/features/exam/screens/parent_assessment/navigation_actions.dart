@@ -50,8 +50,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       MaterialPageRoute<void>(
         builder: (_) => AiAssessmentScreen(
           examService: widget.examService,
-          purpose: examPurposeAssessment,
-          typeOfExam: examTypeGeneral,
+          examType: examTypeAssessment,
           gradeLabel: widget.activeProfile?.grade?.label,
           profileId: profileStableId(widget.activeProfile),
           allowQuestionNavigation: false,
@@ -85,7 +84,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
           initialGrades: widget.initialGrades,
           gradeService: widget.gradeService,
           examService: widget.examService,
-          examPurpose: examPurposeAssessment,
+          examType: examTypeAssessment,
           profileId: profileStableId(widget.activeProfile),
           initialGradeId: profileGradeStableId(widget.activeProfile),
           initialGradeLabel: widget.activeProfile?.grade?.label,
@@ -117,7 +116,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
           user: widget.user,
           initialGrades: widget.initialGrades,
           gradeService: widget.gradeService,
-          examPurpose: examPurposeAssessment,
+          examType: examTypeAssessment,
           profileId: profileStableId(widget.activeProfile),
           initialGradeId: profileGradeStableId(widget.activeProfile),
           initialGradeLabel: widget.activeProfile?.grade?.label,

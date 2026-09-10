@@ -102,7 +102,7 @@ class _RecordingExamService implements ExamService {
     return const <GeneratedExam>[
       GeneratedExam(
         examId: 991,
-        purpose: examPurposeAssessment,
+        examType: examTypeAssessment,
         examStatus: 'SUBMITTED',
         questions: <ExamQuestion>[],
       ),
@@ -123,7 +123,7 @@ class _RecordingExamService implements ExamService {
       exams: <GeneratedExam>[
         GeneratedExam(
           examId: 991,
-          purpose: examPurposeAssessment,
+          examType: examTypeAssessment,
           examStatus: 'SUBMITTED',
           questions: <ExamQuestion>[],
         ),

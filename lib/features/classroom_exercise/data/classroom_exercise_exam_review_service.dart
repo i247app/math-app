@@ -38,7 +38,7 @@ class ClassroomExerciseExamReviewService {
       id: null,
       examId: null,
       profileId: exercise.profileId,
-      purpose: exercise.purpose,
+      examType: exercise.purpose,
       title: exercise.title,
       shortText: exercise.shortText ?? exercise.description,
       createDt: exercise.createDt,

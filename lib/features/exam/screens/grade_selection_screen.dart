@@ -30,7 +30,7 @@ class GradeSelectionScreen extends StatefulWidget {
     this.gradeService,
     this.examService,
     this.examShakeService,
-    this.examPurpose = examPurposeAssessment,
+    this.examType = examTypeAssessment,
     this.profileId,
     this.initialGradeId,
     this.initialGradeLabel,
@@ -42,7 +42,7 @@ class GradeSelectionScreen extends StatefulWidget {
   final GradeService? gradeService;
   final ExamService? examService;
   final ExamShakeService? examShakeService;
-  final String examPurpose;
+  final String examType;
   final int? profileId;
   final int? initialGradeId;
   final String? initialGradeLabel;
@@ -66,7 +66,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
     _gradeService = widget.gradeService ?? context.read<GradeService>();
     grades = widget.initialGrades;
     selectedGradeLabel = _initialSelectedGradeLabel(grades);
-    if (widget.examPurpose == examPurposeAssessment) {
+    if (widget.examType == examTypeAssessment) {
       unawaited(
         (widget.examShakeService ?? context.read<ExamShakeService>()).aiShake(),
       );
@@ -138,8 +138,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
       MaterialPageRoute<AiAssessmentResult>(
         builder: (_) => AiAssessmentScreen(
           examService: widget.examService,
-          purpose: widget.examPurpose,
-          typeOfExam: examTypeGeneral,
+          examType: widget.examType,
           gradeLabel: gradeLabel,
           profileId: widget.profileId,
           onResultBack: widget.onResultBack,
@@ -167,7 +166,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
       grades,
       preferredGradeId: widget.initialGradeId,
       preferredGradeLabel: widget.initialGradeLabel,
-      fallbackToFirst: widget.examPurpose != examPurposeAssessment,
+      fallbackToFirst: widget.examType != examTypeAssessment,
     );
   }
 
@@ -178,7 +177,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
 
   void continueWithSelectedGrade() {
     final gradeLabel = selectedGradeLabel?.trim() ?? '';
-    if (gradeLabel.isEmpty && widget.examPurpose != examPurposeAssessment) {
+    if (gradeLabel.isEmpty && widget.examType != examTypeAssessment) {
       HapticFeedback.selectionClick();
       return;
     }

@@ -31,13 +31,12 @@ extension HomeLayoutExamDtoConversion on HomeLayoutExamDto {
   HomeLayoutExam toModel() => HomeLayoutExam(
     examId: examId,
     createDt: createDt,
-    purpose: purpose,
+    examType: examType,
     examStatus: examStatus,
     scorePercentage: scorePercentage,
     shortText: shortText,
     title: title,
     totalQuestions: totalQuestions,
-    typeOfExam: typeOfExam,
     correctNumber: correctNumber,
   );
 }

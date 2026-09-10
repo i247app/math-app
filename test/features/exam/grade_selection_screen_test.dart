@@ -32,11 +32,8 @@ class _FailingExamService implements ExamService {
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
-    String purpose = examPurposeAssessment,
-    String typeOfExam = examTypeGeneral,
+    String examType = examTypeAssessment,
     String? gradeLabel,
-    int? previousExamId,
-    List<String>? chapters,
     int? profileId,
   }) {
     requestedGradeLabels.add(gradeLabel);
@@ -88,7 +85,7 @@ void main() {
             child: GradeSelectionScreen(
               initialGrades: grades,
               gradeService: _UnusedGradeService(),
-              examPurpose: examPurposePractice,
+              examType: examTypePractice,
             ),
           ),
         ),

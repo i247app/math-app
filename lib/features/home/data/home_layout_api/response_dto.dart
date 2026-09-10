@@ -135,38 +135,35 @@ class HomeLayoutExamDto {
   const HomeLayoutExamDto({
     this.examId,
     this.createDt,
-    this.purpose,
+    this.examType,
     this.examStatus,
     this.scorePercentage,
     this.shortText,
     this.title,
     this.totalQuestions,
-    this.typeOfExam,
     this.correctNumber,
   });
 
   final int? examId;
   final String? createDt;
-  final String? purpose;
+  final String? examType;
   final String? examStatus;
   final int? scorePercentage;
   final String? shortText;
   final String? title;
   final int? totalQuestions;
-  final String? typeOfExam;
   final int? correctNumber;
 
   factory HomeLayoutExamDto.fromJson(Map<String, dynamic> json) {
     return HomeLayoutExamDto(
       examId: _intFromJson(json['exam_id']),
       createDt: _stringFromJson(json['create_dt']),
-      purpose: _stringFromJson(json['purpose']),
+      examType: _stringFromJson(json['exam_type']),
       examStatus: _stringFromJson(json['exam_status']),
       scorePercentage: _intFromJson(json['score_percentage']),
       shortText: _stringFromJson(json['short_text']),
       title: _stringFromJson(json['title']),
       totalQuestions: _intFromJson(json['total_questions']),
-      typeOfExam: _stringFromJson(json['type_of_exam']),
       correctNumber: _intFromJson(json['correct_number']),
     );
   }

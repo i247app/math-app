@@ -1,18 +1,12 @@
 import 'package:numi/features/exam/models/exam.dart';
 
-const examPurposeAssessment = 'ASSESSMENT';
-const examPurposePractice = 'PRACTICE';
-const examTypeGeneral = 'GENERAL';
-const examTypeReinforcement = 'REINFORCEMENT';
-const assessmentExamType = examPurposeAssessment;
+const examTypeAssessment = 'ASSESSMENT';
+const examTypePractice = 'PRACTICE';
 
 abstract interface class ExamService {
   Future<GeneratedExam> generateAssessmentExam({
-    String purpose = examPurposeAssessment,
-    String typeOfExam = examTypeGeneral,
+    String examType = examTypeAssessment,
     String? gradeLabel,
-    int? previousExamId,
-    List<String>? chapters,
     int? profileId,
   });
 
@@ -44,6 +38,6 @@ abstract interface class ExamService {
 abstract interface class ExamStatsService {
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examPurposeAssessment,
+    String examType = examTypeAssessment,
   });
 }

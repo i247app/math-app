@@ -69,7 +69,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
               user: args.user,
               initialGrades: args.initialGrades,
               gradeService: args.gradeService,
-              examPurpose: examPurposeAssessment,
+              examType: examTypeAssessment,
               profileId: profileStableId(args.activeProfile),
               initialGradeId: profileGradeStableId(args.activeProfile),
               initialGradeLabel: args.activeProfile?.grade?.label,
