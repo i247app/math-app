@@ -87,6 +87,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   void selectAnswer(ExamAnswer answer) {
     HapticFeedback.selectionClick();
     _controller.selectAnswer(answer);
+    if (_controller.shouldAutoSubmitAssessment) {
+      submitCurrentExam();
+    }
   }
 
   void goToPreviousQuestion() {

@@ -124,9 +124,113 @@ void main() {
       expect(controller.isAnswerCorrect(answers.first), isNull);
     },
   );
+
+  test(
+    'submits only six answered questions after six correct assessments',
+    () async {
+      final service = _RecordingExamService();
+      final controller = AssessmentController(
+        examService: service,
+        initialExam: GeneratedExam(
+          examId: 77,
+          examType: examTypeAssessment,
+          questions: List<ExamQuestion>.generate(
+            10,
+            (index) => ExamQuestion(
+              questionName: 'Question ${index + 1}',
+              questionNumber: index + 1,
+              answers: answers,
+              rightAnswer: 'B',
+            ),
+          ),
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
+        controller.selectAnswer(answers.last);
+        if (index < assessmentCorrectAnswerTarget - 1) {
+          expect(controller.goToNextQuestion(), isTrue);
+        }
+      }
+
+      expect(controller.correctAnswerCount, assessmentCorrectAnswerTarget);
+      expect(controller.shouldAutoSubmitAssessment, isTrue);
+
+      final result = await controller.submitCurrentExam();
+
+      expect(result.status, AssessmentSubmitStatus.submitted);
+      expect(
+        service.submittedAnswers,
+        hasLength(assessmentCorrectAnswerTarget),
+      );
+      expect(
+        service.submittedAnswers!.map((answer) => answer.questionNumber),
+        orderedEquals(<int>[1, 2, 3, 4, 5, 6]),
+      );
+    },
+  );
+
+  test('practice exams still require every question to be answered', () async {
+    final service = _RecordingExamService();
+    final controller = AssessmentController(
+      examService: service,
+      examType: examTypePractice,
+      initialExam: GeneratedExam(
+        examId: 88,
+        examType: examTypePractice,
+        questions: List<ExamQuestion>.generate(
+          10,
+          (index) => ExamQuestion(
+            questionName: 'Question ${index + 1}',
+            questionNumber: index + 1,
+            answers: answers,
+            rightAnswer: 'B',
+          ),
+        ),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
+      controller.selectAnswer(answers.last);
+      if (index < assessmentCorrectAnswerTarget - 1) {
+        controller.goToNextQuestion();
+      }
+    }
+
+    expect(controller.shouldAutoSubmitAssessment, isFalse);
+    expect(
+      (await controller.submitCurrentExam()).status,
+      AssessmentSubmitStatus.unanswered,
+    );
+    expect(service.submittedAnswers, isNull);
+  });
 }
 
 class _UnusedExamService implements ExamService {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _RecordingExamService implements ExamService {
+  List<SubmitExamAnswer>? submittedAnswers;
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return GeneratedExam(
+      examId: examId,
+      examType: examTypeAssessment,
+      examStatus: 'SUBMITTED',
+      questions: const <ExamQuestion>[],
+    );
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

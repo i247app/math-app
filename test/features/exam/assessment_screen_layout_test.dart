@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
@@ -218,6 +222,47 @@ void main() {
     expect(find.text('Second question'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'assessment auto submits six answers immediately after the sixth correct answer',
+    (tester) async {
+      final service = _PendingSubmitExamService();
+      final questions = List<ExamQuestion>.generate(
+        10,
+        (index) => ExamQuestion(
+          questionName: 'Question ${index + 1}',
+          questionNumber: index + 1,
+          rightAnswer: 'A',
+          answers: const <ExamAnswer>[
+            ExamAnswer(label: 'A', content: 'Correct'),
+            ExamAnswer(label: 'B', content: 'Incorrect'),
+          ],
+        ),
+      );
+      await _pumpAssessment(tester, questions: questions, examService: service);
+
+      for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pump();
+        if (index < assessmentCorrectAnswerTarget - 1) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      expect(service.submitCalls, 1);
+      expect(
+        service.submittedAnswers,
+        hasLength(assessmentCorrectAnswerTarget),
+      );
+      expect(
+        service.submittedAnswers!.map((answer) => answer.questionNumber),
+        orderedEquals(<int>[1, 2, 3, 4, 5, 6]),
+      );
+      expect(find.byKey(const ValueKey('submit-loader')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
 
 Future<void> _pumpAssessment(
@@ -225,6 +270,7 @@ Future<void> _pumpAssessment(
   double bottomInset = 0,
   List<ExamQuestion>? questions,
   bool allowQuestionNavigation = true,
+  ExamService? examService,
 }) async {
   tester.view.physicalSize = const Size(430, 844);
   tester.view.devicePixelRatio = 1;
@@ -248,10 +294,12 @@ Future<void> _pumpAssessment(
         child: LingoScope(
           lingo: lingo,
           child: AiAssessmentScreen(
-            examService: _UnusedExamService(),
+            examService: examService ?? _UnusedExamService(),
             allowQuestionNavigation: allowQuestionNavigation,
             initialExam: GeneratedExam(
               id: 1,
+              examId: 1,
+              examType: examTypeAssessment,
               questions:
                   questions ??
                   const <ExamQuestion>[
@@ -274,4 +322,24 @@ Future<void> _pumpAssessment(
   );
 
   await tester.pump();
+}
+
+class _PendingSubmitExamService implements ExamService {
+  final Completer<GeneratedExam> _submitCompleter = Completer<GeneratedExam>();
+  int submitCalls = 0;
+  List<SubmitExamAnswer>? submittedAnswers;
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) {
+    submitCalls++;
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return _submitCompleter.future;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

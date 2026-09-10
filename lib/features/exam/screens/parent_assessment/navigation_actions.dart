@@ -106,36 +106,4 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       await _loadAssessments(forceRefresh: true, page: 1);
     }
   }
-
-  Future<void> _openAssessment() async {
-    HapticFeedback.lightImpact();
-    final assessmentTabRoute = ModalRoute.of(context);
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => GradeSelectionScreen(
-          user: widget.user,
-          initialGrades: widget.initialGrades,
-          gradeService: widget.gradeService,
-          examType: examTypeAssessment,
-          profileId: profileStableId(widget.activeProfile),
-          initialGradeId: profileGradeStableId(widget.activeProfile),
-          initialGradeLabel: widget.activeProfile?.grade?.label,
-          onResultBack: () {
-            if (!mounted) {
-              return;
-            }
-            final navigator = Navigator.of(context);
-            if (assessmentTabRoute == null) {
-              navigator.popUntil((route) => route.isFirst);
-              return;
-            }
-            navigator.popUntil((route) => identical(route, assessmentTabRoute));
-          },
-        ),
-      ),
-    );
-    if (mounted) {
-      await _loadAssessments(forceRefresh: true, page: 1);
-    }
-  }
 }

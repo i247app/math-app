@@ -150,6 +150,48 @@ void main() {
     expect(examService.listPageCalls, 2);
   });
 
+  testWidgets('populated assessment banner uses the direct assessment flow', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final examService = _PopulatedExamService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: ParentAssessmentTab(
+            user: const LoginUser(id: 981244),
+            activeProfile: null,
+            isActive: true,
+            activeRefreshTick: 0,
+            initialGrades: const <GradeModel>[],
+            gradeService: _FakeGradeService(),
+            examService: examService,
+            bottomPadding: 0,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
+    await tester.tap(find.byType(ParentAssessmentTabBanner));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(GradeSelectionScreen), findsNothing);
+    final assessment = tester.widget<AiAssessmentScreen>(
+      find.byType(AiAssessmentScreen),
+    );
+    expect(assessment.allowQuestionNavigation, isFalse);
+    expect(assessment.showQuestionNavigation, isFalse);
+  });
+
   testWidgets('second empty banner selects a grade before using API service', (
     tester,
   ) async {
@@ -275,6 +317,36 @@ class _CountingExamService implements ExamService {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _PopulatedExamService extends _CountingExamService {
+  @override
+  Future<ExamListResponse> listExamPage({
+    int? userId,
+    int? profileId,
+    required int page,
+    required int size,
+    bool takeAll = false,
+  }) async {
+    listPageCalls++;
+    return const ExamListResponse(
+      mstatus: 1,
+      exams: <GeneratedExam>[
+        GeneratedExam(
+          examId: 8001,
+          examType: examTypeAssessment,
+          examStatus: 'SUBMITTED',
+          createDt: '2026-09-10T20:35:00Z',
+          grading: ExamGrading(
+            correctNumber: 6,
+            scorePercentage: 60,
+            totalQuestions: 10,
+          ),
+          questions: <ExamQuestion>[],
+        ),
+      ],
+    );
+  }
 }
 
 class _FakeGradeService implements GradeService {

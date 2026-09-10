@@ -27,7 +27,7 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
     return [
       Padding(
         padding: const EdgeInsets.only(bottom: 13),
-        child: ParentAssessmentTabBanner(onTap: _openAssessment),
+        child: ParentAssessmentTabBanner(onTap: _openAssessmentDirectly),
       ),
       ParentAssessmentSearchField(controller: _searchController),
       if (shouldShowProgressChart) ...[

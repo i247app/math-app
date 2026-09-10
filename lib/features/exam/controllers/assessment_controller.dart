@@ -7,6 +7,8 @@ import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 
+const assessmentCorrectAnswerTarget = 6;
+
 enum AssessmentRetryAction { generate, submit }
 
 enum AssessmentSubmitStatus {
@@ -91,6 +93,34 @@ class AssessmentController extends ChangeNotifier {
     return questions.isNotEmpty && firstUnansweredQuestionIndex == null;
   }
 
+  int get correctAnswerCount {
+    final questions = _exam?.questions ?? const <ExamQuestion>[];
+    var count = 0;
+    for (final entry in _selectedAnswerLabels.entries) {
+      if (entry.key < 0 || entry.key >= questions.length) {
+        continue;
+      }
+      final question = questions[entry.key];
+      final selectedLabel = _normalizedAnswerValue(entry.value);
+      for (final answer in question.answers) {
+        if (_normalizedAnswerValue(answer.label) == selectedLabel &&
+            _isAnswerCorrect(question, answer) == true) {
+          count++;
+          break;
+        }
+      }
+    }
+    return count;
+  }
+
+  bool get shouldAutoSubmitAssessment {
+    final effectiveExamType = (_exam?.examType ?? examType)
+        .trim()
+        .toUpperCase();
+    return effectiveExamType == examTypeAssessment &&
+        correctAnswerCount >= assessmentCorrectAnswerTarget;
+  }
+
   bool? get isSelectedAnswerCorrect {
     final question = currentQuestion;
     final selectedLabel = selectedAnswerLabel;
@@ -113,6 +143,10 @@ class AssessmentController extends ChangeNotifier {
       return null;
     }
 
+    return _isAnswerCorrect(question, answer);
+  }
+
+  bool? _isAnswerCorrect(ExamQuestion question, ExamAnswer answer) {
     final correctValues = <String?>[
       question.rightAnswer,
       question.correctAnswer,
@@ -238,7 +272,7 @@ class AssessmentController extends ChangeNotifier {
     }
 
     final firstUnansweredIndex = _firstUnansweredIndex(questions);
-    if (firstUnansweredIndex != null) {
+    if (firstUnansweredIndex != null && !shouldAutoSubmitAssessment) {
       _questionIndex = firstUnansweredIndex;
       notifyListeners();
       return const AssessmentSubmitResult.unanswered();
@@ -246,10 +280,11 @@ class AssessmentController extends ChangeNotifier {
 
     final answers = <SubmitExamAnswer>[
       for (var index = 0; index < questions.length; index++)
-        SubmitExamAnswer(
-          questionNumber: questions[index].questionNumber,
-          label: _selectedAnswerLabels[index]!,
-        ),
+        if (_selectedAnswerLabels[index] case final label?)
+          SubmitExamAnswer(
+            questionNumber: questions[index].questionNumber,
+            label: label,
+          ),
     ];
 
     _errorMessage = null;
