@@ -43,16 +43,13 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     );
   }
 
-  Future<void> _openFakeAssessment() async {
+  Future<void> _openAssessmentDirectly() async {
     HapticFeedback.lightImpact();
     final assessmentTabRoute = ModalRoute.of(context);
-    final fakeExamService = FakeAssessmentExamService(
-      delegate: widget.examService,
-    );
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => AiAssessmentScreen(
-          examService: fakeExamService,
+          examService: widget.examService,
           purpose: examPurposeAssessment,
           typeOfExam: examTypeGeneral,
           gradeLabel: widget.activeProfile?.grade?.label,
@@ -77,20 +74,16 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     }
   }
 
-  Future<void> _openFakeAssessmentWithGradeSelection() async {
+  Future<void> _openAssessmentWithGradeSelection() async {
     HapticFeedback.lightImpact();
     final assessmentTabRoute = ModalRoute.of(context);
-    final fakeExamService = FakeAssessmentExamService(
-      delegate: widget.examService,
-    );
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => GradeSelectionScreen(
           user: widget.user,
           initialGrades: widget.initialGrades,
           gradeService: widget.gradeService,
-          examService: fakeExamService,
-          examShakeService: const NoopExamShakeService(),
+          examService: widget.examService,
           examPurpose: examPurposeAssessment,
           profileId: profileStableId(widget.activeProfile),
           initialGradeId: profileGradeStableId(widget.activeProfile),

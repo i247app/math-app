@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
@@ -9,7 +10,6 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
-import 'package:numi/features/exam/data/fake_assessment_exam_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_shake_service.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
@@ -134,7 +134,7 @@ void main() {
     expect(examService.listPageCalls, 2);
   });
 
-  testWidgets('second empty banner selects a grade before using fake data', (
+  testWidgets('second empty banner selects a grade before using API service', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -146,19 +146,22 @@ void main() {
         theme: ThemeData(
           extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
         ),
-        home: LingoScope(
-          lingo: lingo,
-          child: ParentAssessmentTab(
-            user: const LoginUser(id: 981243),
-            activeProfile: null,
-            isActive: true,
-            activeRefreshTick: 0,
-            initialGrades: const <GradeModel>[
-              GradeModel(id: 3, label: 'Lớp 3', displayOrder: 3),
-            ],
-            gradeService: _FakeGradeService(),
-            examService: examService,
-            bottomPadding: 0,
+        home: RepositoryProvider<ExamShakeService>.value(
+          value: const _TestExamShakeService(),
+          child: LingoScope(
+            lingo: lingo,
+            child: ParentAssessmentTab(
+              user: const LoginUser(id: 981243),
+              activeProfile: null,
+              isActive: true,
+              activeRefreshTick: 0,
+              initialGrades: const <GradeModel>[
+                GradeModel(id: 3, label: 'Lớp 3', displayOrder: 3),
+              ],
+              gradeService: _FakeGradeService(),
+              examService: examService,
+              bottomPadding: 0,
+            ),
           ),
         ),
       ),
@@ -178,8 +181,8 @@ void main() {
     final gradeSelection = tester.widget<GradeSelectionScreen>(
       find.byType(GradeSelectionScreen),
     );
-    expect(gradeSelection.examService, isA<FakeAssessmentExamService>());
-    expect(gradeSelection.examShakeService, isA<NoopExamShakeService>());
+    expect(gradeSelection.examService, same(examService));
+    expect(gradeSelection.examShakeService, isNull);
 
     await tester.tap(
       find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
@@ -207,6 +210,16 @@ class _PendingExamService implements ExamService {
   }
 
   @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String purpose = examPurposeAssessment,
+    String typeOfExam = examTypeGeneral,
+    String? gradeLabel,
+    int? previousExamId,
+    List<String>? chapters,
+    int? profileId,
+  }) async => _testExam;
+
+  @override
   Future<ExamListResponse> listExamPage({
     int? userId,
     int? profileId,
@@ -221,6 +234,16 @@ class _PendingExamService implements ExamService {
 
 class _CountingExamService implements ExamService {
   int listPageCalls = 0;
+
+  @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String purpose = examPurposeAssessment,
+    String typeOfExam = examTypeGeneral,
+    String? gradeLabel,
+    int? previousExamId,
+    List<String>? chapters,
+    int? profileId,
+  }) async => _testExam;
 
   @override
   Future<ExamListResponse> listExamPage({
@@ -243,3 +266,27 @@ class _FakeGradeService implements GradeService {
   Future<List<GradeModel>> listGrades({required int userId}) async =>
       const <GradeModel>[];
 }
+
+class _TestExamShakeService implements ExamShakeService {
+  const _TestExamShakeService();
+
+  @override
+  Future<void> aiShake() async {}
+}
+
+const _testExam = GeneratedExam(
+  examId: 7001,
+  questions: <ExamQuestion>[
+    ExamQuestion(
+      questionName: '12 + 8 = ?',
+      questionNumber: 1,
+      rightAnswer: 'C',
+      answers: <ExamAnswer>[
+        ExamAnswer(label: 'A', content: '18'),
+        ExamAnswer(label: 'B', content: '19'),
+        ExamAnswer(label: 'C', content: '20'),
+        ExamAnswer(label: 'D', content: '21'),
+      ],
+    ),
+  ],
+);
