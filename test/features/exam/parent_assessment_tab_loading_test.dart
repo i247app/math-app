@@ -20,9 +20,10 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_f
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_search_field.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_banner.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
+import 'package:numi/shared/widgets/app_back_button.dart';
 
 void main() {
-  testWidgets('shows only the full skeleton until the initial load settles', (
+  testWidgets('loads content with a skeleton only after the first banner tap', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -51,17 +52,9 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.byType(ParentAssessmentFullSkeleton), findsOneWidget);
-    expect(find.byType(ParentAssessmentTabBanner), findsNothing);
-    expect(find.byType(ParentAssessmentSearchField), findsNothing);
-    expect(find.byType(ParentAssessmentEmptyPoster), findsNothing);
-
-    examService.completeWithEmptyPage();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-
-    expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);
+    expect(examService.listPageCalls, 0);
     expect(find.byType(ParentAssessmentEmptyPoster), findsOneWidget);
+    expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);
     expect(find.byType(ParentAssessmentTabBanner), findsNothing);
     expect(find.byType(ParentAssessmentSearchField), findsNothing);
     expect(
@@ -76,6 +69,24 @@ void main() {
     await tester.tap(
       find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
     );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(examService.listPageCalls, 1);
+    expect(find.byType(ParentAssessmentFullSkeleton), findsOneWidget);
+    expect(find.byType(ParentAssessmentEmptyPoster), findsNothing);
+    expect(find.byType(ParentAssessmentTabBanner), findsNothing);
+
+    examService.completeWithEmptyPage();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);
+    expect(find.byType(ParentAssessmentEmptyPoster), findsNothing);
+    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
+    expect(find.byType(ParentAssessmentSearchField), findsOneWidget);
+
+    await tester.tap(find.byType(ParentAssessmentTabBanner));
     await tester.pumpAndSettle();
 
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
@@ -107,9 +118,7 @@ void main() {
     expect(questionLabel.data, isNot(contains('/')));
   });
 
-  testWidgets('reloads assessments whenever the tab becomes active', (
-    tester,
-  ) async {
+  testWidgets('loads assessments lazily on each content entry', (tester) async {
     final lingo = LingoProvider();
     final examService = _CountingExamService();
     addTearDown(lingo.dispose);
@@ -142,15 +151,29 @@ void main() {
 
     await pumpAssessmentTab(isActive: true);
     await tester.pump();
+    expect(examService.listPageCalls, 0);
+
+    await tester.tap(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+    );
+    await tester.pump();
     expect(examService.listPageCalls, 1);
+    await tester.pump(const Duration(milliseconds: 300));
 
     await pumpAssessmentTab(isActive: false);
     await pumpAssessmentTab(isActive: true);
     await tester.pump();
+    expect(examService.listPageCalls, 1);
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+    );
+    await tester.pump();
     expect(examService.listPageCalls, 2);
   });
 
-  testWidgets('populated assessment banner uses the direct assessment flow', (
+  testWidgets('populated assessment opens from the first landing banner', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -180,7 +203,34 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
+    expect(examService.listPageCalls, 0);
+
+    expect(find.byType(ParentAssessmentEmptyPoster), findsOneWidget);
+    expect(find.byType(ParentAssessmentTabBanner), findsNothing);
+    expect(find.byType(ParentAssessmentSearchField), findsNothing);
+
+    await tester.tap(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+    );
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey<String>('assessment-landing-view')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey<String>('assessment-content-view')),
+      findsOneWidget,
+    );
+
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(ParentAssessmentEmptyPoster), findsNothing);
     expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
+    expect(find.byType(ParentAssessmentSearchField), findsOneWidget);
+    expect(find.byType(AppBackButton), findsOneWidget);
+    expect(find.byType(AiAssessmentScreen), findsNothing);
+
     await tester.tap(find.byType(ParentAssessmentTabBanner));
     await tester.pumpAndSettle();
 
@@ -190,6 +240,57 @@ void main() {
     );
     expect(assessment.allowQuestionNavigation, isFalse);
     expect(assessment.showQuestionNavigation, isFalse);
+  });
+
+  testWidgets('back from populated content restores the two-banner landing', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final examService = _PopulatedExamService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: ParentAssessmentTab(
+            user: const LoginUser(id: 981244),
+            activeProfile: null,
+            isActive: true,
+            activeRefreshTick: 0,
+            initialGrades: const <GradeModel>[],
+            gradeService: _FakeGradeService(),
+            examService: examService,
+            bottomPadding: 0,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byType(AppBackButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(ParentAssessmentEmptyPoster), findsOneWidget);
+    expect(find.byType(ParentAssessmentTabBanner), findsNothing);
+    expect(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+      findsOneWidget,
+    );
+    expect(
+      find.image(const AssetImage(parentHomeAfterReviewBannerAsset)),
+      findsOneWidget,
+    );
   });
 
   testWidgets('second empty banner selects a grade before using API service', (
@@ -235,6 +336,7 @@ void main() {
     await tester.tap(secondBanner);
     await tester.pumpAndSettle();
 
+    expect(examService.listPageCalls, 0);
     expect(find.byType(GradeSelectionScreen), findsOneWidget);
     final gradeSelection = tester.widget<GradeSelectionScreen>(
       find.byType(GradeSelectionScreen),
@@ -268,6 +370,7 @@ void main() {
 
 class _PendingExamService implements ExamService {
   final _pageCompleter = Completer<ExamListResponse>();
+  int listPageCalls = 0;
 
   void completeWithEmptyPage() {
     _pageCompleter.complete(const ExamListResponse(mstatus: 1));
@@ -287,7 +390,10 @@ class _PendingExamService implements ExamService {
     required int page,
     required int size,
     bool takeAll = false,
-  }) => _pageCompleter.future;
+  }) {
+    listPageCalls++;
+    return _pageCompleter.future;
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

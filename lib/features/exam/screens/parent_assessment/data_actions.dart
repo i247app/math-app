@@ -1,21 +1,6 @@
 part of '../parent_assessment_tab.dart';
 
 extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
-  void _scheduleActivationLoad() {
-    if (_isActivationLoadScheduled) {
-      return;
-    }
-
-    _isActivationLoadScheduled = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _isActivationLoadScheduled = false;
-      if (!mounted || !widget.isActive) {
-        return;
-      }
-      _loadAssessments();
-    });
-  }
-
   String _profileSourceKey(
     LoginUser? user,
     StudentProfile? activeProfile,

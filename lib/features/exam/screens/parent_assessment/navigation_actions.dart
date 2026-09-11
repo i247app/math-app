@@ -1,6 +1,39 @@
 part of '../parent_assessment_tab.dart';
 
 extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
+  void _showAssessmentContentAndLoad() {
+    if (_showAssessmentContent) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    _updateState(() {
+      _showAssessmentContent = true;
+      _isLoading = true;
+      _hasLoaded = false;
+      _errorMessage = null;
+    });
+    _resetAssessmentScrollAfterBuild();
+    unawaited(_loadAssessments(forceRefresh: true, page: 1));
+  }
+
+  void _showAssessmentLanding() {
+    if (!_showAssessmentContent) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    _updateState(() => _showAssessmentContent = false);
+    _resetAssessmentScrollAfterBuild();
+  }
+
+  void _resetAssessmentScrollAfterBuild() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) {
+        return;
+      }
+      _scrollController.jumpTo(0);
+    });
+  }
+
   List<ParentAssessmentEntry> get _filteredEntries {
     final query = _searchController.text.trim().toLowerCase();
     if (query.isEmpty) {
@@ -69,7 +102,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         ),
       ),
     );
-    if (mounted) {
+    if (mounted && _showAssessmentContent) {
       await _loadAssessments(forceRefresh: true, page: 1);
     }
   }
@@ -102,7 +135,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         ),
       ),
     );
-    if (mounted) {
+    if (mounted && _showAssessmentContent) {
       await _loadAssessments(forceRefresh: true, page: 1);
     }
   }

@@ -1,27 +1,34 @@
 part of '../parent_assessment_tab.dart';
 
 extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
+  Widget _buildAssessmentViewTransition(
+    Widget child,
+    Animation<double> animation,
+  ) {
+    return FadeTransition(opacity: animation, child: child);
+  }
+
   List<Widget> _buildAssessmentChildren({
     required List<ParentAssessmentEntry> entries,
-    required bool hasNoAssessments,
     required bool shouldShowFullSkeleton,
+    required bool showAssessmentLanding,
   }) {
     final colors = context.themeColors;
     final shouldShowProgressChart = _allEntries.length > 1;
 
-    if (shouldShowFullSkeleton) {
-      return const [ParentAssessmentFullSkeleton()];
-    }
-
-    if (hasNoAssessments) {
+    if (showAssessmentLanding) {
       return [
         _initialFadeIn(
           child: ParentAssessmentEmptyPoster(
-            onTap: _openAssessmentDirectly,
+            onTap: _showAssessmentContentAndLoad,
             onSecondaryTap: _openAssessmentWithGradeSelection,
           ),
         ),
       ];
+    }
+
+    if (shouldShowFullSkeleton) {
+      return const [ParentAssessmentFullSkeleton()];
     }
 
     return [
