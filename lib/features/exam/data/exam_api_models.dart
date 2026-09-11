@@ -261,6 +261,7 @@ class ExamStatsDto {
     required this.skippedNumber,
     required this.totalQuestions,
     this.examType,
+    this.userExamId,
     this.grade,
     this.level,
     this.lastSubmittedDt,
@@ -273,6 +274,8 @@ class ExamStatsDto {
   final int skippedNumber;
   final int totalQuestions;
   final String? examType;
+  @JsonKey(fromJson: _intFromJson)
+  final int? userExamId;
   final int? grade;
   final int? level;
   final DateTime? lastSubmittedDt;

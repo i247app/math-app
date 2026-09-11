@@ -389,6 +389,7 @@ Future<void> _pumpAssessment(
             initialExam: GeneratedExam(
               id: 1,
               examId: 1,
+              aiExamId: 7,
               examType: examType,
               grade: initialGrade,
               questions:

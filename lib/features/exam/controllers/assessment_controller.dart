@@ -161,6 +161,18 @@ class AssessmentController extends ChangeNotifier {
   }
 
   int get correctAnswerCount => _currentSetScore.correctCount;
+  int get totalCorrectAnswerCount =>
+      _completedSets.fold<int>(
+        0,
+        (total, set) => total + set.correctAnswerCount,
+      ) +
+      correctAnswerCount;
+  int get totalAnsweredQuestionCount =>
+      _completedSets.fold<int>(
+        0,
+        (total, set) => total + set.selectedAnswerLabels.length,
+      ) +
+      _selectedAnswerLabels.length;
 
   bool get shouldAutoSubmitAssessment => _allowsPartialSubmit;
 
@@ -395,8 +407,12 @@ class AssessmentController extends ChangeNotifier {
     try {
       final submittedExam = await _submitSet(currentExam, answers);
       if (_isAssessment) {
+        final userExamId = submittedExam.userExamId;
+        if (userExamId == null || userExamId <= 0) {
+          throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
+        }
         await _examService.updateUserExamStatus(
-          userExamId: currentExam.userAiExamId ?? examId,
+          userExamId: userExamId,
           status: 'COMPLETE',
           profileId: profileId ?? currentExam.profileId,
         );

@@ -169,9 +169,15 @@ void main() {
       expect(controller.questionIndex, 0);
       expect(controller.completedSets, hasLength(1));
       expect(controller.completedSets.single.correctAnswerCount, 6);
+      expect(controller.totalCorrectAnswerCount, 6);
+      expect(controller.totalAnsweredQuestionCount, 6);
       expect(service.generatedGradeLabels, <String?>['Lớp 2']);
       expect(service.submittedAnswers, hasLength(6));
       expect(service.statusUpdates, isEmpty);
+
+      controller.selectAnswer(answers.first);
+      expect(controller.totalCorrectAnswerCount, 6);
+      expect(controller.totalAnsweredQuestionCount, 7);
     },
   );
 
@@ -229,7 +235,7 @@ void main() {
     );
     expect(service.generatedGradeLabels, isEmpty);
     expect(service.submittedAnswers, hasLength(6));
-    expect(service.statusUpdates, <(int, String)>[(88, 'COMPLETE')]);
+    expect(service.statusUpdates, <(int, String)>[(9088, 'COMPLETE')]);
   });
 
   test('practice exams still require every question to be answered', () async {
@@ -306,6 +312,7 @@ class _RecordingExamService implements ExamService {
     submittedAnswers = List<SubmitExamAnswer>.from(answers);
     return GeneratedExam(
       examId: examId,
+      userExamId: 9000 + examId,
       examType: examTypeAssessment,
       examStatus: 'SUBMITTED',
       questions: const <ExamQuestion>[],
@@ -328,6 +335,7 @@ class _RecordingExamService implements ExamService {
 GeneratedExam _tenQuestionExam({required int examId, required int grade}) {
   return GeneratedExam(
     examId: examId,
+    aiExamId: 7000 + examId,
     examType: examTypeAssessment,
     grade: grade,
     questions: List<ExamQuestion>.generate(

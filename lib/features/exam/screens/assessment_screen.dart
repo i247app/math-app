@@ -10,7 +10,8 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
-import 'package:numi/features/exam/screens/assessment_result_screen.dart';
+import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_grid.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_error_state.dart';
@@ -174,20 +175,41 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     final navigator = Navigator.of(context);
     final examService = _controller.examService;
     final fallbackExamType = widget.examType;
+    final finalGrade = _controller.currentGrade;
     final gradeLabel = _controller.currentGradeLabel;
+    final correctAnswers = _controller.totalCorrectAnswerCount;
+    final totalQuestions = _controller.totalAnsweredQuestionCount;
     final profileId = widget.profileId;
     final onResultBack = widget.onResultBack;
     final allowQuestionNavigation = widget.allowQuestionNavigation;
     final showQuestionNavigation = widget.showQuestionNavigation;
+    final submittedExam = result.exam!;
+    final submittedExamId = submittedExam.examId ?? submittedExam.userAiExamId;
 
     navigator.pushReplacement(
       MaterialPageRoute<void>(
         builder: (resultContext) {
-          return AssessmentResultScreen(
-            exam: result.exam,
+          return AssessmentPlacementResultScreen(
+            grade: finalGrade,
+            correctAnswers: correctAnswers,
+            totalQuestions: totalQuestions,
             examService: examService,
-            gradeLabel: gradeLabel,
             profileId: profileId,
+            onViewDetails: submittedExamId == null
+                ? null
+                : () {
+                    Navigator.of(resultContext).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => RepositoryProvider<ExamService>.value(
+                          value: examService,
+                          child: ExamReviewScreen(
+                            examId: submittedExamId,
+                            initialExam: submittedExam,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
             onTestAgainGenerated: (generatedExam) {
               Navigator.of(resultContext).pushReplacement(
                 MaterialPageRoute<void>(

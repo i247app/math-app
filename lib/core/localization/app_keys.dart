@@ -807,6 +807,15 @@ class AppKeys {
   static const excellentResultMessage = 'excellent_result_message';
   static const generatingNewExam = 'generating_new_exam';
   static const assessmentResultTitle = 'assessment_result_title';
+  static const placementResultCongratulations =
+      'placement_result_congratulations';
+  static const placementResultLevel = 'placement_result_level';
+  static const placementResultKindergarten = 'placement_result_kindergarten';
+  static const placementResultGrade = 'placement_result_grade';
+  static const placementResultCorrectSummary =
+      'placement_result_correct_summary';
+  static const placementResultViewDetails = 'placement_result_view_details';
+  static const placementResultPracticeAgain = 'placement_result_practice_again';
   static const scoreUpper = 'score_upper';
   static const numiAiReview = 'numi_ai_review';
   static const defaultAiReview = 'default_ai_review';

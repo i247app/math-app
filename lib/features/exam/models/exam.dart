@@ -143,6 +143,7 @@ class GeneratedExam {
     this.modifyDt,
     this.aiExamId,
     this.userAiExamId,
+    this.userExamId,
     this.grade,
     this.level,
     this.numQuestions,
@@ -165,6 +166,7 @@ class GeneratedExam {
   final String? modifyDt;
   final int? aiExamId;
   final int? userAiExamId;
+  final int? userExamId;
   final int? grade;
   final int? level;
   final int? numQuestions;
@@ -182,6 +184,7 @@ class ExamStats {
     required this.skippedNumber,
     required this.totalQuestions,
     this.examType,
+    this.userExamId,
     this.grade,
     this.level,
     this.lastSubmittedDt,
@@ -193,6 +196,7 @@ class ExamStats {
   final int skippedNumber;
   final int totalQuestions;
   final String? examType;
+  final int? userExamId;
   final int? grade;
   final int? level;
   final DateTime? lastSubmittedDt;

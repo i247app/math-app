@@ -50,6 +50,14 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.excellentResultMessage: '',
     AppKeys.generatingNewExam: 'đợi Numi tạo bài mới cho bạn nhé!',
     AppKeys.assessmentResultTitle: 'Kết Quả',
+    AppKeys.placementResultCongratulations: 'Chúc mừng!',
+    AppKeys.placementResultLevel: 'Bạn đạt trình độ',
+    AppKeys.placementResultKindergarten: 'MẪU GIÁO',
+    AppKeys.placementResultGrade: 'LỚP {grade}',
+    AppKeys.placementResultCorrectSummary:
+        'Bạn đã trả lời đúng {correct}/{total} câu hỏi',
+    AppKeys.placementResultViewDetails: 'Xem chi tiết',
+    AppKeys.placementResultPracticeAgain: 'Luyện tập lại',
     AppKeys.scoreUpper: 'ĐIỂM SỐ',
     AppKeys.numiAiReview: 'Numi AI nhận xét',
     AppKeys.defaultAiReview:
@@ -109,6 +117,14 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.excellentResultMessage: '',
     AppKeys.generatingNewExam: 'Numi is creating a new test...',
     AppKeys.assessmentResultTitle: 'Result',
+    AppKeys.placementResultCongratulations: 'Congratulations!',
+    AppKeys.placementResultLevel: 'Your level is',
+    AppKeys.placementResultKindergarten: 'KINDERGARTEN',
+    AppKeys.placementResultGrade: 'GRADE {grade}',
+    AppKeys.placementResultCorrectSummary:
+        'You answered {correct}/{total} questions correctly',
+    AppKeys.placementResultViewDetails: 'View details',
+    AppKeys.placementResultPracticeAgain: 'Practice again',
     AppKeys.scoreUpper: 'SCORE',
     AppKeys.numiAiReview: 'Numi AI review',
     AppKeys.defaultAiReview:

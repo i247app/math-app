@@ -98,6 +98,7 @@ void main() {
           },
         },
         'stats': <String, dynamic>{
+          'user_exam_id': 99,
           'correct_number': 13,
           'score_percentage': 65,
           'skipped_number': 0,
@@ -122,6 +123,7 @@ void main() {
     expect(body, isNot(contains('exam_id')));
     expect(exam.grading?.scorePercentage, 100);
     expect(exam.grading?.aiReview, 'Tiến bộ tốt.');
+    expect(exam.userExamId, 99);
     expect(exam.answers.single.label, 'A');
   });
 
@@ -134,14 +136,14 @@ void main() {
 
     await api.updateUserExamStatus(
       profileId: 21,
-      userExamId: 2,
+      userExamId: 99,
       status: 'COMPLETE',
     );
 
     final body = _body(captured);
     expect(captured.path, '/exams/update-user-exam-status');
     expect(body, containsPair('profile_id', 21));
-    expect(body, containsPair('user_exam_id', 2));
+    expect(body, containsPair('user_exam_id', 99));
     expect(body, containsPair('status', 'COMPLETE'));
   });
 
