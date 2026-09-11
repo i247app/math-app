@@ -32,6 +32,12 @@ abstract interface class ExamService {
     int? profileId,
   });
 
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  });
+
   Future<GeneratedExam> getExamDetail(int examId, {int? profileId});
 }
 

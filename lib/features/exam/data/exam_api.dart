@@ -4,6 +4,7 @@ import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_api_models.dart';
 import 'package:numi/features/exam/data/exam_conversion.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 
@@ -29,7 +30,7 @@ class ExamApi implements ExamService, ExamStatsService {
       () => _generateExam(
         GenerateExamRequest(
           profileId: validProfileId,
-          numQuestions: 10,
+          numQuestions: AssessmentFlowPolicy.generatedQuestionCount,
           examType: examType,
           grade: _gradeFromLabel(gradeLabel),
           level: 1,
@@ -73,6 +74,26 @@ class ExamApi implements ExamService, ExamStatsService {
       submittedAnswers: submittedAnswers,
       stats: response.stats,
     );
+  }
+
+  @override
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  }) async {
+    if (userExamId <= 0) {
+      throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
+    }
+    await _runExamRequest(() async {
+      final json = await _networkClient
+          .postJson('/exams/update-user-exam-status', <String, dynamic>{
+            'profile_id': _requireProfileId(profileId),
+            'user_exam_id': userExamId,
+            'status': status,
+          });
+      NetworkClient.throwForApiStatus(json);
+    });
   }
 
   @override
@@ -286,6 +307,5 @@ int _requireProfileId(int? profileId) {
 }
 
 int _gradeFromLabel(String? gradeLabel) {
-  final match = RegExp(r'\d+').firstMatch(gradeLabel?.trim() ?? '');
-  return int.tryParse(match?.group(0) ?? '') ?? 1;
+  return AssessmentFlowPolicy.gradeFromLabel(gradeLabel);
 }

@@ -57,7 +57,7 @@ void main() {
     expect(exam.questions.single.correctAnswer, '4');
   });
 
-  test('defaults an omitted grade to grade one', () async {
+  test('defaults an omitted assessment grade to kindergarten', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {
       captured = options;
@@ -66,7 +66,19 @@ void main() {
 
     await api.generateAssessmentExam(profileId: 21, gradeLabel: '   ');
 
-    expect(_body(captured), containsPair('grade', 1));
+    expect(_body(captured), containsPair('grade', 0));
+  });
+
+  test('maps the kindergarten label to grade zero', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return _examResponse();
+    });
+
+    await api.generateAssessmentExam(profileId: 21, gradeLabel: 'Mẫu giáo');
+
+    expect(_body(captured), containsPair('grade', 0));
   });
 
   test('submits answers by user_ai_exam_id and maps result stats', () async {
@@ -111,6 +123,26 @@ void main() {
     expect(exam.grading?.scorePercentage, 100);
     expect(exam.grading?.aiReview, 'Tiến bộ tốt.');
     expect(exam.answers.single.label, 'A');
+  });
+
+  test('updates the user exam status when assessment stops', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return const <String, dynamic>{'mstatus': 200, 'status': 'Success'};
+    });
+
+    await api.updateUserExamStatus(
+      profileId: 21,
+      userExamId: 2,
+      status: 'COMPLETE',
+    );
+
+    final body = _body(captured);
+    expect(captured.path, '/exams/update-user-exam-status');
+    expect(body, containsPair('profile_id', 21));
+    expect(body, containsPair('user_exam_id', 2));
+    expect(body, containsPair('status', 'COMPLETE'));
   });
 
   test('loads exam detail and maps selected answers from details', () async {

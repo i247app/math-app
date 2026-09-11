@@ -224,7 +224,7 @@ void main() {
   });
 
   testWidgets(
-    'assessment auto submits six answers immediately after the sixth correct answer',
+    'grade 5 assessment submits immediately after the sixth correct answer',
     (tester) async {
       final service = _PendingSubmitExamService();
       final questions = List<ExamQuestion>.generate(
@@ -239,7 +239,13 @@ void main() {
           ],
         ),
       );
-      await _pumpAssessment(tester, questions: questions, examService: service);
+      await _pumpAssessment(
+        tester,
+        questions: questions,
+        examService: service,
+        initialGrade: 5,
+        examType: examTypeAssessment,
+      );
 
       for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
         await tester.tap(find.byType(AssessmentAnswerButton).first);
@@ -263,6 +269,87 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets(
+    'shows question seven skeleton while generating the resolved next set',
+    (tester) async {
+      final service = _PendingGenerateExamService();
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Set 1'),
+        examService: service,
+        examType: examTypeAssessment,
+      );
+
+      for (var index = 0; index < 5; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pump();
+        if (index < 4) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      expect(service.generateCalls, 0);
+      expect(service.requestedGradeLabels, isEmpty);
+      expect(find.text('Set 1 - Question 5'), findsOneWidget);
+      expect(find.byKey(const ValueKey('question-loader')), findsNothing);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+      expect(find.text('Set 1 - Question 6'), findsOneWidget);
+
+      await tester.tap(find.byType(AssessmentAnswerButton).first);
+      await tester.pump();
+
+      expect(find.text('Set 1 - Question 6'), findsOneWidget);
+      expect(find.byKey(const ValueKey('question-loader')), findsNothing);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+
+      expect(service.generateCalls, 1);
+      expect(service.requestedGradeLabels, <String?>['Lớp 2']);
+      expect(service.submitCalls, 1);
+      expect(service.submittedAnswers, hasLength(6));
+      expect(
+        find.byKey(const ValueKey('assessment-question-skeleton')),
+        findsOneWidget,
+      );
+      expect(find.text('Set 1 - Question 6'), findsNothing);
+      expect(find.byKey(const ValueKey('question-loader')), findsNothing);
+      final loadingQuestionLabel = tester.widget<Text>(
+        find.byKey(const ValueKey('assessment-question-label')),
+      );
+      expect(loadingQuestionLabel.data, contains('7'));
+
+      service.completeNextSet();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Set 2 - Question 1'), findsOneWidget);
+      final questionLabel = tester.widget<Text>(
+        find.byKey(const ValueKey('assessment-question-label')),
+      );
+      expect(questionLabel.data, contains('7'));
+      expect(find.byKey(const ValueKey('question-loader')), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+}
+
+List<ExamQuestion> _setQuestions(String setName) {
+  return List<ExamQuestion>.generate(
+    10,
+    (index) => ExamQuestion(
+      questionName: '$setName - Question ${index + 1}',
+      questionNumber: index + 1,
+      rightAnswer: 'A',
+      answers: const <ExamAnswer>[
+        ExamAnswer(label: 'A', content: 'Correct'),
+        ExamAnswer(label: 'B', content: 'Incorrect'),
+      ],
+    ),
+  );
 }
 
 Future<void> _pumpAssessment(
@@ -271,6 +358,8 @@ Future<void> _pumpAssessment(
   List<ExamQuestion>? questions,
   bool allowQuestionNavigation = true,
   ExamService? examService,
+  int initialGrade = 0,
+  String examType = examTypePractice,
 }) async {
   tester.view.physicalSize = const Size(430, 844);
   tester.view.devicePixelRatio = 1;
@@ -295,11 +384,13 @@ Future<void> _pumpAssessment(
           lingo: lingo,
           child: AiAssessmentScreen(
             examService: examService ?? _UnusedExamService(),
+            examType: examType,
             allowQuestionNavigation: allowQuestionNavigation,
             initialExam: GeneratedExam(
               id: 1,
               examId: 1,
-              examType: examTypeAssessment,
+              examType: examType,
+              grade: initialGrade,
               questions:
                   questions ??
                   const <ExamQuestion>[
@@ -338,6 +429,55 @@ class _PendingSubmitExamService implements ExamService {
     submitCalls++;
     submittedAnswers = List<SubmitExamAnswer>.from(answers);
     return _submitCompleter.future;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _PendingGenerateExamService implements ExamService {
+  final Completer<GeneratedExam> _nextSetCompleter = Completer<GeneratedExam>();
+  int generateCalls = 0;
+  int submitCalls = 0;
+  List<SubmitExamAnswer>? submittedAnswers;
+  final List<String?> requestedGradeLabels = <String?>[];
+
+  void completeNextSet() {
+    _nextSetCompleter.complete(
+      GeneratedExam(
+        examId: 2,
+        examType: examTypeAssessment,
+        grade: 2,
+        questions: _setQuestions('Set 2'),
+      ),
+    );
+  }
+
+  @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String examType = examTypeAssessment,
+    String? gradeLabel,
+    int? profileId,
+  }) {
+    generateCalls++;
+    requestedGradeLabels.add(gradeLabel);
+    return _nextSetCompleter.future;
+  }
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    submitCalls++;
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return GeneratedExam(
+      examId: examId,
+      examType: examTypeAssessment,
+      examStatus: 'SUBMITTED',
+      questions: const <ExamQuestion>[],
+    );
   }
 
   @override

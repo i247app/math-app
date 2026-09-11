@@ -12,12 +12,14 @@ class AssessmentProgressSection extends StatelessWidget {
     required this.totalQuestions,
     required this.answeredQuestionIndexes,
     required this.onQuestionSelected,
+    this.questionNumberOffset = 0,
     this.showQuestionNavigation = true,
   });
   final int currentQuestion;
   final int totalQuestions;
   final Set<int> answeredQuestionIndexes;
   final ValueChanged<int>? onQuestionSelected;
+  final int questionNumberOffset;
   final bool showQuestionNavigation;
 
   @override
@@ -30,11 +32,11 @@ class AssessmentProgressSection extends StatelessWidget {
         Text(
           showQuestionNavigation
               ? context.formatText(AppKeys.questionProgress, {
-                  'current': currentQuestion,
-                  'total': totalQuestions,
+                  'current': questionNumberOffset + currentQuestion,
+                  'total': questionNumberOffset + totalQuestions,
                 })
               : context.formatText(AppKeys.questionNumber, {
-                  'number': currentQuestion,
+                  'number': questionNumberOffset + currentQuestion,
                 }),
           key: const ValueKey('assessment-question-label'),
           style: TextStyle(
@@ -61,10 +63,12 @@ class AssessmentProgressSection extends StatelessWidget {
                 final answered = answeredQuestionIndexes.contains(index);
                 final isCurrent = index == currentQuestion - 1;
                 final canSelectQuestion = onQuestionSelected != null;
+                final displayedQuestionNumber =
+                    questionNumberOffset + index + 1;
                 return Semantics(
                   button: canSelectQuestion,
                   selected: isCurrent,
-                  label: '${index + 1}',
+                  label: '$displayedQuestionNumber',
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: canSelectQuestion
@@ -91,7 +95,7 @@ class AssessmentProgressSection extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              '${index + 1}',
+                              '$displayedQuestionNumber',
                               style: TextStyle(
                                 color: answered
                                     ? colors.onBrand

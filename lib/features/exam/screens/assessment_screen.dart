@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +9,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/screens/assessment_result_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_grid.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
@@ -15,6 +18,7 @@ import 'package:numi/features/exam/widgets/assessment/assessment_generating_load
 import 'package:numi/features/exam/widgets/assessment/assessment_header.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_question_card.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_question_skeleton.dart';
 import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/shared/widgets/guarded_exit_scope.dart';
@@ -29,6 +33,7 @@ class AiAssessmentScreen extends StatefulWidget {
     this.examType = examTypeAssessment,
     this.gradeLabel,
     this.profileId,
+    this.startAtKindergarten = true,
     this.onResultBack,
     this.allowQuestionNavigation = true,
     this.showQuestionNavigation = true,
@@ -39,6 +44,9 @@ class AiAssessmentScreen extends StatefulWidget {
   final String examType;
   final String? gradeLabel;
   final int? profileId;
+
+  /// Direct placement starts at grade 0; explicit grade-selection can opt out.
+  final bool startAtKindergarten;
   final VoidCallback? onResultBack;
   final bool allowQuestionNavigation;
   final bool showQuestionNavigation;
@@ -61,6 +69,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       examType: widget.examType,
       gradeLabel: widget.gradeLabel,
       profileId: widget.profileId,
+      startAtKindergarten: widget.startAtKindergarten,
     );
     if (widget.initialExam == null) {
       generateExam();
@@ -87,9 +96,15 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   void selectAnswer(ExamAnswer answer) {
     HapticFeedback.selectionClick();
     _controller.selectAnswer(answer);
-    if (_controller.shouldAutoSubmitAssessment) {
-      submitCurrentExam();
+    _advanceFlowAfterAnswer();
+  }
+
+  void _advanceFlowAfterAnswer() {
+    final action = _controller.prepareAssessmentFlow();
+    if (action != AssessmentFlowAction.submit) {
+      return;
     }
+    unawaited(submitCurrentExam());
   }
 
   void goToPreviousQuestion() {
@@ -107,12 +122,32 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   }
 
   void goToNextQuestion() {
-    if (_controller.allQuestionsAnswered) {
-      submitCurrentExam();
+    unawaited(_goToNextQuestion());
+  }
+
+  Future<void> _goToNextQuestion() async {
+    if (!_controller.isAssessment) {
+      if (_controller.allQuestionsAnswered) {
+        await submitCurrentExam();
+        return;
+      }
+      HapticFeedback.mediumImpact();
+      _moveToNextQuestion();
       return;
     }
 
     HapticFeedback.mediumImpact();
+    final action = await _controller.advanceAssessmentFlow();
+    if (!mounted) {
+      return;
+    }
+    if (action == AssessmentFlowAction.submit) {
+      await submitCurrentExam();
+      return;
+    }
+    if (action == AssessmentFlowAction.generateSet) {
+      return;
+    }
     _moveToNextQuestion();
   }
 
@@ -139,7 +174,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     final navigator = Navigator.of(context);
     final examService = _controller.examService;
     final fallbackExamType = widget.examType;
-    final gradeLabel = widget.gradeLabel;
+    final gradeLabel = _controller.currentGradeLabel;
     final profileId = widget.profileId;
     final onResultBack = widget.onResultBack;
     final allowQuestionNavigation = widget.allowQuestionNavigation;
@@ -179,8 +214,20 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   Future<void> retryErrorAction() {
     return switch (_controller.errorRetryAction) {
       AssessmentRetryAction.submit => submitCurrentExam(),
-      _ => generateExam(),
+      _ => retryGeneration(),
     };
+  }
+
+  Future<void> retryGeneration() async {
+    final isInitialGeneration = _controller.exam == null;
+    final generated = await _controller.retryGeneration();
+    if (!mounted || generated || !isInitialGeneration) {
+      return;
+    }
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop(AiAssessmentResult.generationFailed);
+    }
   }
 
   Future<bool> showUnansweredSubmitDialog() async {
@@ -262,9 +309,11 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final currentQuestion = _controller.currentQuestion;
           final errorMessage = _controller.errorMessage;
           final isGeneratingQuestion = _controller.isGeneratingQuestion;
+          final isTransitioningSet = _controller.isTransitioningSet;
           final isSubmittingExam = _controller.isSubmittingExam;
           final hasActiveAttempt = questions.isNotEmpty;
-          final isBusy = isGeneratingQuestion || isSubmittingExam;
+          final isBusy =
+              isGeneratingQuestion || isTransitioningSet || isSubmittingExam;
           final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
           final backgroundColor = colors.surface;
 
@@ -311,7 +360,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                             key: const ValueKey('question-content-layout'),
                             child: KeyedSubtree(
                               key: ValueKey(
-                                'assessment-question-${_controller.questionIndex}',
+                                'assessment-question-${_controller.displayedQuestionNumber}-$isTransitioningSet',
                               ),
                               child: CustomScrollView(
                                 key: const ValueKey('question-content'),
@@ -330,31 +379,41 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                       children: [
                                         AssessmentProgressSection(
                                           currentQuestion:
-                                              _controller.questionIndex + 1,
+                                              _controller.progressQuestionIndex,
+                                          questionNumberOffset: _controller
+                                              .progressQuestionNumberOffset,
                                           totalQuestions: questions.length,
-                                          answeredQuestionIndexes: _controller
-                                              .selectedAnswerLabels
-                                              .keys
-                                              .toSet(),
+                                          answeredQuestionIndexes:
+                                              isTransitioningSet
+                                              ? const <int>{}
+                                              : _controller
+                                                    .selectedAnswerLabels
+                                                    .keys
+                                                    .toSet(),
                                           onQuestionSelected:
-                                              widget.allowQuestionNavigation
+                                              widget.allowQuestionNavigation &&
+                                                  !isTransitioningSet
                                               ? goToQuestion
                                               : null,
                                           showQuestionNavigation:
                                               widget.showQuestionNavigation,
                                         ),
                                         const SizedBox(height: 16),
-                                        AssessmentQuestionCard(
-                                          question:
-                                              currentQuestion!.questionName,
-                                        ),
-                                        const SizedBox(height: 32),
-                                        AssessmentAnswerGrid(
-                                          answers: currentQuestion.answers,
-                                          selectedAnswerLabel:
-                                              _controller.selectedAnswerLabel,
-                                          onSelected: selectAnswer,
-                                        ),
+                                        if (isTransitioningSet)
+                                          const AssessmentQuestionSkeleton()
+                                        else ...[
+                                          AssessmentQuestionCard(
+                                            question:
+                                                currentQuestion!.questionName,
+                                          ),
+                                          const SizedBox(height: 32),
+                                          AssessmentAnswerGrid(
+                                            answers: currentQuestion.answers,
+                                            selectedAnswerLabel:
+                                                _controller.selectedAnswerLabel,
+                                            onSelected: selectAnswer,
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),
@@ -366,8 +425,10 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                         canGoBack:
                                             _controller.questionIndex > 0,
                                         allQuestionsAnswered:
-                                            _controller.allQuestionsAnswered,
+                                            _controller.allQuestionsAnswered &&
+                                            !_controller.isAssessment,
                                         isSubmitting: isSubmittingExam,
+                                        isTransitioning: isTransitioningSet,
                                         onBack: goToPreviousQuestion,
                                         onContinue: goToNextQuestion,
                                       ),

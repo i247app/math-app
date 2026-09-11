@@ -14,6 +14,7 @@ class AssessmentBottomBar extends StatelessWidget {
     required this.canGoBack,
     required this.allQuestionsAnswered,
     required this.isSubmitting,
+    this.isTransitioning = false,
     required this.onBack,
     required this.onContinue,
   });
@@ -23,6 +24,7 @@ class AssessmentBottomBar extends StatelessWidget {
   final bool canGoBack;
   final bool allQuestionsAnswered;
   final bool isSubmitting;
+  final bool isTransitioning;
   final VoidCallback onBack;
   final VoidCallback onContinue;
 
@@ -46,7 +48,9 @@ class AssessmentBottomBar extends StatelessWidget {
               disabledBackground: colors.disabledBackground,
               disabledForeground: colors.disabledForeground,
               labelFontSize: FontSize.normal,
-              onTap: canGoBack && !isSubmitting ? onBack : null,
+              onTap: canGoBack && !isSubmitting && !isTransitioning
+                  ? onBack
+                  : null,
             ),
           ),
           Expanded(
@@ -62,7 +66,7 @@ class AssessmentBottomBar extends StatelessWidget {
               background: AppColors.brandTealSolid,
               foreground: colors.onBrand,
               labelFontSize: FontSize.normal,
-              onTap: isSubmitting ? null : onContinue,
+              onTap: isSubmitting || isTransitioning ? null : onContinue,
             ),
           ),
         ],

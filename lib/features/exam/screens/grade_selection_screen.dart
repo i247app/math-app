@@ -141,6 +141,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
           examType: widget.examType,
           gradeLabel: gradeLabel,
           profileId: widget.profileId,
+          startAtKindergarten: false,
           onResultBack: widget.onResultBack,
         ),
       ),
