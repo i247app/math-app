@@ -66,6 +66,25 @@ class AssessmentSetScore {
     return true;
   }
 
+  bool hasAtLeastIncorrectAnswersInFirstQuestions({
+    required int questionCount,
+    required int incorrectCount,
+  }) {
+    if (totalQuestions < questionCount || incorrectCount <= 0) {
+      return false;
+    }
+    for (var index = 0; index < questionCount; index++) {
+      if (!answeredQuestionIndexes.contains(index)) {
+        return false;
+      }
+    }
+
+    final correctFirstQuestionCount = correctQuestionIndexes
+        .where((index) => index >= 0 && index < questionCount)
+        .length;
+    return questionCount - correctFirstQuestionCount >= incorrectCount;
+  }
+
   bool get questionThreeAndSixCorrect {
     return correctQuestionIndexes.contains(2) &&
         correctQuestionIndexes.contains(5);
@@ -96,6 +115,8 @@ class AssessmentFlowPolicy {
   static const int maximumGrade = 5;
   static const int generatedQuestionCount = 10;
   static const int firstQuestionsUpgradeTarget = 6;
+  static const int earlyDowngradeQuestionCount = 5;
+  static const int earlyDowngradeIncorrectTarget = 4;
 
   static int clampGrade(int grade) {
     return grade.clamp(minimumGrade, maximumGrade);
@@ -125,6 +146,15 @@ class AssessmentFlowPolicy {
     AssessmentFlowState state,
     AssessmentSetScore score,
   ) {
+    final shouldDowngradeEarly = score
+        .hasAtLeastIncorrectAnswersInFirstQuestions(
+          questionCount: earlyDowngradeQuestionCount,
+          incorrectCount: earlyDowngradeIncorrectTarget,
+        );
+    if (shouldDowngradeEarly) {
+      return _downgradeEarly(state);
+    }
+
     final firstSixCorrect = score.areFirstQuestionsCorrect(
       firstQuestionsUpgradeTarget,
     );
@@ -172,16 +202,7 @@ class AssessmentFlowPolicy {
     if (score.passed) {
       return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
     }
-
-    final failedState = state.copyWith(isFailed: true);
-    if (state.grade == minimumGrade) {
-      return AssessmentFlowDecision(AssessmentFlowAction.submit, failedState);
-    }
-    return _generate(
-      failedState,
-      grade: state.grade - 1,
-      mode: AssessmentFlowMode.recovery,
-    );
+    return _failNormalSet(state);
   }
 
   static AssessmentFlowDecision _finishRecoverySet(
@@ -198,6 +219,51 @@ class AssessmentFlowPolicy {
     if (score.passed) {
       return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
     }
+    return _failRecoverySet(state);
+  }
+
+  static AssessmentFlowDecision _finishVerificationSet(
+    AssessmentFlowState state,
+    AssessmentSetScore score,
+  ) {
+    if (score.failed) {
+      return _failVerificationSet(state);
+    }
+    return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
+  }
+
+  static AssessmentFlowDecision _finishDowngradeSet(
+    AssessmentFlowState state,
+    AssessmentSetScore score,
+  ) {
+    if (score.passed || state.grade == minimumGrade) {
+      return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
+    }
+    return _failDowngradeSet(state);
+  }
+
+  static AssessmentFlowDecision _downgradeEarly(AssessmentFlowState state) {
+    return switch (state.mode) {
+      AssessmentFlowMode.normal => _failNormalSet(state),
+      AssessmentFlowMode.recovery => _failRecoverySet(state),
+      AssessmentFlowMode.verification => _failVerificationSet(state),
+      AssessmentFlowMode.downgrade => _failDowngradeSet(state),
+    };
+  }
+
+  static AssessmentFlowDecision _failNormalSet(AssessmentFlowState state) {
+    final failedState = state.copyWith(isFailed: true);
+    if (state.grade == minimumGrade) {
+      return AssessmentFlowDecision(AssessmentFlowAction.submit, failedState);
+    }
+    return _generate(
+      failedState,
+      grade: state.grade - 1,
+      mode: AssessmentFlowMode.recovery,
+    );
+  }
+
+  static AssessmentFlowDecision _failRecoverySet(AssessmentFlowState state) {
     if (state.grade == minimumGrade) {
       return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
     }
@@ -208,24 +274,17 @@ class AssessmentFlowPolicy {
     );
   }
 
-  static AssessmentFlowDecision _finishVerificationSet(
+  static AssessmentFlowDecision _failVerificationSet(
     AssessmentFlowState state,
-    AssessmentSetScore score,
   ) {
-    if (score.failed) {
-      return AssessmentFlowDecision(
-        AssessmentFlowAction.submit,
-        state.copyWith(grade: clampGrade(state.grade - 1)),
-      );
-    }
-    return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
+    return AssessmentFlowDecision(
+      AssessmentFlowAction.submit,
+      state.copyWith(grade: clampGrade(state.grade - 1)),
+    );
   }
 
-  static AssessmentFlowDecision _finishDowngradeSet(
-    AssessmentFlowState state,
-    AssessmentSetScore score,
-  ) {
-    if (score.passed || state.grade == minimumGrade) {
+  static AssessmentFlowDecision _failDowngradeSet(AssessmentFlowState state) {
+    if (state.grade == minimumGrade) {
       return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
     }
     return _generate(

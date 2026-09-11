@@ -210,6 +210,35 @@ void main() {
     },
   );
 
+  test('submits five answers and downgrades after four early misses', () async {
+    final service = _RecordingExamService();
+    final controller = AssessmentController(
+      examService: service,
+      initialExam: _tenQuestionExam(examId: 79, grade: 2),
+    );
+    addTearDown(controller.dispose);
+
+    AssessmentFlowAction action = AssessmentFlowAction.continueSet;
+    for (var index = 0; index < 5; index++) {
+      controller.selectAnswer(index == 0 ? answers.last : answers.first);
+      action = await controller.advanceAssessmentFlow();
+      if (index < 4) {
+        expect(controller.goToNextQuestion(), isTrue);
+      }
+    }
+
+    expect(action, AssessmentFlowAction.generateSet);
+    expect(controller.currentGrade, 1);
+    expect(controller.flowMode, AssessmentFlowMode.recovery);
+    expect(controller.isFailed, isTrue);
+    expect(controller.setNumber, 2);
+    expect(controller.completedSets, hasLength(1));
+    expect(controller.completedSets.single.correctAnswerCount, 1);
+    expect(controller.completedSets.single.selectedAnswerLabels, hasLength(5));
+    expect(service.submittedAnswers, hasLength(5));
+    expect(service.generatedGradeLabels, <String?>['Lớp 1']);
+  });
+
   test('grade 5 submits only the first six correct answers', () async {
     final service = _RecordingExamService();
     final controller = AssessmentController(

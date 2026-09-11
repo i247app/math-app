@@ -281,29 +281,33 @@ class _PlacementGradeTitle extends StatelessWidget {
       letterSpacing: 1.2,
     );
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: firstPart,
-                style: textStyle.copyWith(color: AppColors.teal600),
-              ),
-              if (secondPart.isNotEmpty)
+    return SizedBox(
+      key: const ValueKey('placement-grade-container'),
+      height: 52,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text.rich(
+            TextSpan(
+              children: [
                 TextSpan(
-                  text: secondPart,
-                  style: textStyle.copyWith(color: AppColors.coral600),
+                  text: firstPart,
+                  style: textStyle.copyWith(color: AppColors.teal600),
                 ),
-            ],
-            style: textStyle,
+                if (secondPart.isNotEmpty)
+                  TextSpan(
+                    text: secondPart,
+                    style: textStyle.copyWith(color: AppColors.coral600),
+                  ),
+              ],
+              style: textStyle,
+            ),
+            key: const ValueKey('placement-grade'),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            softWrap: false,
           ),
-          key: const ValueKey('placement-grade'),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          softWrap: false,
         ),
       ),
     );
@@ -328,6 +332,14 @@ class _CelebrationMascot extends StatelessWidget {
           cacheHeight: 660,
           filterQuality: FilterQuality.high,
           semanticLabel: context.getText(AppKeys.placementResultLevel),
+          errorBuilder: (context, error, stackTrace) => Image.asset(
+            'assets/images/numi-mascot.png',
+            fit: BoxFit.contain,
+            cacheWidth: 660,
+            cacheHeight: 660,
+            filterQuality: FilterQuality.high,
+            semanticLabel: context.getText(AppKeys.placementResultLevel),
+          ),
         ),
       ),
     );

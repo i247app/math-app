@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,6 +13,14 @@ import 'package:numi/features/exam/screens/assessment_result_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
+  testWidgets('bundles the placement mascot asset', (tester) async {
+    final data = await rootBundle.load(
+      'assets/images/assessment-placement-mascot.png',
+    );
+
+    expect(data.lengthInBytes, greaterThan(0));
+  });
+
   testWidgets('matches the focused placement result layout', (tester) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1;
@@ -138,7 +147,6 @@ void main() {
     FlutterSecureStorage.setMockInitialValues(<String, String>{});
 
     final lingo = LingoProvider();
-    await lingo.setLanguage(AppLanguage.en);
     addTearDown(lingo.dispose);
 
     await tester.pumpWidget(
@@ -159,6 +167,22 @@ void main() {
     );
     await tester.pump();
 
+    final vietnameseMascotRect = tester.getRect(
+      find.byKey(const ValueKey('placement-mascot')),
+    );
+    final vietnameseGradeContainerRect = tester.getRect(
+      find.byKey(const ValueKey('placement-grade-container')),
+    );
+    final vietnameseDetailsButtonRect = tester.getRect(
+      find.byKey(const ValueKey('placement-view-details')),
+    );
+    final vietnamesePracticeButtonRect = tester.getRect(
+      find.byKey(const ValueKey('placement-practice-again')),
+    );
+
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pump();
+
     final gradeRect = tester.getRect(
       find.byKey(const ValueKey('placement-grade')),
     );
@@ -172,6 +196,19 @@ void main() {
     final practiceTextRect = tester.getRect(find.text('Practice again'));
     expect(practiceTextRect.left, greaterThan(practiceButtonRect.left + 32));
     expect(practiceTextRect.right, lessThan(practiceButtonRect.right - 8));
+    expect(
+      tester.getRect(find.byKey(const ValueKey('placement-mascot'))),
+      vietnameseMascotRect,
+    );
+    expect(
+      tester.getRect(find.byKey(const ValueKey('placement-grade-container'))),
+      vietnameseGradeContainerRect,
+    );
+    expect(
+      tester.getRect(find.byKey(const ValueKey('placement-view-details'))),
+      vietnameseDetailsButtonRect,
+    );
+    expect(practiceButtonRect, vietnamesePracticeButtonRect);
     expect(tester.takeException(), isNull);
   });
 }

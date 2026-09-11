@@ -36,6 +36,39 @@ void main() {
       expect(decision.nextState.mode, AssessmentFlowMode.normal);
     });
 
+    test('normal downgrades after at least four wrong in the first five', () {
+      final decision = AssessmentFlowPolicy.decide(
+        const AssessmentFlowState(grade: 3),
+        _score(correctIndexes: const <int>{0}, answered: 5),
+      );
+
+      expect(decision.action, AssessmentFlowAction.generateSet);
+      expect(decision.nextState.grade, 2);
+      expect(decision.nextState.mode, AssessmentFlowMode.recovery);
+      expect(decision.nextState.isFailed, isTrue);
+    });
+
+    test('normal early downgrade at grade zero submits five answers', () {
+      final decision = AssessmentFlowPolicy.decide(
+        const AssessmentFlowState(grade: 0),
+        _score(correct: 0, answered: 5),
+      );
+
+      expect(decision.action, AssessmentFlowAction.submit);
+      expect(decision.nextState.grade, 0);
+      expect(decision.nextState.isFailed, isTrue);
+    });
+
+    test('three wrong in the first five still continues the set', () {
+      final decision = AssessmentFlowPolicy.decide(
+        const AssessmentFlowState(grade: 3),
+        _score(correctIndexes: const <int>{0, 1}, answered: 5),
+      );
+
+      expect(decision.action, AssessmentFlowAction.continueSet);
+      expect(decision.nextState.grade, 3);
+    });
+
     test('50 percent without both Q3 and Q6 enters recovery', () {
       final decision = AssessmentFlowPolicy.decide(
         const AssessmentFlowState(grade: 3),
@@ -123,6 +156,22 @@ void main() {
       // Q1, Q3, Q6 and one more answer are wrong, leaving 6/10 correct.
       expect(decision.action, AssessmentFlowAction.submit);
       expect(decision.nextState.grade, 2);
+    });
+
+    test('recovery downgrades early into downgrade mode', () {
+      final decision = AssessmentFlowPolicy.decide(
+        const AssessmentFlowState(
+          grade: 2,
+          mode: AssessmentFlowMode.recovery,
+          isFailed: true,
+          setNumber: 2,
+        ),
+        _score(correctIndexes: const <int>{0}, answered: 5),
+      );
+
+      expect(decision.action, AssessmentFlowAction.generateSet);
+      expect(decision.nextState.grade, 1);
+      expect(decision.nextState.mode, AssessmentFlowMode.downgrade);
     });
 
     test('recovery excellence upgrades one grade then verifies', () {
@@ -218,6 +267,21 @@ void main() {
       expect(decision.nextState.grade, 3);
     });
 
+    test('verification downgrades and submits after four early misses', () {
+      final decision = AssessmentFlowPolicy.decide(
+        const AssessmentFlowState(
+          grade: 3,
+          mode: AssessmentFlowMode.verification,
+          isFailed: true,
+          setNumber: 3,
+        ),
+        _score(correctIndexes: const <int>{0}, answered: 5),
+      );
+
+      expect(decision.action, AssessmentFlowAction.submit);
+      expect(decision.nextState.grade, 2);
+    });
+
     test('verification fail submits one grade lower', () {
       final decision = AssessmentFlowPolicy.decide(
         const AssessmentFlowState(
@@ -275,6 +339,22 @@ void main() {
 
       expect(decision.action, AssessmentFlowAction.submit);
       expect(decision.nextState.grade, 2);
+    });
+
+    test('downgrade mode steps down after four early misses', () {
+      final decision = AssessmentFlowPolicy.decide(
+        const AssessmentFlowState(
+          grade: 2,
+          mode: AssessmentFlowMode.downgrade,
+          isFailed: true,
+          setNumber: 3,
+        ),
+        _score(correctIndexes: const <int>{0}, answered: 5),
+      );
+
+      expect(decision.action, AssessmentFlowAction.generateSet);
+      expect(decision.nextState.grade, 1);
+      expect(decision.nextState.mode, AssessmentFlowMode.downgrade);
     });
 
     test('downgrade mode keeps stepping down until grade zero', () {
