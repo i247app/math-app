@@ -170,8 +170,93 @@ void main() {
     expect(captured.path, '/exams/detail');
     expect(body, containsPair('profile_id', 21));
     expect(body, containsPair('user_ai_exam_id', 2));
+    expect(body, isNot(contains('user_exam_id')));
     expect(exam.answers.single.questionNumber, 1);
     expect(exam.answers.single.label, 'A');
+  });
+
+  test('loads an entire assessment journey by user_exam_id', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return const <String, dynamic>{
+        'mstatus': 200,
+        'status': 'Success',
+        'exams': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'ai_exam_id': 7,
+            'user_ai_exam_id': 2,
+            'profile_id': 21,
+            'exam_type': 'ASSESSMENT',
+            'grade': 1,
+            'level': 1,
+            'num_questions': 10,
+            'status': 'SUBMITTED',
+            'title': 'Lớp 1 - Cấp độ 1',
+            'started_dt': '2026-09-12T08:00:00Z',
+            'submitted_dt': '2026-09-12T08:02:00Z',
+          },
+        ],
+        'stats': <String, dynamic>{
+          'correct_number': 1,
+          'score_percentage': 50,
+          'skipped_number': 0,
+          'total_questions': 2,
+          'exam_type': 'ASSESSMENT',
+          'status': 'COMPLETE',
+          'user_exam_id': 99,
+          'grade': 1,
+          'last_submitted_dt': '2026-09-12T08:02:00Z',
+          'review': 'Journey review',
+        },
+        'details': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'question_number': 1,
+            'question_name': '1 + 1 = ?',
+            'question_level': 1,
+            'question_topic': 'addition',
+            'right_answer_content': '2',
+            'right_answer_label': 'A',
+            'selected_content': '2',
+            'selected_label': 'A',
+            'is_correct': true,
+          },
+          <String, dynamic>{
+            'question_number': 1,
+            'question_name': '3 + 2 = ?',
+            'question_level': 1,
+            'question_topic': 'addition',
+            'right_answer_content': '5',
+            'right_answer_label': 'A',
+            'selected_content': '4',
+            'selected_label': 'B',
+            'is_correct': false,
+          },
+        ],
+      };
+    });
+
+    final exam = await api.getExamDetail(99, profileId: 21, userExamId: 99);
+
+    final body = _body(captured);
+    expect(captured.path, '/exams/detail');
+    expect(body, containsPair('profile_id', 21));
+    expect(body, containsPair('user_exam_id', 99));
+    expect(body, isNot(contains('user_ai_exam_id')));
+    expect(exam.userExamId, 99);
+    expect(
+      exam.questions.map((question) => question.questionNumber),
+      orderedEquals(<int>[1, 2]),
+    );
+    expect(
+      exam.answers.map((answer) => answer.questionNumber),
+      orderedEquals(<int>[1, 2]),
+    );
+    expect(exam.grading?.totalQuestions, 2);
+    expect(exam.grading?.correctNumber, 1);
+    expect(exam.questions.last.answers, hasLength(2));
+    expect(exam.questions.last.rightAnswer, 'A');
+    expect(exam.answers.last.label, 'B');
   });
 
   test('loads the new exam statistics endpoint', () async {

@@ -11,9 +11,9 @@ extension ExamAnswerDtoConversion on ExamAnswerDto {
 }
 
 extension ExamQuestionDtoConversion on ExamQuestionDto {
-  ExamQuestion toModel() => ExamQuestion(
+  ExamQuestion toModel({int? questionNumberOverride}) => ExamQuestion(
     questionName: questionName,
-    questionNumber: questionNumber,
+    questionNumber: questionNumberOverride ?? questionNumber,
     answers: answers.map((answer) => answer.toModel()).toList(),
     rightAnswer: rightAnswerLabel,
     correctAnswer: rightAnswerContent,
@@ -22,12 +22,44 @@ extension ExamQuestionDtoConversion on ExamQuestionDto {
   );
 }
 
+extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
+  ExamQuestion toQuestionModel({required int questionNumber}) {
+    final answersByLabel = <String, String>{};
+
+    void addAnswer(String? label, String? content) {
+      final normalizedLabel = label?.trim().toUpperCase();
+      if (normalizedLabel == null || normalizedLabel.isEmpty) {
+        return;
+      }
+      answersByLabel[normalizedLabel] = content?.trim() ?? '';
+    }
+
+    addAnswer(rightAnswerLabel, rightAnswerContent);
+    addAnswer(selectedLabel, selectedContent);
+    final answers = answersByLabel.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    return ExamQuestion(
+      questionName: questionName?.trim() ?? '',
+      questionNumber: questionNumber,
+      answers: answers
+          .map((answer) => ExamAnswer(label: answer.key, content: answer.value))
+          .toList(growable: false),
+      rightAnswer: rightAnswerLabel,
+      correctAnswer: rightAnswerContent,
+      difficulty: questionLevel,
+      topic: questionTopic,
+    );
+  }
+}
+
 extension ExamResultDtoConversion on ExamResultDto {
   ExamGrading toModel({String? review, int? grade}) => ExamGrading(
     aiDetectGrade: grade == null ? null : 'Lớp $grade',
     aiReview: review,
     correctNumber: correctNumber,
     scorePercentage: scorePercentage,
+    skippedNumber: skippedNumber,
     totalQuestions: totalQuestions,
   );
 }
@@ -36,6 +68,8 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
   GeneratedExam toModel({
     List<SubmitExamAnswerDto> submittedAnswers = const <SubmitExamAnswerDto>[],
     ExamStatsDto? stats,
+    bool useSequentialQuestionNumbers = false,
+    int? userExamId,
   }) => GeneratedExam(
     id: userAiExamId,
     examId: userAiExamId,
@@ -48,7 +82,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     modifyDt: submittedDt,
     aiExamId: aiExamId,
     userAiExamId: userAiExamId,
-    userExamId: stats?.userExamId,
+    userExamId: userExamId ?? stats?.userExamId,
     grade: grade,
     level: level,
     numQuestions: numQuestions,
@@ -63,7 +97,15 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
           ),
         )
         .toList(),
-    questions: questions.map((question) => question.toModel()).toList(),
+    questions: questions.indexed
+        .map(
+          (entry) => entry.$2.toModel(
+            questionNumberOverride: useSequentialQuestionNumbers
+                ? entry.$1 + 1
+                : null,
+          ),
+        )
+        .toList(),
   );
 }
 

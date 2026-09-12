@@ -172,8 +172,18 @@ class ExamApi implements ExamService {
   }
 
   @override
-  Future<GeneratedExam> getExamDetail(int examId, {int? profileId}) async {
-    if (examId <= 0) {
+  Future<GeneratedExam> getExamDetail(
+    int detailId, {
+    int? profileId,
+    int? userExamId,
+  }) async {
+    final validUserExamId = userExamId != null && userExamId > 0
+        ? userExamId
+        : null;
+    final validUserAiExamId = validUserExamId == null && detailId > 0
+        ? detailId
+        : null;
+    if (validUserExamId == null && validUserAiExamId == null) {
       throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
     }
 
@@ -181,26 +191,37 @@ class ExamApi implements ExamService {
     final validProfileId = _requireProfileId(profileId);
     response = await _runExamRequest(
       () => _getExamDetailResponse(
-        userAiExamId: examId,
+        userAiExamId: validUserAiExamId,
+        userExamId: validUserExamId,
         profileId: validProfileId,
       ),
     );
+
+    final isEntireJourney = validUserExamId != null;
+    if (isEntireJourney) {
+      return _journeyDetailToModel(response, validUserExamId);
+    }
 
     final exam = response.exam;
     if (exam == null) {
       throw ExamException(AppStrings.current(AppKeys.examDetailLoadFailed));
     }
 
-    final submittedAnswers = response.details
-        .where((detail) => detail.selectedLabel?.trim().isNotEmpty == true)
-        .map(
-          (detail) => SubmitExamAnswerDto(
-            questionNumber: detail.questionNumber,
-            label: detail.selectedLabel!.trim(),
+    final submittedAnswers = <SubmitExamAnswerDto>[
+      for (var index = 0; index < response.details.length; index++)
+        if (response.details[index].selectedLabel?.trim().isNotEmpty == true)
+          SubmitExamAnswerDto(
+            questionNumber: isEntireJourney
+                ? index + 1
+                : response.details[index].questionNumber,
+            label: response.details[index].selectedLabel!.trim(),
           ),
-        )
-        .toList();
-    return exam.toModel(submittedAnswers: submittedAnswers);
+    ];
+    return exam.toModel(
+      submittedAnswers: submittedAnswers,
+      useSequentialQuestionNumbers: isEntireJourney,
+      userExamId: validUserExamId,
+    );
   }
 
   @override
@@ -256,12 +277,14 @@ class ExamApi implements ExamService {
   }
 
   Future<ExamDetailResponseDto> _getExamDetailResponse({
-    required int userAiExamId,
+    int? userAiExamId,
+    int? userExamId,
     required int profileId,
   }) {
     return _postResponse('/exams/detail', <String, dynamic>{
       'profile_id': profileId,
-      'user_ai_exam_id': userAiExamId,
+      'user_ai_exam_id': ?userAiExamId,
+      'user_exam_id': ?userExamId,
     }, ExamDetailResponseDto.fromJson);
   }
 
@@ -287,6 +310,58 @@ class ExamApi implements ExamService {
     NetworkClient.throwForApiStatus(json);
     return fromJson(json);
   }
+}
+
+GeneratedExam _journeyDetailToModel(
+  ExamDetailResponseDto response,
+  int userExamId,
+) {
+  final stats = response.stats;
+  if (stats == null || response.details.isEmpty) {
+    throw ExamException(AppStrings.current(AppKeys.examDetailLoadFailed));
+  }
+
+  final sourceExams = response.exams;
+  final firstExam = sourceExams.isEmpty ? null : sourceExams.first;
+  final lastExam = sourceExams.isEmpty ? null : sourceExams.last;
+  final questions = <ExamQuestion>[
+    for (var index = 0; index < response.details.length; index++)
+      response.details[index].toQuestionModel(questionNumber: index + 1),
+  ];
+  final submittedAnswers = <SubmitExamAnswer>[
+    for (var index = 0; index < response.details.length; index++)
+      if (response.details[index].selectedLabel?.trim().isNotEmpty == true)
+        SubmitExamAnswer(
+          questionNumber: index + 1,
+          label: response.details[index].selectedLabel!.trim(),
+        ),
+  ];
+
+  return GeneratedExam(
+    profileId: lastExam?.profileId ?? firstExam?.profileId,
+    examStatus: stats.status,
+    examType: stats.examType ?? lastExam?.examType ?? examTypeAssessment,
+    userExamId: userExamId,
+    grade: stats.grade ?? lastExam?.grade,
+    level: stats.level ?? lastExam?.level,
+    numQuestions: stats.totalQuestions,
+    title: lastExam?.title,
+    shortText: stats.review ?? lastExam?.shortText,
+    createDt: firstExam?.createDt ?? firstExam?.startedDt,
+    modifyDt: stats.lastSubmittedDt?.toIso8601String() ?? lastExam?.submittedDt,
+    startedDt: firstExam?.startedDt,
+    submittedDt: lastExam?.submittedDt,
+    grading: ExamGrading(
+      aiDetectGrade: stats.grade == null ? null : 'Lớp ${stats.grade}',
+      aiReview: stats.review,
+      correctNumber: stats.correctNumber,
+      scorePercentage: stats.scorePercentage.round(),
+      skippedNumber: stats.skippedNumber,
+      totalQuestions: stats.totalQuestions,
+    ),
+    answers: submittedAnswers,
+    questions: questions,
+  );
 }
 
 Future<T> _runExamRequest<T>(Future<T> Function() request) async {

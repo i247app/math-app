@@ -43,5 +43,9 @@ abstract interface class ExamService {
     int? profileId,
   });
 
-  Future<GeneratedExam> getExamDetail(int examId, {int? profileId});
+  Future<GeneratedExam> getExamDetail(
+    int detailId, {
+    int? profileId,
+    int? userExamId,
+  });
 }

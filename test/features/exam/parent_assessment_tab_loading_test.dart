@@ -252,7 +252,7 @@ void main() {
     expect(statsCard.exam.userExamId, 8001);
     expect(statsCard.exam.grading?.correctNumber, 13);
     expect(statsCard.exam.grading?.totalQuestions, 20);
-    expect(statsCard.onTap, isNull);
+    expect(statsCard.onTap, isNotNull);
 
     await tester.tap(find.byType(ParentAssessmentTabBanner));
     await tester.pumpAndSettle();

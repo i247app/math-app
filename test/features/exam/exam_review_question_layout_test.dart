@@ -7,6 +7,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_card.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_result_question_card.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_stats_card.dart';
 
 void main() {
   const longQuestion =
@@ -82,4 +83,33 @@ void main() {
     expect(questionText.overflow, isNull);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'stats include skipped questions without counting them as wrong',
+    (tester) async {
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+
+      await tester.pumpWidget(
+        testApp(
+          const ExamReviewStatsCard(
+            exam: GeneratedExam(
+              grading: ExamGrading(
+                correctNumber: 1,
+                totalQuestions: 5,
+                skippedNumber: 5,
+              ),
+              questions: <ExamQuestion>[],
+            ),
+          ),
+          lingo,
+        ),
+      );
+
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('4'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

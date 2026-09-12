@@ -192,6 +192,8 @@ class ExamDetailResponseDto {
   const ExamDetailResponseDto({
     required this.mstatus,
     this.exam,
+    this.exams = const <GeneratedExamDto>[],
+    this.stats,
     this.details = const <ExamDetailAnswerDto>[],
     this.status,
     this.mmessage,
@@ -200,6 +202,8 @@ class ExamDetailResponseDto {
 
   final int mstatus;
   final GeneratedExamDto? exam;
+  final List<GeneratedExamDto> exams;
+  final ExamStatsDto? stats;
   final List<ExamDetailAnswerDto> details;
   final String? status;
   final String? mmessage;
@@ -215,12 +219,31 @@ class ExamDetailResponseDto {
 class ExamDetailAnswerDto {
   const ExamDetailAnswerDto({
     required this.questionNumber,
+    this.userAiExamId,
+    this.questionGrade,
+    this.questionLevel,
+    this.questionName,
+    this.questionTopic,
+    this.questionType,
+    this.rightAnswerContent,
+    this.rightAnswerLabel,
     this.selectedLabel,
     this.selectedContent,
     this.isCorrect,
   });
 
   final int questionNumber;
+  @JsonKey(fromJson: _intFromJson)
+  final int? userAiExamId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? questionGrade;
+  @JsonKey(fromJson: _intFromJson)
+  final int? questionLevel;
+  final String? questionName;
+  final String? questionTopic;
+  final String? questionType;
+  final String? rightAnswerContent;
+  final String? rightAnswerLabel;
   final String? selectedLabel;
   final String? selectedContent;
   final bool? isCorrect;

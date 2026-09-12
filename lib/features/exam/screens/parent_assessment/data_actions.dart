@@ -105,6 +105,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
           aiReview: stats.review,
           correctNumber: stats.correctNumber,
           scorePercentage: stats.scorePercentage.round(),
+          skippedNumber: stats.skippedNumber,
           totalQuestions: stats.totalQuestions,
         ),
         questions: const <ExamQuestion>[],

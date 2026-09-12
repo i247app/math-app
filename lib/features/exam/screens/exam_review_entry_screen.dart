@@ -7,21 +7,34 @@ import 'package:numi/features/exam/screens/exam_review_screen.dart';
 
 /// Exam-specific route into the shared review-detail layout.
 class ExamReviewScreen extends StatelessWidget {
-  const ExamReviewScreen({super.key, required this.examId, this.initialExam});
+  const ExamReviewScreen({
+    super.key,
+    this.examId,
+    this.userExamId,
+    this.initialExam,
+  }) : assert(examId != null || userExamId != null);
 
-  final int examId;
+  final int? examId;
+  final int? userExamId;
   final GeneratedExam? initialExam;
 
   @override
   Widget build(BuildContext context) {
     final examService = context.read<ExamService>();
+    final detailId = userExamId ?? examId!;
+    final isEntireJourney = userExamId != null;
     return ReviewDetailScreen(
-      detailId: examId,
+      detailId: detailId,
       detailLoader: (detailId) => examService.getExamDetail(
         detailId,
         profileId: initialExam?.profileId,
+        userExamId: userExamId,
       ),
       initialDetail: initialExam,
+      allowRetry: !isEntireJourney,
+      cacheKey: isEntireJourney
+          ? (type: 'assessment-journey', userExamId: userExamId)
+          : null,
     );
   }
 }

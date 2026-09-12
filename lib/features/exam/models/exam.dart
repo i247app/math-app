@@ -211,6 +211,7 @@ class ExamGrading {
     this.aiReview,
     this.correctNumber,
     this.scorePercentage,
+    this.skippedNumber,
     this.totalQuestions,
   });
 
@@ -218,6 +219,7 @@ class ExamGrading {
   final String? aiReview;
   final int? correctNumber;
   final int? scorePercentage;
+  final int? skippedNumber;
   final int? totalQuestions;
 }
 

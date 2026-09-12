@@ -51,14 +51,20 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
   }
 
   void _openExamReview(GeneratedExam exam) {
-    final examId = exam.examId ?? exam.id;
-    if (examId == null || examId <= 0) {
+    final userAiExamId = exam.examId ?? exam.userAiExamId ?? exam.id;
+    final userExamId = exam.userExamId;
+    final detailId = userExamId ?? userAiExamId;
+    if (detailId == null || detailId <= 0) {
       return;
     }
     HapticFeedback.selectionClick();
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ExamReviewScreen(examId: examId, initialExam: exam),
+        builder: (_) => ExamReviewScreen(
+          examId: userExamId == null ? userAiExamId : null,
+          userExamId: userExamId,
+          initialExam: exam,
+        ),
       ),
     );
   }

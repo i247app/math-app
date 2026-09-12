@@ -94,6 +94,7 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
               children: [
                 ...entries.map((entry) {
                   final detailId =
+                      entry.exam.userExamId ??
                       entry.exam.examId ??
                       entry.exam.userAiExamId ??
                       entry.exam.id;
