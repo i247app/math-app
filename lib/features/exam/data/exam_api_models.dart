@@ -215,10 +215,11 @@ class ExamDetailResponseDto {
   Map<String, dynamic> toJson() => _$ExamDetailResponseDtoToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ExamDetailAnswerDto {
   const ExamDetailAnswerDto({
     required this.questionNumber,
+    this.answers = const <ExamAnswerDto>[],
     this.userAiExamId,
     this.questionGrade,
     this.questionLevel,
@@ -233,6 +234,7 @@ class ExamDetailAnswerDto {
   });
 
   final int questionNumber;
+  final List<ExamAnswerDto> answers;
   @JsonKey(fromJson: _intFromJson)
   final int? userAiExamId;
   @JsonKey(fromJson: _intFromJson)

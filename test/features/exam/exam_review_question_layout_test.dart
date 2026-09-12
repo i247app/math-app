@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tab_button.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_card.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_result_question_card.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_stats_card.dart';
@@ -111,4 +115,68 @@ void main() {
     expect(find.text('4'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('journey detail shows retry and result modes', (tester) async {
+    final lingo = LingoProvider();
+    final service = _JourneyDetailService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          useMaterial3: true,
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: RepositoryProvider<ExamService>.value(
+          value: service,
+          child: LingoScope(
+            lingo: lingo,
+            child: const ExamReviewScreen(userExamId: 912345),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(service.requestedUserExamId, 912345);
+    expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
+    expect(tester.takeException(), isNull);
+  });
+}
+
+class _JourneyDetailService implements ExamService {
+  int? requestedUserExamId;
+
+  @override
+  Future<GeneratedExam> getExamDetail(
+    int detailId, {
+    int? profileId,
+    int? userExamId,
+  }) async {
+    requestedUserExamId = userExamId;
+    return const GeneratedExam(
+      userExamId: 912345,
+      grading: ExamGrading(correctNumber: 1, totalQuestions: 1),
+      answers: <SubmitExamAnswer>[
+        SubmitExamAnswer(questionNumber: 1, label: 'A'),
+      ],
+      questions: <ExamQuestion>[
+        ExamQuestion(
+          questionName: '1 + 1 = ?',
+          questionNumber: 1,
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '2'),
+            ExamAnswer(label: 'B', content: '1'),
+            ExamAnswer(label: 'C', content: '3'),
+            ExamAnswer(label: 'D', content: '4'),
+          ],
+          rightAnswer: 'A',
+          correctAnswer: '2',
+        ),
+      ],
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

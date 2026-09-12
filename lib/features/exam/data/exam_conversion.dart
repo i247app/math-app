@@ -24,7 +24,11 @@ extension ExamQuestionDtoConversion on ExamQuestionDto {
 
 extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
   ExamQuestion toQuestionModel({required int questionNumber}) {
-    final answersByLabel = <String, String>{};
+    final answersByLabel = <String, String>{
+      for (final answer in this.answers)
+        if (answer.label.trim().isNotEmpty)
+          answer.label.trim().toUpperCase(): answer.content.trim(),
+    };
 
     void addAnswer(String? label, String? content) {
       final normalizedLabel = label?.trim().toUpperCase();

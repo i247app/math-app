@@ -213,6 +213,12 @@ void main() {
           <String, dynamic>{
             'question_number': 1,
             'question_name': '1 + 1 = ?',
+            'answers': <Map<String, dynamic>>[
+              <String, dynamic>{'label': 'A', 'content': '2'},
+              <String, dynamic>{'label': 'B', 'content': '1'},
+              <String, dynamic>{'label': 'C', 'content': '3'},
+              <String, dynamic>{'label': 'D', 'content': '4'},
+            ],
             'question_level': 1,
             'question_topic': 'addition',
             'right_answer_content': '2',
@@ -224,6 +230,12 @@ void main() {
           <String, dynamic>{
             'question_number': 1,
             'question_name': '3 + 2 = ?',
+            'answers': <Map<String, dynamic>>[
+              <String, dynamic>{'label': 'A', 'content': '5'},
+              <String, dynamic>{'label': 'B', 'content': '4'},
+              <String, dynamic>{'label': 'C', 'content': '6'},
+              <String, dynamic>{'label': 'D', 'content': '3'},
+            ],
             'question_level': 1,
             'question_topic': 'addition',
             'right_answer_content': '5',
@@ -254,7 +266,7 @@ void main() {
     );
     expect(exam.grading?.totalQuestions, 2);
     expect(exam.grading?.correctNumber, 1);
-    expect(exam.questions.last.answers, hasLength(2));
+    expect(exam.questions.last.answers, hasLength(4));
     expect(exam.questions.last.rightAnswer, 'A');
     expect(exam.answers.last.label, 'B');
   });

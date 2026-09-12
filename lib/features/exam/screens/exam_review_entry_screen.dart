@@ -31,7 +31,6 @@ class ExamReviewScreen extends StatelessWidget {
         userExamId: userExamId,
       ),
       initialDetail: initialExam,
-      allowRetry: !isEntireJourney,
       cacheKey: isEntireJourney
           ? (type: 'assessment-journey', userExamId: userExamId)
           : null,
