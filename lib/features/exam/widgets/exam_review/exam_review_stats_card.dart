@@ -16,12 +16,10 @@ class ExamReviewStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final answered = exam.grading?.totalQuestions ?? exam.questions.length;
-    final skipped = exam.grading?.skippedNumber ?? 0;
-    final total = answered + skipped;
+    final total = exam.grading?.totalQuestions ?? exam.questions.length;
     final correct =
         exam.grading?.correctNumber ?? examReviewComputedCorrectCount(exam);
-    final wrong = answered > correct ? answered - correct : 0;
+    final wrong = total > correct ? total - correct : 0;
     final time = examReviewTimeLabel(exam);
 
     return ExamReviewCard(

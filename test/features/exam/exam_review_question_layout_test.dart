@@ -84,32 +84,31 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets(
-    'stats include skipped questions without counting them as wrong',
-    (tester) async {
-      final lingo = LingoProvider();
-      addTearDown(lingo.dispose);
+  testWidgets('stats ignore skipped questions outside the journey detail', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
 
-      await tester.pumpWidget(
-        testApp(
-          const ExamReviewStatsCard(
-            exam: GeneratedExam(
-              grading: ExamGrading(
-                correctNumber: 1,
-                totalQuestions: 5,
-                skippedNumber: 5,
-              ),
-              questions: <ExamQuestion>[],
+    await tester.pumpWidget(
+      testApp(
+        const ExamReviewStatsCard(
+          exam: GeneratedExam(
+            grading: ExamGrading(
+              correctNumber: 1,
+              totalQuestions: 5,
+              skippedNumber: 5,
             ),
+            questions: <ExamQuestion>[],
           ),
-          lingo,
         ),
-      );
+        lingo,
+      ),
+    );
 
-      expect(find.text('10'), findsOneWidget);
-      expect(find.text('1'), findsOneWidget);
-      expect(find.text('4'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
+    expect(find.text('5'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('4'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
