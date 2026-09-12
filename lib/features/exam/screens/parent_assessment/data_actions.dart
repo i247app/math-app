@@ -11,49 +11,31 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
         '$useActiveStudentProfileData';
   }
 
-  Future<void> _loadAssessments({bool forceRefresh = false, int? page}) async {
+  Future<void> _loadAssessments({int? page}) async {
     final requestId = ++_loadRequestId;
     final targetPage = page ?? _pagination?.page ?? 1;
     final profileId = profileStableId(widget.activeProfile);
-    final userId = widget.useActiveStudentProfileData ? null : widget.user?.id;
-    final cachedAssessments = ExamCache.peekList(
-      userId: userId,
-      profileId: profileId,
-    );
-    if (!forceRefresh && targetPage == 1 && cachedAssessments != null) {
-      _updateState(() => _applyCachedAssessments(cachedAssessments));
-    }
 
     _updateState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
-    final entries = <ParentAssessmentEntry>[];
-    List<GeneratedExam>? loadedAllExams;
-    List<ParentAssessmentEntry>? loadedAllEntries;
-    ExamPagination? loadedPagination;
+    var loadedAllEntries = const <ParentAssessmentEntry>[];
     var failed = false;
 
-    if ((profileId != null && profileId > 0) ||
-        (userId != null && userId > 0)) {
+    if (profileId != null && profileId > 0) {
       try {
-        final result = await loadCompletedParentAssessments(
-          examService: widget.examService,
+        final stats = await widget.examService.getExamStats(
           profileId: profileId,
-          userId: userId,
-          page: targetPage,
-          size: _ParentAssessmentTabState._pageSize,
-          allowUserFallback: !widget.useActiveStudentProfileData,
+          examType: examTypeAssessment,
         );
-        loadedPagination = result.pagination;
-        loadedAllExams = result.allExams;
-        loadedAllEntries = result.allExams
-            .map((exam) => ParentAssessmentEntry(exam: exam))
-            .toList(growable: false);
-        entries.addAll(
-          result.exams.map((exam) => ParentAssessmentEntry(exam: exam)),
-        );
+        loadedAllEntries =
+            stats
+                .where(_isCompletedAssessmentStats)
+                .map(_assessmentEntryFromStats)
+                .toList(growable: false)
+              ..sort((a, b) => examDate(b.exam).compareTo(examDate(a.exam)));
       } catch (_) {
         failed = true;
       }
@@ -63,15 +45,29 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
       return;
     }
 
-    entries.sort((a, b) => examDate(b.exam).compareTo(examDate(a.exam)));
-    final pageEntries = entries
+    final totalCount = loadedAllEntries.length;
+    final totalPages = totalCount == 0
+        ? 1
+        : (totalCount + _ParentAssessmentTabState._pageSize - 1) ~/
+              _ParentAssessmentTabState._pageSize;
+    final currentPage = targetPage.clamp(1, totalPages);
+    final start = (currentPage - 1) * _ParentAssessmentTabState._pageSize;
+    final pageEntries = loadedAllEntries
+        .skip(start)
         .take(_ParentAssessmentTabState._pageSize)
         .toList(growable: false);
     _updateState(() {
-      if (!failed || entries.isNotEmpty || _entries.isEmpty) {
+      if (!failed || _entries.isEmpty) {
         _entries = pageEntries;
-        _allEntries = loadedAllEntries ?? pageEntries;
-        _pagination = loadedPagination;
+        _allEntries = loadedAllEntries;
+        _pagination = ExamPagination(
+          page: currentPage,
+          size: _ParentAssessmentTabState._pageSize,
+          totalCount: totalCount,
+          totalPages: totalPages,
+          hasNext: currentPage < totalPages,
+          hasPrevious: currentPage > 1,
+        );
       }
       _isLoading = false;
       _hasLoaded = true;
@@ -79,41 +75,41 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
           ? context.readText(AppKeys.parentExamLoadFailed)
           : null;
     });
-    if (!failed && loadedAllExams != null) {
-      ExamCache.seedList(
-        exams: loadedAllExams,
-        userId: userId,
-        profileId: profileId,
-      );
-    }
   }
 
-  void _applyCachedAssessments(List<GeneratedExam> exams) {
-    final cachedEntries =
-        exams
-            .map((exam) => ParentAssessmentEntry(exam: exam))
-            .toList(growable: false)
-          ..sort((a, b) => examDate(b.exam).compareTo(examDate(a.exam)));
-    final totalCount = cachedEntries.length;
-    final totalPages = totalCount == 0
-        ? 1
-        : (totalCount + _ParentAssessmentTabState._pageSize - 1) ~/
-              _ParentAssessmentTabState._pageSize;
-    _entries = cachedEntries
-        .take(_ParentAssessmentTabState._pageSize)
-        .toList(growable: false);
-    _allEntries = cachedEntries;
-    _pagination = ExamPagination(
-      page: 1,
-      size: _ParentAssessmentTabState._pageSize,
-      totalCount: totalCount,
-      totalPages: totalPages,
-      hasNext: totalPages > 1,
-      hasPrevious: false,
+  bool _isCompletedAssessmentStats(ExamStats stats) {
+    final status = stats.status?.trim().toUpperCase();
+    return status == null ||
+        status.isEmpty ||
+        status == 'COMPLETE' ||
+        status == 'COMPLETED' ||
+        status == 'SUBMITTED';
+  }
+
+  ParentAssessmentEntry _assessmentEntryFromStats(ExamStats stats) {
+    final submittedAt = stats.lastSubmittedDt?.toIso8601String();
+    final detectedGrade = stats.grade == null ? null : 'Lớp ${stats.grade}';
+    return ParentAssessmentEntry(
+      exam: GeneratedExam(
+        userExamId: stats.userExamId,
+        profileId: profileStableId(widget.activeProfile),
+        examStatus: stats.status,
+        examType: stats.examType ?? examTypeAssessment,
+        grade: stats.grade,
+        level: stats.level,
+        createDt: submittedAt,
+        modifyDt: submittedAt,
+        shortText: stats.review,
+        grading: ExamGrading(
+          aiDetectGrade: detectedGrade,
+          aiReview: stats.review,
+          correctNumber: stats.correctNumber,
+          scorePercentage: stats.scorePercentage.round(),
+          totalQuestions: stats.totalQuestions,
+        ),
+        questions: const <ExamQuestion>[],
+      ),
     );
-    _isLoading = false;
-    _hasLoaded = true;
-    _errorMessage = null;
   }
 
   void _selectPage(int page) {

@@ -184,6 +184,8 @@ void main() {
           <String, dynamic>{
             'correct_number': 13,
             'exam_type': 'ASSESSMENT',
+            'status': 'COMPLETE',
+            'user_exam_id': 99,
             'grade': 1,
             'level': 5,
             'score_percentage': 65,
@@ -199,6 +201,8 @@ void main() {
     expect(captured.path, '/exams/stats');
     expect(_body(captured), containsPair('exam_type', 'ASSESSMENT'));
     expect(stats.single.level, 5);
+    expect(stats.single.status, 'COMPLETE');
+    expect(stats.single.userExamId, 99);
     expect(stats.single.scorePercentage, 65);
   });
 }

@@ -16,7 +16,6 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
-import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
@@ -205,7 +204,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       child: RefreshIndicator(
         color: colors.brandStrong,
         notificationPredicate: (_) => _showAssessmentContent,
-        onRefresh: () => _loadAssessments(forceRefresh: true),
+        onRefresh: _loadAssessments,
         child: scrollView,
       ),
     );

@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/profile/models/grade.dart';
+import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
@@ -18,6 +19,7 @@ import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_empty_poster.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_search_field.dart';
+import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_banner.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
@@ -39,7 +41,10 @@ void main() {
           ),
           home: ParentAssessmentTab(
             user: const LoginUser(id: 981243),
-            activeProfile: null,
+            activeProfile: const StudentProfile(
+              profileId: 981243,
+              role: 'STUDENT',
+            ),
             isActive: true,
             activeRefreshTick: 0,
             initialGrades: const <GradeModel>[],
@@ -52,7 +57,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(examService.listPageCalls, 0);
+    expect(examService.statsCalls, 0);
     expect(find.byType(ParentAssessmentEmptyPoster), findsOneWidget);
     expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);
     expect(find.byType(ParentAssessmentTabBanner), findsNothing);
@@ -72,7 +77,8 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(examService.listPageCalls, 1);
+    expect(examService.statsCalls, 1);
+    expect(examService.requestedExamTypes, const <String>['ASSESSMENT']);
     expect(find.byType(ParentAssessmentFullSkeleton), findsOneWidget);
     expect(find.byType(ParentAssessmentEmptyPoster), findsNothing);
     expect(find.byType(ParentAssessmentTabBanner), findsNothing);
@@ -133,7 +139,10 @@ void main() {
             ),
             home: ParentAssessmentTab(
               user: const LoginUser(id: 981243),
-              activeProfile: null,
+              activeProfile: const StudentProfile(
+                profileId: 981243,
+                role: 'STUDENT',
+              ),
               isActive: isActive,
               activeRefreshTick: 0,
               initialGrades: const <GradeModel>[],
@@ -147,30 +156,34 @@ void main() {
     }
 
     await pumpAssessmentTab(isActive: false);
-    expect(examService.listPageCalls, 0);
+    expect(examService.statsCalls, 0);
 
     await pumpAssessmentTab(isActive: true);
     await tester.pump();
-    expect(examService.listPageCalls, 0);
+    expect(examService.statsCalls, 0);
 
     await tester.tap(
       find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
     );
     await tester.pump();
-    expect(examService.listPageCalls, 1);
+    expect(examService.statsCalls, 1);
     await tester.pump(const Duration(milliseconds: 300));
 
     await pumpAssessmentTab(isActive: false);
     await pumpAssessmentTab(isActive: true);
     await tester.pump();
-    expect(examService.listPageCalls, 1);
+    expect(examService.statsCalls, 1);
     await tester.pump(const Duration(milliseconds: 300));
 
     await tester.tap(
       find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
     );
     await tester.pump();
-    expect(examService.listPageCalls, 2);
+    expect(examService.statsCalls, 2);
+    expect(examService.requestedExamTypes, const <String>[
+      'ASSESSMENT',
+      'ASSESSMENT',
+    ]);
   });
 
   testWidgets('populated assessment opens from the first landing banner', (
@@ -189,7 +202,10 @@ void main() {
           ),
           home: ParentAssessmentTab(
             user: const LoginUser(id: 981244),
-            activeProfile: null,
+            activeProfile: const StudentProfile(
+              profileId: 981244,
+              role: 'STUDENT',
+            ),
             isActive: true,
             activeRefreshTick: 0,
             initialGrades: const <GradeModel>[],
@@ -203,7 +219,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(examService.listPageCalls, 0);
+    expect(examService.statsCalls, 0);
 
     expect(find.byType(ParentAssessmentEmptyPoster), findsOneWidget);
     expect(find.byType(ParentAssessmentTabBanner), findsNothing);
@@ -230,6 +246,13 @@ void main() {
     expect(find.byType(ParentAssessmentSearchField), findsOneWidget);
     expect(find.byType(AppBackButton), findsOneWidget);
     expect(find.byType(AiAssessmentScreen), findsNothing);
+    final statsCard = tester.widget<AssessmentResultListItemCard>(
+      find.byType(AssessmentResultListItemCard),
+    );
+    expect(statsCard.exam.userExamId, 8001);
+    expect(statsCard.exam.grading?.correctNumber, 13);
+    expect(statsCard.exam.grading?.totalQuestions, 20);
+    expect(statsCard.onTap, isNull);
 
     await tester.tap(find.byType(ParentAssessmentTabBanner));
     await tester.pumpAndSettle();
@@ -258,7 +281,10 @@ void main() {
           ),
           home: ParentAssessmentTab(
             user: const LoginUser(id: 981244),
-            activeProfile: null,
+            activeProfile: const StudentProfile(
+              profileId: 981244,
+              role: 'STUDENT',
+            ),
             isActive: true,
             activeRefreshTick: 0,
             initialGrades: const <GradeModel>[],
@@ -311,7 +337,10 @@ void main() {
             ),
             home: ParentAssessmentTab(
               user: const LoginUser(id: 981243),
-              activeProfile: null,
+              activeProfile: const StudentProfile(
+                profileId: 981243,
+                role: 'STUDENT',
+              ),
               isActive: true,
               activeRefreshTick: 0,
               initialGrades: const <GradeModel>[
@@ -336,7 +365,7 @@ void main() {
     await tester.tap(secondBanner);
     await tester.pumpAndSettle();
 
-    expect(examService.listPageCalls, 0);
+    expect(examService.statsCalls, 0);
     expect(find.byType(GradeSelectionScreen), findsOneWidget);
     final gradeSelection = tester.widget<GradeSelectionScreen>(
       find.byType(GradeSelectionScreen),
@@ -369,11 +398,12 @@ void main() {
 }
 
 class _PendingExamService implements ExamService {
-  final _pageCompleter = Completer<ExamListResponse>();
-  int listPageCalls = 0;
+  final _statsCompleter = Completer<List<ExamStats>>();
+  int statsCalls = 0;
+  final List<String> requestedExamTypes = <String>[];
 
   void completeWithEmptyPage() {
-    _pageCompleter.complete(const ExamListResponse(mstatus: 1));
+    _statsCompleter.complete(const <ExamStats>[]);
   }
 
   @override
@@ -384,15 +414,13 @@ class _PendingExamService implements ExamService {
   }) async => _testExam;
 
   @override
-  Future<ExamListResponse> listExamPage({
-    int? userId,
-    int? profileId,
-    required int page,
-    required int size,
-    bool takeAll = false,
+  Future<List<ExamStats>> getExamStats({
+    required int profileId,
+    String examType = examTypeAssessment,
   }) {
-    listPageCalls++;
-    return _pageCompleter.future;
+    statsCalls++;
+    requestedExamTypes.add(examType);
+    return _statsCompleter.future;
   }
 
   @override
@@ -400,7 +428,8 @@ class _PendingExamService implements ExamService {
 }
 
 class _CountingExamService implements ExamService {
-  int listPageCalls = 0;
+  int statsCalls = 0;
+  final List<String> requestedExamTypes = <String>[];
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
@@ -410,15 +439,13 @@ class _CountingExamService implements ExamService {
   }) async => _testExam;
 
   @override
-  Future<ExamListResponse> listExamPage({
-    int? userId,
-    int? profileId,
-    required int page,
-    required int size,
-    bool takeAll = false,
+  Future<List<ExamStats>> getExamStats({
+    required int profileId,
+    String examType = examTypeAssessment,
   }) async {
-    listPageCalls++;
-    return const ExamListResponse(mstatus: 1);
+    statsCalls++;
+    requestedExamTypes.add(examType);
+    return const <ExamStats>[];
   }
 
   @override
@@ -427,31 +454,27 @@ class _CountingExamService implements ExamService {
 
 class _PopulatedExamService extends _CountingExamService {
   @override
-  Future<ExamListResponse> listExamPage({
-    int? userId,
-    int? profileId,
-    required int page,
-    required int size,
-    bool takeAll = false,
+  Future<List<ExamStats>> getExamStats({
+    required int profileId,
+    String examType = examTypeAssessment,
   }) async {
-    listPageCalls++;
-    return const ExamListResponse(
-      mstatus: 1,
-      exams: <GeneratedExam>[
-        GeneratedExam(
-          examId: 8001,
-          examType: examTypeAssessment,
-          examStatus: 'SUBMITTED',
-          createDt: '2026-09-10T20:35:00Z',
-          grading: ExamGrading(
-            correctNumber: 6,
-            scorePercentage: 60,
-            totalQuestions: 10,
-          ),
-          questions: <ExamQuestion>[],
-        ),
-      ],
-    );
+    statsCalls++;
+    requestedExamTypes.add(examType);
+    return <ExamStats>[
+      ExamStats(
+        correctNumber: 13,
+        scorePercentage: 65,
+        skippedNumber: 0,
+        totalQuestions: 20,
+        examType: examTypeAssessment,
+        userExamId: 8001,
+        status: 'COMPLETE',
+        grade: 2,
+        level: 1,
+        lastSubmittedDt: DateTime.utc(2026, 9, 10, 20, 35),
+        review: 'Tiến bộ tốt.',
+      ),
+    ];
   }
 }
 

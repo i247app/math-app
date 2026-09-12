@@ -92,12 +92,18 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
             child: Column(
               spacing: 14,
               children: [
-                ...entries.map(
-                  (entry) => AssessmentResultListItemCard(
+                ...entries.map((entry) {
+                  final detailId =
+                      entry.exam.examId ??
+                      entry.exam.userAiExamId ??
+                      entry.exam.id;
+                  return AssessmentResultListItemCard(
                     exam: entry.exam,
-                    onTap: () => _openExamReview(entry.exam),
-                  ),
-                ),
+                    onTap: detailId == null
+                        ? null
+                        : () => _openExamReview(entry.exam),
+                  );
+                }),
                 ?_buildPagination(topPadding: 6),
               ],
             ),

@@ -145,6 +145,7 @@ extension ExamStatsDtoConversion on ExamStatsDto {
     totalQuestions: totalQuestions,
     examType: examType,
     userExamId: userExamId,
+    status: status,
     grade: grade,
     level: level,
     lastSubmittedDt: lastSubmittedDt,

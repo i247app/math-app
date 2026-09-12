@@ -13,7 +13,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       _errorMessage = null;
     });
     _resetAssessmentScrollAfterBuild();
-    unawaited(_loadAssessments(forceRefresh: true, page: 1));
+    unawaited(_loadAssessments(page: 1));
   }
 
   void _showAssessmentLanding() {
@@ -103,7 +103,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       ),
     );
     if (mounted && _showAssessmentContent) {
-      await _loadAssessments(forceRefresh: true, page: 1);
+      await _loadAssessments(page: 1);
     }
   }
 
@@ -136,7 +136,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       ),
     );
     if (mounted && _showAssessmentContent) {
-      await _loadAssessments(forceRefresh: true, page: 1);
+      await _loadAssessments(page: 1);
     }
   }
 }

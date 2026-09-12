@@ -17,7 +17,7 @@ class AssessmentResultListItemCard extends StatelessWidget {
   });
 
   final GeneratedExam exam;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool useCardShadow;
 
   @override
@@ -112,11 +112,12 @@ class AssessmentResultListItemCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: colors.brandStrong,
-                size: 26,
-              ),
+              if (onTap != null)
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.brandStrong,
+                  size: 26,
+                ),
             ],
           ),
         ),

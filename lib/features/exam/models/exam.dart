@@ -185,6 +185,7 @@ class ExamStats {
     required this.totalQuestions,
     this.examType,
     this.userExamId,
+    this.status,
     this.grade,
     this.level,
     this.lastSubmittedDt,
@@ -197,6 +198,7 @@ class ExamStats {
   final int totalQuestions;
   final String? examType;
   final int? userExamId;
+  final String? status;
   final int? grade;
   final int? level;
   final DateTime? lastSubmittedDt;

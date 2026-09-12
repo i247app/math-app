@@ -8,7 +8,7 @@ import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 
-class ExamApi implements ExamService, ExamStatsService {
+class ExamApi implements ExamService {
   ExamApi({String? baseUrl, NetworkClient? networkClient})
     : _networkClient =
           networkClient ??

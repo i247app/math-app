@@ -26,6 +26,11 @@ abstract interface class ExamService {
     required DateTime toDt,
   });
 
+  Future<List<ExamStats>> getExamStats({
+    required int profileId,
+    String examType = examTypeAssessment,
+  });
+
   Future<GeneratedExam> submitExam({
     required int examId,
     required List<SubmitExamAnswer> answers,
@@ -39,11 +44,4 @@ abstract interface class ExamService {
   });
 
   Future<GeneratedExam> getExamDetail(int examId, {int? profileId});
-}
-
-abstract interface class ExamStatsService {
-  Future<List<ExamStats>> getExamStats({
-    required int profileId,
-    String examType = examTypeAssessment,
-  });
 }
