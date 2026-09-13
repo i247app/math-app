@@ -302,6 +302,44 @@ void main() {
   );
 
   testWidgets(
+    'four consecutive wrong answers in the first five fail at question four',
+    (tester) async {
+      final service = _PendingGenerateExamService();
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Early fail'),
+        examService: service,
+        initialGrade: 2,
+        examType: examTypeAssessment,
+      );
+
+      for (var index = 0; index < 4; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).at(1));
+        await tester.pump();
+        if (index < 3) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      expect(service.submitCalls, 1);
+      expect(service.submittedAnswers, hasLength(4));
+      expect(service.generateCalls, 1);
+      expect(service.requestedGradeLabels, <String?>['Lớp 1']);
+      expect(
+        find.byKey(const ValueKey('assessment-question-skeleton')),
+        findsOneWidget,
+      );
+
+      service.completeNextSet(grade: 1, setName: 'Recovery');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Recovery - Question 1'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'shows question seven skeleton while generating the resolved next set',
     (tester) async {
       final service = _PendingGenerateExamService();
@@ -526,13 +564,13 @@ class _PendingGenerateExamService implements ExamService {
   List<SubmitExamAnswer>? submittedAnswers;
   final List<String?> requestedGradeLabels = <String?>[];
 
-  void completeNextSet() {
+  void completeNextSet({int grade = 2, String setName = 'Set 2'}) {
     _nextSetCompleter.complete(
       GeneratedExam(
         examId: 2,
         examType: examTypeAssessment,
-        grade: 2,
-        questions: _setQuestions('Set 2'),
+        grade: grade,
+        questions: _setQuestions(setName),
       ),
     );
   }

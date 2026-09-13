@@ -48,6 +48,35 @@ void main() {
       expect(decision.nextState.isFailed, isTrue);
     });
 
+    test(
+      'four consecutive wrong answers fail immediately at question four',
+      () {
+        final decision = AssessmentFlowPolicy.decide(
+          const AssessmentFlowState(grade: 3),
+          _score(correct: 0, answered: 4),
+        );
+
+        expect(decision.action, AssessmentFlowAction.generateSet);
+        expect(decision.nextState.grade, 2);
+        expect(decision.nextState.mode, AssessmentFlowMode.recovery);
+        expect(decision.nextState.isFailed, isTrue);
+      },
+    );
+
+    test(
+      'four consecutive wrong answers after question five do not fail early',
+      () {
+        final decision = AssessmentFlowPolicy.decide(
+          const AssessmentFlowState(grade: 3),
+          _score(correctIndexes: const <int>{0, 1, 2, 3, 4}, answered: 9),
+        );
+
+        expect(decision.action, AssessmentFlowAction.continueSet);
+        expect(decision.nextState.grade, 3);
+        expect(decision.nextState.isFailed, isFalse);
+      },
+    );
+
     test('normal early downgrade at grade zero submits five answers', () {
       final decision = AssessmentFlowPolicy.decide(
         const AssessmentFlowState(grade: 0),

@@ -85,6 +85,35 @@ class AssessmentSetScore {
     return questionCount - correctFirstQuestionCount >= incorrectCount;
   }
 
+  bool hasConsecutiveIncorrectAnswersInFirstQuestions({
+    required int questionCount,
+    required int incorrectCount,
+  }) {
+    if (questionCount <= 0 || incorrectCount <= 0) {
+      return false;
+    }
+
+    var consecutiveIncorrect = 0;
+    final checkedQuestionCount = totalQuestions < questionCount
+        ? totalQuestions
+        : questionCount;
+    for (var index = 0; index < checkedQuestionCount; index++) {
+      if (!answeredQuestionIndexes.contains(index)) {
+        consecutiveIncorrect = 0;
+        continue;
+      }
+      if (correctQuestionIndexes.contains(index)) {
+        consecutiveIncorrect = 0;
+        continue;
+      }
+      consecutiveIncorrect++;
+      if (consecutiveIncorrect >= incorrectCount) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool get questionThreeAndSixCorrect {
     return correctQuestionIndexes.contains(2) &&
         correctQuestionIndexes.contains(5);
@@ -115,6 +144,7 @@ class AssessmentFlowPolicy {
   static const int maximumGrade = 5;
   static const int generatedQuestionCount = 10;
   static const int firstQuestionsUpgradeTarget = 6;
+  static const int consecutiveIncorrectTarget = 4;
   static const int earlyDowngradeQuestionCount = 5;
   static const int earlyDowngradeIncorrectTarget = 4;
 
@@ -146,6 +176,13 @@ class AssessmentFlowPolicy {
     AssessmentFlowState state,
     AssessmentSetScore score,
   ) {
+    if (score.hasConsecutiveIncorrectAnswersInFirstQuestions(
+      questionCount: earlyDowngradeQuestionCount,
+      incorrectCount: consecutiveIncorrectTarget,
+    )) {
+      return _downgradeEarly(state);
+    }
+
     final shouldDowngradeEarly = score
         .hasAtLeastIncorrectAnswersInFirstQuestions(
           questionCount: earlyDowngradeQuestionCount,

@@ -323,6 +323,19 @@ class AssessmentController extends ChangeNotifier {
         : AssessmentFlowAction.continueSet;
   }
 
+  Future<AssessmentFlowAction> advanceConsecutiveFailureFlow() async {
+    if (!_isAssessment ||
+        _isTransitioningSet ||
+        _isSubmittingExam ||
+        !_currentSetScore.hasConsecutiveIncorrectAnswersInFirstQuestions(
+          questionCount: AssessmentFlowPolicy.earlyDowngradeQuestionCount,
+          incorrectCount: AssessmentFlowPolicy.consecutiveIncorrectTarget,
+        )) {
+      return AssessmentFlowAction.continueSet;
+    }
+    return advanceAssessmentFlow();
+  }
+
   /// Evaluates automatic submit without generating a speculative next set.
   AssessmentFlowAction prepareAssessmentFlow() {
     if (!_isAssessment || _isTransitioningSet || _isSubmittingExam) {

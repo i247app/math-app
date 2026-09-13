@@ -102,10 +102,19 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
   void _advanceFlowAfterAnswer() {
     final action = _controller.prepareAssessmentFlow();
-    if (action != AssessmentFlowAction.submit) {
+    if (action == AssessmentFlowAction.submit) {
+      unawaited(submitCurrentExam());
       return;
     }
-    unawaited(submitCurrentExam());
+    unawaited(_advanceConsecutiveFailureAfterAnswer());
+  }
+
+  Future<void> _advanceConsecutiveFailureAfterAnswer() async {
+    final action = await _controller.advanceConsecutiveFailureFlow();
+    if (!mounted || action != AssessmentFlowAction.submit) {
+      return;
+    }
+    await submitCurrentExam();
   }
 
   void goToPreviousQuestion() {
