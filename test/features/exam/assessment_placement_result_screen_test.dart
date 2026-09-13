@@ -13,12 +13,20 @@ import 'package:numi/features/exam/screens/assessment_result_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
-  testWidgets('bundles the placement mascot asset', (tester) async {
-    final data = await rootBundle.load(
-      'assets/images/assessment-placement-mascot.png',
-    );
+  testWidgets('bundles every placement celebration layer', (tester) async {
+    const assets = [
+      'assets/images/assessment-result-mascot.png',
+      'assets/images/assessment-result-stars.png',
+      'assets/images/assessment-result-numbers.png',
+      'assets/images/assessment-result-blocks.png',
+      'assets/images/assessment-result-checklist.png',
+      'assets/images/assessment-result-pencil.png',
+    ];
 
-    expect(data.lengthInBytes, greaterThan(0));
+    for (final asset in assets) {
+      final data = await rootBundle.load(asset);
+      expect(data.lengthInBytes, greaterThan(0), reason: asset);
+    }
   });
 
   testWidgets('matches the focused placement result layout', (tester) async {
@@ -60,10 +68,7 @@ void main() {
     expect(find.text('Luyện tập lại'), findsOneWidget);
     expect(find.byKey(const ValueKey('placement-mascot')), findsOneWidget);
     final mascotImage = tester.widget<Image>(
-      find.descendant(
-        of: find.byKey(const ValueKey('placement-mascot')),
-        matching: find.byType(Image),
-      ),
+      find.byKey(const ValueKey('placement-mascot-character')),
     );
     expect(mascotImage.image, isA<ResizeImage>());
     final mascotAsset = (mascotImage.image as ResizeImage).imageProvider;
@@ -72,9 +77,30 @@ void main() {
       isA<AssetImage>().having(
         (image) => image.assetName,
         'assetName',
-        'assets/images/assessment-placement-mascot.png',
+        'assets/images/assessment-result-mascot.png',
       ),
     );
+    expect(
+      find.byKey(const ValueKey('placement-decoration-stars')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-decoration-numbers')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-decoration-blocks')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-decoration-checklist')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-decoration-pencil')),
+      findsOneWidget,
+    );
+    await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 
