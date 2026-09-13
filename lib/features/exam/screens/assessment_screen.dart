@@ -337,7 +337,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     }
     return showAssessmentExitDialog(
       dialogContext,
-      onUpdateStatus: _controller.updateCurrentUserExamStatus,
+      onUpdateStatus: _controller.submitCurrentSetAndUpdateStatus,
     );
   }
 

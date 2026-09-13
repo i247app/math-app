@@ -151,6 +151,7 @@ class GeneratedExam {
     this.submittedDt,
     this.grading,
     this.answers = const <SubmitExamAnswer>[],
+    this.resumeQuestionIndex,
     required this.questions,
   });
 
@@ -174,6 +175,7 @@ class GeneratedExam {
   final String? submittedDt;
   final ExamGrading? grading;
   final List<SubmitExamAnswer> answers;
+  final int? resumeQuestionIndex;
   final List<ExamQuestion> questions;
 }
 

@@ -22,6 +22,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
     });
 
     var loadedAllEntries = const <ParentAssessmentEntry>[];
+    ParentAssessmentEntry? loadedActiveEntry;
     var failed = false;
 
     if (profileId != null && profileId > 0) {
@@ -30,6 +31,13 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
           profileId: profileId,
           examType: examTypeAssessment,
         );
+        final activeEntries =
+            stats
+                .where(_isActiveAssessmentStats)
+                .map(_assessmentEntryFromStats)
+                .toList(growable: false)
+              ..sort((a, b) => examDate(b.exam).compareTo(examDate(a.exam)));
+        loadedActiveEntry = activeEntries.isEmpty ? null : activeEntries.first;
         loadedAllEntries =
             stats
                 .where(_isCompletedAssessmentStats)
@@ -57,9 +65,10 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
         .take(_ParentAssessmentTabState._pageSize)
         .toList(growable: false);
     _updateState(() {
-      if (!failed || _entries.isEmpty) {
+      if (!failed || (_entries.isEmpty && _activeEntry == null)) {
         _entries = pageEntries;
         _allEntries = loadedAllEntries;
+        _activeEntry = loadedActiveEntry;
         _pagination = ExamPagination(
           page: currentPage,
           size: _ParentAssessmentTabState._pageSize,
@@ -79,11 +88,19 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
 
   bool _isCompletedAssessmentStats(ExamStats stats) {
     final status = stats.status?.trim().toUpperCase();
+    if (status == 'CANCEL' || status == 'CANCELED' || status == 'CANCELLED') {
+      return false;
+    }
     return status == null ||
         status.isEmpty ||
         status == 'COMPLETE' ||
         status == 'COMPLETED' ||
         status == 'SUBMITTED';
+  }
+
+  bool _isActiveAssessmentStats(ExamStats stats) {
+    final status = stats.status?.trim().toUpperCase();
+    return status == 'ACTIVE' || status == 'IN_PROGRESS';
   }
 
   ParentAssessmentEntry _assessmentEntryFromStats(ExamStats stats) {

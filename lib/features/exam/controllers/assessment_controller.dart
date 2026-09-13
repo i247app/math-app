@@ -82,6 +82,7 @@ class AssessmentController extends ChangeNotifier {
             ),
       ),
     );
+    _restoreInitialAttempt(initialExam);
   }
 
   final ExamService _examService;
@@ -102,6 +103,7 @@ class AssessmentController extends ChangeNotifier {
   bool _isGeneratingExam = false;
   bool _isTransitioningSet = false;
   bool _isSubmittingExam = false;
+  bool _isUpdatingExitStatus = false;
   bool _allowsPartialSubmit = false;
   int _generateRequestId = 0;
   AssessmentFlowDecision? _pendingGenerationDecision;
@@ -195,6 +197,35 @@ class AssessmentController extends ChangeNotifier {
 
   bool get shouldAutoSubmitAssessment => _allowsPartialSubmit;
 
+  void _restoreInitialAttempt(GeneratedExam? initialExam) {
+    final questions = initialExam?.questions ?? const <ExamQuestion>[];
+    final answers = initialExam?.answers ?? const <SubmitExamAnswer>[];
+    if (questions.isEmpty) {
+      return;
+    }
+
+    for (final answer in answers) {
+      final answerLabel = answer.label.trim();
+      if (answerLabel.isEmpty) {
+        continue;
+      }
+      final questionIndex = questions.indexWhere(
+        (question) => question.questionNumber == answer.questionNumber,
+      );
+      if (questionIndex >= 0) {
+        _selectedAnswerLabels[questionIndex] = answerLabel;
+      }
+    }
+
+    final resumeQuestionIndex = initialExam?.resumeQuestionIndex;
+    if (resumeQuestionIndex != null) {
+      _questionIndex = resumeQuestionIndex.clamp(0, questions.length - 1);
+      return;
+    }
+    final firstUnansweredIndex = _firstUnansweredIndex(questions);
+    _questionIndex = firstUnansweredIndex ?? questions.length - 1;
+  }
+
   bool? get isSelectedAnswerCorrect {
     final question = currentQuestion;
     final selectedLabel = selectedAnswerLabel;
@@ -221,6 +252,36 @@ class AssessmentController extends ChangeNotifier {
       status: status,
       profileId: profileId ?? _exam?.profileId,
     );
+  }
+
+  Future<void> submitCurrentSetAndUpdateStatus(String status) async {
+    if (_isSubmittingExam || _isUpdatingExitStatus) {
+      return;
+    }
+    final currentExam = _exam;
+    if (currentExam == null || currentExam.questions.isEmpty) {
+      throw ExamException(AppStrings.current(AppKeys.missingExamToSubmit));
+    }
+
+    _isUpdatingExitStatus = true;
+    try {
+      final submittedExam = await _submitSet(
+        currentExam,
+        _answersForExam(currentExam),
+      );
+      final submittedUserExamId = submittedExam.userExamId;
+      if (submittedUserExamId == null || submittedUserExamId <= 0) {
+        throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
+      }
+      await _examService.updateUserExamStatus(
+        userExamId: submittedUserExamId,
+        status: status,
+        profileId:
+            profileId ?? submittedExam.profileId ?? currentExam.profileId,
+      );
+    } finally {
+      _isUpdatingExitStatus = false;
+    }
   }
 
   bool? isAnswerCorrect(ExamAnswer answer) {

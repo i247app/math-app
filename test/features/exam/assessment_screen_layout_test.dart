@@ -285,8 +285,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
     await tester.pumpAndSettle();
 
+    expect(service.events, <String>['submit:1', 'status:CANCEL:9001']);
+    expect(service.submittedAnswers, isEmpty);
     expect(service.statusUpdates, <(int, String)>[
-      (7001, assessmentCanceledStatus),
+      (9001, assessmentCanceledStatus),
     ]);
     expect(tester.takeException(), isNull);
   });
@@ -306,9 +308,58 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
     await tester.pumpAndSettle();
 
+    expect(service.events, <String>['submit:1', 'status:ACTIVE:9001']);
+    expect(service.submittedAnswers, isEmpty);
     expect(service.statusUpdates, <(int, String)>[
-      (7001, assessmentActiveStatus),
+      (9001, assessmentActiveStatus),
     ]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('exit submit keeps the question screen still behind the dialog', (
+    tester,
+  ) async {
+    final submitCompleter = Completer<GeneratedExam>();
+    final service = _ExitStatusExamService(submitCompleter: submitCompleter);
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('assessment-exit-dialog')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('assessment-leave-active')),
+        matching: find.byType(CircularProgressIndicator),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('question-content-layout')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('submit-loader')), findsNothing);
+
+    submitCompleter.complete(
+      const GeneratedExam(
+        examId: 1,
+        userExamId: 9001,
+        examType: examTypeAssessment,
+        questions: <ExamQuestion>[],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(service.events, <String>['submit:1', 'status:ACTIVE:9001']);
     expect(tester.takeException(), isNull);
   });
 
@@ -596,7 +647,32 @@ class _PendingSubmitExamService implements ExamService {
 }
 
 class _ExitStatusExamService implements ExamService {
+  _ExitStatusExamService({this.submitCompleter});
+
+  final Completer<GeneratedExam>? submitCompleter;
   final List<(int, String)> statusUpdates = <(int, String)>[];
+  final List<String> events = <String>[];
+  List<SubmitExamAnswer>? submittedAnswers;
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    events.add('submit:$examId');
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    final pendingSubmit = submitCompleter;
+    if (pendingSubmit != null) {
+      return pendingSubmit.future;
+    }
+    return const GeneratedExam(
+      examId: 1,
+      userExamId: 9001,
+      examType: examTypeAssessment,
+      questions: <ExamQuestion>[],
+    );
+  }
 
   @override
   Future<void> updateUserExamStatus({
@@ -604,6 +680,7 @@ class _ExitStatusExamService implements ExamService {
     required String status,
     int? profileId,
   }) async {
+    events.add('status:$status:$userExamId');
     statusUpdates.add((userExamId, status));
   }
 

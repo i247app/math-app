@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +31,9 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_f
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_state_card.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_banner.dart';
+import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart';
+import 'package:numi/features/exam/widgets/parent_assessment/active_assessment_dialog.dart';
+import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 
 part 'parent_assessment/data_actions.dart';
 part 'parent_assessment/navigation_actions.dart';
@@ -78,6 +82,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
 
   List<ParentAssessmentEntry> _entries = const <ParentAssessmentEntry>[];
   List<ParentAssessmentEntry> _allEntries = const <ParentAssessmentEntry>[];
+  ParentAssessmentEntry? _activeEntry;
   ExamPagination? _pagination;
   bool _isLoading = false;
   bool _hasLoaded = false;
@@ -116,6 +121,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       _entries = const <ParentAssessmentEntry>[];
       _pagination = null;
       _allEntries = const <ParentAssessmentEntry>[];
+      _activeEntry = null;
       _hasLoaded = false;
       _errorMessage = null;
       _showAssessmentContent = false;

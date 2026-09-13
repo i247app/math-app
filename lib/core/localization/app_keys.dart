@@ -143,6 +143,15 @@ class AppKeys {
   static const parentLearningStreak = 'parent_learning_streak';
   static const parentAssessmentTitle = 'parent_assessment_title';
   static const parentAssessmentSubtitle = 'parent_assessment_subtitle';
+  static const parentAssessmentActiveBadge = 'parent_assessment_active_badge';
+  static const parentAssessmentActiveTitle = 'parent_assessment_active_title';
+  static const parentAssessmentActiveSubtitle =
+      'parent_assessment_active_subtitle';
+  static const parentAssessmentContinue = 'parent_assessment_continue';
+  static const parentAssessmentResumeTitle = 'parent_assessment_resume_title';
+  static const parentAssessmentResumeMessage =
+      'parent_assessment_resume_message';
+  static const parentAssessmentCancelActive = 'parent_assessment_cancel_active';
   static const parentLearningProgress = 'parent_learning_progress';
   static const learningProgressTitle = 'learning_progress_title';
   static const learningProgressAllAssessments =

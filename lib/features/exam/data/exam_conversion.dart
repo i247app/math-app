@@ -74,6 +74,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     ExamStatsDto? stats,
     bool useSequentialQuestionNumbers = false,
     int? userExamId,
+    int? resumeQuestionIndex,
   }) => GeneratedExam(
     id: userAiExamId,
     examId: userAiExamId,
@@ -101,6 +102,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
           ),
         )
         .toList(),
+    resumeQuestionIndex: resumeQuestionIndex,
     questions: questions.indexed
         .map(
           (entry) => entry.$2.toModel(

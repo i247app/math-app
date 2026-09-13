@@ -69,6 +69,67 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     );
   }
 
+  Future<void> _openActiveAssessment(GeneratedExam summaryExam) async {
+    final userExamId = summaryExam.userExamId;
+    final profileId = profileStableId(widget.activeProfile);
+    if (userExamId == null || userExamId <= 0 || profileId == null) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    final result = await showActiveAssessmentDialog(
+      context,
+      onCancel: () => widget.examService.updateUserExamStatus(
+        userExamId: userExamId,
+        status: assessmentCanceledStatus,
+        profileId: profileId,
+      ),
+      onContinue: () => widget.examService.getExamDetail(
+        userExamId,
+        profileId: profileId,
+        userExamId: userExamId,
+      ),
+    );
+    if (!mounted || result == null) {
+      return;
+    }
+    if (result.action == ActiveAssessmentDialogAction.canceled) {
+      await _loadAssessments(page: 1);
+      return;
+    }
+
+    final resumedExam = result.exam;
+    if (resumedExam == null || resumedExam.questions.isEmpty) {
+      return;
+    }
+    final assessmentTabRoute = ModalRoute.of(context);
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => AiAssessmentScreen(
+          examService: widget.examService,
+          initialExam: resumedExam,
+          examType: resumedExam.examType ?? examTypeAssessment,
+          gradeLabel: AssessmentFlowPolicy.gradeLabel(resumedExam.grade ?? 0),
+          profileId: profileId,
+          allowQuestionNavigation: false,
+          showQuestionNavigation: false,
+          onResultBack: () {
+            if (!mounted) return;
+            final navigator = Navigator.of(context);
+            if (assessmentTabRoute == null) {
+              navigator.popUntil((route) => route.isFirst);
+              return;
+            }
+            navigator.popUntil((route) => identical(route, assessmentTabRoute));
+          },
+        ),
+      ),
+    );
+    if (mounted && _showAssessmentContent) {
+      await _loadAssessments(page: 1);
+    }
+  }
+
   void _openLearningProgress() {
     HapticFeedback.selectionClick();
     Navigator.of(context).push<void>(

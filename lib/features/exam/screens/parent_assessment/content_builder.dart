@@ -15,6 +15,9 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
   }) {
     final colors = context.themeColors;
     final shouldShowProgressChart = _allEntries.length > 1;
+    final activeEntry = _searchController.text.trim().isEmpty
+        ? _activeEntry
+        : null;
 
     if (showAssessmentLanding) {
       return [
@@ -55,7 +58,16 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
           onTap: _openLearningProgress,
         ),
       ],
-      if (_errorMessage != null && _entries.isEmpty)
+      if (activeEntry != null)
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: _initialFadeIn(
+            child: ParentAssessmentActiveCard(
+              onTap: () => _openActiveAssessment(activeEntry.exam),
+            ),
+          ),
+        ),
+      if (_errorMessage != null && _entries.isEmpty && activeEntry == null)
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: _initialFadeIn(
@@ -67,7 +79,7 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
             ),
           ),
         )
-      else if (entries.isEmpty)
+      else if (entries.isEmpty && activeEntry == null)
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: _initialFadeIn(
@@ -85,7 +97,7 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
             ),
           ),
         )
-      else
+      else if (entries.isNotEmpty)
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: _initialFadeIn(

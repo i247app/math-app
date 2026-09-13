@@ -317,6 +317,28 @@ GeneratedExam _journeyDetailToModel(
   int userExamId,
 ) {
   final stats = response.stats;
+  GeneratedExamDto? activeExam;
+  for (final candidate in response.exams.reversed) {
+    final status = candidate.status?.trim().toUpperCase();
+    if (status == 'ACTIVE' || status == 'IN_PROGRESS') {
+      activeExam = candidate;
+      break;
+    }
+  }
+  final journeyStatus = stats?.status?.trim().toUpperCase();
+  if (activeExam == null &&
+      (journeyStatus == 'ACTIVE' || journeyStatus == 'IN_PROGRESS') &&
+      response.exams.isNotEmpty) {
+    activeExam = response.exams.last;
+  }
+  if (activeExam != null) {
+    return _activeJourneySetToModel(
+      response: response,
+      activeExam: activeExam,
+      userExamId: userExamId,
+    );
+  }
+
   if (stats == null || response.details.isEmpty) {
     throw ExamException(AppStrings.current(AppKeys.examDetailLoadFailed));
   }
@@ -362,6 +384,114 @@ GeneratedExam _journeyDetailToModel(
     answers: submittedAnswers,
     questions: questions,
   );
+}
+
+GeneratedExam _activeJourneySetToModel({
+  required ExamDetailResponseDto response,
+  required GeneratedExamDto activeExam,
+  required int userExamId,
+}) {
+  final activeUserAiExamId = activeExam.userAiExamId;
+  final activeDetails = response.details
+      .where((detail) {
+        if (activeUserAiExamId == null) {
+          return response.exams.length == 1;
+        }
+        return detail.userAiExamId == activeUserAiExamId ||
+            (detail.userAiExamId == null && response.exams.length == 1);
+      })
+      .toList(growable: false);
+  final submittedAnswers = <SubmitExamAnswerDto>[
+    for (final detail in activeDetails)
+      if (detail.selectedLabel?.trim().isNotEmpty == true)
+        SubmitExamAnswerDto(
+          questionNumber: detail.questionNumber,
+          label: detail.selectedLabel!.trim(),
+        ),
+  ];
+  final resumeQuestionIndex = _activeResumeQuestionIndex(
+    details: activeDetails,
+    questions: activeExam.questions,
+  );
+
+  if (activeExam.questions.isNotEmpty) {
+    return activeExam.toModel(
+      submittedAnswers: submittedAnswers,
+      stats: response.stats,
+      userExamId: userExamId,
+      resumeQuestionIndex: resumeQuestionIndex,
+    );
+  }
+  if (activeDetails.isEmpty) {
+    throw ExamException(AppStrings.current(AppKeys.examDetailLoadFailed));
+  }
+
+  return GeneratedExam(
+    examId: activeExam.userAiExamId,
+    aiExamId: activeExam.aiExamId,
+    userAiExamId: activeExam.userAiExamId,
+    userExamId: userExamId,
+    profileId: activeExam.profileId,
+    examStatus: activeExam.status,
+    examType: activeExam.examType ?? examTypeAssessment,
+    grade: activeExam.grade,
+    level: activeExam.level,
+    numQuestions: activeDetails.length,
+    title: activeExam.title,
+    shortText: activeExam.shortText,
+    createDt: activeExam.createDt,
+    startedDt: activeExam.startedDt,
+    answers: submittedAnswers
+        .map(
+          (answer) => SubmitExamAnswer(
+            questionNumber: answer.questionNumber,
+            label: answer.label,
+          ),
+        )
+        .toList(growable: false),
+    resumeQuestionIndex: _activeResumeQuestionIndex(
+      details: activeDetails,
+      questions: const <ExamQuestionDto>[],
+      questionCount: activeDetails.length,
+    ),
+    questions: activeDetails
+        .map(
+          (detail) =>
+              detail.toQuestionModel(questionNumber: detail.questionNumber),
+        )
+        .toList(growable: false),
+  );
+}
+
+int? _activeResumeQuestionIndex({
+  required List<ExamDetailAnswerDto> details,
+  required List<ExamQuestionDto> questions,
+  int? questionCount,
+}) {
+  if (details.isEmpty) {
+    return null;
+  }
+  final totalQuestions = questionCount ?? questions.length;
+  if (totalQuestions <= 0) {
+    return null;
+  }
+  final furthestQuestionNumber = details.fold<int>(
+    0,
+    (furthest, detail) =>
+        detail.questionNumber > furthest ? detail.questionNumber : furthest,
+  );
+  if (furthestQuestionNumber <= 0) {
+    return null;
+  }
+  if (questions.isNotEmpty) {
+    final nextIndex = questions.indexWhere(
+      (question) => question.questionNumber == furthestQuestionNumber + 1,
+    );
+    if (nextIndex >= 0) {
+      return nextIndex;
+    }
+  }
+  return furthestQuestionNumber.clamp(0, totalQuestions - 1);
 }
 
 Future<T> _runExamRequest<T>(Future<T> Function() request) async {

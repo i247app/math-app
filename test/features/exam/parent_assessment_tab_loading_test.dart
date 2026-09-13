@@ -17,6 +17,7 @@ import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_empty_poster.dart';
+import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_search_field.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
@@ -395,6 +396,136 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('12 + 8 = ?'), findsOneWidget);
   });
+
+  testWidgets('active assessment resumes at the first unanswered question', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final examService = _ActiveAssessmentExamService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: ParentAssessmentTab(
+            user: const LoginUser(id: 981245),
+            activeProfile: const StudentProfile(
+              profileId: 981245,
+              role: 'STUDENT',
+            ),
+            isActive: true,
+            activeRefreshTick: 0,
+            initialGrades: const <GradeModel>[],
+            gradeService: _FakeGradeService(),
+            examService: examService,
+            bottomPadding: 0,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(ParentAssessmentActiveCard),
+        matching: find.byType(Image),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.ensureVisible(find.byType(ParentAssessmentActiveCard));
+    await tester.tap(find.byType(ParentAssessmentActiveCard));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('active-assessment-dialog')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('active-assessment-continue')));
+    await tester.pumpAndSettle();
+
+    expect(examService.requestedDetailId, 8100);
+    expect(examService.requestedUserExamId, 8100);
+    expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    expect(find.text('Resume question 3'), findsOneWidget);
+    final assessment = tester.widget<AiAssessmentScreen>(
+      find.byType(AiAssessmentScreen),
+    );
+    expect(assessment.allowQuestionNavigation, isFalse);
+    expect(assessment.showQuestionNavigation, isFalse);
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
+    await tester.pumpAndSettle();
+
+    expect(examService.submittedAnswers, hasLength(2));
+    expect(examService.updatedUserExamId, 8100);
+    expect(examService.updatedStatus, 'ACTIVE');
+    expect(find.byType(AiAssessmentScreen), findsNothing);
+    expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
+    expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);
+  });
+
+  testWidgets(
+    'canceling an active assessment updates status and removes card',
+    (tester) async {
+      final lingo = LingoProvider();
+      final examService = _ActiveAssessmentExamService();
+      addTearDown(lingo.dispose);
+
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: ParentAssessmentTab(
+              user: const LoginUser(id: 981245),
+              activeProfile: const StudentProfile(
+                profileId: 981245,
+                role: 'STUDENT',
+              ),
+              isActive: true,
+              activeRefreshTick: 0,
+              initialGrades: const <GradeModel>[],
+              gradeService: _FakeGradeService(),
+              examService: examService,
+              bottomPadding: 0,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(
+        find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.ensureVisible(find.byType(ParentAssessmentActiveCard));
+      await tester.tap(find.byType(ParentAssessmentActiveCard));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('active-assessment-cancel')));
+      await tester.pumpAndSettle();
+
+      expect(examService.updatedUserExamId, 8100);
+      expect(examService.updatedStatus, 'CANCEL');
+      expect(find.byType(ParentAssessmentActiveCard), findsNothing);
+    },
+  );
 }
 
 class _PendingExamService implements ExamService {
@@ -462,6 +593,18 @@ class _PopulatedExamService extends _CountingExamService {
     requestedExamTypes.add(examType);
     return <ExamStats>[
       ExamStats(
+        correctNumber: 1,
+        scorePercentage: 20,
+        skippedNumber: 4,
+        totalQuestions: 5,
+        examType: examTypeAssessment,
+        userExamId: 8000,
+        status: 'CANCEL',
+        grade: 0,
+        level: 1,
+        lastSubmittedDt: DateTime.utc(2026, 9, 11, 20, 35),
+      ),
+      ExamStats(
         correctNumber: 13,
         scorePercentage: 65,
         skippedNumber: 0,
@@ -475,6 +618,81 @@ class _PopulatedExamService extends _CountingExamService {
         review: 'Tiến bộ tốt.',
       ),
     ];
+  }
+}
+
+class _ActiveAssessmentExamService extends _CountingExamService {
+  bool _isCanceled = false;
+  int? requestedDetailId;
+  int? requestedUserExamId;
+  int? updatedUserExamId;
+  String? updatedStatus;
+  List<SubmitExamAnswer>? submittedAnswers;
+
+  @override
+  Future<List<ExamStats>> getExamStats({
+    required int profileId,
+    String examType = examTypeAssessment,
+  }) async {
+    statsCalls++;
+    requestedExamTypes.add(examType);
+    if (_isCanceled) {
+      return const <ExamStats>[];
+    }
+    return <ExamStats>[
+      ExamStats(
+        correctNumber: 2,
+        scorePercentage: 40,
+        skippedNumber: 3,
+        totalQuestions: 5,
+        examType: examTypeAssessment,
+        userExamId: 8100,
+        status: 'ACTIVE',
+        grade: 1,
+        level: 1,
+        lastSubmittedDt: DateTime.utc(2026, 9, 13, 8, 30),
+      ),
+    ];
+  }
+
+  @override
+  Future<GeneratedExam> getExamDetail(
+    int detailId, {
+    int? profileId,
+    int? userExamId,
+  }) async {
+    requestedDetailId = detailId;
+    requestedUserExamId = userExamId;
+    return _activeResumeExam;
+  }
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return GeneratedExam(
+      examId: examId,
+      userAiExamId: examId,
+      userExamId: 8100,
+      profileId: profileId,
+      examStatus: 'SUBMITTED',
+      examType: examTypeAssessment,
+      questions: const <ExamQuestion>[],
+    );
+  }
+
+  @override
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  }) async {
+    updatedUserExamId = userExamId;
+    updatedStatus = status;
+    _isCanceled = status == 'CANCEL';
   }
 }
 
@@ -503,6 +721,48 @@ const _testExam = GeneratedExam(
         ExamAnswer(label: 'B', content: '19'),
         ExamAnswer(label: 'C', content: '20'),
         ExamAnswer(label: 'D', content: '21'),
+      ],
+    ),
+  ],
+);
+
+const _activeResumeExam = GeneratedExam(
+  examId: 8200,
+  userAiExamId: 8200,
+  userExamId: 8100,
+  examStatus: 'ACTIVE',
+  examType: examTypeAssessment,
+  grade: 1,
+  answers: <SubmitExamAnswer>[
+    SubmitExamAnswer(questionNumber: 1, label: 'A'),
+    SubmitExamAnswer(questionNumber: 2, label: 'B'),
+  ],
+  questions: <ExamQuestion>[
+    ExamQuestion(
+      questionName: 'Resume question 1',
+      questionNumber: 1,
+      rightAnswer: 'A',
+      answers: <ExamAnswer>[
+        ExamAnswer(label: 'A', content: '1'),
+        ExamAnswer(label: 'B', content: '2'),
+      ],
+    ),
+    ExamQuestion(
+      questionName: 'Resume question 2',
+      questionNumber: 2,
+      rightAnswer: 'A',
+      answers: <ExamAnswer>[
+        ExamAnswer(label: 'A', content: '2'),
+        ExamAnswer(label: 'B', content: '3'),
+      ],
+    ),
+    ExamQuestion(
+      questionName: 'Resume question 3',
+      questionNumber: 3,
+      rightAnswer: 'A',
+      answers: <ExamAnswer>[
+        ExamAnswer(label: 'A', content: '3'),
+        ExamAnswer(label: 'B', content: '4'),
       ],
     ),
   ],

@@ -272,6 +272,90 @@ void main() {
     expect(exam.answers.last.label, 'B');
   });
 
+  test('loads only the active set with its saved answers for resume', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return <String, dynamic>{
+        'mstatus': 200,
+        'status': 'Success',
+        'exams': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'user_ai_exam_id': 40,
+            'profile_id': 21,
+            'exam_type': 'ASSESSMENT',
+            'grade': 0,
+            'status': 'SUBMITTED',
+            'questions': <Map<String, dynamic>>[],
+          },
+          <String, dynamic>{
+            'user_ai_exam_id': 41,
+            'profile_id': 21,
+            'exam_type': 'ASSESSMENT',
+            'grade': 1,
+            'status': 'ACTIVE',
+            'questions': List<Map<String, dynamic>>.generate(
+              3,
+              (index) => <String, dynamic>{
+                'question_number': index + 1,
+                'question_name': 'Resume question ${index + 1}',
+                'right_answer_label': 'A',
+                'right_answer_content': '${index + 2}',
+                'answers': <Map<String, dynamic>>[
+                  <String, dynamic>{'label': 'A', 'content': '${index + 2}'},
+                  <String, dynamic>{'label': 'B', 'content': '0'},
+                ],
+              },
+            ),
+          },
+        ],
+        'stats': <String, dynamic>{
+          'correct_number': 2,
+          'score_percentage': 0,
+          'skipped_number': 0,
+          'total_questions': 3,
+          'exam_type': 'ASSESSMENT',
+          'status': 'ACTIVE',
+          'user_exam_id': 99,
+          'grade': 1,
+        },
+        'details': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'user_ai_exam_id': 40,
+            'question_number': 1,
+            'selected_label': 'A',
+          },
+          <String, dynamic>{
+            'user_ai_exam_id': 41,
+            'question_number': 1,
+            'selected_label': 'A',
+          },
+          <String, dynamic>{
+            'user_ai_exam_id': 41,
+            'question_number': 2,
+            'selected_label': 'B',
+          },
+        ],
+      };
+    });
+
+    final exam = await api.getExamDetail(99, profileId: 21, userExamId: 99);
+
+    final body = _body(captured);
+    expect(body, containsPair('user_exam_id', 99));
+    expect(exam.examId, 41);
+    expect(exam.userExamId, 99);
+    expect(exam.examStatus, 'ACTIVE');
+    expect(exam.questions, hasLength(3));
+    expect(exam.questions.last.questionName, 'Resume question 3');
+    expect(exam.answers, hasLength(2));
+    expect(exam.resumeQuestionIndex, 2);
+    expect(
+      exam.answers.map((answer) => answer.questionNumber),
+      orderedEquals(<int>[1, 2]),
+    );
+  });
+
   test('loads the new exam statistics endpoint', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {

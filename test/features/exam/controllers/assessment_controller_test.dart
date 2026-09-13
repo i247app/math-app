@@ -154,6 +154,71 @@ void main() {
     },
   );
 
+  test(
+    'restores saved answers and resumes at the first unanswered question',
+    () {
+      final controller = AssessmentController(
+        examService: _UnusedExamService(),
+        examType: examTypeAssessment,
+        initialExam: GeneratedExam(
+          examId: 77,
+          userExamId: 501,
+          examType: examTypeAssessment,
+          answers: const <SubmitExamAnswer>[
+            SubmitExamAnswer(questionNumber: 1, label: 'B'),
+            SubmitExamAnswer(questionNumber: 2, label: 'A'),
+          ],
+          questions: List<ExamQuestion>.generate(
+            4,
+            (index) => ExamQuestion(
+              questionName: 'Resume question ${index + 1}',
+              questionNumber: index + 1,
+              answers: answers,
+              rightAnswer: 'B',
+            ),
+          ),
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      expect(controller.selectedAnswerLabels, <int, String>{0: 'B', 1: 'A'});
+      expect(controller.questionIndex, 2);
+      expect(controller.currentQuestion?.questionName, 'Resume question 3');
+    },
+  );
+
+  test(
+    'uses the API resume position even when an earlier answer was skipped',
+    () {
+      final controller = AssessmentController(
+        examService: _UnusedExamService(),
+        initialExam: GeneratedExam(
+          examId: 301,
+          examType: examTypeAssessment,
+          grade: 1,
+          resumeQuestionIndex: 2,
+          questions: List<ExamQuestion>.generate(
+            4,
+            (index) => ExamQuestion(
+              questionName: 'Question ${index + 1}',
+              questionNumber: index + 1,
+              answers: answers,
+              rightAnswer: 'B',
+            ),
+          ),
+          answers: const <SubmitExamAnswer>[
+            SubmitExamAnswer(questionNumber: 2, label: 'A'),
+          ],
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      expect(controller.selectedAnswerLabels, const <int, String>{1: 'A'});
+      expect(controller.questionIndex, 2);
+      expect(controller.currentQuestion?.questionNumber, 3);
+    },
+  );
+
   test('starts a generated assessment at kindergarten', () async {
     final service = _RecordingExamService();
     final controller = AssessmentController(
