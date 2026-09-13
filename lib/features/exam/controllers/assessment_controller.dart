@@ -415,13 +415,12 @@ class AssessmentController extends ChangeNotifier {
         : AssessmentFlowAction.continueSet;
   }
 
-  Future<AssessmentFlowAction> advanceConsecutiveFailureFlow() async {
+  Future<AssessmentFlowAction> advanceEarlyFailureFlow() async {
     if (!_isAssessment ||
         _isTransitioningSet ||
         _isSubmittingExam ||
-        !_currentSetScore.hasConsecutiveIncorrectAnswersInFirstQuestions(
-          questionCount: AssessmentFlowPolicy.earlyDowngradeQuestionCount,
-          incorrectCount: AssessmentFlowPolicy.consecutiveIncorrectTarget,
+        !_currentSetScore.areFirstQuestionsWrong(
+          AssessmentFlowPolicy.earlyFailQuestionCount,
         )) {
       return AssessmentFlowAction.continueSet;
     }

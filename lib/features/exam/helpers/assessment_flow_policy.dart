@@ -43,90 +43,81 @@ class AssessmentSetScore {
   final Set<int> answeredQuestionIndexes;
   final Set<int> correctQuestionIndexes;
 
-  int get correctCount => correctQuestionIndexes.length;
+  int get answeredCount => answeredQuestionIndexes.length;
+
+  int get correctCount =>
+      answeredQuestionIndexes.where(correctQuestionIndexes.contains).length;
+
+  int get wrongCount => answeredQuestionIndexes
+      .where((index) => !correctQuestionIndexes.contains(index))
+      .length;
 
   bool get isComplete {
     return totalQuestions > 0 &&
         answeredQuestionIndexes.length >= totalQuestions;
   }
 
-  bool get passed => correctCount * 2 > totalQuestions;
+  bool get passed => isComplete && wrongCount * 2 < totalQuestions;
 
   bool get failed => isComplete && !passed;
 
   bool get isExactlyFiftyPercent {
-    return isComplete && correctCount * 2 == totalQuestions;
+    return isComplete && wrongCount * 2 == totalQuestions;
   }
 
-  bool areFirstQuestionsCorrect(int count) {
-    if (totalQuestions < count) {
+  int wrongCountInFirstQuestions(int count) {
+    return answeredQuestionIndexes
+        .where(
+          (index) =>
+              index >= 0 &&
+              index < count &&
+              !correctQuestionIndexes.contains(index),
+        )
+        .length;
+  }
+
+  bool areFirstQuestionsAnswered(int count) {
+    if (totalQuestions < count || count <= 0) {
       return false;
     }
     for (var index = 0; index < count; index++) {
-      if (!correctQuestionIndexes.contains(index)) {
+      if (!answeredQuestionIndexes.contains(index)) {
         return false;
       }
     }
     return true;
   }
 
-  bool hasAtLeastIncorrectAnswersInFirstQuestions({
-    required int questionCount,
-    required int incorrectCount,
-  }) {
-    if (totalQuestions < questionCount || incorrectCount <= 0) {
-      return false;
-    }
-    for (var index = 0; index < questionCount; index++) {
-      if (!answeredQuestionIndexes.contains(index)) {
-        return false;
-      }
-    }
-
-    final correctFirstQuestionCount = correctQuestionIndexes
-        .where((index) => index >= 0 && index < questionCount)
-        .length;
-    return questionCount - correctFirstQuestionCount >= incorrectCount;
+  bool areFirstQuestionsPerfect(int count) {
+    return areFirstQuestionsAnswered(count) &&
+        wrongCountInFirstQuestions(count) == 0;
   }
 
-  bool hasConsecutiveIncorrectAnswersInFirstQuestions({
-    required int questionCount,
-    required int incorrectCount,
-  }) {
-    if (questionCount <= 0 || incorrectCount <= 0) {
-      return false;
-    }
-
-    var consecutiveIncorrect = 0;
-    final checkedQuestionCount = totalQuestions < questionCount
-        ? totalQuestions
-        : questionCount;
-    for (var index = 0; index < checkedQuestionCount; index++) {
-      if (!answeredQuestionIndexes.contains(index)) {
-        consecutiveIncorrect = 0;
-        continue;
-      }
-      if (correctQuestionIndexes.contains(index)) {
-        consecutiveIncorrect = 0;
-        continue;
-      }
-      consecutiveIncorrect++;
-      if (consecutiveIncorrect >= incorrectCount) {
-        return true;
-      }
-    }
-    return false;
+  bool areFirstQuestionsWrong(int count) {
+    return areFirstQuestionsAnswered(count) &&
+        wrongCountInFirstQuestions(count) == count;
   }
 
-  bool get questionThreeAndSixCorrect {
-    return correctQuestionIndexes.contains(2) &&
-        correctQuestionIndexes.contains(5);
+  bool isQuestionWrong(int index) {
+    return answeredQuestionIndexes.contains(index) &&
+        !correctQuestionIndexes.contains(index);
   }
 
-  bool get qualifiesForSingleGradeUpgrade {
-    return totalQuestions > 0 &&
-        correctCount * 2 >= totalQuestions &&
-        questionThreeAndSixCorrect;
+  bool get requiredQuestionsAreCorrect {
+    return answeredQuestionIndexes.contains(2) &&
+        answeredQuestionIndexes.contains(5) &&
+        !isQuestionWrong(2) &&
+        !isQuestionWrong(5);
+  }
+
+  bool get hasWrongRequiredQuestion {
+    return isQuestionWrong(2) || isQuestionWrong(5);
+  }
+
+  bool get canUpgradeOneGrade {
+    return isComplete &&
+        wrongCount * 2 <= totalQuestions &&
+        requiredQuestionsAreCorrect;
   }
 }
 
@@ -148,9 +139,7 @@ class AssessmentFlowPolicy {
   static const int maximumGrade = 5;
   static const int generatedQuestionCount = 10;
   static const int firstQuestionsUpgradeTarget = 6;
-  static const int consecutiveIncorrectTarget = 5;
-  static const int earlyDowngradeQuestionCount = 5;
-  static const int earlyDowngradeIncorrectTarget = 5;
+  static const int earlyFailQuestionCount = 5;
 
   static int clampGrade(int grade) {
     return grade.clamp(minimumGrade, maximumGrade);
@@ -180,23 +169,11 @@ class AssessmentFlowPolicy {
     AssessmentFlowState state,
     AssessmentSetScore score,
   ) {
-    if (score.hasConsecutiveIncorrectAnswersInFirstQuestions(
-      questionCount: earlyDowngradeQuestionCount,
-      incorrectCount: consecutiveIncorrectTarget,
-    )) {
+    if (score.areFirstQuestionsWrong(earlyFailQuestionCount)) {
       return _downgradeEarly(state);
     }
 
-    final shouldDowngradeEarly = score
-        .hasAtLeastIncorrectAnswersInFirstQuestions(
-          questionCount: earlyDowngradeQuestionCount,
-          incorrectCount: earlyDowngradeIncorrectTarget,
-        );
-    if (shouldDowngradeEarly) {
-      return _downgradeEarly(state);
-    }
-
-    final firstSixCorrect = score.areFirstQuestionsCorrect(
+    final firstSixCorrect = score.areFirstQuestionsPerfect(
       firstQuestionsUpgradeTarget,
     );
 
@@ -221,7 +198,7 @@ class AssessmentFlowPolicy {
       return AssessmentFlowDecision(AssessmentFlowAction.continueSet, state);
     }
 
-    if (score.isExactlyFiftyPercent && !score.questionThreeAndSixCorrect) {
+    if (score.isExactlyFiftyPercent && score.hasWrongRequiredQuestion) {
       return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
     }
 
@@ -237,7 +214,7 @@ class AssessmentFlowPolicy {
     AssessmentFlowState state,
     AssessmentSetScore score,
   ) {
-    if (score.qualifiesForSingleGradeUpgrade) {
+    if (score.canUpgradeOneGrade) {
       return _upgradeOrSubmit(
         state,
         gradeIncrease: 1,
@@ -254,7 +231,7 @@ class AssessmentFlowPolicy {
     AssessmentFlowState state,
     AssessmentSetScore score,
   ) {
-    if (score.qualifiesForSingleGradeUpgrade) {
+    if (score.canUpgradeOneGrade) {
       return _upgradeOrSubmit(
         state,
         gradeIncrease: 1,

@@ -3,6 +3,21 @@ import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 
 void main() {
   group('AssessmentFlowPolicy', () {
+    test('counts only answered incorrect questions as wrong', () {
+      final score = AssessmentSetScore(
+        totalQuestions: 10,
+        answeredQuestionIndexes: const <int>{0, 1},
+        correctQuestionIndexes: const <int>{0},
+      );
+
+      expect(score.answeredCount, 2);
+      expect(score.correctCount, 1);
+      expect(score.wrongCount, 1);
+      expect(score.wrongCountInFirstQuestions(5), 1);
+      expect(score.isComplete, isFalse);
+      expect(score.failed, isFalse);
+    });
+
     test('upgrades two grades after the first six correct answers', () {
       final decision = AssessmentFlowPolicy.decide(
         const AssessmentFlowState(grade: 0),
